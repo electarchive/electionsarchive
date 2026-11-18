@@ -1,0 +1,400 @@
+{
+  "polity": "EH-SR",
+  "name": "Sahrawi Arab Democratic Republic",
+  "sources": {
+    "proclamation": {
+      "title": "Proclamation of the first government of the Saharawi Arab Democratic Republic, Bir Lahlou, 27 February 1976",
+      "publisher": "Saharawi Arab Democratic Republic",
+      "url": "https://www.arso.org/03-1.htm",
+      "kind": "official_body",
+      "note": "Text of the proclamation made at Bir Lahlou on 27 February 1976 by the Polisario Front with the unanimous agreement of the Provisional Sahrawi National Council; copy kept by ARSO, with French (03-1f.htm) and Spanish (03-1s.htm) versions."
+    },
+    "const1999": {
+      "title": "Constitution de la RASD, adoptée par le dixième Congrès national, 26.08.-04.09.1999",
+      "publisher": "Saharawi Arab Democratic Republic",
+      "url": "https://www.arso.org/03-const.99.htm",
+      "kind": "official_body",
+      "note": "Arts. 16 (wilayat, dawair, baladiat), 20 (elected councils), 51 (the Secretary-General of the Polisario Front is head of state), 74 (51 members of the National Council), 75-77 (a new Council formed within 45 days of each Congress, members elected by direct and secret suffrage for eighteen months, twice between two Congresses), 85 (a vacant seat goes to the runner-up in the constituency); copy kept by ARSO."
+    },
+    "const2015": {
+      "title": "The Constitution of the Sahrawi Arab Democratic Republic, adopted by the 14th Congress of the Frente POLISARIO, 16-20 December 2015",
+      "publisher": "Saharawi Arab Democratic Republic",
+      "url": "https://www.policinglaw.info/assets/downloads/2015_Constitution_of_the_Sahrawi_Arab_Democratic_Republic.pdf",
+      "kind": "official_body",
+      "note": "English text. Arts. 16 (wilayat, dawair, baladiat), 20 (elected councils; a National Committee named by presidential decree oversees the political seminars and the elections), 51 (the Secretary-General of the Frente POLISARIO is ex officio President of the Republic, elected by the General Congress by secret and direct suffrage), 77 (53 members of the National Council), 78-79 (a new Council within 90 days of each Congress, its members elected by direct and secret suffrage once between two Congresses), 83 (a vacant seat goes to the runner-up in the electoral district); copy kept by policinglaw.info."
+    },
+    "sps": {
+      "title": "Sahara Press Service",
+      "publisher": "Sahara Press Service (SPS)",
+      "url": "https://www.spsrasd.info/",
+      "kind": "news_agency",
+      "note": "The Sahrawi Republic's official news agency, in Arabic, Spanish, English, French, and Russian. Its current site holds items from late 2023; links to its older archive (www.spsrasd.info/news/... and archive.spsrasd.info) redirected to each other in a loop on 18 November 2026."
+    },
+    "sps-cn50": {
+      "title": "Establishment of National Council constituted pivotal event in history of Sahrawi people and embodied final break with colonizer (President of National Council)",
+      "publisher": "Sahara Press Service (SPS)",
+      "url": "https://www.spsrasd.info/en/2025/11/30/13240.html",
+      "kind": "news_agency",
+      "note": "Dates the Provisional Sahrawi National Council to 28 November 1975 (the Guelta Document)."
+    },
+    "sps-cn2026": {
+      "title": "President of Republic oversees installation of Bashir Mustafa Sayed as President of National Council",
+      "publisher": "Sahara Press Service (SPS)",
+      "url": "https://www.spsrasd.info/en/2026/03/28/14799.html",
+      "kind": "news_agency"
+    },
+    "sps-congress17": {
+      "title": "President of Republic: Preparing for 17th Congress is historic responsibility in shaping strategy for national struggle across all fronts",
+      "publisher": "Sahara Press Service (SPS)",
+      "url": "https://www.spsrasd.info/en/2026/10/06/18091.html",
+      "kind": "news_agency",
+      "note": "The Preparatory Committee for the 17th Congress of the Polisario Front was installed in October 2026; under the Constitution a new National Council is elected after each Congress."
+    },
+    "cn2023": {
+      "title": "إنطلاق الندوات السياسية الخاصة بإنتخاب أعضاء المجلس الوطني الصحراوي",
+      "publisher": "mapnr.blogspot.com",
+      "url": "https://mapnr.blogspot.com/2023/04/blog-post_38.html",
+      "kind": "community",
+      "note": "Repeats the announcement of Saturday 8 April 2023 opening the political seminars for the election of the National Council, with its 50 seats by constituency: wilayas of El Aaiún 6, Auserd 6, Smara 7, Dakhla 7, Boujdour 3, the administrative unit of Chahid El Hafed 4, the workers', youth, and students' unions and the women's union 1 each, and the Consultative Council 3; the army's representatives are elected as the General Staff decides (Order-Law 02/2023 arts. 6-7)."
+    },
+    "arso-98-45": {
+      "title": "Western Sahara weekly news, November 1998 (week 45)",
+      "publisher": "ARSO, Association de soutien à un référendum libre et régulier au Sahara Occidental",
+      "url": "https://www.arso.org/01-e98-45.htm",
+      "kind": "compendium",
+      "note": "Relays the Sahrawi Ministry of Information: elections for the National Council began in all wilayas."
+    },
+    "arso-99-35": {
+      "title": "Western Sahara weekly news, 10th Congress of the Polisario Front, 1999 (week 35)",
+      "publisher": "ARSO, Association de soutien à un référendum libre et régulier au Sahara Occidental",
+      "url": "https://www.arso.org/01-e99-35.htm",
+      "kind": "compendium",
+      "note": "The 10th Congress cut the National Council from 101 to 51 members, set three years between Congresses, and created a Council of Notables (shioukh)."
+    },
+    "arso-99-42": {
+      "title": "Western Sahara weekly news, October 1999 (week 42)",
+      "publisher": "ARSO, Association de soutien à un référendum libre et régulier au Sahara Occidental",
+      "url": "https://www.arso.org/01-e99-42.htm",
+      "kind": "compendium",
+      "note": "Inaugural sitting of the National Council at Tifariti on 20-21 October 1999: 51 members elected for 18 months (34 for the wilayas, 7 for the national institutions, 10 for the army); Salem Lebsir elected its president by 33 votes."
+    },
+    "arso-99-47": {
+      "title": "Western Sahara weekly news, November 1999 (week 47)",
+      "publisher": "ARSO, Association de soutien à un référendum libre et régulier au Sahara Occidental",
+      "url": "https://www.arso.org/01-e99-47.htm",
+      "kind": "compendium",
+      "note": "Winter session of the new National Council, \"elected last month\"."
+    },
+    "arso-01-16": {
+      "title": "Western Sahara weekly news, April 2001 (week 16)",
+      "publisher": "ARSO, Association de soutien à un référendum libre et régulier au Sahara Occidental",
+      "url": "https://www.arso.org/01-e01-16.htm",
+      "kind": "compendium",
+      "note": "A committee to run the National Council election was set up; 51 members to be elected on 21 April in 30 constituencies (wilayas, socio-economic institutions, the army, and overseas missions)."
+    },
+    "arso-01-19": {
+      "title": "Western Sahara weekly news, May 2001 (week 19)",
+      "publisher": "ARSO, Association de soutien à un référendum libre et régulier au Sahara Occidental",
+      "url": "https://www.arso.org/01-e01-19.htm",
+      "kind": "compendium",
+      "note": "The renewal of the National Council ran from 21 April to 4 May 2001: 26 members elected in the wilayas and 25 by the national institutions (3), the shioukh (5), the administration (4), the mass organisations (3), and the army (10)."
+    },
+    "arso-03-4547": {
+      "title": "Western Sahara weekly news, November 2003 (weeks 45-47)",
+      "publisher": "ARSO, Association de soutien à un référendum libre et régulier au Sahara Occidental",
+      "url": "https://www.arso.org/01-e03-4547.htm",
+      "kind": "compendium",
+      "note": "Agenda: elections for the National Council from 22 November to 2 December 2003; opening of the new Council at Tifariti on 3 December."
+    },
+    "arso-08-02": {
+      "title": "Western Sahara weekly news, February 2008",
+      "publisher": "ARSO, Association de soutien à un référendum libre et régulier au Sahara Occidental",
+      "url": "https://www.arso.org/01-e08-02.htm",
+      "kind": "compendium",
+      "note": "Investiture of the newly elected National Council at Tifariti: 126 candidates for 52 seats; Mahfoud Ali Beiba re-elected its president."
+    },
+    "arso-ref": {
+      "title": "Self-determination referendum",
+      "publisher": "ARSO, Association de soutien à un référendum libre et régulier au Sahara Occidental",
+      "url": "https://www.arso.org/Ref.htm",
+      "kind": "compendium",
+      "note": "ARSO's file on the United Nations referendum of self-determination for Western Sahara and the negotiations between Morocco and the Polisario Front."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "al-Jumhūriyya al-ʿArabiyya aṣ-Ṣaḥrāwiyya ad-Dīmuqrāṭiyya",
+      "name_en": "Sahrawi Arab Democratic Republic",
+      "parent": null,
+      "polity_kind": "de_facto_state",
+      "source": "proclamation"
+    },
+    {
+      "key": "wilaya",
+      "name": "al-Wilāyāt",
+      "name_en": "Wilayas (provinces; the refugee-camp constituencies of the National Council)",
+      "parent": "national",
+      "polity_kind": "region",
+      "elects": false,
+      "source": "const2015"
+    },
+    {
+      "key": "daira",
+      "name": "ad-Dawāʾir",
+      "name_en": "Dairas (districts), subdivided into baladiyas",
+      "parent": "wilaya",
+      "polity_kind": "municipality",
+      "elects": false,
+      "source": "const2015"
+    }
+  ],
+  "classes": [
+    {
+      "key": "majlis_watani",
+      "tier": "national",
+      "name": "Intikhābāt al-Majlis al-Waṭanī aṣ-Ṣaḥrāwī",
+      "name_en": "Sahrawi National Council",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "Seats by constituency (the wilayas, the army, the mass organisations, and the Consultative Council); no official count of votes by constituency or candidate is online.",
+      "source": "const2015",
+      "locator": "https://www.policinglaw.info/assets/downloads/2015_Constitution_of_the_Sahrawi_Arab_Democratic_Republic.pdf (Article 77: 53 members; Articles 78-79: a new Council within 90 days of each Congress, its members elected by direct and secret suffrage once between two Congresses)",
+      "note": "The unicameral legislature. Members are elected by direct and secret vote in constituencies of the refugee-camp wilayas and of the national institutions, the army, the mass organisations, and (from 2001) the shioukh or Consultative Council, with seats reserved for women; there are no parties besides the Polisario Front, and a vacant seat goes to the runner-up in its constituency (Constitution of 1999 art. 85; of 2015 art. 83). The Council had 101 members until the 10th Congress of 1999 cut it to 51; it had 52 seats in 2008, 53 under the 2015 Constitution, and 50 elected seats in 2023. The 1999 Constitution elected it for eighteen months, twice between Congresses; since at least 2008 it has been elected once after each Congress. Elections of February 2012 and March 2020 are reported by SPS items whose archive this session could not open, and the 2016 election is not yet dated from an official source. The 17th Congress was in preparation in October 2026.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "EH-SR"
+        }
+      ],
+      "cadence": [
+        {
+          "called": false,
+          "partisan": false,
+          "administered_by": "Lajnat al-intikhābāt (election committee named before each election)",
+          "valid_to": "2003-12-03",
+          "source": "const1999",
+          "locator": "https://www.arso.org/03-const.99.htm (Article 77: members elected by direct and secret suffrage for eighteen months, twice between two Congresses)"
+        },
+        {
+          "called": false,
+          "partisan": false,
+          "administered_by": "al-Lajna al-Waṭaniyya (National Committee named by presidential decree)",
+          "valid_from": "2015-12-20",
+          "source": "const2015",
+          "locator": "https://www.policinglaw.info/assets/downloads/2015_Constitution_of_the_Sahrawi_Arab_Democratic_Republic.pdf (Article 20: National Committee; Article 79: once between two Congresses)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Sahara Press Service",
+          "url": "https://www.spsrasd.info/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "sps",
+          "role": "publishes",
+          "evidence": "Announces the elections, the seats by constituency, and the Council's installation; the current site holds items from late 2023 and older items' links loop between www.spsrasd.info and archive.spsrasd.info"
+        },
+        {
+          "platform": "ARSO, Western Sahara weekly news",
+          "url": "https://www.arso.org/01-e.htm",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1998-11-01",
+          "last_date": "2008-02-01",
+          "source": "arso-01-19",
+          "role": "publishes",
+          "evidence": "Weekly digests that relay SPS reports of the 1998, 1999, 2001, 2003, and 2008 elections, with seats by kind of constituency"
+        }
+      ],
+      "est_votes": 60000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1998-11-01",
+          "precision": "month",
+          "election_kind": "general",
+          "seats": 101,
+          "source": "arso-98-45",
+          "quote": "Elections for the Saharawi National Council (Parliament) began in all wilayas.",
+          "note": "The Council then had 101 members (ARSO, 1999 week 35)."
+        },
+        {
+          "date": "1999-10-01",
+          "precision": "month",
+          "election_kind": "general",
+          "seats": 51,
+          "source": "arso-99-42",
+          "quote": "Made up of 51 members elected for 18 months",
+          "note": "Elected after the 10th Congress (26 August to 4 September 1999); 34 members for the wilayas, 7 for the national institutions, and 10 for the army. Installed at Tifariti on 20-21 October 1999."
+        },
+        {
+          "date": "2001-04-21",
+          "election_kind": "general",
+          "contests": 30,
+          "seats": 51,
+          "source": "arso-01-19",
+          "quote": "The renewal of the National Council (Saharawi parliament) took place from 21 April to 04 May.",
+          "note": "Polling ran from 21 April to 4 May 2001 in thirty constituencies (ARSO, 2001 week 16): 26 members elected in the wilayas and 25 by the national institutions (3), the shioukh (5), the administration (4), the mass organisations (3), and the army (10)."
+        },
+        {
+          "date": "2003-11-22",
+          "election_kind": "general",
+          "source": "arso-03-4547",
+          "quote": "Elections for the National Council, the Saharawi Parliament.",
+          "note": "Polling ran from 22 November to 2 December 2003, after the 11th Congress; the new Council opened at Tifariti on 3 December 2003."
+        },
+        {
+          "date": "2008-02-01",
+          "precision": "month",
+          "election_kind": "general",
+          "seats": 52,
+          "source": "arso-08-02",
+          "quote": "126 candidates stood for the 52 seats to be filled.",
+          "note": "After the 12th Congress of December 2007; the Council was installed at Tifariti."
+        },
+        {
+          "date": "2023-04-08",
+          "precision": "month",
+          "election_kind": "general",
+          "seats": 50,
+          "source": "cn2023",
+          "quote": "و تتوزع مقاعد المجلس الوطني ال50 على الدوائر الانتخابية",
+          "note": "After the 16th Congress of January 2023. The political seminars opened in every wilaya and national institution on Saturday 8 April 2023; seats: El Aaiún 6, Auserd 6, Smara 7, Dakhla 7, Boujdour 3, Chahid El Hafed 4, four mass organisations 1 each, the Consultative Council 3, and the army as its General Staff decides."
+        }
+      ]
+    },
+    {
+      "key": "majlis_muaqqat",
+      "tier": "national",
+      "name": "al-Majlis al-Waṭanī aṣ-Ṣaḥrāwī al-Muʾaqqat",
+      "name_en": "Provisional Sahrawi National Council and councils chosen by the Congress",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "sps-cn50",
+      "valid_to": "1998-11-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Provisional Sahrawi National Council was formed on 28 November 1975 by members of the dissolved Spanish General Assembly who joined the Polisario Front (the Guelta Document), and under the 1999 Constitution each new Council is formed after the Congress by rules the National Secretariat sets (art. 75); no public vote for the Council before the elections of November 1998 was found.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "EH-SR",
+          "valid_to": "1998-11-01"
+        }
+      ]
+    },
+    {
+      "key": "rais",
+      "tier": "national",
+      "name": "Raʾīs al-Jumhūriyya (al-Amīn al-ʿĀmm li-Jabhat al-Bulīsāriyū)",
+      "name_en": "President of the Republic (Secretary-General of the Polisario Front)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const2015",
+      "locator": "https://www.policinglaw.info/assets/downloads/2015_Constitution_of_the_Sahrawi_Arab_Democratic_Republic.pdf (Article 51: the Secretary-General of the Frente POLISARIO is ex officio President of the Republic, elected by the General Congress)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The President of the Republic is ex officio the Secretary-General of the Polisario Front, elected by the delegates of the Front's General Popular Congress (Constitution of 1999 art. 51; of 2015 art. 51); there is no public vote. A vacancy is filled by an extraordinary Congress (2015 art. 59).",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "EH-SR"
+        }
+      ]
+    },
+    {
+      "key": "majlis_istishari",
+      "tier": "national",
+      "name": "al-Majlis al-Istishārī",
+      "name_en": "Consultative Council (Council of Notables, shioukh)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "arso-99-35",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Council of Notables (shioukh) created by the 10th Congress in 1999 is an advisory body whose members are not chosen by a public vote; it elects its own members of the National Council (5 in 2001, 3 in 2023), which the class majlis_watani counts.",
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "EH-SR"
+        }
+      ]
+    },
+    {
+      "key": "majalis_mahalliyya",
+      "tier": "daira",
+      "name": "al-Majālis al-muntakhaba li-l-wilāyāt wa-d-dawāʾir wa-l-baladiyyāt",
+      "name_en": "Wilaya, daira, and baladiya councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const2015",
+      "locator": "https://www.policinglaw.info/assets/downloads/2015_Constitution_of_the_Sahrawi_Arab_Democratic_Republic.pdf (Article 16: wilayat, dawair, and baladiat; Article 20: the elected councils)",
+      "disposition": "blocked",
+      "disposition_reason": "The Constitution divides the territory into wilayas, dairas, and baladiyas and makes elected councils the people's framework (arts. 16 and 20), and the 2023 candidacy rules cite members of regional councils and mayors, but no official date, seat count, or vote of these councils was found; SPS's archive before late 2023 did not open.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "EH-SR*"
+        }
+      ]
+    },
+    {
+      "key": "istifta",
+      "tier": "national",
+      "name": "Istiftāʾ taqrīr al-maṣīr",
+      "name_en": "Self-determination referendum",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "arso-ref",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The self-determination referendum for Western Sahara would be organised by the United Nations (MINURSO, from 1991), not by the Sahrawi Republic, and has never been held; the Republic's Constitutions provide for no referendum of their own.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "EH-SR*"
+        }
+      ]
+    }
+  ]
+}

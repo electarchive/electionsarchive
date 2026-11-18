@@ -806,10 +806,10 @@
       "kind": "official_body"
     },
     "eh-sr": {
-      "publisher": "Country Reports",
-      "title": "Western Sahara embassy page (does not settle the entry)",
-      "url": "https://www.countryreports.org/country/WesternSahara/embassy.htm",
-      "kind": "compendium"
+      "publisher": "Saharawi Arab Democratic Republic",
+      "title": "Proclamation of the first government of the Saharawi Arab Democratic Republic, Bir Lahlou, 27 February 1976",
+      "url": "https://www.arso.org/03-1.htm",
+      "kind": "official_body"
     },
     "sun": {
       "publisher": "Wikidata",
@@ -3284,9 +3284,9 @@
       "name_en": "Sahrawi Republic",
       "status": "de_facto",
       "recognized_within": "EH",
-      "reason": "Sahrawi National Council elections, including 2012, 2020, and 2023.",
+      "reason": "Proclaimed at Bir Lahlou on 27 February 1976 by the Polisario Front with the agreement of the Provisional Sahrawi National Council; its National Council has been elected by direct and secret vote in the refugee-camp wilayas, the army, and the national institutions since at least November 1998 (1998, 1999, 2001, 2003, 2008, and after each later Congress of the Front, most recently in April 2023), while its President is the Front's Secretary-General, chosen by the Congress.",
       "source": "eh-sr",
-      "locator": "https://www.countryreports.org/country/WesternSahara/embassy.htm"
+      "locator": "https://www.arso.org/03-1.htm (Proclamation of the first government of the Saharawi Arab Democratic Republic, Bir Lahlou, 27 February 1976; text kept by ARSO)"
     },
     {
       "iso": "SUN",
