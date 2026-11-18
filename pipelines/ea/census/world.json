@@ -882,10 +882,10 @@
       "note": "Minutes of the sitting at which the Grand National Assembly of Turkey, the successor state's parliament, adopted the joint committees' declaration abolishing the sultanate: the Istanbul government founded on personal sovereignty had passed into history from 16 March 1336 (1920), and the caliphate stayed with the House of Osman, chosen by the Assembly. The Assembly's 1992 album (https://acikerisim.tbmm.gov.tr/handle/11543/1806) gives the Ottoman Chamber of Deputies' periods: elected under the Talimat-ı Muvakkate of 28 October 1876, opened 19 March 1877, prorogued 14 February 1878, and elected again in 1908, 1912, 1914, and 1919, its last sitting on 18 March 1920. The founding year 1299 is the traditional date of Osman I's independent rule; no official source dates it more exactly."
     },
     "xdz": {
-      "publisher": "Oxford Public International Law",
-      "title": "Danzig, Free City of",
-      "url": "https://opil.ouplaw.com/display/10.1093/law:epil/9780199231690/law-9780199231690-e1275",
-      "kind": "compendium"
+      "publisher": "Volkstag der Freien Stadt Danzig",
+      "title": "Verhandlungen des Volkstags der Freien Stadt Danzig: Stenographische Berichte, Bd. 9 (1925-1926)",
+      "url": "https://archive.org/details/pbc.gda.pl.Od_6145_4_1925-26_Bd9",
+      "kind": "official_body"
     },
     "xsv": {
       "publisher": "Republic of Vietnam, Office of the President",
@@ -3387,9 +3387,9 @@
       "iso": "XDZ",
       "name_en": "Free City of Danzig",
       "status": "former",
-      "reason": "Volkstag elections from 1920 to 1935.",
+      "reason": "Constituted on 15 November 1920, the date of its Convention with Poland signed in Paris (as the Volkstag's own reports cite it), under the protection of the League of Nations, until its annexation by the German Reich on 1 September 1939; its Constituent Assembly, elected in May 1920 and sitting as the first Volkstag, was followed by Volkstag elections in November 1923, on 13 November 1927, 16 November 1930, 28 May 1933, and 7 April 1935, whose term a decree of 21 March 1939 extended by four years (Gesetzblatt für die Freie Stadt Danzig, 1939, Nr. 20), with municipal and Kreistag elections from 1924 and 1927 and two referendums in December 1928.",
       "source": "xdz",
-      "locator": "https://opil.ouplaw.com/display/10.1093/law:epil/9780199231690/law-9780199231690-e1275"
+      "locator": "https://archive.org/details/pbc.gda.pl.Od_6145_4_1925-26_Bd9 (Volkstag, 1925-1926: the Danzig-Polish Convention of Paris of 15 November 1920; the Volkstag elected in November 1923; elections of May 1920)"
     },
     {
       "iso": "XSV",
