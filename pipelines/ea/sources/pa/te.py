@@ -1240,8 +1240,18 @@ WINNER_ALIASES = {
     "kuna de wardandi:kuna de wardandi": "comarca kuna de wargandi:comarca kuna de wargandi",
 }
 
+# Corregimientos the 2014 table of representatives proclaimed (Cuadro 13) spells differently from that year's results
+# table (Cuadro 11), where the spelling differs from the other years'.
+WINNER_ALIASES_2014 = {
+    **WINNER_ALIASES,
+    "chepigana:agua fria": "chepigana:aguas frias",
+    "pinogana:el real de santa maria (cab)": "pinogana:el real de sta. maria (cab)",
+    "las minas:quebrada el ciprian": "las minas:el ciprian",
+    "muna:rokari": "muna:roka",
+}
 
-def place_code(office: str, place: win.Place) -> str:
+
+def place_code(office: str, place: win.Place, year: int) -> str:
     """The code of the area a proclamation row belongs to, in the form `area_of` gives its unit."""
     scheme = {"deputy": "circuito", "mayor": "distrito", "rep": "corregimiento"}[office]
     path = place.path if office != "deputy" else ("", place.path[0])
@@ -1250,7 +1260,7 @@ def place_code(office: str, place: win.Place) -> str:
         path = (path[0], path[2], path[2])
     found = area_of(Unit(scheme, path, Row("", 0, [])))
     assert found is not None
-    return WINNER_ALIASES.get(found[1], found[1])
+    return (WINNER_ALIASES_2014 if year == 2014 else WINNER_ALIASES).get(found[1], found[1])
 
 
 def match_declared(e: Election) -> dict[str, dict[str, tuple[Unit, win.Place]]]:
@@ -1262,7 +1272,7 @@ def match_declared(e: Election) -> dict[str, dict[str, tuple[Unit, win.Place]]]:
         units = {found[1]: u for u in getattr(e, office) if (found := area_of(u))}
         paired = out[office] = {}
         for place in places:
-            code = place_code(office, place)
+            code = place_code(office, place, e.year)
             if code not in units:
                 e.issues.append(f"{office} winners: {place.path} pairs with no unit")
             elif code in paired:
@@ -1464,6 +1474,10 @@ def election(e: Election) -> Package:
     ) -> None:
         """Record who the Tribunal proclaimed in a contest: each winner's candidacy and outcome, then the options
         that lost."""
+        if not place.winners:
+            if place.note:
+                p.add("note", id=key("note", rid, "tie"), entity_id=rid, kind="caveat", lang="en", body_md=place.note)
+            return
         deputy = office == "deputy"
         votes = u.row.votes
         elected: list[tuple[str, win.Winner]] = []
@@ -1815,6 +1829,11 @@ def load_1999() -> Election:
     return e
 
 
+# The 2014 tables the Tribunal posts beside its lists of candidates in force. It posted Cuadro 11 later, as a workbook.
+UPLOADS_2014 = SITE + "/wp-content/uploads/2017/07/"
+CUADRO_11_2014 = SITE + "/wp-content/uploads/2019/04/Cuadro-11-Representantes-PP.xlsx"
+
+
 def load_2014() -> Election:
     e = Election(2014, date(2014, 5, 4), [])
     names = ["01_-_Presidente", "02_-_Presidente", "04_-_Diputado_PP", "08_-_Alcalde_PP"]
@@ -1822,6 +1841,9 @@ def load_2014() -> Election:
     president_table(2014, pdf_grid(e.files[0], stop="DE MAYO DE 2009"), C1, pdf_grid(e.files[1]), e)
     pdf_party_table(e.files[2], P14, e, "c", "deputy")
     pdf_party_table(e.files[3], P14, e, 2, "mayor")
+    e.files += [CUADRO_11_2014, f"{UPLOADS_2014}Cuadro_14_-_Concejal_PP.pdf"]
+    party_table(next(iter(grids(e.files[-2]).values())), "rep", e, 3, "rep")
+    pdf_party_table(e.files[-1], P14[:6], e, 2, "council")
     e.files += [
         "b:1-presidente-en-firme.pdf",
         "b:4-alcaldes-en-firme.pdf",
@@ -1829,4 +1851,6 @@ def load_2014() -> Election:
     ]
     e.president_winner = win.pdf_president(pdf_lines(e.files[-3]))
     e.declared["mayor"] = win.pdf_list(pdf_lines(e.files[-2]), "district")
+    e.files.append(f"{UPLOADS_2014}Cuadro_13_-_Representantes_Proclamados.pdf")
+    e.declared["rep"] = win.pdf_representatives(pdf_lines(e.files[-1]))
     return e
