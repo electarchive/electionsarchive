@@ -1,0 +1,1107 @@
+{
+  "polity": "MD-SN",
+  "name": "Pridnestrovian Moldavian Republic",
+  "sources": {
+    "vs-history": {
+      "title": "История создания и развития Верховного Совета Приднестровской Молдавской Республики",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/about/history/",
+      "kind": "official_body",
+      "license": "CC BY 4.0",
+      "note": "The Supreme Council's account of the founding of the republic: the proclamation by the II Extraordinary Congress of People's Deputies of All Levels on 2 September 1990, the Provisional Supreme Council, the first Supreme Council elections of 25 November 1990, and the independence referendum and first presidential election of 1 December 1991. Every page of the site lists the seven city and district Councils of People's Deputies."
+    },
+    "vs-book": {
+      "title": "Верховный Совет ПМР 1990-2015 гг.",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/file.xp?file=17974",
+      "kind": "official_body",
+      "license": "CC BY 4.0",
+      "note": "The Supreme Council's history of its first five convocations (PDF), with the dates, district counts, and chamber sizes of the 1990, 1995, 2000, 2005, and 2010 elections and the 1991 and 1995 referendums."
+    },
+    "constitution": {
+      "title": "Конституция Приднестровской Молдавской Республики",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/about/constitution/",
+      "kind": "official_body",
+      "license": "CC BY 4.0",
+      "note": "Adopted at the referendum of 24 December 1995, consolidated with later amendments. Arts. 60 (President elected directly for five years), 67 (Supreme Council of 33 deputies from the VII convocation, five-year term, early elections after dissolution), 77 (city, district, village and settlement Councils of People's Deputies elected for five years), 78 (heads of city and district state administrations appointed by the President)."
+    },
+    "president-office": {
+      "title": "Государственная власть: Президент Приднестровской Молдавской Республики",
+      "publisher": "Президент Приднестровской Молдавской Республики",
+      "url": "https://president.gospmr.org/gosudarstvennaya-vlastj/",
+      "kind": "official_body",
+      "license": "CC BY 4.0",
+      "note": "History of the office of President: the Chairman of the PMSSR elected by the Supreme Council in 1990, the office renamed President on 22 October 1991, and the presidential election laws of 1991 and 1996."
+    },
+    "president-bio": {
+      "title": "Биография Президента Приднестровской Молдавской Республики",
+      "publisher": "Президент Приднестровской Молдавской Республики",
+      "url": "https://president.gospmr.org/prezident/biography/",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2025-scheme": {
+      "title": "Парламент утвердил схему образования избирательных округов по выборам депутатов Верховного Совета ПМР VIII созыва",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/parlament-utverdil-shemu-obrazovaniya-izbirateljnih-okrugov-po-viboram-deputatov-verhovnogo-soveta-pmr-viii-soziva.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0",
+      "note": "25 June 2025: 33 single-member districts; Electoral Code art. 11 sets the single voting day on the last Sunday of November for the Supreme Council, the local Councils, and the heads of village and settlement administrations; the Central Election Commission counts 394,104 registered voters."
+    },
+    "vs-2025-start": {
+      "title": "Стартовал Единый день голосования",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/startoval-ediniy-denj-golosovaniya.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0",
+      "note": "30 November 2025: 33 Supreme Council seats, 183 city and district council seats, 469 village and settlement council seats, and 76 heads of village and settlement administrations."
+    },
+    "vs-2025-result": {
+      "title": "VIII созыв Верховного Совета ПМР начал работу",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/viii-soziv-verhovnogo-soveta-pmr-nachal-rabotu.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2020": {
+      "title": "Единый день голосования",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/ediniy-denj-golosovaniya.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2020-bendery": {
+      "title": "Бендерчане выбирают депутатов всех уровней",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/benderchane-vibirayut-deputatov-vseh-urovney.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2015": {
+      "title": "В Приднестровье единый день голосования впервые проходил пять лет назад",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/v-pridnestrovje-ediniy-denj-golosovaniya-vpervie-prohodil-pyatj-let-nazad.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2010": {
+      "title": "Выборы: как это было пять лет назад",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/vibori-kak-eto-bilo-pyatj-let-nazad.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2010-local": {
+      "title": "В Приднестровье проходят выборы в местные органы власти",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/v-pridnestrovje-prohodyat-vibori-v-mestnie-organi-vlasti.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2005": {
+      "title": "Четвертый созыв: работа депутатов в период 2005 – 2010 годов",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/chetvertiy-soziv-rabota-deputatov-v-period-2005-2010-godov.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2007-by": {
+      "title": "Депутатом Верховного Совета ПМР IV созыва избран Валерий Пономаренко",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/deputatom-verhovnogo-soveta-pmr-iv-soziva-izbran-valeriy-ponomarenko.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2012-by": {
+      "title": "29 апреля 2012 года состоятся дополнительные выборы депутата ВС ПМР V созыва по избирательному округу №22",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/29-aprelya-2012-goda-sostoyatsya-dopolniteljnie-vibori-deputata-vs-pmr-v-soziva-po-izbirateljnomu-okrugu-22.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2017-04": {
+      "title": "Снова выборы",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/snova-vibori.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2017-10": {
+      "title": "ЦИК подвел предварительные итоги выборов",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/tsik-podvel-predvariteljnie-itogi-viborov.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2018-04": {
+      "title": "ЦИК подвел итоги голосования на дополнительных, повторных выборах",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/tsik-podvel-itogi-golosovaniya-na-dopolniteljnih-povtornih-viborah.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2018-10": {
+      "title": "В Приднестровье пройдут повторные и дополнительные выборы депутатов",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/ololololol.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2022-03": {
+      "title": "Депутаты утвердили отчет ЦИК",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/deputati-utverdili-otchet-tsik.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2024-by": {
+      "title": "Дополнительные выборы на округе «Парканский»",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/dopolniteljnie-vibori-na-okruge-parkanskiy-.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2006-pres": {
+      "title": "22 декабря – инаугурация Президента Приднестровской Молдавской Республики",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/22-dekabrya-inauguratsiya-prezidenta-pridnestrovskoy-moldavskoy-respubliki.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2026-pres": {
+      "title": "Шаг к первым выборам Президента",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/shag-k-pervim-viboram-prezidenta.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-1995-ref": {
+      "title": "Один созыв – автор двух Конституций",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/odin-soziv-avtor-dvuh-konstitutsiy.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    },
+    "vs-2006-ref": {
+      "title": "Референдуму 2006 года – 20 лет",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/news/supreme-council/referendumu-2006-goda-20-let.html",
+      "kind": "official_body",
+      "license": "CC BY 4.0"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Приднестровская Молдавская Республика",
+      "name_en": "Pridnestrovian Moldavian Republic (Pridnestrovian Moldavian Soviet Socialist Republic, 1990-1991)",
+      "parent": null,
+      "polity_kind": "de_facto_state",
+      "source": "vs-history"
+    },
+    {
+      "key": "rayon",
+      "name": "Города и районы",
+      "name_en": "Cities and districts (Tiraspol, Bendery, and the Slobodzeya, Grigoriopol, Dubossary, Rybnitsa, and Kamenka districts)",
+      "parent": "national",
+      "polity_kind": "county",
+      "scheme": "md-sn.rayon",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2026-11-18",
+          "value": 7,
+          "source": "vs-history",
+          "locator": "https://vspmr.org/about/history/ (site footer, Советы народных депутатов: г. Тирасполь, г. Бендеры, г. Слободзея и Слободзейского района, г. Григориополь и Григориопольского района, г. Дубоссары и Дубоссарского района, г. Рыбница и Рыбницкий район, г. Каменка и Каменский район)"
+        }
+      ]
+    },
+    {
+      "key": "selo",
+      "name": "Сёла и посёлки",
+      "name_en": "Villages and settlements",
+      "parent": "rayon",
+      "polity_kind": "municipality",
+      "scheme": "md-sn.selo",
+      "source": "constitution",
+      "counts": [
+        {
+          "date": "2025-11-30",
+          "value": 76,
+          "source": "vs-2025-start",
+          "locator": "https://vspmr.org/news/supreme-council/startoval-ediniy-denj-golosovaniya.html (76 выборных должностей председателей сельских советов – глав администраций сел (поселков))"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "verkhovny_sovet",
+      "tier": "national",
+      "name": "Выборы депутатов Верховного Совета Приднестровской Молдавской Республики (1990-1995: Верховный Совет ПМССР/ПМР)",
+      "name_en": "Supreme Council",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "1990-11-25",
+      "earliest_record": "1990-11-25",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "md-sn.okrug"
+        ]
+      },
+      "finest_note": "Each deputy is elected in a single-member district; the Central Election Commission publishes the winner and vote shares by district.",
+      "source": "constitution",
+      "locator": "https://vspmr.org/about/constitution/ (art. 67)",
+      "note": "Elected for five years. The first Supreme Council (1990-1995) had two equal chambers, the Council of the Republic and the Council of Nationalities, chosen in 63 districts on 25 November 1990. Under the 1995 election law the 1995-2000 Supreme Council had a Chamber of Legislators of 32 and a Chamber of Representatives of 35 deputies, the latter elected in seven territorial districts. The constitutional reform of 21 June 2000 made it unicameral with 43 deputies in single-member districts by simple majority (Electoral Code of 9 August 2000); from the VII convocation (2020) it has 33. An election is valid only if at least 25% of registered voters take part.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house",
+            "upper_house"
+          ],
+          "iso_pattern": "MD-SN"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 0,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 5,
+          "called": true,
+          "runoff": "none",
+          "runoff_rule": "Simple majority in single-member districts (Electoral Code of 9 August 2000)",
+          "administered_by": "Центральная избирательная комиссия Приднестровской Молдавской Республики",
+          "valid_from": "2015-01-01",
+          "source": "vs-2025-scheme",
+          "locator": "https://vspmr.org/news/supreme-council/parlament-utverdil-shemu-obrazovaniya-izbirateljnih-okrugov-po-viboram-deputatov-verhovnogo-soveta-pmr-viii-soziva.html (Electoral Code art. 11: last Sunday of November; Constitution art. 67(2): five-year term and early elections after dissolution)"
+        },
+        {
+          "period_years": 5,
+          "phase": 0,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Центральная избирательная комиссия Приднестровской Молдавской Республики",
+          "valid_to": "2015-01-01",
+          "source": "vs-book",
+          "locator": "https://vspmr.org/file.xp?file=17974 (elections of 25 November 1990, 24 December 1995, 10 December 2000, and 12 December 2010)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия ПМР",
+          "url": "https://cik.gospmr.org/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "first_date": "1990-11-25",
+          "last_date": "2025-11-30",
+          "role": "administers",
+          "evidence": "The Central Election Commission's site, which publishes district results, resets connections from this network"
+        },
+        {
+          "platform": "Верховный Совет ПМР, новости",
+          "url": "https://vspmr.org/news/supreme-council/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "CC BY 4.0",
+          "first_date": "1990-11-25",
+          "last_date": "2025-11-30",
+          "role": "publishes",
+          "source": "vs-history",
+          "evidence": "Supreme Council news reports and its 1990-2015 history give each election's date, districts, and seats"
+        }
+      ],
+      "est_votes": 110000,
+      "effort": 3,
+      "dates": [
+        {
+          "date": "1990-11-25",
+          "election_kind": "general",
+          "contests": 63,
+          "source": "vs-book",
+          "quote": "Была назначена дата выборов в Верховный Совет – 25 ноября 1990 г. … на территории республики было образовано 63 избирательных округа",
+          "note": "Supreme Council of the Pridnestrovian Moldavian SSR, first convocation; the Supreme Council's history gives 64 deputies for the convocation and 60 elected in November 1990."
+        },
+        {
+          "date": "1995-12-24",
+          "election_kind": "general",
+          "seats": 67,
+          "source": "vs-book",
+          "quote": "24 декабря 1995 г. состоялись очередные выборы в Верховный Совет ПМР второго созыва … Палата законодателей должна была состоять из 32, верхняя – Палата представителей – из 35 депутатов",
+          "note": "Second convocation, bicameral; held with the constitutional referendum."
+        },
+        {
+          "date": "2000-12-10",
+          "election_kind": "general",
+          "contests": 43,
+          "seats": 43,
+          "source": "vs-book",
+          "quote": "10 декабря 2000 г. состоялись выборы депутатов высшего законодательного органа республики третьего созыва … однопалатного Верховного Совета, состоящего из 43 депутатов, избиравшихся по мажоритарной системе",
+          "note": "Third convocation, the first unicameral one."
+        },
+        {
+          "date": "2005-12-11",
+          "election_kind": "general",
+          "source": "vs-2005",
+          "quote": "11 декабря 2005 года в Приднестровье состоялись выборы в Верховный Совет четвертого созыва",
+          "note": "Fourth convocation, 43 seats. The Supreme Council's 1990-2015 history prints 10 December 2005, a Saturday."
+        },
+        {
+          "date": "2010-12-12",
+          "election_kind": "general",
+          "contests": 43,
+          "seats": 43,
+          "source": "vs-2010",
+          "quote": "Выборы в парламент республики состоялись 12 декабря 2010 года. … Тогда на 43 депутатских мандата претендовало 120 человек.",
+          "note": "Fifth convocation."
+        },
+        {
+          "date": "2015-11-29",
+          "election_kind": "general",
+          "contests": 43,
+          "seats": 43,
+          "source": "vs-2015",
+          "quote": "29 ноября 2015 года в Приднестровье впервые проходил единый день голосования. … На 43 места в Верховном Совете претендовали 136 кандидатов.",
+          "note": "Sixth convocation; the first single voting day with the local Councils and the heads of village and settlement administrations."
+        },
+        {
+          "date": "2020-11-29",
+          "election_kind": "general",
+          "contests": 33,
+          "seats": 33,
+          "source": "vs-2020",
+          "quote": "Сегодня в Приднестровской Молдавской Республике единый день голосования. … На 33 места в парламент претендуют 45 кандидатов",
+          "note": "Seventh convocation, reduced to 33 seats."
+        },
+        {
+          "date": "2025-11-30",
+          "election_kind": "general",
+          "contests": 33,
+          "seats": 33,
+          "source": "vs-2025-result",
+          "quote": "30 ноября 2025 в Приднестровской Молдавской Республике прошли выборы депутатов Верховного Совета VIII созыва … Всего республике было образовано 33 избирательных округа",
+          "note": "Eighth convocation."
+        }
+      ]
+    },
+    {
+      "key": "verkhovny_sovet_dop",
+      "tier": "national",
+      "name": "Дополнительные и повторные выборы депутатов Верховного Совета ПМР",
+      "name_en": "Supreme Council by-elections and repeat elections",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "2007-06-10",
+      "earliest_record": "2007-06-10",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "md-sn.okrug"
+        ]
+      },
+      "source": "vs-2024-by",
+      "locator": "https://vspmr.org/news/supreme-council/dopolniteljnie-vibori-na-okruge-parkanskiy-.html (Electoral Code art. 92-1: by-elections)",
+      "note": "A seat that falls vacant is filled at a by-election (дополнительные выборы) in its district, called by the Supreme Council (Electoral Code art. 92-1); a district where turnout falls below 25% holds a repeat election (повторные выборы). By-elections before 2007 are not listed here.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "MD-SN"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия ПМР",
+          "url": "https://cik.gospmr.org/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "first_date": "2007-06-10",
+          "last_date": "2024-03-31",
+          "role": "administers",
+          "evidence": "The Central Election Commission's site resets connections from this network"
+        },
+        {
+          "platform": "Верховный Совет ПМР, новости",
+          "url": "https://vspmr.org/news/supreme-council/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "CC BY 4.0",
+          "first_date": "2007-06-10",
+          "last_date": "2024-03-31",
+          "role": "publishes",
+          "source": "vs-history",
+          "evidence": "Supreme Council news reports name each by-election's districts and date"
+        }
+      ],
+      "est_votes": 8000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "2007-06-10",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "vs-2007-by",
+          "quote": "10 июня в Приднестровье состоялись дополнительные выборы по Избирательному округу № 24 «Ближнехуторской»."
+        },
+        {
+          "date": "2012-04-29",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "vs-2012-by",
+          "quote": "дополнительных выборов депутата Верховного Совета ПМР V созыва по избирательному округу № 22 «Больше-Молокишский». Выборы состоятся 29 апреля текущего года."
+        },
+        {
+          "date": "2017-04-02",
+          "election_kind": "by_election",
+          "contests": 5,
+          "seats": 5,
+          "source": "vs-2017-04",
+          "quote": "на 2 апреля были назначены дополнительные выборы в Верховный Совет. Голосование пройдет на избирательных округах №2 «Мемориальный», №7 «Первомайский» (г. Бендеры), №22 «Больше-Молокишский» (Рыбницкий район), №24 «Ближнехуторской» (Слободзейский район) и №31 «Парканский»"
+        },
+        {
+          "date": "2017-10-01",
+          "election_kind": "by_election",
+          "contests": 2,
+          "seats": 2,
+          "source": "vs-2017-10",
+          "quote": "1 октября в республике прошли дополнительные и повторные выборы депутатов Верховного Совета ПМР VI созыва и местных Советов народных депутатов. Согласно предварительным итогам, было избрано 2 депутата в Верховный Совет ПМР VI созыва"
+        },
+        {
+          "date": "2024-03-31",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "vs-2024-by",
+          "quote": "назначить дополнительные выборы депутата Верховного Совета VII созыва по избирательному округу № 24 «Парканский». Они пройдут 31 марта 2024 года"
+        }
+      ]
+    },
+    {
+      "key": "prezident",
+      "tier": "national",
+      "name": "Выборы Президента Приднестровской Молдавской Республики",
+      "name_en": "President",
+      "category": "executive",
+      "goal": "national",
+      "first_held": "1991-12-01",
+      "earliest_record": "1991-12-01",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "md-sn.rayon"
+        ]
+      },
+      "finest_note": "Votes by city and district; the Central Election Commission reports turnout by polling station.",
+      "source": "constitution",
+      "locator": "https://vspmr.org/about/constitution/ (art. 60)",
+      "note": "Elected directly for five years, at most two terms in a row (Constitution art. 60). A candidate needs more than half the votes cast; otherwise the top two meet in a second round, as on 25 December 2011. A Vice-President was elected on the same ticket until the office was abolished in 2011. Before the first popular vote, the Supreme Council elected Igor Smirnov Chairman of the PMSSR on 29 November 1990 (see the class chairman_1990).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "MD-SN"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 1,
+          "month": 12,
+          "term_years": 5,
+          "called": false,
+          "runoff": "majority",
+          "runoff_rule": "More than half of the votes cast; otherwise the top two in a second round",
+          "administered_by": "Центральная избирательная комиссия Приднестровской Молдавской Республики",
+          "source": "constitution",
+          "locator": "https://vspmr.org/about/constitution/ (art. 60(3): five-year term, two consecutive terms)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия ПМР",
+          "url": "https://cik.gospmr.org/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "first_date": "1991-12-01",
+          "last_date": "2021-12-12",
+          "role": "administers",
+          "evidence": "The Central Election Commission's site, which publishes the results by city and district, resets connections from this network"
+        },
+        {
+          "platform": "Верховный Совет ПМР, новости",
+          "url": "https://vspmr.org/news/supreme-council/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "CC BY 4.0",
+          "first_date": "2006-12-10",
+          "last_date": "2021-12-12",
+          "role": "publishes",
+          "source": "vs-history",
+          "evidence": "Supreme Council news reports give the dates, turnout, and declared winners from 2006"
+        }
+      ],
+      "est_votes": 250000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1991-12-01",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "vs-history",
+          "quote": "Референдум состоялся 1 декабря 1991 года одновременно с выборами первого Президента ПМР.",
+          "note": "Igor Smirnov elected over Grigory Marakutsa and G. Blagodarny."
+        },
+        {
+          "date": "1996-12-01",
+          "precision": "month",
+          "election_kind": "general",
+          "source": "president-office",
+          "quote": "26 декабря 1996 года прошли выборы Президента Приднестровской Молдавской Республики, на которых повторно был избран И.Н. Смирнов.",
+          "note": "The President's site prints 26 December 1996, a Thursday; the poll was on Sunday 22 December. The day is held at month precision until the Central Election Commission's record can be read."
+        },
+        {
+          "date": "2001-12-09",
+          "election_kind": "general",
+          "note": "Third election of Igor Smirnov. No page reachable from here states the date; the Central Election Commission's archive at cik.gospmr.org would settle it."
+        },
+        {
+          "date": "2006-12-10",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "vs-2006-pres",
+          "quote": "Окончательные результаты прошедших 10 декабря выборов Президента и Вице-Президента Приднестровской Молдавской Республики были объявлены 13-го декабря."
+        },
+        {
+          "date": "2011-12-11",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "vs-book",
+          "quote": "данная норма должна касаться президента, избранного 11 декабря 2011 г.",
+          "note": "No candidate won a majority; Yevgeny Shevchuk and Anatoly Kaminsky went to the second round."
+        },
+        {
+          "date": "2011-12-25",
+          "election_kind": "runoff",
+          "contests": 1,
+          "source": "president-office",
+          "quote": "25 декабря 2011 года Президентом Приднестровской Молдавской Республики был избран Е.В. Шевчук."
+        },
+        {
+          "date": "2016-12-11",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "president-bio",
+          "quote": "11 декабря 2016 года избран Президентом Приднестровской Молдавской Республики."
+        },
+        {
+          "date": "2021-12-12",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "president-bio",
+          "quote": "12 декабря 2021 года вновь избран Президентом Приднестровской Молдавской Республики."
+        },
+        {
+          "date": "2026-12-13",
+          "election_kind": "general",
+          "source": "vs-2026-pres",
+          "quote": "В Приднестровье 13 декабря будем выбирать Президента ПМР. В истории республики это будут восьмые выборы.",
+          "note": "Scheduled."
+        }
+      ]
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Всенародный (республиканский) референдум",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "1991-12-01",
+      "earliest_record": "1991-12-01",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "md-sn.rayon"
+        ]
+      },
+      "source": "constitution",
+      "locator": "https://vspmr.org/about/constitution/ (art. 1: referendum as the highest expression of the people's power; art. 70(г): the Supreme Council calls referendums; arts. 102-104: constitutional changes by referendum)",
+      "note": "The Supreme Council calls republic-wide referendums; each question is one contest. The Union referendum of 17 March 1991, which the Supreme Council organized in Pridnestrovie, belongs to the USSR, and the city and district referendums of 1989-1990 predate the republic.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "MD-SN"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия ПМР",
+          "url": "https://cik.gospmr.org/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "first_date": "1991-12-01",
+          "last_date": "2006-09-17",
+          "role": "administers",
+          "evidence": "The Central Election Commission's site resets connections from this network"
+        },
+        {
+          "platform": "Верховный Совет ПМР, новости",
+          "url": "https://vspmr.org/news/supreme-council/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "CC BY 4.0",
+          "first_date": "1991-12-01",
+          "last_date": "2006-09-17",
+          "role": "publishes",
+          "source": "vs-history",
+          "evidence": "Supreme Council pages give each referendum's date, questions, turnout, and share of votes in favor"
+        }
+      ],
+      "est_votes": 300000,
+      "effort": 1,
+      "dates": [
+        {
+          "date": "1991-12-01",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "vs-2026-pres",
+          "quote": "Выборы президента и референдум о независимости Приднестровья прошли в один день – 1 декабря 1991 года.",
+          "note": "Independence of the republic; 78% turnout, 97.7% in favor."
+        },
+        {
+          "date": "1995-03-26",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "vs-1995-ref",
+          "quote": "26 марта 1995-го более 90% участников референдума высказались за нахождение на территории ПМР российской армии.",
+          "note": "On keeping the Russian 14th Army in Pridnestrovie."
+        },
+        {
+          "date": "1995-12-24",
+          "election_kind": "referendum",
+          "contests": 2,
+          "source": "vs-book",
+          "quote": "24 декабря 1995 г. состоялись выборы в Верховный Совет второго созыва и референдум по принятию Конституции ПМР … о проведенном 24 декабря 1995 г. референдуме о вхождении Приднестровской Молдавской Республики в СНГ",
+          "note": "Adoption of the Constitution and joining the Commonwealth of Independent States."
+        },
+        {
+          "date": "2006-09-17",
+          "election_kind": "referendum",
+          "contests": 2,
+          "source": "vs-2006-ref",
+          "quote": "Всенародный референдум прошёл 17 сентября 2006 года. … В бюллетене было два вопроса.",
+          "note": "Independence with later free association with Russia (97.2% yes), and giving up independence to join Moldova (94.9% no); 78.6% turnout."
+        }
+      ]
+    },
+    {
+      "key": "gorrayon_sovet",
+      "tier": "rayon",
+      "name": "Выборы депутатов городских и районных Советов народных депутатов",
+      "name_en": "City and district Councils of People's Deputies",
+      "category": "council",
+      "goal": "local",
+      "earliest_record": "2010-03-28",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "md-sn.rayon"
+        ]
+      },
+      "finest_note": "Each deputy is elected in a single-member district of the city or district.",
+      "source": "constitution",
+      "locator": "https://vspmr.org/about/constitution/ (art. 77(2): five-year term)",
+      "note": "The Councils of Tiraspol, Bendery, and the five districts (each with its chief town) are elected for five years by majority vote in single-member districts; Dnestrovsk, the satellite town of Tiraspol, elects its own council. The councils elected in 1990 under the Moldavian SSR sat on into the republic and convocations are numbered from Soviet times (the 2010 councils were the XXIV, the 2020 councils the 26th). The local elections held between 1990 and 2010 are not yet dated from a reachable source. Heads of city and district state administrations are appointed by the President (see admin_head).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 0,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Центральная избирательная комиссия Приднестровской Молдавской Республики",
+          "valid_from": "2015-01-01",
+          "source": "vs-2025-scheme",
+          "locator": "https://vspmr.org/news/supreme-council/parlament-utverdil-shemu-obrazovaniya-izbirateljnih-okrugov-po-viboram-deputatov-verhovnogo-soveta-pmr-viii-soziva.html (Electoral Code art. 11: single voting day on the last Sunday of November)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия ПМР",
+          "url": "https://cik.gospmr.org/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "first_date": "2010-03-28",
+          "last_date": "2025-11-30",
+          "role": "administers",
+          "evidence": "The Central Election Commission's site resets connections from this network"
+        },
+        {
+          "platform": "Верховный Совет ПМР, новости",
+          "url": "https://vspmr.org/news/supreme-council/",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "CC BY 4.0",
+          "first_date": "2010-03-28",
+          "last_date": "2025-11-30",
+          "role": "publishes",
+          "source": "vs-history",
+          "evidence": "Supreme Council news reports give the dates and seat counts of the local elections from 2010"
+        }
+      ],
+      "est_votes": 110000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "2010-03-28",
+          "election_kind": "local",
+          "source": "vs-2010-local",
+          "quote": "Сегодня в Приднестровье проходят выборы в местные органы власти. 256 избирательных участков начали свою работу с 7 часов утра.",
+          "note": "XXIV convocation of the city and district councils, with the heads of village and settlement administrations."
+        },
+        {
+          "date": "2015-11-29",
+          "election_kind": "general",
+          "source": "vs-2015",
+          "quote": "Жители республики выбирали депутатов Верховного и местных Советов, глав сельских и поселковых администраций."
+        },
+        {
+          "date": "2017-04-02",
+          "election_kind": "by_election",
+          "source": "vs-2017-04",
+          "quote": "Одновременно с дополнительными выборами в Верховный Совет пройдут дополнительные выборы народных депутатов местных Советов народных депутатов в г. Бендеры по избирательным округам №26, №27; в г. Тирасполе по избирательным округам №5, №38, №45; в г. Днестровске по избирательному округу №49",
+          "note": "Also a village council seat in Parkany and a district council seat for Krasnenkoe and Ivanovka."
+        },
+        {
+          "date": "2017-10-01",
+          "election_kind": "by_election",
+          "source": "vs-2017-10",
+          "quote": "1 октября в республике прошли дополнительные и повторные выборы депутатов Верховного Совета ПМР VI созыва и местных Советов народных депутатов."
+        },
+        {
+          "date": "2018-04-01",
+          "election_kind": "by_election",
+          "source": "vs-2018-04",
+          "quote": "1 апреля, в республике прошли дополнительные, повторные выборы народных депутатов в местные Советы народных депутатов Бендер, Слободзейского и Рыбницкого района."
+        },
+        {
+          "date": "2018-10-28",
+          "election_kind": "by_election",
+          "source": "vs-2018-10",
+          "quote": "подготовку к дополнительным и повторным выборам депутатов местных Советов народных депутатов. Они намечены 28 октября.",
+          "note": "Eight districts in the Slobodzeya district, Bendery, and Dnestrovsk."
+        },
+        {
+          "date": "2020-11-29",
+          "election_kind": "general",
+          "source": "vs-2020",
+          "quote": "Выбирают депутата Верховного Совета и депутата Тираспольского горсовета.",
+          "note": "26th convocation."
+        },
+        {
+          "date": "2022-03-27",
+          "election_kind": "by_election",
+          "source": "vs-2022-03",
+          "quote": "на двух округах в Бендерах пройдет голосование за своих представителей в горсовете, еще на пяти округах в Слободзейском райо"
+        },
+        {
+          "date": "2025-11-30",
+          "election_kind": "general",
+          "seats": 183,
+          "source": "vs-2025-start",
+          "quote": "В городских и районных Советах на 183 места зарегистрировано 235 кандидатов."
+        }
+      ]
+    },
+    {
+      "key": "selsky_sovet",
+      "tier": "selo",
+      "name": "Выборы депутатов сельских (поселковых) Советов народных депутатов",
+      "name_en": "Village and settlement Councils of People's Deputies",
+      "category": "council",
+      "goal": "local",
+      "earliest_record": "2015-11-29",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "md-sn.selo"
+        ]
+      },
+      "source": "constitution",
+      "locator": "https://vspmr.org/about/constitution/ (art. 77(2): village and settlement councils elected for five years)",
+      "note": "Village and settlement councils are elected for five years on the single voting day. Elections before 2015 are not yet dated from a reachable source.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 0,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Центральная избирательная комиссия Приднестровской Молдавской Республики",
+          "valid_from": "2015-01-01",
+          "source": "vs-2025-scheme",
+          "locator": "https://vspmr.org/news/supreme-council/parlament-utverdil-shemu-obrazovaniya-izbirateljnih-okrugov-po-viboram-deputatov-verhovnogo-soveta-pmr-viii-soziva.html (Electoral Code art. 11)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия ПМР",
+          "url": "https://cik.gospmr.org/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "first_date": "2015-11-29",
+          "last_date": "2025-11-30",
+          "role": "administers",
+          "evidence": "The Central Election Commission's site resets connections from this network"
+        }
+      ],
+      "est_votes": 70000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "2015-11-29",
+          "election_kind": "general",
+          "source": "vs-2015",
+          "quote": "В 2015 году приднестровцы впервые в истории государства выбирали в один день депутатов Верховного Совета, городских и районных Советов народных депутатов, сельских Советов и глав администраций сел и поселков."
+        },
+        {
+          "date": "2020-11-29",
+          "election_kind": "general",
+          "source": "vs-2020-bendery",
+          "quote": "Сегодня приднестровцы выбирают депутатов всех уровней."
+        },
+        {
+          "date": "2025-11-30",
+          "election_kind": "general",
+          "seats": 469,
+          "source": "vs-2025-start",
+          "quote": "За 469 мандатов депутатов сельских и поселковых советов поборется 491 кандидат."
+        }
+      ]
+    },
+    {
+      "key": "glava_sela",
+      "tier": "selo",
+      "name": "Выборы председателей сельских (поселковых) Советов – глав администраций сел (поселков)",
+      "name_en": "Chairs of village and settlement councils and heads of their administrations",
+      "category": "executive",
+      "goal": "local",
+      "first_held": "2010-03-28",
+      "earliest_record": "2010-03-28",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "md-sn.selo"
+        ]
+      },
+      "source": "vs-2025-scheme",
+      "note": "Each village and settlement elects the chair of its council, who heads its administration, by direct vote on the local election day; vacancies go to by-elections. From 2025 they no longer sit ex officio on the city and district councils. Whether heads were elected directly before 2010 is not yet established.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election",
+            "special"
+          ],
+          "office_kinds": [
+            "mayor"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "phase": 0,
+          "month": 11,
+          "day_rule": "nov_last_sunday",
+          "called": false,
+          "administered_by": "Центральная избирательная комиссия Приднестровской Молдавской Республики",
+          "valid_from": "2015-01-01",
+          "source": "vs-2025-scheme",
+          "locator": "https://vspmr.org/news/supreme-council/parlament-utverdil-shemu-obrazovaniya-izbirateljnih-okrugov-po-viboram-deputatov-verhovnogo-soveta-pmr-viii-soziva.html (Electoral Code art. 11)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия ПМР",
+          "url": "https://cik.gospmr.org/",
+          "format": "html",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "first_date": "2010-03-28",
+          "last_date": "2025-11-30",
+          "role": "administers",
+          "evidence": "The Central Election Commission's site resets connections from this network"
+        }
+      ],
+      "est_votes": 70000,
+      "effort": 3,
+      "dates": [
+        {
+          "date": "2010-03-28",
+          "election_kind": "local",
+          "source": "vs-2010-local",
+          "quote": "Сегодня в Приднестровье проходят выборы в местные органы власти.",
+          "note": "The Central Election Commission declared the elections of the city and district councils and of the heads of village, settlement, and small-town administrations valid."
+        },
+        {
+          "date": "2015-11-29",
+          "election_kind": "general",
+          "source": "vs-2015",
+          "quote": "Жители республики выбирали депутатов Верховного и местных Советов, глав сельских и поселковых администраций."
+        },
+        {
+          "date": "2020-11-29",
+          "election_kind": "general",
+          "note": "Held on the 2020 single voting day (the by-election for the head of Gidirim in March 2022 filled a post elected then); no reachable page states it."
+        },
+        {
+          "date": "2022-03-27",
+          "election_kind": "by_election",
+          "contests": 1,
+          "source": "vs-2022-03",
+          "quote": "В этот день в с. Гидирим Рыбницкого района сельчане будут выбирать главу села"
+        },
+        {
+          "date": "2025-11-30",
+          "election_kind": "general",
+          "contests": 76,
+          "seats": 76,
+          "source": "vs-2025-start",
+          "quote": "А на 76 выборных должностей председателей сельских советов – глав администраций сел (поселков) претендует 119 человек."
+        }
+      ]
+    },
+    {
+      "key": "chairman_1990",
+      "tier": "national",
+      "name": "Избрание Председателя ПМССР Верховным Советом",
+      "name_en": "Chairman of the PMSSR, elected by the Supreme Council (1990-1991)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1990-11-29",
+      "valid_to": "1991-12-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "president-office",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Supreme Council chose Igor Smirnov as Chairman of the PMSSR at its first session on 29 November 1990; voters had no part until the office became the popularly elected President on 1 December 1991.",
+      "match": []
+    },
+    {
+      "key": "admin_head",
+      "tier": "rayon",
+      "name": "Главы государственных администраций городов (районов)",
+      "name_en": "Heads of city and district state administrations",
+      "category": "executive",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "locator": "https://vspmr.org/about/constitution/ (art. 78(2)-(3))",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed and dismissed by the President, or in some units by the local council on the President's nomination (Constitution art. 78); no popular vote.",
+      "match": []
+    },
+    {
+      "key": "judicial",
+      "tier": "national",
+      "name": "Судьи",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges are appointed under chapter 5 of the Constitution; the Electoral Code provides only for the President, the Supreme Council, the local Councils, the heads of village and settlement administrations, and referendums.",
+      "match": []
+    },
+    {
+      "key": "nominating",
+      "tier": "national",
+      "name": "Выдвижение кандидатов партиями",
+      "name_en": "Party candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "vs-book",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Candidates are nominated by voters' initiative groups, parties, and blocs and registered by the election commissions; no public primary is held or published.",
+      "match": []
+    }
+  ]
+}

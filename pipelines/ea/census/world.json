@@ -782,9 +782,15 @@
       "kind": "official_body"
     },
     "md-sn": {
-      "publisher": "Supreme Council of the Pridnestrovian Moldavian Republic",
-      "title": "Supreme Council (official website)",
-      "url": "https://en.vspmr.org",
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "title": "История создания и развития Верховного Совета Приднестровской Молдавской Республики",
+      "url": "https://vspmr.org/about/history/",
+      "kind": "official_body"
+    },
+    "md-sn-vs": {
+      "publisher": "Верховный Совет Приднестровской Молдавской Республики",
+      "title": "Парламент утвердил схему образования избирательных округов по выборам депутатов Верховного Совета ПМР VIII созыва",
+      "url": "https://vspmr.org/news/supreme-council/parlament-utverdil-shemu-obrazovaniya-izbirateljnih-okrugov-po-viboram-deputatov-verhovnogo-soveta-pmr-viii-soziva.html",
       "kind": "official_body"
     },
     "az-nk": {
@@ -3248,9 +3254,15 @@
       "name_en": "Transnistria",
       "status": "de_facto",
       "recognized_within": "MD",
-      "reason": "Supreme Council elections since 1990 and presidential elections since 1991.",
+      "reason": "Proclaimed on 2 September 1990 by the II Extraordinary Congress of People's Deputies of All Levels of Pridnestrovie as the Pridnestrovian Moldavian SSR; its Supreme Council has been elected since 25 November 1990, and its President and referendums voted on since 1 December 1991.",
       "source": "md-sn",
-      "locator": "https://en.vspmr.org"
+      "locator": "https://vspmr.org/about/history/ (2 сентября 1990 года ... II Чрезвычайный съезд народных депутатов всех уровней Приднестровья провозгласил образование суверенного государства Приднестровской Молдавской Советской Социалистической Республики)",
+      "electorate": {
+        "value": 394104,
+        "date": "2025-06-25",
+        "source": "md-sn-vs",
+        "locator": "https://vspmr.org/news/supreme-council/parlament-utverdil-shemu-obrazovaniya-izbirateljnih-okrugov-po-viboram-deputatov-verhovnogo-soveta-pmr-viii-soziva.html (По данным ЦИК, численность избирателей, зарегистрированных на территории республики, составляет 394 104 человека)"
+      }
     },
     {
       "iso": "AZ-NK",
