@@ -1,0 +1,442 @@
+{
+  "polity": "XAH",
+  "name": "Austria-Hungary",
+  "sources": {
+    "mnl-koronazas": {
+      "title": "Ferenc József koronázása (The coronation of Francis Joseph)",
+      "publisher": "Magyar Nemzeti Levéltár (National Archives of Hungary)",
+      "url": "https://mnl.gov.hu/mnl/ol/hirek/ferenc_jozsef_koronazasa",
+      "kind": "official_body",
+      "note": "The National Archives of Hungary: Francis Joseph was crowned King of Hungary on 8 June 1867, a little over a week after the Diet adopted the law on common affairs (Law XII of 1867), completing the Compromise."
+    },
+    "parl-ausgleich": {
+      "title": "Abschied vom gesamtstaatlichen Kaiserreich",
+      "publisher": "Parlamentsdirektion (Republik Österreich)",
+      "url": "https://www.parlament.gv.at/verstehen/historisches/1848-1918/abschied-kaiserreich/index.html",
+      "kind": "official_body",
+      "note": "The Austrian Parliament's history of the Compromise of 1867: agreement with Hungary in March 1867, the December Constitution and the Delegation Law passed by the Reichsrat in December 1867; each half of the Dual Monarchy with its own parliament, government, laws, and courts; the common affairs (foreign policy, the army, and common finance) legislated by Delegations of 60 members each from the Austrian Reichsrat and the Hungarian Diet."
+    },
+    "parl-ende": {
+      "title": "Erster Weltkrieg und Ende der Monarchie",
+      "publisher": "Parlamentsdirektion (Republik Österreich)",
+      "url": "https://www.parlament.gv.at/verstehen/historisches/1848-1918/erster-weltkrieg-ende-monarchie/index.html",
+      "kind": "official_body",
+      "note": "The Austrian Parliament's history of the monarchy's end: the Reichsrat was closed in 1914 and recalled for 30 May 1917; the Emperor's manifesto of 16 October 1918; the German deputies elected in 1911 met as the Provisional National Assembly on 21 October 1918; the Republic was proclaimed on 12 November 1918, the day of the Reichsrat's last sitting."
+    },
+    "parl-nationalitaeten": {
+      "title": "Nationalitätenfrage",
+      "publisher": "Parlamentsdirektion (Republik Österreich)",
+      "url": "https://www.parlament.gv.at/verstehen/historisches/1848-1918/nationalitatenfrage/index.html",
+      "kind": "official_body",
+      "note": "Each half of the monarchy had its own parliament; the members of the Herrenhaus were appointed by the Emperor; the House of Deputies was filled by the Landtage until direct election by curiae began in 1873; its membership grew from 203 in 1867 to 516 in 1907, the first election with equal male suffrage."
+    },
+    "parl-wahlrecht": {
+      "title": "Geschichte des Wahlrechts",
+      "publisher": "Parlamentsdirektion (Republik Österreich)",
+      "url": "https://www.parlament.gv.at/verstehen/historisches/wahlen/geschichte-des-wahlrechts/index.html",
+      "kind": "official_body"
+    },
+    "parlament": {
+      "title": "Az Országgyűlés története és a korábbi országgyűlési választások",
+      "publisher": "Országgyűlés Hivatala",
+      "url": "https://www.parlament.hu/",
+      "kind": "official_body",
+      "note": "The Parliament's own history pages and almanacs; dates before 1990 are listed from them and the laws that called each election, not quoted."
+    },
+    "dzs_ljetopis_2009": {
+      "title": "Statistički ljetopis Republike Hrvatske 2009, poglavlje 2: Upravno-teritorijalni ustroj",
+      "publisher": "Državni zavod za statistiku",
+      "url": "https://web.dzs.hr/Hrv_Eng/ljetopis/2009/PDF/02-bind.pdf",
+      "kind": "official_body"
+    },
+    "landesstatut": {
+      "title": "Landesstatut für Bosnien und die Hercegovina und Landtagswahlordnung (Gesetz- und Verordnungsblatt für Bosnien und die Hercegovina, 1910)",
+      "publisher": "Österreichische Nationalbibliothek (ALEX, historische Rechts- und Gesetzestexte)",
+      "url": "https://alex.onb.ac.at/",
+      "kind": "official_body",
+      "note": "Digitized official gazettes; the Bosnian Landtag (Sabor) of 1910-1914 was elected by curiae."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Österreichisch-Ungarische Monarchie (Osztrák–Magyar Monarchia)",
+      "name_en": "Austria-Hungary, the Dual Monarchy and its common institutions",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "elects": false,
+      "valid_from": "1867-06-08",
+      "valid_to": "1918-11-12",
+      "source": "parl-ausgleich"
+    },
+    {
+      "key": "cisleithanien",
+      "name": "Im Reichsrat vertretene Königreiche und Länder",
+      "name_en": "Cisleithania, the Austrian half of the monarchy",
+      "parent": "national",
+      "polity_kind": "region",
+      "valid_from": "1867-12-21",
+      "valid_to": "1918-11-12",
+      "source": "parl-ausgleich"
+    },
+    {
+      "key": "kronland",
+      "name": "Kronländer",
+      "name_en": "Crown lands of Cisleithania, each with its own Landtag",
+      "parent": "cisleithanien",
+      "polity_kind": "region",
+      "valid_from": "1867-12-21",
+      "valid_to": "1918-11-12",
+      "source": "parl-wahlrecht"
+    },
+    {
+      "key": "transleithanien",
+      "name": "A Szent Korona országai (Länder der ungarischen Krone)",
+      "name_en": "Transleithania, the lands of the Hungarian Crown",
+      "parent": "national",
+      "polity_kind": "region",
+      "valid_from": "1867-06-08",
+      "valid_to": "1918-11-12",
+      "source": "mnl-koronazas"
+    },
+    {
+      "key": "kroatien_slawonien",
+      "name": "Kraljevine Hrvatska i Slavonija",
+      "name_en": "Kingdom of Croatia-Slavonia, the autonomous land of the Hungarian Crown",
+      "parent": "transleithanien",
+      "polity_kind": "region",
+      "valid_to": "1918-10-29",
+      "source": "dzs_ljetopis_2009"
+    },
+    {
+      "key": "bosnien",
+      "name": "Bosnien und die Hercegovina (Reichsland)",
+      "name_en": "Bosnia and Herzegovina, administered in common by both halves",
+      "parent": "national",
+      "polity_kind": "region",
+      "valid_from": "1908-10-07",
+      "valid_to": "1918-10-29",
+      "source": "landesstatut"
+    },
+    {
+      "key": "gemeinde",
+      "name": "Gemeinden, Komitate und Munizipien (községek, vármegyék, törvényhatóságok)",
+      "name_en": "Municipalities, Hungarian counties, and chartered towns",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "valid_from": "1867-06-08",
+      "valid_to": "1918-11-12",
+      "source": "parl-ausgleich"
+    }
+  ],
+  "classes": [
+    {
+      "key": "delegationen",
+      "tier": "national",
+      "name": "Wahl der Delegationen (Delegációk választása)",
+      "name_en": "Delegations for the common affairs, chosen by the two parliaments",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1867-12-21",
+      "valid_to": "1918-11-12",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parl-ausgleich",
+      "locator": "https://www.parlament.gv.at/verstehen/historisches/1848-1918/abschied-kaiserreich/index.html (Die Geburt der Doppelmonarchie: Delegationen aus je 60 Mitgliedern des österreichischen Reichsrats und des ungarischen Reichstags)",
+      "note": "The only deliberative body common to the whole monarchy. Foreign affairs, the army, and common finance were legislated by two Delegations of 60 members each, one chosen from the Austrian Reichsrat and one from the Hungarian Diet, which met separately and exchanged their decisions in writing. There was no common parliament and no common popular election.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No popular vote: the members of each Delegation were chosen by and from the Austrian Reichsrat and the Hungarian Diet under the Delegation Law of December 1867 and Hungarian Law XII of 1867 (Austrian Parliament).",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "appointed_assembly",
+            "electoral_college"
+          ],
+          "iso_pattern": "XAH"
+        }
+      ]
+    },
+    {
+      "key": "monarch",
+      "tier": "national",
+      "name": "Kaiser von Österreich und Apostolischer König von Ungarn",
+      "name_en": "Emperor of Austria and King of Hungary (head of state)",
+      "category": "executive",
+      "goal": "national",
+      "valid_from": "1867-06-08",
+      "valid_to": "1918-11-12",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "mnl-koronazas",
+      "locator": "https://mnl.gov.hu/mnl/ol/hirek/ferenc_jozsef_koronazasa (coronation of Francis Joseph as King of Hungary on 8 June 1867)",
+      "note": "The monarch reigned over both halves by hereditary succession (Francis Joseph to 21 November 1916, then Charles); the common ministers of foreign affairs, war, and finance were appointed by the monarch.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Hereditary: the Habsburg monarch held the throne by succession and was crowned King of Hungary (8 June 1867, National Archives of Hungary); the common ministers were appointed, not elected.",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_state",
+            "head_of_government"
+          ],
+          "iso_pattern": "XAH"
+        }
+      ]
+    },
+    {
+      "key": "volksabstimmung",
+      "tier": "national",
+      "name": "Volksabstimmung (népszavazás)",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1867-06-08",
+      "valid_to": "1918-11-12",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "parl-ausgleich",
+      "disposition": "out_of_scope",
+      "disposition_reason": "None held: the Compromise laws and the December Constitution placed legislation in the two parliaments and the Delegations and provided no popular vote on laws or the constitution in the monarchy or either half (Austrian Parliament); the first referendums on the territory were held by the successor states after 1918.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "XAH*"
+        }
+      ]
+    },
+    {
+      "key": "reichsrat",
+      "tier": "cisleithanien",
+      "name": "Wahlen zum Abgeordnetenhaus des Reichsrates",
+      "name_en": "Elections to the House of Deputies of the Reichsrat (Cisleithania)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1867-12-21",
+      "valid_to": "1918-11-12",
+      "first_held": "1873-01-01",
+      "measure": {
+        "unit": "election"
+      },
+      "source": "parl-nationalitaeten",
+      "locator": "https://www.parlament.gv.at/verstehen/historisches/1848-1918/nationalitatenfrage/index.html (Die ersten Wahlen zum Abgeordnetenhaus: 1873 Direktwahl; 203 Mitglieder 1867, 516 im Jahr 1907)",
+      "note": "The parliament of the Austrian half. Until 1873 the Landtage delegated its deputies; from 1873 they were elected directly by curiae (the rural curia through electors), a fifth general curia was added in 1896 and first voted in 1897, and equal direct male suffrage applied in 1907 and 1911, the last election of the monarchy. Membership grew from 203 in 1867 to 516 in 1907. The Reichsrat last sat on 12 November 1918. Constituency returns were printed by the state at the time; none is published online by an official body today.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Counted in Austria's census (census.at, class reichsrat on its Cisleithania tier), which the Slovenian census also points to; listing it here as well would count the same elections twice.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "XAH",
+          "valid_to": "1918-11-12"
+        }
+      ]
+    },
+    {
+      "key": "herrenhaus",
+      "tier": "cisleithanien",
+      "name": "Herrenhaus des Reichsrates",
+      "name_en": "House of Lords of the Reichsrat",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1867-12-21",
+      "valid_to": "1918-11-12",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "parl-nationalitaeten",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No popular vote: the members of the Herrenhaus sat by birth or office or were appointed by the Emperor (Austrian Parliament).",
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "XAH",
+          "valid_to": "1918-11-12"
+        }
+      ]
+    },
+    {
+      "key": "landtage",
+      "tier": "kronland",
+      "name": "Landtagswahlen in den Kronländern",
+      "name_en": "Crown-land diet elections",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_from": "1867-12-21",
+      "valid_to": "1918-11-12",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parl-wahlrecht",
+      "note": "Each crown land (Bohemia, Moravia, Silesia, Galicia, Bukovina, Lower and Upper Austria, Salzburg, Styria, Carinthia, Carniola, Tyrol, Vorarlberg, Gorizia and Gradisca, Istria, Trieste, and Dalmatia) elected its Landtag by curiae under its own Landesordnung; until 1873 the Landtage also delegated the Reichsrat's deputies.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Counted in Austria's census (census.at, class kronland_landtage, held there as blocked for want of an official compilation); listing them here as well would count the same elections twice.",
+      "match": [
+        {
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "XAH-*",
+          "valid_to": "1918-11-12"
+        }
+      ]
+    },
+    {
+      "key": "orszaggyules",
+      "tier": "transleithanien",
+      "name": "Országgyűlési képviselőválasztások",
+      "name_en": "Elections to the House of Representatives of the Hungarian Diet",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1867-06-08",
+      "valid_to": "1918-11-12",
+      "first_held": "1869-03-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "parlament",
+      "note": "The parliament of the Hungarian half, elected under a census franchise in single-member constituencies, largely by open ballot, from 1869 to 1910; Croatia-Slavonia sent delegates from its Sabor rather than electing members directly. Constituency returns are in the Parliament's almanacs.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Counted in Hungary's census (census.hu, class orszaggyules_kiralysag on its Kingdom of Hungary tier); listing them here as well would count the same elections twice.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "XAH",
+          "valid_to": "1918-11-12"
+        }
+      ]
+    },
+    {
+      "key": "forendihaz",
+      "tier": "transleithanien",
+      "name": "Főrendiház",
+      "name_en": "House of Magnates of the Hungarian Diet",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1867-06-08",
+      "valid_to": "1918-11-12",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "parlament",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No popular vote: the magnates sat by birth, office, or royal appointment, and Croatia-Slavonia's members were delegated by its Sabor.",
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "XAH",
+          "valid_to": "1918-11-12",
+          "precedence": 1
+        }
+      ]
+    },
+    {
+      "key": "sabor_hrvatska_slavonija",
+      "tier": "kroatien_slawonien",
+      "name": "Izbori za Sabor Kraljevina Hrvatske i Slavonije",
+      "name_en": "Elections to the Sabor of Croatia-Slavonia",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_to": "1918-10-29",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "dzs_ljetopis_2009",
+      "note": "The autonomous Sabor of Croatia-Slavonia, elected under a census franchise in single-member districts with public voting; it delegated Croatia-Slavonia's members to the Hungarian Diet.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Counted in Croatia's census (census.hr, class sabor_hrvatsko_slavonski); listing them here as well would count the same elections twice.",
+      "match": [
+        {
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "XAH-*",
+          "valid_to": "1918-10-29",
+          "precedence": 1
+        }
+      ]
+    },
+    {
+      "key": "sabor_bosna",
+      "tier": "bosnien",
+      "name": "Wahlen zum Bosnisch-hercegovinischen Landtag (Sabor)",
+      "name_en": "Elections to the Diet (Sabor) of Bosnia and Herzegovina",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_from": "1910-05-01",
+      "valid_to": "1918-10-29",
+      "first_held": "1910-05-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "landesstatut",
+      "note": "The one elected body of the land the two halves administered in common through the joint Ministry of Finance: 72 members elected by confessional curiae in May 1910 under the Landesstatut of 17 February 1910; the Diet sat until 1914 and no further election was held.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Counted in the census of Bosnia and Herzegovina (census.ba, class sabor_1910, held there as blocked); listing it here as well would count the same election twice.",
+      "match": [
+        {
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "XAH-*",
+          "valid_from": "1910-01-01",
+          "valid_to": "1918-10-29",
+          "precedence": 2
+        }
+      ]
+    },
+    {
+      "key": "kommunal",
+      "tier": "gemeinde",
+      "name": "Gemeinde-, Komitats- und Munizipalwahlen (községi és törvényhatósági választások)",
+      "name_en": "Municipal, county, and chartered-town elections",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1867-06-08",
+      "valid_to": "1918-11-12",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "parl-ausgleich",
+      "note": "Each half regulated its own local government: in Cisleithania under the crown lands' municipal codes, by curiae; in Hungary half of each county and municipal committee sat as the largest taxpayers (virilists) and the other half was elected.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Local elections were held under the laws of each half and each crown land, not of the common monarchy; they belong to the successor states' censuses (census.hu, torvenyhatosag, held there as blocked; census.at, gemeinderat).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "XAH*",
+          "valid_to": "1918-11-12"
+        }
+      ]
+    }
+  ]
+}
