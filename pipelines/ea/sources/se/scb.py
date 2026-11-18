@@ -78,6 +78,9 @@ def fetch() -> None:
     jobs += [(table, year) for table in EP_TABLES for year in EP_YEARS]
     with ThreadPoolExecutor(WORKERS) as pool:
         list(pool.map(_get, jobs))
+    from ea.sources.se import scb_referendums
+
+    scb_referendums.fetch()
 
 
 # Membership of municipalities in the constituencies and county councils of Skåne and Västra Götaland. Statistics
@@ -272,6 +275,10 @@ OLD_COUNCILS = {
     "15": "Älvsborgs läns landsting",
     "16": "Skaraborgs läns landsting",
 }
+STOCKHOLM_CITY, STOCKHOLM_COUNTY = "01A", "01B"
+OLD_STOCKHOLM = {STOCKHOLM_CITY: "Stockholms stad", STOCKHOLM_COUNTY: "Stockholms län"}
+"""The capital and the county around it, separate counties until they merged into today's Stockholms län in 1968.
+Statistics Sweden's tables of the 1950s print them apart; the codes follow their old county letters, A and B."""
 BARA = "1229"
 """A municipality of Malmöhus County that Statistics Sweden lists for the 1973 elections only; it was merged into
 Svedala."""
@@ -306,6 +313,7 @@ def council_name(code: str, year: int) -> str:
 SCHEMES = {val.COUNTY, val.MUNICIPALITY, val.CONSTITUENCY}
 OWN_AREAS = (
     {(val.COUNTY, code) for code in OLD_COUNTIES}
+    | {(val.COUNTY, code) for code in OLD_STOCKHOLM}
     | {(val.CONSTITUENCY, code) for code in OLD_CONSTITUENCIES}
     | {(val.MUNICIPALITY, BARA)}
 )
@@ -379,8 +387,8 @@ def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "Sweden's former Riksdag constituencies, county councils' counties, and municipality as Statistics Sweden "
-        "lists them for 1973 to 1998",
+        "Sweden's former Riksdag constituencies, counties, and municipality as Statistics Sweden lists them for 1957 "
+        "to 1998",
         depends=[f"{val.SOURCE}/geo"],
     )
     p.external |= {SWEDEN, COUNTRY, *SCHEMES}
@@ -397,6 +405,17 @@ def geo() -> Package:
         place(val.COUNTY, code, text, COUNTRY)
     for code, text in OLD_CONSTITUENCIES.items():
         place(val.CONSTITUENCY, code, text, COUNTRY)
+    for code, text in OLD_STOCKHOLM.items():
+        place(val.COUNTY, code, text, COUNTRY)
+        p.add(
+            "note",
+            id=key("note", area(val.COUNTY, code)),
+            entity_id=area(val.COUNTY, code),
+            kind="context",
+            body_md="Stockholms stad (the city of Stockholm) and Stockholms län (the county around it) were separate "
+            "counties until 1968, when they merged into today's Stockholms län.",
+            lang="en",
+        )
     place(val.MUNICIPALITY, BARA, "Bara", area(val.COUNTY, "12G"))
     p.add(
         "note",
@@ -947,21 +966,27 @@ def ep_election(year: int) -> Package:
 
 
 def packages() -> list[str]:
+    from ea.sources.se import scb_referendums
+
     return [
         f"{SOURCE}/geo",
         f"{SOURCE}/registry",
         *(f"{SOURCE}/{DATES[year]}" for year in YEARS),
         *(f"{SOURCE}/{EP_DATES[year]}" for year in EP_YEARS),
+        *scb_referendums.packages(),
     ]
 
 
 def parse() -> None:
+    from ea.sources.se import scb_referendums
+
     geo().write()
     registry().write()
     for year in YEARS:
         election(year).write()
     for year in EP_YEARS:
         ep_election(year).write()
+    scb_referendums.parse()
 
 
 NATIONAL = {"R": "VR00", "L": "00L", "K": "00"}
