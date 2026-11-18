@@ -19,6 +19,7 @@ ARCHIVE = "https://www.dvk-rs.si/arhivi"
 VOLITVE = "https://volitve.dvk-rs.si"
 SLOVENIA = str(uuid5(package.NAMESPACE, "polity\x1fSI"))
 ELECTORAL_UNITS = range(1, 9)
+COMMUNITY_UNITS = {9: "Koper", 10: "Lendava"}
 DISTRICTS = range(1, 12)
 
 
@@ -971,8 +972,8 @@ def geo() -> Package:
     p = Package(
         "si.dvk/geo",
         SOURCE,
-        "Slovenia's 8 National Assembly electoral units and 88 electoral districts, as numbered by the State "
-        "Election Commission",
+        "Slovenia's 8 territorial and 2 national-community National Assembly electoral units and 88 electoral "
+        "districts, as numbered by the State Election Commission",
     )
     p.external.add(SLOVENIA)
     for code, rank, kind, noun in (
@@ -995,6 +996,11 @@ def geo() -> Package:
         p.add("area", id=id, scheme_code="si.ve")
         p.add("area_code", area_id=id, code=str(unit))
         p.name(id, title(units[unit]), "sl", "official")
+    for unit, name in COMMUNITY_UNITS.items():
+        id = area("si.ve", str(unit))
+        p.add("area", id=id, scheme_code="si.ve")
+        p.add("area_code", area_id=id, code=str(unit))
+        p.name(id, name, "sl", "official")
     for (unit, seat), text in sorted(seats.items()):
         id = area("si.vo", f"{unit}.{seat}")
         p.add("area", id=id, scheme_code="si.vo")
