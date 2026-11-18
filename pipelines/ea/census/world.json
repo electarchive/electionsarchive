@@ -824,10 +824,10 @@
       "kind": "official_body"
     },
     "csk": {
-      "publisher": "Sociological Review, Czech Academy of Sciences",
-      "title": "The Dissolution of Czechoslovakia: A Chronology of Events in 1992",
-      "url": "https://sreview.soc.cas.cz/pdfs/csr/1993/11/33.pdf",
-      "kind": "compendium"
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "title": "Zákon č. 542/1992 Sb., o zániku České a Slovenské Federativní Republiky",
+      "url": "https://e-sbirka.gov.cz/sb/1992/542",
+      "kind": "official_body"
     },
     "scg": {
       "publisher": "Council of Europe, Parliamentary Assembly",
@@ -3308,9 +3308,9 @@
       "iso": "CSK",
       "name_en": "Czechoslovakia",
       "status": "former",
-      "reason": "Chamber of Deputies, Senate, and Federal Assembly elections from 1920 to 1992.",
+      "reason": "Founded by the National Committee's Act 11/1918 of 28 October 1918, in force that day, and dissolved at the end of 31 December 1992 by Constitutional Act 542/1992, its powers passing to the Czech and Slovak Republics on 1 January 1993; it elected the Chamber of Deputies and Senate from 1920 to 1935, the Constituent National Assembly in 1946, single-list National Assemblies from 1948 to 1964, and the Federal Assembly from 1971 to 1992, whose Presidents were all chosen by the legislature.",
       "source": "csk",
-      "locator": "https://sreview.soc.cas.cz/pdfs/csr/1993/11/33.pdf"
+      "locator": "https://e-sbirka.gov.cz/sb/1992/542 (čl. 1: Uplynutím dne 31. prosince 1992 zaniká Česká a Slovenská Federativní Republika); https://e-sbirka.gov.cz/sb/1918/11 (Samostatný stát československý vstoupil v život; zákon nabývá účinnosti dnešním dnem, 28. října 1918)"
     },
     {
       "iso": "SCG",
