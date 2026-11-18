@@ -112,6 +112,7 @@ def _pdf(path: object) -> None:
 
 ETHIOPIA = str(uuid5(package.NAMESPACE, "polity\x1fET"))
 TRANSCRIPTION = Path(__file__).with_name("nebe_hopr_2021.json")
+RC_TRANSCRIPTION = Path(__file__).with_name("nebe_rc_2021.json")
 POLLS = {"2021-06-21": date(2021, 6, 21), "2021-09-30": date(2021, 9, 30)}
 POLL_TEXT = {"2021-06-21": "ሰኔ 14 ቀን 2013 ዓ.ም.", "2021-09-30": "መስከረም 20 ቀን 2014 ዓ.ም."}
 VOTES, REGISTERED, VALID, INVALID, VOTERS = 1, 2, 4, 5, 14
@@ -145,24 +146,24 @@ METHOD = (
 PARTIES: list[tuple[str, str | None, str, str, str]] = [
     # key, English name, native name, language, pattern
     ("independent", None, "", "", r"የግል|independent|musharax madax|kaadhim"),
-    ("pp", "Prosperity Party", "ብልፅግና ፓርቲ", "am", r"ብል[ፅጽ]ግ|bh?a+dh?a+dh|barwaaqo|leeda|prosperity"),
+    ("pp", "Prosperity Party", "ብልፅግና ፓርቲ", "am", r"ብል[ፅጽ]ግ|bh?a+dh?a+dh|barwaaqo|leeda|leed\b|prosperity"),
     (
         "ezema",
         "Ethiopian Citizens for Social Justice",
         "የኢትዮጵያ ዜጎች ለማኅበራዊ ፍትህ ፓርቲ",
         "am",
-        r"[ዜዚ]ጎች|ኢዜማ|izema|lamm|caddaaladda",
+        r"[ዜዚ]ጎች|ኢዜማ|[ie]zee?ma|lamm|caddaaladda",
     ),
     ("enat", "Enat Party", "እናት ፓርቲ", "am", r"እናት|harmee|haadhoo"),
     ("aeuo", "All Ethiopian Unity Organization", "የመላው ኢትዮጵያ አንድነት ድርጅት", "am", r"መላው"),
-    ("nama", "National Movement of Amhara", "የአማራ ብሔራዊ ንቅናቄ", "am", r"አማራ ብ|saba amaara"),
+    ("nama", "National Movement of Amhara", "የአማራ ብሔራዊ ንቅናቄ", "am", r"አማራ [ብን]ሔራዊ|አማራ ብ|saba amaara"),
     ("adfm", "Amhara Democratic Force Movement", "የአማራ ዴሞክራሲያዊ ኃይል ንቅናቄ", "am", r"አማራ ዴሞ"),
     (
         "efep",
         "Freedom and Equality Party",
         "ነፃነትና እኩልነት ፓርቲ",
         "am",
-        r"ነ[ፃጻ]ነት(ና)? ?(ለ)?እኩልነት|bilisumm?aa? ?fi ?wa|sinaanta",
+        r"ነ[ፃጻ]ነት(ና| እና)? ?(ለ)?እኩልነት|bilisumm?aa? ?fi ?wa|sinaanta",
     ),
     ("hibir", "Hibir Ethiopia Democratic Party", "ኅብር ኢትዮጵያ ዴሞክራሲያዊ ፓርቲ", "am", r"[ኅህሕ][ብበ]ር ኢትዮጵያ"),
     ("esdp", "Ethiopian Social Democratic Party", "የኢትዮጵያ ሶሻል ዴሞክራቲክ ፓርቲ", "am", r"ሶሻል|sooshaal"),
@@ -197,19 +198,19 @@ PARTIES: list[tuple[str, str | None, str, str, str]] = [
     ("donga", "Donga People's Democratic Organization", "የዶንጋ ሕዝቦች ዴሞክራሲያዊ ድርጅት", "am", r"ዶንጋ"),
     ("argoba", "Argoba Nationality Democratic Movement", "የአርጎባ ብሔረሰብ ዴሞክራሲያዊ ንቅናቄ", "am", r"አርጎባ"),
     ("mocha", "Mocha Democratic Party", "ሞቻ ዴሞክራሲያዊ ፓርቲ", "am", r"ሞቻ"),
-    ("gplm", "Gambella Peoples' Liberation Movement", "የጋምቤላ ሕዝቦች ነፃነት ንቅናቄ", "am", r"ጋምቤላ ሕዝቦች"),
+    ("gplm", "Gambella Peoples' Liberation Movement", "የጋምቤላ ሕዝቦች ነፃነት ንቅናቄ", "am", r"ጋየ?ምቤላ [ሕህ]ዝቦች"),
     (
         "gpdlm",
         "Gambella People's Democratic Liberation Movement",
         "የጋምቤላ ሕዝብ ነፃነት ዴሞክራሲያዊ ንቅናቄ",
         "am",
-        r"ጋምቤላ ሕዝብ ነ",
+        r"ጋምቤላ [ሕህ]ዝብ ነ",
     ),
     ("wolene", "Wolene People's Democratic Party", "የወለኔ ሕዝብ ዴሞክራሲያዊ ፓርቲ", "am", r"ወለኔ"),
     ("goto", None, "የጎጦ ዴሞክራሲያዊ ፓርቲ", "am", r"ጎጦ"),
     ("hdo", "Harari Democratic Organization", "ሐረሪ ዴሞክራሲያዊ ድርጅት", "am", r"ሐረሪ"),
     ("bplm", "Benishangul People's Liberation Movement", "የቤኒሻንጉል ሕዝብ ነፃነት ንቅናቄ", "am", r"ቤ[ንኒ]ሻንጉል"),
-    ("qafar-ummattah", None, "Qafar Ummattah Parti", "aa", r"qafar ummattah"),
+    ("qafar-ummattah", None, "Qafar Ummattah Parti", "aa", r"qafara? ummattah|\bapp parti"),
     ("qafar-amobaxxaqah", None, "Qafar Amobaxxaqah Foocih Parti", "aa", r"qafar amob"),
     ("qafar-uguugumoh", None, "Qafar Uguugumoh Dimokrasih Inriinoh Fooca", "aa", r"qafar uguugumoh"),
     ("xaylok", None, "Ityoppiyah Xaylok Ayyuntiino Qadlih Parti", "aa", r"xaylok"),
@@ -221,6 +222,16 @@ PARTIES: list[tuple[str, str | None, str, str, str]] = [
         r"feedarali",
     ),
     ("qargubbi", None, "Qargubbi Agattiinah Ximokraasih Angoyyao", "aa", r"qargubbi"),
+    ("arduf", "Afar Revolutionary Democratic Unity Front", "ARDUF", "aa", r"\bardufa?( parti)?$|\barduuf"),
+    ("alf", "Afar Liberation Front Party", "ALF Parti", "aa", r"\balf parti"),
+    ("qadli", None, "Qadli Parti", "aa", r"^qadli parti$"),
+    (
+        "apdo",
+        "Argoba People's Democratic Organization",
+        "Qargobbah Ummattah Ximokraasih Missoyna",
+        "aa",
+        r"qargobbah ummattah",
+    ),
     ("cankah", None, "Cankah Faxita", "aa", r"cankah"),
     ("qusba", None, "Qusba Horihmissoyna Parti", "aa", r"qusba"),
     ("uummata-balaa", None, "Paartii Uummata Balaa Itiyoophiyaa", "om", r"u?umm?ata ball?aa?"),
@@ -235,6 +246,16 @@ def key(kind: str, *parts: object) -> str:
 NEBE_SOURCE = key("source", "nebe_2021")
 HOPR = key("body", "hopr")
 FPTP = key("electoral_system", "hopr")
+BLOCK = key("electoral_system", "rc")
+# The two chartered cities elect city councils; the regions elect regional state councils.
+COUNCILS = {
+    "addis-ababa": ("Addis Ababa City Council", "የአዲስ አበባ ከተማ ምክር ቤት"),
+    "dire-dawa": ("Dire Dawa City Council", "የድሬዳዋ ከተማ ምክር ቤት"),
+}
+
+
+def council_body(region: str) -> str:
+    return key("body", "rc", region)
 
 
 def fold(text: str) -> str:
@@ -258,7 +279,12 @@ def area(scheme: str, code: str) -> str:
 
 
 def packages() -> list[str]:
-    return ["et.nebe_2021/geo", "et.nebe_2021/registry", *(f"et.nebe_2021/hopr-{poll}" for poll in POLLS)]
+    return [
+        "et.nebe_2021/geo",
+        "et.nebe_2021/registry",
+        *(f"et.nebe_2021/hopr-{poll}" for poll in POLLS),
+        *(f"et.nebe_2021/rc-{poll}" for poll in rc_polls()),
+    ]
 
 
 @cache
@@ -292,12 +318,26 @@ def winners() -> dict[tuple[str, str], list[dict[str, str | int]]]:
     return found
 
 
+@cache
+def rc_forms() -> list[dict]:
+    return json.loads(RC_TRANSCRIPTION.read_text())["forms"]
+
+
+def rc_polls() -> list[str]:
+    return sorted({form["poll"] for form in rc_forms()})
+
+
+def rc_regions() -> list[tuple[str, str]]:
+    """The (poll, region) pairs whose council forms are transcribed."""
+    return sorted({(form["poll"], form["region"]) for form in rc_forms()})
+
+
 def code(form: dict) -> str:
     return f"{form['region']}:{changeset.slug(form['constituency_en'])}"
 
 
 def parse() -> None:
-    for p in (geo(), registry(), *(election(poll) for poll in POLLS)):
+    for p in (geo(), registry(), *(election(poll) for poll in POLLS), *(council(poll) for poll in rc_polls())):
         p.write()
 
 
@@ -309,8 +349,8 @@ def geo() -> Package:
     p = Package(
         "et.nebe_2021/geo",
         SOURCE,
-        "Ethiopia's regions and the House of Peoples' Representatives constituencies that voted in 2021, named as the "
-        "National Election Board prints them, without boundaries",
+        "Ethiopia's regions and the House of Peoples' Representatives and regional council constituencies that voted "
+        "in 2021, named as the National Election Board prints them, without boundaries",
     )
     p.external.add(ETHIOPIA)
     p.add(
@@ -319,6 +359,15 @@ def geo() -> Package:
     p.add(
         "scheme",
         code="et.hopr_constituency",
+        polity_id=ETHIOPIA,
+        kind="electoral_district",
+        rank=2,
+        noun="constituency",
+        code_system=None,
+    )
+    p.add(
+        "scheme",
+        code="et.rc_constituency",
         polity_id=ETHIOPIA,
         kind="electoral_district",
         rank=2,
@@ -345,6 +394,20 @@ def geo() -> Package:
             p.name(
                 id, form["constituency"], REGIONS[form["region"]][2] if _latin(form["constituency"]) else "am", "native"
             )
+    seen = set()
+    for form in rc_forms():
+        if code(form) in seen:
+            continue
+        seen.add(code(form))
+        id = area("et.rc_constituency", code(form))
+        p.add("area", id=id, scheme_code="et.rc_constituency")
+        p.add("area_code", area_id=id, code=code(form))
+        p.add("area_parent", area_id=id, parent_id=area("et.region", form["region"]))
+        p.name(id, form["constituency_en"], "en", "official")
+        if form["constituency"] and fold(form["constituency"]) != fold(form["constituency_en"]):
+            p.name(
+                id, form["constituency"], REGIONS[form["region"]][2] if _latin(form["constituency"]) else "am", "native"
+            )
     return p
 
 
@@ -356,8 +419,8 @@ def registry() -> Package:
     p = Package(
         "et.nebe_2021/registry",
         SOURCE,
-        "The House of Peoples' Representatives, its electoral system, and the parties on the 2021 House ballots, from "
-        "the National Election Board of Ethiopia",
+        "The House of Peoples' Representatives, the regional councils, their electoral systems, and the parties on "
+        "the 2021 ballots, from the National Election Board of Ethiopia",
         depends=["et.nebe_2021/geo"],
     )
     p.external.add(ETHIOPIA)
@@ -373,11 +436,12 @@ def registry() -> Package:
     )
     for url in (PAGE_EN, PAGE_AM, SUMMARY_HOPR, SUMMARY_RC, SEPTEMBER):
         p.artifact(raw.cached(SOURCE, url), NEBE_SOURCE)
+    councils = rc_regions()
     for (poll, region, body), url in WINNERS.items():
-        if body == "hopr":
+        if body == "hopr" or (poll, region) in councils:
             p.artifact(raw.cached(SOURCE, url), NEBE_SOURCE)
     for poll, region, body in FORMS:
-        if body == "hopr":
+        if body == "hopr" or (poll, region) in councils:
             p.artifact(raw.cached(SOURCE, form_url(poll, region, body)), NEBE_SOURCE)
     p.add("body", id=HOPR, polity_id=ETHIOPIA, kind="lower_house")
     p.name(HOPR, "House of Peoples' Representatives", "en", "official")
@@ -391,7 +455,29 @@ def registry() -> Package:
         body_md="Each constituency elects one member, the candidate with the most votes (Proclamation 1162/2019, art. 4).",
         lang="en",
     )
-    used = {party_key(c["party"]) for form in forms() for c in form["candidates"]}
+    p.add("electoral_system", id=BLOCK, polity_id=ETHIOPIA, rules={"formula": "block"}, rules_version=1)
+    p.add(
+        "note",
+        id=key("note", BLOCK),
+        entity_id=BLOCK,
+        kind="methodology",
+        body_md=(
+            "Each regional council constituency elects the number of members printed on its result form, the "
+            "candidates with the most votes; the votes of all candidates add up to more than the valid ballots where "
+            "a constituency has more than one seat."
+        ),
+        lang="en",
+    )
+    for region in sorted({region for _, region in councils}):
+        id = council_body(region)
+        english, amharic = COUNCILS.get(region) or (
+            f"{REGIONS[region][0]} Regional State Council",
+            f"የ{REGIONS[region][1]} ክልል ምክር ቤት",
+        )
+        p.add("body", id=id, polity_id=ETHIOPIA, kind="unicameral")
+        p.name(id, english, "en", "official")
+        p.name(id, amharic, "am", "native")
+    used = {party_key(c["party"]) for form in (*forms(), *rc_forms()) for c in form["candidates"]}
     for code_, english, native, lang, _ in PARTIES:
         if code_ == "independent" or code_ not in used:
             continue
@@ -600,3 +686,164 @@ def election(poll: str) -> Package:
             if candidate["votes"] is not None:
                 _locate(p, result_set, unit, option, VOTES, page, candidate["box"])
     return p
+
+
+RC_METHOD = (
+    "Read from the Board-approved regional council constituency result form, linked region by region from the "
+    "Board's Amharic results page; a form runs over more than one scanned page where its candidates do not fit on "
+    "one. Each number was read twice, by Tesseract OCR of each table cell and by a multimodal model reading the page, "
+    "and kept only where the two readings agree or a third reading of the page settled them. Registered voters are "
+    "form line 1, voters are the signatures in the voter register (line 3), and valid and invalid ballots are lines "
+    "7 and 8; the form's other accounting lines are not stored here. The elected candidates are those the form lists "
+    "under the highest votes. Winners' names in English and their gender come from the Board's typed list of "
+    "council winners on its English page."
+)
+
+
+def council(poll: str) -> Package:
+    """The regional council contests of one polling day, in the House election of that day."""
+    day = POLLS[poll]
+    p = Package(
+        f"et.nebe_2021/rc-{poll}",
+        SOURCE,
+        f"The regional council elections of {day:%-d %B %Y} by constituency, digitized from the National Election "
+        "Board's scanned constituency result forms",
+        depends=["et.nebe_2021/geo", "et.nebe_2021/registry", f"et.nebe_2021/hopr-{poll}"],
+    )
+    p.external.add(ETHIOPIA)
+    for poll_, region in rc_regions():
+        if poll_ == poll:
+            p.uses(raw.cached(SOURCE, WINNERS[(poll, region, "rc")]))
+            p.uses(raw.cached(SOURCE, form_url(poll, region, "rc")))
+    for code_, reason in RC_ACCEPTED.get(poll, {}).items():
+        p.accept(code_, reason)
+    election_id = key("election", "hopr", poll)
+    path = f"et/{poll}-general"
+    for form in (f for f in rc_forms() if f["poll"] == poll):
+        region = form["region"]
+        tag = f"rc:{poll}:{code(form)}"
+        contest = key("contest", tag)
+        district = area("et.rc_constituency", code(form))
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="body_seats",
+            body_id=council_body(region),
+            district_area_id=district,
+            magnitude=form["seats"],
+            round_number=1,
+            electoral_system_id=BLOCK,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"{form['constituency_en']} ({REGIONS[region][0]} council)", "en", "official")
+        p.add(
+            "slug",
+            path=f"{path}/{region}-council-{changeset.slug(form['constituency_en'])}",
+            entity_id=contest,
+            is_current=True,
+        )
+        result_set = key("result_set", tag)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election_id,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=NEBE_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=RC_METHOD, lang="en"
+        )
+        if form.get("caveat"):
+            p.add(
+                "note",
+                id=key("note", result_set, "caveat"),
+                entity_id=result_set,
+                kind="caveat",
+                body_md=form["caveat"],
+                lang="en",
+            )
+        unit = key("unit", tag)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=ETHIOPIA,
+            scheme_code="et.rc_constituency",
+            code=tag,
+            area_relation="equals",
+            area_id=district,
+            kind="standard",
+        )
+        p.name(unit, form["constituency_en"], "en", "official")
+        url = form_url(poll, region, "rc")
+        pages: dict[int, str] = {}
+
+        def page_id(number: int, url: str = url, region: str = region) -> str:
+            if number not in pages:
+                pages[number] = key("page", poll, region, "rc", number)
+                p.add(
+                    "source_page",
+                    id=pages[number],
+                    artifact_id=_artifact_id(url),
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{raw.cached(SOURCE, url).sha256}-{number}.png",
+                    width=form["size"][0],
+                    height=form["size"][1],
+                )
+            return pages[number]
+
+        for index, measure in LINES.items():
+            value = form["lines"][index]
+            _put(p, result_set, unit, None, measure, value)
+            if value is not None:
+                _locate(p, result_set, unit, None, measure, page_id(form["page"]), form["line_boxes"][index])
+        lang = REGIONS[region][2]
+        english = form.get("winners_en", {})
+        for candidate in form["candidates"]:
+            n = candidate["row"]
+            option = key("option", tag, n)
+            code_ = party_key(candidate["party"])
+            independent = code_ == "independent"
+            name = candidate["name"]
+            party_id = None if independent or code_ is None else party(code_)
+            p.add(
+                "contest_option", id=option, contest_id=contest, kind="candidate", party_id=party_id, ballot_label=name
+            )
+            person = key("person", tag, n)
+            known = english.get(str(n))
+            p.add("person", id=person, gender=known["gender"] if known else None)
+            p.name(person, name, lang if _latin(name) else "am", "official")
+            if known:
+                p.name(person, known["name"], "en", "english")
+            p.add(
+                "candidacy",
+                id=key("candidacy", tag, n),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=name,
+                member_of_party_id=party_id,
+                is_independent=independent,
+            )
+            elected = n in form["winners"]
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="elected" if elected else "lost")
+            _put(p, result_set, unit, option, VOTES, candidate["votes"])
+            if candidate["votes"] is not None:
+                _locate(p, result_set, unit, option, VOTES, page_id(candidate["page"]), candidate["box"])
+    return p
+
+
+# Findings the forms' own printed figures cause, by poll.
+RC_ACCEPTED: dict[str, dict[str, str]] = {
+    "2021-06-21": {
+        "accounting.turnout": (
+            "The Chiri Miti (Dire Dawa) form prints 4,470 registered voters and 4,478 voters; its own remarks correct "
+            "the registered voters to 4,694, and both figures are stored as printed."
+        ),
+    },
+}
