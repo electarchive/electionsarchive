@@ -4,8 +4,11 @@ The IEBC's "Registered voters per county assembly ward for the 2022 general elec
 constituencies, and 1,450 county assembly wards with their codes and registered voters. Their shapes come from
 geoBoundaries' open set (2020 vintage), matched to the IEBC's areas by name within each parent area.
 
-The 2022 result forms (34A, 35A, 36A, 37A, and the 34B and 34C tallies) are published by the IEBC only as scanned images
-without a text layer, so no election package is built from them yet.
+The IEBC's "Data Report of 2017 Elections" prints every candidate's votes in the six ballots of 8 August 2017: president
+by county, governor, senator, and woman representative by county, member of the National Assembly by constituency, and
+member of the county assembly by ward. It also prints the 26 October 2017 fresh presidential election by county, as does
+the commission's separate county summary. The 2022 result forms (34A, 35A, 36A, 37A, and the 34B and 34C tallies) are
+published by the IEBC only as scanned images without a text layer, so no election package is built from them yet.
 """
 
 import difflib
@@ -89,7 +92,11 @@ def fold(text: str) -> str:
 
 
 def fetch() -> None:
+    from ea.sources.ke import results
+
     raw.fetch(SOURCE, ROLL, suffix=".pdf")
+    raw.fetch(SOURCE, results.REPORT, suffix=".pdf")
+    raw.fetch(SOURCE, results.FRESH, suffix=".pdf")
     for level in SHAPE_SOURCES:
         raw.fetch(SHAPES, SHAPE_URL.format(level), suffix=".geojson")
 
@@ -301,11 +308,16 @@ def geo() -> Package:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo"]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/general-2017", f"{SOURCE}/fresh-presidential-2017"]
 
 
 def parse() -> None:
+    from ea.sources.ke import results
+
     geo().write()
+    results.registry().write()
+    results.general().write()
+    results.rerun().write()
 
 
 def emit() -> None:
