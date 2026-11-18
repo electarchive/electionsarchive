@@ -14,6 +14,10 @@ REGISTERED, CAST, VALID, INVALID, VOTES = 2, 3, 4, 5, 1
 
 # The Journal officiel's French edition, by issue, with the page where the proclamation's table or figures begin.
 ISSUES = {
+    1963: ("1963", "F1963068", "No. 68 of 18 September 1963", 974),
+    1976: ("1976", "F1976099", "No. 99 of 12 December 1976", 1100),
+    1979: ("1979", "F1979008", "No. 8 of 20 February 1979", 137),
+    1988: ("1988", "F1988053", "No. 53 of 24 December 1988", 1388),
     1995: ("1995", "F1995072", "No. 72 of 26 November 1995", 4),
     1999: ("1999", "F1999029", "No. 29 of 21 April 1999", 3),
     2004: ("2004", "F2004024", "No. 24 of 25 April 2004", 8),
@@ -23,6 +27,10 @@ ISSUES = {
     2024: ("2024", "F2024063", "No. 63 of 15 September 2024", 8),
 }
 DAYS = {
+    1963: date(1963, 9, 15),
+    1976: date(1976, 12, 10),
+    1979: date(1979, 2, 7),
+    1988: date(1988, 12, 22),
     1995: date(1995, 11, 16),
     1999: date(1999, 4, 15),
     2004: date(2004, 4, 8),
@@ -33,6 +41,10 @@ DAYS = {
 }
 # Candidates in the order of the printed columns, with the vote totals the proclamation prints.
 CANDIDATES = {
+    1963: ["Ahmed Ben Bella"],
+    1976: ["Houari Boumédiène"],
+    1979: ["Chadli Bendjedid"],
+    1988: ["Chadli Bendjedid"],
     1995: ["Nouredine Boukrouh", "Liamine Zeroual", "Saïd Sadi", "Mahfoud Nahnah"],
     1999: [
         "Mohand Oulhadj Aït Ahmed",
@@ -70,11 +82,26 @@ CANDIDATES = {
     2019: ["Abdelmadjid Tebboune", "Abdelkader Bengrina", "Ali Benflis", "Azzeddine Mihoubi", "Abdelaziz Belaïd"],
     2024: ["Abdelmadjid Tebboune", "Abdelaali Hassani Cherif", "Youcef Aouchiche"],
 }
-# National figures of the two elections whose proclamation prints no table by wilaya: registered, voters, valid, votes.
-NATIONAL = {
-    1995: (15_969_904, 12_087_281, 11_619_532, [443_144, 7_088_618, 1_115_796, 2_971_974]),
-    1999: (17_488_759, 10_652_623, 10_093_611, [321_179, 7_445_045, 314_160, 121_414, 400_080, 226_139, 1_265_594]),
+# National figures of the elections whose proclamation is read as a national total: registered, voters, valid, invalid
+# (None when the proclamation does not print it), and the votes per option. A sole candidate faced either no opponent
+# (1963) or a yes/no vote on their candidacy, whose "no" votes are the last option. The 1979 proclamation prints the
+# roll and the voters for the national territory and abroad separately (7,888,875 + 318,959 registered; 7,490,479 +
+# 318,959 voters; 7,470,528 + 315,107 valid), so its national figures are the sums.
+NATIONAL: dict[int, tuple[int, int, int, int | None, list[int]]] = {
+    1963: (6_581_340, 5_827_618, 5_805_103, 22_515, [5_805_103]),
+    1976: (8_352_147, 8_197_485, 8_019_822, None, [7_976_568, 43_242]),
+    1979: (8_207_834, 7_809_438, 7_785_635, None, [7_736_697, 48_938]),
+    1988: (13_060_720, 11_634_139, 11_369_304, 264_835, [10_603_067, 766_237]),
+    1995: (15_969_904, 12_087_281, 11_619_532, None, [443_144, 7_088_618, 1_115_796, 2_971_974]),
+    1999: (
+        17_488_759,
+        10_652_623,
+        10_093_611,
+        None,
+        [321_179, 7_445_045, 314_160, 121_414, 400_080, 226_139, 1_265_594],
+    ),
 }
+YES_NO = {1976, 1979, 1988}
 WILAYAS = {
     "01": "Adrar",
     "02": "Chlef",
@@ -152,7 +179,11 @@ METHOD_TABLE = (
 )
 METHOD_NATIONAL = (
     "The proclamation prints only the national figures, not a table by wilaya, so the results are stored for the "
-    "country as a whole. Invalid ballots are not printed. The figures were read from a scan of the printed page."
+    "country as a whole. The figures were read from a scan of the printed page. "
+)
+METHOD_YES_NO = (
+    "Voters answered yes or no to the candidacy of the sole candidate, so the candidate's votes are the yes votes "
+    "and the other option holds the no votes. "
 )
 
 
@@ -402,7 +433,10 @@ def build(year: int) -> Package:
         id=key("note", result_set),
         entity_id=result_set,
         kind="methodology",
-        body_md=METHOD + (METHOD_TABLE if tabulated else METHOD_NATIONAL) + f" Journal officiel {issue}, page {page}.",
+        body_md=METHOD
+        + (METHOD_TABLE if tabulated else METHOD_NATIONAL)
+        + (METHOD_YES_NO if year in YES_NO else "")
+        + f"Journal officiel {issue}, page {page}.",
         lang="en",
     )
     p.add(
@@ -435,13 +469,24 @@ def build(year: int) -> Package:
             role="head",
             ballot_name=name,
         )
+    if year in YES_NO:
+        option = key("option", year, "no")
+        options.append(option)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="answer",
+            ballot_position=2,
+            ballot_label="Non",
+        )
     if tabulated:
         units, total = table_rows(year)
         data = units
         declared = total
     else:
-        registered, voters, valid, votes = NATIONAL[year]
-        declared = Row("TOTAL", (registered, voters, valid, 0), votes)
+        registered, voters, valid, invalid, votes = NATIONAL[year]
+        declared = Row("TOTAL", (registered, voters, valid, invalid or 0), votes)
         data = [(NATION, declared)]
     for code, row in data:
         unit = key("unit", f"{day}:{code}")
@@ -480,17 +525,23 @@ def build(year: int) -> Package:
         registered, voters, valid, invalid = row.accounting
         for measure, value in ((REGISTERED, registered), (CAST, voters), (VALID, valid)):
             _put(p, result_set, unit, None, measure, value)
-        if tabulated:
+        if tabulated or NATIONAL[year][3] is not None:
             _put(p, result_set, unit, None, INVALID, invalid)
         for option, value in zip(options, row.votes, strict=True):
             _put(p, result_set, unit, option, VOTES, value)
     registered, voters, valid, invalid = declared.accounting
     for measure, value in ((REGISTERED, registered), (CAST, voters), (VALID, valid)):
         p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
-    if tabulated:
+    if tabulated or NATIONAL[year][3] is not None:
         p.add("declared", result_set_id=result_set, option_id=None, measure=INVALID, value=invalid)
     for option, value in zip(options, declared.votes, strict=True):
         p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=value)
+    if year == 1976:
+        p.accept(
+            "accounting.votes_valid",
+            "The proclamation prints 8,019,822 valid votes but its yes and no totals, 7,976,568 and 43,242, sum to "
+            "8,019,810; both are stored as printed.",
+        )
     order = sorted(range(len(options)), key=lambda index: -declared.votes[index])
     for rank, index in enumerate(order):
         p.add("outcome", result_set_id=result_set, option_id=options[index], kind="elected" if rank == 0 else "lost")
