@@ -340,8 +340,9 @@ def declared_url(d: Day, contest: str) -> str:
 
 
 def fetch() -> None:
-    from ea.sources.hr import skenovi, zupanijski
+    from ea.sources.hr import sabor1990, skenovi, zupanijski
 
+    sabor1990.fetch()
     skenovi.fetch()
     zupanijski.fetch()
     for family, year in sorted({(d.family, d.year) for d in days()}):
@@ -1210,7 +1211,7 @@ def registry() -> Package:
         f"{SOURCE}/registry",
         SOURCE,
         "The Croatian Parliament, the presidency, Croatia's members of the European Parliament, their electoral systems, and the parties and coalitions on the "
-        "State Electoral Commission's results since 1991",
+        "State Electoral Commission's results since 1990",
         depends=[f"{SOURCE}/geo"],
     )
     p.external |= {CROATIA}
@@ -1258,11 +1259,12 @@ def registry() -> Package:
         p.add("party", id=id, kind="bloc", polity_id=CROATIA)
         p.name(id, labels.most_common(1)[0][0], "hr", "official")
         p.name(id, ", ".join(sorted({clean(m) for m in members})), "hr", "ballot", False)
-    from ea.sources.hr import skenovi, zupanijski
+    from ea.sources.hr import sabor1990, skenovi, zupanijski
 
     known = set(spellings) | set(blocs)
     skenovi.registry(p, known)
     zupanijski.registry(p, known)
+    sabor1990.registry(p, known)
     return p
 
 
@@ -1306,11 +1308,12 @@ def package_key(d: Day) -> str:
 
 
 def packages() -> list[str]:
-    from ea.sources.hr import skenovi, zupanijski
+    from ea.sources.hr import sabor1990, skenovi, zupanijski
 
     return [
         f"{SOURCE}/geo",
         f"{SOURCE}/registry",
+        *sabor1990.packages(),
         *skenovi.packages(),
         *zupanijski.packages(),
         *(package_key(d) for d in days()),
@@ -1320,8 +1323,9 @@ def packages() -> list[str]:
 def parse() -> None:
     geo().write()
     registry().write()
-    from ea.sources.hr import skenovi, zupanijski
+    from ea.sources.hr import sabor1990, skenovi, zupanijski
 
+    sabor1990.parse()
     skenovi.parse()
     zupanijski.parse()
     for d in days():
