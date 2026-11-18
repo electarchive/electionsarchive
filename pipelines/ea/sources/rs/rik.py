@@ -18,6 +18,7 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.rs import rik_parties
 
 SOURCE = "rs.rik"
 BASE = "https://www.rik.parlament.gov.rs"
@@ -901,7 +902,8 @@ def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "The legislatures Serbia's Republic Electoral Commission publishes results for, and their electoral systems",
+        "The legislatures Serbia's Republic Electoral Commission publishes results for, their electoral systems, and the "
+        "parties and coalitions behind the lists",
         depends=[f"{SOURCE}/geo"],
     )
     p.external.add(SERBIA)
@@ -932,7 +934,28 @@ def registry() -> Package:
     for id, rules, method in SYSTEMS:
         p.add("electoral_system", id=id, polity_id=SERBIA, valid_from=None, valid_to=None, rules=rules, rules_version=1)
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=method, lang="en")
+    p.add(
+        "source",
+        id=COLORS_SOURCE,
+        kind="community",
+        publisher="electionsarchive.com",
+        title="Brand colors of Serbian parties, taken from their logos",
+        url="https://electionsarchive.com",
+        license="CC0 1.0",
+        license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+        attribution="electionsarchive.com",
+    )
+    labels = {e.slug: table(e, gazetteer()[1]).labels for e in ELECTIONS if e.slug in rik_parties.LISTS}
+    rik_parties.add_parties(p, labels, SERBIA, COLORS_SOURCE)
     return p
+
+
+COLORS_SOURCE = key("source", "rs.rik.party_colors")
+
+
+def party(slug: str, number: int) -> str | None:
+    """The party row of a list, for the elections whose lists have one."""
+    return key("party", rik_parties.party_key(slug, number)) if slug in rik_parties.LISTS else None
 
 
 SYSTEMS: list[tuple[str, dict[str, object], str]] = [
@@ -1079,6 +1102,7 @@ def build(e: Election) -> Package:
             kind="answer" if referendum else "candidate" if president else "list",
             ballot_position=number,
             ballot_label=label,
+            party_id=party(e.slug, number),
         )
         if referendum:
             p.name(option, {1: "Yes", 2: "No"}[number], "en", "official")
