@@ -17,6 +17,11 @@ electoral districts the votes are counted in (`ep_<n>.js`, 57 of them with the o
   The 2019 national figures are the previous-election block of the 2024 national static file, which the Ministry
   prints. The 2019 party names are those of the 2019 site's static file.
 
+The geo package draws the Hellenic Statistical Authority's 2021 Kallikratis municipalities and municipal units
+(`ypes_ep_areas`). A 2024 station is placed in the municipal unit the Ministry's static file names for it (237 postal
+stations have none and stay at the country), and each 2019 municipal unit is its Authority unit. No open source draws
+polling-station boundaries, and the 2019 station files carry no unit, so those 21,043 stations stay at the country.
+
 The 2009 and 2014 elections are built by `ypes_national` and `ypes_results` at the unit those years publish, and the
 1999 and 2004 ones by `ypes_results` as national results; earlier elections are not on the Ministry's site.
 
@@ -34,9 +39,11 @@ from pathlib import Path
 from uuid import uuid5
 
 import polars as pl
+import shapely
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.gr import ypes_ep_areas as areas
 
 SOURCE = "gr.ypes_ep"
 SITE = "https://ekloges.ypes.gr/"
@@ -61,6 +68,8 @@ STATICS_2014 = f"{OLD}may2014/stat/e/statics.js"
 STATICS_2019 = f"{OLD}2019/stat/e/statics.js"
 UNITS_2019 = "browser://20261118-192640-d46ed1/gr-2019-euro-municipal-units-bundle.txt"
 UNIT = "gr.ep_municipal_unit"
+KALLIKRATIS_UNIT = "gr.kallikratis_unit"
+KALLIKRATIS_MUNICIPALITY = "gr.kallikratis_municipality"
 
 
 @dataclass(frozen=True)
@@ -93,6 +102,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 YPES = key("source", "ypes")
+ELSTAT = key("source", "elstat-kallikratis-2021")
 
 
 def packages() -> list[str]:
@@ -104,7 +114,7 @@ def fetch() -> None:
     folder = Path(os.environ["EA_GR_FETCHED"])
     index = json.loads((folder / "index.json").read_text())
     for url, entry in index.items():
-        if url not in FILES:
+        if url not in FILES | set(areas.FILES):
             continue
         raw.store(
             SOURCE,
@@ -220,6 +230,7 @@ class Station:
     name: str | None
     kind: str
     figures: Figures
+    unit: int | None = None  # the Ministry's code of the municipal unit the station lies in
 
 
 @dataclass
@@ -298,7 +309,14 @@ def load(e: Election) -> Data:
         n, got = dyn[tm]
         row = stat.get(tm)
         stations.append(
-            Station(tm, n, str(row["Descr"]) if row else None, KINDS[str(row["TM_KIND"])] if row else "standard", got)
+            Station(
+                tm,
+                n,
+                str(row["Descr"]) if row else None,
+                KINDS[str(row["TM_KIND"])] if row else "standard",
+                got,
+                whole(row["DEN_ID"]) or None if row else None,
+            )
         )
     if set(stat) - set(dyn):
         raise ValueError(f"{len(set(stat) - set(dyn))} stations have a static file and no count")
@@ -449,7 +467,102 @@ def geo() -> Package:
     p.add("scheme", code=DISTRICT, polity_id=GREECE, kind="electoral_district", rank=1, noun="counting district")
     p.add("scheme", code=UNIT, polity_id=GREECE, kind="administrative", rank=2, noun="municipal unit")
     p.add("scheme", code=STATION, polity_id=GREECE, kind="precinct", rank=3, noun="polling station")
+    p.add(
+        "source",
+        id=ELSTAT,
+        kind="official_body",
+        publisher="Ελληνική Στατιστική Αρχή (Hellenic Statistical Authority)",
+        title="Kallikratis municipalities and municipal units of the 2021 census (digital cartographic data)",
+        url="https://www.statistics.gr/",
+        license="Official publication; the Authority's copyright and reuse notice applies",
+        license_url="https://www.statistics.gr/en/pneumatika-diakaiomata-kai-epanachresimopoiese-stoicheion",
+        attribution="Ελληνική Στατιστική Αρχή (ΕΛΣΤΑΤ)",
+    )
+    for url in areas.FILES:
+        p.artifact(raw.cached(SOURCE, url), ELSTAT)
+    p.add(
+        "scheme",
+        code=KALLIKRATIS_MUNICIPALITY,
+        polity_id=GREECE,
+        kind="administrative",
+        rank=2,
+        noun="municipality",
+        code_system="elstat-kallikratis",
+    )
+    p.add(
+        "scheme",
+        code=KALLIKRATIS_UNIT,
+        polity_id=GREECE,
+        kind="administrative",
+        rank=3,
+        noun="municipal unit",
+        code_system="elstat-kallikratis",
+    )
+    for scheme in (KALLIKRATIS_MUNICIPALITY, KALLIKRATIS_UNIT):
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", scheme, 2021),
+            scheme_code=scheme,
+            vintage="2021",
+            as_of=ELSTAT_AS_OF,
+        )
+    shapes = geometries()
+    for place in shapes.municipalities:
+        add_place(p, KALLIKRATIS_MUNICIPALITY, place, TERRITORY)
+    for place in shapes.units:
+        add_place(p, KALLIKRATIS_UNIT, place, area(KALLIKRATIS_MUNICIPALITY, place.code[:4]))
     return p
+
+
+ELSTAT_AS_OF = date(2024, 7, 9)  # the date of the Authority's shapefiles
+
+
+def area(scheme: str, code: str) -> str:
+    return key("area", scheme, code)
+
+
+@dataclass
+class Geometries:
+    municipalities: list[areas.Place]
+    units: list[areas.Place]
+    ministry: dict[int, str]  # the Ministry's code of a municipal unit to the Authority's
+
+
+_GEOMETRIES: list[Geometries] = []
+
+
+def geometries() -> Geometries:
+    if not _GEOMETRIES:
+        units = areas.read(areas.UNITS_FILE, SOURCE)
+        found = areas.ministry_units(segments(STATICS_2014))
+        _GEOMETRIES.append(Geometries(areas.read(areas.MUNICIPALITIES_FILE, SOURCE), units, areas.tie(found, units)))
+    return _GEOMETRIES[0]
+
+
+def add_place(p: Package, scheme: str, place: areas.Place, parent: str) -> None:
+    id = area(scheme, place.code)
+    p.add("area", id=id, scheme_code=scheme)
+    p.add("area_code", area_id=id, code=place.code)
+    p.add("area_parent", area_id=id, parent_id=parent)
+    p.name(id, place.greek, "el", "official")
+    p.name(id, place.english, "en", "official", False)
+    p.add(
+        "area_geometry",
+        area_id=id,
+        geom=shapely.to_wkb(place.shape, hex=True, include_srid=True),
+        label_point=shapely.to_wkb(
+            shapely.set_srid(shapely.point_on_surface(place.shape), 4326), hex=True, include_srid=True
+        ),
+        quality="official",
+        source_id=ELSTAT,
+    )
+
+
+def located(unit: int | None) -> str:
+    """The area of a Ministry municipal unit, or the country when it has none."""
+    if unit is None:
+        return TERRITORY
+    return area(KALLIKRATIS_UNIT, geometries().ministry[unit])
 
 
 def used() -> set[int]:
@@ -585,7 +698,15 @@ def election(e: Election) -> Package:
             ballot_label=name or f"Party {pid}",
         )
 
-    def unit(scheme: str, code: str, kind: str, district: int | None, parent: str | None, name: str | None) -> str:
+    def unit(
+        scheme: str,
+        code: str,
+        kind: str,
+        district: int | None,
+        parent: str | None,
+        name: str | None,
+        where: str = TERRITORY,
+    ) -> str:
         uid = key("unit", e.key, scheme, code)
         abroad = district == ABROAD
         p.add(
@@ -595,8 +716,8 @@ def election(e: Election) -> Package:
             scheme_code=scheme,
             code=f"{e.day}:{code}",
             parent_id=parent,
-            area_relation="unlocated" if abroad else "within",
-            area_id=None if abroad else TERRITORY,
+            area_relation="unlocated" if abroad else ("equals" if scheme == UNIT else "within"),
+            area_id=None if abroad else where,
             kind=kind,
         )
         if name:
@@ -627,10 +748,11 @@ def election(e: Election) -> Package:
             s.district,
             parents[s.district],
             s.name,
+            located(s.unit),
         )
         emit(uid, s.figures)
     for u in d.units:
-        emit(unit(UNIT, str(u.id), "aggregate", u.district, parents[u.district], u.name), u.figures)
+        emit(unit(UNIT, str(u.id), "aggregate", u.district, parents[u.district], u.name, located(u.id)), u.figures)
     for n, f in rest.items():
         emit(unit(STATION, f"residual:{n}", "aggregate", n, parents[n], None), f, DERIVED)
     frame = pl.DataFrame(
