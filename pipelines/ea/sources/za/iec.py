@@ -6,6 +6,7 @@ import zipfile
 from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import date
+from pathlib import Path
 from uuid import uuid5
 
 import fastexcel
@@ -63,6 +64,24 @@ MUNICIPAL = {
 }
 VINTAGES = sorted(item.day for item in MUNICIPAL.values())
 NATIONAL = {
+    "2014": National(
+        date(2014, 5, 7),
+        (
+            Ballot(
+                "national",
+                "NPEPublicReports/291/Downloadable%20Results/National.csv",
+                "NPEPublicReports/291/Results%20Report/National.xls",
+                None,
+            ),
+            Ballot(
+                "provincial",
+                "NPEPublicReports/292/Downloadable%20Results/National.csv",
+                "NPEPublicReports/292/Results%20Report/National.xls",
+                {"EC": 63, "FS": 30, "GP": 73, "KZN": 80, "LP": 49, "MP": 30, "NW": 33, "NC": 30, "WC": 42},
+            ),
+        ),
+        date(2011, 5, 18),
+    ),
     "2019": National(
         date(2019, 5, 8),
         (
@@ -106,7 +125,7 @@ NATIONAL = {
         date(2021, 11, 1),
     ),
 }
-NATIONAL_SEATS = {"2019": 400, "2024": 200}
+NATIONAL_SEATS = {"2014": 400, "2019": 400, "2024": 200}
 NATIONAL_METHOD = (
     "Counted by the Electoral Commission of South Africa (IEC) per voting district, as published in the IEC's "
     "downloadable detailed results. Registered voters are the voters' roll of the voting district, valid votes "
@@ -150,7 +169,7 @@ def municipal_totals_url(event: int) -> str:
 def fetch() -> None:
     for election in NATIONAL.values():
         for ballot in election.ballots:
-            raw.fetch(SOURCE, url(ballot.path), suffix=".zip")
+            raw.fetch(SOURCE, url(ballot.path), suffix=Path(ballot.path).suffix)
             raw.fetch(SOURCE, url(ballot.totals), suffix=".xls")
     for election in MUNICIPAL.values():
         for province in FILES:
@@ -196,17 +215,24 @@ NATIONAL_COLUMNS = ["Province", "Municipality", "VD", "Station", "Registered", "
 
 @functools.cache
 def national_table(path: str) -> pl.DataFrame:
-    archive = zipfile.ZipFile(raw.cached(SOURCE, url(path)).path)
-    (member,) = [name for name in archive.namelist() if name.lower().endswith(".csv")]
-    lines = csv.reader(io.StringIO(_decode(archive.read(member))))
+    cached = raw.cached(SOURCE, url(path)).path
+    if path.endswith(".zip"):
+        archive = zipfile.ZipFile(cached)
+        (member,) = [name for name in archive.namelist() if name.lower().endswith(".csv")]
+        data = archive.read(member)
+        lead = 0
+    else:
+        data = cached.read_bytes()
+        lead = 1  # the 2014 files lead each row with a generated-at stamp
+    lines = csv.reader(io.StringIO(_decode(data)))
     next(lines)
-    rows = [parsed for row in lines if (parsed := _national_row(row)) is not None]
+    rows = [parsed for row in lines if (parsed := _national_row(row[lead:])) is not None]
     return pl.DataFrame(rows, schema=NATIONAL_COLUMNS, orient="row")
 
 
 def _national_row(row: list[str]) -> list[str | None] | None:
     """Station names in the 2019 file hold unquoted commas, so the fields are found by their shape."""
-    if len(row) < 9 or not row[2].strip():
+    if len(row) < 9 or not row[2].strip() or row[0] == "Province":
         return None
     start = next(
         index for index in range(4, len(row) - 3) if all(re.fullmatch(r"\d*", row[index + k].strip()) for k in range(3))
@@ -765,6 +791,10 @@ def national(year: str) -> Package:
         votes: dict[tuple[str, str, str], int] = {}
         for row in frame.iter_rows(named=True):
             province = row["Province"]
+            if province == ABROAD and ballot.kind != "national":
+                if int(row["Votes"]) or _count(row["Valid"] or ""):
+                    raise ValueError(f"{ballot.path}: votes cast abroad on a provincial ballot")
+                continue  # the file lists the abroad station with no votes on a ballot cast only at home
             scope = "" if ballot.kind == "national" else province
             if scope not in sets:
                 raise ValueError(f"{ballot.path}: {province} has no contest")
