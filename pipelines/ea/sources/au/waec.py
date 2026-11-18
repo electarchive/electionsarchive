@@ -3,12 +3,18 @@
 The commission publishes a Results and Statistics report after each state general election. Its district profiles
 print the Legislative Assembly's first preference votes for each candidate at each polling place, the declaration
 votes by type, and the two-candidate preferred count; its region profiles print each Legislative Council region's
-count, whose first line gives every candidate's first preference votes. The referendum reports print yes and no
-votes at each polling place. The reports are PDFs with a text layer, read here with `pdftotext -layout`. One
-package holds each general election and each referendum, plus a `geo` and a `registry` package.
+count, whose first line gives every candidate's first preference votes, and from 2008 a first preference analysis
+of each region: ticket and below-the-line votes for each group and candidate at each polling place (2008 to 2017)
+or by district and type of vote (2021). The referendum reports print yes and no votes at each polling place. The
+reports are PDFs with a text layer, read here with `pdftotext -layout`, and the analysis tables, whose candidate
+names are set rotated over their columns, with `pdftotext -bbox`. One package holds each general election and each
+referendum, plus a `geo` and a `registry` package.
 """
 
+import difflib
 import functools
+import html
+import itertools
 import re
 import subprocess
 from collections import Counter
@@ -768,6 +774,635 @@ def council(day: str) -> list[Region]:
     return out
 
 
+# Legislative Council by polling place -----------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class Box:
+    x0: float
+    y0: float
+    x1: float
+    y1: float
+    text: str
+
+    @property
+    def rotated(self) -> bool:
+        return self.y1 - self.y0 > 1.6 * (self.x1 - self.x0) and bool(re.search(r"[A-Za-z]", self.text))
+
+    @property
+    def middle(self) -> float:
+        return (self.y0 + self.y1) / 2
+
+
+WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>')
+
+
+@functools.cache
+def boxes(link: str) -> list[list[Box]]:
+    """Each page's words with their boxes, from `pdftotext -bbox`."""
+    path = str(raw.cached(SOURCE, link).path)
+    text = subprocess.run(["pdftotext", "-bbox", path, "-"], check=True, capture_output=True, text=True).stdout
+    pages = []
+    for page in text.split("<page ")[1:]:
+        found = WORD.findall(page)
+        pages.append([Box(float(a), float(b), float(c), float(d), html.unescape(t)) for a, b, c, d, t in found])
+    return pages
+
+
+def lines_of(words: list[Box]) -> list[list[Box]]:
+    """Words grouped into lines by their vertical middles, each line left to right."""
+    out: list[list[Box]] = []
+    for w in sorted(words, key=lambda w: w.middle):
+        if out and abs(out[-1][0].middle - w.middle) < 0.45 * (w.y1 - w.y0):
+            out[-1].append(w)
+        else:
+            out.append([w])
+    return [sorted(line, key=lambda w: w.x0) for line in out]
+
+
+DIGITS = re.compile(r"\d{1,3}(?:[,.]\d{3})*")  # one 2008 cell prints its thousands with a full stop
+
+
+def cells_of(line: list[Box], edge: float) -> list[Box]:
+    """The numbers right of `edge` on a line, joining a thousands group the report sets apart with a space."""
+    out: list[Box] = []
+    for w in line:
+        if w.x0 < edge or not DIGITS.fullmatch(w.text):
+            continue
+        if (
+            out
+            and re.fullmatch(r"\d{3}", w.text)
+            and re.fullmatch(r"\d{1,3}", out[-1].text)
+            and w.x0 - out[-1].x1 < 0.4 * (w.y1 - w.y0)
+        ):
+            last = out.pop()
+            w = Box(last.x0, last.y0, w.x1, w.y1, last.text + w.text)
+        out.append(w)
+    return out
+
+
+MISPRINTED = {"agricuturalregion": "Agricultural"}  # region headings the reports misspell
+DISTRICT_MISPRINTS = {"blemont": "Belmont"}  # district names the summaries misspell
+# Lines of polling place names the region profiles shorten past recognition, to the name the district profile
+# prints: (day, district, line) to name.
+LABEL_FIXES = {("2013-03-09", "Perth", "Northbridge"): "Central Institute of Technology - Northbridge"}
+
+
+@dataclass
+class Sheet:
+    """One page of a region's first preference analysis: the region's summary by district and type of vote, or one
+    district's polling places."""
+
+    region: str
+    district: str | None  # None for the region's summary
+    columns: list[str]  # each vote column's kind ("ticket", "first", or "pref"), then "valid", "informal", "total"
+    names: list[str]  # the rotated candidate names over the columns, one per candidate
+    rows: list[tuple[str, str, list[int]]]  # (type of vote, label, cells)
+    page: int
+    labels: list[str] = field(default_factory=list)  # a district page's lines of polling place names, in order
+
+
+def blocks_of(words: list[Box]) -> list[list[Box]]:
+    """Rotated words grouped into the names they make, left to right."""
+    out: list[list[Box]] = []
+    for w in sorted(words, key=lambda w: w.x0):
+        if out and w.x0 < max(v.x1 for v in out[-1]) + 0.5:
+            out[-1].append(w)
+        else:
+            out.append([w])
+    return out
+
+
+def anchors(link: str, number: int, words: list[Box], top: float) -> tuple[list[tuple[str, float]], list[str]]:
+    """The vote columns of a page as (kind, centre), and the candidate names over them.
+
+    Each candidate's name is printed rotated over their column, and a group's first candidate's name over both the
+    group's ticket column and the candidate's own. The Ticket and Pref headings give the width of a column, and the
+    spacing of the names then tells a group's first candidate (one and a half or two columns from the next name)
+    from the others (one column). The headings themselves are not used to place the columns, because some pages set
+    them under the wrong candidates."""
+    head = [w for w in words if not w.rotated and top - 2 < w.y0 < top + 2]
+    tickets = sorted((w for w in head if w.text == "Ticket"), key=lambda w: w.x0)
+    prefs = sorted((w for w in head if w.text == "Pref"), key=lambda w: w.x0)
+    gaps = []
+    for t in tickets:
+        p = next((p for p in prefs if p.x0 > t.x1), None)
+        if p is not None:
+            gaps.append((p.x0 + p.x1 - t.x0 - t.x1) / 2)
+    width = sorted(gaps)[len(gaps) // 2]
+    # A rotated word's box is as wide as its font is tall; a short one is not much taller than that.
+    widths = Counter(round(w.x1 - w.x0, 1) for w in words if w.rotated and w.y1 < top)
+    if not widths:
+        raise ValueError(f"{link} page {number}: no candidate names")
+    size = widths.most_common(1)[0][0]
+    floor = min(w.y0 for w in words if w.rotated and w.y1 < top and round(w.x1 - w.x0, 1) == size) - 1
+    rotated = [
+        w
+        for w in words
+        if floor < w.y0 and w.y1 < top and abs(w.x1 - w.x0 - size) < 0.3 and re.search(r"[A-Za-z]", w.text)
+    ]
+    found: list[list[Box]] = []
+    for block in blocks_of(rotated):
+        # The lines of one name sit closer together than a column's width.
+        if (
+            found
+            and (min(w.x0 for w in block) + max(w.x1 for w in block)) / 2
+            - (min(w.x0 for w in found[-1]) + max(w.x1 for w in found[-1])) / 2
+            < 0.6 * width
+        ):
+            found[-1] += block
+        else:
+            found.append(block)
+    centres = [(min(w.x0 for w in b) + max(w.x1 for w in b)) / 2 for b in found]
+    names = [" ".join(w.text for w in sorted(b, key=lambda w: (w.y0, w.x0))) for b in found]
+    first = [1]
+    for a, b in itertools.pairwise(centres):
+        step = (b - a) / width
+        f = round(2 * (step - 1) - first[-1])
+        if f not in (0, 1) or abs(step - 1 - (first[-1] + f) / 2) > 0.3:
+            raise ValueError(f"{link} page {number}: names {a:.1f} and {b:.1f} are {step:.2f} columns apart")
+        first.append(f)
+    if sum(first) != len(tickets):
+        raise ValueError(f"{link} page {number}: {sum(first)} groups by the names, {len(tickets)} ticket columns")
+    out: list[tuple[str, float]] = []
+    for centre, f in zip(centres, first, strict=True):
+        out += [("ticket", centre - width / 2), ("first", centre + width / 2)] if f else [("pref", centre)]
+    return out, names
+
+
+def sheets(link: str, districts: dict[str, list[str]]) -> list[Sheet]:
+    """The first preference analysis pages of a region profiles report, with each column of votes placed by the
+    page's headings. `districts` lists each region's districts."""
+    out = []
+    for number, words in enumerate(boxes(link), 1):
+        found = sheet(link, number, words, districts)
+        if found is not None:
+            out.append(found)
+    return out
+
+
+def sheet(link: str, number: int, words: list[Box], districts: dict[str, list[str]]) -> Sheet | None:
+    flat = [w for w in words if not w.rotated]
+    tickets = [w for w in flat if w.text == "Ticket"]
+    if not tickets or max(w.x0 for w in tickets) - min(w.x0 for w in tickets) < 5:
+        return None  # no table, or the 2017 summary, which sets the candidates in rows
+    top = min(w.y0 for w in tickets)
+    heading = [" ".join(w.text for w in line) for line in lines_of([w for w in flat if w.y1 < top])]
+    region = next(
+        (r for h in heading for r in REGIONS if fold(h).startswith(fold(f"{r} Region"))),
+        next((r for h in heading for m, r in MISPRINTED.items() if fold(h).startswith(m)), None),
+    )
+    if region is None:
+        raise ValueError(f"{link} page {number}: no region in {heading}")
+    known = {fold(d): d for d in districts[region]}
+    report = max(i for i, h in enumerate(heading) if "Report" in h)
+    district = next((known[fold(h)] for h in heading[report + 1 : report + 2] if fold(h) in known), None)
+    columns, names = anchors(link, number, words, top)
+    totals = []
+    for label in ("Valid", "Informal", "Totals"):
+        found = [w for w in flat if w.text == label and w.y1 < top + 12 and w.x0 > columns[-1][1]]
+        if label == "Totals" and not found:
+            found = [w for w in flat if w.text == "Total" and w.y1 < top + 12 and w.x0 > columns[-1][1]]
+        if not found:
+            raise ValueError(f"{link} page {number}: no {label} heading")
+        w = max(found, key=lambda w: w.x0)
+        totals.append((label.lower().removesuffix("s"), (w.x0 + w.x1) / 2))
+    columns += totals
+    centres = [x for _, x in columns]
+    edge = centres[0] - 0.75 * (centres[1] - centres[0])
+    lines: list[tuple[list[Box], list[int] | None]] = []
+    for line in lines_of([w for w in flat if w.y0 > top + 2]):
+        cells = cells_of(line, edge)
+        values = [0] * len(columns)
+        for c in cells:
+            at = max((i for i, x in enumerate(centres) if x < c.x1), default=None)
+            if at is None or (at + 1 < len(centres) and c.x1 > centres[at + 1]) or values[at]:
+                raise ValueError(f"{link} page {number}: cell {c.text} at {c.x1:.1f} has no column")
+            values[at] = integer(c.text.replace(".", ","))
+        label = [w for w in line if w.x1 < centres[0] and not DIGITS.fullmatch(w.text)]
+        lines.append((label, values if cells else None))
+    width = len(columns)
+    rows = place_rows(lines, width) if district else summary_rows(lines, width, districts[region])
+    labels = []
+    if district:
+        for found, _ in lines:
+            label = " ".join(w.text for w in found).strip()
+            if label.startswith("Total Ordinary"):
+                break
+            if label and label not in ("Polling Places", "Polling Place"):
+                labels.append(label)
+    return Sheet(region, district, [k for k, _ in columns], names, rows, number, labels)
+
+
+def vote_type(label: str) -> str | None:
+    """The type of declaration vote a row label names, or None for a polling place."""
+    if not re.match(r"(Absent|Early|Provisional|Special Inst|Ordinary)", label):
+        return None
+    text = label.casefold()
+    for word, kind in (
+        ("absent", "Absent Votes"),
+        ("post", "Early Votes (by Post)"),
+        ("person", "Early Votes (In Person)"),
+        ("provisional", "Provisional Votes"),
+        ("special", "Special Institutions, Hospitals & Remotes"),
+        ("ordinary", "Ordinary Votes"),
+    ):
+        if word in text:
+            return kind
+    raise ValueError(f"unknown type of vote {label!r}")
+
+
+TOTAL_ROW = re.compile(r"^(TOTALS?|Totals?)\b(?: \d+| Page| of| \d+ of \d+)*$")
+
+
+def place_rows(lines: list[tuple[list[Box], list[int] | None]], width: int) -> list[tuple[str, str, list[int]]]:
+    """A district page's rows: its polling places, Total Ordinary, the declaration votes by type, Subtotal, and
+    TOTAL. A row of blank cells is a row of zeros. The layout sometimes sets a row's name on the line above or below
+    its cells, wraps a polling place's name, or sets a row's total beside the first line of its name and its other
+    cells beside the second; each is joined back up."""
+    reserved = ("Subtotal", "Total Ordinary", "TOTAL")
+    rows: list[tuple[str, str, list[int]]] = []
+    orphan = False  # whether the last row is a name with no cells of its own yet
+    pending: list[str] = []  # lines of a polling place's name with no cells
+    for words, values in lines:
+        label = " ".join(w.text for w in words).strip()
+        if TOTAL_ROW.match(label):
+            label = "TOTAL"
+        kind = vote_type(label)
+        name = kind or label
+        if values is None:
+            if not label or label in ("Remotes", "Remote"):
+                continue
+            if rows and not rows[-1][1]:
+                rows[-1] = ("", name, rows[-1][2])  # a name below its cells
+            elif kind or label in reserved:
+                rows.append(("", name, [0] * width))
+                orphan = True
+            else:
+                pending.append(label)
+            continue
+        if not label and orphan:
+            rows[-1] = ("", rows[-1][1], values)  # a name above its cells
+            orphan = False
+            continue
+        if not label and pending:
+            name, pending = " ".join(pending), []
+        elif pending and rows:
+            rows[-1] = ("", " ".join([rows[-1][1], *pending]), rows[-1][2])  # a name that wraps
+            pending = []
+        orphan = False
+        last = rows[-1] if rows else None
+        if (
+            last is not None
+            and last[1]
+            and not kind
+            and name not in reserved
+            and vote_type(last[1]) is None
+            and last[1] not in reserved
+            and not any(a and b for a, b in zip(last[2], values, strict=True))
+            and (not label or (not any(last[2][:-1]) and not values[-1]))
+        ):
+            rows[-1] = ("", f"{last[1]} {name}".strip(), [a + b for a, b in zip(last[2], values, strict=True)])
+            continue
+        rows.append(("", name, values))
+    return rows
+
+
+def summary_rows(
+    lines: list[tuple[list[Box], list[int] | None]], width: int, districts: list[str]
+) -> list[tuple[str, str, list[int]]]:
+    """A region summary's rows as (type of vote, district, cells), with Subtotal and TOTALS rows. The type of vote
+    is printed down the first column beside its block of districts, ending at the block's Subtotal."""
+    known = {fold(d): d for d in districts}
+    known |= {m: d for m, d in DISTRICT_MISPRINTS.items() if d in districts}
+    starts = [w.x0 for words, _ in lines for w in words if w.text in ("Subtotal",)]
+    column = min(starts) - 1 if starts else 0.0
+    rows: list[tuple[str, str, list[int]]] = []
+    block: list[tuple[str, list[int]]] = []
+    fragments: list[str] = []
+    name: list[str] = []
+    for words, values in lines:
+        left = " ".join(w.text for w in words if w.x0 < column)
+        right = " ".join(w.text for w in words if w.x0 >= column)
+        if TOTAL_ROW.match(left) or TOTAL_ROW.match(right):
+            rows.append(("", "TOTALS", values or [0] * width))
+            break
+        if left and left != "Districts":
+            fragments.append(left)
+        if not right:
+            continue
+        name.append(right)
+        label = " ".join(name)
+        if label == "Subtotal":
+            kind = vote_type(" ".join(fragments))
+            if kind is None:
+                raise ValueError(f"no type of vote in {fragments}")
+            rows += [(kind, d, v) for d, v in block] + [(kind, "Subtotal", values or [0] * width)]
+            block, fragments, name = [], [], []
+        elif fold(label) in known:
+            block.append((known[fold(label)], values or [0] * width))
+            name = []
+        elif not any(k.startswith(fold(label)) for k in known):
+            raise ValueError(f"unknown district {label!r}")
+    return rows
+
+
+@dataclass
+class Tally:
+    """One row of a region's first preference analysis."""
+
+    name: str
+    kind: str  # "standard" for a polling place, "aggregate" for a type of declaration vote
+    tickets: list[int]  # each group's votes above the line
+    prefs: list[int]  # each candidate's first preference votes below the line
+    formal: int
+    informal: int
+    total: int
+
+    def __add__(self, other: Tally) -> Tally:
+        return Tally(
+            self.name,
+            self.kind,
+            [a + b for a, b in zip(self.tickets, other.tickets, strict=True)],
+            [a + b for a, b in zip(self.prefs, other.prefs, strict=True)],
+            self.formal + other.formal,
+            self.informal + other.informal,
+            self.total + other.total,
+        )
+
+    def cells(self) -> tuple[int, ...]:
+        return (*self.tickets, *self.prefs, self.formal, self.informal, self.total)
+
+
+@dataclass
+class Booths:
+    """A region's first preference votes by polling place, or by district and type of vote where the report prints
+    no polling places."""
+
+    groups: list[list[int]]  # each group's candidates in ballot order; the group's ticket counts for the first
+    loose: list[int]  # candidates outside any group with a ticket
+    places: dict[str, list[Tally]]  # by district
+
+
+# Printed subtotal and total rows that differ from the rows above them, where the district's other totals show
+# the rows are right: (day and district, row) to [(cell, sum of the rows, printed)], the cells in `Tally.cells` order.
+SUBTOTAL_MISPRINTS: dict[tuple[str, str], list[tuple[int, int, int]]] = {
+    ("2008-09-06 Balcatta", "Subtotal"): [(26, 1, 0)],  # its absent votes and TOTAL row give the 1
+    ("2008-09-06 Carine", "TOTAL"): [(1, 16, 6)],  # Total Ordinary 11 and Subtotal 5 make 16
+}
+ORDINARY = "Ordinary Votes"
+TYPES = [
+    ORDINARY,
+    "Absent Votes",
+    "Early Votes (by Post)",
+    "Early Votes (In Person)",
+    "Provisional Votes",
+    "Special Institutions, Hospitals & Remotes",
+]
+
+
+def structure(columns: list[str], cands: list[Candidate]) -> tuple[list[list[int]], list[int]]:
+    """The groups with a voting ticket, and the candidates outside them, by the columns: a group is its ticket
+    column and its candidates' columns. A candidate of another party after a group's candidates, with no ticket
+    column of their own, is ungrouped or in a group that lodged no ticket."""
+    groups: list[list[int]] = []
+    loose: list[int] = []
+    at = 0
+    inside = False
+    for kind in columns:
+        if kind == "ticket":
+            groups.append([])
+            inside = True
+        elif kind in ("first", "pref"):
+            if kind == "pref" and inside and party_name(cands[at].party) != party_name(cands[groups[-1][0]].party):
+                inside = False
+            if inside:
+                groups[-1].append(at)
+            else:
+                loose.append(at)
+            at += 1
+    if at != len(cands):
+        raise ValueError(f"{at} candidate columns for {len(cands)} candidates")
+    return groups, loose
+
+
+def named(names: list[str], cands: list[Candidate]) -> bool:
+    """Whether the rotated names over the columns are the candidates in ballot order."""
+    if len(names) != len(cands):
+        return False
+    for printed, c in zip(names, cands, strict=True):
+        words = {norm(w) for w in printed.split() if len(norm(w)) > 1}
+        parts = [norm(p) for p in re.split(r"[\s-]+", c.surname) if len(norm(p)) > 1]
+        given = [norm(g) for g in (c.preferred, *c.given.split()) if g]
+        if not any(p.startswith(w) or w.startswith(p) for w in words for p in parts) and not any(
+            w[:3] == g[:3] for w in words for g in given
+        ):
+            return False
+    return True
+
+
+def tally(name: str, kind: str, columns: list[str], values: list[int], check: bool = True) -> Tally:
+    tickets = [v for k, v in zip(columns, values, strict=True) if k == "ticket"]
+    prefs = [v for k, v in zip(columns, values, strict=True) if k in ("first", "pref")]
+    formal, informal, total = values[-3:]
+    out = Tally(name, kind, tickets, prefs, formal, informal, total)
+    if check and (sum(tickets) + sum(prefs) != formal or formal + informal != total):
+        raise ValueError(f"{name}: {values} do not add up")
+    return out
+
+
+def summed(name: str, rows: list[Tally]) -> Tally:
+    out = Tally(name, "aggregate", [0] * len(rows[0].tickets), [0] * len(rows[0].prefs), 0, 0, 0)
+    for row in rows:
+        out = out + row
+    return out
+
+
+def polling(where: str, columns: list[str], rows: list[tuple[str, str, list[int]]]) -> tuple[list[Tally], Tally]:
+    """A district's polling places and declaration votes, checked against its printed subtotals and total, with
+    the district's ordinary votes."""
+    places: list[Tally] = []
+    declared: list[Tally] = []
+    printed: dict[str, Tally] = {}
+    for _, label, values in rows:
+        if label in ("Total Ordinary", "Subtotal", "TOTAL"):
+            printed[label] = tally(f"{where}: {label}", "aggregate", columns, values, check=False)
+            if label == "TOTAL":
+                break
+        elif label in TYPES:
+            declared.append(tally(label, "aggregate", columns, values))
+        elif "Total Ordinary" in printed:
+            raise ValueError(f"{where}: polling place {label} after the ordinary votes")
+        else:
+            places.append(tally(label, "standard", columns, values))
+    declared.sort(key=lambda d: TYPES.index(d.name))
+    if set(printed) != {"Total Ordinary", "Subtotal", "TOTAL"} or [d.name for d in declared] != TYPES[1:]:
+        raise ValueError(f"{where}: rows {[label for _, label, _ in rows]}")
+    ordinary = summed(where, places)
+    for label, found in (
+        ("Total Ordinary", ordinary),
+        ("Subtotal", summed(where, declared)),
+        ("TOTAL", ordinary + summed(where, declared)),
+    ):
+        wrong = [
+            (n, a, b) for n, (a, b) in enumerate(zip(found.cells(), printed[label].cells(), strict=True)) if a != b
+        ]
+        if wrong and SUBTOTAL_MISPRINTS.get((where, label)) != wrong:
+            raise ValueError(
+                f"{where}: the rows' sums differ from the {label} row's cells (column, sum, printed) {wrong}"
+            )
+    return places + declared, ordinary
+
+
+def segment(lines: list[str], count: int, known: list[str]) -> list[str] | None:
+    """The lines of a district's polling place names split into `count` names the district's Assembly profile
+    prints, when they split one way only."""
+    words = " ".join(lines).split()
+    names = {}
+    for name in known:
+        names.setdefault(len(name.split()), {})[fold(name)] = name
+    found: list[list[str]] = []
+
+    def walk(at: int, out: list[str]) -> None:
+        if len(found) > 1:
+            return
+        if at == len(words):
+            if len(out) == count:
+                found.append(list(out))
+            return
+        for size, table in names.items():
+            text = fold(" ".join(words[at : at + size]))
+            name = table.get(text)
+            if name is None:  # the report cuts a long name's last letters off
+                name = next((n for k, n in table.items() if k.startswith(text) and len(k) - len(text) <= 2), None)
+            if name is not None:
+                walk(at + size, [*out, name])
+
+    walk(0, [])
+    if len(found) == 1:
+        return found[0]
+    if found:
+        return None
+    # Otherwise the closest split, where every name is near one the Assembly profile prints: the two reports
+    # spell some names a letter or a word apart.
+    longest = max(len(n.split()) for n in known) + 2
+    keys = [(fold(n), n) for n in known]
+
+    @functools.cache
+    def near(at: int, size: int) -> tuple[float, str] | None:
+        text = fold(" ".join(words[at : at + size]))
+        score, name = max((difflib.SequenceMatcher(None, text, k).ratio(), n) for k, n in keys)
+        return (score, name) if score >= 0.85 else None
+
+    @functools.cache
+    def best(at: int, left: int) -> tuple[float, tuple[str, ...]] | None:
+        if at == len(words):
+            return (0.0, ()) if left == 0 else None
+        if left == 0:
+            return None
+        out = None
+        for size in range(1, min(longest, len(words) - at) + 1):
+            hit = near(at, size)
+            rest = best(at + size, left - 1) if hit else None
+            if hit and rest and (out is None or hit[0] + rest[0] > out[0]):
+                out = (hit[0] + rest[0], (hit[1], *rest[1]))
+        return out
+
+    result = best(0, count)
+    if result is None or len(set(result[1])) != count:
+        return None
+    return list(result[1])
+
+
+def by_type(where: str, columns: list[str], rows: list[tuple[str, str, list[int]]]) -> dict[tuple[str, str], Tally]:
+    """A region summary's rows by type of vote and district, checked against its subtotals and total."""
+    out: dict[tuple[str, str], Tally] = {}
+    blocks: dict[str, list[Tally]] = {}
+    total = None
+    for kind, label, values in rows:
+        row = tally(f"{where}: {kind} {label}", "aggregate", columns, values)
+        if label == "TOTALS":
+            total = row
+        elif label == "Subtotal":
+            if summed(where, blocks[kind]).cells() != row.cells():
+                raise ValueError(f"{where}: {kind} does not add up to its subtotal")
+        else:
+            out[(kind, label)] = row
+            blocks.setdefault(kind, []).append(row)
+    if total is None or list(blocks) != TYPES or summed(where, list(out.values())).cells() != total.cells():
+        raise ValueError(f"{where}: the types of vote {list(blocks)} do not add up to the total")
+    return out
+
+
+@functools.cache
+def booths(day: str) -> dict[str, Booths]:
+    """Each region's first preference votes by polling place, checked against the report's district totals, its
+    region summary where it prints one in columns, and the region's count."""
+    spec = next(c for c in COUNCILS if c.day == day)
+    districts = {r: [d.name for d in checked(day) if d.region == r] for r in REGIONS}
+    pages = sheets(spec.counts, districts)
+    out: dict[str, Booths] = {}
+    for region in council(day):
+        name = region.name
+        mine = [s for s in pages if s.region == name]
+        if len({tuple(s.columns) for s in mine}) != 1:
+            raise ValueError(f"{day} {name}: the pages set out the columns differently")
+        columns = mine[0].columns
+        for s in mine:
+            if not named(s.names, region.candidates):
+                raise ValueError(f"{day} {name} page {s.page}: names {s.names} are not the candidates in order")
+        groups, loose = structure(columns, region.candidates)
+        places: dict[str, list[Tally]] = {}
+        ordinary: dict[str, Tally] = {}
+        assembly = {d.name: [p.name for p in d.places if p.kind == "standard"] for d in checked(day)}
+        for d in districts[name]:
+            rows = [row for s in mine if s.district == d for row in s.rows]
+            if not rows:
+                continue
+            places[d], ordinary[d] = polling(f"{day} {d}", columns, rows)
+            # The district's polling places, named as its Assembly profile names them.
+            labels = [LABEL_FIXES.get((day, d, line), line) for s in mine if s.district == d for line in s.labels]
+            standard = [t for t in places[d] if t.kind == "standard"]
+            found = segment(labels, len(standard), assembly[d])
+            if found is None:
+                raise ValueError(f"{day} {d}: cannot name {len(standard)} polling places from {labels}")
+            for t, place in zip(standard, found, strict=True):
+                t.name = place
+        summaries = [s for s in mine if s.district is None]
+        if len(summaries) > 1:
+            raise ValueError(f"{day} {name}: {len(summaries)} summaries")
+        if summaries:
+            found = by_type(f"{day} {name}", columns, summaries[0].rows)
+            if {d for _, d in found} != set(districts[name]):
+                raise ValueError(f"{day} {name}: the summary's districts are {sorted({d for _, d in found})}")
+            for d in districts[name]:
+                rows = [found[(kind, d)] for kind in TYPES]
+                if d not in places:
+                    # The report prints no polling places for the district: its votes by type of vote.
+                    places[d] = [
+                        Tally(kind, "aggregate", r.tickets, r.prefs, r.formal, r.informal, r.total)
+                        for kind, r in zip(TYPES, rows, strict=True)
+                    ]
+                    continue
+                mine_rows = [ordinary[d], *places[d][-5:]]
+                for kind, a, b in zip(TYPES, rows, mine_rows, strict=True):
+                    if a.cells() != b.cells():
+                        raise ValueError(f"{day} {d}: {kind} in the summary is not the district's polling places")
+        if set(places) != set(districts[name]):
+            raise ValueError(f"{day} {name}: first preferences for {sorted(places)}, not {districts[name]}")
+        total = summed(name, [t for rows in places.values() for t in rows])
+        votes = list(total.prefs)
+        for g, members in enumerate(groups):
+            votes[members[0]] += total.tickets[g]
+        if votes != region.votes or total.formal != region.formal or total.informal != region.informal:
+            raise ValueError(
+                f"{day} {name}: the polling places add up to {votes}, {total.formal:,} formal and "
+                f"{total.informal:,} informal, not the count's {region.votes}, {region.formal:,}, and {region.informal:,}"
+            )
+        out[name] = Booths(groups, loose, places)
+    return out
+
+
 # Referendums ------------------------------------------------------------------------------------------------------
 
 
@@ -1307,7 +1942,7 @@ def election(day: str) -> Package:
         f"{SOURCE}/{day}",
         SOURCE,
         f"The {when.year} Western Australian state election's Legislative Assembly results by polling place"
-        + (" and Legislative Council results by region" if any(c.day == day for c in COUNCILS) else "")
+        + (" and Legislative Council results" if any(c.day == day for c in COUNCILS) else "")
         + ", from the Western Australian Electoral Commission",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
@@ -1328,6 +1963,7 @@ def election(day: str) -> Package:
     )
     p.name(election_id, f"{when.year} Western Australian state election", "en", "official")
     p.add("slug", path=path, entity_id=election_id, is_current=True)
+    units: dict[str, str] = {}  # each polling place unit's code to its id, which the Legislative Council shares
     for d in districts:
         slug = changeset.slug(d.name)
         district = district_area(day, d.name)
@@ -1403,7 +2039,7 @@ def election(day: str) -> Package:
             code = f"{day}:{slug}:{changeset.slug(place.name)}"
             if seen[place.name] > 1:
                 code += f"-{seen[place.name]}"
-            unit = key("unit", code)
+            unit = units[code] = key("unit", code)
             p.add(
                 "reporting_unit",
                 id=unit,
@@ -1421,7 +2057,7 @@ def election(day: str) -> Package:
             put(p, result_set, unit, None, VALID, place.formal)
             put(p, result_set, unit, None, INVALID, place.informal)
             put(p, result_set, unit, None, CAST, place.total)
-        roll = key("unit", day, slug, "roll")
+        roll = units[f"{day}:{slug}:roll"] = key("unit", day, slug, "roll")
         p.add(
             "reporting_unit",
             id=roll,
@@ -1457,25 +2093,73 @@ def election(day: str) -> Package:
             kind = "elected" if index == win else "lost" if index in d.finalists else "eliminated"
             p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
     if any(c.day == day for c in COUNCILS):
-        council_contests(p, day, election_id, path)
+        council_contests(p, day, election_id, path, units)
     return p
 
 
 COUNCIL_METHOD = (
-    "First preference votes for each candidate in the region, from the first line of the Western Australian "
-    "Electoral Commission's count of the region in its Results and Statistics report. As in the commission's "
-    "count, the votes cast above the line for a group's voting ticket are counted as first preferences for the "
-    "group's first candidate. Informal ballot papers and the enrolment are the commission's figures for the region; "
-    "the enrolment is the sum of its districts' enrolments. The later counts are not stored, and the members are "
+    "First preference votes at each polling place, from the first preference analysis in the region profiles of "
+    "the Western Australian Electoral Commission's Results and Statistics report. Votes cast above the line for a "
+    "group's voting ticket are stored on one option per group, and votes below the line on each candidate, so the "
+    "options together hold every formal vote; the commission's count adds a group's ticket votes to its first "
+    "candidate's first preferences. Absent, early (postal and in person), provisional, and special institution, "
+    "hospital, and remote votes are reported once per district and stored as one unit each.{types} The rows add up "
+    "to each district's printed totals, and the districts to the first preferences of the region's count. The "
+    "enrolment is stored on a separate unit of each district. The later counts are not stored, and the members are "
     "listed as the commission declared them elected."
+)
+BY_TYPE = (
+    " The {year} report prints the region's votes by district and type of vote, with no polling places, so each "
+    "district's ordinary votes are stored as one unit."
+)
+NO_PLACES = (
+    "The report leaves the polling place page of the {district} district blank, so the district's votes are stored "
+    "by type of vote from the region's summary, with its ordinary votes as one unit."
 )
 
 
-def council_contests(p: Package, day: str, election_id: str, path: str) -> None:
+def council_unit(p: Package, units: dict[str, str], day: str, district: str, row: Tally) -> str:
+    """The unit of a row of a region's first preference analysis: the Assembly's unit for the same polling place or
+    type of declaration vote in the district, or a unit of its own."""
+    slug = changeset.slug(district)
+    if row.kind == "standard":
+        codes = [f"{day}:{slug}:{changeset.slug(row.name)}"]
+    else:
+        same = [
+            place.name
+            for d in checked(day)
+            if d.name == district
+            for place in d.places
+            if place.kind == "aggregate" and vote_type(place.name) == row.name
+        ]
+        codes = [f"{day}:{slug}:{changeset.slug(name)}" for name in same]
+    for code in codes:
+        if code in units:
+            return units[code]
+    code = f"{day}:{slug}:{changeset.slug(row.name)}"
+    unit = units[code] = key("unit", code)
+    p.add(
+        "reporting_unit",
+        id=unit,
+        polity_id=AUSTRALIA,
+        scheme_code="au-wa.polling_place",
+        code=code,
+        area_relation="within",
+        area_id=district_area(day, district),
+        kind=row.kind,
+    )
+    p.name(unit, row.name if row.kind == "standard" else f"{district}: {row.name}", "en", "official")
+    return unit
+
+
+def council_contests(p: Package, day: str, election_id: str, path: str, units: dict[str, str]) -> None:
     spec = next(c for c in COUNCILS if c.day == day)
     for link in dict.fromkeys(x for x in (spec.candidates, spec.counts, spec.elected) if x):
         p.uses(raw.cached(SOURCE, link))
+    found = booths(day)
+    enrolment = {d.name: d.enrolled for d in checked(day)}
     for r in council(day):
+        b = found[r.name]
         slug = changeset.slug(r.name)
         region = region_area(day, r.name)
         contest = key("contest", day, "council", slug)
@@ -1506,30 +2190,49 @@ def council_contests(p: Package, day: str, election_id: str, path: str) -> None:
             is_default=True,
             completeness=1.0,
         )
+        places = any(t.kind == "standard" for rows in b.places.values() for t in rows)
         p.add(
             "note",
             id=key("note", result_set),
             entity_id=result_set,
             kind="methodology",
-            body_md=COUNCIL_METHOD,
+            body_md=COUNCIL_METHOD.format(types="" if places else BY_TYPE.format(year=day[:4])),
             lang="en",
         )
-        unit = key("unit", day, "council", slug)
-        p.add(
-            "reporting_unit",
-            id=unit,
-            polity_id=AUSTRALIA,
-            scheme_code="au-wa.region",
-            code=f"{day}:{slug}",
-            area_relation="equals",
-            area_id=region,
-            kind="standard",
-        )
-        p.name(unit, f"{r.name} Region", "en", "official")
-        for position, (c, votes) in enumerate(zip(r.candidates, r.votes, strict=True), 1):
-            option = key("option", contest, position)
+        for d, rows in sorted(b.places.items()):
+            if places and not any(t.kind == "standard" for t in rows):
+                p.add(
+                    "note",
+                    id=key("note", result_set, "by-type", d),
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=NO_PLACES.format(district=d),
+                    lang="en",
+                )
+        # The options in ballot order: each group's ticket above the line, then the candidates below it.
+        legends: list[str] = []
+        options: list[str] = []
+        heads = {members[0] for members in b.groups}
+        position = 0
+        for index, c in enumerate(r.candidates):
             name = party_name(c.party)
             party = party_id(name) if name else None
+            if index in heads:
+                position += 1
+                legend = key("option", contest, "group", index + 1)
+                legends.append(legend)
+                p.add(
+                    "contest_option",
+                    id=legend,
+                    contest_id=contest,
+                    kind="legend",
+                    party_id=party,
+                    ballot_position=position,
+                    ballot_label=f"{name or c.display} group (above the line)",
+                )
+            position += 1
+            option = key("option", contest, index + 1)
+            options.append(option)
             p.add(
                 "contest_option",
                 id=option,
@@ -1539,12 +2242,12 @@ def council_contests(p: Package, day: str, election_id: str, path: str) -> None:
                 ballot_position=position,
                 ballot_label=c.ballot,
             )
-            person = key("person", contest, position)
+            person = key("person", contest, index + 1)
             p.add("person", id=person)
             p.name(person, c.display, "en", "official")
             p.add(
                 "candidacy",
-                id=key("candidacy", contest, position),
+                id=key("candidacy", contest, index + 1),
                 person_id=person,
                 option_id=option,
                 role="head",
@@ -1552,17 +2255,32 @@ def council_contests(p: Package, day: str, election_id: str, path: str) -> None:
                 member_of_party_id=party,
                 is_independent=party is None,
             )
-            put(p, result_set, unit, option, VOTES, votes)
-            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=votes)
-            won = position - 1 in r.elected
+            won = index in r.elected
             p.add("outcome", result_set_id=result_set, option_id=option, kind="elected" if won else "lost")
+        rows: list[Tally] = []
+        for d in sorted(b.places):
+            for row in b.places[d]:
+                rows.append(row)
+                unit = council_unit(p, units, day, d, row)
+                for option, value in zip(legends, row.tickets, strict=True):
+                    put(p, result_set, unit, option, VOTES, value)
+                for option, value in zip(options, row.prefs, strict=True):
+                    put(p, result_set, unit, option, VOTES, value)
+                put(p, result_set, unit, None, VALID, row.formal)
+                put(p, result_set, unit, None, INVALID, row.informal)
+                put(p, result_set, unit, None, CAST, row.total)
+            enrolled = enrolment[d]
+            assert enrolled is not None
+            put(p, result_set, units[f"{day}:{changeset.slug(d)}:roll"], None, REGISTERED, enrolled)
+        total = summed(r.name, rows)
+        for option, value in [*zip(legends, total.tickets, strict=True), *zip(options, total.prefs, strict=True)]:
+            p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=value)
         for measure, value in (
             (VALID, r.formal),
             (INVALID, r.informal),
             (CAST, r.formal + r.informal),
             (REGISTERED, r.enrolled),
         ):
-            put(p, result_set, unit, None, measure, value)
             p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
 
 
