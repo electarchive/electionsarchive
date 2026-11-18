@@ -427,12 +427,63 @@ def _solve(rows: list[dict], n: int, targets: list[int], rejected: int | None, c
             return
 
 
+def _middle(r: dict) -> int:
+    boxes = [b for b in r.get("boxes") or [] if b]
+    return sorted((b[1] + b[3]) // 2 for b in boxes)[len(boxes) // 2]
+
+
+def _insert(grouped: dict[str, list[tuple[dict, dict]]], entry: dict) -> None:
+    """Adds a station row the reader skipped altogether, beside the row of its page nearest to it in height."""
+    for items in grouped.values():
+        on = [(p, r) for p, r in items if p["page"] == entry["page"] and not r["total"] and r.get("boxes")]
+        if not on:
+            continue
+        page_, like = min(on, key=lambda m: abs(_middle(m[1]) - entry["y"]))
+        shift = entry["y"] - _middle(like)
+        row = {
+            "pd": "?",
+            "ps": "?",
+            "total": False,
+            "values": list(entry["values"]),
+            "pct": None,
+            "page": page_["page"],
+            "angle": page_["angle"],
+            "boxes": [[b[0], b[1] + shift, b[2], b[3] + shift] if b else None for b in like["boxes"]],
+            "seen": True,
+        }
+        later = [
+            i
+            for i, (p, r) in enumerate(items)
+            if p["page"] == page_["page"] and r.get("boxes") and not r["total"] and _middle(r) > entry["y"]
+        ]
+        items.insert(later[0] if later else len(items), (page_, row))
+        return
+    raise ValueError(f"page {entry['page']}: no rows to place an added row beside")
+
+
+def _totals(grouped: dict[str, list[tuple[dict, dict]]], entry: dict) -> None:
+    """Sets the figures of a constituency's totals line from the page image, where the reading garbled them."""
+    for items in grouped.values():
+        for p, r in items:
+            ys = [(c["y0"] + c["y1"]) // 2 for c in r["cells"] if c]
+            if p["page"] == entry["page"] and r["total"] and ys and abs(sorted(ys)[len(ys) // 2] - entry["y"]) <= 12:
+                r["values"] = list(entry["values"])
+                return
+    raise ValueError(f"page {entry['page']}, y {entry['y']}: no totals line to set")
+
+
 def _override(day: str, grouped: dict[str, list[tuple[dict, dict]]]) -> None:
     """Puts the rows read by eye from the page images (`boxes/<day>.overrides.json`) in place of the readings."""
     path = Path(__file__).parent / "boxes" / f"{day}.overrides.json"
     if not path.exists():
         return
     for entry in json.loads(path.read_text())["rows"]:
+        if entry.get("add"):
+            _insert(grouped, entry)
+            continue
+        if entry.get("totals"):
+            _totals(grouped, entry)
+            continue
         matches = []
         for items in grouped.values():
             for p, r in items:

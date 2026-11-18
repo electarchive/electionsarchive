@@ -682,6 +682,7 @@ def build_scanned(day: str) -> Package:
     p.name(election, f"{first.year} Jamaican general election", "en", "official")
     flagged: dict[str, list[str]] = {}
     own: list[str] = []
+    unbalanced: dict[str, int] = {}
     for k in report.constituencies:
         name = k.name
         contest = key("contest", day, k.number)
@@ -775,6 +776,9 @@ def build_scanned(day: str) -> Package:
         )
         if rows:
             _stations(p, day, k, name, result_set, options, rows, pages)
+            off = sum(1 for r in rows if sum(r.votes) + r.rejected != r.total)
+            if off:
+                unbalanced[name] = off
             if k.number in scanned.own_totals(day):
                 own.append(name)
                 p.add(
@@ -844,6 +848,14 @@ def build_scanned(day: str) -> Package:
     }
     for code, names in flagged.items():
         p.accept(code, f"In {', '.join(names)}, {reasons[code]}; the figures are stored as printed")
+    if unbalanced:
+        p.accept(
+            "accounting.votes_valid",
+            "Polling stations whose candidates' votes and rejected ballots do not add up to the total votes the "
+            "report prints: "
+            + ", ".join(f"{count} in {name}" for name, count in unbalanced.items())
+            + "; the figures are stored as printed, and the candidates' columns still add up to the constituency's declared votes.",
+        )
     over = sum(1 for rows in boxed.values() for s in rows if s.electors is not None and s.total > s.electors)
     if over:
         p.accept(
