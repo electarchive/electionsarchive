@@ -1,7 +1,7 @@
 """Ukraine: the regular local elections of 25 October 2020 from the Central Election Commission.
 
-The regular local elections of 25 October 2015 are built by ea.sources.ua.cvk_local_2015, which this module's
-fetch() and parse() call.
+The regular local elections of 25 October 2015 are built by ea.sources.ua.cvk_local_2015, and those of 31 October 2010
+by ea.sources.ua.cvk_local_2010, which this module's fetch() and parse() call.
 
 The Commission's results site for the local elections of 2020 (cvk.gov.ua/pls/vm2020, election 695) publishes:
 
@@ -64,8 +64,9 @@ def _first_round(url: str) -> str:
 
 
 def fetch() -> None:
-    from ea.sources.ua import cvk_local_2015
+    from ea.sources.ua import cvk_local_2010, cvk_local_2015
 
+    cvk_local_2010.fetch()
     cvk_local_2015.fetch()
     raw.fetch(SOURCE, SHAPES, suffix=".zip")
     raw.fetch(SOURCE, OPEN_DATA, suffix=".xml")
@@ -805,7 +806,7 @@ def runoff_days() -> list[date]:
 
 
 def packages() -> list[str]:
-    from ea.sources.ua import cvk_local_2015
+    from ea.sources.ua import cvk_local_2010, cvk_local_2015
 
     return [
         f"{SOURCE}/geo",
@@ -813,11 +814,12 @@ def packages() -> list[str]:
         f"{SOURCE}/{DAY}",
         *(f"{SOURCE}/{day}" for day in runoff_days()),
         *cvk_local_2015.packages(),
+        *cvk_local_2010.packages(),
     ]
 
 
 def parse() -> None:
-    from ea.sources.ua import cvk_local_2015
+    from ea.sources.ua import cvk_local_2010, cvk_local_2015
 
     geo().write()
     registry().write()
@@ -825,6 +827,7 @@ def parse() -> None:
     for day in runoff_days():
         runoff(day).write()
     cvk_local_2015.parse()
+    cvk_local_2010.parse()
 
 
 def emit() -> None:
