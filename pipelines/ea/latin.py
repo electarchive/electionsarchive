@@ -40,7 +40,7 @@ LIMIT = 300_000
 MODEL = "claude-haiku-5-5"
 EFFORT = "low"
 JOB_CAP = 40.0
-CHUNK_CHARS = 6_000
+CHUNK_CHARS = 3_000
 GENERATED = ("transliteration", "english", "official")
 
 NONLATIN = (
@@ -808,7 +808,7 @@ def chunks(
         )
         params: dict[str, object] = {
             "model": MODEL,
-            "max_tokens": 16_000,
+            "max_tokens": 32_000,
             "output_config": {"effort": EFFORT},
             "system": [{"type": "text", "text": PROMPTS[task], "cache_control": {"type": "ephemeral", "ttl": "1h"}}],
             "messages": [{"role": "user", "content": prompt}],
