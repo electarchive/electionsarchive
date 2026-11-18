@@ -764,10 +764,10 @@
       "kind": "official_body"
     },
     "ge-ab": {
-      "publisher": "AbkhazWorld (Donnacha Ó Beacháin)",
-      "title": "Dynamics of Electoral Politics in Abkhazia",
-      "url": "https://www.abkhazworld.com/aw/Pdf/Dynamics_of_Electoral_Politics_in_Abkhazia_Donnacha_O_Beachain.pdf",
-      "kind": "compendium"
+      "publisher": "Администрация Президента Республики Абхазия",
+      "title": "История",
+      "url": "https://president.apsny.land/istoriya",
+      "kind": "official_body"
     },
     "ge-so": {
       "publisher": "Caucasian Knot",
@@ -3212,9 +3212,9 @@
       "name_en": "Abkhazia",
       "status": "de_facto",
       "recognized_within": "GE",
-      "reason": "People's Assembly and presidential elections, including 2012, 2014, and 2017.",
+      "reason": "The Supreme Council restored the 1925 Abkhaz Constitution on 23 July 1992; under the Constitution of 26 November 1994, approved by referendum on 3 October 1999, its Central Election Commission has run People's Assembly elections since 1996, presidential elections since 1999, and referendums, and district, city, and village assemblies are elected every four years.",
       "source": "ge-ab",
-      "locator": "https://www.abkhazworld.com/aw/Pdf/Dynamics_of_Electoral_Politics_in_Abkhazia_Donnacha_O_Beachain.pdf"
+      "locator": "https://president.apsny.land/istoriya (\"23 июля 1992 г. Верховный Совет Абхазии решил восстановить действие Конституции Абхазии 1925 года\")"
     },
     {
       "iso": "GE-SO",
