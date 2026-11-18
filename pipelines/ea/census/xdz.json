@@ -1,0 +1,622 @@
+{
+  "polity": "XDZ",
+  "name": "Free City of Danzig",
+  "sources": {
+    "gbl-1922-vtwg": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1922, Nr. 46 (23 September): Volkstagswahlgesetz vom 6. September 1922",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_1922_046",
+      "kind": "official_body",
+      "note": "The Volkstag electoral law: electors are Danzig citizens aged 20 or more, candidates 25 or more; proportional representation; the territory of the Free City forms one Wahlkreis divided into Wahlbezirke; the Senate appoints a Wahlleiter to examine and determine the results."
+    },
+    "gbl-1923-vwo": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1923, Nr. 33 (12 Mai): Volkstagswahlordnung vom 20. April 1923",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66759912",
+      "kind": "official_body",
+      "note": "Electoral regulations for the Volkstag: the Wahlleiter publishes the total result, the names of those elected and their substitutes, and the valid votes for each list; a Hauptzusammenstellung of the results is drawn up within 21 days of polling."
+    },
+    "gbl-1923-ve": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1923, Nr. 22 (14 März): Gesetz über den Volksentscheid vom 6. März 1923",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66759901",
+      "kind": "official_body",
+      "note": "Referendum law under Article 43 III and Article 47 of the Constitution: a Volksentscheid on a law the Senate refers to the people, or on a bill demanded by a Volksbegehren signed by a tenth of the electors and not passed unchanged by the Volkstag; a constitutional change needs the consent of a majority of the electorate."
+    },
+    "gbl-1923-ao": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1923, Nr. 76 (13 Oktober): Abstimmungsordnung vom 5. Oktober 1923",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66759970",
+      "kind": "official_body",
+      "note": "Regulations for Volksbegehren and Volksentscheid: the Abstimmungsleiter publishes the total result in the Staatsanzeiger, with the number of electors at the last Volkstag election."
+    },
+    "gbl-1923-sb": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1923, Nr. 77 (15 Oktober): Gesetz über die Verwaltung der Gemeindeangelegenheiten der Stadtgemeinde Danzig vom 9. Oktober 1923",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66759971",
+      "kind": "official_body",
+      "note": "The city of Danzig is administered by the Senate and a Stadtbürgerschaft of 51 members, elected by the Volkstag by proportional representation for the Volkstag's term; the first Stadtbürgerschaft was to be elected within four weeks of the meeting of the Volkstag to be elected in November 1923, the old Stadtverordnetenversammlung serving until then."
+    },
+    "gbl-1924-gw": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1924, Nr. 18 (10 April): Gesetz über die Gemeindewahlen und Gemeindewahlordnung vom 4. April 1924",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66760204",
+      "kind": "official_body",
+      "note": "Municipal councils (Gemeindevertretungen) of towns and rural municipalities are elected for four years on a Sunday in November set by the Senate, not as a rule together with the Volkstag; the first elections under the law were to be held on one day by the end of May 1924; each Gemeindevorstand determines and publishes its own result."
+    },
+    "gbl-1927-kt": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1927, Nr. 6 (12 Februar): Gesetz betreffend die Wahlen zu den Kreistagen vom 1. Februar 1927",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66761027",
+      "kind": "official_body",
+      "note": "The Kreistage of the Landkreise are elected by universal, equal, direct, and secret ballot under proportional representation for four years, 20 members in Kreise of 30,000 inhabitants or fewer; the new elections were to be held on a Sunday between 15 May and 15 June 1927."
+    },
+    "gbl-1930-vf": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1930, Nr. 35 (20 September): Gesetz betreffend Änderung der Verfassung der Freien Stadt Danzig vom 4. Juli 1930",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66761476",
+      "kind": "official_body",
+      "note": "Constitutional amendment: the Volkstag has 72 members elected for four years and may be dissolved by its own resolution or by Volksentscheid; the Senate (President, deputy, and ten senators) is elected by the Volkstag; the Volkstag was to be re-elected within two months of the amendment's entry into force."
+    },
+    "gbl-1932-gv": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1932, Nr. 62 (22 Oktober): Verordnung betreffend Verlängerung der Amtsdauer der im Jahre 1928 gewählten Gemeindevertretungen vom 14. Oktober 1932",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66761707",
+      "kind": "official_body",
+      "note": "The municipal councils elected in 1928 under the law of 4 April 1924 are extended to 31 December 1933, with new elections on a Sunday in November 1933."
+    },
+    "gbl-1933-gv": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1933, Nr. 79 (18 Oktober): Verordnung betreffend die weitere Verlängerung der Amtsdauer der im Jahre 1928 gewählten Gemeindevertretungen vom 13. Oktober 1933",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66785526",
+      "kind": "official_body",
+      "note": "The municipal councils elected in 1928 are extended beyond 31 December 1933 until further notice."
+    },
+    "gbl-1934-gw": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1934, Nr. 81 (26 Oktober): Verordnung betreffend weitere Abänderung der Gesetze über die Kreistags- und Gemeindewahlen vom 26. Oktober 1934",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66786065",
+      "kind": "official_body",
+      "note": "The municipal councils of the Kreise Großes Werder and Danziger Niederung end on 30 November 1934; new elections on a Sunday in November set by the Senate, for a term from 1 December 1934 to 31 December 1938."
+    },
+    "gbl-1935-gw": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1935, Nr. 14 (20 Februar): Verordnung zur Abänderung der Verordnung betreffend die weitere Verlängerung der Amtsdauer der im Jahre 1928 gewählten Gemeindevertretungen vom 19. Februar 1935",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66786527",
+      "kind": "official_body",
+      "note": "The Stadtverordnetenversammlung of Zoppot and the municipal councils of the Kreis Danziger Höhe end on 30 April 1935; new elections on a Sunday in April set by the Senate, for a term from 1 May 1935 to 31 December 1938."
+    },
+    "gbl-1938-kt": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1938, Nr. 71 (2 November): Rechtsverordnung betreffend die Verlängerung der Amtsdauer der in den Jahren 1934/35 gewählten Kreistage und Gemeindevertretungen vom 27. Oktober 1938",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_67006026",
+      "kind": "official_body",
+      "note": "The Kreistage and municipal councils elected in 1934 and 1935 are extended until further notice."
+    },
+    "gbl-1939-vt": {
+      "title": "Gesetzblatt für die Freie Stadt Danzig, 1939, Nr. 20 (22 März): Rechtsverordnung betreffend die Verlängerung der Amtsdauer des am 7. April 1935 gewählten Volkstages vom 21. März 1939",
+      "publisher": "Senat der Freien Stadt Danzig",
+      "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_67006064",
+      "kind": "official_body",
+      "note": "The term of the Volkstag elected on 7 April 1935 is extended by a further four years; no later Volkstag election was held."
+    },
+    "vt-bd9": {
+      "title": "Verhandlungen des Volkstags der Freien Stadt Danzig: Stenographische Berichte, Bd. 9 (1925-1926)",
+      "publisher": "Volkstag der Freien Stadt Danzig",
+      "url": "https://archive.org/details/pbc.gda.pl.Od_6145_4_1925-26_Bd9",
+      "kind": "official_body",
+      "note": "Second Wahlperiode: speakers refer to the Volkstag elected in November 1923, to the Danzig-Polish Convention of Paris dated 15 November 1920, and to the three Kreistage elected in May 1920 under an ordinance of the Staatsrat of 31 March 1920."
+    },
+    "vt-bd11": {
+      "title": "Verhandlungen des Volkstags der Freien Stadt Danzig: Stenographische Berichte, Bd. 11 (1928)",
+      "publisher": "Volkstag der Freien Stadt Danzig",
+      "url": "https://archive.org/details/pbc.gda.pl.Od_6145_4_1928_Bd11",
+      "kind": "official_body",
+      "note": "Third Wahlperiode (1928/31): a speaker in 1928 notes that the Kreistage were elected in May of the previous year."
+    },
+    "vt-bd12": {
+      "title": "Verhandlungen des Volkstags der Freien Stadt Danzig: Stenographische Berichte, Bd. 12 (1928-1929)",
+      "publisher": "Volkstag der Freien Stadt Danzig",
+      "url": "https://archive.org/details/pbc.gda.pl.Od_6145_4_1928-29_Bd12",
+      "kind": "official_body",
+      "note": "Third Wahlperiode: records that Volkstag elections took place on 13 November 1927 and that municipal elections were held on Sunday, 18 November 1928."
+    },
+    "vt-bd14": {
+      "title": "Verhandlungen des Volkstags der Freien Stadt Danzig: Stenographische Berichte, Bd. 14 (1928-1930)",
+      "publisher": "Volkstag der Freien Stadt Danzig",
+      "url": "https://archive.org/details/pbc.gda.pl.Od_6145_4_1928-30_Bd14",
+      "kind": "official_body",
+      "note": "Third Wahlperiode: a motion refers to the new election of the Volkstag due on 16 November 1930 under the constitutional amendment; speakers refer to the two Volksentscheide of December 1928 on reducing the Senate and Volkstag and the Abstimmungsergebnis of 6 December 1928."
+    },
+    "vt-bd17": {
+      "title": "Verhandlungen des Volkstags der Freien Stadt Danzig: Stenographische Berichte, Bd. 17 (1933-1935)",
+      "publisher": "Volkstag der Freien Stadt Danzig",
+      "url": "https://archive.org/details/pbc.gda.pl.Od_6145_4_1933-35_Bd17",
+      "kind": "official_body",
+      "note": "Fifth Wahlperiode, from the first sitting of 20 June 1933 after the election of 28 May 1933; in November 1934 speakers refer to the Kreistag and municipal elections held ten days earlier."
+    },
+    "vt-bd18": {
+      "title": "Verhandlungen des Volkstags der Freien Stadt Danzig: Stenographische Berichte, Bd. 18 (1935-1937)",
+      "publisher": "Volkstag der Freien Stadt Danzig",
+      "url": "https://archive.org/details/pbc.gda.pl.Od_6145_4_1935-37_Bd18",
+      "kind": "official_body",
+      "note": "Sixth Wahlperiode, from the first sitting of 30 April 1935 after the election of 7 April 1935; after the Obergericht's ruling on the validity of that election the Wahlausschuss found on 5 December 1935 that the NSDAP held 42 seats instead of 43 and the Social Democrats 13 instead of 12; a speaker recalls the Kreistag elections in two Landkreise in November 1934."
+    },
+    "kb-werder-1928": {
+      "title": "Kreis-Blatt für den Kreis Gr. Werder, 1928, Nr. 40 (1. Oktober): Betr. Gemeindewahlen",
+      "publisher": "Landrat des Kreises Großes Werder (Kreisausschuß), Tiegenhof",
+      "url": "https://dlibra.bibliotekaelblaska.pl/dlibra/publication/edition/69009",
+      "kind": "official_body",
+      "note": "The district gazette reprints the law of 4 April 1924 (first municipal elections by the end of May 1924, term to 31 December 1928) and announces that the Senate set the new municipal elections for Sunday, 18 November 1928. Held by the Elbląg digital library."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Freie Stadt Danzig",
+      "name_en": "Free City of Danzig",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1920-11-15",
+      "valid_to": "1939-09-01",
+      "source": "vt-bd9"
+    },
+    {
+      "key": "kreis",
+      "name": "Landkreise",
+      "name_en": "Rural districts (Landkreise Danziger Höhe, Danziger Niederung, Großes Werder)",
+      "parent": "national",
+      "polity_kind": "county",
+      "valid_from": "1920-11-15",
+      "valid_to": "1939-09-01",
+      "source": "gbl-1927-kt"
+    },
+    {
+      "key": "gemeinde",
+      "name": "Stadt- und Landgemeinden",
+      "name_en": "Towns and rural municipalities (including the city of Danzig and Zoppot)",
+      "parent": "kreis",
+      "polity_kind": "municipality",
+      "valid_from": "1920-11-15",
+      "valid_to": "1939-09-01",
+      "source": "gbl-1924-gw"
+    }
+  ],
+  "classes": [
+    {
+      "key": "volkstag",
+      "tier": "national",
+      "name": "Wahlen zum Volkstag",
+      "name_en": "Volkstag (Popular Assembly)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1920-11-15",
+      "valid_to": "1939-09-01",
+      "first_held": "1923-11-01",
+      "measure": {
+        "unit": "constituency"
+      },
+      "finest_note": "The whole Free City formed one Wahlkreis, divided into Wahlbezirke that follow the municipalities; the Wahlleiter appointed by the Senate published the total result and a Hauptzusammenstellung by Wahlbezirk was drawn up.",
+      "source": "gbl-1922-vtwg",
+      "locator": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_1922_046 (§§ on the Wahlkreis: Das Gebiet der Freien Stadt Danzig bildet einen Wahlkreis; the Senate names a Wahlleiter)",
+      "note": "The unicameral legislature, elected by list proportional representation in one constituency covering the whole Free City: 120 members until the constitutional amendment of 4 July 1930 reduced it to 72. The Constituent Assembly elected in May 1920 sat as the first Volkstag until the election of November 1923; later elections were held on 13 November 1927, 16 November 1930 (early, under the 1930 amendment), 28 May 1933 (after dissolution), and 7 April 1935 (after dissolution). The Obergericht's ruling on the 1935 election moved one seat from the NSDAP to the Social Democrats. A decree of 21 March 1939 extended the Volkstag's term by four years, and no later election was held before the annexation of 1 September 1939.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "XDZ",
+          "valid_from": "1920-11-15",
+          "valid_to": "1939-09-01"
+        }
+      ],
+      "cadence": [
+        {
+          "selection": "elected",
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "partisan": true,
+          "administered_by": "Wahlleiter appointed by the Senate of the Free City of Danzig, with a Wahlausschuss",
+          "valid_from": "1920-11-15",
+          "valid_to": "1939-09-01",
+          "source": "gbl-1930-vf",
+          "locator": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66761476 (Article 9 as amended on 4 July 1930: Die Wahl des Volkstages erfolgt auf vier Jahre; dissolution by the Volkstag or by Volksentscheid; new election on a Sunday set by the Senate)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Wahlleiter der Freien Stadt Danzig: total result published under the Volkstagswahlordnung (Staatsanzeiger für die Freie Stadt Danzig)",
+          "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66759912",
+          "format": "print",
+          "access": "none",
+          "checked_at": "2026-11-18",
+          "first_date": "1923-11-01",
+          "last_date": "1935-04-07",
+          "source": "gbl-1923-vwo",
+          "role": "publishes",
+          "evidence": "The Volkstagswahlordnung of 20 April 1923 has the Wahlleiter publish the total result with the valid votes for each list and the names of those elected; no digitized copy of the Staatsanzeiger was found. The Gesetzblatt (1922-August 1939, Jagiellonian Digital Library copy on archive.org) and the Volkstag's stenographic reports (Bd. 9-18, Pomeranian Digital Library copy on archive.org) are open and give the dates but not the returns."
+        },
+        {
+          "platform": "Verhandlungen des Volkstags der Freien Stadt Danzig (Pomeranian Digital Library copy on archive.org)",
+          "url": "https://archive.org/details/pbc.gda.pl.Od_6145_4_1935-37_Bd18",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "first_date": "1927-11-13",
+          "last_date": "1935-04-07",
+          "source": "vt-bd18",
+          "role": "administers",
+          "evidence": "The Volkstag's own reports record each new Wahlperiode, the election dates, and the seat changes after the 1935 Wahlprüfung (NSDAP 42 instead of 43, SPD 13 instead of 12); volumes 9-14, 17, and 18 have OCR text, volume 15 (1930-31) has none, and volumes for 1920-1925 are not in the series online."
+        }
+      ],
+      "est_votes": 235000,
+      "effort": 3,
+      "dates": [
+        {
+          "date": "1923-11-01",
+          "precision": "month",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 120,
+          "source": "vt-bd9",
+          "quote": "Als der Volkstag im November 1923 gewählt wurde",
+          "note": "Second Volkstag; the Gesetzblatt of 15 October 1923 speaks of the Volkstag to be elected in November 1923. Secondary sources give Sunday, 18 November 1923; no official page reached here gives the day."
+        },
+        {
+          "date": "1927-11-13",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 120,
+          "source": "vt-bd12",
+          "quote": "Am 13. November 1927 fanden Volkstagswahlen statt.",
+          "note": "Third Volkstag (Wahlperiode 1928/31)."
+        },
+        {
+          "date": "1930-11-16",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 72,
+          "source": "vt-bd14",
+          "quote": "die am 16. November 1930 bevorstehenden Neuwahl des Volkstages",
+          "note": "Fourth Volkstag, elected early under the constitutional amendment of 4 July 1930, which cut the Volkstag to 72 members."
+        },
+        {
+          "date": "1933-05-28",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 72,
+          "source": "vt-bd17",
+          "quote": "Die aus diesem Geiste nationaler Erhebung geborene Wahl vom 28. Mai",
+          "note": "Fifth Volkstag, after dissolution; first sitting on 20 June 1933."
+        },
+        {
+          "date": "1935-04-07",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 72,
+          "source": "vt-bd18",
+          "quote": "Die Volkstagswahl am 7. April 1935 erbrachte",
+          "note": "Sixth Volkstag, after dissolution; first sitting on 30 April 1935. On the Obergericht's ruling the Wahlausschuss found on 5 December 1935 that the NSDAP held 42 seats instead of 43 and the Social Democrats 13 instead of 12. Its term was extended by four years on 21 March 1939."
+        }
+      ]
+    },
+    {
+      "key": "verfassunggebende_versammlung",
+      "tier": "national",
+      "name": "Wahl zur Verfassunggebenden Versammlung",
+      "name_en": "Constituent Assembly (1920)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1920-05-01",
+      "valid_to": "1920-11-15",
+      "first_held": "1920-05-01",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "vt-bd9",
+      "locator": "https://archive.org/details/pbc.gda.pl.Od_6145_4_1925-26_Bd9 (on the Kreistage resting on an ordinance of the old Staatsrat of 31 March 1920: Die Wahlen wurden dann im Mai 1920 durchgeführt)",
+      "note": "Elected in May 1920, under Allied administration before the Free City was constituted, to draft the Constitution; it then sat as the first Volkstag until the election of November 1923. Secondary sources give 16 May 1920 and 120 seats; the polling day is not in any official page reached here.",
+      "disposition": "blocked",
+      "disposition_reason": "The election predates the Free City (constituted on 15 November 1920), and the Staatsrat's ordinances and the Assembly's own proceedings for 1920 are not online; the official day and seat count were not reached.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "XDZ",
+          "valid_to": "1920-11-15"
+        }
+      ],
+      "est_votes": 190000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1920-05-01",
+          "precision": "month",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "vt-bd9",
+          "quote": "Die Wahlen wurden dann im Mai 1920 durchgeführt",
+          "note": "The speaker refers to the elections of May 1920 held before the Constitution entered into force; the Constituent Assembly and the three Kreistage were elected that month."
+        }
+      ]
+    },
+    {
+      "key": "senat",
+      "tier": "national",
+      "name": "Wahl des Senats",
+      "name_en": "Senate (President of the Senate and senators)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1920-11-15",
+      "valid_to": "1939-09-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "gbl-1930-vf",
+      "locator": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66761476 (Die Mitglieder des Senats werden auf unbestimmte Zeit vom Volkstag gewählt)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Senate, the Free City's government and head of state, was elected by the Volkstag, never by popular vote: until 1930 with full-time senators chosen for longer terms, and under the amendment of 4 July 1930 all twelve members for an indefinite period, dependent on the Volkstag's confidence.",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_state",
+            "head_of_government"
+          ],
+          "iso_pattern": "XDZ"
+        },
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "iso_pattern": "XDZ"
+        }
+      ]
+    },
+    {
+      "key": "kreistag",
+      "tier": "kreis",
+      "name": "Wahlen zu den Kreistagen",
+      "name_en": "Kreistage of the Landkreise (Danziger Höhe, Danziger Niederung, Großes Werder)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1920-11-15",
+      "valid_to": "1939-09-01",
+      "first_held": "1927-05-15",
+      "measure": {
+        "unit": "body"
+      },
+      "source": "gbl-1927-kt",
+      "locator": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66761027 (§ 1: general, equal, direct, and secret election by proportional representation; § 25: new elections on a Sunday from 15 May to 15 June 1927)",
+      "note": "Each of the three Landkreise elected a Kreistag (20 members where the Kreis had 30,000 inhabitants or fewer) for four years. The Kreistage elected in May 1920 under the Staatsrat's ordinance of 31 March 1920 sat until the elections of May 1927 under the law of 1 February 1927. Kreistag and municipal elections were held in two Landkreise (Großes Werder and Danziger Niederung) in November 1934 and in Danziger Höhe in April 1935; the decree of 27 October 1938 extended the Kreistage elected in 1934/35 until further notice. Whether the Kreistage were re-elected when their terms ran out in 1931 is not recorded in the pages reached here. The Stadtkreise of Danzig and Zoppot had no Kreistag.",
+      "disposition": "blocked",
+      "disposition_reason": "No result of any Kreistag election is online: results were declared by each Kreis and printed in the Kreisblätter, of which only scattered issues are digitized (Elbląg digital library for Großes Werder; Pomeranian Digital Library for Danziger Höhe before 1920); the polling days of 1927, 1934, and 1935 are known only to the month.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "county"
+          ],
+          "within": "XDZ"
+        }
+      ],
+      "cadence": [
+        {
+          "selection": "elected",
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Wahlkommissar of each Landkreis, under the Senate",
+          "valid_from": "1927-02-01",
+          "valid_to": "1939-09-01",
+          "source": "gbl-1927-kt",
+          "locator": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66761027 (Die Kreistagsabgeordneten werden auf vier Jahre gewählt)"
+        }
+      ],
+      "est_votes": 90000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1927-05-01",
+          "precision": "month",
+          "election_kind": "local",
+          "contests": 3,
+          "source": "vt-bd11",
+          "quote": "Im Mai vorigen Jahres, also vor [...] Jahren, sind die Kreistage gewählt worden.",
+          "note": "First Kreistag elections under the law of 1 February 1927, which set a Sunday between 15 May and 15 June 1927, in all three Landkreise."
+        },
+        {
+          "date": "1934-11-01",
+          "precision": "month",
+          "election_kind": "local",
+          "contests": 2,
+          "source": "vt-bd18",
+          "quote": "Als im November vergangenen Jahres die Kreistagswahlen in zwei Landkreisen stattfanden",
+          "note": "Kreistag elections with the municipal elections in Großes Werder and Danziger Niederung (decree of 26 October 1934)."
+        },
+        {
+          "date": "1935-04-01",
+          "precision": "month",
+          "election_kind": "local",
+          "contests": 1,
+          "source": "gbl-1938-kt",
+          "quote": "die Verlängerung der Amtsdauer der in den Jahren 1934/1935 gewählten Kreistage und Gemeindevertretungen",
+          "note": "Kreis Danziger Höhe, presumably with its municipal elections of April 1935 (decree of 19 February 1935); the Kreistag's polling month is inferred from the 1938 decree and not stated in a page reached here."
+        }
+      ]
+    },
+    {
+      "key": "gemeindevertretung",
+      "tier": "gemeinde",
+      "name": "Gemeindewahlen",
+      "name_en": "Municipal councils (Gemeindevertretungen and the Stadtverordnetenversammlung of Zoppot)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1920-11-15",
+      "valid_to": "1939-09-01",
+      "first_held": "1924-05-01",
+      "measure": {
+        "unit": "municipality"
+      },
+      "source": "gbl-1924-gw",
+      "locator": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66760204 (§ 1: four-year term, a Sunday in November set by the Senate; first elections on one day by the end of May 1924)",
+      "note": "The councils of the towns and rural municipalities outside the city of Danzig, including the Stadtverordnetenversammlung of Zoppot, were elected by proportional representation for four years under the law of 4 April 1924: first by the end of May 1924, then on 18 November 1928. The councils elected in 1928 were extended to the end of 1933 and then indefinitely; new elections were held in the Kreise Großes Werder and Danziger Niederung in November 1934 and in Zoppot and the Kreis Danziger Höhe in April 1935, and those councils were extended until further notice on 27 October 1938. The city of Danzig had no directly elected council: its Stadtbürgerschaft was chosen by the Volkstag (see stadtbuergerschaft).",
+      "disposition": "blocked",
+      "disposition_reason": "Each Gemeindevorstand determined and published its own result in the customary local way; no compilation of municipal results is online, and the Kreisblätter and local papers that printed them are digitized only in scattered issues.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "within": "XDZ"
+        }
+      ],
+      "cadence": [
+        {
+          "selection": "elected",
+          "period_years": 4,
+          "term_years": 4,
+          "month": 11,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Gemeindevorstand of each municipality; polling day set by the Senate",
+          "valid_from": "1924-04-04",
+          "valid_to": "1939-09-01",
+          "source": "gbl-1924-gw",
+          "locator": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66760204 (Gewählt wird an einem Sonntag des Monats November. Den Wahltag bestimmt der Senat.)"
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1924-05-01",
+          "precision": "month",
+          "election_kind": "local",
+          "source": "kb-werder-1928",
+          "quote": "Erstmalig haben die Wahlen nach Maßgabe dieses Gesetzes an einem Tage bis zum Ablauf des Monats Mai 1924 stattzufinden.",
+          "note": "First municipal elections under the law of 4 April 1924, on one day by the end of May 1924; the councils served from 1 June 1924 to 31 December 1928."
+        },
+        {
+          "date": "1928-11-18",
+          "election_kind": "local",
+          "source": "kb-werder-1928",
+          "quote": "Der Termin zur Vornahme der Neuwahl ist vom Senat der Freien Stadt Danzig auf Sonntag, den 18. November 1928 festgesetzt worden.",
+          "note": "All municipal councils outside the city of Danzig; the Volkstag's reports also refer to the municipal elections of 18 November 1928."
+        },
+        {
+          "date": "1934-11-01",
+          "precision": "month",
+          "election_kind": "local",
+          "source": "gbl-1934-gw",
+          "quote": "Die Amtsdauer der zur Zeit bestehenden Gemeindevertretungen des Kreises Großes Werder und des Kreises Danziger Niederung endet am 30. November 1934. Die Neuwahlen finden an einem Sonntag des Monats November statt.",
+          "note": "Municipalities of Großes Werder and Danziger Niederung, with their Kreistage; a speaker in the Volkstag in November 1934 refers to the Kreistag and municipal elections held ten days earlier (Verhandlungen, Bd. 17)."
+        },
+        {
+          "date": "1935-04-01",
+          "precision": "month",
+          "election_kind": "local",
+          "source": "gbl-1935-gw",
+          "quote": "Die Amtsdauer der zur Zeit bestehenden Stadtverordnetenversammlung der Stadt Zoppot und der z. Zt. bestehenden Gemeindevertretungen des Kreises Danziger Höhe endet am 30. April 1935. Die Neuwahlen finden an einem Sonntag des Monats April statt.",
+          "note": "Zoppot and the municipalities of Danziger Höhe."
+        }
+      ]
+    },
+    {
+      "key": "stadtbuergerschaft",
+      "tier": "gemeinde",
+      "name": "Wahl der Stadtbürgerschaft der Stadtgemeinde Danzig",
+      "name_en": "City assembly of Danzig (Stadtbürgerschaft)",
+      "category": "indirect",
+      "goal": "local",
+      "valid_from": "1923-10-09",
+      "valid_to": "1939-09-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "gbl-1923-sb",
+      "locator": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66759971 (§ 6: Die Stadtbürgerschaft besteht aus 51 Mitgliedern. Diese werden vom Volkstag ... gewählt)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No popular vote: from the law of 9 October 1923 the 51 members of the city of Danzig's Stadtbürgerschaft were elected by the Volkstag by proportional representation for the Volkstag's term; until then the Stadtverordnetenversammlung elected before the Free City was constituted continued in office.",
+      "match": [
+        {
+          "name_pattern": "Stadtbürgerschaft",
+          "iso_pattern": "XDZ*"
+        }
+      ]
+    },
+    {
+      "key": "volksentscheid",
+      "tier": "national",
+      "name": "Volksbegehren und Volksentscheid",
+      "name_en": "Popular initiatives and referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1923-03-06",
+      "valid_to": "1939-09-01",
+      "first_held": "1928-12-01",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "gbl-1923-ve",
+      "locator": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66759901 (§ 1: cases in which a Volksentscheid takes place; § 21: a Volksbegehren succeeds with a tenth of the electors)",
+      "note": "Under the law of 6 March 1923 a Volksentscheid was held on a law referred by the Senate or on a bill demanded by a Volksbegehren of a tenth of the electors; from 1930 the Volkstag could also be dissolved by Volksentscheid. The Abstimmungsleiter published the total result in the Staatsanzeiger. In December 1928 two Volksentscheide on constitutional reform (reducing the Senate and the Volkstag and dissolving the Volkstag) were held on the same Sunday after the Volksbegehren of 1928; speakers in the Volkstag call them a failure for their sponsors although most votes cast favored reform, and the Abstimmungsergebnis was determined on 6 December 1928. A Volksentscheid pending in 1933 on the repeal of the enabling act lapsed with the Volkstag's dissolution.",
+      "disposition": "blocked",
+      "disposition_reason": "The Abstimmungsleiter's published results in the Staatsanzeiger are not online, and the polling day of December 1928 is not stated in a page reached here.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "XDZ*"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Abstimmungsleiter: total result published in the Staatsanzeiger für die Freie Stadt Danzig",
+          "url": "https://archive.org/details/jbc.bj.uj.edu.pl.NDIGCZAS018825_66759970",
+          "format": "print",
+          "access": "none",
+          "checked_at": "2026-11-18",
+          "first_date": "1928-12-01",
+          "last_date": "1928-12-31",
+          "source": "gbl-1923-ao",
+          "role": "publishes",
+          "evidence": "The Abstimmungsordnung of 5 October 1923 has the Abstimmungsleiter publish the total result in the Staatsanzeiger; no digitized copy of the Staatsanzeiger was found."
+        }
+      ],
+      "est_votes": 150000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1928-12-01",
+          "precision": "month",
+          "election_kind": "referendum",
+          "contests": 2,
+          "source": "vt-bd14",
+          "quote": "auf das Ergebnis der schon erwähnten Volksentscheide vom Dezember 1928",
+          "note": "Two questions on constitutional reform on the same Sunday; the Abstimmungsergebnis is dated 6 December 1928 in the Volkstag's reports."
+        }
+      ]
+    }
+  ]
+}
