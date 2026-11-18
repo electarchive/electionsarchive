@@ -4,6 +4,7 @@ import inspect
 import json
 import os
 import shlex
+import ssl
 import subprocess
 import sys
 from collections.abc import Callable, Generator
@@ -214,7 +215,10 @@ def fetch(
     suffix: str,
     body: dict[str, object] | None = None,
     check: Callable[[Path], object] | None = None,
+    verify: ssl.SSLContext | bool = True,
 ) -> Artifact:
+    """Fetch one URL into the cache. `verify` takes a TLS context for a host that serves an incomplete
+    certificate chain."""
     index = _read(source)
     key = _key(url, body)
     if key in index:
@@ -233,6 +237,7 @@ def fetch(
                 headers={"User-Agent": USER_AGENT},
                 follow_redirects=True,
                 timeout=600,
+                verify=verify,
             ) as response,
             partial.open("wb") as file,
         ):
