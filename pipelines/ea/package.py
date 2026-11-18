@@ -186,6 +186,7 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
             "is_independent": B,
             "is_incumbent": B,
             "ballot_lines": I16,
+            "preference_option_id": U,
         },
     ),
     "reporting_unit": (
@@ -308,6 +309,43 @@ FACT_LIKE: dict[str, LiteralString] = {
     " count_round smallint, page_id uuid, source_id uuid, x0 real, y0 real, x1 real, y1 real",
 }
 JSON_COLUMNS = {"kinds", "rules", "locator"}
+# Columns added to the format after packages were already built. A writer leaves one out of the Parquet file when
+# every row leaves it empty, so earlier packages and their digests stay valid, and every reader takes a missing one
+# as null.
+OPTIONAL: dict[str, frozenset[str]] = {"candidacy": frozenset({"preference_option_id"})}
+
+
+def _empty(table: str, frame: pl.LazyFrame) -> list[str]:
+    """The optional columns of a table that no row of the frame fills."""
+    names = [column for column in OPTIONAL.get(table, ()) if column in frame.collect_schema().names()]
+    if not names:
+        return []
+    counts = frame.select(pl.col(column).is_not_null().sum() for column in names).collect().row(0)
+    return [column for column, n in zip(names, counts, strict=True) if not n]
+
+
+def _trim(table: str, file: Path) -> None:
+    """Rewrite a Parquet file without the optional columns no row fills."""
+    empty = _empty(table, pl.scan_parquet(file))
+    if empty:
+        pl.read_parquet(file).drop(empty).write_parquet(file, statistics=False)
+
+
+def _present(table: str, schema: dict[str, pl.DataType], file: Path) -> dict[str, pl.DataType]:
+    """The schema's columns a Parquet file holds; only an optional column may be missing."""
+    found = set(pl.read_parquet_schema(file))
+    missing = [column for column in schema if column not in found and column not in OPTIONAL.get(table, ())]
+    if missing:
+        raise ValueError(f"{file} lacks the columns {missing}")
+    return {column: kind for column, kind in schema.items() if column in found}
+
+
+def _duck_select(table: str, schema: dict[str, pl.DataType], file: Path) -> str:
+    """A DuckDB select of the schema's columns from a Parquet file, with missing optional columns as nulls."""
+    found = _present(table, schema, file)
+    return ", ".join(
+        f'"{column}"' if column in found else f'null::{_duck(kind)} as "{column}"' for column, kind in schema.items()
+    )
 
 
 def folder(key: str) -> Path:
@@ -495,6 +533,9 @@ class Package:
                 kind = _settle(pieces, table)
                 pieces = [piece.with_columns(pl.col("value").cast(kind)) for piece in pieces]
             combined = pl.concat(pieces).select(list(schema))
+            empty = _empty(table, combined)
+            if empty:
+                combined = combined.drop(empty)
             file = out / f"{table}.parquet"
             if table in self.parts:
                 combined.sink_parquet(file, statistics=False)
@@ -553,12 +594,13 @@ def _views(con: duckdb.DuckDBPyConnection, path: Path) -> list[str]:
     manifest = _manifest(path)
     paths = [path, *(_resolve(str(key)) for key in manifest["depends"])]
     for table, (_, schema) in [*TABLES.items(), *((t, (None, s)) for t, s in FACTS.items())]:
-        columns = ", ".join(f'"{column}"' for column in schema)
         types = ", ".join(f'null::{_duck(kind)} as "{column}"' for column, kind in schema.items())
         for prefix, scope in (("", [path]), ("all_", paths)):
-            files = [str(p / f"{table}.parquet") for p in scope if (p / f"{table}.parquet").exists()]
+            files = [p / f"{table}.parquet" for p in scope if (p / f"{table}.parquet").exists()]
             body = (
-                " union all ".join(f"select {columns} from read_parquet('{file}')" for file in files)
+                " union all ".join(
+                    f"select {_duck_select(table, schema, file)} from read_parquet('{file}')" for file in files
+                )
                 if files
                 else f"select {types} where false"
             )
@@ -584,7 +626,7 @@ def _digest(out: Path, tables: Iterable[str], con: duckdb.DuckDBPyConnection | N
     con = con or duckdb.connect(config={"memory_limit": CHECK_MEMORY, "threads": 4})
     digest = hashlib.sha256()
     for table in sorted(tables):
-        schema = _schema(table, out / f"{table}.parquet")
+        schema = _present(table, _schema(table, out / f"{table}.parquet"), out / f"{table}.parquet")
         columns = ", ".join(f'"{c}"::{_duck(kind)} as "{c}"' for c, kind in schema.items())
         found = con.execute(
             f"select sum(hash(t))::varchar from (select {columns} from read_parquet('{out / table}.parquet')) t"
@@ -631,6 +673,7 @@ REFERENCES = [
     ("candidacy", "person_id", "person"),
     ("candidacy", "option_id", "contest_option"),
     ("candidacy", "member_of_party_id", "party"),
+    ("candidacy", "preference_option_id", "contest_option"),
     ("reporting_unit", "polity_id", "polity"),
     ("reporting_unit", "scheme_code", "scheme"),
     ("reporting_unit", "area_id", "area"),
@@ -737,6 +780,26 @@ CHECKS = {
                                    join all_contest c on c.id = r.contest_id
                                    where c.magnitude = 1 and o.kind = 'elected' group by all)
                                  select * from w where winners > 1""",
+    "unique.preference_option": """select preference_option_id, count(*) as n from all_candidacy
+                                   where preference_option_id is not null group by all having count(*) > 1""",
+    "fact.preference_option": """select k.id, k.option_id, k.preference_option_id, l.kind, o.kind, o.parent_option_id
+                                 from candidacy k join all_contest_option o on o.id = k.preference_option_id
+                                 join all_contest_option l on l.id = k.option_id
+                                 where o.kind <> 'candidate' or o.parent_option_id is distinct from k.option_id
+                                   or o.contest_id <> l.contest_id
+                                   or l.kind not in ('list', 'independents', 'others')""",
+    "fact.preference_measure": """select v.result_set_id, v.option_id, v.measure, count(*) as n from result_value v
+                                  where v.measure <> 7 and v.option_id in (
+                                    select preference_option_id from all_candidacy
+                                    where preference_option_id is not null)
+                                  group by all""",
+    "accounting.preference_over_list": """select p.result_set_id, p.unit_id, p.option_id, p.channel, p.count_round,
+                                                 p.value as preference_votes, l.value as list_votes, k.ballot_lines
+                                          from result_value p join all_candidacy k on k.preference_option_id = p.option_id
+                                          join result_value l on l.result_set_id = p.result_set_id
+                                           and l.unit_id = p.unit_id and l.option_id = k.option_id
+                                           and l.channel = p.channel and l.count_round = p.count_round and l.measure = 1
+                                          where p.measure = 7 and p.value > l.value * coalesce(k.ballot_lines, 1)""",
     "result_set.default": """select contest_id, stage, count(*) as n from all_result_set where is_default
                              group by all having count(*) > 1""",
     "result_set.empty": """select r.id from result_set r where r.completeness > 0
@@ -1019,8 +1082,18 @@ def _facts(
     staged: dict[str, tuple[str, list[str]]] = {}
     for table, file in files.items():
         if table in TABLES:
-            columns = list(TABLES[table][1])
+            columns = list(_present(table, TABLES[table][1], file))
             _stage(conn, table, columns, file)
+            for column in OPTIONAL.get(table, ()):
+                if column not in columns and column in _columns(conn, table):
+                    conn.execute(
+                        sql.SQL("alter table {s} add column {c} {k}").format(
+                            s=sql.Identifier(f"pkg_{table}"),
+                            c=sql.Identifier(column),
+                            k=sql.SQL(_type(conn, table, column)),
+                        )
+                    )
+                    columns.append(column)
             _follow(conn, table, sql.Identifier(f"pkg_{table}"), columns, referencing)
             staged[table] = (f"pkg_{table}", columns)
     moved = [
@@ -1374,6 +1447,17 @@ def _columns(conn: Connection, table: str) -> Columns:
     }
 
 
+def _type(conn: Connection, table: str, column: str) -> LiteralString:
+    found = conn.execute(
+        """select format_type(a.atttypid, a.atttypmod) from pg_attribute a
+           where a.attrelid = %s::regclass and a.attname = %s and not a.attisdropped""",
+        [f"public.{table}", column],
+    ).fetchone()
+    if found is None:
+        raise LookupError(f"{table}.{column} does not exist in the database")
+    return cast(LiteralString, str(found[0]))
+
+
 def snapshot(target: Path) -> None:
     with store.connect() as conn:
         ids = [str(value) for (value,) in conn.execute(SNAPSHOT_IDS).fetchall()]
@@ -1438,6 +1522,8 @@ def _ready(source: Connection | Reference, key: str, batch: set[str], minted: se
         rows = frame.select(pl.len()).collect().item()
         known = source.columns.get(table, {}) if isinstance(source, Reference) else _columns(source, table)
         for column in schema:
+            if column not in present and column in OPTIONAL.get(table, ()):
+                continue
             if column not in known:
                 found.append(f"ready.column: {table}.{column} does not exist in the database")
                 continue
@@ -1598,9 +1684,12 @@ def _seal(
     con = _connect()
     for table, (_, schema) in [*TABLES.items(), *((t, (None, s)) for t, s in FACTS.items())]:
         file = out / f"{table}.parquet"
-        columns = ", ".join(f'"{c}"' for c in schema)
         types = ", ".join(f'null::{_duck(kind)} as "{c}"' for c, kind in schema.items())
-        body = f"select {columns} from read_parquet('{file}')" if file.exists() else f"select {types} where false"
+        body = (
+            f"select {_duck_select(table, schema, file)} from read_parquet('{file}')"
+            if file.exists()
+            else f"select {types} where false"
+        )
         con.execute(f'create or replace view "{table}" as {body}')
     external: set[str] = set()
     for table, column, target in REFERENCES:
@@ -1726,6 +1815,8 @@ def export(pipeline: str) -> Path:
     counts = {table: rows for table, rows in counts.items() if rows}
     con.close()
     for table in counts:
+        if table in OPTIONAL:
+            _trim(table, out / f"{table}.parquet")
         columns = [column for column in TABLES[table][1] if column in JSON_COLUMNS] if table in TABLES else []
         if columns:
             _canonicalize(out / f"{table}.parquet", columns)
@@ -1791,6 +1882,8 @@ class Draft(Changeset):
                 for column in schema
                 if column in JSON_COLUMNS
             ).write_parquet(out / f"{table}.parquet", statistics=False)
+            if table in OPTIONAL:
+                _trim(table, out / f"{table}.parquet")
             counts[table] = frame.height
         owned, artifacts = _adopted(self.conn, pipeline)
         new = tables["source_artifact"]["storage_key"].to_list() if "source_artifact" in tables else []

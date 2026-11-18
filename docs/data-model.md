@@ -150,6 +150,42 @@ The `person` table holds only what an official source publishes about a candidat
 
 A `candidacy` links a person to an option, with a role of `head`, `running_mate`, `list_member`, or `substitute`. The `candidacy_nomination` table records how a party is connected to a candidate. The kind is `nominated` when the party formally applied for the candidate, `endorsed` when a party backs a candidate who qualified another way, and `supported` when a party backs another party's candidate. A party label on a ballot without a nomination is a preference, not a nomination.
 
+#### Preference votes within a list
+
+Where voters on a list ballot can also mark candidates on that list (Belgian and Croatian preference votes, for example), each candidate's preference votes are stored on the candidacy within its list, and the list's own total stays as declared. Three rows carry them:
+
+- The list is a `contest_option` of kind `list` (or `independents` or `others`). Its votes stay under measure 1 (`votes`) as the authority declared them, and every list count, rollup, share, and seat check reads them unchanged.
+- Each candidate who received preference votes has a `contest_option` of kind `candidate` in the same contest, with `parent_option_id` set to the list option. It holds the candidate's preference votes under measure 7 (`preference_votes`) and nothing else, for each unit, channel, and count round the source reports. Measure 7 never adds to measure 1, so the list total is never counted twice.
+- The candidacy stays on the list option (`option_id`, role `list_member` or `head`, with `list_position`), so elected members remain outcomes of the list. `candidacy.preference_option_id` names the candidate option that holds its preference votes. At most one candidacy names a given option, and it never names the candidacy's own list option.
+
+Preference votes don't enter a list's total, and they don't change who a list elects. A source's own preference totals go in `declared` against the candidate option under measure 7, like any other declared total. A pipeline that stores candidates as the counted options themselves, with no list total of their own, keeps their votes on measure 1 and doesn't use `preference_option_id`. Some pipelines written before the column existed still hold preference votes on a child option with no candidacy pointing at it.
+
+The column is not in the migrations yet. The schema owner adds it as an additive migration, with the matching `candidacy` entry in `packages/db/src/core.ts` and `preference_option_id` in the `candidacy` column loop of `_publish_table` in `pipelines/ea/apply.py`:
+
+```sql
+set lock_timeout = '5s';
+alter table candidacy
+  add column preference_option_id uuid references contest_option (id),
+  add constraint candidacy_preference_option_key unique (preference_option_id) deferrable initially deferred,
+  add constraint candidacy_preference_option_check check (preference_option_id is distinct from option_id);
+comment on column candidacy.preference_option_id is
+  'The candidate option, under this candidacy''s list option, that carries its preference votes (measure 7); the list''s own votes stay on the list option';
+alter table candidacy_history add column preference_option_id uuid;
+create or replace function candidacy_capture() returns trigger language plpgsql as $$
+begin
+  insert into candidacy_history (
+    id, person_id, option_id, role, list_position, ballot_name, member_of_party_id, is_independent, is_incumbent,
+    ballot_lines, changeset_id, recorded_from, recorded, superseded_by, preference_option_id
+  )
+  select
+    o.id, o.person_id, o.option_id, o.role, o.list_position, o.ballot_name, o.member_of_party_id, o.is_independent,
+    o.is_incumbent, o.ballot_lines, o.changeset_id, o.recorded_from, tstzrange(o.recorded_from, now()),
+    ea_current_changeset(), o.preference_option_id
+  from old_rows o;
+  return null;
+end $$;
+```
+
 The `person_party_membership` table is keyed by person, party, and valid time, so memberships can overlap.
 
 ### Bodies, offices, and tenures
