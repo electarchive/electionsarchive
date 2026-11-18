@@ -308,7 +308,7 @@ def geo() -> Package:
         "Tyrol's districts and municipalities as the state's election office codes them in its Landtag results",
         depends=[f"{landtag.SOURCE}/geo"],
     )
-    p.external |= {AUSTRIA, COUNTRY}
+    p.external |= {AUSTRIA, COUNTRY, LAND_POLITY}
     for code, rank, noun in (
         ("at-7.land", 1, "state"),
         ("at-7.bezirk", 2, "political district"),
@@ -345,7 +345,7 @@ def registry() -> Package:
         "The Tyrolean Landtag and the lists on its ballots, as the state's election office prints them",
         depends=[f"{SOURCE}/geo"],
     )
-    p.external |= {AUSTRIA, COUNTRY}
+    p.external |= {AUSTRIA, COUNTRY, LAND_POLITY}
     p.add(
         "source",
         id=SOURCE_ID,
@@ -394,7 +394,7 @@ def election(edition: Edition) -> Package:
         f"The {day} Tyrolean Landtag election by municipality from the state's election office",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
-    p.external |= {AUSTRIA, COUNTRY}
+    p.external |= {AUSTRIA, COUNTRY, LAND_POLITY}
     p.uses(raw.cached(SOURCE, edition.csv))
     p.uses(raw.cached(SOURCE, edition.page))
     if edition.districts:
