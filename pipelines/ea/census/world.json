@@ -818,9 +818,9 @@
       "kind": "official_body"
     },
     "yug": {
-      "publisher": "United Nations",
-      "title": "Yugoslavia and Successor States",
-      "url": "https://www.un.org/en/about-us/member-states/yugoslavia",
+      "publisher": "Архив Југославије",
+      "title": "Лексикон Југославије: Конститутивни акти Југославије",
+      "url": "https://www.arhivyu.rs/leksikon-jugoslavije/konstitutivni_akti_jugoslavije",
       "kind": "official_body"
     },
     "csk": {
@@ -3300,9 +3300,9 @@
       "iso": "YUG",
       "name_en": "Yugoslavia",
       "status": "former",
-      "reason": "Federal Assembly elections from 1945 to 2003.",
+      "reason": "Proclaimed as the Kingdom of Serbs, Croats and Slovenes on 1 December 1918 and held its state's elections until the Federal Assembly's Constitutional Charter made it the State Union of Serbia and Montenegro in February 2003: the Constituent Assemblies of 1920 and 1945, the Kingdom's National Assembly from 1923 to 1938 and its indirectly elected Senate, the federal assemblies of 1950 to 1969 and, under the delegate system, 1974 to 1986, and the Federal Republic's Chamber of Citizens from 1992 to 2000, with its directly elected Chamber of Republics and President in 2000.",
       "source": "yug",
-      "locator": "https://www.un.org/en/about-us/member-states/yugoslavia"
+      "locator": "https://www.arhivyu.rs/leksikon-jugoslavije/konstitutivni_akti_jugoslavije (\"престолонаследник Александар Карађорђевић је 1. децембра 1918, у кући Крсмановића на Теразијама у Београду, прокламовао Краљевство Срба, Хрвата и Словенаца\"); the Archives' home page dates the Yugoslav state's records \"од њеног стварања 1918. до 2003\""
     },
     {
       "iso": "CSK",

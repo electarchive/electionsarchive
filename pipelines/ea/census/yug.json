@@ -1,0 +1,1205 @@
+{
+  "polity": "YUG",
+  "name": "Yugoslavia",
+  "sources": {
+    "aj": {
+      "title": "Архив Југославије: почетна страница",
+      "publisher": "Архив Југославије",
+      "url": "https://www.arhivyu.rs/",
+      "kind": "official_body",
+      "note": "The national archive that holds the records of the central state bodies of Yugoslavia \"од њеног стварања 1918. до 2003\" and of the State Union of Serbia and Montenegro from 2003 to 2006."
+    },
+    "aj_akti": {
+      "title": "Лексикон Југославије: Конститутивни акти Југославије",
+      "publisher": "Архив Југославије",
+      "url": "https://www.arhivyu.rs/leksikon-jugoslavije/konstitutivni_akti_jugoslavije",
+      "kind": "official_body",
+      "note": "The Archives' account of each constitutive act: the act of 1 December 1918, the Vidovdan Constitution of 28 June 1921, the law of 6 January 1929, the Constitution of 3 September 1931 (bicameral National Representation with a partly indirectly elected Senate), the AVNOJ decisions of 1942-1943, the Tito-Šubašić agreement, the proclamation of the FPRY on 29 November 1945, the Constitution of 7 April 1963, and the amendments of 1967-1971."
+    },
+    "ns_1918": {
+      "title": "Историјат 1804 - 1918",
+      "publisher": "Народна скупштина Републике Србије",
+      "url": "https://www.parlament.gov.rs/народна-скупштина/историјат/историјат-1804---1918.117.html",
+      "kind": "official_body"
+    },
+    "ns_posle": {
+      "title": "Историјат: после Другог светског рата",
+      "publisher": "Народна скупштина Републике Србије",
+      "url": "https://www.parlament.gov.rs/народна-скупштина/историјат/после-другог-светског-рата.126.html",
+      "kind": "official_body"
+    },
+    "stat_1923": {
+      "title": "Статистика избора народних посланика Краљевине Срба, Хрвата и Словенаца одржаних 18 марта 1923. године",
+      "publisher": "Народна скупштина Краљевине Срба, Хрвата и Словенаца (дигитална библиотека Управе за заједничке послове републичких органа)",
+      "url": "https://www.uzzpro.gov.rs/doc/biblioteka/digitalna-biblioteka/Statistika%20izbora%20narodnih%20poslanika%201923.pdf",
+      "kind": "official_body",
+      "note": "Edited by Laza M. Kostić and issued by the National Assembly (Državna štamparija, 1924); results by electoral district (izborni okrug) and electoral county (izborni srez), with a table of polling places. Scanned, 207 pages; served by the Serbian government's Administration for Joint Services digital library."
+    },
+    "zakon_1920": {
+      "title": "Закон о избору народних посланика за Уставотворну скупштину Краљевине Срба, Хрвата и Словенаца (1920)",
+      "publisher": "Краљевина Срба, Хрвата и Словенаца (дигитална библиотека Управе за заједничке послове републичких органа)",
+      "url": "https://www.uzzpro.gov.rs/doc/biblioteka/digitalna-biblioteka/Zakon%20o%20izboru%20narodnih%20poslanika%20za%20ustavotvornu%20skustinu%20kraljevine%20SHS%201920.pdf",
+      "kind": "official_body"
+    },
+    "uredba_oblasti": {
+      "title": "Уредба о подели земље на области (1922)",
+      "publisher": "Краљевина Срба, Хрвата и Словенаца (дигитална библиотека Управе за заједничке послове републичких органа)",
+      "url": "https://www.uzzpro.gov.rs/doc/biblioteka/digitalna-biblioteka/UREDBA%20o%20podeli%20zemlje%20na%20oblasti.pdf",
+      "kind": "official_body"
+    },
+    "zakon_1933": {
+      "title": "Закон о избору народних посланика (1933)",
+      "publisher": "Краљевина Југославија (дигитална библиотека Управе за заједничке послове републичких органа)",
+      "url": "https://www.uzzpro.gov.rs/doc/biblioteka/digitalna-biblioteka/1933-Izborni-zakon.pdf",
+      "kind": "official_body"
+    },
+    "zakon_1935": {
+      "title": "Закон о избору народних посланика за Народну скупштину (1935)",
+      "publisher": "Краљевина Југославија (дигитална библиотека Управе за заједничке послове републичких органа)",
+      "url": "https://www.uzzpro.gov.rs/doc/biblioteka/digitalna-biblioteka/Zakon%20o%20izboru%20narodnih%20poslanika%20za%20Narodnu%20skupstinu%201935.pdf",
+      "kind": "official_body"
+    },
+    "zakon_opstine_1933": {
+      "title": "Закон о општинама (1933)",
+      "publisher": "Краљевина Југославија (дигитална библиотека Управе за заједничке послове републичких органа)",
+      "url": "https://www.uzzpro.gov.rs/doc/biblioteka/digitalna-biblioteka/1933-zakon-o-opstinama.pdf",
+      "kind": "official_body"
+    },
+    "rzs_1992": {
+      "title": "Избори 1992. Коначни резултати: избори за Веће грађана Савезне скупштине (31. мај 1992)",
+      "publisher": "Републички завод за статистику Србије",
+      "url": "https://publikacije.stat.gov.rs/G1992/pdf/G19926001.pdf",
+      "kind": "official_body",
+      "note": "Results in Serbia only: 54 single-member constituencies and the list vote in Serbia as one constituency, with elected deputies by constituency. Scanned, 84 pages."
+    },
+    "szs_1996": {
+      "title": "Избори '96: Веће грађана Савезне скупштине",
+      "publisher": "Савезни завод за статистику",
+      "url": "https://publikacije.stat.gov.rs/G1996/pdf/G19966001.pdf",
+      "kind": "official_body",
+      "note": "Results of 3 November 1996 for the federation, each republic, each of the 36 constituencies, and each polling station. Scanned, 306 pages; served by the Statistical Office of the Republic of Serbia."
+    },
+    "szs_2000": {
+      "title": "Избори 2000: Веће република и Веће грађана Савезне скупштине",
+      "publisher": "Савезни завод за статистику",
+      "url": "https://publikacije.stat.gov.rs/G2000/pdf/G20006001.pdf",
+      "kind": "official_body",
+      "note": "Results of 24 September 2000 for both chambers: the Chamber of Republics by republic and municipality, the Chamber of Citizens by constituency (Montenegro and 26 in Serbia) and municipality. Scanned, 80 pages."
+    },
+    "szs_2001": {
+      "title": "Статистички џепни приручник СРЈ 2001",
+      "publisher": "Савезни завод за статистику",
+      "url": "https://publikacije.stat.gov.rs/G2001/pdf/G20016001.pdf",
+      "kind": "official_body",
+      "note": "Seats and votes of the lists in both chambers and the votes of the five presidential candidates of 24 September 2000."
+    },
+    "ipu_arc": {
+      "title": "Serbia: historical archive of parliamentary election results",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/2355_arc.htm",
+      "kind": "compendium"
+    },
+    "ipu_1969": {
+      "title": "Yugoslavia: Dates of Elections, 13 April to 9 May 1969",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/YUGOSLAVIA_1969_E.PDF",
+      "kind": "compendium"
+    },
+    "ipu_1974": {
+      "title": "Yugoslavia: Dates of Elections, March 16 to May 10, 1974",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/YUGOSLAVIA_1974_E.PDF",
+      "kind": "compendium"
+    },
+    "ipu_1978": {
+      "title": "Yugoslavia: Dates of Elections, April 12 to May 10, 1978",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/YUGOSLAVIA_1978_E.PDF",
+      "kind": "compendium"
+    },
+    "ipu_1982": {
+      "title": "Yugoslavia: Dates of Elections, 13 April to 10 May 1982",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/YUGOSLAVIA_1982_E.PDF",
+      "kind": "compendium"
+    },
+    "ipu_1986": {
+      "title": "Yugoslavia: Dates of Elections, 14 April to 10 May 1986",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/YUGOSLAVIA_1986_E.PDF",
+      "kind": "compendium"
+    },
+    "ipu_1992": {
+      "title": "Yugoslavia: Date of Elections, 31 May 1992",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/YUGOSLAVIA_1992_E.PDF",
+      "kind": "compendium"
+    },
+    "ipu_1992b": {
+      "title": "Yugoslavia: parliamentary elections Vece Gradjana, 1992",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/2355_92.htm",
+      "kind": "compendium"
+    },
+    "ipu_1996": {
+      "title": "Yugoslavia: parliamentary elections Vece Gradjana, 1996",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/2355_96.htm",
+      "kind": "compendium"
+    },
+    "ipu_2000": {
+      "title": "Yugoslavia: parliamentary elections Vece Gradjana, 2000",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/2355_00.htm",
+      "kind": "compendium"
+    },
+    "ipu_2000r": {
+      "title": "Yugoslavia: parliamentary elections Vece Republika, 2000",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/2356_00.htm",
+      "kind": "compendium"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Краљевина СХС / Краљевина Југославија / ДФЈ / ФНРЈ / СФРЈ / СРЈ",
+      "name_en": "Yugoslavia: the Kingdom of Serbs, Croats and Slovenes (Kingdom of Yugoslavia from 1929), Democratic Federal Yugoslavia, the Federal People's and Socialist Federal Republic, and the Federal Republic (1992-2003)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1918-12-01",
+      "valid_to": "2003-02-04",
+      "source": "aj"
+    },
+    {
+      "key": "izborni_okrug",
+      "name": "Изборни окрузи (1920-1938)",
+      "name_en": "Electoral districts of the Kingdom (1920-1938)",
+      "parent": "national",
+      "polity_kind": "region",
+      "elects": false,
+      "valid_from": "1920-07-10",
+      "valid_to": "1941-04-17",
+      "source": "stat_1923",
+      "counts": [
+        {
+          "date": "1923-03-18",
+          "value": 56,
+          "source": "stat_1923",
+          "locator": "https://www.uzzpro.gov.rs/doc/biblioteka/digitalna-biblioteka/Statistika%20izbora%20narodnih%20poslanika%201923.pdf (p. VI, § 7: \"Цела земља је подељена у 56 изборних округа, од којих 18 спадају на северну, предкумановску Србију, 12 на јужну Србију, 9 на Хрватску и Славонију, 6 на Босну и Херцеговину, 5 на Војводину, 3 на Словенију, 2 на Далмацију, 1 на Црну Гору\")"
+        }
+      ]
+    },
+    {
+      "key": "oblast",
+      "name": "Области (1922-1929)",
+      "name_en": "Oblasts (1922-1929)",
+      "parent": "national",
+      "polity_kind": "region",
+      "valid_from": "1922-04-26",
+      "valid_to": "1929-10-03",
+      "source": "uredba_oblasti",
+      "counts": [
+        {
+          "date": "1922-04-26",
+          "value": 33,
+          "source": "aj_akti",
+          "locator": "https://www.arhivyu.rs/leksikon-jugoslavije/konstitutivni_akti_jugoslavije (Видовдански устав: \"На основу Уредбе о подели на области од 26. априла 1922. Краљевина СХС подељена је на 33 области\")"
+        }
+      ]
+    },
+    {
+      "key": "opstina_kraljevina",
+      "name": "Општине (1918-1941)",
+      "name_en": "Municipalities of the Kingdom (1918-1941)",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "valid_from": "1918-12-01",
+      "valid_to": "1941-04-17",
+      "source": "zakon_opstine_1933"
+    },
+    {
+      "key": "republika_pokrajina",
+      "name": "Републике и аутономне покрајине (1945-1992)",
+      "name_en": "Republics and autonomous provinces of the federation (1945-1992)",
+      "parent": "national",
+      "polity_kind": "federal_unit",
+      "elects": false,
+      "valid_from": "1945-11-29",
+      "valid_to": "1992-04-27",
+      "source": "ipu_1974"
+    },
+    {
+      "key": "republika_clanica",
+      "name": "Републике чланице СРЈ (1992-2003)",
+      "name_en": "Member republics of the Federal Republic (Serbia and Montenegro, 1992-2003)",
+      "parent": "national",
+      "polity_kind": "federal_unit",
+      "elects": false,
+      "valid_from": "1992-04-27",
+      "valid_to": "2003-02-04",
+      "source": "ipu_1992"
+    },
+    {
+      "key": "izborna_jedinica_srj",
+      "name": "Изборне јединице за Веће грађана (1992-2000)",
+      "name_en": "Chamber of Citizens constituencies (1992-2000)",
+      "parent": "national",
+      "polity_kind": "region",
+      "elects": false,
+      "valid_from": "1992-04-27",
+      "valid_to": "2003-02-04",
+      "source": "szs_1996",
+      "counts": [
+        {
+          "date": "1996-11-03",
+          "value": 36,
+          "source": "szs_1996",
+          "locator": "https://publikacije.stat.gov.rs/G1996/pdf/G19966001.pdf (p. 3: \"Савезна република Југославија је подељена на 36 изборних јединица, па се у Црној Гори бира 30 посланика у 7 изборних јединица а у Србији 108 посланика у 29 изборних јединица\")"
+        },
+        {
+          "date": "2000-09-24",
+          "value": 27,
+          "source": "szs_2000",
+          "locator": "https://publikacije.stat.gov.rs/G2000/pdf/G20006001.pdf (pp. 5-6, contents: \"Изборна јединица Црна Гора\" and \"Изборна јединица бр. 1, Палилула\" through \"Изборна јединица бр. 26, Врање\")"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "privremeno_narodno_predstavnistvo",
+      "tier": "national",
+      "name": "Привремено народно представништво Краљевства Срба, Хрвата и Словенаца",
+      "name_en": "Provisional National Representation (delegated, 1919)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1918-12-01",
+      "valid_to": "1920-11-28",
+      "first_held": "1918-12-14",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ns_1918",
+      "locator": "https://www.parlament.gov.rs/народна-скупштина/историјат/историјат-1804---1918.117.html (\"Српска народна скупштина састала се последњи пут 14. децембра 1918. године. На основу саопштења Краљевске владе, изабрала је из својих редова 84 посланика за Привремено народно представништво Краљевства СХС\")",
+      "note": "A body delegated, not elected, by the existing representative bodies of the uniting lands (the Serbian National Assembly chose 84 of its members on 14 December 1918, and the National Council in Zagreb, the Montenegrin and Vojvodina assemblies, and the provincial diets sent their own); it first met on 1 March 1919 and sat until the Constituent Assembly was elected.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "appointed_assembly",
+            "unicameral"
+          ],
+          "valid_to": "1920-11-28",
+          "iso_pattern": "YUG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1918-12-14",
+          "election_kind": "indirect",
+          "source": "ns_1918",
+          "quote": "Српска народна скупштина састала се последњи пут 14. децембра 1918. године. На основу саопштења Краљевске владе, изабрала је из својих редова 84 посланика за Привремено народно представништво Краљевства СХС.",
+          "note": "The Serbian National Assembly's delegation; the other lands' delegations followed until the body first met on 1 March 1919 (Archives of Yugoslavia: \"Привремено народно представништво састало се 1. марта 1919\")."
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Delegations named by the uniting lands' bodies; the composition is recorded only in the printed proceedings of the Provisional National Representation, of which no official digital copy was found.",
+      "est_votes": 0,
+      "effort": 3
+    },
+    {
+      "key": "ustavotvorna_skupstina",
+      "tier": "national",
+      "name": "Избори за Уставотворну скупштину (1920 и 1945)",
+      "name_en": "Constituent Assembly elections (1920 and 1945)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1920-07-10",
+      "valid_to": "1946-01-31",
+      "first_held": "1920-11-28",
+      "earliest_record": "1920-11-28",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "1920: by electoral district and county in the Constituent Assembly's printed statistics; 1945: by federal unit and constituency in the printed records of the Assembly.",
+      "source": "zakon_1920",
+      "note": "The Constituent Assembly of the Kingdom, elected on 28 November 1920 by universal male suffrage with list PR in the electoral districts, adopted the Vidovdan Constitution on 28 June 1921 and continued as the National Assembly. The Constituent Assembly of Democratic Federal Yugoslavia, elected on 11 November 1945 with two chambers (the Federal Assembly by population and the Assembly of Nations by federal unit) on single People's Front lists with a \"box without a list\", proclaimed the Federal People's Republic on 29 November 1945 and adopted the Constitution of 31 January 1946.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "YUG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1920-11-28",
+          "election_kind": "general",
+          "contests": 55,
+          "seats": 419,
+          "source": "stat_1923",
+          "quote": "Округи су остали исти који су били и приликом избора за Уставотворну Скупштину; једино је од Северне Далмације, која је у време избора за Конституанту била окупирана од италијанских трупа, образован нов изборни округ Шибеник и област Задарског Суда.",
+          "note": "55 districts: the 56 of 1923 less Šibenik, which the cited page says was formed after 1920. Day and the 419 seats are not quoted from a fetched source; the Constituent Assembly's own statistics were not found online."
+        },
+        {
+          "date": "1945-11-11",
+          "election_kind": "general",
+          "source": "aj_akti",
+          "quote": "Уставотворна скупштина је на првој заједничкој седници оба дома (Савезна скупштина и Скупштина народа) ...",
+          "note": "Two chambers: the Federal Assembly and the Assembly of Nations. Day not quoted from a fetched source; constituency and seat counts are not yet listed."
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "The Constituent Assembly's 1920 statistics and the 1945 returns survive only in print; no official digital copy was found.",
+      "est_votes": 9500000,
+      "effort": 4
+    },
+    {
+      "key": "narodna_skupstina_kraljevina",
+      "tier": "national",
+      "name": "Избори за народне посланике Народне скупштине Краљевине СХС / Југославије",
+      "name_en": "National Assembly of the Kingdom (1923-1938)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1921-06-28",
+      "valid_to": "1941-04-17",
+      "first_held": "1923-03-18",
+      "earliest_record": "1923-03-18",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "The National Assembly's statistics give votes by electoral district (okrug) and electoral county (srez); 1931-1938 the national list's votes by district and county.",
+      "source": "stat_1923",
+      "locator": "https://www.uzzpro.gov.rs/doc/biblioteka/digitalna-biblioteka/Statistika%20izbora%20narodnih%20poslanika%201923.pdf (pp. VI-XIII: districts, counties, seats, electors)",
+      "note": "Unicameral under the Vidovdan Constitution of 28 June 1921, with list PR in electoral districts and candidates by county (1923, 1925, 1927). The law of 6 January 1929 dissolved it; under the Constitution of 3 September 1931 it became the lower chamber of the National Representation, elected on a national list that had to carry candidates in every county, with open public voting (1931, 1935, 1938). Deputies elected on 11 December 1938 sat until the April 1941 invasion.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "valid_from": "1921-06-28",
+          "valid_to": "1941-04-17",
+          "iso_pattern": "YUG"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Дигитална библиотека Управе за заједничке послове републичких органа",
+          "url": "https://www.uzzpro.gov.rs/doc/biblioteka/digitalna-biblioteka/Statistika%20izbora%20narodnih%20poslanika%201923.pdf",
+          "format": "pdf (scanned print)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "stat_1923",
+          "evidence": "The 1923 statistics, issued by the National Assembly in 1924, downloaded whole (207 pages); the library lists no statistics for the other elections.",
+          "first_date": "1923-03-18",
+          "last_date": "1923-03-18"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1923-03-18",
+          "election_kind": "general",
+          "contests": 56,
+          "seats": 313,
+          "source": "stat_1923",
+          "quote": "У I. табели означено је да наша Држава бира 312 посланика. Она у ствари бира 313 посланика, само приликом последњих избора један посланик није могао да буде изабран у крајевима Северне Далмације",
+          "note": "56 electoral districts (p. VI, § 7)."
+        },
+        {
+          "date": "1925-02-08",
+          "election_kind": "general",
+          "note": "Day not quoted from a fetched source; district and seat counts not yet listed."
+        },
+        {
+          "date": "1927-09-11",
+          "election_kind": "general",
+          "note": "Day not quoted from a fetched source; district and seat counts not yet listed."
+        },
+        {
+          "date": "1931-11-08",
+          "election_kind": "general",
+          "note": "First election under the 1931 Constitution, with a single national list. Day not quoted from a fetched source."
+        },
+        {
+          "date": "1935-05-05",
+          "election_kind": "general",
+          "source": "zakon_1935",
+          "note": "Held under the 1933 law as amended in 1935. Day not quoted from a fetched source."
+        },
+        {
+          "date": "1938-12-11",
+          "election_kind": "general",
+          "note": "Day not quoted from a fetched source."
+        }
+      ],
+      "est_votes": 14000000,
+      "effort": 4
+    },
+    {
+      "key": "senat",
+      "tier": "national",
+      "name": "Избори сенатора (1932-1941)",
+      "name_en": "Senate of the Kingdom (indirectly elected half, 1932-1941)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1931-09-03",
+      "valid_to": "1941-04-17",
+      "first_held": "1932-01-03",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "aj_akti",
+      "locator": "https://www.arhivyu.rs/leksikon-jugoslavije/konstitutivni_akti_jugoslavije (Октроисани устав, 3. септембар 1931: \"Уведено је дводомно Народно представништво састављено од Сената и Народне скупштине. Краљ је имао право да именује онолико сенатора колико их је бирано на посредним изборима.\")",
+      "note": "Half the senators were elected indirectly in each banovina by an electoral body of the banovina's deputies, councillors, and municipal heads, and the King appointed as many again; half the elected senators were renewed every three years.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "valid_from": "1931-09-03",
+          "valid_to": "1941-04-17",
+          "iso_pattern": "YUG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1932-01-03",
+          "election_kind": "indirect",
+          "note": "First Senate election. Day not quoted from a fetched source."
+        },
+        {
+          "date": "1934-01-01",
+          "precision": "year",
+          "through": "1940-12-31",
+          "election_kind": "indirect",
+          "note": "Triennial renewals of half the elected senators; not yet dated from the Senate's records."
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Votes of the banovina electoral bodies are recorded only in the printed Senate proceedings and the Službene novine; no official digital copy was found.",
+      "est_votes": 0,
+      "effort": 3
+    },
+    {
+      "key": "oblasne_skupstine",
+      "tier": "oblast",
+      "name": "Избори за обласне скупштине",
+      "name_en": "Oblast assemblies (1927)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1922-04-26",
+      "valid_to": "1929-10-03",
+      "first_held": "1927-01-23",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "uredba_oblasti",
+      "note": "The Vidovdan Constitution gave each of the 33 oblasts an elected oblast assembly (Archives of Yugoslavia: \"Органи обласне управе били су обласна скупштина и обласни одбор\"). The only election was held on 23 January 1927; the law of 6 January 1929 suspended oblast self-government and the banovinas replaced the oblasts on 3 October 1929.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "valid_from": "1922-04-26",
+          "valid_to": "1929-10-03"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1927-01-23",
+          "election_kind": "local",
+          "note": "One assembly in each of the 33 oblasts. Day not quoted from a fetched source."
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Results were published by the oblasts and in the Službene novine; no official digital copy was found.",
+      "est_votes": 2000000,
+      "effort": 4
+    },
+    {
+      "key": "opstinski_izbori_kraljevina",
+      "tier": "opstina_kraljevina",
+      "name": "Општински избори у Краљевини СХС / Југославији",
+      "name_en": "Municipal elections of the Kingdom (1919-1940)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1918-12-01",
+      "valid_to": "1941-04-17",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "zakon_opstine_1933",
+      "note": "Municipal councils were elected under the provincial laws inherited in 1918 until the Law on Municipalities of 1933 unified them; elections under that law were held banovina by banovina from 1933 to 1936. The law of 6 January 1929 dissolved the elected municipal administrations of Belgrade, Zagreb, and Ljubljana.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "valid_from": "1918-12-01",
+          "valid_to": "1941-04-17"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1919-01-01",
+          "precision": "year",
+          "through": "1940-12-31",
+          "election_kind": "local",
+          "note": "Municipal elections across the Kingdom; not yet dated from the banovinas' gazettes."
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Returns were published, if at all, in the provincial and banovina gazettes; no official digital copy was found.",
+      "est_votes": 8000000,
+      "effort": 5
+    },
+    {
+      "key": "savezna_skupstina_neposredni",
+      "tier": "national",
+      "name": "Непосредни избори за савезне посланике (1950-1969)",
+      "name_en": "Federal People's Assembly and Federal Assembly, directly elected chambers (1950-1969)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1946-01-31",
+      "valid_to": "1974-02-21",
+      "first_held": "1950-03-26",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "Single-member constituencies; the printed bulletins give votes by constituency and municipality.",
+      "source": "ns_posle",
+      "note": "Directly elected chambers in single-member constituencies on People's Front and then Socialist Alliance candidacies: the Federal Council and Council of Nationalities of the Federal People's Assembly (26 March 1950), the Federal Council (22 November 1953 and 23 March 1958), the Federal Chamber under the 1963 Constitution (1963, and half renewed in 1965 and 1967), and the Socio-Political Council of 120 deputies (13 April 1969).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election",
+            "special",
+            "runoff"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house",
+            "upper_house"
+          ],
+          "valid_from": "1946-01-31",
+          "valid_to": "1974-02-21",
+          "iso_pattern": "YUG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1950-03-26",
+          "election_kind": "general",
+          "note": "Federal Council and Council of Nationalities. Day not quoted from a fetched source."
+        },
+        {
+          "date": "1953-11-22",
+          "election_kind": "general",
+          "source": "ns_posle",
+          "quote": "Гласање је вршено куглицама до новембарских избора 1953, када се по први пут уводе гласачки листићи.",
+          "note": "Federal Council; day not quoted from a fetched source."
+        },
+        {
+          "date": "1958-03-23",
+          "election_kind": "general",
+          "note": "Federal Council. Day not quoted from a fetched source."
+        },
+        {
+          "date": "1963-01-01",
+          "precision": "year",
+          "election_kind": "general",
+          "source": "aj_akti",
+          "quote": "Устав СФРЈ, 7. април 1963.",
+          "note": "Federal Chamber elected under the 1963 Constitution; day not yet listed."
+        },
+        {
+          "date": "1965-01-01",
+          "precision": "year",
+          "election_kind": "general",
+          "note": "Renewal of half the Federal Chamber; not yet dated."
+        },
+        {
+          "date": "1967-01-01",
+          "precision": "year",
+          "election_kind": "general",
+          "note": "Renewal of half the Federal Chamber; not yet dated."
+        },
+        {
+          "date": "1969-04-13",
+          "election_kind": "general",
+          "contests": 120,
+          "seats": 120,
+          "source": "ipu_1969",
+          "quote": "For elections to the Socio-Political Council and Council of Working Communities, the entire country is divided into 120 constituencies ... In these constituencies, deputies to the Socio-Political Council are elected directly and by majority uninominal vote.",
+          "note": "Socio-Political Council; a second round where the only candidate failed to win more than half the register."
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Published only in the Federal Statistical Office's printed election bulletins and the Službeni list; no official digital copy was found, and no successor authority publishes them online.",
+      "est_votes": 45000000,
+      "effort": 5
+    },
+    {
+      "key": "savezna_skupstina_posredni",
+      "tier": "national",
+      "name": "Посредни избори за већа Савезне скупштине (1953-1969)",
+      "name_en": "Indirectly elected chambers of the Federal Assembly (1953-1969)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1953-01-13",
+      "valid_to": "1974-02-21",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ipu_1969",
+      "note": "Chambers chosen by electoral colleges or assemblies: the Council of Producers (1953-1963), chosen by producers' councils; the Economic, Educational and Cultural, Social and Health, and Organizational-Political Chambers (1963-1974), chosen by communal assemblies; and the Council of Nationalities (from 1967), chosen by the republican and provincial assemblies.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house",
+            "upper_house"
+          ],
+          "valid_from": "1953-01-13",
+          "valid_to": "1974-02-21",
+          "iso_pattern": "YUG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1953-01-01",
+          "precision": "year",
+          "through": "1967-12-31",
+          "election_kind": "indirect",
+          "note": "Councils of producers and working communities, 1953-1967; not yet dated."
+        },
+        {
+          "date": "1969-04-23",
+          "election_kind": "indirect",
+          "seats": 360,
+          "source": "ipu_1969",
+          "quote": "The 3 Councils of Working Communities — Economic Council, Educational and Cultural Council and Council for Social Affairs and Health — each have 120 members designated by electoral colleges composed of the councillors of the communal assemblies and delegates from the working communities."
+        },
+        {
+          "date": "1969-05-06",
+          "election_kind": "indirect",
+          "seats": 140,
+          "deferred": [
+            "1969-05-07",
+            "1969-05-08",
+            "1969-05-09"
+          ],
+          "source": "ipu_1969",
+          "quote": "The Council of Nationalities ... has 140 members elected by the republican and provincial assemblies at a joint sitting of all their councils — 20 members for each Republic and 10 for each of the 2 Autonomous Provinces."
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Published only in the Federal Statistical Office's printed election bulletins and the Službeni list; no official digital copy was found, and no successor authority publishes them online.",
+      "est_votes": 0,
+      "effort": 3
+    },
+    {
+      "key": "skupstina_sfrj_delegatska",
+      "tier": "national",
+      "name": "Избори делегата у Савезно веће и Веће република и покрајина Скупштине СФРЈ",
+      "name_en": "Assembly of the SFRY under the delegate system (1974-1986)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1974-02-21",
+      "valid_to": "1992-04-27",
+      "first_held": "1974-03-16",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ipu_1974",
+      "note": "Under the 1974 Constitution the 220 delegates of the Federal Chamber (30 per republic and 20 per province) were elected by the communal assemblies from lists drawn up by the Socialist Alliance, and the 88 of the Chamber of Republics and Provinces (12 per republic and 8 per province) by the republican and provincial assemblies, for four years. No federal election was held in 1990; the delegates of 1986 sat until the federation dissolved.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "lower_house",
+            "upper_house"
+          ],
+          "valid_from": "1974-02-21",
+          "valid_to": "1992-04-27",
+          "iso_pattern": "YUG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1974-03-16",
+          "election_kind": "indirect",
+          "seats": 308,
+          "deferred": [
+            "1974-05-10"
+          ],
+          "source": "ipu_1974",
+          "quote": "Dates of Elections: March 16 to May 10, 1974"
+        },
+        {
+          "date": "1978-04-12",
+          "election_kind": "indirect",
+          "seats": 308,
+          "deferred": [
+            "1978-05-10"
+          ],
+          "source": "ipu_1978",
+          "quote": "Dates of Elections: April 12 to May 10, 1978"
+        },
+        {
+          "date": "1982-04-13",
+          "election_kind": "indirect",
+          "seats": 308,
+          "deferred": [
+            "1982-05-10"
+          ],
+          "source": "ipu_1982",
+          "quote": "the elections by communal assemblies of delegates for the Federal Chamber were held from 13 to 21 April, depending on the Republic or Province. Elections by the Republican and Provincial Assemblies followed until May 10."
+        },
+        {
+          "date": "1986-04-14",
+          "election_kind": "indirect",
+          "seats": 308,
+          "deferred": [
+            "1986-05-10"
+          ],
+          "source": "ipu_1986",
+          "quote": "Dates of Elections: 14 April to 10 May 1986"
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Published only in the Federal Statistical Office's printed election bulletins and the Službeni list; no official digital copy was found, and no successor authority publishes them online.",
+      "est_votes": 0,
+      "effort": 3
+    },
+    {
+      "key": "predsednik_predsednistvo",
+      "tier": "national",
+      "name": "Избор председника Републике и чланова Председништва СФРЈ",
+      "name_en": "President of the Republic and members of the Presidency (chosen by assemblies, 1953-1991)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1953-01-13",
+      "valid_to": "1992-04-27",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "aj_akti",
+      "note": "The Federal People's Assembly elected the President of the Republic from 1953 (the 1963 Constitution set a four-year term with no limit for Josip Broz Tito). From 1971 the collective Presidency's members were elected by the republican and provincial assemblies, and from 1974 Tito held the presidency without term. The direct popular votes for Slovenia's member of the Presidency in 1989 were run by the republic and belong to its census.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "valid_from": "1953-01-13",
+          "valid_to": "1992-04-27",
+          "iso_pattern": "YUG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1953-01-01",
+          "precision": "year",
+          "through": "1991-12-31",
+          "election_kind": "indirect",
+          "note": "Elections of the President by the Federal Assembly and of the Presidency's members by the republican and provincial assemblies; not yet dated."
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Published only in the Federal Statistical Office's printed election bulletins and the Službeni list; no official digital copy was found, and no successor authority publishes them online.",
+      "est_votes": 0,
+      "effort": 2
+    },
+    {
+      "key": "vece_gradjana",
+      "tier": "national",
+      "name": "Избори за савезне посланике у Веће грађана Савезне скупштине СРЈ",
+      "name_en": "Chamber of Citizens of the Federal Assembly (1992-2000)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1992-04-27",
+      "valid_to": "2003-02-04",
+      "first_held": "1992-05-31",
+      "earliest_record": "1992-05-31",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "The Federal Statistical Office published results by constituency and polling station for 1996 and by constituency and municipality for 2000; for May 1992 the Serbian statistical office published Serbia's results by constituency.",
+      "source": "ipu_1992",
+      "note": "138 deputies (108 from Serbia and 30 from Montenegro) for four years. May 1992: half of Serbia's seats in 54 single-member constituencies and half by list in Serbia as one constituency, and in Montenegro 6 by constituency and 24 by list. From December 1992 list PR in multi-member constituencies with the D'Hondt method: 36 in 1996 (7 in Montenegro and 29 in Serbia), and in 2000 Montenegro as one constituency and 26 in Serbia. The Federal Electoral Commission declared the results.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election",
+            "special",
+            "runoff"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "valid_from": "1992-04-27",
+          "valid_to": "2003-02-04",
+          "iso_pattern": "YUG"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Републички завод за статистику Србије (публикације)",
+          "url": "https://publikacije.stat.gov.rs/G1996/pdf/G19966001.pdf",
+          "format": "pdf (scanned print)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "szs_1996",
+          "evidence": "The Federal Statistical Office's volumes for 1996 (G19966001) and 2000 (G20006001) and the Serbian office's May 1992 volume (G19926001) downloaded whole; the December 1992 federal volume was not identified.",
+          "first_date": "1992-05-31",
+          "last_date": "2000-09-24"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-05-31",
+          "election_kind": "general",
+          "seats": 138,
+          "source": "rzs_1992",
+          "quote": "вишестраначки избори су, у Републици Србији и Републици Црној Гори као републикама чланицама, одржани 31. маја 1992. године. У Републици Србији бирано је укупно 108 посланика у Веће грађана",
+          "note": "Serbia: 54 single-member constituencies and one list constituency; Montenegro: 6 single-member seats and 24 list seats (IPU)."
+        },
+        {
+          "date": "1992-12-20",
+          "election_kind": "general",
+          "seats": 138,
+          "deferred": [
+            "1993-01-03"
+          ],
+          "source": "ipu_1992b",
+          "quote": "Dates of elections / renewal (from/to): 20 December 1992 3 January 1993",
+          "note": "Early election after the constitutional amendments of September 1992; repeat voting on 3 January 1993. Constituency count not yet listed."
+        },
+        {
+          "date": "1996-11-03",
+          "election_kind": "general",
+          "contests": 36,
+          "seats": 138,
+          "source": "szs_1996",
+          "quote": "Савезна република Југославија је подељена на 36 изборних јединица, па се у Црној Гори бира 30 посланика у 7 изборних јединица а у Србији 108 посланика у 29 изборних јединица."
+        },
+        {
+          "date": "2000-09-24",
+          "election_kind": "general",
+          "contests": 27,
+          "seats": 138,
+          "source": "szs_2000",
+          "quote": "У овој публикацији Савезни завод за статистику објављује резултате избора за савезне посланике у Већу република и Већу грађана Савезне скупштине Савезне Републике Југославије, који су одржани 24. септембра 2000. године у СР Југославији.",
+          "note": "Montenegro as one constituency and 26 in Serbia (the volume's contents); Montenegro's governing parties boycotted."
+        }
+      ],
+      "est_votes": 18500000,
+      "effort": 4
+    },
+    {
+      "key": "vece_republika_posredni",
+      "tier": "republika_clanica",
+      "name": "Избор савезних посланика у Веће република од стране републичких скупштина",
+      "name_en": "Chamber of Republics, chosen by the republican assemblies (1992-1996)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1992-04-27",
+      "valid_to": "2000-07-06",
+      "first_held": "1992-05-31",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ipu_1992",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/YUGOSLAVIA_1992_E.PDF (\"The Chamber of Republics has 40 members: 20 delegates elected by each of the two republican assemblies of Serbia and Montenegro\")",
+      "note": "Twenty members chosen by each republic's assembly in proportion to its parties, after each federal or republican election, until the constitutional amendments of 6 July 2000 made the chamber directly elected.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "valid_from": "1992-04-27",
+          "valid_to": "2000-07-06",
+          "iso_pattern": "YUG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-01-01",
+          "precision": "year",
+          "through": "1998-12-31",
+          "election_kind": "indirect",
+          "note": "Selections by the assemblies of Serbia and Montenegro after the 1992, 1993, 1996, and 1997-1998 republican and federal elections; not yet dated."
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Chosen by the republican assemblies; the selections are recorded only in their printed records and the Službeni list SRJ, of which no official digital copy was found.",
+      "est_votes": 0,
+      "effort": 2
+    },
+    {
+      "key": "vece_republika",
+      "tier": "republika_clanica",
+      "name": "Непосредни избори за савезне посланике у Веће република (2000)",
+      "name_en": "Chamber of Republics, directly elected (2000)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "2000-07-06",
+      "valid_to": "2003-02-04",
+      "first_held": "2000-09-24",
+      "earliest_record": "2000-09-24",
+      "contests_per_unit": 1,
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "The Federal Statistical Office published results by republic and municipality.",
+      "source": "ipu_2000r",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/2356_00.htm (\"First election of the 40 members of the Chamber of the Republics by direct universal suffrage after the Constitution was amended in July 2000\")",
+      "note": "Twenty members from each republic, each republic one constituency with list PR.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "valid_from": "2000-07-06",
+          "valid_to": "2003-02-04",
+          "iso_pattern": "YUG"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Републички завод за статистику Србије (публикације)",
+          "url": "https://publikacije.stat.gov.rs/G2000/pdf/G20006001.pdf",
+          "format": "pdf (scanned print)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "szs_2000",
+          "evidence": "The Federal Statistical Office's volume for 24 September 2000 downloaded whole.",
+          "first_date": "2000-09-24",
+          "last_date": "2000-09-24"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-09-24",
+          "election_kind": "general",
+          "contests": 2,
+          "seats": 40,
+          "source": "szs_2001",
+          "quote": "CHAMBER OF REPUBLICS Ukupno / Total",
+          "note": "The table's total row gives 4 444 860 votes and 40 seats; each republic was one constituency."
+        }
+      ],
+      "est_votes": 4800000,
+      "effort": 2
+    },
+    {
+      "key": "predsednik_srj",
+      "tier": "national",
+      "name": "Избори за председника Савезне Републике Југославије",
+      "name_en": "President of the Federal Republic, directly elected (2000)",
+      "category": "executive",
+      "goal": "national",
+      "valid_from": "2000-07-06",
+      "valid_to": "2003-02-04",
+      "first_held": "2000-09-24",
+      "earliest_record": "2000-09-24",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ipu_2000",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/2355_00.htm (\"The new law states that the President will be elected directly - instead of by the Parliament - for up to two terms of four years each\")",
+      "note": "The only direct election of the federal President; a runoff was due on 8 October 2000 if no candidate won an absolute majority, but the Federal Electoral Commission's call for one was overturned after the protests of 5 October 2000.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "valid_from": "2000-07-06",
+          "valid_to": "2003-02-04",
+          "iso_pattern": "YUG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "2000-09-24",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "szs_2001",
+          "quote": "GAINED VOTES OF PRESIDENTS CANDIDATES",
+          "note": "Five candidates; Vojislav Koštunica (DOS) 2 470 304 votes and Slobodan Milošević 1 826 799."
+        }
+      ],
+      "disposition": "blocked",
+      "disposition_reason": "Only the five candidates' federation-wide totals were found online, in the Federal Statistical Office's 2001 pocket book; no official results by republic, constituency, or municipality were found.",
+      "est_votes": 4800000,
+      "effort": 3
+    },
+    {
+      "key": "predsednik_srj_skupstina",
+      "tier": "national",
+      "name": "Избор председника Савезне Републике Југославије у Савезној скупштини",
+      "name_en": "President of the Federal Republic, chosen by the Federal Assembly (1992-1997)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1992-04-27",
+      "valid_to": "2000-07-06",
+      "first_held": "1992-06-15",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ipu_2000",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/2355_00.htm (\"the President will be elected directly - instead of by the Parliament\")",
+      "note": "Elected by both chambers of the Federal Assembly for four years: Dobrica Ćosić (15 June 1992), Zoran Lilić (25 June 1993) after the Assembly removed Ćosić, and Slobodan Milošević (15 July 1997).",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "valid_from": "1992-04-27",
+          "valid_to": "2000-07-06",
+          "iso_pattern": "YUG"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1992-06-15",
+          "election_kind": "indirect",
+          "contests": 1,
+          "seats": 1,
+          "source": "ipu_2000",
+          "quote": "the President will be elected directly - instead of by the Parliament",
+          "note": "One election by the Federal Assembly; the day is not quoted from a fetched source."
+        },
+        {
+          "date": "1993-06-25",
+          "election_kind": "indirect",
+          "contests": 1,
+          "seats": 1,
+          "source": "ipu_2000",
+          "quote": "the President will be elected directly - instead of by the Parliament",
+          "note": "One election by the Federal Assembly; the day is not quoted from a fetched source."
+        },
+        {
+          "date": "1997-07-15",
+          "election_kind": "indirect",
+          "contests": 1,
+          "seats": 1,
+          "source": "ipu_2000",
+          "quote": "the President will be elected directly - instead of by the Parliament",
+          "note": "One election by the Federal Assembly; the day is not quoted from a fetched source."
+        }
+      ],
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "republicki_i_lokalni_socijalizam",
+      "tier": "republika_pokrajina",
+      "name": "Избори за скупштине република, покрајина и општина (1945-1990)",
+      "name_en": "Republican, provincial, and communal assembly elections of the socialist federation (1945-1990)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1945-11-29",
+      "valid_to": "1992-04-27",
+      "measure": {},
+      "source": "ns_posle",
+      "note": "Each republic and province ran its own assembly and communal elections, on the same days as the federal elections from 1963.",
+      "match": [],
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run under each republic's and province's own laws; the archive counts them in the successor states' censuses (census.rs, census.hr, census.si, census.ba, census.me, census.mk, and census.xk)."
+    },
+    {
+      "key": "republicki_i_lokalni_srj",
+      "tier": "republika_clanica",
+      "name": "Републички и локални избори у Србији и Црној Гори (1992-2003)",
+      "name_en": "Republican and local elections in Serbia and Montenegro (1992-2003)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1992-04-27",
+      "valid_to": "2003-02-04",
+      "measure": {},
+      "source": "ipu_1996",
+      "note": "Assembly, presidential, municipal, and referendum votes of the member republics, some held on the same days as federal elections.",
+      "match": [],
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run by each member republic under its own laws; the archive counts them in census.rs, census.me, and census.xk."
+    },
+    {
+      "key": "savezni_referendum",
+      "tier": "national",
+      "name": "Савезни референдум",
+      "name_en": "Federal referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1918-12-01",
+      "valid_to": "2003-02-04",
+      "measure": {},
+      "source": "aj_akti",
+      "note": "No referendum was held across Yugoslavia: the monarchy was abolished by the Constituent Assembly's declaration of 29 November 1945, and the referendums of 1990-1992 on independence, sovereignty, and state symbols were each called and run by one republic.",
+      "match": [],
+      "disposition": "out_of_scope",
+      "disposition_reason": "No federal referendum was ever held; the republican referendums belong to the successor states' censuses."
+    }
+  ]
+}
