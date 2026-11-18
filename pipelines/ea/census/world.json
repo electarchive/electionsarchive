@@ -875,10 +875,11 @@
       "note": "The Government of Vietnam's history of the Democratic Republic's founding: the Provisional Government's proclamation and the Declaration of Independence in Ba Đình Square on 2 September 1945. The end date is the first session of the Sixth National Assembly, which on 2 July 1976 named the reunified state the Socialist Republic of Vietnam, as the same history records (chinhphu.vn/giai-doan-1976-1985-dat-nuoc-thong-nhat-xay-dung-va-bao-ve-to-quoc-xhcn/i-chinh-phu-nhiem-ky-quoc-hoi-khoa-vi-1976-1981-2892); the IPU PARLINE archive files the 1975 election under the Democratic Republic and the 1976 election under the Socialist Republic (archive.ipu.org/parline-e/reports/2349_arc.htm)."
     },
     "xot": {
-      "publisher": "Istanbul Tarihi",
-      "title": "The History of Elections in Istanbul, 1876-1950",
-      "url": "https://istanbultarihi.ist/453-the-history-of-elections-in-istanbul-18761950",
-      "kind": "compendium"
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "title": "T.B.M.M. Zabıt Ceridesi, Devre I, Cilt 24, İçtima Senesi 3, Yüz otuzuncu İçtima, 1.11.1338 (1 November 1922)",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d01/c024/tbmm01024130.pdf",
+      "kind": "official_body",
+      "note": "Minutes of the sitting at which the Grand National Assembly of Turkey, the successor state's parliament, adopted the joint committees' declaration abolishing the sultanate: the Istanbul government founded on personal sovereignty had passed into history from 16 March 1336 (1920), and the caliphate stayed with the House of Osman, chosen by the Assembly. The Assembly's 1992 album (https://acikerisim.tbmm.gov.tr/handle/11543/1806) gives the Ottoman Chamber of Deputies' periods: elected under the Talimat-ı Muvakkate of 28 October 1876, opened 19 March 1877, prorogued 14 February 1878, and elected again in 1908, 1912, 1914, and 1919, its last sitting on 18 March 1920. The founding year 1299 is the traditional date of Osman I's independent rule; no official source dates it more exactly."
     },
     "xdz": {
       "publisher": "Oxford Public International Law",
@@ -3377,9 +3378,9 @@
       "iso": "XOT",
       "name_en": "Ottoman Empire",
       "status": "former",
-      "reason": "Chamber of Deputies (Meclis-i Mebusan) elections from 1877 to 1914.",
+      "reason": "Founded by tradition in 1299 under Osman I; elected a Chamber of Deputies (Meclis-i Mebusan) in two stages in 1877 and, after the constitution was restored in 1908, in 1908, 1912, 1913-1914, and 1919, its last Chamber adjourning on 18 March 1920; ended when the Grand National Assembly of Turkey abolished the sultanate on 1 November 1922.",
       "source": "xot",
-      "locator": "https://istanbultarihi.ist/453-the-history-of-elections-in-istanbul-18761950"
+      "locator": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d01/c024/tbmm01024130.pdf (joint committees' Mazbata, adopted at this sitting: Binaenaleyh o zamandan beri eski Osmanlı İmparatorluğu tarihe intikal edip yerine yeni ve millî bir Türkiye Devleti, yine o zamandan beri padişahlık merfû olup yerine Türkiye Büyük Millet Meclisi kaim olmuştur.)"
     },
     {
       "iso": "XDZ",
