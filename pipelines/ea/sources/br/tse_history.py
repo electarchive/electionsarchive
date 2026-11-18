@@ -17,6 +17,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.sources.br.identity import namesakes
 from ea.sources.br.tse import ANNULLED, COORDINATES, NOT_OPENED, SEATS, UFS, proper
 from ea.store import DATA, connect
 
@@ -1055,6 +1056,32 @@ def party_key(number: str, abbreviation: str, year: int) -> str:
     return f"{number}:{abbreviation}" + (":1985" if abbreviation == "PL" and year <= 2006 else "")
 
 
+def slug(text: str) -> str:
+    return unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower().replace(" ", "-")
+
+
+def person_keys() -> pl.DataFrame:
+    """The person key of each candidacy with a birth date, as `emit` builds it before rekeying namesakes."""
+    return (
+        pl.read_parquet(PARSED / "candidates.parquet", columns=["contest", "candidate", "name", "birth"])
+        .filter(pl.col("birth").is_not_null())
+        .unique(["contest", "candidate"])
+        .select(
+            year=pl.col("contest").str.slice(0, 4).cast(pl.Int32),
+            place=pl.col("contest").str.split(":").list.get(3),
+            candidate=pl.col("candidate").cast(pl.String),
+            key=pl.struct("name", "birth").map_elements(
+                lambda row: name_key(row["name"], row["birth"]), return_dtype=pl.String
+            ),
+        )
+    )
+
+
+def name_key(name: str, birth: date) -> str:
+    key = f"{slug(name)}|{birth}"
+    return SAME.get(key, key)
+
+
 def emit() -> Path:
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
     votes = pl.read_parquet(PARSED / "votes.parquet")
@@ -1099,9 +1126,6 @@ def emit() -> Path:
         def name(entity: UUID, text: str, lang: str = "pt", kind: str = "official") -> None:
             if entity in cs.minted:
                 cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
-
-        def slug(text: str) -> str:
-            return unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower().replace(" ", "-")
 
         results: dict[int, UUID] = {}
         for year in YEARS:
@@ -1453,6 +1477,7 @@ def emit() -> Path:
             .unique(["contest", "party_number"], keep="first")
         )
 
+        moved = namesakes()
         persons: dict[str, UUID] = {
             f"{slug(text)}|{birth}": entity
             for entity, text, birth in conn.execute(
@@ -1664,6 +1689,8 @@ def emit() -> Path:
                     f"{slug(row['name'])}|{row['birth']}" if row["birth"] is not None else f"{year}:{row['candidate']}"
                 )
                 person_key = SAME.get(person_key, person_key)
+                if row["birth"] is not None:
+                    person_key = moved.get((int(year), uf, str(row["candidate"])), person_key)
                 if person_key not in persons:
                     persons[person_key] = cs.key(f"{SOURCE}.person", person_key)
                     if persons[person_key] in cs.minted:
