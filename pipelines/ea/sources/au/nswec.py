@@ -3,12 +3,14 @@ import html
 import io
 import re
 from collections import Counter, defaultdict
-from datetime import date
+from datetime import UTC, date, datetime
 from html.parser import HTMLParser
+from time import sleep
 from typing import NamedTuple
 from uuid import uuid5
 
 import fastexcel
+import httpx
 import polars as pl
 
 from ea import changeset, package, raw
@@ -247,13 +249,44 @@ def district_pages_2011() -> list[tuple[str, str, str]]:
     ]
 
 
+# The host's CDN appends a script carrying a per-request id to every page, so two fetches of one page never hash
+# alike. It is cut before the page is stored, which keeps each stored page's hash stable across fetches.
+CDN_SCRIPT = re.compile(rb"<script>\(function\(\)\{function c\(\)\{.*?__CF\$cv\$params.*?</script>", re.DOTALL)
+
+
+def fetch_page_2011(client: httpx.Client, url: str) -> None:
+    if url in raw.keys(SOURCE):
+        return
+    for attempt in range(4):
+        try:
+            response = client.get(url)
+            response.raise_for_status()
+            break
+        except httpx.HTTPError:
+            if attempt == 3:
+                raise
+            sleep(2**attempt)
+    content = CDN_SCRIPT.sub(b"", response.content)
+    if b"__CF$cv$params" in content:
+        raise ValueError(f"{url}: the CDN script was not removed")
+    raw.store(
+        SOURCE,
+        url,
+        content,
+        suffix=".html",
+        retrieved_at=datetime.now(UTC),
+        media_type=response.headers.get("content-type", "text/html"),
+    )
+
+
 def fetch_2011() -> None:
-    raw.fetch(SOURCE, state_url(2011), suffix=".html")
-    urls = [u for _, a, b in district_pages_2011() for u in (a, b)]
-    got = raw.fetch_many(SOURCE, urls, suffix=".html")
-    missing = [u for u in urls if u not in got]
-    if missing:
-        raise RuntimeError(f"{len(missing)} 2011 pages could not be fetched: {missing[:3]}")
+    from concurrent.futures import ThreadPoolExecutor
+
+    with httpx.Client(headers={"User-Agent": raw.USER_AGENT}, follow_redirects=True, timeout=120) as client:
+        fetch_page_2011(client, state_url(2011))
+        urls = [u for _, a, b in district_pages_2011() for u in (a, b)]
+        with ThreadPoolExecutor(8) as pool:
+            list(pool.map(lambda u: fetch_page_2011(client, u), urls))
 
 
 def state_pages(year: int) -> list[str]:
