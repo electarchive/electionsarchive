@@ -2,8 +2,9 @@
 
 The Commission publishes results as Government Gazette notices and printed tables on its website. Constituency
 results come from regional council elections (2010, 2015, 2020, and the 2025 by-elections) and from the 2014 National
-Assembly table; local authority results come from the 2020 gazette; the 2024 presidential and National Assembly
-results are gazetted nationally. Every file has a text layer, read here with ``pdftotext -layout``. The 1998 and 2004
+Assembly table; local authority results come from the 2020 gazette; the 2014 and 2024 presidential and National Assembly
+results are gazetted nationally, and the 2024 election report adds each constituency's registered voters, rejected
+votes, and votes cast. Every file has a text layer, read here with ``pdftotext -layout``. The 1998 and 2004
 regional council and local authority tables are spreadsheets, read here with ``xlrd``.
 """
 
@@ -37,7 +38,9 @@ URLS = {
     "rc2015": f"{UPLOADS}/2021/06/Regional-Counils-Election-Results_Duly-elected-candidates-2015.pdf",
     "rc2020": f"{UPLOADS}/2023/02/7654-Gov-N219-Results-Regional-Council-2020.pdf",
     "la2020": f"{UPLOADS}/2021/06/7497-Gov-N65-Results-LA-2020.pdf",
+    "gazette2014": "https://www.lac.org.na/laws/2015/5641.pdf",
     "pna2024": f"{UPLOADS}/2025/03/Results-publication-2024PNA.pdf",
+    "report2024": f"{UPLOADS}/2025/07/ECN_2024-NPA_Report_Latest_Lower-Version.pdf",
     "rcby2025": f"{UPLOADS}/2025/10/Govt-Gazette-five-by-elections-result.pdf",
     "rc1998": f"{UPLOADS}/2021/06/REgional-Councils-Elections-1998.xls",
     "la1998": f"{UPLOADS}/2021/06/Local-Authourities-Elections-1998.xls",
@@ -842,6 +845,224 @@ def read_2024() -> National:
     )
 
 
+# --- 2014 presidential election and the 2024 constituency tables --------------------------------------------------------
+
+
+def read_2014_president() -> tuple[int, list[tuple[str, str, int]], str]:
+    """The votes counted, each candidate's printed name, party label, and votes, and the candidate declared elected."""
+    page = next(p for p in text("gazette2014") if "SCHEDULE" in p and "Column 4" in p and "President" in p)
+    counted = 0
+    winner = ""
+    candidates: list[tuple[str, str, int]] = []
+    for line in page.splitlines():
+        row = segments(line)
+        first = len(row) >= 4 and re.fullmatch(THOUSANDS, row[0][1]) is not None  # the row that also prints the total
+        at = int(first)
+        if len(row) < at + 3 or not re.fullmatch(THOUSANDS, row[at][1]) or "," not in row[at + 1][1]:
+            continue
+        if first:
+            counted, winner = number(row[0][1]), row[-1][1]
+        candidates.append((clean(row[at + 1][1].replace(" ,", ",")), row[at + 2][1], number(row[at][1])))
+    if sum(votes for _, _, votes in candidates) != counted:
+        raise ValueError(f"2014 presidential votes add up to {sum(v for _, _, v in candidates)}, not {counted}")
+    return counted, candidates, clean(winner.replace(" ,", ","))
+
+
+@dataclass
+class Turnout:
+    region: str
+    name: str
+    registered: int | None
+    ballots: int  # ballot papers issued to the constituency's polling stations
+    valid: int
+    invalid: int
+    cast: int
+
+
+TURNOUT_NUMBERS = re.compile(
+    r"(?:(?P<registered>\d{1,3}(?:,\d{3})*)\s+)?(?P<ballots>\d[\d,]*)\s+(?P<valid>\d[\d,]*)\s+(?P<invalid>\d[\d,]*)\s+(?P<cast>\d[\d,]*)"
+    r"(?:\s+(?P<turnout>\d+(?:\.\d+)?))?\s*$"
+)
+TURNOUT_HEADS = {
+    "Total",
+    "Registered",
+    "Ballots",
+    "Valid",
+    "Reject",
+    "Rejected",
+    "Votes",
+    "Counted",
+    "Cast",
+    "Casted",
+    "Voters",
+    "%Turnout",
+    "Region",
+    "Constituency",
+}
+
+
+def _plain(name: str) -> str:
+    folded = unicodedata.normalize("NFKD", name.replace("ǁ", "/").replace("‡", "#"))
+    return re.sub(r"[^a-z]+", "", "".join(c for c in folded if not unicodedata.combining(c)).casefold())
+
+
+def read_turnout(title: str, stop: str) -> tuple[list[Turnout], Turnout, list[tuple[int, str]]]:
+    """The constituency rows of a results table in the 2024 report, and its printed subtotal row.
+
+    The third value lists the region labels printed beside the rows, each with the number of rows above its line.
+    The table starts at the page that prints ``title`` and ends at the page with the SUB-TOTAL row. A constituency
+    name that wraps sits on the lines just above and below its numbers, so each fragment goes to the nearest numbers.
+    """
+    pages = text("report2024")
+    first = next(i for i, page in enumerate(pages) if title in page)
+    last = next(i for i in range(first, len(pages)) if "SUB-TOTAL" in pages[i])
+    rows: list[Turnout] = []
+    labels: list[tuple[int, str]] = []
+    subtotal: Turnout | None = None
+    for index in range(first, last + 1):
+        lines = pages[index].splitlines()
+        if index == first:
+            lines = lines[next(i for i, line in enumerate(lines) if title in line) + 1 :]
+        head = next(i for i, line in enumerate(lines) if "Constituency" in line)
+        column = lines[head].index("Constituency") - 3
+        numbers: list[tuple[int, re.Match[str], list[str]]] = []
+        fragments: list[tuple[int, str]] = []
+        for i, line in enumerate(lines[head:], head):
+            if stop in line or "ECN 2024 NPA" in line or not line.strip():
+                continue
+            found = TURNOUT_NUMBERS.search(line)
+            row = segments(line[: found.start()] if found else line)
+            if not found and all(word in TURNOUT_HEADS for _, t in row for word in t.split()):
+                continue
+            left = [t for start, t in row if start >= column or t == "SUB-TOTAL"]
+            labels.extend((len(rows) + len(numbers), t) for start, t in row if start < column and t != "SUB-TOTAL")
+            if found:
+                numbers.append((i, found, left))
+            else:
+                fragments.extend((i, t) for t in left)
+        pieces: list[list[tuple[int, str]]] = [[(i, t) for t in left] for i, _, left in numbers]
+        for i, t in fragments:
+            distance = sorted((abs(i - at), k) for k, (at, _, _) in enumerate(numbers))
+            near = [k for d, k in distance if d == distance[0][0]]
+            if len(near) > 1:  # a fragment between two rows belongs to the one whose numbers have no name beside them
+                near = [k for k in near if not numbers[k][2]]
+            if len(near) != 1:
+                raise ValueError(f"2024 report page {index + 1}: cannot tell which row {t!r} belongs to")
+            pieces[near[0]].append((i, t))
+        for (_, found, _), parts in zip(numbers, pieces, strict=True):
+            name = clean(" ".join(t for _, t in sorted(parts)))
+            registered = found.group("registered")
+            row = Turnout(
+                "",
+                name,
+                number(registered) if registered else None,
+                number(found.group("ballots")),
+                number(found.group("valid")),
+                number(found.group("invalid")),
+                number(found.group("cast")),
+            )
+            if row.valid + row.invalid != row.cast:
+                raise ValueError(f"2024 report: {name}: {row.valid} + {row.invalid} is not {row.cast}")
+            if (
+                row.registered
+                and "." in (found.group("turnout") or "")
+                and abs(row.cast / row.registered * 100 - float(found.group("turnout"))) > 0.006
+            ):
+                raise ValueError(
+                    f"2024 report: {name}: printed turnout {found.group('turnout')} is not cast / registered"
+                )
+            if name == "SUB-TOTAL":
+                subtotal = row
+            else:
+                rows.append(row)
+    if subtotal is None:
+        raise ValueError(f"2024 report: no subtotal under {title!r}")
+    return rows, subtotal, labels
+
+
+FOREIGN = "foreign-missions"
+# The regions in the order the 2024 report's tables run, each with its number of constituencies; the report prints
+# each region's name beside the middle of its rows, which is checked against these counts.
+REGIONS_2024 = (
+    ("Kharas", 7),
+    ("Erongo", 7),
+    ("Hardap", 8),
+    ("Kavango East", 6),
+    ("Kavango West", 8),
+    ("Khomas", 10),
+    ("Kunene", 7),
+    ("Ohangwena", 12),
+    ("Omaheke", 7),
+    ("Omusati", 12),
+    ("Oshana", 11),
+    ("Oshikoto", 11),
+    ("Otjozondjupa", 7),
+    ("Zambezi", 8),
+    ("Foreign Missions", 1),
+)
+# The text layer draws the clicks of !Nami#nus and Moses //Garoeb as other characters, and a capital L as a lowercase one.
+SPELLINGS_2024 = {"Nehale lyaMpingana": "Nehale LyaMpingana"}
+
+
+def _spelled(name: str) -> str:
+    name = SPELLINGS_2024.get(name, name).replace("‡", "#").replace("ǁ", "//")
+    return "".join(c for c in unicodedata.normalize("NFKD", name) if not unicodedata.combining(c))
+
+
+def _regions_2024(rows: int, labels: list[tuple[int, str]]) -> list[str]:
+    """The region of each row, after checking that the report prints each region's name beside its own rows."""
+    regions = [region for region, count in REGIONS_2024 for _ in range(count)]
+    if len(regions) != rows:
+        raise ValueError(f"2024 report: {rows} rows, but the regions' constituency counts add up to {len(regions)}")
+    at, text_ = 0, ""
+    for region, count in REGIONS_2024:
+        end = at + count
+        spots = []
+        while _plain(text_) != _plain(region):
+            if not labels or not _plain(region).startswith(_plain(text_ + labels[0][1])):
+                raise ValueError(f"2024 report: the region label for {region} is not where {count} rows put it")
+            spots.append(labels[0][0])
+            text_ += labels.pop(0)[1]
+        if not all(at <= spot <= end for spot in spots):
+            raise ValueError(f"2024 report: the label {region} is not beside rows {at + 1} to {end}")
+        at, text_ = end, ""
+    if labels:
+        raise ValueError(f"2024 report: region labels left over: {labels}")
+    return regions
+
+
+@cache
+def turnout_2024() -> tuple[list[tuple[str, str, Turnout, Turnout]], tuple[Turnout, Turnout]]:
+    """Each constituency's code, English name, and its row in the presidential and National Assembly tables, plus both subtotals.
+
+    The tables print each region's name once, beside its rows. The foreign missions are one more row, with no
+    registered voters.
+    """
+    president, president_total, labels = read_turnout("Table 18: Results Count", "9. ELECTION")
+    assembly, assembly_total, assembly_labels = read_turnout("Table 20: Results Count", "9. ELECTION")
+    if [r.name for r in president] != [r.name for r in assembly]:
+        raise ValueError("the presidential and National Assembly tables list different constituencies")
+    regions = _regions_2024(len(president), labels)
+    if _regions_2024(len(assembly), assembly_labels) != regions:
+        raise ValueError("2024 report: the two tables group the constituencies differently")
+    out: list[tuple[str, str, Turnout, Turnout]] = []
+    for region, a, b in zip(regions, president, assembly, strict=True):
+        if a.registered != b.registered or a.ballots != b.ballots:
+            raise ValueError(f"{a.name}: the two tables print different registered voters or ballot papers")
+        if region == "Foreign Missions":
+            out.append((FOREIGN, "Foreign missions", a, b))
+            continue
+        name = _spelled(a.name)
+        out.append((f"{slug(region)}-{slug(name)}", f"{name} constituency, {region} region", a, b))
+    if len({code for code, *_ in out}) != len(out):
+        raise ValueError("2024 report: two rows share a constituency")
+    for table, total in ((president, president_total), (assembly, assembly_total)):
+        for column in ("registered", "ballots", "valid", "invalid", "cast"):
+            if sum(getattr(r, column) or 0 for r in table) != getattr(total, column):
+                raise ValueError(f"2024 report: the {column} column does not add up to its printed subtotal")
+    return out, (president_total, assembly_total)
+
+
 # --- 1998 and 2004 regional councils and local authorities (spreadsheets) ---------------------------------------------
 
 # Local associations on the 1998 and 2004 ballots. The tables truncate the names, so each is found by its opening words.
@@ -1274,6 +1495,8 @@ def everything() -> None:
     for name in ("la1998", "la2004"):
         old_local(name)
     assembly_2014()
+    for _, label, _ in read_2014_president()[1]:
+        party_of(label)
     for _, label, _ in national().president:
         party_of(label)
     for label, *_ in national().lists:
@@ -1434,7 +1657,9 @@ def _unit(p: Package, tag: str, scheme: str, code: str, english: str) -> str:
     return unit
 
 
-def _candidate(p: Package, tag: str, contest: str, position: int, name: str, party: str | None) -> str:
+def _candidate(
+    p: Package, tag: str, contest: str, position: int, name: str, party: str | None, person_name: str | None = None
+) -> str:
     option = key("option", tag, position)
     if not name:  # the table prints the party or the independent label without a name
         p.add(
@@ -1449,7 +1674,7 @@ def _candidate(p: Package, tag: str, contest: str, position: int, name: str, par
         return option
     person = key("person", tag, position, name)
     p.add("person", id=person)
-    p.name(person, name, "en", "official")
+    p.name(person, person_name or name, "en", "official")
     p.add(
         "contest_option",
         id=option,
@@ -1746,9 +1971,13 @@ def build(day: str) -> Package:
 
 def _assembly_2014(p: Package, day: str, first: date) -> None:
     p.uses(raw.cached(SOURCE, URLS["na2014"]))
+    p.uses(raw.cached(SOURCE, URLS["gazette2014"]))
     rows, last, printed = assembly_2014()
     tag, path = "na2014", f"na/{day}-general"
-    election = _election(p, tag, "general", first, first, "2014 Namibian National Assembly election", path)
+    election = _election(
+        p, tag, "general", first, first, "2014 Namibian presidential and National Assembly elections", path
+    )
+    _president_2014(p, election, path)
     contest = _contest(
         p,
         tag,
@@ -1797,6 +2026,51 @@ def _assembly_2014(p: Package, day: str, first: date) -> None:
         "totals",
         "The Commission's printed national row exceeds the sum of its constituency rows by two votes for the "
         "Congress of Democrats. The table declares no seats or winners, so none are stored.",
+    )
+
+
+def _president_2014(p: Package, election: str, path: str) -> None:
+    """The presidential contest, from Government Notice 259 of the 30 December 2014 Gazette: national totals only."""
+    counted, candidates, declared = read_2014_president()
+    tag = "na2014:president"
+    contest = _contest(
+        p,
+        tag,
+        election,
+        "office",
+        "2014 Namibian presidential election",
+        f"{path}/president",
+        office_id=PRESIDENCY,
+        magnitude=1,
+        electoral_system_id=SYSTEM_PRESIDENT,
+    )
+    result_set = _result_set(p, tag, election, contest)
+    unit = _unit(p, tag, "na.national", "national", "Namibia")
+    _put(p, result_set, unit, None, VALID, counted)
+    p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=counted)
+    leader = max(candidates, key=lambda c: c[2])
+    if declared != leader[0]:
+        raise ValueError(f"declared winner {declared!r} is not the leading candidate {leader[0]!r}")
+    for position, (printed, label, votes) in enumerate(candidates, 1):
+        surname, _, given = printed.partition(", ")
+        party = party_of(label)
+        option = _candidate(p, tag, contest, position, printed, party, clean(f"{given} {surname}"))
+        _put(p, result_set, unit, option, VOTES, votes)
+        p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=votes)
+        p.add(
+            "outcome",
+            result_set_id=result_set,
+            option_id=option,
+            candidacy_id=None,
+            kind="elected" if printed == declared else "lost",
+            seats=None,
+        )
+    _caveat(
+        p,
+        result_set,
+        "scope",
+        "The notice prints national totals only: the votes counted and each candidate's votes. Results by "
+        "constituency are not part of it.",
     )
 
 
@@ -2025,6 +2299,7 @@ def _national_2024(p: Package, day: str, first: date) -> None:
             kind="elected" if (name, label, votes) == winner else "lost",
             seats=None,
         )
+    president_contest = contest
     # assembly
     seats = sum(entry[2] for entry in data.lists)
     contest = _contest(
@@ -2098,3 +2373,76 @@ def _national_2024(p: Package, day: str, first: date) -> None:
                 kind="elected",
                 seats=None,
             )
+    _turnout_2024(p, tag, election, path, president_contest, contest, data)
+
+
+def _turnout_2024(
+    p: Package, tag: str, election: str, path: str, president: str, assembly: str, data: National
+) -> None:
+    """Registered voters, rejected votes, and votes cast in each constituency, in sets beside the national ones.
+
+    The report's tables print no votes for candidates or parties by constituency, so these sets hold only the
+    constituency totals. The national sets stay the default and keep the outcomes.
+    """
+    p.uses(raw.cached(SOURCE, URLS["report2024"]))
+    rows, totals = turnout_2024()
+    units = {code: _unit(p, tag, "na.constituency", code, english) for code, english, *_ in rows}
+    over: dict[str, list[str]] = {}
+    for which, contest, official, subtotal in (
+        ("president", president, data.president_counted, totals[0]),
+        ("assembly", assembly, data.counted, totals[1]),
+    ):
+        result_set = key("result_set", f"{tag}:{which}:constituencies")
+        summed = sum((row[2] if which == "president" else row[3]).valid for row in rows)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=ECN_SOURCE,
+            status="active",
+            is_default=False,
+            completeness=min(1.0, summed / official),
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=(
+                "Registered voters, rejected votes, and votes cast in each constituency and for the "
+                "foreign missions, from the Commission's 2024 election report. Valid votes are the votes cast less "
+                "the rejected votes, and are not stored by constituency because the report prints no votes for "
+                "candidates or parties by constituency, and it also prints the ballot papers issued to each "
+                "constituency, which are not stored here."
+            ),
+            lang="en",
+        )
+        for code, _, president_row, assembly_row in rows:
+            row = president_row if which == "president" else assembly_row
+            unit = units[code]
+            _put(p, result_set, unit, None, REGISTERED, row.registered)
+            _put(p, result_set, unit, None, CAST, row.cast)
+            _put(p, result_set, unit, None, INVALID, row.invalid)
+        over[which] = [
+            english.split(" constituency")[0]
+            for _, english, a, b in rows
+            if (row := a if which == "president" else b).registered is not None and row.cast > row.registered
+        ]
+        if summed != subtotal.valid or summed != official:
+            _caveat(
+                p,
+                result_set,
+                "total",
+                f"The report's rows add up to {summed:,} valid votes, as its own subtotal prints, while the "
+                f"Commission's gazetted national total is {official:,}. Each is stored as printed.",
+            )
+    p.accept(
+        "accounting.turnout",
+        "The report prints more votes cast than registered voters in "
+        f"{len(over['president'])} constituencies for the presidential election and {len(over['assembly'])} for the "
+        "National Assembly election, among them Windhoek East, Windhoek Rural, and Okatyali, whose printed turnout "
+        "exceeds 100 percent. Each figure is stored as printed.",
+    )
