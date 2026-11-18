@@ -1,5 +1,7 @@
 """Tanzania's National Assembly elections of 2015 and 2020, by constituency, from the Government Gazette.
 
+The Union presidential elections printed in the same Gazettes are read in `president.py`.
+
 The National Electoral Commission publishes the result of each general election in the Government Gazette. Notice
 No. 1546 (Gazette of 28 October 2016) prints the 2015 result and General Notice No. 30B (special Gazette of 5 January
 2021) the 2020 result. Each lists, for every constituency (jimbo la uchaguzi), the candidates with their party and
@@ -32,6 +34,7 @@ class Election:
     year: int
     day: date
     gazette: str
+    notices: str  # the notices of the presidential and National Assembly results
     published: str
     url: str
     first: int  # first and last PDF page that hold the constituencies
@@ -43,6 +46,7 @@ ELECTIONS = {
         2015,
         date(2015, 10, 25),
         "Notice No. 1546",
+        "Notices No. 1545 and 1546",
         "28 October 2016",
         f"{UPLOADS}/sw-1713443566-1513775610-21-MATOKEO%20YA%20UCHAGUZI%20MKUU%202015.pdf",
         22,
@@ -52,6 +56,7 @@ ELECTIONS = {
         2020,
         date(2020, 10, 28),
         "General Notice No. 30B",
+        "General Notices No. 30A and 30B",
         "5 January 2021",
         f"{UPLOADS}/sw-1713180982-1624892417-matokeo%20final%205%20january%202021%20special%20gazzete.pdf",
         2,
@@ -135,7 +140,12 @@ SYSTEM = key("electoral_system", "constituency-plurality")
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/assembly-{year}" for year in ELECTIONS)]
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/assembly-{year}" for year in ELECTIONS),
+        *(f"{SOURCE}/president-{year}" for year in ELECTIONS),
+    ]
 
 
 def fetch() -> None:
@@ -144,10 +154,13 @@ def fetch() -> None:
 
 
 def parse() -> None:
+    from ea.sources.tz import president
+
     geo().write()
     registry().write()
     for year in ELECTIONS:
         build(year).write()
+        president.build(year).write()
 
 
 def emit() -> None:
@@ -296,12 +309,15 @@ def party_id(party: str) -> str:
 
 
 def geo() -> Package:
+    from ea.sources.tz import president
+
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
         "Tanzania's regions and the National Assembly constituencies of 2015 and 2020, keyed by region and name",
     )
     p.external |= {TANZANIA, TERRITORY}
+    president.geo(p)
     for code, rank, kind, noun in (
         ("tz.region", 1, "administrative", "region"),
         ("tz.constituency", 2, "electoral_district", "constituency"),
@@ -329,10 +345,12 @@ def geo() -> Package:
 
 
 def registry() -> Package:
+    from ea.sources.tz import president
+
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "Tanzania's National Assembly, its constituency electoral system, and the parties named in the National "
+        "Tanzania's National Assembly and presidency, their electoral systems, and the parties named in the National "
         "Electoral Commission's notices of 2015 and 2020",
         depends=[f"{SOURCE}/geo"],
     )
@@ -343,13 +361,14 @@ def registry() -> Package:
             id=SOURCES[year],
             kind="official_body",
             publisher="Tume ya Taifa ya Uchaguzi (National Electoral Commission of Tanzania)",
-            title=f"Government Gazette of the United Republic of Tanzania: {election.gazette} of {election.published}, "
-            f"results of the {year} general election for the National Assembly",
+            title=f"Government Gazette of the United Republic of Tanzania: {election.notices} of {election.published}, "
+            f"results of the {year} general election for President and the National Assembly",
             url=election.url,
             license="Official publication; reuse terms are not stated",
             attribution="National Electoral Commission of Tanzania, Government Gazette of the United Republic of Tanzania",
         )
         p.artifact(raw.cached(SOURCE, election.url), SOURCES[year])
+    president.registry(p)
     p.add("body", id=ASSEMBLY, polity_id=TANZANIA, kind="unicameral")
     p.name(ASSEMBLY, "National Assembly of Tanzania", "en", "official")
     p.name(ASSEMBLY, "Bunge la Jamhuri ya Muungano wa Tanzania", "sw", "official", False)
@@ -365,7 +384,7 @@ def registry() -> Package:
         ),
         lang="en",
     )
-    labels = sorted({c.party for year in ELECTIONS for s in seats(year) for c in s.candidates})
+    labels = sorted({c.party for year in ELECTIONS for s in seats(year) for c in s.candidates} | president.parties())
     for label in labels:
         id = party_id(label)
         p.add("party", id=id, kind="party", polity_id=TANZANIA)
