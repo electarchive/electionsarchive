@@ -1,0 +1,380 @@
+{
+  "polity": "XWI",
+  "name": "West Indies Federation",
+  "sources": {
+    "oic-1957": {
+      "title": "The West Indies (Federation) Order in Council 1957 (S.I. 1957 No. 1364), with the Constitution of the Federation in its Annex",
+      "publisher": "legislation.gov.uk (The National Archives)",
+      "url": "https://www.legislation.gov.uk/uksi/1957/1364/pdfs/uksi_19571364_en.pdf",
+      "kind": "official_body",
+      "note": "Made at the Court at Goodwood House on 31 July 1957 under the British Caribbean Federation Act 1956. Section 1 establishes the Federation, with Chapter I of the Constitution and other provisions to come into force on a date appointed by Order in Council; the printed volume's footnote gives that date as 3.1.58. Article 8 provides a Senate of nineteen appointed members, articles 15 and 16 a House of Representatives of forty-five elected members plus an alternate member for Montserrat, article 39 general elections within three months of each dissolution, article 62 the election of the Prime Minister by the House, and article 107 the rules for the first general election."
+    },
+    "oic-1962": {
+      "title": "The West Indies (Dissolution and Interim Commissioner) Order in Council 1962 (S.I. 1962 No. 1084)",
+      "publisher": "legislation.gov.uk (The National Archives)",
+      "url": "https://www.legislation.gov.uk/uksi/1962/1084/pdfs/uksi_19621084_en.pdf",
+      "kind": "official_body",
+      "note": "Made on 23 May 1962 under the West Indies Act 1962. Article 3 dissolves the Federation, the Federal Government, the Federal Legislature, and the Federal Supreme Court on the day the Commissioner appoints by proclamation, on which the 1957 Constitution ceases to have effect; the printed volume's footnote gives the day appointed as 1.6.62."
+    },
+    "act-1962": {
+      "title": "West Indies Act 1962 (10 & 11 Eliz. 2 c. 19), as enacted",
+      "publisher": "legislation.gov.uk (The National Archives)",
+      "url": "https://www.legislation.gov.uk/ukpga/1962/19/pdfs/ukpga_19620019_en.pdf",
+      "kind": "official_body",
+      "note": "Empowers Her Majesty by Order in Council to provide for the exclusion of colonies from, and the dissolution of, the Federation."
+    },
+    "hl-1956": {
+      "title": "British Caribbean Federation Bill, House of Lords debate of 23 July 1956 (HL Deb vol 199)",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/lords/1956/jul/23/british-caribbean-federation-bill",
+      "kind": "official_body"
+    },
+    "hc-1958": {
+      "title": "The West Indies (Gift of Mace), House of Commons debate of 25 March 1958 (HC Deb vol 585 cc249-51)",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1958/mar/25/the-west-indies-gift-of-mace",
+      "kind": "official_body"
+    },
+    "hl-1962": {
+      "title": "West Indies Bill [H.L.], House of Lords debate of 7 March 1962 (HL Deb vol 238)",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/lords/1962/mar/07/west-indies-bill-hl",
+      "kind": "official_body"
+    },
+    "hc-1962": {
+      "title": "Jamaica Independence Bill, House of Commons debate of 31 May 1962 (HC Deb vol 661)",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1962/may/31/jamaica-independence-bill",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "The West Indies",
+      "name_en": "West Indies Federation (the Federation of the West Indies)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "source": "oic-1957"
+    },
+    {
+      "key": "territory",
+      "name": "Territories of the Federation",
+      "name_en": "The ten member Territories (Antigua, Barbados, Dominica, Grenada, Jamaica, Montserrat, Saint Christopher-Nevis-Anguilla, Saint Lucia, Saint Vincent, and Trinidad and Tobago), whose own legislatures are counted in their own censuses",
+      "parent": "national",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "source": "oic-1957",
+      "counts": [
+        {
+          "date": "1958-01-03",
+          "value": 10,
+          "source": "hc-1958",
+          "locator": "https://api.parliament.uk/historic-hansard/commons/1958/mar/25/the-west-indies-gift-of-mace (no fewer than ten territories joined their destinies in federating into the West Indies)"
+        }
+      ]
+    },
+    {
+      "key": "electoral_area",
+      "name": "Electoral areas for the House of Representatives",
+      "name_en": "Federal electoral areas, prescribed in each Territory by its Governor's regulations; Montserrat a single area",
+      "parent": "territory",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "source": "oic-1957"
+    }
+  ],
+  "classes": [
+    {
+      "key": "house_of_representatives",
+      "tier": "electoral_area",
+      "name": "General election to the House of Representatives",
+      "name_en": "House of Representatives of the West Indies, general election of 1958",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "oic-1957",
+      "locator": "https://www.legislation.gov.uk/uksi/1957/1364/pdfs/uksi_19571364_en.pdf (article 15: the House of Representatives shall consist of forty-five members of whom five shall be elected in Barbados, seventeen in Jamaica, ten in Trinidad and Tobago, one in Montserrat and two in each of the other Territories)",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "first_held": "1958-03-25",
+      "disposition": "blocked",
+      "disposition_reason": "Constituency returns were published by each Territory's government in its own Gazette, under the electoral laws the Governor of each Territory adapted for the federal election by regulation (article 107 of the Constitution); those Gazettes, and any federal report of the election, are not online. The Federation's own records passed to the Commissioner for the Territories on its dissolution.",
+      "finest_note": "Federal electoral area within each Territory, some returning more than one member; Montserrat elected its member and an alternate member as a single area. No official return is online.",
+      "note": "Forty-five members elected by universal adult suffrage under each Territory's own franchise and electoral law, as adapted by its Governor (article 107): Jamaica 17, Trinidad and Tobago 10, Barbados 5, Montserrat 1 with an alternate member, and Antigua, Dominica, Grenada, Saint Christopher-Nevis-Anguilla, Saint Lucia, and Saint Vincent 2 each. The only general election was held in March 1958, and the new legislature was inaugurated in Port-of-Spain on 22 April 1958. The Legislature was never dissolved by the Governor-General; the Federation was dissolved on 1 June 1962 before its five-year term ran out. The Jamaica and Trinidad and Tobago censuses also list their own federal seats.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "XWI",
+          "valid_from": "1958-01-03",
+          "valid_to": "1962-06-01"
+        }
+      ],
+      "est_votes": 1000000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1958-03-25",
+          "seats": 45,
+          "source": "oic-1957",
+          "quote": "the House of Representatives shall consist of forty-five members of whom five shall be elected in Barbados, seventeen in Jamaica, ten in Trinidad and Tobago, one in Montserrat and two in each of the other Territories",
+          "note": "The only federal general election. The seat count is quoted from article 15 of the Constitution; the day of the poll, 25 March 1958, is taken from the general literature and is not yet confirmed from an official record. The House of Commons debated a mace for the new House the same day (HC Deb 25 March 1958 vol 585 cc249-51)."
+        }
+      ]
+    },
+    {
+      "key": "house_by",
+      "tier": "electoral_area",
+      "name": "By-election to the House of Representatives",
+      "name_en": "House of Representatives by-elections, 1958-1962",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "oic-1957",
+      "valid_from": "1958-03-26",
+      "valid_to": "1962-06-01",
+      "disposition": "blocked",
+      "disposition_reason": "Constituency returns were published by each Territory's government in its own Gazette, under the electoral laws the Governor of each Territory adapted for the federal election by regulation (article 107 of the Constitution); those Gazettes, and any federal report of the election, are not online. The Federation's own records passed to the Commissioner for the Territories on its dissolution.",
+      "note": "Seats vacated under article 23 were filled under each Territory's electoral law until the Federal Legislature provided otherwise; no official list of federal by-elections is online.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "XWI"
+        }
+      ],
+      "est_votes": 20000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1958-03-26",
+          "through": "1962-05-31",
+          "note": "By-elections in this span are not yet counted from an official record."
+        }
+      ]
+    },
+    {
+      "key": "senate",
+      "tier": "national",
+      "name": "Senate",
+      "name_en": "Senate of the West Indies (nineteen appointed members)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "oic-1957",
+      "locator": "https://www.legislation.gov.uk/uksi/1957/1364/pdfs/uksi_19571364_en.pdf (article 8: the Senate shall consist of nineteen members ... who shall be appointed by the Governor-General)",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Senators were appointed by the Governor-General, two for each Territory and one for Montserrat, after consultation with the Territory's Governor; no vote was held.",
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "XWI"
+        }
+      ]
+    },
+    {
+      "key": "governor_general",
+      "tier": "national",
+      "name": "Governor-General and Commander-in-Chief",
+      "name_en": "Governor-General of the West Indies",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "oic-1957",
+      "locator": "https://www.legislation.gov.uk/uksi/1957/1364/pdfs/uksi_19571364_en.pdf (article 2: There shall be a Governor-General and Commander-in-Chief of the Federation)",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed by the Queen and held office during her pleasure; never elected.",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_state",
+            "governor"
+          ],
+          "iso_pattern": "XWI"
+        }
+      ]
+    },
+    {
+      "key": "prime_minister",
+      "tier": "national",
+      "name": "Prime Minister of the Federation",
+      "name_en": "Prime Minister of the West Indies, elected by the House of Representatives",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "oic-1957",
+      "locator": "https://www.legislation.gov.uk/uksi/1957/1364/pdfs/uksi_19571364_en.pdf (article 62: the House shall elect from among its own members a person ... appoint as Prime Minister of the Federation any person whom the House of Representatives elects)",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elected by the House of Representatives from among its members and appointed by the Governor-General; a vote within the legislature, not a popular election.",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "XWI"
+        }
+      ]
+    },
+    {
+      "key": "speaker",
+      "tier": "national",
+      "name": "Speaker and Deputy Speaker of the House of Representatives; President of the Senate",
+      "name_en": "Presiding officers elected by each chamber",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "oic-1957",
+      "locator": "https://www.legislation.gov.uk/uksi/1957/1364/pdfs/uksi_19571364_en.pdf (article 24: it shall elect a person to be the Speaker of the House)",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Officers elected by the chambers themselves.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "speaker"
+          ],
+          "iso_pattern": "XWI"
+        }
+      ]
+    },
+    {
+      "key": "federal_supreme_court",
+      "tier": "national",
+      "name": "Federal Supreme Court",
+      "name_en": "Chief Justice and Federal Justices",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "oic-1957",
+      "locator": "https://www.legislation.gov.uk/uksi/1957/1364/pdfs/uksi_19571364_en.pdf (article 73: the judges of the Federal Supreme Court shall be a Chief Justice and three Federal Justices)",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges were appointed; never elected.",
+      "match": []
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Referendum",
+      "name_en": "Federal referendums (none provided for or held)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "hl-1962",
+      "locator": "https://api.parliament.uk/historic-hansard/lords/1962/mar/07/west-indies-bill-hl (On September 19 that referendum was held and, unhappily, there was a small but decisive majority against Jamaica's staying in the Federation)",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Constitution provided for no federal referendum and none was held. The referendum of 19 September 1961 on Jamaica's membership was a Jamaican vote held under Jamaican law and is counted in the Jamaica census.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "XWI"
+        }
+      ]
+    },
+    {
+      "key": "territorial_legislatures",
+      "tier": "territory",
+      "name": "Legislatures of the Territories",
+      "name_en": "Legislative councils and houses of the ten member Territories",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "oic-1957",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each Territory kept its own colonial constitution and legislature, which the Federation did not elect. Counted in that Territory's own census.",
+      "match": []
+    },
+    {
+      "key": "local_councils",
+      "tier": "territory",
+      "name": "Local councils of the Territories",
+      "name_en": "Parish, district, and town councils of the member Territories",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "oic-1957",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Local government was a matter for each Territory, not the Federation. Counted in that Territory's own census.",
+      "match": []
+    },
+    {
+      "key": "party_selection",
+      "tier": "electoral_area",
+      "name": "Party selection of candidates",
+      "name_en": "Candidate selection by the federal parties",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "oic-1957",
+      "valid_from": "1958-01-03",
+      "valid_to": "1962-06-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Candidates were chosen by the parties themselves; no state-run nominating contest existed.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "XWI"
+        }
+      ]
+    }
+  ]
+}
