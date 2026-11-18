@@ -17,7 +17,7 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.pt import cne_ac1975, mai
+from ea.sources.pt import cne_ac1975, cne_al, mai
 
 SOURCE = "pt.cne"
 HOST = "https://www.cne.pt/sites/default/files/dl"
@@ -51,6 +51,7 @@ def url(name: str) -> str:
 def fetch() -> None:
     for name, file in FILES.items():
         raw.fetch(SOURCE, url(name), suffix=".zip" if file.endswith(".zip") else ".pdf")
+    cne_al.fetch()
 
 
 def artifact(name: str) -> raw.Artifact:
@@ -439,7 +440,25 @@ def circle_area(name: str) -> tuple[str | None, str]:
 # ---------------------------------------------------------------------------------------------------------------------
 # Registry
 
-BLOCS = {"AD", "APU", "CDU", "PCP/PEV", "PPM MPT", "UDP/PSR", "FRS", "PDC-MIRN/PDP-FN", "POUS/PST", "UDA/PDA"}
+BLOCS = {
+    "AD",
+    "APU",
+    "CDU",
+    "PCP/PEV",
+    "PCP-PEV",
+    "PPM MPT",
+    "UDP/PSR",
+    "FRS",
+    "PDC-MIRN/PDP-FN",
+    "POUS/PST",
+    "UDA/PDA",
+    "PS/CDS-PP",
+    "PS/PCP/PEV/PSR/UDP",
+    "PS-PCP-PEV-UDP-PDA",
+    "PS/PCP/PEV/UDP",
+    "PPD/PSD.CDS-PP",
+    "CDS-PP.PPD/PSD",
+}
 NAMES = {
     "AD": "Aliança Democrática",
     "APU": "Aliança Povo Unido",
@@ -460,6 +479,7 @@ NAMES = {
     "MUT": "Movimento Unitário dos Trabalhadores",
     "PC(R)": "Partido Comunista (Reconstruído)",
     "PCP": "Partido Comunista Português",
+    "PCP-PEV": "Coligação Democrática Unitária",
     "PCTP/MRPP": "Partido Comunista dos Trabalhadores Portugueses",
     "PCTP-MRPP": "Partido Comunista dos Trabalhadores Portugueses",
     "PDA": "Partido Democrático do Atlântico",
@@ -504,6 +524,8 @@ def list_labels() -> dict[str, str | None]:
             out.setdefault(label, None)
     for label in cne_ac1975.AC1975_ORDER:
         out.setdefault(label, None)
+    for label in cne_al.labels():
+        out.setdefault(label, None)
     return out
 
 
@@ -520,6 +542,7 @@ def packages() -> list[str]:
         f"{SOURCE}/geo",
         f"{SOURCE}/registry",
         *(f"{SOURCE}/{day}-{tail}" for _, day, tail, _, _ in ELECTIONS),
+        *cne_al.packages(),
     ]
 
 
@@ -597,6 +620,8 @@ def registry() -> Package:
     )
     for name in FILES:
         p.artifact(artifact(name), CNE_SOURCE)
+    for spec in cne_al.MAPS:
+        p.artifact(cne_al.artifact(spec), CNE_SOURCE)
     p.add("body", id=CONSTITUENT, polity_id=PORTUGAL, kind="constituent_assembly")
     p.name(CONSTITUENT, "Constituent Assembly", "en", "official")
     p.name(CONSTITUENT, "Assembleia Constituinte", "pt", "native", False)
@@ -1084,6 +1109,8 @@ def parse() -> None:
     registry().write()
     for entry in ELECTIONS:
         election(entry).write()
+    for spec in cne_al.MAPS:
+        cne_al.election(spec).write()
 
 
 def emit() -> None:
