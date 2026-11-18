@@ -292,6 +292,41 @@
    "url": "https://csu.gov.cz/produkty/volby-do-narodniho-shromazdeni-1920-az-1935-n-2hwwxuf57q",
    "kind": "official_body",
    "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office"
+  },
+  "oso2002": {
+   "title": "Voľby do orgánov samosprávy obcí 2002: zvolení starostovia (tab02)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/oso/2002/OSO_2002_tab02.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "oso2006m": {
+   "title": "Voľby do orgánov samosprávy obcí 2006: výsledky podľa obcí (tab07)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/oso/2006/OSO_2006_tab07.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "oso2010m": {
+   "title": "Voľby do orgánov samosprávy obcí 2010: výsledky podľa obcí (tab07)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/oso/2010/OSO_2010_tab07.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "oso2014m": {
+   "title": "Voľby do orgánov samosprávy obcí 2014: zvolení poslanci a ich hlasy podľa obcí (tab10)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/oso/2014/OSO_2014_tab10.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "oso2018m": {
+   "title": "Voľby do orgánov samosprávy obcí 2018: zvolení poslanci a ich hlasy podľa volebných obvodov (tab06d)",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "https://volby.statistics.sk/opendata/oso/2018/OSO_2018_tab06d.csv",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
   }
  },
  "tiers": [
@@ -1680,13 +1715,13 @@
      "sk.okrsok"
     ]
    },
-   "finest_note": "Candidates' votes by municipality and electoral district are in the open data for 2022 and 2026; 2002–2018 tables give turnout and the elected only; 1990–1998 are not on the office's site.",
+   "finest_note": "Candidates' votes by municipality and electoral district are in the open data for 2022 and 2026; for 2014 every candidate's votes by polling district in ten cities and the elected councillors' votes elsewhere; for 2018 the elected councillors' votes by electoral district; 2006 and 2010 give turnout and seats (2006 the seats of each party); 2002 prints no council results; 1990–1998 are not on the office's site.",
    "note": "Councillors elected for one or more multi-member electoral districts (volebné obvody) per municipality by plurality block vote; four-year terms. Bratislava and Košice also elect city councils over their boroughs (district counts in tab0dx). Contest counts below are electoral districts.",
    "source": "zoso",
    "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/346/",
    "valid_from": "1990-11-01",
    "first_held": "1990-11-23",
-   "earliest_record": "2022-10-29",
+   "earliest_record": "2006-12-02",
    "est_votes": 21000000,
    "effort": 3,
    "cadence": [
@@ -1712,7 +1747,7 @@
      "first_date": "2002-12-06",
      "finest": "sk.okrsok",
      "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
-     "evidence": "Open data: candidates' votes for 2022 and 2026; turnout and the elected for 2002–2018."
+     "evidence": "Open data: candidates' votes for 2022 and 2026; the elected councillors' votes for 2014 and 2018 (all candidates in ten cities in 2014); turnout and seats for 2006 and 2010."
     }
    ],
    "match": [
@@ -1802,13 +1837,13 @@
      "sk.okrsok"
     ]
    },
-   "finest_note": "Candidates' votes by municipality in the open data for 2014 and 2018 and by polling district for 2022 and 2026; 2002–2010 tables list the elected only.",
+   "finest_note": "Candidates' votes by municipality in the open data for 2014 and 2018 (by polling district for ten cities in 2014) and by polling district for 2022 and 2026; 2002 lists the elected mayors without votes; 2006 and 2010 print only each municipality's roll, turnout, and valid ballots.",
    "note": "Elected directly in one round by plurality for four-year terms, together with the council.",
    "source": "zoso",
    "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/346/",
    "valid_from": "1990-11-01",
    "first_held": "1990-11-23",
-   "earliest_record": "2014-11-15",
+   "earliest_record": "2002-12-06",
    "est_votes": 21000000,
    "effort": 2,
    "cadence": [
@@ -1834,7 +1869,7 @@
      "first_date": "2002-12-06",
      "finest": "sk.okrsok",
      "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
-     "evidence": "Open data: candidates' votes for 2014–2026; the elected for 2002–2010."
+     "evidence": "Open data: candidates' votes for 2014–2026; the elected mayors for 2002; roll, turnout, and valid ballots for 2006 and 2010."
     }
    ],
    "match": [
@@ -1921,13 +1956,13 @@
      "sk.okrsok"
     ]
    },
-   "finest_note": "The office codes each borough as a municipality; candidates' votes by polling district for 2022 and 2026.",
+   "finest_note": "The office codes each borough as a municipality; candidates' votes by polling district for 2022 and 2026; the elected councillors' votes for 2014 and 2018 (every candidate's votes by polling district in Petržalka and Ružinov in 2014); the seats of each party for 2006; turnout and seats for 2010.",
    "note": "The 17 boroughs of Bratislava (Act 377/1990) and 22 of Košice (Act 401/1990) elect a local council (miestne zastupiteľstvo) with the municipal elections, by the same plurality block vote.",
    "source": "zba",
    "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/377/; https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/401/",
    "valid_from": "1990-11-01",
    "first_held": "1990-11-23",
-   "earliest_record": "2022-10-29",
+   "earliest_record": "2006-12-02",
    "est_votes": 1800000,
    "effort": 2,
    "cadence": [
@@ -1955,6 +1990,34 @@
     }
    ],
    "dates": [
+    {
+     "date": "2006-12-02",
+     "contests": 39,
+     "seats": 698,
+     "source": "oso2006m",
+     "quote": "tab07: 39 rows Bratislava - … and Košice - …: 698 poslancov"
+    },
+    {
+     "date": "2010-11-27",
+     "contests": 39,
+     "seats": 571,
+     "source": "oso2010m",
+     "quote": "tab07: 39 rows Bratislava - … and Košice - …: 571 poslancov"
+    },
+    {
+     "date": "2014-11-15",
+     "contests": 52,
+     "seats": 452,
+     "source": "oso2014m",
+     "quote": "tab10 and tab14: 37 boroughs with one electoral district each and Petržalka (6) and Ružinov (9) with several: 52 contests"
+    },
+    {
+     "date": "2018-11-10",
+     "contests": 94,
+     "seats": 453,
+     "source": "oso2018m",
+     "quote": "tab06 and tab06d: 39 boroughs, 94 volebných obvodov, 453 zvolených poslancov"
+    },
     {
      "date": "2022-10-29",
      "contests": 91,
@@ -1986,13 +2049,13 @@
      "sk.okrsok"
     ]
    },
-   "finest_note": "Candidates' votes by borough for 2014 and 2018 and by polling district for 2022 and 2026.",
+   "finest_note": "Candidates' votes by borough for 2014 and 2018 and by polling district for 2022 and 2026; 2002 lists the elected mayors without votes; 2006 and 2010 print each borough's roll, turnout, and valid ballots.",
    "note": "Each of the 39 boroughs elects a starosta in one round by plurality, with the municipal elections.",
    "source": "zke",
    "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/401/; https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/1990/377/",
    "valid_from": "1990-11-01",
    "first_held": "1990-11-23",
-   "earliest_record": "2014-11-15",
+   "earliest_record": "2002-12-06",
    "est_votes": 1800000,
    "effort": 2,
    "cadence": [
@@ -2020,6 +2083,41 @@
     }
    ],
    "dates": [
+    {
+     "date": "2002-12-06",
+     "contests": 39,
+     "seats": 39,
+     "source": "oso2002",
+     "quote": "tab02: 39 rows Bratislava - … and Košice - … with the elected mayor of each borough"
+    },
+    {
+     "date": "2006-12-02",
+     "contests": 39,
+     "seats": 39,
+     "source": "oso2006m",
+     "quote": "tab07: 39 rows Bratislava - … and Košice - … (17 and 22 boroughs)"
+    },
+    {
+     "date": "2010-11-27",
+     "contests": 39,
+     "seats": 39,
+     "source": "oso2010m",
+     "quote": "tab07: 39 rows Bratislava - … and Košice - … (17 and 22 boroughs)"
+    },
+    {
+     "date": "2014-11-15",
+     "contests": 39,
+     "seats": 39,
+     "source": "oso2014m",
+     "quote": "tab10 and tab11: 39 boroughs Bratislava - … and Košice - …"
+    },
+    {
+     "date": "2018-11-10",
+     "contests": 39,
+     "seats": 39,
+     "source": "oso2018m",
+     "quote": "tab05: 39 boroughs Bratislava - … and Košice - …"
+    },
     {
      "date": "2022-10-29",
      "contests": 39,
