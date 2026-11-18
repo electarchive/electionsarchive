@@ -812,10 +812,10 @@
       "kind": "official_body"
     },
     "sun": {
-      "publisher": "Wikidata",
-      "title": "Declaration of the Council of Republics of the Supreme Soviet of the USSR No. 142-N of 26 December 1991",
-      "url": "https://www.wikidata.org/wiki/Q11836865",
-      "kind": "compendium"
+      "publisher": "Центральная избирательная комиссия по выборам в Верховный Совет СССР",
+      "title": "Сообщение Центральной избирательной комиссии о результатах выборов в Верховный Совет СССР (Заря Востока, No. 286, 14 December 1937)",
+      "url": "https://dspace.nplg.gov.ge/handle/1234/468241",
+      "kind": "official_body"
     },
     "yug": {
       "publisher": "United Nations",
@@ -3292,9 +3292,9 @@
       "iso": "SUN",
       "name_en": "Soviet Union",
       "status": "former",
-      "reason": "Supreme Soviet of the USSR elections from 1937 to 1989.",
+      "reason": "Formed by the Treaty signed at the First Congress of Soviets on 30 December 1922 and dissolved by the Soviet of the Republics' Declaration No. 142-N of 26 December 1991; its Central Electoral Commissions ran the Supreme Soviet elections from 12 December 1937 to 1984 and the Congress of People's Deputies election of 26 March 1989, and its only referendum was held on 17 March 1991.",
       "source": "sun",
-      "locator": "https://www.wikidata.org/wiki/Q11836865"
+      "locator": "https://dspace.nplg.gov.ge/handle/1234/468241 (the Commission's first report on the Supreme Soviet election of 12 December 1937, printed in Заря Востока and kept by the National Parliamentary Library of Georgia)"
     },
     {
       "iso": "YUG",
