@@ -70,6 +70,11 @@ NO_WINNER = "The service marks no candidate as elected or advancing on these pag
 RESULT_ONLY = (
     "The service marks no individual candidate as elected on these pages, so only each list's seats are stored."
 )
+SELECTED = (
+    "The service marks no individual candidate as elected on these pages. The elected candidates are those that "
+    "Statistics Finland's candidate table for the election marks as selected, matched by candidate number, and the "
+    "deputies the table marks are not stored. Each list's seats are as the pages declare them."
+)
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -206,6 +211,14 @@ class Build:
         self.units = units
         self.values = values
         self.mismatched = 0
+        self.selected: dict[tuple[str, int], pages.Selection] = {
+            (pages.CONSTITUENCIES.get(area, area), number): chosen
+            for (area, number), chosen in pages.selections(self.page.folder).items()
+        }
+        self.matched: set[tuple[str, int]] = set()
+        self.unplaced: list[str] = []
+        self.differ: list[str] = []
+        self.elected = 0
 
     # -- helpers ------------------------------------------------------------------------------------------------
 
@@ -294,6 +307,15 @@ class Build:
             self.contest(
                 f"{year} {english}", self.data.national, self.data.candidates, self.data.turnout, members, None
             )
+        left = [f"{ck} {n}" for (ck, n), chosen in self.selected.items() if (ck, n) not in self.matched]
+        if self.unplaced:
+            raise ValueError(f"{page.folder}: elected candidates without a list: {self.unplaced}")
+        if self.differ:
+            print(page.folder, *self.differ, sep="\n  ")
+        print(
+            f"{page.folder}: {self.elected} elected; {len(left)} of {len(self.selected)} table rows have no "
+            f"candidate on the pages ({sum(self.selected[k].status == 1 for k in self.selected if k not in self.matched)} of them elected)"
+        )
         return self.mismatched
 
     # -- one contest ---------------------------------------------------------------------------------------------
@@ -381,7 +403,7 @@ class Build:
             kind="methodology",
             body_md=METHOD
             + (LIST_METHOD if candidates and not president else "")
-            + (" " + NO_WINNER if president else " " + RESULT_ONLY)
+            + (" " + NO_WINNER if president else " " + (SELECTED if candidates and self.selected else RESULT_ONLY))
             + (SUPERSEDED_NOTE if superseded else ""),
             lang="en",
         )
@@ -501,6 +523,7 @@ class Build:
             parent = out.lists[listed] if listed else None
             party = vaalit.list_party(listed) if listed else None
             option = out.candidates[cand.number] = vaalit.key("option", *tag, "candidate")
+            status = self.selection(ck, cand, result_set)
             p.add(
                 "contest_option",
                 id=option,
@@ -511,9 +534,10 @@ class Build:
                 ballot_position=cand.number if cand.party else None,
                 ballot_label=label,
             )
+            candidacy = vaalit.key("candidacy", *tag)
             p.add(
                 "candidacy",
-                id=vaalit.key("candidacy", *tag),
+                id=candidacy,
                 person_id=person,
                 option_id=parent or option,
                 role="list_member" if parent else "head",
@@ -521,7 +545,47 @@ class Build:
                 ballot_name=label,
                 member_of_party_id=party,
             )
+            if status == 1:
+                if parent is None:
+                    self.unplaced.append(f"{page.folder} {ck} {cand.number} {cand.name}")
+                else:
+                    p.add("outcome", result_set_id=result_set, option_id=parent, candidacy_id=candidacy, kind="elected")
+                    self.elected += 1
         return out
+
+    def selection(self, ck: str, cand: Candidate, result_set: str) -> int | None:
+        """The selection Statistics Finland's candidate table prints for a candidate, where the election has one."""
+        if not self.selected:
+            return None
+        chosen = self.selected.get((ck, cand.number))
+        if chosen is None:
+            raise LookupError(f"{self.page.folder} {ck}: no selection for candidate {cand.number} {cand.name}")
+        other = plain(chosen.name) != plain(cand.name)
+        if other and chosen.votes != cand.votes:
+            raise ValueError(f"{self.page.folder} {ck}: candidate {cand.number} {cand.name!r} is not {chosen.name!r}")
+        if other or chosen.votes != cand.votes:
+            what = (
+                f"candidate {cand.number} is {cand.name} with {cand.votes} votes on the pages and "
+                f"{chosen.name} with {chosen.votes} votes in the table"
+            )
+            self.differ.append(f"{ck}: {what}")
+            self.p.add(
+                "note",
+                id=vaalit.key("note", result_set, "selection", cand.number),
+                entity_id=result_set,
+                kind="caveat",
+                body_md=f"The pages and Statistics Finland's candidate table differ: {what}. The pages' name and votes "
+                "are stored, and the selection is the table's.",
+                lang="en",
+            )
+        self.matched.add((ck, cand.number))
+        return chosen.status
+
+
+def plain(name: str) -> list[str]:
+    """The ASCII letters of a name, sorted, to compare a name that the table prints in another character set (and
+    with its parts in another order) with the page's."""
+    return sorted(c.casefold() for c in name if c.isascii() and c.isalpha())
 
 
 class Options:
