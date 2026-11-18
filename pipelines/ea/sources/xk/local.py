@@ -34,6 +34,13 @@ LOCAL_SOURCE = kqz.key("source", "xk.kqz.local")
 MAYOR_SYSTEM = kqz.key("electoral_system", "local", "mayor")
 ASSEMBLY_SYSTEM = kqz.key("electoral_system", "local", "municipal_assembly")
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
+MEDIA_TYPES = {
+    ".pdf": "application/pdf",
+    ".doc": "application/msword",
+    ".xls": "application/vnd.ms-excel",
+    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".zip": "application/zip",
+}
 
 
 def store_fetched(folder: Path) -> int:
@@ -46,13 +53,15 @@ def store_fetched(folder: Path) -> int:
         content = (folder / entry["file"]).read_bytes()
         if hashlib.sha256(content).hexdigest() != entry["sha256"]:
             raise ValueError(f"{link} does not match its checksum")
+        suffix = Path(link).suffix.lower()
         raw.store(
             SOURCE,
             entry.get("source", link),
             content,
-            suffix=Path(link).suffix.lower(),
+            suffix=suffix,
             retrieved_at=datetime.fromisoformat(entry["retrieved_at"]),
-            media_type=entry["media_type"],
+            # An archived copy can come back labeled as plain text; the file's own extension names its type.
+            media_type=MEDIA_TYPES.get(suffix, entry["media_type"]),
         )
         stored += 1
     return stored
