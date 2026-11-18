@@ -23,6 +23,7 @@ class Row:
     label: str
     votes: list[int | None]
     extra: dict[int, int] = field(default_factory=dict)
+    constituency: str | None = None
 
 
 @dataclass

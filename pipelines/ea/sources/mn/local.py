@@ -58,6 +58,7 @@ class Block:
     candidates: list[polls.Candidate]
     rows: list[polls.Row]
     declared: list[int] | None
+    label: str | None = None
 
 
 @dataclass
