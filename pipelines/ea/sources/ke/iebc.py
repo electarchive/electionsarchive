@@ -47,6 +47,8 @@ ROW = re.compile(r"\s*(\d{3}) (.+?)\s{2,}(\d{3}) (.+?)\s{2,}(\d{4}) (.+?)\s{2,}(
 TOLERANCE = 0.0005
 # The IEBC and geoBoundaries spell a few areas differently; each pair is checked by the one-to-one match below.
 COUNTY_NAMES = {"nairobicity": "nairobi", "tharakanithi": "tharaka"}
+# Wards with no shape of their own in geoBoundaries: each is what its constituency has left after its sibling wards.
+DERIVED = {"0118"}
 WARD_NAMES = {"hirimani": "bura", "sala": "bullampya"}
 CONSTITUENCY_NAMES = {
     "garissatownship": "dujis",
@@ -200,6 +202,8 @@ def outlines() -> tuple[dict[str, shapely.Geometry], dict[str, shapely.Geometry]
         rest = shapely.difference(const_shape[key_], shapely.union_all(siblings))
         if rest.area > 0.1 * const_shape[key_].area:
             ward_shape[code] = rest
+            if code not in DERIVED:
+                raise ValueError(f"ward {code} has no shape; derived wards are listed in DERIVED")
     missing = [w.code for w in wards if w.code not in ward_shape]
     lost = [k for k in constituencies if k not in const_shape]
     if missing or lost or len(county_shape) != 47:
@@ -216,8 +220,8 @@ def outline(p: Package, id: str, shape: shapely.Geometry, level: str) -> None:
         label_point=shapely.to_wkb(
             shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
         ),
-        quality="official" if level == "ADM1" else "approximate",
-        source_id=key("source", SHAPE_SOURCES[level][0]),
+        quality="synthetic" if level == "derived" else "academic",
+        source_id=key("source", SHAPE_SOURCES["ADM3" if level == "derived" else level][0]),
     )
 
 
@@ -292,7 +296,7 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=w.code)
         p.add("area_parent", area_id=id, parent_id=area(CONSTITUENCY, ck))
         p.name(id, titled(w.name), "en", "official")
-        outline(p, id, ward_shape[w.code], "ADM3")
+        outline(p, id, ward_shape[w.code], "derived" if w.code in DERIVED else "ADM3")
     return p
 
 
