@@ -95,12 +95,13 @@ def fold(text: str) -> str:
 
 
 def fetch() -> None:
-    from ea.sources.ke import results, results2013
+    from ea.sources.ke import byelections, results, results2013
 
     raw.fetch(SOURCE, ROLL, suffix=".pdf")
     raw.fetch(SOURCE, results2013.DATA, suffix=".pdf")
     raw.fetch(SOURCE, results.REPORT, suffix=".pdf")
     raw.fetch(SOURCE, results.FRESH, suffix=".pdf")
+    byelections.fetch()
     for level in SHAPE_SOURCES:
         raw.fetch(SHAPES, SHAPE_URL.format(level), suffix=".geojson")
 
@@ -319,11 +320,14 @@ def packages() -> list[str]:
         f"{SOURCE}/general-2013",
         f"{SOURCE}/general-2017",
         f"{SOURCE}/fresh-presidential-2017",
+        f"{SOURCE}/registry-by-elections-2022",
+        f"{SOURCE}/by-elections-2022-12-08",
+        f"{SOURCE}/by-elections-2023-01-05",
     ]
 
 
 def parse() -> None:
-    from ea.sources.ke import results, results2013
+    from ea.sources.ke import byelections, results, results2013
 
     geo().write()
     results.registry().write()
@@ -331,6 +335,9 @@ def parse() -> None:
     results2013.general().write()
     results.general().write()
     results.rerun().write()
+    byelections.registry().write()
+    byelections.december().write()
+    byelections.january().write()
 
 
 def emit() -> None:
