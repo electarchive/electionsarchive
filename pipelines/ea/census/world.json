@@ -746,9 +746,15 @@
       "kind": "official_body"
     },
     "cy-nc": {
-      "publisher": "Supreme Election Council of the TRNC (Yüksek Seçim Kurulu)",
-      "title": "Yüksek Seçim Kurulu, election results and calendar",
-      "url": "https://www.ysk.gov.ct.tr",
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Dışişleri Bakanlığı",
+      "title": "Historical Perspective",
+      "url": "https://mfa.gov.ct.tr/pages/historical-perspective",
+      "kind": "official_body"
+    },
+    "cy-nc-ysk": {
+      "publisher": "Kuzey Kıbrıs Türk Cumhuriyeti Yüksek Seçim Kurulu",
+      "title": "Cumhurbaşkanlığı seçim sonuçları, 19 Ekim 2025",
+      "url": "https://ysk.gov.ct.tr/wp-content/uploads/2025/10/SecimSonuclari-1.zip",
       "kind": "official_body"
     },
     "so-sl": {
@@ -3182,9 +3188,15 @@
       "name_en": "Northern Cyprus",
       "status": "de_facto",
       "recognized_within": "CY",
-      "reason": "Assembly of the Republic, presidential, and local elections since 1985.",
+      "reason": "Proclaimed on 15 November 1983 from the Turkish Federated State of Cyprus (1975); its Supreme Election Council has run Assembly, presidential, local, and referendum votes since the 1975 constitutional referendum.",
       "source": "cy-nc",
-      "locator": "https://www.ysk.gov.ct.tr"
+      "locator": "https://mfa.gov.ct.tr/pages/historical-perspective",
+      "electorate": {
+        "value": 218313,
+        "date": "2025-10-19",
+        "source": "cy-nc-ysk",
+        "locator": "https://ysk.gov.ct.tr/wp-content/uploads/2025/10/SecimSonuclari-1.zip (KKTC_GENELI_PUSULA_SIRASI_NA_GORE_SECIM_SONUCU_CUMHURBASKANLIGI.pdf: Kayıtlı Seçmen Sayısı 218,313)"
+      }
     },
     {
       "iso": "SO-SL",
