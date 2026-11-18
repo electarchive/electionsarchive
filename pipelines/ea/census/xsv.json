@@ -1,0 +1,583 @@
+{
+  "polity": "XSV",
+  "name": "Republic of Vietnam",
+  "sources": {
+    "decree8-1956": {
+      "title": "Decree No 8 of 23 January 1956 creating the National Assembly (English translation)",
+      "publisher": "Republic of Vietnam, Office of the President",
+      "url": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3322/UA17-95_001183.pdf",
+      "kind": "official_body",
+      "note": "The President's decree, issued under the Provisional Constitutional Law No I of 26 October 1955, setting up the 123-member National Assembly elected by universal, uninominal, secret, and direct suffrage to examine the draft constitution; held in the Michigan State University Archives' Vietnam Project records."
+    },
+    "chinhphu-1976": {
+      "title": "I - Chính phủ nhiệm kỳ Quốc hội khóa VI (1976-1981)",
+      "publisher": "Cổng thông tin điện tử Chính phủ nước Cộng hòa xã hội chủ nghĩa Việt Nam (Government of the Socialist Republic of Vietnam)",
+      "url": "https://chinhphu.vn/giai-doan-1976-1985-dat-nuoc-thong-nhat-xay-dung-va-bao-ve-to-quoc-xhcn/i-chinh-phu-nhiem-ky-quoc-hoi-khoa-vi-1976-1981-2892",
+      "kind": "official_body",
+      "note": "The successor state's government portal: after 30 April 1975 the South was wholly taken over, two governments (the Democratic Republic of Vietnam and the Provisional Revolutionary Government of the Republic of South Vietnam) coexisted until reunification, and the reunified National Assembly was elected on 25 April 1976."
+    },
+    "ipu1967": {
+      "title": "Vietnam (Republic of): Date of Elections, September 3, 1967 (Senate), October 22, 1967 (House of Representatives) (Chronicle of Parliamentary Elections II, 1967-1968)",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/VIETNAM__REPUBLIC_OF__E.PDF",
+      "kind": "compendium",
+      "note": "The Senate's 60 members were elected nationwide on 3 September 1967 from 48 lists of 10 (each voter placing up to six lists in the ballot box, the six lists with the most votes winning all seats); 5,853,384 registered, 4,902,748 voters, 212,060 blank or void; the 137-member House of Representatives was elected on 22 October 1967 in single-member constituencies with 4,274,303 voters (73%); the President and Vice-President were elected on 3 September 1967."
+    },
+    "ipu-arc": {
+      "title": "PARLINE database: Viet Nam, election archives",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/2349_arc.htm",
+      "kind": "compendium",
+      "note": "Lists one report for the Republic of Vietnam (the 1967 Senate and House elections) beside the reports for the Democratic Republic and the Socialist Republic of Viet Nam."
+    },
+    "bg1971": {
+      "title": "South Viet-Nam Background Data, January 1971",
+      "publisher": "Michigan State University Archives, Vietnam Project records",
+      "url": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3251/UA17-95_001118.pdf",
+      "kind": "compendium",
+      "note": "Reference brief on the Second Republic: 44 provinces and 11 autonomous municipalities, 2,157 villages and 10,514 hamlets; province councils elected for the first time in 1965 and again on 28 June 1970; half the Senate (30 members) elected on 30 August 1970; Lower House election set for 29 August 1971 and presidential election for 3 October 1971; villages elect administrative committees and councils under the 1967 Constitution."
+    },
+    "scigliano1960": {
+      "title": "The Electoral Process in South Vietnam: Politics in an Underdeveloped State (Midwest Journal of Political Science, vol. IV, no. 2, May 1960)",
+      "publisher": "Robert G. Scigliano, Michigan State University",
+      "url": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3186/UA17-95_001070.pdf",
+      "kind": "academic",
+      "note": "Reprint held in the Michigan State University Archives. The Constituent Assembly was elected on 4 March 1956 and the second National Assembly on 30 August 1959, each with 123 seats in single-member districts; government parties took 83 seats in 1956 and 89 in 1959; it cites the official Vietnam Presse for returns."
+    },
+    "nohlen2001": {
+      "title": "Elections in Asia and the Pacific: A Data Handbook, Volume II: South East Asia, East Asia, and the South Pacific (chapter Vietnam)",
+      "publisher": "Dieter Nohlen, Florian Grotz, and Christof Hartmann (eds.), Oxford University Press, 2001",
+      "url": "https://academic.oup.com/book/36353",
+      "kind": "compendium",
+      "note": "The Vietnam chapter tabulates the Republic of Vietnam's national elections and referendum from 1955 to 1973. The publisher's site refused this session, so dates cited to it here are not yet checked against its tables."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Việt Nam Cộng hòa",
+      "name_en": "Republic of Vietnam",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1955-10-26",
+      "valid_to": "1975-04-30",
+      "source": "decree8-1956"
+    },
+    {
+      "key": "province",
+      "name": "Tỉnh và Thị xã tự trị",
+      "name_en": "Provinces and autonomous municipalities",
+      "parent": "national",
+      "polity_kind": "region",
+      "valid_from": "1955-10-26",
+      "valid_to": "1975-04-30",
+      "source": "bg1971"
+    },
+    {
+      "key": "village",
+      "name": "Xã",
+      "name_en": "Villages",
+      "parent": "province",
+      "polity_kind": "municipality",
+      "valid_from": "1955-10-26",
+      "valid_to": "1975-04-30",
+      "source": "bg1971"
+    }
+  ],
+  "classes": [
+    {
+      "key": "quoc_hoi",
+      "tier": "national",
+      "name": "Bầu cử Quốc hội Lập hiến và Quốc hội (Đệ nhất Cộng hòa)",
+      "name_en": "Constituent Assembly of 1956 and National Assembly of the First Republic",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1956-03-04",
+      "valid_to": "1963-11-02",
+      "first_held": "1956-03-04",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "decree8-1956",
+      "locator": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3322/UA17-95_001183.pdf (Art. 2: 123 representatives elected by universal, uninominal, secret and direct suffrage; Art. 20: the mandate ends when the constitution is promulgated unless it decides otherwise)",
+      "note": "A unicameral assembly of 123 members elected by plurality in single-member constituencies drawn within the provinces, with seats reserved for the highland minorities and for refugees from the North. The Constituent Assembly elected on 4 March 1956 became the first National Assembly under the Constitution of 26 October 1956; National Assemblies were elected again on 30 August 1959 and 27 September 1963. The coup of 1-2 November 1963 suspended the Constitution and dissolved the Assembly.",
+      "disposition": "blocked",
+      "disposition_reason": "No result by constituency is online: returns were printed in the government's Vietnam Presse bulletins and the official gazette (Công báo), whose files are held by the National Archives Centre II in Ho Chi Minh City without an online catalog; only party seat totals reach print in secondary studies.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "constituent_assembly"
+          ],
+          "iso_pattern": "XSV",
+          "valid_from": "1956-03-04",
+          "valid_to": "1963-11-02"
+        }
+      ],
+      "est_votes": 4500000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1956-03-04",
+          "election_kind": "general",
+          "seats": 123,
+          "source": "scigliano1960",
+          "quote": "The first election, held March 4, 1956, actually established a qualified Constituent Assembly (Quoc-Hoi Lap-Hien)",
+          "note": "Constituent Assembly of 123 members; government parties took 83 seats (Scigliano). It became the National Assembly under the Constitution of 26 October 1956."
+        },
+        {
+          "date": "1959-08-30",
+          "election_kind": "general",
+          "seats": 123,
+          "source": "scigliano1960",
+          "quote": "laid down the procedures to be followed in the election of a new National Assembly, set for August 30, 1959",
+          "note": "Second National Assembly of 123 members; government parties took 89 seats (Scigliano)."
+        },
+        {
+          "date": "1963-09-27",
+          "election_kind": "general",
+          "seats": 123,
+          "source": "nohlen2001",
+          "note": "Third National Assembly of 123 members; it was dissolved by the coup of 1-2 November 1963 (bg1971: the coup suspended the Constitution and dissolved the National Assembly)."
+        }
+      ]
+    },
+    {
+      "key": "quoc_hoi_lap_hien_1966",
+      "tier": "national",
+      "name": "Bầu cử Quốc hội Lập hiến 1966",
+      "name_en": "Constituent Assembly of 1966",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1966-09-11",
+      "valid_to": "1967-10-31",
+      "first_held": "1966-09-11",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "bg1971",
+      "locator": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3251/UA17-95_001118.pdf (page 14: Sept. 27, 1966, elected Constituent Assembly convened and prepared democratic constitution promulgated April 1, 1967)",
+      "note": "A 117-member assembly elected under the military Directory to draft the Constitution promulgated on 1 April 1967; it sat as the legislature until the National Assembly elected in September and October 1967 met.",
+      "disposition": "blocked",
+      "disposition_reason": "No result by constituency is online: the Central Election Council's returns sit in the official gazette and the Directory's files at the National Archives Centre II, which has no online catalog.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "XSV",
+          "valid_from": "1966-09-11",
+          "valid_to": "1967-10-31"
+        }
+      ],
+      "est_votes": 4270000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1966-09-11",
+          "election_kind": "general",
+          "seats": 117,
+          "source": "nohlen2001",
+          "note": "The assembly convened on 27 September 1966 (bg1971)."
+        }
+      ]
+    },
+    {
+      "key": "thuong_nghi_vien",
+      "tier": "national",
+      "name": "Bầu cử Thượng nghị viện",
+      "name_en": "Senate",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1967-09-03",
+      "valid_to": "1975-04-30",
+      "first_held": "1967-09-03",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ipu1967",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/VIETNAM__REPUBLIC_OF__E.PDF (Electoral System: the entire country constitutes a single electoral college; lists of up to 10 names, each voter placing from one to six lists in the ballot box)",
+      "finest_note": "National totals of votes by list (IPU); no count by province is online.",
+      "note": "The upper house of the National Assembly under the Constitution of 1 April 1967: 60 senators elected nationwide by list block vote for six years, half renewed every three years. The whole Senate was elected on 3 September 1967; the half chosen by lot was renewed on 30 August 1970 and the other half in August 1973.",
+      "disposition": "blocked",
+      "disposition_reason": "Only the 1967 national totals by list are online (IPU); the Central Election Council's returns for 1967, 1970, and 1973 by province are in the official gazette and the Senate's files at the National Archives Centre II, which has no online catalog.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "XSV",
+          "valid_from": "1967-09-03",
+          "valid_to": "1975-04-30"
+        }
+      ],
+      "cadence": [
+        {
+          "selection": "elected",
+          "period_years": 3,
+          "term_years": 6,
+          "partisan": true,
+          "valid_from": "1967-09-03",
+          "valid_to": "1975-04-30",
+          "source": "bg1971",
+          "locator": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3251/UA17-95_001118.pdf (page 4: six-year terms with one-half up for re-election every three years)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Inter-Parliamentary Union, PARLINE historical archive (Chronicle of Parliamentary Elections)",
+          "url": "http://archive.ipu.org/parline-e/reports/2349_arc.htm",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1967-09-03",
+          "last_date": "1967-09-03",
+          "source": "ipu-arc",
+          "role": "publishes",
+          "evidence": "One scanned Chronicle report with the 1967 Senate's electors, voters, blank or void ballots, and votes and seats of the six winning lists; the https host reset the connection and the http host answered"
+        }
+      ],
+      "est_votes": 4900000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1967-09-03",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 60,
+          "source": "ipu1967",
+          "quote": "Date of Elections: September 3, 1967 (Senate)",
+          "note": "48 lists of 10 on the ballot after 16 were excluded; 5,853,384 registered, 4,902,748 voters (83%), 212,060 blank or void, 21,884,602 list ballots; the six winning lists took 10 seats each."
+        },
+        {
+          "date": "1970-08-30",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 30,
+          "source": "bg1971",
+          "quote": "Aug. 30, 1970 -- Elections for one-half of the Upper House (30 members) were held.",
+          "note": "Won by the lists of Vu Van Mau, Huynh Van Cao, and Nguyen Van Huyen (bg1971)."
+        },
+        {
+          "date": "1973-08-26",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "nohlen2001",
+          "note": "Renewal of the other half elected in 1967 (bg1971: the next Senatorial election will be held in 1973); the seat count is unconfirmed (30 or 31)."
+        }
+      ]
+    },
+    {
+      "key": "ha_nghi_vien",
+      "tier": "national",
+      "name": "Bầu cử Hạ nghị viện",
+      "name_en": "House of Representatives",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1967-10-22",
+      "valid_to": "1975-04-30",
+      "first_held": "1967-10-22",
+      "measure": {
+        "unit": "constituency"
+      },
+      "source": "ipu1967",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/VIETNAM__REPUBLIC_OF__E.PDF (Characteristics of Parliament: the 137-strong House of Representatives, elected for 4 years, with 16 seats set aside for Khmer and other minorities)",
+      "finest_note": "National electors and voters only (IPU); no result by constituency or candidate is online.",
+      "note": "The lower house of the National Assembly under the Constitution of 1967, elected for four years by plurality in constituencies drawn by province (137 seats in 1967, 159 in 1971). The IPU's report gives 53 constituencies for 1967, so several are multi-member.",
+      "disposition": "blocked",
+      "disposition_reason": "No result by constituency is online: returns sit in the official gazette and the House's files at the National Archives Centre II, which has no online catalog; the IPU publishes only national electors and voters for 1967.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "XSV",
+          "valid_from": "1967-10-22",
+          "valid_to": "1975-04-30"
+        }
+      ],
+      "cadence": [
+        {
+          "selection": "elected",
+          "period_years": 4,
+          "term_years": 4,
+          "partisan": true,
+          "valid_from": "1967-10-22",
+          "valid_to": "1975-04-30",
+          "source": "bg1971",
+          "locator": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3251/UA17-95_001118.pdf (page 4: Deputies are elected for 4-year terms, with each province having one or more Deputies)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Inter-Parliamentary Union, PARLINE historical archive (Chronicle of Parliamentary Elections)",
+          "url": "http://archive.ipu.org/parline-e/reports/2349_arc.htm",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "1967-10-22",
+          "last_date": "1967-10-22",
+          "source": "ipu-arc",
+          "role": "publishes",
+          "evidence": "The 1967 Chronicle report gives national registered electors and voters for the House and its members by profession"
+        }
+      ],
+      "est_votes": 4300000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1967-10-22",
+          "election_kind": "general",
+          "contests": 53,
+          "seats": 137,
+          "source": "ipu1967",
+          "quote": "Deputies are elected in 53 constituencies in a single round by majority uninominal ballot.",
+          "note": "1,172 candidates for 137 seats; 5,853,384 registered, 4,274,303 voters (73%)."
+        },
+        {
+          "date": "1971-08-29",
+          "election_kind": "general",
+          "seats": 159,
+          "source": "bg1971",
+          "quote": "The next Lower House election will take place on August 29, 1971.",
+          "note": "Held as scheduled for an enlarged House of 159 seats (nohlen2001)."
+        }
+      ]
+    },
+    {
+      "key": "tong_thong",
+      "tier": "national",
+      "name": "Bầu cử Tổng thống và Phó Tổng thống",
+      "name_en": "President and Vice President",
+      "category": "executive",
+      "goal": "national",
+      "valid_from": "1961-04-09",
+      "valid_to": "1975-04-30",
+      "first_held": "1961-04-09",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "bg1971",
+      "locator": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3251/UA17-95_001118.pdf (page 4: the President and Vice President are elected on the same ticket for a four-year term and may be re-elected once)",
+      "note": "Direct election of the President and Vice President on one ticket by plurality nationwide: under the Constitution of 1956 on 9 April 1961, and under the Constitution of 1967 on 3 September 1967 and 3 October 1971 (a single ticket). Diem's first term followed the State of Vietnam's referendum of 23 October 1955, which is not an election of this Republic. Between the coup of November 1963 and 1967 the head of state was chosen by military councils.",
+      "disposition": "blocked",
+      "disposition_reason": "No official result by province is online: the Central Election Council's returns are in the official gazette and the Presidency's files at the National Archives Centre II, which has no online catalog.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "XSV",
+          "valid_from": "1961-04-09",
+          "valid_to": "1975-04-30"
+        }
+      ],
+      "cadence": [
+        {
+          "selection": "elected",
+          "period_years": 4,
+          "term_years": 4,
+          "partisan": true,
+          "valid_from": "1967-09-03",
+          "valid_to": "1975-04-30",
+          "source": "bg1971",
+          "locator": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3251/UA17-95_001118.pdf (page 4)"
+        }
+      ],
+      "est_votes": 6000000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1961-04-09",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "nohlen2001",
+          "note": "Ngo Dinh Diem and Nguyen Ngoc Tho re-elected under the Constitution of 1956."
+        },
+        {
+          "date": "1967-09-03",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "ipu1967",
+          "quote": "The President and Vice-President of the Republic were elected on September 3",
+          "note": "Nguyen Van Thieu and Nguyen Cao Ky elected, held the same day as the Senate election."
+        },
+        {
+          "date": "1971-10-03",
+          "election_kind": "general",
+          "contests": 1,
+          "source": "bg1971",
+          "quote": "The next Presidential election will take place October 3, 1971.",
+          "note": "Held as scheduled with a single ticket (nohlen2001)."
+        }
+      ]
+    },
+    {
+      "key": "hoi_dong_tinh",
+      "tier": "province",
+      "name": "Bầu cử Hội đồng tỉnh và Hội đồng thị xã",
+      "name_en": "Province and municipal councils",
+      "category": "council",
+      "goal": "subnational",
+      "valid_from": "1965-01-01",
+      "valid_to": "1975-04-30",
+      "first_held": "1965-01-01",
+      "measure": {
+        "unit": "body"
+      },
+      "source": "bg1971",
+      "locator": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3251/UA17-95_001118.pdf (page 7: Province Councils elected for the first time in 1965; elections held for the second time in June 1970)",
+      "note": "Councils that assist the appointed Province Chief and the mayors of the autonomous municipalities, elected in 1965 and again on 28 June 1970.",
+      "disposition": "blocked",
+      "disposition_reason": "No result of any province or municipal council election is online; the Ministry of Interior's files are at the National Archives Centre II without an online catalog, and the 1965 election day is not confirmed in a source reached here.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "XSV*",
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "valid_from": "1965-01-01",
+          "valid_to": "1975-04-30"
+        }
+      ],
+      "est_votes": 4000000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1965-01-01",
+          "precision": "year",
+          "election_kind": "local",
+          "source": "bg1971",
+          "quote": "These councils were elected for the first time in 1965",
+          "note": "First elections of the province councils, under decrees of 1965."
+        },
+        {
+          "date": "1970-06-28",
+          "election_kind": "local",
+          "source": "bg1971",
+          "quote": "June 28, 1970 -- Elections for Municipal and Provincial Councils were held, for the first time since 1965, throughout the country."
+        }
+      ]
+    },
+    {
+      "key": "hoi_dong_xa",
+      "tier": "village",
+      "name": "Bầu cử Hội đồng xã, Ủy ban hành chánh xã và Trưởng ấp",
+      "name_en": "Village councils, village administrative committees, and hamlet chiefs",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1967-04-01",
+      "valid_to": "1975-04-30",
+      "measure": {
+        "unit": "body"
+      },
+      "source": "bg1971",
+      "locator": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3251/UA17-95_001118.pdf (pages 8-9: villages elect an 8 to 12-man Administrative Committee and a Village Council of 5 to 11 members; each hamlet has a locally elected chief)",
+      "note": "The Constitution of 1967 restored elected village government (the First Republic had appointed village councillors from 1956): voters in each of about 2,157 villages elect a council and an administrative committee that chooses the village chief, and each hamlet elects its chief. Elections were staggered by village from 1967.",
+      "disposition": "blocked",
+      "disposition_reason": "No date or result of any village or hamlet election is in a source reached here; the rounds were staggered by village and their records are with the Ministry of Interior's files at the National Archives Centre II, which has no online catalog.",
+      "match": [
+        {
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "XSV*",
+          "election_kinds": [
+            "local"
+          ],
+          "precedence": 1,
+          "valid_from": "1967-04-01",
+          "valid_to": "1975-04-30",
+          "polity_kinds": [
+            "municipality"
+          ]
+        }
+      ],
+      "est_votes": 5000000,
+      "effort": 5
+    },
+    {
+      "key": "nguyen_thu_chi_dinh",
+      "tier": "national",
+      "name": "Quốc trưởng, Hội đồng Quân nhân Cách mạng, Ủy ban Lãnh đạo Quốc gia, Thủ tướng",
+      "name_en": "Head of state chosen by military councils (1963-1967) and the appointed Prime Minister",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1955-10-26",
+      "valid_to": "1975-04-30",
+      "measure": {
+        "unit": "office"
+      },
+      "source": "bg1971",
+      "locator": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3251/UA17-95_001118.pdf (page 14: November 1963 to November 1964 military control; the Provisional Charter of the High National Council; the Central Executive Committee led by Nguyen Cao Ky from 19 June 1965; page 4: the Prime Minister appointed by the President)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "No public vote: from the coup of November 1963 until September 1967 the head of state and government were named by the Military Revolutionary Council, the High National Council, and the Armed Forces Council and its Directory, and the Prime Minister was always appointed by the President (bg1971).",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "XSV"
+        },
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "XSV"
+        }
+      ]
+    },
+    {
+      "key": "trung_cau_dan_y",
+      "tier": "national",
+      "name": "Trưng cầu dân ý",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1955-10-26",
+      "valid_to": "1975-04-30",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "decree8-1956",
+      "locator": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3322/UA17-95_001183.pdf (Art. 12: the President may put a draft constitution to a referendum if the Assembly rejects or fails to decide on it within 45 days)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "None held by the Republic: the only referendum, of 23 October 1955, was held by the State of Vietnam three days before the Republic was proclaimed and is counted in Vietnam's census; the referendum the 1956 decree provided for was never needed, since the Assembly adopted the Constitution of 26 October 1956, and the Constitution of 1967 was adopted by the elected Constituent Assembly.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "XSV*"
+        }
+      ]
+    }
+  ]
+}

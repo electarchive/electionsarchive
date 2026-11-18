@@ -887,10 +887,11 @@
       "kind": "compendium"
     },
     "xsv": {
-      "publisher": "University of New South Wales, Canberra (ADFA)",
-      "title": "Political legitimacy: The 1971 Vietnamese Presidential election",
-      "url": "https://vietnam.unsw.adfa.edu.au/political-legitimacy-the-1971-vietnamese-presidential-election/",
-      "kind": "compendium"
+      "publisher": "Republic of Vietnam, Office of the President",
+      "title": "Decree No 8 of 23 January 1956 creating the National Assembly (English translation)",
+      "url": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3322/UA17-95_001183.pdf",
+      "kind": "official_body",
+      "note": "Issued by the President of the Republic of Vietnam under the Provisional Constitutional Law No I of 26 October 1955, which proclaimed the Republic; held in the Michigan State University Archives' Vietnam Project records. The successor state's government portal dates the end of the Republic's rule in the South to 30 April 1975 (https://chinhphu.vn/giai-doan-1976-1985-dat-nuoc-thong-nhat-xay-dung-va-bao-ve-to-quoc-xhcn/i-chinh-phu-nhiem-ky-quoc-hoi-khoa-vi-1976-1981-2892), and the IPU's Chronicle reports the Senate and House elections of 1967 (http://archive.ipu.org/parline-e/reports/arc/VIETNAM__REPUBLIC_OF__E.PDF)."
     },
     "xah": {
       "publisher": "Parlamentsdirektion (Republik Österreich)",
@@ -3391,9 +3392,9 @@
       "iso": "XSV",
       "name_en": "South Vietnam",
       "status": "former",
-      "reason": "National Assembly and presidential elections from 1967 to 1971.",
+      "reason": "Proclaimed on 26 October 1955 under the Provisional Constitutional Law No I, after the State of Vietnam's referendum of 23 October 1955, and ended when its government in Saigon fell on 30 April 1975; it elected a Constituent Assembly (1956) and National Assemblies (1959, 1963) under the First Republic, a Constituent Assembly (1966), and under the Constitution of 1967 a Senate (1967, 1970, 1973), a House of Representatives (1967, 1971), and Presidents (1961, 1967, 1971), with province councils from 1965.",
       "source": "xsv",
-      "locator": "https://vietnam.unsw.adfa.edu.au/political-legitimacy-the-1971-vietnamese-presidential-election/"
+      "locator": "https://vietnamproject.archives.msu.edu/recordFiles/159-547-3322/UA17-95_001183.pdf (Decree No 8 of 23 January 1956, preamble: Under the Provisional Constitutional Law No I of 26 October 1955; end date from the Government portal of the Socialist Republic of Vietnam: Sau ngày 30-4-1975, miền Nam được hoàn toàn giải phóng)"
     },
     {
       "iso": "XAH",
