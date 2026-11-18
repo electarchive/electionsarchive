@@ -2,6 +2,7 @@
 
 import functools
 import html
+import json
 import re
 import subprocess
 import unicodedata
@@ -11,6 +12,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.bd import report1996
 from ea.sources.bd.bijoy import unicode
 
 SOURCE = "bd.ecs_parliament"
@@ -22,6 +24,7 @@ SCHEME = "bd.constituency"
 VOTES, REGISTERED, CAST, VALID, INVALID = 1, 2, 3, 4, 5
 
 # The Commission's statistical reports of each general election, posted in its Election Report category.
+REPORT_1996 = ASSET + "VCgSSqUcjDR8tI1q8QbNACSe96YNm2EYTISFFKtl.pdf"
 REPORT_2001 = ASSET + "WqafvkDhpbk4kb1MV6PNWIHvIngSvbLWrVIhVxEK.pdf"
 REPORT_2008 = ASSET + "36Sa01LjyXk71kuGw5U1oK5zGEvYq8LxRx5sm0MG.pdf"
 
@@ -69,10 +72,11 @@ class General:
 
 
 GENERAL = {
+    1996: General(date(1996, 6, 12), 7, REPORT_1996, (report1996.FIRST, report1996.LAST), 300),
     2001: General(date(2001, 10, 1), 8, REPORT_2001, (208, 324), 300),
     2008: General(date(2008, 12, 29), 9, REPORT_2008, (159, 309), 300),
 }
-ORDINAL = {8: "8th", 9: "9th"}
+ORDINAL = {7: "7th", 8: "8th", 9: "9th"}
 
 
 def clean(text: str) -> str:
@@ -420,6 +424,284 @@ def seats_2008() -> list[Seat]:
 
 
 # ----------------------------------------------------------------------------------------------------------------
+# 1996: the English scan's chapter 6, read by OCR in report1996 and reconciled against its printed shares and totals.
+
+# The parties of 1996 as the report's list of participating parties (3.01) spells them, each with its symbol, and
+# the name the 2001 or 2008 report gives the same party, where it ran again, so the elections share one party.
+PARTIES_1996: tuple[tuple[str, str, str | None], ...] = (
+    ("Bangladesh Awami League", "Nowka (Boat)", None),
+    ("Bangladesh Bastuhara Parishad", "Truck", None),
+    ("Bangladesh Bekar Samaj", "Thelagari", None),
+    ("Bangladesh Gono Azadi League", "Dhenki", "Bangladesh Gono Azadi League (Samad)"),
+    ("Bangladesh Hindu League", "Shankha (Conchshel)", None),
+    ("Bangladesh Islami Biplobi Parishad", "Tarabari (Sword)", None),
+    ("Bangladesh Islami Front", "Mombati (Candle)", None),
+    ("Bangladesh Islami Party", "Kolsi (Pitcher)", None),
+    ("Bangladesh Janata Party", "Bus", None),
+    ("Bangladesh Jatiya Agragati Party", "Tiffin Carrier", None),
+    ("Bangladesh Jatiya League (Sobhan)", "Latim (Top)", None),
+    ("Bangladesh Jatiyabadi Awami League (Mostofa Allama)", "Nolkup (Tubewell)", None),
+    ("Bangladesh Khelafat Andolon", "Bot Gachh (Banyon Tree)", None),
+    ("Bangladesh Krisak Sramik Janata Party", "Boi (Book)", None),
+    ("Bangladesh Krisak Sramik Mukti Andolon", "Morog (Cock)", None),
+    ("Bangladesh Krishak Raj Islami Party (F.Hq. Sardar)", "Glass", None),
+    ("Bangladesh Manabodhikar Dal", "Anaros (Pineapple)", "Bangladesh Manabadhikar Dal (Bamad)"),
+    ("Bangladesh Mehanati Front", "Helicopter", None),
+    ("Bangladesh Muslim League (Jamir Ali)", "Hariken (Lantern)", None),
+    ("Bangladesh National Awami Parti (Nap Vasani)", "Chari (Walking Stick)", "National Awami Party (NAP-Bhasani)"),
+    ("Bangladesh National Awami Party (NAP)", "Kureh Ghar (Hut)", "National Awami Party (NAP)"),
+    ("Bangladesh National Congress", "Ghora (Horse)", None),
+    ("Bangladesh Nationalist Party", "Dhaner Shish (Sheaf Of Paddy)", "Bangladesh Nationalist Party (BNP)"),
+    ("Bangladesh People's League", "Hati (Elephant)", None),
+    ("Bangladesh Peoples Party", "Rocket", "Bangladesh Peoples Party (BPP)"),
+    ("Bangladesh Samajtantrik Dal (Mahbub)", "Rickshaw", None),
+    ("Bangladesh Samajtantrik Samsad (Darshan Shava)", "Aam (Mango)", None),
+    ("Bangladesh Samyabadi Dal (Marx-Lenin)", "Chair", "Bangladesh Sammyabadi Dal (Marx-Lenin)"),
+    ("Bangladesh Sarbahara Party", "Chaka (Wheel)", None),
+    ("Bangladesh Tafsil Jati Federation (S.K. Mandal)", "Kanthal (Jack Fruit)", None),
+    ("Bangladesh Tafsili Federation (Sudir)", "Palki", None),
+    ("Bangladesh Tanjimul Muslimin", "Phuler Mala (Garland of Flowers)", None),
+    ("Bangladesh Vasani Adarsha Bastabayan Parishad", "Hansh (Duck)", None),
+    ("Bangladesh Workers Party", "Haturi (Hammer)", None),
+    ("Bangladesher Communist Party", "Kaste", None),
+    (
+        "Bangladesher Samajtantrik Dal (Khalekuzzaman)",
+        "Tala (Lock)",
+        "Bangladesh Samajtantrik Dal (BASAD-Khalekuzzaman)",
+    ),
+    ("Bhasani Front", "Pradip (Lamp)", None),
+    ("Communist Kendra", "Chabi (Key)", None),
+    ("Democratic Republican Party", "Moiyur (Peacock)", None),
+    ("Desh Prem Party", "Ektara", None),
+    ("Freedom Party", "Tara (Star)", None),
+    ("Gonatantry Party", "Paira (Pegion)", "Gonotantri Party"),
+    ("Gono Forum", "Udiyaman Surjo (Rising Sun)", None),
+    ("Gono Oikkya Front (Guff)", "Baloon", None),
+    ("Gontantrik Sarbahara Party", "Baitha", None),
+    ("Hak Kathar Mancha", "Chingri Machh (Lobster)", None),
+    ("Islami Al Zihad Dal", "Kolar Chhari (Row of Bananas)", None),
+    ("Islami Oikya Jote", "Minar", None),
+    ("Islami Shasantantra Andolon", "Minar1", None),
+    ("Islamic Dal Bangladesh (Saifur)", "Tractor", None),
+    ("Jaker Party", "Golap Phul (Rose)", None),
+    ("Jamat-E-Islami Bangladesh", "Daripalla (Scale)", "Jamaat-e-Islami Bangladesh"),
+    ("Jamiate Ulumaye Islam Bangladesh", "Khejur Gachh (Date Tree)", "Jamiate Ulamae Islam Bangladesh"),
+    ("Jana Dal", "Balti (Bucket)", None),
+    ("Jatiya Biplobi Front", "Ghuri (Kite)", None),
+    ("Jatiya Daridra Party", "Thala (Plate)", None),
+    ("Jatiya Janata Party (Nurul Islam)", "Moi (Ladder)", None),
+    ("Jatiya Janata Party (Sheikh Asad)", "Horin (Deer)", "Jatiya Janata Party (Sheik Asad)"),
+    ("Jatiya Party", "Langol (Plough)", "Jatiya Party (Ershad)"),
+    ("Jatiya Samajtantrik Dal (Inu)", "Moshal (Flaming Torch)", None),
+    ("Jatiya Samajtantrik Dal (Mahiuddin)", "Battery", None),
+    ("Jatiya Samajtantrik Dal (Rab)", "Charka (Spining Wheel)", None),
+    ("Jatiya Seba Dal", "Dab (Coconut)", None),
+    ("National Awami Party (NAP Bhashani) (Mustaq)", "Oot (Camel)", "National Awami Party (NAP-Vasani Mushtaq)"),
+    ("National Democratic Party", "Bagh (Tiger)", None),
+    ("National Patriotic Party", "Urajahaj (Aeroplane)", None),
+    ("Oikya Prokria", "Shighho (Lion)", None),
+    ("People's Muslim League", "Suitcase", None),
+    ("Progatishil Gonotantrik Shakti", "Kodal (Spade)", "Pragatishil Gonotantrik Shakti (Pragash)"),
+    ("Progotisil Jatiatabadi Dal (Nurul A Moula)", "Chand (Moon)", None),
+    ("Quran Sunna Bastabayan Party", "Apple", "Quran and Sunnah Bastabayan Party"),
+    ("Quran Dorshion Sangshta Bangladesh", "Anchor", "Quran Darshan Sangstha Bangladesh"),
+    ("Saat Dalya Jote (Mirpur)", "Mathal", None),
+    ("Sammilita Sangram Parishad", "Table Ghori (Table Clock)", None),
+    ("Samridhya Bangladesh Andolon", "Machh (Fish)", "Samridha Bangladesh Andolon"),
+    ("Samridhya Bangladesh Babosai Samproday", "Chamoch (Spoon)", None),
+    ("Social Democratic Party", "Magh (Mug)", None),
+    ("Sramajibi Oikya Foram", "Telephone", None),
+    ("Sramik Krishak Samajbadi Dal", "Chhata (Umbrella)", None),
+    ("Taherikay Olama-E-Bangladesh", "Table", None),
+    ("United People's Party", "Garur Gari (Bullock Cart)", None),
+)
+
+
+def partial(text: str, name: str) -> float:
+    """How well text matches a name, allowing the stray marks OCR reads before or after it."""
+    best = report1996.similar(text, name)
+    for start in range(max(len(text) - len(name), 0) + 1):
+        best = max(best, report1996.similar(text[start : start + len(name)], name))
+    for cut in (1, 2, 3):
+        best = max(best, report1996.similar(text[cut:], name))
+    # The column cuts long names short, so a short reading matches the start of the name.
+    if 15 <= len(text) < len(name) and len(name) >= 25:
+        best = max(best, report1996.similar(text, name[: len(text)]))
+    return best
+
+
+def party_1996(text: str, symbol: str) -> str | None:
+    """The party of a row, from its printed party and symbol as OCR reads them, or None when the reading is too
+    damaged to tell. Each party's symbol is its own, so the symbol settles a party name the scan has damaged; a
+    candidate with no party's symbol is independent."""
+    party, sign = squash(text), squash(symbol)
+    both = squash(f"{text} {symbol}")
+    if "ndepend" in party or "depend" in party or report1996.similar(party, "independent") >= 0.7:
+        return "Independent"
+    # A legible party name settles the row; two parties' symbols both print as "Minar".
+    if len(party) >= 6:
+        ranked = sorted(((partial(party, squash(name)), name) for name, _, _ in PARTIES_1996), reverse=True)
+        named = ranked[0] if ranked[0][0] - ranked[1][0] >= 0.05 else (0.0, "")
+        signed = max((report1996.similar(sign, squash(mark)), name, mark) for name, mark, _ in PARTIES_1996)
+        clear_sign = signed[0] >= 0.85 and squash(signed[2]) != "minar"
+        if named[0] >= 0.8 and not (clear_sign and signed[1] != named[1]):
+            return named[1]
+        # The report prints a few rows whose party and symbol disagree; a name read near-exactly is what it prints,
+        # and a damaged or truncated name yields to a clear symbol.
+        if clear_sign and signed[1] != named[1]:
+            return named[1] if named[0] >= 0.92 else signed[1]
+    best, found = 0.0, None
+    for name, printed_symbol, _ in PARTIES_1996:
+        name_s, symbol_s = squash(name), squash(printed_symbol)
+        by_name = partial(party, name_s) if len(party) >= 4 else None
+        by_sign = report1996.similar(sign, symbol_s) if len(sign) >= 3 else None
+        if by_name is not None and by_sign is not None:
+            score = max((by_name + by_sign) / 2, report1996.similar(both, name_s + symbol_s))
+        else:
+            score = max(by_name or 0.0, by_sign or 0.0, report1996.similar(both, name_s + symbol_s))
+        if score > best:
+            best, found = score, name
+    if found is None or best < 0.68:
+        return None
+    return found
+
+
+CANONICAL_1996 = {name: later or name for name, _, later in PARTIES_1996} | {"Independent": "Independent"}
+# Words of a name that the scan's rules turn into stray marks, and the prefix it misreads most often.
+JUNK = re.compile(r"^[^A-Za-z]*$")
+TITLES = {"Ma.": "Md.", "Ma,": "Md.", "Md,": "Md.", "Mad.": "Md.", "Mo.": "Md.", "Ma": "Md.", "Id.": "Md."}
+
+
+def name_1996(text: str) -> str:
+    """A candidate's name from the OCR of its cell, without the marks that the cell's rules leave around it."""
+    words = []
+    for word in text.split():
+        word = word.strip("|[]{}()‘’'\"“”_—-~;:,°©=*!")
+        if not word or JUNK.match(word):
+            continue
+        if len(word) > 2 and word[0] in "Ijli|\\" and word[1].isupper():
+            word = word[1:]
+        words.append(word)
+    while words and len(words[-1]) <= 2 and words[-1].islower():
+        words.pop()
+    while words and len(words[0]) == 1 and words[0].islower():
+        words.pop(0)
+    if words:
+        words[0] = TITLES.get(words[0], words[0])
+    # Restore the bracket around a nickname, as in "Golam Mohammad (Kader)", where it survives on one side.
+    out = " ".join(words)
+    out = re.sub(r"\(([^)]*)$", r"(\1)", out)
+    return clean(out)
+
+
+def overrides_1996() -> dict[int, dict[str, int]]:
+    """The cells read by eye, by constituency: "row1" and so on for the candidates in printed order, and the totals."""
+    if not report1996.OVERRIDES.exists():
+        return {}
+    found: dict[int, dict[str, int]] = {}
+    for number, entry in json.loads(report1996.OVERRIDES.read_text()).items():
+        cells = {f"row{i}": int(v) for i, v in enumerate(entry.get("votes", []), start=1)}
+        cells |= {k: int(entry[k]) for k in ("registered", "valid", "invalid", "cast") if k in entry}
+        found[int(number)] = cells
+    return found
+
+
+def candidates_1996() -> dict[int, list[tuple[str, str, int]]]:
+    """The tables read by eye in full, where the page's rows could not be told apart by machine."""
+    if not report1996.OVERRIDES.exists():
+        return {}
+    entries = json.loads(report1996.OVERRIDES.read_text())
+    return {int(n): [(a, b, int(c)) for a, b, c in e["candidates"]] for n, e in entries.items() if "candidates" in e}
+
+
+def names_1996() -> dict[int, dict[int, str]]:
+    """The candidates' names read by eye, by constituency and row, where OCR reads a name cell as blank."""
+    if not report1996.OVERRIDES.exists():
+        return {}
+    entries = json.loads(report1996.OVERRIDES.read_text())
+    return {int(n): {int(i): v for i, v in e.get("names", {}).items()} for n, e in entries.items()}
+
+
+def parties_1996() -> dict[int, dict[int, str]]:
+    """The parties read by eye, by constituency and row, where the scan leaves a row's party and symbol illegible."""
+    if not report1996.OVERRIDES.exists():
+        return {}
+    entries = json.loads(report1996.OVERRIDES.read_text())
+    return {int(n): {int(i): p for i, p in e.get("parties", {}).items()} for n, e in entries.items()}
+
+
+@functools.cache
+def tables_1996() -> dict[int, tuple[report1996.Table, report1996.Settled]]:
+    pdf = raw.cached(SOURCE, REPORT_1996).path
+    fixes = overrides_1996()
+    found: dict[int, tuple[report1996.Table, report1996.Settled]] = {}
+    listed = candidates_1996()
+    for table in report1996.tables(pdf):
+        if table.number in found:
+            raise ValueError(f"1996: constituency {table.number} appears twice")
+        cells = fixes.get(table.number, {})
+        if table.number in listed:
+            votes = [v for _, _, v in listed[table.number]]
+            totals = [cells[k] for k in ("registered", "valid", "invalid", "cast")]
+            problems = (
+                [] if sum(votes) == totals[1] and totals[1] + totals[2] == totals[3] else ["listed votes do not add"]
+            )
+            found[table.number] = (table, report1996.Settled(votes, *totals, problems))
+        else:
+            found[table.number] = (table, report1996.settle(table, cells))
+    return found
+
+
+def party_of(row: report1996.Row) -> str | None:
+    """A row's party, reading its party and symbol cells again on their own when the page's OCR missed them."""
+    found = party_1996(row.party, row.symbol)
+    if found is None and len(row.spans) == 3:
+        pdf = raw.cached(SOURCE, REPORT_1996).path
+        party, symbol = (report1996.text(pdf, row.page, box) for box in row.spans[1:])
+        row.party, row.symbol = party, symbol
+        found = party_1996(party, symbol)
+    return found
+
+
+@functools.cache
+def seats_1996() -> list[Seat]:
+    names = {seat.number: seat.name for seat in seats_2001()}
+    seats: list[Seat] = []
+    problems: list[str] = []
+    for number, (table, settled) in sorted(tables_1996().items()):
+        problems.extend(f"{number} {table.name}: {problem}" for problem in settled.problems)
+        seat = Seat(number, names[number], None)
+        seat.registered, seat.valid, seat.invalid, seat.cast = (
+            settled.registered,
+            settled.valid,
+            settled.invalid,
+            settled.cast,
+        )
+        if number in candidates_1996():
+            for name, party_name, votes in candidates_1996()[number]:
+                seat.candidates.append(Candidate(name, CANONICAL_1996[party_name], votes))
+            seats.append(seat)
+            continue
+        named = parties_1996().get(number, {})
+        for index, (row, votes) in enumerate(zip(table.rows, settled.votes, strict=True), start=1):
+            found = named.get(index) or party_of(row)
+            if found is None:
+                problems.append(f"{number} {table.name}: no party for {row.party!r} with symbol {row.symbol!r}")
+                continue
+            name = names_1996().get(number, {}).get(index) or name_1996(row.name)
+            if len(re.sub(r"[^A-Za-z]", "", name)) < 5 and row.spans:
+                pdf = raw.cached(SOURCE, REPORT_1996).path
+                name = name_1996(report1996.text(pdf, row.page, row.spans[0])) or name
+            if not name:
+                problems.append(f"{number} {table.name}: no name in row {index}")
+            seat.candidates.append(Candidate(name, CANONICAL_1996[found], votes))
+        seats.append(seat)
+    if problems:
+        raise ValueError("1996: tables that do not reconcile:\n" + "\n".join(problems))
+    return seats
+
+
+# ----------------------------------------------------------------------------------------------------------------
 
 
 # The districts as the 2008 report names them in Bengali, with the spelling of the 2001 report, so that a
@@ -506,7 +788,7 @@ def english(bengali: str) -> str:
 
 
 def seats(year: int) -> list[Seat]:
-    found = seats_2001() if year == 2001 else seats_2008()
+    found = {1996: seats_1996, 2001: seats_2001, 2008: seats_2008}[year]()
     for seat in found:
         if seat.name_bn and not seat.name:
             seat.name = english(seat.name_bn)
@@ -527,7 +809,7 @@ def packages() -> list[str]:
 
 
 def fetch() -> None:
-    for url in (REPORT_2001, REPORT_2008):
+    for url in (REPORT_1996, REPORT_2001, REPORT_2008):
         raw.fetch(SOURCE, url, suffix=".pdf")
 
 
@@ -606,7 +888,7 @@ def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "Bangladesh's parties of the 2001 and 2008 general elections, the Jatiya Sangsad, and its electoral system",
+        "Bangladesh's parties of the 1996, 2001, and 2008 general elections, the Jatiya Sangsad, and its electoral system",
         depends=[f"{SOURCE}/geo"],
     )
     p.external.add(BANGLADESH)
@@ -633,6 +915,17 @@ def registry() -> Package:
 
 
 METHOD = {
+    1996: (
+        "Counted by the Bangladesh Election Commission for each constituency, as chapter 6 of its statistical "
+        'report on the 1996 election ("Detailed Results as Described in the Result Sheet furnished by the Returning '
+        'Officer") prints them. The report is a scan, so every number was read by OCR, cell by cell, and kept only '
+        "where the candidates' votes add to the printed valid votes, each candidate's votes give the printed share "
+        "of them, the valid and cancelled votes add to the printed turnout, and the turnout gives the printed "
+        "percentage of the registered voters. Candidates' names were read by OCR from the same scan and may carry "
+        "its misreadings; each party is identified by its printed symbol, which the Commission allots to one party "
+        "only. The candidate with the most votes is stored as elected. Constituencies are matched to the 2001 "
+        "report's by number, under the same delimitation."
+    ),
     2001: (
         'Counted by the Bangladesh Election Commission for each constituency, as the "Detailed Official Results" '
         "of its statistical report on the 2001 election print them. Registered voters are the whole roll of the "
@@ -648,6 +941,12 @@ METHOD = {
         "together, and registered voters are the roll. The candidate with the most votes is stored as elected. "
         "Constituencies are matched across elections by name, and the Commission redrew them in 2008."
     ),
+}
+FOOTNOTES_1996 = {
+    "decisive": "Polling was suspended at some centres here, and the Commission declared the result decisive without "
+    "them; the votes are those of the centres that reported.",
+    "repoll": "Polling was suspended at some centres here and held again there on 19 June 1996; the votes include "
+    "the repoll.",
 }
 LATE_NOTE = "This constituency polled on {day:%-d %B %Y}, after the general election."
 
@@ -668,8 +967,28 @@ def election(year: int) -> Package:
     path = f"bd/{day}"
     p.add("election", id=id, polity_id=BANGLADESH, kind="general", date_from=day, date_to=day, status="held")
     p.add("slug", path=path, entity_id=id, is_current=True)
-    p.name(id, f"{year} Bangladeshi general election", "en", "official")
-    lang = "en" if year == 2001 else "bn"
+    # Two general elections were held in 1996, on 15 February and 12 June, so the June one carries its month.
+    p.name(id, f"{'June ' if year == 1996 else ''}{year} Bangladeshi general election", "en", "official")
+    lang = "bn" if year == 2008 else "en"
+    scanned = year == 1996
+    if scanned:
+        stored = raw.cached(SOURCE, spec.url)
+        artifact = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{ECS}\x1f{stored.storage_key}"))
+        tables = tables_1996()
+        pages: dict[int, str] = {}
+        for number in sorted(
+            {t.page for t, _ in tables.values()} | {r.page for t, _ in tables.values() for r in t.rows}
+        ):
+            pages[number] = key("page", day, number)
+            p.add(
+                "source_page",
+                id=pages[number],
+                artifact_id=artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{stored.sha256}-{number}.png",
+                width=PAGE_WIDTH,
+                height=PAGE_HEIGHT,
+            )
     for seat in seats(year):
         tag = f"{day}:{seat.number}"
         district = area(seat.name)
@@ -698,7 +1017,9 @@ def election(year: int) -> Package:
             electoral_system_id=FPTP,
             default_result_kind="counted",
         )
-        p.name(contest, f"{year} Jatiya Sangsad election, {seat.name}", "en", "official")
+        p.name(
+            contest, f"{'June ' if year == 1996 else ''}{year} Jatiya Sangsad election, {seat.name}", "en", "official"
+        )
         p.add("slug", path=f"{path}/{seat.number}-{changeset.slug(seat.name)}", entity_id=contest, is_current=True)
         result_set = key("result_set", tag)
         p.add(
@@ -716,6 +1037,8 @@ def election(year: int) -> Package:
         method = METHOD[year]
         if seat.day:
             method = f"{method} {LATE_NOTE.format(day=seat.day)}"
+        if scanned and (footnote := tables[seat.number][0].footnote):
+            method = f"{method} {FOOTNOTES_1996[footnote]}"
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
         real = [c for c in seat.candidates if not c.none_of_above]
         ranked = sorted((c.votes for c in real), reverse=True)
@@ -757,18 +1080,57 @@ def election(year: int) -> Package:
             )
             if c.votes == ranked[0] and (len(ranked) < 2 or ranked[0] > ranked[1]):
                 p.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
-            put(p, result_set, unit, option, VOTES, c.votes)
+            put(p, result_set, unit, option, VOTES, c.votes, scanned)
+            rows = tables[seat.number][0].rows if scanned else []
+            if scanned and len(rows) == len(seat.candidates):
+                row = rows[index - 1]
+                locate(p, result_set, unit, option, VOTES, pages[row.page], row.box)
         for measure, value in (
             (REGISTERED, seat.registered),
             (CAST, seat.cast),
             (INVALID, seat.invalid),
             (VALID, seat.valid),
         ):
-            put(p, result_set, unit, None, measure, value)
+            put(p, result_set, unit, None, measure, value, scanned)
+            if scanned:
+                spot = tables[seat.number][0].boxes.get(MEASURES[measure])
+                if spot is not None:
+                    locate(p, result_set, unit, None, measure, pages[spot[0]], spot[1])
     return p
 
 
-def put(p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int) -> None:
+# The size of a page of the 1996 scan at 100 dpi, the scale its page images are kept at, and the 300 dpi the cells
+# were read at.
+PAGE_WIDTH, PAGE_HEIGHT = 827, 1170
+SCAN_WIDTH, SCAN_HEIGHT = 2480, 3509
+MEASURES = {REGISTERED: "registered", CAST: "cast", INVALID: "invalid", VALID: "valid"}
+DIGITIZED = 8
+
+
+def locate(
+    p: Package, result_set: str, unit: str, option: str | None, measure: int, page: str, box: report1996.Box
+) -> None:
+    x0, y0, x1, y1 = box
+    p.add(
+        "value_locator",
+        result_set_id=result_set,
+        unit_id=unit,
+        option_id=option,
+        channel=0,
+        measure=measure,
+        count_round=0,
+        page_id=page,
+        source_id=None,
+        x0=round(max(x0, 0) / SCAN_WIDTH, 4),
+        y0=round(max(y0, 0) / SCAN_HEIGHT, 4),
+        x1=round(min(x1, SCAN_WIDTH) / SCAN_WIDTH, 4),
+        y1=round(min(y1, SCAN_HEIGHT) / SCAN_HEIGHT, 4),
+    )
+
+
+def put(
+    p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int, scanned: bool = False
+) -> None:
     p.add(
         "result_value",
         result_set_id=result_set,
@@ -777,6 +1139,6 @@ def put(p: Package, result_set: str, unit: str, option: str | None, measure: int
         channel=0,
         measure=measure,
         count_round=0,
-        flags=0,
+        flags=DIGITIZED if scanned else 0,
         value=value,
     )
