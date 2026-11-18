@@ -15,6 +15,7 @@ The local elections of 2017 to 2023 are built by the module `local` from the fil
 import functools
 import json
 import re
+import subprocess
 import unicodedata
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
@@ -50,6 +51,10 @@ RUNOFF = date(2025, 11, 9)
 
 # Round one: the final counts of both contests, the names of places, entities, and candidates.
 ASSEMBLY = f"{STORAGE}/assembly-total-latest.json"
+# The certified seats and elected councillors of the municipal assemblies, from the Commission's result archive.
+UPLOADS = f"{SITE}/wp-content/uploads/2025/11/"
+ELECTED = UPLOADS + "7.MA_Subjektet-politike-qe-kane-fituar-mandate-dhe-kandidatet-e-zgjedhur-1.xlsx"
+SEATS_REPORT = UPLOADS + "7.Raporti_i_Mandateve_te_Kuvendit.pdf"
 MAYOR = f"{STORAGE}/mayor-total-latest.json"
 ENTITIES = f"{STORAGE}/political-entities.json"
 CANDIDATES = f"{STORAGE}/full-candidates-gender.json"
@@ -86,8 +91,7 @@ MAYOR_NOTE = (
 ASSEMBLY_NOTE = (
     "A municipal assembly is elected by open-list proportional representation in a single municipality-wide "
     "district. Seats are divided among the political entities by the Sainte-Laguë method, and each entity's seats go "
-    "to its candidates in order of their preference votes, subject to the gender quota, and a vacant seat goes to the entity's next candidate by votes. The seats each entity won "
-    "are not stored here."
+    "to its candidates in order of their preference votes, subject to the gender quota, and a vacant seat goes to the entity's next candidate by votes."
 )
 METHOD = (
     "Votes by polling station from the final 'total' file of the Commission's results platform for the 2025 local "
@@ -452,6 +456,61 @@ def candidates(url: str) -> dict[tuple[str, str], dict[int, tuple[str, str | Non
     return found
 
 
+@dataclass
+class Certified:
+    seats: dict[str, dict[str, int]]  # municipality -> entity -> seats
+    elected: dict[str, dict[str, list[tuple[int, str, str | None]]]]  # municipality -> entity -> (rank, name, gender)
+
+
+def certified_seats() -> Certified:
+    """The seats each entity won and the councillors elected, from the Commission's workbook of elected candidates.
+
+    The workbook lists every elected candidate under the entity's name. The Commission's report of the allocation
+    prints each assembly's size and each entity's seats and ballot number, and the two must agree.
+    """
+    book = raw.cached(SOURCE, ELECTED)
+    import fastexcel
+
+    sheet = fastexcel.read_excel(str(book.path))
+    frame = sheet.load_sheet_by_name(sheet.sheet_names[0], header_row=None, dtypes="string").to_polars()
+    rows = [[clean(c) for c in row] for row in frame.iter_rows()][1:]
+    by_name: dict[str, dict[str, str]] = defaultdict(dict)  # municipality -> folded entity name -> entity
+    for e, entity in entities().items():
+        for m in entity.municipalities:
+            by_name[m][fold(entity.name)] = e
+    elected: dict[str, dict[str, list[tuple[int, str, str | None]]]] = defaultdict(lambda: defaultdict(list))
+    for row in rows:
+        if not row[0]:
+            continue
+        m, name, position, who, gender = row[0], row[2], int(row[5]), row[6], row[7]
+        e = by_name[m].get(fold(name))
+        if e is None:
+            raise ValueError(f"municipality {m}: no entity is named {name}")
+        elected[m][e].append((position, who, {"Mashkull": "male", "Femër": "female"}.get(gender)))
+    seats = {m: {e: len(c) for e, c in node.items()} for m, node in elected.items()}
+    blocks: list[tuple[int, dict[str, int]]] = []
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, SEATS_REPORT).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    for line in text.splitlines():
+        size = re.search(r"Broj mesta u Skupštini opštine: (\d+)", line)
+        if size:
+            blocks.append((int(size.group(1)), {}))
+            continue
+        entity = re.match(r"^(\d+)\s+(\S.*?)\s{2,}(\d+)\s{2,}[\d,]+\s{2,}[\d.]+%\s*$", line)
+        if entity and blocks and entity.group(1) in entities():
+            blocks[-1][1][entity.group(1)] = int(entity.group(3))
+    # The report names each assembly in its own spelling, so each block is matched to the municipality whose
+    # elected candidates it describes.
+    matched = {m for m, node in seats.items() if (sum(node.values()), node) in blocks}
+    if len(blocks) != len(municipalities()) or matched != set(municipalities()):
+        raise ValueError("the elected candidates do not match the allocation the Commission printed")
+    return Certified(seats, {m: dict(node) for m, node in elected.items()})
+
+
 def person(m: str, e: str, name: str) -> str:
     return key("person", m, e, fold(name))
 
@@ -617,6 +676,9 @@ def first() -> Package:
         p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
     for url in (ENTITIES, ENTITIES_2, CENTERS, TYPES, MUNICIPALITIES):
         p.uses(raw.cached(SOURCE, url))
+    for url in (ELECTED, SEATS_REPORT):
+        p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
+    certified = certified_seats()
     assembly, mayor = count(ASSEMBLY), count(MAYOR)
     compare(ASSEMBLY, assembly)
     compare(MAYOR, mayor)
@@ -639,6 +701,7 @@ def first() -> Package:
             kind="list_allocation",
             body_id=body(m),
             district_area_id=municipality(m),
+            magnitude=sum(certified.seats[m].values()),
             round_number=1,
             electoral_system_id=ASSEMBLY_SYSTEM,
             default_result_kind="counted",
@@ -683,6 +746,28 @@ def first() -> Package:
                 )
         values(facts, rs, day, m, assembly, options)
         declared(p, rs, assembly.municipal[m], assembly.municipal_valid[m], options)
+        for e, seats in sorted(certified.seats[m].items(), key=lambda item: int(item[0])):
+            p.add("outcome", result_set_id=rs, option_id=options[e], kind="won", seats=seats)
+            if independent(e):
+                continue
+            listed = {}
+            for position, (name, _) in people.get((e, m), {}).items():
+                if position > 0:
+                    listed.setdefault(fold(name), []).append(position)
+            won = Counter(fold(name) for _, name, _ in certified.elected[m][e])
+            for name, times in sorted(won.items()):
+                found = listed.get(name, [])
+                # Two candidates of one list can share a printed name; both must then have won, so the match holds.
+                if len(found) != times:
+                    raise ValueError(f"{m}: elected candidate {name} of entity {e} is not on the list {times} times")
+                for position in found:
+                    p.add(
+                        "outcome",
+                        result_set_id=rs,
+                        option_id=options[e],
+                        candidacy_id=key("candidacy", day, "assembly", m, e, position),
+                        kind="elected",
+                    )
         # The mayor.
         contest = key("contest", day, "mayor", m)
         p.add(
