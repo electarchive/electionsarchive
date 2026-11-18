@@ -1,0 +1,985 @@
+{
+  "polity": "DDR",
+  "name": "Deutsche Demokratische Republik",
+  "sources": {
+    "ba-wahlen": {
+      "title": "Wahlen in der DDR - Übersicht über die Wahlen zur Volkskammer (1950-1989)",
+      "publisher": "Bundesarchiv",
+      "url": "https://www.bundesarchiv.de/themen-entdecken/online-entdecken/geschichtsgalerien/wahlen-in-der-ddr/",
+      "kind": "official_body",
+      "note": "Online gallery of the federal archive of Germany, the GDR's successor state. It lists the ten Volkskammer elections (15.10.1950 to 18.03.1990; the page misprints 02.07.1967 as 02.07.1067), gives the four-year term and the five-year term from the 1974 constitutional amendment, and names the holdings: the Staatsrat (DA 5) keeps the former Wahlarchiv with the files of the 1st to 9th electoral periods, and the Volkskammer (DA 1) and the Wahlbüro beim Ministerium des Innern (DO 100) those of the 10th."
+    },
+    "ba-weber": {
+      "title": "»Nun falten Sie den Zettel ...« Wahlen in der DDR in der Überlieferung der Staatssicherheit (1949-1961)",
+      "publisher": "Bundesarchiv (Stasi-Unterlagen-Archiv), BF informiert 41",
+      "url": "https://www.bundesarchiv.de/assets/bundesarchiv/de/Publikationen/BFi_41_Weber_Wahlen_barrierefrei.pdf",
+      "kind": "official_body",
+      "note": "Document edition by Gudrun Weber (2019). Its introduction gives the founding of 7 October 1949 without an election, the joint Volkskammer, Landtag, Kreistag, and Gemeindevertretung election of 15 October 1950, the first Bezirkstag elections in 1954, the Kommunalwahlen of 23 June 1957 and 17 September 1961, the Volksbefragung of 27 to 29 June 1954, and the count of ten Volkskammer periods, nine Bezirkstag elections, and ten Kommunalwahlen."
+    },
+    "ba-1968": {
+      "title": "»Habt Mut – stimmt Nein« – Der Volksentscheid im Jahr 1968 über die neue sozialistische Verfassung der DDR",
+      "publisher": "Bundesarchiv",
+      "url": "https://www.bundesarchiv.de/themen-entdecken/online-entdecken/themenbeitraege/habt-mut-stimmt-nein/",
+      "kind": "official_body",
+      "note": "States that the Volksentscheid of 6 April 1968 was the only one in the GDR's history and gives the result of 94.5 percent Yes and 5.5 percent No."
+    },
+    "ba-1989": {
+      "title": "Die DDR-Wahl 1989, ihre Fälschung und die Folgen",
+      "publisher": "Bundesarchiv",
+      "url": "https://www.bundesarchiv.de/nachricht/die-ddr-wahl-1989-ihr/",
+      "kind": "official_body",
+      "note": "On the Kommunalwahlen of 7 May 1989, the last elections under the SED, whose official result opposition observers disproved by their own counts."
+    },
+    "ba-1990-03": {
+      "title": "Der Weg zur deutschen Einheit: März 1990",
+      "publisher": "Bundesarchiv",
+      "url": "https://www.bundesarchiv.de/themen-entdecken/online-entdecken/storys/der-weg-zur-deutschen-einheit/maerz-1990/",
+      "kind": "official_body",
+      "note": "The Volkskammer election of 18 March 1990: Allianz für Deutschland 48.1 percent, SPD 21.8, PDS 16.4, Liberals 5.2, Bündnis 90 2.9; turnout 93.1 percent."
+    },
+    "ba-1990-08": {
+      "title": "Der Weg zur deutschen Einheit: August 1990",
+      "publisher": "Bundesarchiv",
+      "url": "https://www.bundesarchiv.de/themen-entdecken/online-entdecken/storys/der-weg-zur-deutschen-einheit/august-1990/",
+      "kind": "official_body",
+      "note": "The Volkskammer's special session of 22-23 August 1990 agreed with the required two-thirds majority on 3 October 1990 as the date of accession; the page reproduces the Volkskammer decision of 23 August 1990."
+    },
+    "sj-1956": {
+      "title": "Statistisches Jahrbuch der Deutschen Demokratischen Republik 1956, VII. Wahlen und Volksvertretungen",
+      "publisher": "Staatliche Zentralverwaltung für Statistik",
+      "url": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514402644_1956/pdf/514402644_0157.pdf",
+      "kind": "official_body",
+      "note": "Digitized by the Universitätsbibliothek Mannheim. Scan page 0157: Volkskammerwahlen am 15. Oktober 1950 by Land; scan page 0158: Volksbefragung vom 3. bis 6. Juni 1951 by Land and Volkskammerwahlen am 17. Oktober 1954 by Bezirk, both without the democratic sector of Berlin for the Volkskammer."
+    },
+    "gbl-1949-vk": {
+      "title": "Gesetz über die Konstituierung der Provisorischen Volkskammer der Deutschen Demokratischen Republik vom 7. Oktober 1949, GBl. 1949 S. 1",
+      "publisher": "Provisorische Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/volkskammergesetz49.htm",
+      "kind": "official_body",
+      "note": "The Deutscher Volksrat elected by the Third German People's Congress constitutes itself as the Provisional Volkskammer on 7 October 1949; the Volkskammer was not elected. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1950-wahl": {
+      "title": "Gesetz über die Wahlen zur Volkskammer, zu den Landtagen, Kreistagen und Gemeindevertretungen in der Deutschen Demokratischen Republik am 15. Oktober 1950, GBl. 1950 S. 743",
+      "publisher": "Provisorische Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahlgesetz50.htm",
+      "kind": "official_body",
+      "note": "§ 1: one joint election on 15 October 1950; § 2: 400 Volkskammer members and Landtage of 120 (Sachsen), 110 (Sachsen-Anhalt), 100 (Thüringen), 100 (Brandenburg), and 90 (Mecklenburg). Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1950-lk": {
+      "title": "Gesetz über die Zusammensetzung der Länderkammer der Deutschen Demokratischen Republik vom 8. November 1950, GBl. 1950 S. 1135",
+      "publisher": "Provisorische Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/laenderkammer50.htm",
+      "kind": "official_body",
+      "note": "The Länderkammer of 50 members chosen by the five Landtage, with 13 non-voting representatives of Berlin. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1952-laender": {
+      "title": "Gesetz über die weitere Demokratisierung des Aufbaus und der Arbeitsweise der staatlichen Organe in den Ländern der Deutschen Demokratischen Republik vom 23. Juli 1952",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/laenderaufloesungsgesetz52.htm",
+      "kind": "official_body",
+      "note": "Replaces the five Länder by Bezirke and redraws the Kreise. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1954-vk": {
+      "title": "Gesetz über die Wahlen zur Volkskammer der Deutschen Demokratischen Republik vom 4. August 1954, GBl. 1954 S. 667",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahlgesetz54.htm",
+      "kind": "official_body",
+      "note": "§ 2: 400 elected members; Berlin is entitled to send 66 representatives. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1954-bt": {
+      "title": "Gesetz über die Wahlen zu den Bezirkstagen der Deutschen Demokratischen Republik vom 4. August 1954, GBl. 1954 S. 672",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/bezirkswahlgesetz54.htm",
+      "kind": "official_body",
+      "note": "The first law for direct elections to the Bezirkstage: 120 members for a Bezirk of up to 600,000 inhabitants, up to 180. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1954-vb": {
+      "title": "Verordnung zur Durchführung der Volksbefragung für einen Friedensvertrag und Abzug der Besatzungstruppen oder für EVG, Generalvertrag und Belassung der Besatzungstruppen auf 50 Jahre vom 28. Mai 1954, GBl. 1954 S. 505",
+      "publisher": "Regierung der DDR",
+      "url": "https://www.verfassungen.de/ddr/volksbefragungsverordnung54.htm",
+      "kind": "official_body",
+      "note": "§ 1: the Volksbefragung is held on Sunday 27, Monday 28, and Tuesday 29 June 1954; § 5: voting areas are the republic, the Bezirke, the Stadt- and Landkreise, and the towns, Stadtbezirke, and Gemeinden. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1957-kw": {
+      "title": "Gesetz über die Wahlen zu den örtlichen Volksvertretungen in der Deutschen Demokratischen Republik vom 3. April 1957, GBl. I 1957 S. 221",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/kommunalwahlgesetz57.htm",
+      "kind": "official_body",
+      "note": "Elections to the Bezirkstage, Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen; the Staatsrat (until 1960 the government) sets the date. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1958-vk": {
+      "title": "Gesetz über die Wahlen zur Volkskammer der Deutschen Demokratischen Republik am 16. November 1958 vom 24. September 1958, GBl. I 1958 S. 677",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahlgesetz58.htm",
+      "kind": "official_body",
+      "note": "§ 6: 400 elected members and 66 representatives sent by Berlin; § 8: election in multi-member Wahlkreise. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1958-lk": {
+      "title": "Gesetz über die Auflösung der Länderkammer der Deutschen Demokratischen Republik vom 8. Dezember 1958, GBl. I 1958 S. 867",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/laenderkammeraufloesung58.htm",
+      "kind": "official_body",
+      "note": "Abolishes the Länderkammer; in force 11 December 1958. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1962-wp": {
+      "title": "Beschluß über die Verlängerung der laufenden Wahlperioden der Volkskammer und der Bezirkstage der Deutschen Demokratischen Republik vom 19. Oktober 1962, GBl. I 1962 S. 91",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahlperiodenverlaengerung62.htm",
+      "kind": "official_body",
+      "note": "Extends the Volkskammer term ending 15 November 1962, and that of the Bezirkstage, by one year. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1963-wt": {
+      "title": "Beschluß des Staatsrates der Deutschen Demokratischen Republik über die Durchführung der Wahlen zur Volkskammer und zu den Bezirkstagen der Deutschen Demokratischen Republik im Jahre 1963 vom 31. Juli 1963, GBl. I 1963 S. 107",
+      "publisher": "Staatsrat der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahltag63.htm",
+      "kind": "official_body",
+      "note": "Sets 20 October 1963 for the Volkskammer and Bezirkstag elections. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1963-wg": {
+      "title": "Gesetz über die Wahlen zu den Volksvertretungen der Deutschen Demokratischen Republik (Wahlgesetz) vom 31. Juli 1963, GBl. I 1963 S. 97",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahlgesetz63.htm",
+      "kind": "official_body",
+      "note": "One law for the Volkskammer and all local assemblies: § 6 the Staatsrat calls elections and sets the date; § 7 434 elected Volkskammer members and 66 sent by Berlin. The notes list the Staatsrat decisions for 1963, 1965, and 1967. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1967-wp": {
+      "title": "Beschluß der Volkskammer der Deutschen Demokratischen Republik über die Wahlperiode der Volkskammer und der Bezirkstage der Deutschen Demokratischen Republik vom 2. Mai 1967, GBl. I 1967 S. 58",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/volkskammerwahlperiode67.htm",
+      "kind": "official_body",
+      "note": "The 4th Volkskammer period and the Bezirkstag period end on 1 July 1967. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1968-ve": {
+      "title": "Gesetz zur Durchführung eines Volksentscheides über die Verfassung der Deutschen Demokratischen Republik vom 26. März 1968, GBl. I 1968 S. 192",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/volksentscheid68.htm",
+      "kind": "official_body",
+      "note": "§ 1: the Volksentscheid on the constitution is held on 6 April 1968. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1971-wp": {
+      "title": "Beschluß der Volkskammer der Deutschen Demokratischen Republik über die Wahlperioden der Volkskammer und der Bezirkstage der Deutschen Demokratischen Republik vom 24. Juni 1971, GBl. I 1971 S. 55",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/volkskammerwahlperiode71.htm",
+      "kind": "official_body",
+      "note": "Extends the 5th Volkskammer period and the Bezirkstag periods to 14 November 1971 and asks the Staatsrat to call both elections for that day. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1975-bt": {
+      "title": "Beschluß der Volkskammer der Deutschen Demokratischen Republik zur Verlängerung der Wahlperioden der Bezirkstage vom 19. Juni 1975, GBl. I 1975 S. 55",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/bezirkstagswahlperiode75.htm",
+      "kind": "official_body",
+      "note": "Extends the Bezirkstag period by one year to align it with the Volkskammer's five-year term. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1976-wg": {
+      "title": "Gesetz über die Wahlen zu den Volksvertretungen der Deutschen Demokratischen Republik (Wahlgesetz) vom 24. Juni 1976, GBl. I 1976 S. 301",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahlgesetz76.htm",
+      "kind": "official_body",
+      "note": "§ 7: a Volkskammer of 500 members, 66 of them sent by Berlin, until the amendment of 28 June 1979 made all 500 directly elected (Berlin's members were elected directly in 1981, 1986, and 1990). The notes list the Staatsrat decisions calling the elections of 17 October 1976 (Volkskammer and Bezirkstage), 20 May 1979, 14 June 1981 (Volkskammer and Bezirkstage), 6 May 1984, 8 June 1986 (Volkskammer, Berlin Stadtverordnetenversammlung, and Bezirkstage), 7 May 1989, and 18 March 1990. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1980-wp": {
+      "title": "Beschluß der Volkskammer der Deutschen Demokratischen Republik über die Wahlperiode der Volkskammer und der Bezirkstage der Deutschen Demokratischen Republik vom 17. Dezember 1980, GBl. I 1980 S. 364",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/volkskammerwahlperiode80.htm",
+      "kind": "official_body",
+      "note": "The 7th Volkskammer period and the Bezirkstag period end on 13 June 1981. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1990-wp": {
+      "title": "Beschluß der Volkskammer der Deutschen Demokratischen Republik über die Wahlperiode der Volkskammer der Deutschen Demokratischen Republik vom 5. Februar 1990, GBl. I 1990 S. 41",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahlperiode90-2.htm",
+      "kind": "official_body",
+      "note": "Ends the 9th Volkskammer period on 17 March 1990 and recommends the election for 18 March 1990, replacing the decision of 11 January 1990 that had set 6 May 1990. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1990-vk": {
+      "title": "Gesetz über die Wahlen zur Volkskammer der Deutschen Demokratischen Republik am 18. März 1990 vom 20. Februar 1990, GBl. I 1990 S. 60",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahlgesetz90.htm",
+      "kind": "official_body",
+      "note": "A Volkskammer of 400 members elected by list proportional representation in 15 Wahlkreise. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1990-kw": {
+      "title": "Gesetz über die Wahlen zu Kreistagen, Stadtverordnetenversammlungen, Stadtbezirksversammlungen und Gemeindevertretungen am 6. Mai 1990 vom 6. März 1990, GBl. I 1990 S. 105",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/kommunalwahlgesetz90.htm",
+      "kind": "official_body",
+      "note": "Free elections to every Kreistag, Stadtverordnetenversammlung, Stadtbezirksversammlung, and Gemeindevertretung; each Kreis, town, Stadtbezirk, and Gemeinde is its own electoral area. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1990-bt": {
+      "title": "Beschluß der Volkskammer der Deutschen Demokratischen Republik zur Beendigung der Legislaturperiode der Bezirkstage vom 17. Mai 1990, GBl. I 1990 S. 43",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahlperiodebeendigung90.htm",
+      "kind": "official_body",
+      "note": "Ends the Bezirkstage on 31 May 1990 and places government commissioners in the Bezirke until the Länder are formed. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-1990-beitritt": {
+      "title": "Beschluß der Volkskammer der Deutschen Demokratischen Republik über den Beitritt der Deutschen Demokratischen Republik zum Geltungsbereich des Grundgesetzes der Bundesrepublik Deutschland vom 23. August 1990, GBl. I 1990 S. 1324",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/beitrittsbeschluss90.htm",
+      "kind": "official_body",
+      "note": "The Volkskammer declares the GDR's accession under Article 23 of the Basic Law with effect from 3 October 1990, and expects the Landtag elections of 14 October 1990. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "gbl-ddr-1957-wahl": {
+      "title": "Verordnung über die Durchführung der Wahlen zu den örtlichen Volksvertretungen am 23. Juni 1957 (Vom 9. April 1957), Gesetzblatt der DDR Teil I 1957 S. 230",
+      "publisher": "Regierung der DDR",
+      "url": "https://www.gvoon.de/art/dokumente/1957/gesetzblatt-gbl-ddr-teil-1-1957/pdf/gesetzblatt-gbl-ddr-teil-1-1957-seite_230.pdf",
+      "kind": "official_body",
+      "note": "Gesetzblatt page on the gvoon.de document archive: sets the elections to the Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen for 23 June 1957."
+    },
+    "gbl-ddr-1961-wahl": {
+      "title": "Beschluß über die Ausschreibung der Wahlen zu den örtlichen Volksvertretungen 1961, Gesetzblatt der DDR Teil I 1961 S. 157",
+      "publisher": "Staatsrat der DDR",
+      "url": "https://www.gvoon.de/art/dokumente/1961/gesetzblatt-gbl-ddr-teil-1-1961/pdf/gesetzblatt-gbl-ddr-teil-1-1961-seite_157.pdf",
+      "kind": "official_body",
+      "note": "Gesetzblatt page on the gvoon.de document archive: \"Als Wahltermin wird der 17. September 1961 festgelegt.\""
+    },
+    "ddr-staatsrat-1965": {
+      "title": "Beschluß des Staatsrates der DDR über die Durchführung der Wahlen zu den Kreistagen, Stadtverordnetenversammlungen, Stadtbezirksversammlungen und Gemeindevertretungen im Jahre 1965 (2 July 1965)",
+      "publisher": "Staatsrat der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahltag65.htm",
+      "kind": "official_body",
+      "note": "Text on verfassungen.de: \"Als Wahltermin wird der 10. Oktober 1965 festgelegt.\""
+    },
+    "gbl-ddr-1970": {
+      "title": "Beschluß des Staatsrates über die Durchführung von Wahlen im Jahre 1970, Gesetzblatt der DDR Teil I Nr. 1 vom 5. Januar 1970",
+      "publisher": "Staatsrat der DDR",
+      "url": "https://www.gvoon.de/art/dokumente/1970/gesetzblatt-gbl-ddr-teil-1-1970/pdf/gesetzblatt-gbl-ddr-teil-1-1970-seite_005.pdf",
+      "kind": "official_body",
+      "note": "Scan page 5: the elections to the Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen are called for 22 March 1970."
+    },
+    "gbl-1974-kw": {
+      "title": "Gesetz über die Wahlen zu den Volksvertretungen der Deutschen Demokratischen Republik (Wahlgesetz), Neufassung vom 17. Dezember 1969, GBl. I 1970 S. 2",
+      "publisher": "Volkskammer der DDR",
+      "url": "https://www.verfassungen.de/ddr/wahlgesetz69.htm",
+      "kind": "official_body",
+      "note": "The notes to § 6 cite the Staatsrat decision of 25 February 1974 (GBl. I S. 89) calling the elections to the Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen for 19 May 1974. Text as printed in the Gesetzblatt der DDR, transcribed on verfassungen.de."
+    },
+    "vs-ddr-1969": {
+      "title": "Die Verfassung der Deutschen Demokratischen Republik: Dokumente, Kommentar, Band 1, Gesamtergebnis des Volksentscheides vom 6. April 1968",
+      "publisher": "Staatsverlag der DDR",
+      "url": "https://www.gvoon.de/art/dokumente/1969/verfassung-ddr-dokumente-kommentar-1969-band-1/pdf/verfassung-ddr-dokumente-kommentar-1969-band-1-seite_191.pdf",
+      "kind": "official_body",
+      "note": "Page 191 prints the Central Voting Commission's result by Bezirk."
+    },
+    "sj-1956-p158": {
+      "title": "Statistisches Jahrbuch der Deutschen Demokratischen Republik 1956, VII. Wahlen und Volksvertretungen",
+      "publisher": "Staatliche Zentralverwaltung für Statistik",
+      "url": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514402644_1956/pdf/514402644_0158.pdf",
+      "kind": "official_body",
+      "note": "Digitized by the Universitätsbibliothek Mannheim. Scan page 0157: Volkskammerwahlen am 15. Oktober 1950 by Land; scan page 0158: Volksbefragung vom 3. bis 6. Juni 1951 by Land and Volkskammerwahlen am 17. Oktober 1954 by Bezirk, both without the democratic sector of Berlin for the Volkskammer."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Deutsche Demokratische Republik",
+      "name_en": "German Democratic Republic",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1949-10-07",
+      "valid_to": "1990-10-03",
+      "source": "gbl-1949-vk"
+    },
+    {
+      "key": "land",
+      "name": "Länder",
+      "name_en": "Länder (Brandenburg, Mecklenburg, Sachsen-Anhalt, Thüringen, Sachsen)",
+      "parent": "national",
+      "polity_kind": "federal_unit",
+      "scheme": "de.ddr_land",
+      "valid_from": "1949-10-07",
+      "valid_to": "1952-07-23",
+      "source": "gbl-1952-laender",
+      "counts": [
+        {
+          "date": "1950-10-15",
+          "value": 5,
+          "source": "gbl-1950-wahl",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz50.htm (§ 2 (2): Landtage in Sachsen, Sachsen-Anhalt, Thüringen, Brandenburg, and Mecklenburg)"
+        }
+      ]
+    },
+    {
+      "key": "bezirk",
+      "name": "Bezirke und Berlin, Hauptstadt der DDR",
+      "name_en": "Bezirke and East Berlin",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "de.ddr_bezirk",
+      "valid_from": "1952-07-23",
+      "valid_to": "1990-10-03",
+      "source": "gbl-1952-laender",
+      "counts": [
+        {
+          "date": "1954-10-17",
+          "value": 14,
+          "source": "sj-1956-p158",
+          "locator": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514402644_1956/pdf/514402644_0158.pdf (Volkskammerwahlen am 17. Oktober 1954 by Bezirk: Rostock, Schwerin, Neubrandenburg, Potsdam, Frankfurt, Cottbus, Magdeburg, Halle, Erfurt, Gera, Suhl, Dresden, Leipzig, Karl-Marx-Stadt; East Berlin outside)"
+        }
+      ]
+    },
+    {
+      "key": "kreis",
+      "name": "Kreise und kreisfreie Städte",
+      "name_en": "Kreise and Kreis-level towns",
+      "parent": "bezirk",
+      "polity_kind": "county",
+      "source": "ba-weber",
+      "counts": [
+        {
+          "date": "1952-01-01",
+          "precision": "year",
+          "value": 217,
+          "source": "ba-weber",
+          "locator": "https://www.bundesarchiv.de/assets/bundesarchiv/de/Publikationen/BFi_41_Weber_Wahlen_barrierefrei.pdf (introduction: bei der aus 132 alten Kreisen 217 neue gebildet wurden)"
+        }
+      ]
+    },
+    {
+      "key": "gemeinde",
+      "name": "Städte und Gemeinden",
+      "name_en": "Towns and municipalities",
+      "parent": "kreis",
+      "polity_kind": "municipality",
+      "source": "gbl-1990-kw"
+    },
+    {
+      "key": "stadtbezirk",
+      "name": "Stadtbezirke",
+      "name_en": "Town districts (Stadtbezirke)",
+      "parent": "gemeinde",
+      "polity_kind": "submunicipal",
+      "source": "gbl-1990-kw"
+    }
+  ],
+  "classes": [
+    {
+      "key": "volkskammer",
+      "tier": "national",
+      "name": "Wahlen zur Volkskammer der Deutschen Demokratischen Republik",
+      "name_en": "People's Chamber (Volkskammer)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1949-10-07",
+      "valid_to": "1990-10-03",
+      "first_held": "1950-10-15",
+      "earliest_record": "1950-10-15",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "de.ddr_land",
+          "de.ddr_bezirk"
+        ]
+      },
+      "finest_note": "The Statistisches Jahrbuch prints the 1950 result by Land and the 1954 result by Bezirk; the files of the Wahlkommission der Republik in the Bundesarchiv hold Wahlkreis, Kreis, and polling-district returns. The 1990 result was declared for each of the 15 Wahlkreise.",
+      "source": "ba-wahlen",
+      "note": "The Provisional Volkskammer of 7 October 1949 was the Deutscher Volksrat chosen by the Third People's Congress, not an elected body. From 1950 to 1986 voters approved a single list of the National Front, with the seats shared among parties and mass organizations in advance. Until 1976 East Berlin's 66 members were sent by its city assembly rather than elected; they were elected directly from 1981. The term was four years until the 1974 constitutional amendment made it five. Results were declared by the Wahlleiter der Republik (the Minister of the Interior) until 1958, by the Wahlkommission der Republik from 1963 to 1986, and by the Wahlkommission der DDR in 1990; the Staatliche Zentralverwaltung für Statistik printed them in the Statistisches Jahrbuch. The election of 18 March 1990 was the only free one.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "DDR"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Wahlleiter der Republik (Minister des Innern der DDR)",
+          "source": "gbl-1954-vk",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz54.htm (§ 8 of the 1950 law and § 8 of the 1954 law make the Minister of the Interior the Wahlleiter der Republik; four-year term until the 1974 constitutional amendment)",
+          "valid_to": "1963-07-31"
+        },
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Wahlkommission der Republik",
+          "source": "gbl-1963-wg",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz63.htm (Wahlgesetz 1963: the Staatsrat forms the Wahlkommission der Deutschen Demokratischen Republik (Wahlkommission der Republik); four-year term until the 1974 constitutional amendment)",
+          "valid_from": "1963-07-31",
+          "valid_to": "1974-10-07"
+        },
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Wahlkommission der Republik",
+          "source": "gbl-1963-wg",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz63.htm (Wahlgesetz 1963: the Staatsrat forms the Wahlkommission der Deutschen Demokratischen Republik (Wahlkommission der Republik); five-year term from the 1974 constitutional amendment)",
+          "valid_from": "1974-10-07",
+          "valid_to": "1990-02-20"
+        },
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Wahlkommission der DDR",
+          "source": "gbl-1990-vk",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz90.htm (Wahlgesetz of 20 February 1990: the Wahlkommission der DDR and its five-member presidium; five-year term from the 1974 constitutional amendment)",
+          "valid_from": "1990-02-20",
+          "valid_to": "1990-10-03"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Bundesarchiv, invenio (DA 5 Staatsrat: Wahlarchiv 1950-1990; DA 1 Volkskammer and DO 100 Wahlbüro beim Ministerium des Innern: 1990)",
+          "url": "https://invenio.bundesarchiv.de/",
+          "format": "paper (archive files)",
+          "access": "manual",
+          "checked_at": "2026-11-18",
+          "role": "administers",
+          "source": "ba-wahlen",
+          "first_date": "1950-10-15",
+          "last_date": "1990-03-18",
+          "evidence": "The Bundesarchiv keeps the Wahlarchiv of the 1st to 9th electoral periods in the Staatsrat holdings (DA 5) and the 1990 election files in DA 1 and DO 100; they are read in the reading room or ordered as scans"
+        },
+        {
+          "platform": "Statistisches Jahrbuch der DDR (scans of the Universitätsbibliothek Mannheim)",
+          "url": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514402644_1956/pdf/",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "role": "publishes",
+          "source": "sj-1956",
+          "first_date": "1950-10-15",
+          "last_date": "1954-10-17",
+          "evidence": "The 1956 Yearbook prints the 1950 result by Land (scan page 0157) and the 1954 result by Bezirk (scan page 0158), with eligible voters and percentages"
+        }
+      ],
+      "est_votes": 12300000,
+      "effort": 3,
+      "dates": [
+        {
+          "date": "1950-10-15",
+          "seats": 400,
+          "source": "gbl-1950-wahl",
+          "quote": "Die allgemeine, gleiche, unmittelbare und geheime Wähl zur Volkskammer, zu den Landtagen, Kreistagen und Gemeindevertretungen wird am 15. Oktober 1950 nach den Grundsätzen des Verhältniswahlrechts in einem Wahlakt durchgeführt. … (1) Für die Volkskammer werden 400 Abgeordnete gewählt.",
+          "note": "First Volkskammer election, held with the Landtage, Kreistage, and Gemeindevertretungen on one single list of the National Front, with no choice between candidates. The Statistisches Jahrbuch prints the result by Land without the democratic sector of Berlin, whose members were not elected by its voters."
+        },
+        {
+          "date": "1954-10-17",
+          "seats": 400,
+          "source": "ba-wahlen",
+          "quote": "17.10.1954 (2. Wahlperiode)",
+          "note": "Second Volkskammer, single list of the National Front, with no choice between candidates; held with the first Bezirkstag elections. The Volkskammer election law of 4 August 1954 sets 400 elected members and 66 representatives sent by Berlin; the Statistisches Jahrbuch 1956 prints the result by Bezirk."
+        },
+        {
+          "date": "1958-11-16",
+          "seats": 400,
+          "source": "gbl-1958-vk",
+          "quote": "Gesetz über die Wahlen zur Volkskammer der Deutschen Demokratischen Republik am 16. November 1958 … § 6. Zusammensetzung der Volkskammer. (1) Für die Volkskammer werden 400 Mitglieder gewählt. (2) Die Hauptstadt der Deutschen Demokratischen Republik, Berlin, ist berechtigt, 66 Vertreter in die Volkskammer zu entsenden.",
+          "note": "Third Volkskammer, single list of the National Front, with no choice between candidates, in multi-member Wahlkreise; held with the Bezirkstage. The term, due to end on 15 November 1962, was extended by one year."
+        },
+        {
+          "date": "1963-10-20",
+          "seats": 434,
+          "source": "gbl-1963-wt",
+          "quote": "werden für das Jahr 1963 die Wahlen zur Volkshammer und zu den Bezirkstagen der Deutschen Demokratischen Republik ausgeschrieben. Als Wahltermin wird der 20. Oktober 1963 festgelegt.",
+          "note": "Fourth Volkskammer: 434 elected members and 66 sent by Berlin under the Wahlgesetz of 31 July 1963. The decision's text misprints Volkskammer as Volkshammer."
+        },
+        {
+          "date": "1967-07-02",
+          "seats": 434,
+          "source": "ba-wahlen",
+          "quote": "02.07.1067 (5. Wahlperiode)",
+          "note": "Fifth Volkskammer, 434 elected members; held with the Bezirkstage. The Bundesarchiv page misprints the year as 1067; the Volkskammer decision of 2 May 1967 ends the 4th period on 1 July 1967."
+        },
+        {
+          "date": "1971-11-14",
+          "seats": 434,
+          "source": "gbl-1971-wp",
+          "quote": "Die Volkskammer beauftragt den Staatsrat, entsprechend Artikel 72 der Verfassung der Deutschen Demokratischen Republik die Wahlen zur Volkskammer und zu den Bezirkstagen der Deutschen Demokratischen Republik für den 14. November 1971 auszuschreiben.",
+          "note": "Sixth Volkskammer, 434 elected members and 66 sent by Berlin."
+        },
+        {
+          "date": "1976-10-17",
+          "seats": 434,
+          "source": "gbl-1976-wg",
+          "quote": "Ausschreibung der Wahlen zur Volkskammer und zu den Bezirkstagen am 17. Oktober 1976",
+          "note": "Seventh Volkskammer, the first with a five-year term: 500 members, of whom Berlin still sent 66 (§ 7 in its 1976 wording)."
+        },
+        {
+          "date": "1981-06-14",
+          "seats": 500,
+          "source": "gbl-1976-wg",
+          "quote": "Beschluß des Staatsrates der DDR über die Durchführung der Wahlen zur Volkskammer und zu den Bezirkstagen im Jahre 1981 vom 17. Dezember 1980 (GBl. I S. 364, Wahltermin: 14. Juni 1981)",
+          "note": "Eighth Volkskammer: all 500 members elected, East Berlin's directly for the first time after the amendment of 28 June 1979."
+        },
+        {
+          "date": "1986-06-08",
+          "seats": 500,
+          "source": "gbl-1976-wg",
+          "quote": "Beschluß des Staatsrates der DDR über die Durchführung der Wahlen zur Volkskammer, zur Stadtverordnetenversammlung von Berlin und zu den Bezirkstagen im Jahre 1986 vom 4. Dezember 1985 (GBl. I S. 361, Wahltermin: 8. Juni 1986)",
+          "note": "Ninth Volkskammer, 500 members."
+        },
+        {
+          "date": "1990-03-18",
+          "contests": 15,
+          "seats": 400,
+          "source": "gbl-1990-vk",
+          "quote": "(2) Die Volkskammer besteht aus 400 Abgeordneten. … Das Wahlgebiet wird in 15 Wahlkreise eingeteilt.",
+          "note": "Tenth Volkskammer, the only free election: list proportional representation in 15 Wahlkreise (the 14 Bezirke and East Berlin) without a threshold, brought forward from 6 May 1990 by the Volkskammer decision of 5 February 1990."
+        }
+      ]
+    },
+    {
+      "key": "landtag",
+      "tier": "land",
+      "name": "Wahlen zu den Landtagen der Länder der DDR",
+      "name_en": "Landtage of the five Länder",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_from": "1949-10-07",
+      "valid_to": "1952-07-23",
+      "first_held": "1950-10-15",
+      "earliest_record": "1950-10-15",
+      "measure": {
+        "unit": "body",
+        "grain": [
+          "de.ddr_land"
+        ]
+      },
+      "source": "gbl-1950-wahl",
+      "note": "The Landtage of Brandenburg, Mecklenburg, Sachsen-Anhalt, Thüringen, and Sachsen were elected once in the GDR, on 15 October 1950, on single lists of the National Front. The law of 23 July 1952 replaced the Länder by Bezirke. The Landtage elected on 20 October 1946 predate the republic, and those elected on 14 October 1990 belong to the Federal Republic.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "federal_unit"
+          ]
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1950-10-15",
+          "contests": 5,
+          "seats": 520,
+          "source": "gbl-1950-wahl",
+          "quote": "(2) Für den Landtag werden gewählt: 120 Abgeordnete in Sachsen, 110 Abgeordnete in Sachsen-Anhalt, 100 Abgeordnete in Thüringen, 100 Abgeordnete in Brandenburg, 90 Abgeordnete in Mecklenburg.",
+          "note": "Five Landtage, elected with the Volkskammer."
+        }
+      ]
+    },
+    {
+      "key": "bezirkstag",
+      "tier": "bezirk",
+      "name": "Wahlen zu den Bezirkstagen der DDR (ab 1981 mit der Stadtverordnetenversammlung von Berlin)",
+      "name_en": "Bezirk assemblies (Bezirkstage)",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_from": "1952-07-23",
+      "valid_to": "1990-06-01",
+      "first_held": "1954-10-17",
+      "earliest_record": "1954-10-17",
+      "measure": {
+        "unit": "body",
+        "grain": [
+          "de.ddr_bezirk"
+        ]
+      },
+      "source": "gbl-1954-bt",
+      "note": "The 14 Bezirke formed in 1952 first elected their Bezirkstage in 1954; every Bezirkstag election was held on the day of a Volkskammer election, on single lists of the National Front. East Berlin's Stadtverordnetenversammlung was elected with them in 1981 and 1986. The Volkskammer ended the Bezirkstage on 31 May 1990 without a new election. The Bundesarchiv's 2019 edition counts nine Bezirkstag elections; the Gesetzblatt texts cited here document the eight listed.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "polity_kinds": [
+            "region"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Wahlleiter der Republik (Minister des Innern der DDR)",
+          "source": "gbl-1954-vk",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz54.htm (§ 8 of the 1950 law and § 8 of the 1954 law make the Minister of the Interior the Wahlleiter der Republik; elected with the Volkskammer)",
+          "valid_to": "1963-07-31"
+        },
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Wahlkommission der Republik",
+          "source": "gbl-1963-wg",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz63.htm (Wahlgesetz 1963: the Staatsrat forms the Wahlkommission der Deutschen Demokratischen Republik (Wahlkommission der Republik); elected with the Volkskammer)",
+          "valid_from": "1963-07-31",
+          "valid_to": "1974-10-07"
+        },
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Wahlkommission der Republik",
+          "source": "gbl-1963-wg",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz63.htm (Wahlgesetz 1963: the Staatsrat forms the Wahlkommission der Deutschen Demokratischen Republik (Wahlkommission der Republik); term extended to five years in 1975)",
+          "valid_from": "1974-10-07",
+          "valid_to": "1990-02-20"
+        },
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Wahlkommission der DDR",
+          "source": "gbl-1990-vk",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz90.htm (Wahlgesetz of 20 February 1990: the Wahlkommission der DDR and its five-member presidium; term extended to five years in 1975)",
+          "valid_from": "1990-02-20",
+          "valid_to": "1990-06-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Bundesarchiv, invenio (DA 5 Staatsrat: Wahlarchiv 1950-1990; DA 1 Volkskammer and DO 100 Wahlbüro beim Ministerium des Innern: 1990)",
+          "url": "https://invenio.bundesarchiv.de/",
+          "format": "paper (archive files)",
+          "access": "manual",
+          "checked_at": "2026-11-18",
+          "role": "administers",
+          "source": "ba-wahlen",
+          "first_date": "1954-10-17",
+          "last_date": "1986-06-08",
+          "evidence": "The Bezirkstag returns are filed with the Volkskammer election files of the Wahlkommission der Republik in the Bundesarchiv (DA 5)"
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1954-10-17",
+          "source": "ba-weber",
+          "quote": "Wahlen zu den Bezirkstagen fanden erstmals 1954 statt.",
+          "note": "The first Bezirkstag elections, held with the Volkskammer election of 17 October 1954 under the Bezirkstag election law of 4 August 1954; the 1952 Bezirkstage had been formed from Landtag members and appointees."
+        },
+        {
+          "date": "1958-11-16",
+          "source": "ba-wahlen",
+          "quote": "Analyse mit endgültigem Wahlergebnis über die Vorbereitung der Wahlen zur Volkskammer und zu den Bezirkstagen am 16. November 1958"
+        },
+        {
+          "date": "1963-10-20",
+          "source": "gbl-1963-wt",
+          "quote": "werden für das Jahr 1963 die Wahlen zur Volkshammer und zu den Bezirkstagen der Deutschen Demokratischen Republik ausgeschrieben. Als Wahltermin wird der 20. Oktober 1963 festgelegt."
+        },
+        {
+          "date": "1967-07-02",
+          "source": "gbl-1967-wp",
+          "quote": "Die 4. Wahlperiode der Volkskammer der Deutschen Demokratischen Republik endet am 1. Juli 1967. Am gleichen Tage endet die Wahlperiode der Bezirkstage.",
+          "note": "Held with the Volkskammer election of 2 July 1967."
+        },
+        {
+          "date": "1971-11-14",
+          "source": "gbl-1971-wp",
+          "quote": "die Wahlen zur Volkskammer und zu den Bezirkstagen der Deutschen Demokratischen Republik für den 14. November 1971 auszuschreiben"
+        },
+        {
+          "date": "1976-10-17",
+          "source": "gbl-1976-wg",
+          "quote": "Ausschreibung der Wahlen zur Volkskammer und zu den Bezirkstagen am 17. Oktober 1976",
+          "note": "The Bezirkstag term had been extended by one year in 1975 to match the Volkskammer's new five-year term."
+        },
+        {
+          "date": "1981-06-14",
+          "source": "gbl-1980-wp",
+          "quote": "Die 7. Wahlperiode der Volkskammer der Deutschen Demokratischen Republik endet am 13. Juni 1981. Am gleichen Tage endet die Wahlperiode der Bezirkstage.",
+          "note": "Held with the Volkskammer on 14 June 1981; from this election the Stadtverordnetenversammlung of East Berlin was elected with the Bezirkstage."
+        },
+        {
+          "date": "1986-06-08",
+          "source": "gbl-1976-wg",
+          "quote": "Beschluß des Staatsrates der DDR über die Durchführung der Wahlen zur Volkskammer, zur Stadtverordnetenversammlung von Berlin und zu den Bezirkstagen im Jahre 1986 vom 4. Dezember 1985 (GBl. I S. 361, Wahltermin: 8. Juni 1986)",
+          "note": "The last Bezirkstag election; the Volkskammer ended the Bezirkstage on 31 May 1990 without a new election."
+        }
+      ]
+    },
+    {
+      "key": "kommunal",
+      "tier": "kreis",
+      "name": "Wahlen zu den Kreistagen, Stadtverordnetenversammlungen, Stadtbezirksversammlungen und Gemeindevertretungen",
+      "name_en": "Kreis, town, town district, and municipal assemblies",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1949-10-07",
+      "valid_to": "1990-10-03",
+      "first_held": "1950-10-15",
+      "earliest_record": "1950-10-15",
+      "measure": {
+        "unit": "body"
+      },
+      "finest_note": "Each Kreistag, Stadtverordnetenversammlung, Stadtbezirksversammlung, and Gemeindevertretung is one body; official results were declared by the local election commissions and summed by the Wahlkommission der Republik.",
+      "source": "gbl-1957-kw",
+      "note": "All local assemblies were elected on one day: in 1950 with the Volkskammer, and from 1957 on separate dates set by the Staatsrat, on single lists of the National Front until 1989. The free elections of 6 May 1990 used competing lists. East Berlin's Stadtverordnetenversammlung was elected with the local assemblies until 1979 and with the Bezirkstage in 1981 and 1986. The Bundesarchiv's 2019 edition counts ten local elections, as listed here.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "polity_kinds": [
+            "county",
+            "municipality",
+            "submunicipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Wahlleiter der Republik (Minister des Innern der DDR)",
+          "source": "gbl-1954-vk",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz54.htm (§ 8 of the 1950 law and § 8 of the 1954 law make the Minister of the Interior the Wahlleiter der Republik; four-year term)",
+          "valid_to": "1963-07-31"
+        },
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Wahlkommission der Republik",
+          "source": "gbl-1963-wg",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz63.htm (Wahlgesetz 1963: the Staatsrat forms the Wahlkommission der Deutschen Demokratischen Republik (Wahlkommission der Republik); four-year term)",
+          "valid_from": "1963-07-31",
+          "valid_to": "1974-10-07"
+        },
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Wahlkommission der Republik",
+          "source": "gbl-1963-wg",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz63.htm (Wahlgesetz 1963: the Staatsrat forms the Wahlkommission der Deutschen Demokratischen Republik (Wahlkommission der Republik); five-year term from 1974)",
+          "valid_from": "1974-10-07",
+          "valid_to": "1990-02-20"
+        },
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Wahlkommission der DDR",
+          "source": "gbl-1990-vk",
+          "locator": "https://www.verfassungen.de/ddr/wahlgesetz90.htm (Wahlgesetz of 20 February 1990: the Wahlkommission der DDR and its five-member presidium; five-year term from 1974)",
+          "valid_from": "1990-02-20",
+          "valid_to": "1990-10-03"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Bundesarchiv, invenio (DA 5 Staatsrat: Wahlarchiv 1950-1990; DA 1 Volkskammer and DO 100 Wahlbüro beim Ministerium des Innern: 1990)",
+          "url": "https://invenio.bundesarchiv.de/",
+          "format": "paper (archive files)",
+          "access": "manual",
+          "checked_at": "2026-11-18",
+          "role": "administers",
+          "source": "ba-wahlen",
+          "first_date": "1950-10-15",
+          "last_date": "1990-05-06",
+          "evidence": "Central returns of the local elections are in the Staatsrat's Wahlarchiv (DA 5); the 1990 returns in the Wahlbüro beim Ministerium des Innern (DO 100)"
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1950-10-15",
+          "source": "gbl-1950-wahl",
+          "quote": "Die allgemeine, gleiche, unmittelbare und geheime Wähl zur Volkskammer, zu den Landtagen, Kreistagen und Gemeindevertretungen wird am 15. Oktober 1950 nach den Grundsätzen des Verhältniswahlrechts in einem Wahlakt durchgeführt.",
+          "note": "Kreistage and Gemeindevertretungen, elected with the Volkskammer and the Landtage on one single list of the National Front, with no choice between candidates."
+        },
+        {
+          "date": "1957-06-23",
+          "source": "ba-weber",
+          "quote": "Erst am 23. Juni 1957 veranstaltete die SED wieder eine Kommunalwahl.",
+          "note": "Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen, the first since the 1952 reform of the Kreise; the ordinance of 9 April 1957 (GBl. I S. 230) set the date. The local elections due in 1954 were not held."
+        },
+        {
+          "date": "1961-09-17",
+          "source": "ba-weber",
+          "quote": "bei der Kommunalwahl am 17. September 1961",
+          "note": "Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen (Staatsrat decision, GBl. I 1961 S. 157)."
+        },
+        {
+          "date": "1965-10-10",
+          "source": "ddr-staatsrat-1965",
+          "quote": "Als Wahltermin wird der 10. Oktober 1965 festgelegt.",
+          "note": "Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen."
+        },
+        {
+          "date": "1970-03-22",
+          "source": "gbl-ddr-1970",
+          "note": "Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen."
+        },
+        {
+          "date": "1974-05-19",
+          "source": "gbl-1974-kw",
+          "quote": "es erfolgte die Ausschreibung der Wahlen zum 19. Mai 1974",
+          "note": "Kreistage, Stadtverordnetenversammlungen, Stadtbezirksversammlungen, and Gemeindevertretungen; the term became five years from 1974."
+        },
+        {
+          "date": "1979-05-20",
+          "source": "gbl-1976-wg",
+          "quote": "Beschluss des Staatsrates der DDR über die Durchführung der Wahlen zu den Kreistagen, Stadtverordnetenversammlungen, Stadtbezirksversammlungen und Gemeindevertretungen im Jahre 1979 vom 31. Januar 1979 (GBl. I S. 53; Wahltermin: 20. Mai 1979)"
+        },
+        {
+          "date": "1984-05-06",
+          "source": "gbl-1976-wg",
+          "quote": "Beschluss des Staatsrates der DDR über die Durchführung der Wahlen zu den Kreistagen, Stadtverordnetenversammlungen, Stadtbezirksversammlungen und Gemeindevertretungen im Jahre 1984 vom 5. Dezember 1983 (GBl. I S. 330; Wahltermin: 6. Mai 1984)"
+        },
+        {
+          "date": "1989-05-07",
+          "source": "gbl-1976-wg",
+          "quote": "Beschluss des Staatsrates der DDR über die Durchführung der Wahlen zu den Kreistagen, Stadtverordnetenversammlungen, Stadtbezirksversammlungen und Gemeindevertretungen im Jahre 1989 vom 19. September 1988 (GBl. I S. 233; Wahltermin: 7. Mai 1989)",
+          "note": "The last single-list election; opposition observers' own counts disproved the official result (Bundesarchiv, Die DDR-Wahl 1989, ihre Fälschung und die Folgen)."
+        },
+        {
+          "date": "1990-05-06",
+          "source": "gbl-1990-kw",
+          "quote": "Gesetz über die Wahlen zu Kreistagen, Stadtverordnetenversammlungen, Stadtbezirksversammlungen und Gemeindevertretungen am 6. Mai 1990",
+          "note": "The only free local elections: each Kreis, town, Stadtbezirk, and Gemeinde elected its assembly from competing lists. These assemblies carried over into the Länder after 3 October 1990."
+        }
+      ]
+    },
+    {
+      "key": "volksabstimmung",
+      "tier": "national",
+      "name": "Volksbefragungen und Volksentscheid der DDR",
+      "name_en": "Plebiscites (Volksbefragungen 1951 and 1954, Volksentscheid 1968)",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1949-10-07",
+      "valid_to": "1990-10-03",
+      "first_held": "1951-06-03",
+      "earliest_record": "1951-06-03",
+      "measure": {
+        "unit": "question",
+        "grain": [
+          "de.ddr_land",
+          "de.ddr_bezirk"
+        ]
+      },
+      "source": "ba-1968",
+      "note": "Two Volksbefragungen on German rearmament and a peace treaty (3 to 6 June 1951 and 27 to 29 June 1954), held over several days, and the constitutional Volksentscheid of 6 April 1968. None offered a free choice. The Minister of the Interior led the 1954 vote as Abstimmungsleiter of the republic; the Zentrale Abstimmungskommission declared the 1968 result. The Yearbook prints the 1951 result by Land, and the 1968 result was published by Bezirk.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "DDR"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Statistisches Jahrbuch der DDR (scans of the Universitätsbibliothek Mannheim)",
+          "url": "https://digi.bib.uni-mannheim.de/fileadmin/statjahrb/514402644_1956/pdf/",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "role": "publishes",
+          "source": "sj-1956-p158",
+          "first_date": "1951-06-03",
+          "last_date": "1951-06-03",
+          "evidence": "The 1956 Yearbook prints the 1951 Volksbefragung by Land and for East Berlin (scan page 0158)"
+        },
+        {
+          "platform": "Bundesarchiv, invenio (DA 5 Staatsrat: Wahlarchiv 1950-1990; DA 1 Volkskammer and DO 100 Wahlbüro beim Ministerium des Innern: 1990)",
+          "url": "https://invenio.bundesarchiv.de/",
+          "format": "paper (archive files)",
+          "access": "manual",
+          "checked_at": "2026-11-18",
+          "role": "administers",
+          "source": "ba-wahlen",
+          "first_date": "1951-06-03",
+          "last_date": "1968-04-06",
+          "evidence": "The Bundesarchiv holds the voting records, including the Zentrale Abstimmungskommission's 1968 correspondence shown in its Stasi records"
+        }
+      ],
+      "est_votes": 12000000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1951-06-03",
+          "contests": 1,
+          "source": "sj-1956-p158",
+          "quote": "4. Volksbefragung vom 3. bis 6. Juni 1951 gegen die Remilitarisierung Deutschlands und für den Abschluß eines FriedensVertrages mit Deutschland",
+          "note": "Volksbefragung held from 3 to 6 June 1951, one question; voters from age 16, the democratic sector of Berlin included. The Yearbook prints 13,703,077 entitled to vote and 96.02 percent Yes."
+        },
+        {
+          "date": "1954-06-27",
+          "contests": 1,
+          "source": "gbl-1954-vb",
+          "quote": "Die Volksbefragung für einen Friedensvertrag und Abzug der Besatzungstruppen oder für EVG, Generalvertrag Lind Belassung der Besatzungstruppen auf 50 Jahre findet statt am Sonntag, dem 27. Juni 1954, Montag, dem 28. Juni 1954 und Dienstag, dem 29. Juni 1954",
+          "note": "Volksbefragung held from 27 to 29 June 1954 on a choice between a peace treaty with withdrawal of the occupation troops and the European Defence Community; one question. The Bundesarchiv's 2019 edition gives the official 93.5 percent of those entitled to vote for the peace treaty. The ordinance's text misprints und as Lind."
+        },
+        {
+          "date": "1968-04-06",
+          "contests": 1,
+          "source": "gbl-1968-ve",
+          "quote": "(1) Über die Verfassung der Deutschen Demokratischen Republik findet am 6. April 1968 ein Volksentscheid statt.",
+          "note": "Volksentscheid on the socialist constitution, the only one in the GDR's history; the Central Voting Commission (Zentrale Abstimmungskommission) counted 94.49 percent of those entitled to vote as Yes."
+        }
+      ]
+    },
+    {
+      "key": "laenderkammer",
+      "tier": "national",
+      "name": "Länderkammer der DDR",
+      "name_en": "Chamber of States (Länderkammer)",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1949-10-07",
+      "valid_to": "1958-12-11",
+      "measure": {
+        "unit": "body"
+      },
+      "source": "gbl-1950-lk",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Its members were chosen by the Landtage, not by voters (Gesetz vom 8. November 1950); it was abolished by the law of 8 December 1958.",
+      "match": []
+    },
+    {
+      "key": "staatsoberhaupt",
+      "tier": "national",
+      "name": "Präsident der DDR (1949-1960) und Staatsrat (1960-1990)",
+      "name_en": "Head of state (President, then Council of State)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "office"
+      },
+      "source": "ba-wahlen",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Volkskammer elected the President (with the Länderkammer until 1958) and, after Wilhelm Pieck's death in 1960, the members of the Staatsrat; there was no popular vote.",
+      "match": []
+    },
+    {
+      "key": "richter",
+      "tier": "national",
+      "name": "Wahl der Richter und Schöffen",
+      "name_en": "Judges and lay judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "office"
+      },
+      "source": "gbl-1990-bt",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judges of the Supreme Court were elected by the Volkskammer and those of the Bezirk and Kreis courts by the local assemblies, not by voters.",
+      "match": []
+    }
+  ]
+}
