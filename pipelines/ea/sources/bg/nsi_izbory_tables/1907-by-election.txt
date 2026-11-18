@@ -1,0 +1,26 @@
+# DATE 1907-04-01
+# page 185
+D 1 | Айтосъ | Aïtos
+S I 2480 529
+S II 1391 207
+S III 2643 789
+T 6514 1525
+C E | Д-ръ Димитъръ Станчевъ | I:505 II:201 III:789 | 1495
+D 2 | Пловдивъ (I-а изб.) | Plovdiv (I-er électoral)
+S I 2304 514
+S II 2649 673
+S III 2158 602
+S IV 2726 669
+S V 2926 1070
+S VI 2613 717
+T 15376 4245
+C E | Д-ръ Димитъръ Станчевъ | I:512 II:617 III:599 IV:427 V:487 VI:413 | 3055
+C N | Димитъръ Драшевъ [*] | I:2 II:55 III:3 IV:242 V:582 VI:304 | 1188
+D 3 | Ески-Джумая | Eski-Djoumaya
+S I 2913 419
+S II 2696 681
+S III 2336 426
+S IV 1653 431
+T 9598 1957
+C E | Ибрямъ Исуфовъ | I:410 II:678 III:426 IV:431 | 9145
+# MISMATCH Ибрямъ Исуфовъ: sections sum to 1945, printed total clearly 9145 (likely misprint of 1945)

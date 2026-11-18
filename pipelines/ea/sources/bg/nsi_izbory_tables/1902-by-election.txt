@@ -1,0 +1,115 @@
+# page 543
+# Supplementary elections of 1 September 1902 (date not printed on the page; taken from task)
+D 1 | Анхиоло | Anhiolo
+S I 1868 905
+S II 1571 630
+S III 1716 637
+T 5155 2172
+C E | Никола Шивачевъ | I:670 II:403 III:331 | 1404
+C N | Д-ръ Паскалъ Табурновъ [*] | I:234 II:226 III:306 | 766
+D 2 | Бѣла-Слатина | Béla-Slatina
+S I 2107 656
+S II 2536 542
+S III 1521 478
+S IV 2174 679
+S V 2327 550
+T 10665 2905
+C E | Д-ръ Андрей Ходжовъ | I:453 II:493 III:444 IV:468 V:457 | 2315
+C N | Александръ Малиновъ [*] | I:88 II:29 III:22 IV:210 V:91 | 440
+C N | Гроздю Петковъ [*] | I:114 II:21 III:12 IV:- V:- | 147
+D 3 | Враца | Vratza
+S I 2915 432
+S II 2396 369
+S III 2131 233
+S IV 2409 216
+S V 2890 363
+S VI 1652 263
+S VII 1689 253
+T 16082 2129
+# NAME uncertain: last letters of Петринъ (could read Петриинъ/Петрипъ)
+C E | Петко Ц. Петринъ | I:431 II:367 III:233 IV:216 V:364 VI:263 VII:252 | 2126
+D 4 | Кюстендилъ (I-а избират.) | Kustendil (I-ère électorale)
+S I 3351 1244
+S II 2407 516
+S III 2288 415
+S IV 2127 306
+S V 1873 397
+T 12046 2878
+C E | Д-ръ Сава Мирковъ | I:594 II:513 III:261 IV:226 V:242 | 1836
+C N | Христо П. Славейковъ [*] | I:647 II:3 III:154 IV:80 V:154 | 1038
+D 5 | Пловдивъ (градска) | Plovdiv (urbain)
+S I 952 435
+S II 2210 706
+S III 1928 485
+S IV 1828 607
+T 6918 2233
+C E | Стефанъ Калчовъ | I:287 II:426 III:183 IV:316 | 1212
+C N | Д-ръ Тодоръ Гатевъ [¹] | I:144 II:268 III:289 IV:278 | 979
+C N | Аргиръ Димитровъ [*] | I:4 II:8 III:6 IV:12 | 30
+D 6 | Никополъ | Nikopol
+S I 1824 503
+S II 2146 637
+S III 2044 556
+S IV 2191 496
+S V 1971 721
+T 10176 2913
+# NAME uncertain: Бурмовъ (faint print)
+# Faint print: III read 353 (could be 355 -> 2315); alternatively V 606. 353 chosen to match printed total.
+C E | Ст. Бурмовъ | I:416 II:569 III:353? IV:367 V:608 | 2313
+# Faint print: III read 33 (looks 33/35); 33 matches printed total 342.
+C N | Панайотъ Г. Чорбаджиевъ [*] | I:32 II:65 III:33? IV:110 V:102 | 342
+F ¹) Въ броя на гласове подаденитѣ, за лицето Д-ръ Т. Гатевъ, влизатъ и гласоветѣ, подадени за Т. Гатевъ.
+
+# page 544
+# Supplementary elections of 1 September 1902 (date not printed on the page; taken from task)
+D 6 | cont
+C N | Ив. Балканджиевъ [*] | I:- II:- III:170 IV:19 V:9 | 198
+C N | Давидъ Димовъ [*] | I:31 II:- III:- IV:- V:- | 31
+D 7 | Плѣвенъ (I-а избирателна) | Plèven (I-ère électorale)
+S I 4239 360
+S II 2033 422
+S III 2313 229
+S IV 2054 339
+T 10639 1350
+C E | Д-ръ Димитръ Моловъ | I:359 II:421 III:227 IV:338 | 1345
+D 8 | София (градска) | Sophia (urbain)
+S I 1703 563
+S II 2343 829
+S III 2053 595
+S IV 1252 319
+S V 1447 494
+S VI 1920 589
+S VII 848 363
+T 11566 3752
+C E | Тодоръ Балабановъ | I:361 II:544 III:345 IV:251 V:258 VI:275 VII:216 | 2250
+# NAME: surname blurred here; read Пѣевъ (same person printed clearly on p558)
+# II read 133 (glyph 133/135); 135 would give 908 vs printed 906
+C N | Иванъ Пѣевъ [*] | I:109 II:133? III:118 IV:45 V:157 VI:223 VII:121 | 906
+C N | Илия Джанджиевъ [*] | I:33 II:73 III:83 IV:15 V:39 VI:50 VII:11 | 304
+C N | Гаврилъ Георгиевъ [*] | I:58 II:71 III:47 IV:8 V:34 VI:38 VII:14 | 270
+D 9 | Казанлъкъ | Kazanlik
+S I 2856 747
+S II 2735 500
+S III 1973 627
+S IV 2051 506
+S V 2058 417
+S VI 2256 790
+T 13929 3587
+C E | Тодоръ К. Шипковъ | I:544 II:421 III:620 IV:505 V:575 VI:786 | 3451?
+# NAME uncertain: Бозвелиевъ (faint); V cell partly under a stamp; total faint
+C N | К. Т. Бозвелиевъ [*] | I:129? II:79 III:7 IV:- V:12? VI:4 | 231?
+
+# page 545
+# Supplementary elections of 1 September 1902 (date not printed on the page; taken from task)
+D 10 | Търново (II-а избират.) | Tirnovo (II-ème électorale)
+S I 2633 1044
+S II 2410 690
+S III 2331 828
+T 7374 2562
+C E | Атанасъ х. Славчовъ | I:630 II:33 III:37 | 700
+C N | Владъ Д. Владовъ | I:78 II:253 III:354 | 685
+C N | Иванъ Халачевъ [*] | I:75 II:197 III:285 | 557
+C N | Константинъ Бозвелиевъ | I:146 II:135 III:44 | 325
+C N | Никола Церовски [*] | I:1 II:65 III:103 | 169
+C N | Цанко Бакаловъ [*] | I:112 II:4 III:4 | 120
+

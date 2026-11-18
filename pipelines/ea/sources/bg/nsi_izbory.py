@@ -11,7 +11,12 @@ voters, and the votes of every elected and non-elected candidate (its Table IV).
 images and transcribed into `nsi_izbory_tables/{key}.txt`, one file per election, page by page. Parsing checks every
 printed figure: each candidate's section votes against the candidate's printed total and the sections' registered
 voters and voters against the district's printed totals. A mismatch raises, unless the transcription records that the
-printed figures themselves disagree, so a misread number never reaches a package.
+printed figures themselves disagree, so a misread number never reaches a package. Where Table IV's scan was unclear,
+the same volume's Table III, which prints each section's registered voters and voters and every elected candidate's
+votes again, settled the reading; the transcription notes each such case.
+
+The elections of the X to XIII Ordinary National Assemblies (1899 to 1903) and their by-elections are transcribed so
+far. The later volumes, from the XIV Assembly of 1908 on, are fetched but not yet transcribed.
 
 Until 1916 Bulgaria kept the Julian calendar. Election days are stored in the Gregorian calendar, with the Julian date
 as printed kept as the original text.
@@ -94,6 +99,7 @@ def gregorian(julian: tuple[int, int, int]) -> date:
 
 X_STRIPS = Strips((0.225, 0.262), (0.264, 0.300), (0.565, 0.605), (0.905, 0.945))
 VOLUME_X = "Izbory_14_X_1900.pdf"
+VOLUME_XIII = "Izbory_14_XIII_1909.pdf"
 EDITIONS = [
     Edition("1899-general", VOLUME_X, (1899, 4, 25), "25 априлий 1899 г.", "general", "X", X_STRIPS),
     Edition("1899-by-election", VOLUME_X, (1899, 9, 19), "19 септемврий 1899 г.", "by_election", "X", X_STRIPS),
@@ -102,6 +108,14 @@ EDITIONS = [
     Edition("1901-general", VOLUME_X, (1901, 1, 28), "28 януарий 1901 г.", "general", "XI", X_STRIPS),
     Edition("1901-04-by-election", VOLUME_X, (1901, 4, 8), "8 априлий 1901 г.", "by_election", "XI", X_STRIPS),
     Edition("1901-10-by-election", VOLUME_X, (1901, 10, 7), "7 октомврий 1901 г.", "by_election", "XI", X_STRIPS),
+    Edition("1902-general", VOLUME_X, (1902, 2, 17), "17 февруарий 1902 г.", "general", "XII", X_STRIPS),
+    Edition("1902-by-election", VOLUME_X, (1902, 9, 1), "1 септемврий 1902 г.", "by_election", "XII", X_STRIPS),
+    Edition("1903-04-by-election", VOLUME_X, (1903, 4, 20), "20 априлий 1903 г.", "by_election", "XII", X_STRIPS),
+    Edition("1903-general", VOLUME_XIII, (1903, 10, 19), "19 октомврий 1903 г.", "general", "XIII", X_STRIPS),
+    Edition("1904-by-election", VOLUME_XIII, (1904, 2, 29), "29 февруарий 1904 г.", "by_election", "XIII", X_STRIPS),
+    Edition("1905-by-election", VOLUME_XIII, (1905, 3, 20), "20 мартъ 1905 г.", "by_election", "XIII", X_STRIPS),
+    Edition("1906-by-election", VOLUME_XIII, (1906, 3, 12), "12 мартъ 1906 г.", "by_election", "XIII", X_STRIPS),
+    Edition("1907-by-election", VOLUME_XIII, (1907, 4, 1), "1 априлъ 1907 г.", "by_election", "XIII", X_STRIPS),
 ]
 BY_KEY = {e.key: e for e in EDITIONS}
 
@@ -122,8 +136,24 @@ def packages() -> list[str]:
     return [REGISTRY, *(f"{SOURCE}/{e.key}" for e in EDITIONS if (TABLES / f"{e.key}.txt").exists())]
 
 
+VOLUMES = [
+    "Izbory_14_X_1900.pdf",
+    "Izbory_14_XI_1904.pdf",
+    "Izbory_14_XII_1904.pdf",
+    "Izbory_14_XIII_1909.pdf",
+    "Izbory_14_XIV_1910.pdf",
+    "Izbory_14_V_1914.pdf",
+    "Izbory_14_XV_1914.pdf",
+    "Izbory_14_XVII-XVIII-XIX_1928.pdf",
+    "Izbory_14_XX_1927.pdf",
+    "Izbory_14_XXI_1928.pdf",
+]
+"""Every election volume the statistical library serves; `Izbory_14_XI_1904.pdf` and `Izbory_14_XII_1904.pdf` are
+separate scans of volumes that `Izbory_14_X_1900.pdf` also binds."""
+
+
 def fetch() -> None:
-    for file in sorted({e.file for e in EDITIONS}):
+    for file in VOLUMES:
         raw.fetch(SOURCE, url(file), suffix=".pdf")
 
 
@@ -175,7 +205,8 @@ class Candidate:
 @dataclass
 class District:
     number: str
-    """The district's number in the table, as printed (Plovdiv's two districts of 1901 print 7a and 7б)."""
+    """The district's number in the table, with the letter of a split district in Latin script (the volumes print
+    Plovdiv's two rural districts of 1901 as 7а and 7б)."""
     name: str
     latin: str
     page: int
@@ -188,6 +219,8 @@ class District:
 
 def _cell(text: str, page: int, column: str) -> Cell:
     text = text.strip()
+    if text == "?":
+        raise Unread(f"page {page}: an unreadable cell")
     inferred = text.endswith("!")
     text = text.rstrip("?!")
     if text in ("-", "—", ""):
@@ -195,6 +228,10 @@ def _cell(text: str, page: int, column: str) -> Cell:
     if not text.isdigit():
         raise ValueError(f"page {page}: {text!r} is not a number")
     return Cell(int(text), page, column, inferred)
+
+
+class Unread(ValueError):
+    """A printed figure the scan hides entirely."""
 
 
 def _votes(text: str, page: int, column: str) -> Iterator[tuple[str, Cell]]:
@@ -232,6 +269,7 @@ def transcription(edition: str) -> list[District]:
         head, _, rest = line.partition(" ")
         parts = [part.strip() for part in rest.split("|")]
         if head == "D":
+            parts[0] = parts[0].replace("-", "").replace("а", "a").replace("б", "b").replace("в", "c")
             if parts[1] == "cont":
                 current = by_number[parts[0]] if parts[0] != "?" else districts[-1]
                 continue
@@ -261,14 +299,19 @@ def transcription(edition: str) -> list[District]:
                 current.candidates.append(candidate)
             else:
                 candidate = next(c for c in reversed(current.candidates) if c.elected == elected)
-            for section, cell in _votes(parts[2], page, column):
-                if section in candidate.votes:
-                    raise ValueError(f"{edition} page {page}: {candidate.name} section {section} twice")
-                candidate.votes[section] = cell
             if parts[2].strip() == "?" and parts[3].strip() == "?":
                 candidate.unread = True
-            if parts[3].strip() != "?":
-                candidate.total = _cell(parts[3], page, column)
+                continue
+            try:
+                for section, cell in _votes(parts[2], page, column):
+                    if section in candidate.votes:
+                        raise ValueError(f"{edition} page {page}: {candidate.name} section {section} twice")
+                    candidate.votes[section] = cell
+                if parts[3].strip() != "?":
+                    candidate.total = _cell(parts[3], page, column)
+            except Unread:
+                # the scan hides some of the candidate's figures: keep the name, store none of the votes
+                candidate.unread = True
         elif head == "F":
             current.footnotes.append(rest)
         else:
@@ -322,19 +365,13 @@ def problems(edition: str) -> list[str]:
 
 def tag_of(number: str) -> str:
     """A district's number as a code: two digits, with a letter suffix in Latin script."""
-    digits = number.rstrip("abаб")
-    return f"{int(digits):02d}" + number[len(digits) :].replace("а", "a").replace("б", "b")
-
-
-MARKS = {"(ОТ.)": "declined", "(К.)": "annulled"}
-"""Marks the volume prints after an elected candidate: ОТ. for one who declined the seat because another district
-also elected him and he took that one, and К. for one whose election the National Assembly annulled."""
+    digits = number.rstrip("abc")
+    return f"{int(digits):02d}" + number[len(digits) :]
 
 
 def clean(name: str) -> str:
-    """A candidate's name without the volume's marks and the transcription's notes."""
-    for mark in (*MARKS, "[*]", "†"):
-        name = name.replace(mark, "")
+    """A candidate's name without the volume's marks (К., ОТ., *, †) and the transcription's notes."""
+    name = re.sub(r"\(+[А-ЯA-Z]+\.?\)|\[[^\]]*\]|†", "", name)
     return " ".join(name.replace("?", "").split())
 
 
@@ -662,7 +699,7 @@ def election(e: Edition) -> Package:
                 + ". Every figure is stored as printed."
             )
         for c in d.candidates:
-            if "(ОТ.)" in c.name:
+            if re.search(r"\(ОТ\.?\)", c.name):
                 caveats.append(
                     f"{clean(c.name)} was also elected in another district and took the seat there, so he declined "
                     "this one (the volume marks him ОТ.)."
@@ -673,8 +710,8 @@ def election(e: Edition) -> Package:
                 )
             if c.unread:
                 caveats.append(
-                    f"The scan cuts off the foot of the page, so the votes of {clean(c.name)}, a candidate who was not "
-                    "elected, are missing."
+                    f"A stamp or the edge of the scan hides some of the votes of {clean(c.name)}, so none of that "
+                    "candidate's votes are stored."
                 )
         inferred = [c for c in d.candidates for cell in c.votes.values() if cell.inferred]
         inferred += [c for c in d.candidates if c.total is not None and c.total.inferred]
