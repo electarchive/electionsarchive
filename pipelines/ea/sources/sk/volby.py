@@ -10,6 +10,7 @@ of 2001 to 2013, whose chairs the office prints by region in the first round. On
 
 import csv
 import functools
+import html
 import io
 import re
 import unicodedata
@@ -831,6 +832,8 @@ def geo() -> Package:
         (OKRSOK, 4, "precinct", "polling district", None),
         (VUC_OBVOD, 2, "electoral_district", "regional electoral district", None),
         (TOWN_DISTRICT, 4, "electoral_district", "municipal electoral district", None),
+        (KRAJ_90, 1, "electoral_district", "electoral region (1990-1996)", None),
+        (OKRES_90, 2, "administrative", "district (1990-1996)", None),
     ):
         p.add("scheme", code=code, polity_id=SLOVAKIA, kind=kind, rank=rank, noun=noun, code_system=system_)
 
@@ -868,6 +871,21 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=code, valid_from=since, valid_to=until)
         p.add("area_parent", area_id=id, parent_id=area(KRAJ, kraj), valid_from=since, valid_to=until)
         p.name(id, f"{known.kraje[kraj]}, {text}", "sk", "official")
+    for path in sorted(snr_geo_paths()):
+        p.artifact(raw.cached(SOURCE, path), VOLBY_SOURCE)
+    snr_kraje_, snr_okresy = snr_places()
+    for slug, text in sorted(snr_kraje_.items()):
+        id = area(KRAJ_90, slug)
+        p.add("area", id=id, scheme_code=KRAJ_90)
+        p.add("area_code", area_id=id, code=slug, valid_from=SNR_FROM, valid_to=SNR_UNTIL)
+        p.add("area_parent", area_id=id, parent_id=COUNTRY, valid_from=SNR_FROM, valid_to=SNR_UNTIL)
+        p.name(id, text, "sk", "official")
+    for slug, (text, kraj) in sorted(snr_okresy.items()):
+        id = area(OKRES_90, slug)
+        p.add("area", id=id, scheme_code=OKRES_90)
+        p.add("area_code", area_id=id, code=slug, valid_from=SNR_FROM, valid_to=SNR_UNTIL)
+        p.add("area_parent", area_id=id, parent_id=area(KRAJ_90, kraj), valid_from=SNR_FROM, valid_to=SNR_UNTIL)
+        p.name(id, text, "sk", "official")
     return p
 
 
@@ -994,6 +1012,14 @@ SYSTEMS: dict[str, tuple[date, dict[str, object], str]] = {
 }
 
 
+SNR_SYSTEMS = {1990: (date(1990, 1, 1), date(1990, 12, 31), 3), 1992: (date(1991, 1, 1), date(1992, 12, 31), 5)}
+SNR_METHOD = (
+    "The 150 members of the Slovak National Council were elected by party-list proportional representation in four "
+    "electoral regions, the Bratislava region and the West, Central, and East Slovak regions, among the lists that won "
+    "at least {percent}% of the valid votes in the republic."
+)
+
+
 def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
@@ -1006,6 +1032,9 @@ def registry() -> Package:
     p.add("body", id=NRSR_BODY, polity_id=SLOVAKIA, kind="unicameral")
     p.name(NRSR_BODY, "National Council of the Slovak Republic", "en", "official")
     p.name(NRSR_BODY, "Národná rada Slovenskej republiky", "sk", "native", False)
+    p.add("body", id=SNR_BODY, polity_id=SLOVAKIA, kind="unicameral")
+    p.name(SNR_BODY, "Slovak National Council", "en", "official")
+    p.name(SNR_BODY, "Slovenská národná rada", "sk", "native", False)
     p.add("office", id=PRESIDENCY, polity_id=SLOVAKIA, kind="head_of_state")
     p.name(PRESIDENCY, "President of the Slovak Republic", "en", "official")
     p.name(PRESIDENCY, "Prezident Slovenskej republiky", "sk", "native", False)
@@ -1015,13 +1044,36 @@ def registry() -> Package:
             "electoral_system", id=id, polity_id=SLOVAKIA, valid_from=since, valid_to=None, rules=rules, rules_version=1
         )
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=method, lang="en")
+    for year, (since, until, percent) in SNR_SYSTEMS.items():
+        id = system(f"snr-{year}")
+        rules = {
+            "formula": "hagenbach_bischoff",
+            "threshold": {"level": "list", "scope": "national", "percent": percent},
+        }
+        p.add(
+            "electoral_system",
+            id=id,
+            polity_id=SLOVAKIA,
+            valid_from=since,
+            valid_to=until,
+            rules=rules,
+            rules_version=1,
+        )
+        p.add(
+            "note",
+            id=key("note", id),
+            entity_id=id,
+            kind="methodology",
+            body_md=SNR_METHOD.format(percent=percent),
+            lang="en",
+        )
     known = places()
     bodies: set[str] = set()
     offices: set[str] = set()
     labels: dict[str, tuple[date, str, str | None]] = {}
     for d in days():
         for c in d.contests:
-            if c.body and c.body != NRSR_BODY:
+            if c.body and c.body not in (NRSR_BODY, SNR_BODY):
                 bodies.add(c.body)
             if c.office and c.office != PRESIDENCY:
                 offices.add(c.office)
@@ -1075,7 +1127,7 @@ def build(d: Day) -> Package:
     stored: set[str] = set()
     for path in dict.fromkeys(d.paths):
         cached = raw.cached(SOURCE, url(path))
-        if path in TERRITORY or path in DISTRICT_TABLES or path in old_geo_paths():
+        if path in TERRITORY or path in DISTRICT_TABLES or path in old_geo_paths() or path in snr_geo_paths():
             p.uses(cached)
         elif cached.storage_key not in stored:  # two tables with the same bytes are one artifact
             stored.add(cached.storage_key)
@@ -1344,6 +1396,8 @@ def _register() -> None:
         reader(functools.partial(ref_modern, year), f"ref-{year}")
     reader(nrsr_1994, "nrsr-1994")
     reader(nrsr_1998, "nrsr-1998")
+    for year in SNR_DAYS:
+        reader(functools.partial(snr, year), f"snr-{year}")
     for year in NRSR_OLD:
         reader(functools.partial(nrsr_municipal, year), f"nrsr-{year}")
     for year in (2004, 2009, 2014):
@@ -1406,6 +1460,10 @@ def fetch() -> None:
     pages = [*PREZ_1999_SUMMARY.values(), *PREZ_1999_VOTES.values(), *PREZ_1999_NATIONAL.values(), *PREZ_1999_INFO]
     for page in dict.fromkeys(pages):
         raw.fetch(SOURCE, page_url(page), suffix=".html")
+    for year in SNR_DAYS:
+        for page in ("zvk", "zps", "pph"):
+            raw.fetch(SOURCE, snr_page(year, page), suffix=".html")
+        raw.fetch(SOURCE, snr_image(year), suffix=".jpg")
     for path in files():
         raw.fetch(SOURCE, url(path), suffix=".csv")
 
@@ -2128,6 +2186,244 @@ def prez_1999() -> Day:
         )
         presidential_outcomes(c)
         d.contests.append(c)
+    return d
+
+
+# The National Council elections of 1990 and 1992, before independence, from the office's archived pages. The pages
+# print the votes of each party by district (okres) with a total for each of the four electoral regions (volebné
+# kraje) and the republic, and one chart of the seats each party won in the republic.
+
+SNR_DAYS = {1990: (date(1990, 6, 8), date(1990, 6, 9)), 1992: (date(1992, 6, 5), date(1992, 6, 6))}
+SNR_SITE = {1990: f"{SITE}/nrsr/snr1990/volby90_s", 1992: f"{SITE}/nrsr/snr1992/volby92s"}
+SNR_SEATS = {
+    1990: {"VPN": 48, "KDH": 31, "KSČ": 22, "SNS": 22, "ESWMK": 14, "DS": 7, "SZ": 6},
+    1992: {"HZDS": 74, "SDĽ": 29, "KDH": 18, "SNS": 15, "MKM-EGY": 14},
+}
+"""The seats printed on the pie chart of each year's mandates page, read from the chart's labels and legend."""
+SNR_THRESHOLD = {1990: 3, 1992: 5}
+KRAJ_90, OKRES_90 = "sk.volebny_kraj_1990", "sk.okres_1990"
+SNR_FROM, SNR_UNTIL = date(1990, 6, 8), date(1996, 7, 23)
+"""The regions and districts of these elections are dated from the first election that printed them until the day before
+the 1996 reform replaced them with 8 regions and 79 districts."""
+SNR_BODY = key("body", "snr")
+SNR_REPUBLIC = "Spolu za SR"
+SNR_KRAJ_NAMES = {"Hlavné mesto SR Bratislava": "Hl. m. SR Bratislava"}
+SNR_FIXES = {"Koš ice-mesto": "Košice-mesto"}
+"""The office's tables misprint one district name and the list of regions prints Bratislava in short."""
+
+
+def snr_page(year: int, page: str) -> str:
+    return f"{SNR_SITE[year]}/{page}{year % 100}.htm"
+
+
+def snr_image(year: int) -> str:
+    return f"{SNR_SITE[year]}/pmp901.jpg" if year == 1990 else f"{SNR_SITE[year]}/pmp92.jpg"
+
+
+def snr_geo_paths() -> set[str]:
+    return {snr_page(year, page) for year in SNR_DAYS for page in ("zvk", "pph")}
+
+
+def snr_rows(path: str) -> list[list[str]]:
+    text = raw.cached(SOURCE, path).path.read_bytes().decode("cp1250")
+    rows = []
+    for row in ROW.findall(text):
+        cells = [clean(html.unescape(re.sub(r"(?s)<[^>]*>", " ", cell))) for cell in CELL.findall(row)]
+        if any(cells):
+            rows.append(cells)
+    return rows
+
+
+@dataclass
+class SnrRow:
+    name: str
+    registered: int
+    issued: int
+    valid: int
+    votes: list[int]
+
+    def totals(self) -> list[int]:
+        return [self.registered, self.issued, self.valid, *self.votes]
+
+
+@dataclass
+class SnrTable:
+    parties: list[tuple[int, str, str]]
+    """Each party's ballot number, abbreviation, and full name."""
+    groups: dict[str, list[SnrRow]]
+    """Each region's districts, in the office's order, by the region's name."""
+    kraje: dict[str, SnrRow]
+    republic: SnrRow
+
+
+def snr_party_list(year: int) -> list[tuple[int, str, str]]:
+    found = []
+    for r in snr_rows(snr_page(year, "zps")):
+        if len(r) == 3 and r[0].isdigit():
+            found.append((int(r[0]), "".join(r[1].split()), r[2]))
+    return found
+
+
+def snr_kraje(year: int) -> list[tuple[str, int]]:
+    """The regions the office lists, with their polling-district counts, the republic's total last."""
+    return [(r[0], number_or_zero(r[1])) for r in snr_rows(snr_page(year, "zvk")) if len(r) == 2 and r[1][:1].isdigit()]
+
+
+@functools.cache
+def snr_table(year: int) -> SnrTable:
+    parties = snr_party_list(year)
+    rows = snr_rows(snr_page(year, "pph"))
+    head = next(r for r in rows if r and fold(r[0]) == "vsetky politicke strany")
+    abbreviations = ["".join(cell.split()) for cell in head[1:]]
+    if abbreviations != [abbr for _, abbr, _ in parties]:
+        raise ValueError(f"snr {year}: the vote table's columns {abbreviations} are not the list of parties")
+    width = 5 + 2 * len(parties)
+    groups: dict[str, list[SnrRow]] = {}
+    kraje: dict[str, SnrRow] = {}
+    republic: SnrRow | None = None
+    pending: list[SnrRow] = []
+    for r in rows:
+        if len(r) != width or not re.fullmatch(r"[\d ]+", r[1]):
+            continue
+        row = SnrRow(
+            SNR_FIXES.get(r[0], r[0]),
+            number_or_zero(r[1]),
+            number_or_zero(r[2]),
+            number_or_zero(r[4]),
+            [number_or_zero(r[5 + 2 * i]) for i in range(len(parties))],
+        )
+        if row.name == SNR_REPUBLIC:
+            republic = row
+        elif row.name == "Hlavné mesto SR Bratislava" or row.name.endswith(" kraj"):
+            name = SNR_KRAJ_NAMES.get(row.name, row.name)
+            kraje[name] = row
+            groups[name] = pending
+            pending = []
+        else:
+            pending.append(row)
+    if republic is None or pending:
+        raise ValueError(f"snr {year}: the vote table has no republic total or ends inside a region")
+    table_ = SnrTable(parties, groups, kraje, republic)
+    for r in [*(r for rows_ in groups.values() for r in rows_), *kraje.values(), republic]:
+        if sum(r.votes) != r.valid:
+            raise ValueError(f"snr {year}: {r.name} lists {sum(r.votes)} votes for parties but {r.valid} valid votes")
+    for name, rows_ in groups.items():
+        for i, total in enumerate(kraje[name].totals()):
+            if sum(r.totals()[i] for r in rows_) != total:
+                raise ValueError(f"snr {year}: the districts of {name} do not add up to its total (column {i})")
+    for i, total in enumerate(republic.totals()):
+        if sum(r.totals()[i] for r in kraje.values()) != total:
+            raise ValueError(f"snr {year}: the regions do not add up to the republic (column {i})")
+    listed = [name for name, _ in snr_kraje(year)][:-1]
+    if listed != list(kraje):
+        raise ValueError(f"snr {year}: the regions {list(kraje)} are not the office's list {listed}")
+    return table_
+
+
+def snr_slug(name: str) -> str:
+    return fold(name).replace(" ", "-")
+
+
+@functools.cache
+def snr_places() -> tuple[dict[str, str], dict[str, tuple[str, str]]]:
+    """The regions by slug and the districts by slug with their region, the same in both years."""
+    kraje: dict[str, str] = {}
+    okresy: dict[str, tuple[str, str]] = {}
+    for year in SNR_DAYS:
+        for kraj, rows in snr_table(year).groups.items():
+            kraje[snr_slug(kraj)] = kraj
+            for r in rows:
+                seen = okresy.setdefault(snr_slug(r.name), (r.name, snr_slug(kraj)))
+                if seen != (r.name, snr_slug(kraj)):
+                    raise ValueError(f"snr: district {r.name} differs between the elections")
+    return kraje, okresy
+
+
+def snr_election(year: int) -> Election:
+    start, end = SNR_DAYS[year]
+    return Election(
+        "snr",
+        "general",
+        start,
+        end,
+        f"{year} Slovak National Council election",
+        f"Voľby do Slovenskej národnej rady {year}",
+        f"sk/{start}-parliamentary",
+    )
+
+
+def snr(year: int) -> Day:
+    start, _ = SNR_DAYS[year]
+    t = snr_table(year)
+    d = Day(str(start), f"The {year} Slovak National Council election by district", [])
+    d.method = (
+        f" In {year} the 150 members of the Slovak National Council were elected in four electoral regions (Bratislava "
+        "and the West, Central, and East Slovak regions). The office's archived pages print each party's votes by "
+        "district (okres), the finest unit it holds, with a total for each region and the republic; the totals match "
+        "the districts. The pages give the seats of each party only for the republic, on a chart whose labels this "
+        "package reads, so the contest is stored nationally with those seats and without seats per region."
+    )
+    d.elections.append(snr_election(year))
+    d.paths += [snr_page(year, page) for page in ("zvk", "zps", "pph")] + [snr_image(year)]
+    c = Contest(
+        "snr",
+        "snr",
+        "list_allocation",
+        "Slovenská národná rada",
+        "national-council",
+        system(f"snr-{year}"),
+        magnitude=150,
+        body=SNR_BODY,
+    )
+    seats = SNR_SEATS[year]
+    if sum(seats.values()) != 150 or set(seats) - {abbr for _, abbr, _ in t.parties}:
+        raise ValueError(f"snr {year}: the chart's seats {seats} are not 150 seats for listed parties")
+    option_of = {}
+    for number_, abbr, label in t.parties:
+        option_of[abbr] = fold(label)
+        won = seats.get(abbr)
+        c.options.append(
+            Option(
+                fold(label),
+                label,
+                "list",
+                position=number_,
+                party=label,
+                outcome="won" if won else "lost",
+                seats=won,
+                english=abbr,
+            )
+        )
+    for (_, abbr, _), total in zip(t.parties, t.republic.votes, strict=True):
+        c.declared[(option_of[abbr], VOTES)] = total
+    c.declared[(None, REGISTERED)] = t.republic.registered
+    c.declared[(None, VOTERS)] = t.republic.issued
+    c.declared[(None, VALID)] = t.republic.valid
+    accounting_rows: list[dict[str, object]] = []
+    vote_rows: list[dict[str, object]] = []
+    units = []
+    for rows in t.groups.values():
+        for r in rows:
+            unit = f"{start}:okres:{snr_slug(r.name)}"
+            units.append(
+                {
+                    "unit": unit,
+                    "scheme": OKRES_90,
+                    "obec": None,
+                    "okres": None,
+                    "kraj": None,
+                    "area": area(OKRES_90, snr_slug(r.name)),
+                    "relation": None,
+                }
+            )
+            for measure, value in ((REGISTERED, r.registered), (VOTERS, r.issued), (VALID, r.valid)):
+                accounting_rows.append({"unit": unit, "option": None, "measure": measure, "value": value})
+            for (_, abbr, _), value in zip(t.parties, r.votes, strict=True):
+                vote_rows.append({"unit": unit, "option": option_of[abbr], "measure": VOTES, "value": value})
+    d.units.append(pl.DataFrame(units, schema={**UNIT_SCHEMA, **UNIT_EXTRA}))
+    c.facts.append(pl.DataFrame(accounting_rows, schema=FACT_SCHEMA))
+    c.facts.append(pl.DataFrame(vote_rows, schema=FACT_SCHEMA))
+    d.contests.append(c)
     return d
 
 
