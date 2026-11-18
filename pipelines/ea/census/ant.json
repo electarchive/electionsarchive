@@ -1,0 +1,1101 @@
+{
+  "polity": "ANT",
+  "name": "Netherlands Antilles",
+  "sources": {
+    "statuut": {
+      "title": "Statuut voor het Koninkrijk der Nederlanden (BWBR0002154): wijzigingshistorie",
+      "publisher": "Overheid.nl, wetten.overheid.nl",
+      "url": "https://wetten.overheid.nl/BWBR0002154/2024-01-01/0/informatie",
+      "kind": "official_body",
+      "note": "Version history of the Charter for the Kingdom: \"29-12-1954 Nieuwe-regeling Datum inwerkingtreding: 29-12-1954 Ontstaansbron: Stb. 1954, 503 Inwerkingtredingsbron: Stb. 1954, 596\". Art. 61: the Charter enters into force at its solemn proclamation after the King's confirmation (given on 15 December 1954). Arts. 41-42 and 46: the Netherlands Antilles run their own affairs under their Staatsregeling, and their representative bodies are elected by free and secret vote."
+    },
+    "statuut1998": {
+      "title": "Statuut voor het Koninkrijk der Nederlanden, version in force from 9 October 1998",
+      "publisher": "Overheid.nl, wetten.overheid.nl",
+      "url": "https://wetten.overheid.nl/jci1.3:c:BWBR0002154&g=1998-10-09",
+      "kind": "official_body",
+      "note": "Art. 46(1): \"De vertegenwoordigende lichamen worden gekozen door de ingezetenen van het betrokken land, tevens Nederlanders\"; the elections are free and secret."
+    },
+    "stb2010-333": {
+      "title": "Rijkswet van 7 september 2010 tot wijziging van het Statuut voor het Koninkrijk der Nederlanden in verband met de wijziging van de staatkundige hoedanigheid van de eilandgebieden van de Nederlandse Antillen (Stb. 2010, 333)",
+      "publisher": "Staatsblad van het Koninkrijk der Nederlanden",
+      "url": "https://zoek.officielebekendmakingen.nl/stb-2010-333.html",
+      "kind": "official_body",
+      "note": "The Rijkswet wijziging Statuut in verband met de opheffing van de Nederlandse Antillen; its articles I and II enter into force on a date set by royal decree (art. IV(2))."
+    },
+    "stb2010-387": {
+      "title": "Besluit van 23 september 2010 tot vaststelling van het tijdstip van inwerkingtreding van de artikelen I en II van de Rijkswet wijziging Statuut in verband met de opheffing van de Nederlandse Antillen (Stb. 2010, 387)",
+      "publisher": "Staatsblad van het Koninkrijk der Nederlanden",
+      "url": "https://zoek.officielebekendmakingen.nl/stb-2010-387.html",
+      "kind": "official_body",
+      "note": "\"treden in werking met ingang van 10 oktober 2010, om 00.00 uur in Aruba, Curaçao, Sint Maarten, Bonaire, Sint Eustatius en Saba\"."
+    },
+    "nak": {
+      "title": "Nederlands-Antilliaans Kiesreglement (P.B. 2001, no. 159, as amended)",
+      "publisher": "Nederlandse Antillen (Overheid.nl, lokaleregelgeving.overheid.nl)",
+      "url": "https://lokaleregelgeving.overheid.nl/CVDR1533/2",
+      "kind": "official_body",
+      "note": "Electoral law for the Staten. Art. 13(1): a hoofdstembureau in each island territory, chaired by the gezaghebber; arts. 14 and 33: the nomination and polling days of a periodic election are set by landsbesluit, and after a dissolution by the Governor; arts. 90-91 and 99: list proportional representation by Hare quota and largest averages, and in a one-member district the seat goes to the list with most votes."
+    },
+    "erna": {
+      "title": "Koninklijk Besluit van 3 maart 1951, houdende de Eilandenregeling Nederlandse Antillen",
+      "publisher": "Nederlandse Antillen (Overheid.nl, lokaleregelgeving.overheid.nl)",
+      "url": "https://lokaleregelgeving.overheid.nl/CVDR7402/2",
+      "kind": "official_body",
+      "note": "Island regulation, version in force from 22 July 2006. Art. 5: Curaçao's island council has 21 members; art. 6: proportional representation, free and secret; art. 8: island ordinances govern the franchise and the elections; art. 16: members sit for four years; art. 16a: a one-time early dissolution of Curaçao's council; art. 106: Bonaire 9 members, Sint Maarten 11 (15 after an art. 16a dissolution), Saba and Sint Eustatius 5 each."
+    },
+    "kst26605-2": {
+      "title": "Staatkundige, bestuurlijke en financiële verhoudingen binnen het Koninkrijk (Kamerstuk 26605, nr. 2)",
+      "publisher": "Tweede Kamer der Staten-Generaal",
+      "url": "https://zoek.officielebekendmakingen.nl/kst-26605-2.html",
+      "kind": "official_body",
+      "note": "\"De volksvertegenwoordiging van de Nederlandse Antillen bestaat uit 22 leden (Curaçao 14, Bonaire 3, Sint Maarten 3 en Saba en Sint Eustatius elk 1).\" Elected at general elections for four years."
+    },
+    "kst27916-2": {
+      "title": "Kamerstuk 27916, nr. 2",
+      "publisher": "Tweede Kamer der Staten-Generaal",
+      "url": "https://zoek.officielebekendmakingen.nl/kst-27916-2.html",
+      "kind": "official_body"
+    },
+    "hek2006": {
+      "title": "Handelingen Eerste Kamer 2005-2006, 28 februari 2006, pp. 850-878",
+      "publisher": "Eerste Kamer der Staten-Generaal",
+      "url": "https://zoek.officielebekendmakingen.nl/h-ek-20052006-850-878.html",
+      "kind": "official_body"
+    },
+    "kst32213-10": {
+      "title": "Kamerstuk 32213, nr. 10",
+      "publisher": "Tweede Kamer der Staten-Generaal",
+      "url": "https://zoek.officielebekendmakingen.nl/kst-32213-10.html",
+      "kind": "official_body"
+    },
+    "kst28600-IV-19": {
+      "title": "Kamerstuk 28600 IV, nr. 19",
+      "publisher": "Tweede Kamer der Staten-Generaal",
+      "url": "https://zoek.officielebekendmakingen.nl/kst-28600-IV-19.html",
+      "kind": "official_body"
+    },
+    "kst30800-IV-26": {
+      "title": "Kamerstuk 30800 IV, nr. 26",
+      "publisher": "Tweede Kamer der Staten-Generaal",
+      "url": "https://zoek.officielebekendmakingen.nl/kst-30800-IV-26.html",
+      "kind": "official_body"
+    },
+    "kst30945-3": {
+      "title": "Kamerstuk 30945, nr. 3",
+      "publisher": "Tweede Kamer der Staten-Generaal",
+      "url": "https://zoek.officielebekendmakingen.nl/kst-30945-3.html",
+      "kind": "official_body"
+    },
+    "ah2010-340": {
+      "title": "Aanhangsel Handelingen Tweede Kamer 2010-2011, nr. 340",
+      "publisher": "Tweede Kamer der Staten-Generaal",
+      "url": "https://zoek.officielebekendmakingen.nl/ah-tk-20102011-340.html",
+      "kind": "official_body"
+    },
+    "kst27400-IV-2": {
+      "title": "Kamerstuk 27400 IV, nr. 2",
+      "publisher": "Tweede Kamer der Staten-Generaal",
+      "url": "https://zoek.officielebekendmakingen.nl/kst-27400-IV-2.html",
+      "kind": "official_body"
+    },
+    "kst31954-3": {
+      "title": "Kamerstuk 31954, nr. 3",
+      "publisher": "Tweede Kamer der Staten-Generaal",
+      "url": "https://zoek.officielebekendmakingen.nl/kst-31954-3.html",
+      "kind": "official_body"
+    },
+    "kst32213-45": {
+      "title": "Kamerstuk 32213, nr. 45",
+      "publisher": "Tweede Kamer der Staten-Generaal",
+      "url": "https://zoek.officielebekendmakingen.nl/kst-32213-45.html",
+      "kind": "official_body"
+    },
+    "kst32026-5": {
+      "title": "Kamerstuk 32026, nr. 5",
+      "publisher": "Tweede Kamer der Staten-Generaal",
+      "url": "https://zoek.officielebekendmakingen.nl/kst-32026-5.html",
+      "kind": "official_body"
+    },
+    "delpher": {
+      "title": "Delpher: kranten",
+      "publisher": "Koninklijke Bibliotheek",
+      "url": "https://www.delpher.nl/nl/kranten",
+      "kind": "aggregator",
+      "note": "Digitized newspapers with OCR text, including the Amigoe di Curaçao, which printed the island governments' election notices and results; Antillean coverage runs to about 2005."
+    },
+    "p1958": {
+      "title": "Verkiezingen in Nederlandse Antillen De huidige regeringscoalitie krijgt nieuw mandaat (Leeuwarder Courant, 3 September 1958)",
+      "publisher": "Leeuwarder Courant",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010615110:mpeg21:a0110:ocr",
+      "kind": "news_agency",
+      "note": "Article of 3 September 1958 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "p1962": {
+      "title": "Verkiezingsuitslag Ned. Antillen: Democratisch blok behield (krappe) meerderheid (Algemeen Handelsblad, 5 June 1962)",
+      "publisher": "Algemeen Handelsblad",
+      "url": "http://resolver.kb.nl/resolve?urn=KBNRC01:000035887:mpeg21:a0011:ocr",
+      "kind": "news_agency",
+      "note": "Article of 5 June 1962 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "p1966": {
+      "title": "Dit maal 82.710 kiesgerechtigden (Amigoe di Curaçao, 8 June 1966)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010462932:mpeg21:a0005:ocr",
+      "kind": "news_agency",
+      "note": "Article of 8 June 1966 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "p1969": {
+      "title": "Vechtpartij op Aruba: onrust op Antillen bij verkiezingen (De Volkskrant, 6 September 1969)",
+      "publisher": "De Volkskrant",
+      "url": "http://resolver.kb.nl/resolve?urn=ABCDDD:010848137:mpeg21:a0257:ocr",
+      "kind": "news_agency",
+      "note": "Article of 6 September 1969 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "p1973": {
+      "title": "Nieuwe partij op Aruba boekt fors succes bij verkiezingen (Het Parool, 4 August 1973)",
+      "publisher": "Het Parool",
+      "url": "http://resolver.kb.nl/resolve?urn=ABCDDD:010838712:mpeg21:a0001:ocr",
+      "kind": "news_agency",
+      "note": "Article of 4 August 1973 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "p1977": {
+      "title": "Boy Rozendal wint op de Ned. Antillen (NRC Handelsblad, 18 June 1977)",
+      "publisher": "NRC Handelsblad",
+      "url": "http://resolver.kb.nl/resolve?urn=KBNRC01:000026367:mpeg21:a0009:ocr",
+      "kind": "news_agency",
+      "note": "Article of 18 June 1977 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "p1979": {
+      "title": "MAN grote winnaar statenverkiezingen Antillen (Leeuwarder Courant, 7 July 1979)",
+      "publisher": "Leeuwarder Courant",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010637213:mpeg21:a0299:ocr",
+      "kind": "news_agency",
+      "note": "Article of 7 July 1979 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "p1982": {
+      "title": "Klein verlies Don Martina op Antillen (NRC Handelsblad, 26 June 1982)",
+      "publisher": "NRC Handelsblad",
+      "url": "http://resolver.kb.nl/resolve?urn=KBNRC01:000028217:mpeg21:a0002:ocr",
+      "kind": "news_agency",
+      "note": "Article of 26 June 1982 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "p1985": {
+      "title": "Kiezers Antillen zetten grote partijen voet dwars (Trouw, 25 November 1985)",
+      "publisher": "Trouw",
+      "url": "http://resolver.kb.nl/resolve?urn=ABCDDD:010828300:mpeg21:a0072:ocr",
+      "kind": "news_agency",
+      "note": "Article of 25 November 1985 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "p1990": {
+      "title": "Coalitie wint verkiezingen in de Antillen (NRC Handelsblad, 17 March 1990)",
+      "publisher": "NRC Handelsblad",
+      "url": "http://resolver.kb.nl/resolve?urn=KBNRC01:000029473:mpeg21:a0001:ocr",
+      "kind": "news_agency",
+      "note": "Article of 17 March 1990 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "p1994": {
+      "title": "Pourier winnaar van verkiezingen Antillen (NRC Handelsblad, 26 February 1994)",
+      "publisher": "NRC Handelsblad",
+      "url": "http://resolver.kb.nl/resolve?urn=KBNRC01:000030789:mpeg21:a0011:ocr",
+      "kind": "news_agency",
+      "note": "Article of 26 February 1994 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "p1998": {
+      "title": "Verkiezingsstrijd Curaçao ontaardt in kort geding (Algemeen Dagblad, 29 January 1998)",
+      "publisher": "Algemeen Dagblad",
+      "url": "http://resolver.kb.nl/resolve?urn=KBPERS01:003156024:mpeg21:a00043:ocr",
+      "kind": "news_agency",
+      "note": "Article of 29 January 1998 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1955": {
+      "title": "Advertentie (Eilandsraadsverkiezing, Eilandgebied Curaçao) (Amigoe di Curaçao, 3 June 1955)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010404601:mpeg21:a0039:ocr",
+      "kind": "news_agency",
+      "note": "Article of 3 June 1955 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1959": {
+      "title": "Advertentie (Amigoe di Curaçao, 21 May 1959)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010997612:mpeg21:a0025:ocr",
+      "kind": "news_agency",
+      "note": "Article of 21 May 1959 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1963a": {
+      "title": "Nieuwe eilandsraden op Aruba en Bonaire (Algemeen Handelsblad, 30 April 1963)",
+      "publisher": "Algemeen Handelsblad",
+      "url": "http://resolver.kb.nl/resolve?urn=KBNRC01:000033841:mpeg21:a0050:ocr",
+      "kind": "news_agency",
+      "note": "Article of 30 April 1963 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1963b": {
+      "title": "Advertentie (Amigoe di Curaçao, 25 May 1963)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010461752:mpeg21:a0040:ocr",
+      "kind": "news_agency",
+      "note": "Article of 25 May 1963 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1967a": {
+      "title": "Eilandsraadverkiezingen: P.D.B. wint zes zetels op Bonaire (Amigoe di Curaçao, 22 April 1967)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010470444:mpeg21:a0001:ocr",
+      "kind": "news_agency",
+      "note": "Article of 22 April 1967 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1967b": {
+      "title": "Democratische Partij kan werkprogramma voor raadsverkiezingen uitvoeren (Amigoe di Curaçao, 15 May 1967)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010463515:mpeg21:a0031:ocr",
+      "kind": "news_agency",
+      "note": "Article of 15 May 1967 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1967c": {
+      "title": "Met voorkeurstemmen Domi Tromp toch in raad op Aruba (Amigoe di Curaçao, 29 May 1967)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010463526:mpeg21:a0018:ocr",
+      "kind": "news_agency",
+      "note": "Article of 29 May 1967 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1971": {
+      "title": "Bij Antilliaanse verkiezingen: Partij van premier Isa verliest (De Tijd, 10 May 1971)",
+      "publisher": "De Tijd",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:011235846:mpeg21:a0071:ocr",
+      "kind": "news_agency",
+      "note": "Article of 10 May 1971 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1975a": {
+      "title": "MASA neemt niet deel aan verkiezingen (Amigoe di Curaçao, 4 March 1975)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010998555:mpeg21:a0075:ocr",
+      "kind": "news_agency",
+      "note": "Article of 4 March 1975 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1975b": {
+      "title": "Verkiezingen St. Maarten (Amigoe di Curaçao, 9 May 1975)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010460481:mpeg21:a0117:ocr",
+      "kind": "news_agency",
+      "note": "Article of 9 May 1975 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1979a": {
+      "title": "Verkiezingswinst op Curaçao voor Don Martina (Leeuwarder Courant, 26 April 1979)",
+      "publisher": "Leeuwarder Courant",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010621084:mpeg21:a0309:ocr",
+      "kind": "news_agency",
+      "note": "Article of 26 April 1979 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1979b": {
+      "title": "WIPM: toekomst van Statia rooskleurig (Amigoe di Curaçao, 2 May 1979)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010639820:mpeg21:a0054:ocr",
+      "kind": "news_agency",
+      "note": "Article of 2 May 1979 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1983a": {
+      "title": "Voor verkiezingen 29 april: op Curaçao 103.000 kiesgerechtigden (Amigoe di Curaçao, 9 February 1983)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010640531:mpeg21:a0068:ocr",
+      "kind": "news_agency",
+      "note": "Article of 9 February 1983 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1983b": {
+      "title": "Nauwelijks verandering bij stemming Bovenwinden (NRC Handelsblad, 9 May 1983)",
+      "publisher": "NRC Handelsblad",
+      "url": "http://resolver.kb.nl/resolve?urn=KBNRC01:000027610:mpeg21:a0040:ocr",
+      "kind": "news_agency",
+      "note": "Article of 9 May 1983 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1987a": {
+      "title": "Waarschijnlijk keuze uit drie partijen: Saba op 22 mei ter stembus (Amigoe di Curaçao, 9 March 1987)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010641952:mpeg21:a0101:ocr",
+      "kind": "news_agency",
+      "note": "Article of 9 March 1987 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1987b": {
+      "title": "Antilliaan krijgt koelkast voor stem bij verkiezingen (De Volkskrant, 22 May 1987)",
+      "publisher": "De Volkskrant",
+      "url": "http://resolver.kb.nl/resolve?urn=ABCDDD:010856784:mpeg21:a0146:ocr",
+      "kind": "news_agency",
+      "note": "Article of 22 May 1987 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1991": {
+      "title": "Invullen (Amigoe di Curaçao, 11 April 1991)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010644478:mpeg21:a0080:ocr",
+      "kind": "news_agency",
+      "note": "Article of 11 April 1991 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1995a": {
+      "title": "Winst democraten eilandraad Bonaire (Het Parool, 10 April 1995)",
+      "publisher": "Het Parool",
+      "url": "http://resolver.kb.nl/resolve?urn=ABCDDD:010842094:mpeg21:a0040:ocr",
+      "kind": "news_agency",
+      "note": "Article of 10 April 1995 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1995b": {
+      "title": "WIPM in oppositie: meerderheid voor Sabaanse en Statiaanse Democraten (Amigoe di Curaçao, 13 May 1995)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010645041:mpeg21:a0073:ocr",
+      "kind": "news_agency",
+      "note": "Article of 13 May 1995 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "e1999": {
+      "title": "Grootste partij Bonaire verliest (Algemeen Dagblad, 26 April 1999)",
+      "publisher": "Algemeen Dagblad",
+      "url": "http://resolver.kb.nl/resolve?urn=KBPERS01:003175021:mpeg21:a00026:ocr",
+      "kind": "news_agency",
+      "note": "Article of 26 April 1999 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "r1977": {
+      "title": "Advertentie (Bestuurscollege Aruba) (Amigoe di Curaçao, 21 March 1977)",
+      "publisher": "Amigoe di Curaçao",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010639105:mpeg21:a0014:ocr",
+      "kind": "news_agency",
+      "note": "Article of 21 March 1977 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "r1993": {
+      "title": "Meerderheid Curaçao stemt voor behoud Antilliaanse eenheid (NRC Handelsblad, 20 November 1993)",
+      "publisher": "NRC Handelsblad",
+      "url": "http://resolver.kb.nl/resolve?urn=KBNRC01:000031069:mpeg21:a0009:ocr",
+      "kind": "news_agency",
+      "note": "Article of 20 November 1993 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "r1994a": {
+      "title": "Inwoners Sint Maarten tegen een eigen koers (Nederlands Dagblad, 17 October 1994)",
+      "publisher": "Nederlands Dagblad",
+      "url": "http://resolver.kb.nl/resolve?urn=ddd:010629071:mpeg21:a0046:ocr",
+      "kind": "news_agency",
+      "note": "Article of 17 October 1994 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    },
+    "r1994b": {
+      "title": "Inwoners Bonaire kiezen voor Antillen (NRC Handelsblad, 22 October 1994)",
+      "publisher": "NRC Handelsblad",
+      "url": "http://resolver.kb.nl/resolve?urn=KBNRC01:000030891:mpeg21:a0004:ocr",
+      "kind": "news_agency",
+      "note": "Article of 22 October 1994 in Delpher, the Koninklijke Bibliotheek's newspaper archive (OCR text at the resolver URL)."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Nederlandse Antillen",
+      "name_en": "Netherlands Antilles",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1954-12-29",
+      "valid_to": "2010-10-10",
+      "source": "statuut"
+    },
+    {
+      "key": "eilandgebied",
+      "name": "Eilandgebieden",
+      "name_en": "Island territories (each also a Staten electoral district)",
+      "parent": "national",
+      "polity_kind": "region",
+      "valid_from": "1954-12-29",
+      "valid_to": "2010-10-10",
+      "source": "erna",
+      "counts": [
+        {
+          "date": "1999-01-01",
+          "precision": "year",
+          "value": 5,
+          "source": "kst26605-2",
+          "locator": "https://zoek.officielebekendmakingen.nl/kst-26605-2.html (\"De volksvertegenwoordiging van de Nederlandse Antillen bestaat uit 22 leden (Curaçao 14, Bonaire 3, Sint Maarten 3 en Saba en Sint Eustatius elk 1)\")"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "staten",
+      "tier": "national",
+      "name": "Verkiezing van de leden van de Staten van de Nederlandse Antillen",
+      "name_en": "Staten (parliament) of the Netherlands Antilles",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1954-12-29",
+      "valid_to": "2010-10-10",
+      "first_held": "1958-09-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "Seats and votes by island district; each island's hoofdstembureau counted by polling station, but no official count by station is online.",
+      "source": "kst26605-2",
+      "locator": "https://zoek.officielebekendmakingen.nl/kst-26605-2.html (22 members elected at general elections for four years: Curaçao 14, Bonaire 3, Sint Maarten 3, Saba and Sint Eustatius 1 each)",
+      "note": "The unicameral legislature of the Netherlands Antilles: 22 members elected for four years by list proportional representation, each island territory forming one district. Until 1985 the districts were Curaçao (12 seats), Aruba (8), Bonaire (1), and the three Windward Islands together (1); from the election of 22 November 1985, after Aruba's departure, Curaçao 14, Bonaire 3, Sint Maarten 3, Saba 1, and Sint Eustatius 1. The polling day is set by landsbesluit, or by the Governor after a dissolution, and early elections followed dissolutions in 1958, 1969, 1979, and 1982. The Staten elected on 15 November 1954, a few weeks before the Charter took effect, sat as the country's first legislature until 1958; that election, and those of 1937 to 1949 for the Staten of Curaçao and of the Netherlands Antilles before autonomy, fall outside this span. Results were declared by each island's hoofdstembureau and printed in the Amigoe di Curaçao and the other island papers; no electoral body published them online before the dissolution.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "ANT"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Hoofdstembureaus of the island territories, chaired by the gezaghebbers",
+          "source": "nak",
+          "locator": "https://lokaleregelgeving.overheid.nl/CVDR1533/2 (art. 13(1): \"In elk eilandgebied wordt voor de verkiezing van de Staten een hoofdstembureau ingesteld.\"; art. 33: polling day set by landsbesluit)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Delpher (Koninklijke Bibliotheek)",
+          "url": "https://www.delpher.nl/nl/kranten",
+          "format": "html (OCR of newspaper pages)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "delpher",
+          "role": "publishes",
+          "first_date": "1958-09-01",
+          "last_date": "1998-01-30",
+          "evidence": "The Amigoe di Curaçao and Dutch national papers printed the island governments' notices and the seats and votes by island for each Staten election from 1958 to 1998; Antillean coverage ends about 2005"
+        },
+        {
+          "platform": "Hoofdstembureaus of the island territories",
+          "url": "https://lokaleregelgeving.overheid.nl/CVDR1533/2",
+          "format": "paper (processen-verbaal)",
+          "access": "none",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "nak",
+          "role": "administers",
+          "evidence": "Each island's hoofdstembureau declared the count (Kiesreglement art. 13); none of their records is online, and the successor governments of Curaçao and Sint Maarten publish no historical Staten results"
+        }
+      ],
+      "est_votes": 90000,
+      "effort": 3,
+      "dates": [
+        {
+          "date": "1958-09-01",
+          "election_kind": "general",
+          "contests": 4,
+          "seats": 22,
+          "source": "p1958",
+          "quote": "De uitslagen van de maandag gehouden verkiezingen in de Nederla-ndr? Antillen zijn als volgt",
+          "note": "Early election after the Staten were dissolved on a motion of 24 June 1958. Four districts: Curaçao 12 seats, Aruba 8, Bonaire 1, and the Windward Islands 1."
+        },
+        {
+          "date": "1962-06-04",
+          "election_kind": "general",
+          "contests": 4,
+          "seats": 22,
+          "source": "p1962",
+          "quote": "GISTEREN zgn in de eilandsgebieden van de Nederlandse Antillen verkiezingen voor de Staten gehouden.",
+          "note": "Four districts: Curaçao 12 seats, Aruba 8, Bonaire 1, and the Windward Islands 1."
+        },
+        {
+          "date": "1966-06-08",
+          "election_kind": "general",
+          "contests": 4,
+          "seats": 22,
+          "source": "p1966",
+          "quote": "Curacao 8 juni 1!)66: voor dc zesde maal verkiezingen van de leden van de staten van de Nederlandse Antillen",
+          "note": "82,710 registered voters. Four districts: Curaçao 12 seats, Aruba 8, Bonaire 1, and the Windward Islands 1."
+        },
+        {
+          "date": "1969-09-05",
+          "election_kind": "general",
+          "contests": 4,
+          "seats": 22,
+          "source": "p1969",
+          "quote": "De verkiezingen op de Nederlandse Antillen zijn gisteren vooral op Aruba onrustig verlopen.",
+          "note": "Early election after the Staten were dissolved following the Curaçao riots of 30 May 1969. Four districts: Curaçao 12 seats, Aruba 8, Bonaire 1, and the Windward Islands 1."
+        },
+        {
+          "date": "1973-08-03",
+          "election_kind": "general",
+          "contests": 4,
+          "seats": 22,
+          "source": "p1973",
+          "quote": "hebben de verkiezingen op de Antillen van gisteren een drastische wijziging van de samenstelling van de Antilliaanse Staten opgeleverd",
+          "note": "First Staten election with a voting age of 18. Four districts: Curaçao 12 seats, Aruba 8, Bonaire 1, and the Windward Islands 1."
+        },
+        {
+          "date": "1977-06-17",
+          "election_kind": "general",
+          "contests": 4,
+          "seats": 22,
+          "source": "p1977",
+          "quote": "De enige zetel waarmee de drie bovenwindse eilanden, St. Maarten, St. Eustatius en Saba, in de Staten zijn vertegenwoordigd, ging naar de Democratische partij Bovenwinden.",
+          "note": "Four districts: Curaçao 12 seats, Aruba 8, Bonaire 1, and the Windward Islands 1."
+        },
+        {
+          "date": "1979-07-06",
+          "election_kind": "general",
+          "contests": 4,
+          "seats": 22,
+          "source": "p1979",
+          "quote": "is de grote overwinnaar geworden bij de gisteren gehouden parlementsverkiezingen op de Nederlandse Antillen. De partij behaalde zeven zetels",
+          "note": "Early election after the Staten were dissolved on the fall of the Rozendal cabinet. Four districts: Curaçao 12 seats, Aruba 8, Bonaire 1, and the Windward Islands 1."
+        },
+        {
+          "date": "1982-06-25",
+          "election_kind": "general",
+          "contests": 4,
+          "seats": 22,
+          "source": "p1982",
+          "quote": "I)e partij van demissionair premier Don Martina is bij de verkiezingen gisteren voor het parlement van de Nederlandse Antillen de grootste gebleven.",
+          "note": "Early election called in March 1982. Four districts: Curaçao 12 seats, Aruba 8, Bonaire 1, and the Windward Islands 1."
+        },
+        {
+          "date": "1985-11-22",
+          "election_kind": "general",
+          "contests": 5,
+          "seats": 22,
+          "source": "p1985",
+          "quote": "Overigens is het'voor het eerst dat Saba en Sint Eustatius een eigen vertegen woordiuger hebben in de Antilliaanse staten, het parlement van de Antillen van de Vijf.",
+          "note": "Brought forward for Aruba's departure on 1 January 1986; Aruba elected its own Staten the same day, which belongs to Aruba's census. First election without Aruba and with five districts: Curaçao 14 seats, Bonaire 3, Sint Maarten 3, Saba 1, and Sint Eustatius 1. The new Staten took office on 1 January 1986."
+        },
+        {
+          "date": "1990-03-16",
+          "election_kind": "general",
+          "contests": 5,
+          "seats": 22,
+          "source": "p1990",
+          "quote": "De regeringspartijen op Curagao hebben de gisteren gehouden verkiezingen voor het Antilliaanse parlement ruimschoots gewonnen."
+        },
+        {
+          "date": "1994-02-25",
+          "election_kind": "general",
+          "contests": 5,
+          "seats": 22,
+          "source": "p1994",
+          "quote": "De PAR kreeg gisteren 8 van de 22 zetels in de Antilliaanse Staten (parlement)",
+          "note": "Brought forward a few weeks by the coalition's decision of October 1993."
+        },
+        {
+          "date": "1998-01-30",
+          "election_kind": "general",
+          "contests": 5,
+          "seats": 22,
+          "source": "p1998",
+          "quote": "Op 30 januari worden op de Nederlandse Antillen voor de 15e keer verkiezingen gehouden. leder eilandgebied vormt een kieskring",
+          "note": "The article lists Curaçao 14, Bonaire 3, Saba 1, Sint Eustatius 1, and Sint Maarten 3 seats, 22 in all."
+        },
+        {
+          "date": "2002-01-18",
+          "election_kind": "general",
+          "contests": 5,
+          "seats": 22,
+          "source": "kst27916-2",
+          "quote": "De heer Koerten schetst de politieke ontwikkelingen sinds 18 januari 2002. Op die dag vonden landelijke verkiezingen plaats.",
+          "note": "Five districts, 22 seats (Kamerstuk 26605, nr. 2)."
+        },
+        {
+          "date": "2006-01-27",
+          "election_kind": "general",
+          "contests": 5,
+          "seats": 22,
+          "source": "hek2006",
+          "quote": "Dat draagvlak is onder andere op 27 januari bij de verkiezingen nog bevestigd.",
+          "note": "The same debate of 28 February 2006 refers to the elections for the Antillean parliament at the end of the previous month."
+        },
+        {
+          "date": "2010-01-22",
+          "election_kind": "general",
+          "contests": 5,
+          "seats": 22,
+          "source": "kst32213-10",
+          "quote": "zijn op 22 januari 2010, hier te lande verkiezingen voor de Staten van de Nederlandse Antillen gehouden.",
+          "note": "Last Staten election before the dissolution of 10 October 2010: Curaçao 14 seats, Bonaire 3, Sint Maarten 3, Saba 1, Sint Eustatius 1."
+        }
+      ]
+    },
+    {
+      "key": "eilandsraad",
+      "tier": "eilandgebied",
+      "name": "Verkiezing van de leden van de eilandsraden",
+      "name_en": "Island councils",
+      "category": "council",
+      "goal": "subnational",
+      "valid_from": "1954-12-29",
+      "valid_to": "2010-10-10",
+      "first_held": "1955-06-13",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "Seats and votes by island territory; Saba, Sint Eustatius, and Sint Maarten voted as districts of the Windward Islands territory until 1983.",
+      "source": "erna",
+      "locator": "https://lokaleregelgeving.overheid.nl/CVDR7402/2 (arts. 5, 6, 8, 16, 106)",
+      "note": "Each island territory elected its island council for four years by list proportional representation under the Eilandenregeling of 1951 and its own island ordinance: Curaçao 21 seats, Aruba 21 (until it left on 1 January 1986), Bonaire 7 then 9, and the Windward Islands territory 15 (five per island) until it was split into Sint Maarten, Saba, and Sint Eustatius on 1 April 1983; Sint Maarten's council then grew from 7 to 9, 11, and finally 15 seats, while Saba and Sint Eustatius kept 5. The islands often voted on different days, each set by its own government, so each row lists the islands that voted that day. The first island councils were elected on 4 June 1951, before the Charter took effect. Curaçao and Sint Maarten held early elections in August and September 2010 for the councils that became their first Staten; Bonaire, Saba, and Sint Eustatius held none before the dissolution, their next elections falling in 2011 as Dutch public bodies, which belong to the Netherlands' census.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Hoofdstembureau of each island territory",
+          "source": "erna",
+          "locator": "https://lokaleregelgeving.overheid.nl/CVDR7402/2 (art. 16(1): \"De leden hebben zitting gedurende vier jaren.\"; art. 8(1): elections regulated by island ordinance)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Delpher (Koninklijke Bibliotheek)",
+          "url": "https://www.delpher.nl/nl/kranten",
+          "format": "html (OCR of newspaper pages)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "delpher",
+          "role": "publishes",
+          "first_date": "1955-06-13",
+          "last_date": "1999-05-21",
+          "evidence": "The Amigoe di Curaçao printed each island government's notice of the polling day and the seats by party; Dutch national papers reported the results"
+        }
+      ],
+      "est_votes": 80000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1955-06-13",
+          "election_kind": "local",
+          "contests": 4,
+          "source": "e1955",
+          "quote": "In verband met de op 13 Juni 1955 te houden",
+          "note": "Curaçao, Aruba, Bonaire, and the Windward Islands. Sint Eustatius did not vote because only one list was filed. Bonaire's council grew from 7 to 9 seats."
+        },
+        {
+          "date": "1959-05-25",
+          "election_kind": "local",
+          "source": "e1959",
+          "quote": "de stemming ter verkiezing van de leden van de Eilandsraad zal worden gehouden op maandag 25 mei 1959",
+          "note": "Curaçao's notice; the Amigoe of 26 May 1959 reports results from Aruba, Bonaire, and the Windward Islands too, but their polling day is not quoted."
+        },
+        {
+          "date": "1963-04-29",
+          "election_kind": "local",
+          "contests": 2,
+          "seats": 30,
+          "source": "e1963a",
+          "quote": "Op de eilanden Aruba en Bonaire zijn gisteren verkiezingen gehouden voor de eilandsraden.",
+          "note": "Aruba (21 seats) and Bonaire (9)."
+        },
+        {
+          "date": "1963-05-31",
+          "election_kind": "local",
+          "contests": 2,
+          "seats": 36,
+          "source": "e1963b",
+          "quote": "in verband met de verkiezing van de leden van de Eilandsraad op 31 mei 1963",
+          "note": "Curaçao (21 seats) and the Windward Islands (15, five per island)."
+        },
+        {
+          "date": "1967-04-21",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 9,
+          "source": "e1967a",
+          "quote": "bij de gisteren op Bonaire gehouden verkiezingen voor de eilandsraad een absolute meerderheid van zes van de negen zetels",
+          "note": "Bonaire (9 seats). In the Windward Islands only the Democratic Party filed a list, so no poll was held in 1967 (Algemeen Handelsblad, 18 April 1967)."
+        },
+        {
+          "date": "1967-05-19",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 21,
+          "source": "e1967b",
+          "quote": "in verband met de verkiezingen voor de eilandsraad van Curacao op 19 mei aanstaande",
+          "note": "Curaçao (21 seats)."
+        },
+        {
+          "date": "1967-05-26",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 21,
+          "source": "e1967c",
+          "quote": "bij de vrijdag gehouden eilandsraadverkiezingen twintig stemmen meer heeft behaald",
+          "note": "Aruba (21 seats); the Amigoe of Monday 29 May reports the vote of Friday 26 May."
+        },
+        {
+          "date": "1971-05-07",
+          "election_kind": "local",
+          "contests": 4,
+          "seats": 66,
+          "source": "e1971",
+          "quote": "BU de eilandsraadverkiezingen die vrUdag op de Nederlandse Antillen zijn gehouden",
+          "note": "Curaçao (21 seats), Aruba (21), Bonaire (9), and the Windward Islands (15)."
+        },
+        {
+          "date": "1975-04-25",
+          "election_kind": "local",
+          "contests": 3,
+          "seats": 51,
+          "source": "e1975a",
+          "quote": "de eilandsraadsverkiezingen welke op 25 april a.s. worden gehouden",
+          "note": "Curaçao (21 seats), Aruba (21), and Bonaire (9)."
+        },
+        {
+          "date": "1975-05-09",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 15,
+          "source": "e1975b",
+          "quote": "besloten om de dag der stemming voor de verkiezing van de leden van de Eilandsraad op 9 mei 1975 te bepalen. Op de eilanden Saba, Sint Eustatius en Sint Maarten worden op die dag elk 5 leden",
+          "note": "The Windward Islands territory, five members from each island."
+        },
+        {
+          "date": "1979-04-25",
+          "election_kind": "local",
+          "contests": 3,
+          "seats": 51,
+          "source": "e1979a",
+          "quote": "Op de Benedenwinden van de Nederlandse Antillen zijn gisteren eilandraadsverkiezingen gehouden.",
+          "note": "Curaçao (21 seats), Aruba (21), and Bonaire (9)."
+        },
+        {
+          "date": "1979-04-27",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 15,
+          "source": "e1979b",
+          "quote": "de verkiezingen van 27 april op St Eustatius gewonnen",
+          "note": "The Windward Islands territory (15 seats)."
+        },
+        {
+          "date": "1983-04-29",
+          "election_kind": "local",
+          "contests": 3,
+          "source": "e1983a",
+          "quote": "Voor verkiezingen 29 april Op Curacao 103.000 kiesgerechtigden",
+          "note": "Curaçao, Aruba, and Bonaire; Aruba's last island council election before it left the Netherlands Antilles on 1 January 1986."
+        },
+        {
+          "date": "1983-05-06",
+          "election_kind": "local",
+          "contests": 3,
+          "seats": 17,
+          "source": "e1983b",
+          "quote": "De verkiezingen voor de eilandsraden die vrijdag op de drie bovenwindse eilanden St. Maarten, Saba en St. Eustatius zijn gehouden",
+          "note": "First election of the three island territories that replaced the Windward Islands territory on 1 April 1983: Sint Maarten (7 seats), Saba (5), and Sint Eustatius (5)."
+        },
+        {
+          "date": "1987-04-10",
+          "election_kind": "local",
+          "contests": 2,
+          "seats": 30,
+          "source": "e1987a",
+          "quote": "In tegenstelling tot Curacao en Bonaire, waar de verkiezingen voor een nieuwe Eilandsraad op vrijdag, 10 april 1987 zullen worden gehouden",
+          "note": "Curaçao (21 seats) and Bonaire (9)."
+        },
+        {
+          "date": "1987-05-22",
+          "election_kind": "local",
+          "contests": 3,
+          "seats": 19,
+          "source": "e1987b",
+          "quote": "De bevolking van de Antilliaanse eilanden Saba, St Eustatius en St Maarten gaat vrijdag naar de stembus",
+          "note": "Sint Maarten (9 seats, up from 7), Saba (5), and Sint Eustatius (5)."
+        },
+        {
+          "date": "1991-04-12",
+          "election_kind": "local",
+          "contests": 5,
+          "source": "e1991",
+          "quote": "de invullijsten aan van de Eilandsraadsverkiezingen van morgen, 12 april.",
+          "note": "All five island territories: Curaçao, Bonaire, Sint Maarten, Saba, and Sint Eustatius."
+        },
+        {
+          "date": "1995-04-07",
+          "election_kind": "local",
+          "contests": 2,
+          "source": "e1995a",
+          "quote": "Bij verkiezingen die vrijdag op Bonaire zijn gehouden voor een nieuwe Eilandsraad, heeft de Democratische Partij de absolute meerderheid behaald.",
+          "note": "Bonaire (9 seats) and Sint Maarten, whose council was enlarged (Amigoe, 21 April 1995: \"bij de verkiezingen van 7 april\")."
+        },
+        {
+          "date": "1995-05-12",
+          "election_kind": "local",
+          "contests": 3,
+          "source": "e1995b",
+          "quote": "Dé eilandsraadsverkiezingen op Saba leverden gisteren een kleine verrassing op.",
+          "note": "Curaçao, whose executive council put its election back a month, and Saba (5 seats) and Sint Eustatius (5)."
+        },
+        {
+          "date": "1999-04-23",
+          "election_kind": "local",
+          "contests": 1,
+          "source": "e1999",
+          "quote": "Bij de verkiezingen van vrijdag",
+          "note": "Bonaire; the article of Monday 26 April reports the vote of Friday 23 April and announces the other islands' dates."
+        },
+        {
+          "date": "1999-05-07",
+          "election_kind": "local",
+          "contests": 3,
+          "source": "e1999",
+          "quote": "Vrijdag 7 mei volgen verkiezingen op Curagao, Saba en Sint Eustatius.",
+          "note": "Curaçao, Saba, and Sint Eustatius, as announced."
+        },
+        {
+          "date": "1999-05-21",
+          "election_kind": "local",
+          "contests": 1,
+          "source": "e1999",
+          "quote": "De bewoners van Sint Maarten kiezen hun nieuwe Eilandsraadleden op 21 mei.",
+          "note": "Sint Maarten, as announced."
+        },
+        {
+          "date": "2003-05-09",
+          "election_kind": "local",
+          "contests": 2,
+          "source": "kst28600-IV-19",
+          "quote": "Na de eilandraadsverkiezingen op de Benedenwinden op 9 mei jl.",
+          "note": "Curaçao and Bonaire, the Leeward Islands."
+        },
+        {
+          "date": "2003-01-01",
+          "precision": "year",
+          "election_kind": "local",
+          "source": "erna",
+          "quote": "De leden hebben zitting gedurende vier jaren.",
+          "note": "Sint Maarten, Saba, and Sint Eustatius elected their councils in 2003 at the end of the four-year term; the day is not yet dated from a source."
+        },
+        {
+          "date": "2007-04-20",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 21,
+          "source": "kst30800-IV-26",
+          "quote": "De verkiezingen voor de Eilandraad van Curaçao worden gehouden op 20 april.",
+          "note": "Curaçao (21 seats)."
+        },
+        {
+          "date": "2007-04-01",
+          "precision": "month",
+          "election_kind": "local",
+          "source": "kst30945-3",
+          "quote": "Naar verwachting zullen in april 2007 de laatste verkiezingen voor de eilandsraad plaatsvinden.",
+          "note": "Bonaire, Sint Maarten, Saba, and Sint Eustatius; the source announces Sint Maarten's election for April 2007, and the days are not yet dated."
+        },
+        {
+          "date": "2010-08-27",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 21,
+          "source": "ah2010-340",
+          "quote": "de verkiezingen op Curaçao van 27 augustus 2010",
+          "note": "Early election of Curaçao's council under ERNA art. 16a, ahead of Curaçao becoming a country; the council became its first Staten on 10 October 2010."
+        },
+        {
+          "date": "2010-09-17",
+          "election_kind": "local",
+          "contests": 1,
+          "seats": 15,
+          "source": "ah2010-340",
+          "quote": "bij de verkiezingen op Sint Maarten van 17 september 2010",
+          "note": "Early election of Sint Maarten's council, enlarged to 15 seats under ERNA art. 106(2), which became its first Staten on 10 October 2010."
+        }
+      ]
+    },
+    {
+      "key": "referendum",
+      "tier": "eilandgebied",
+      "name": "Referenda over de staatkundige toekomst van de eilandgebieden",
+      "name_en": "Island status referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1954-12-29",
+      "valid_to": "2010-10-10",
+      "first_held": "1977-03-25",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "Results by island, some by polling station in the island governments' notices.",
+      "source": "kst31954-3",
+      "note": "Consultative referendums held by the island territories on their constitutional future, each under its own island ordinance (for example Saba's ordinance for the vote of 5 November 2004, CVDR30428, and Sint Eustatius's of 2005, CVDR40046): Aruba in 1977, all five islands in 1993 and 1994, then Sint Maarten in 2000, Bonaire and Saba in 2004, Curaçao and Sint Eustatius in 2005, and Curaçao again in 2009 on the agreement that dissolved the country. The Netherlands Antilles held no country-wide referendum.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "ANT"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Delpher (Koninklijke Bibliotheek)",
+          "url": "https://www.delpher.nl/nl/kranten",
+          "format": "html (OCR of newspaper pages)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "delpher",
+          "role": "publishes",
+          "first_date": "1977-03-25",
+          "last_date": "1994-10-21",
+          "evidence": "The Amigoe di Curaçao and Dutch national papers printed the notices and the results by island"
+        },
+        {
+          "platform": "Officiële bekendmakingen (Kamerstukken)",
+          "url": "https://zoek.officielebekendmakingen.nl/",
+          "format": "html, pdf",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "kst31954-3",
+          "role": "publishes",
+          "first_date": "2000-06-23",
+          "last_date": "2009-05-15",
+          "evidence": "Dutch parliamentary papers give the date, turnout, and winning option of each referendum from 2000 to 2009"
+        }
+      ],
+      "est_votes": 40000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1977-03-25",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "r1977",
+          "quote": "dat de stemming voor het referendum bij wijze van opinie-peiling op vrijdag 25 maart 1977 plaatsvindt",
+          "note": "Aruba's consultative referendum on independence, held as an opinion poll by the island government; about 82% chose independence."
+        },
+        {
+          "date": "1993-11-19",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "r1993",
+          "quote": "De bevolking van Cura?ao heeft zich in het gisteren gehouden referendum massaal — 74 procent van de uitgebrachte stemmen — uitgesproken voor handhaving van de Antilliaanse",
+          "note": "Curaçao's status referendum; a second round planned for 26 November was not needed."
+        },
+        {
+          "date": "1994-10-14",
+          "election_kind": "referendum",
+          "contests": 3,
+          "source": "r1994a",
+          "quote": "Ook de beide andere Bovenwindse eilanden, Sint Eustatius en Saba, hielden vrijdag een referendum.",
+          "note": "Status referendums on Sint Maarten, Saba, and Sint Eustatius; each chose to stay in the Netherlands Antilles."
+        },
+        {
+          "date": "1994-10-21",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "r1994b",
+          "quote": "Dat was het resultaat van het vrijdag gehouden referendum over de staatkundige toekomst van Bonaire.",
+          "note": "Bonaire's status referendum, the last of the five islands in the 1993-1994 round."
+        },
+        {
+          "date": "2000-06-23",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "kst27400-IV-2",
+          "quote": "Tijdens het op 23 juni 2000 op Sint Maarten gehouden raadplegend referendum",
+          "note": "Sint Maarten's consultative status referendum; status aparte won 68.9%."
+        },
+        {
+          "date": "2004-09-10",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "kst31954-3",
+          "quote": "Op 10 september 2004 is op Bonaire een referendum gehouden.",
+          "note": "Bonaire's status referendum; turnout 56.1%."
+        },
+        {
+          "date": "2004-11-05",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "kst31954-3",
+          "quote": "Op 5 november 2004 is op Saba een referendum gehouden.",
+          "note": "Saba's status referendum; turnout 78%."
+        },
+        {
+          "date": "2005-04-08",
+          "election_kind": "referendum",
+          "contests": 2,
+          "source": "kst31954-3",
+          "quote": "Op 8 april 2005 is op Sint Eustatius een referendum gehouden.",
+          "note": "Status referendums on Sint Eustatius and Curaçao the same day (Curaçao: Kamerstuk 32213, nr. 45, \"op Curaçao op 8 april 2005\")."
+        },
+        {
+          "date": "2009-05-15",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "kst32026-5",
+          "quote": "het op 15 mei 2009 gehouden referendum waarbij de meerderheid van de bevolking van Curaçao te kennen had gegeven akkoord te gaan",
+          "note": "Curaçao's referendum approving the round-table agreement on its new status."
+        }
+      ]
+    },
+    {
+      "key": "gouverneur",
+      "tier": "national",
+      "name": "Gouverneur van de Nederlandse Antillen",
+      "name_en": "Governor",
+      "category": "executive",
+      "goal": "national",
+      "valid_from": "1954-12-29",
+      "valid_to": "2010-10-10",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "statuut",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Governor represented the King and headed the Antillean government; the Crown appointed and dismissed him (Charter art. 2), and the ministers were appointed and answered to the Staten, so no executive was elected.",
+      "match": [
+        {
+          "office_kinds": [
+            "governor",
+            "head_of_government"
+          ],
+          "iso_pattern": "ANT"
+        }
+      ]
+    },
+    {
+      "key": "gezaghebber",
+      "tier": "eilandgebied",
+      "name": "Gezaghebbers van de eilandgebieden",
+      "name_en": "Lieutenant governors of the island territories",
+      "category": "executive",
+      "goal": "subnational",
+      "valid_from": "1954-12-29",
+      "valid_to": "2010-10-10",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "nak",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each island territory's gezaghebber, who also chaired its hoofdstembureau (Kiesreglement art. 13), was appointed by the Crown, and its executive council (bestuurscollege) was chosen by the island council from among its members, so no island executive was elected.",
+      "match": [
+        {
+          "office_kinds": [
+            "governor",
+            "mayor",
+            "other"
+          ],
+          "polity_kinds": [
+            "region"
+          ]
+        }
+      ]
+    }
+  ]
+}

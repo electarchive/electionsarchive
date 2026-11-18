@@ -844,10 +844,10 @@
       "note": "The GDR parliament's decision of accession with effect from 3 October 1990, as printed in the Gesetzblatt der DDR and transcribed on verfassungen.de. The republic began when the Provisional Volkskammer constituted itself on 7 October 1949 (Gesetz über die Konstituierung der Provisorischen Volkskammer, GBl. 1949 S. 1, https://www.verfassungen.de/ddr/volkskammergesetz49.htm), and the Bundesarchiv lists its ten Volkskammer elections from 15 October 1950 to 18 March 1990 (https://www.bundesarchiv.de/themen-entdecken/online-entdecken/geschichtsgalerien/wahlen-in-der-ddr/)."
     },
     "ant": {
-      "publisher": "Encyclopaedia Britannica",
-      "title": "Netherlands Antilles",
-      "url": "https://www.britannica.com/place/Netherlands-Antilles",
-      "kind": "compendium"
+      "publisher": "Overheid.nl, wetten.overheid.nl",
+      "title": "Statuut voor het Koninkrijk der Nederlanden (BWBR0002154): wijzigingshistorie",
+      "url": "https://wetten.overheid.nl/BWBR0002154/2024-01-01/0/informatie",
+      "kind": "official_body"
     },
     "ymd": {
       "publisher": "Republic of Yemen, National Information Center (المركز الوطني للمعلومات)",
@@ -3334,9 +3334,9 @@
       "iso": "ANT",
       "name_en": "Netherlands Antilles",
       "status": "former",
-      "reason": "Staten of the Netherlands Antilles elections from 1954 to 2010.",
+      "reason": "A country of the Kingdom of the Netherlands under the Charter for the Kingdom, which entered into force on 29 December 1954 (Stb. 1954, 596), until the Kingdom act dissolving it took effect on 10 October 2010 (Stb. 2010, 387); its 22-member Staten were elected by island district at fifteen general elections from 1 September 1958 to 22 January 2010, and its island territories elected their own island councils.",
       "source": "ant",
-      "locator": "https://www.britannica.com/place/Netherlands-Antilles"
+      "locator": "https://wetten.overheid.nl/BWBR0002154/2024-01-01/0/informatie (\"29-12-1954 Nieuwe-regeling Datum inwerkingtreding: 29-12-1954 Ontstaansbron: Stb. 1954, 503 Inwerkingtredingsbron: Stb. 1954, 596\"); end date from https://zoek.officielebekendmakingen.nl/stb-2010-387.html (\"treden in werking met ingang van 10 oktober 2010\")"
     },
     {
       "iso": "YMD",
