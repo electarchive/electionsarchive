@@ -3,6 +3,7 @@ import re
 import subprocess
 import unicodedata
 from datetime import date
+from typing import NamedTuple
 from uuid import uuid5
 
 import polars as pl
@@ -353,6 +354,85 @@ def book() -> tuple[dict[int, tuple[str, str]], dict[int, list[tuple[str, str, s
     return {v: rows[0] for v, rows in prefects.items() if len(rows) == 1}, mayors
 
 
+SEAT = re.compile(
+    rf"(?P<list>\d{{1,3}}(?:-\d{{1,3}})*) {{2,}}(?:(?P<org>{WORD}) {{2,}})?(?P<name>{WORD}) {{2,}}(?P<votes>{NUMBER}) +(?P<seat>\d{{1,2}}) *$"
+)
+# the heading above each table of councillors names its dignity: urban, by urban circumscription, or rural
+COUNCIL_HEADS = (("CONCEJALES URBANOS", "5"), ("CONCEJALES POR CIRCUNSCRIPCI", "5"), ("CONCEJALES RURALES", "3"))
+
+
+class Councillor(NamedTuple):
+    dignity: str
+    votes: int
+    name: str
+    org: str
+    seat: int
+
+
+@functools.cache
+def councillors() -> list[tuple[list[Councillor], str]]:
+    """The elected councillors of each canton as the 2019 book prints them: one group of seats per contest, in seat
+    order, with the printed text around it, where the canton's name stands."""
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(artifact(BOOK_2019).path), "-"], check=True, capture_output=True, text=True
+    ).stdout
+    lines = unicodedata.normalize("NFC", text).splitlines()
+    start = next(i for i, line in enumerate(lines) if line.strip() == "CONCEJALES URBANOS")
+    end = next(i for i, line in enumerate(lines) if "Composición de las juntas parroquiales" in line)
+    groups: list[tuple[list[Councillor], str]] = []
+    dignity, current, around = "", [], []
+    for line in lines[start:end]:
+        if "RESULTADOS ELECTORALES" in line or "<" in line:
+            for head, value in COUNCIL_HEADS:
+                if head in line:
+                    dignity = value
+        found = SEAT.search(line)
+        if not found:
+            around.append(line)
+            continue
+        row = Councillor(
+            dignity, int(found["votes"].replace(".", "")), clean(found["name"]), found["org"] or "", int(found["seat"])
+        )
+        if row.seat == 1 and current:
+            groups.append((current, " ".join(around)))
+            current, around = [], []
+        current.append(row)
+        around.append(line[: found.start()])
+    if current:
+        groups.append((current, " ".join(around)))
+    return groups
+
+
+@functools.cache
+def council_names() -> dict[tuple[str, str, int], dict[str, Councillor]]:
+    """Elected councillors by (dignity, canton, circumscription) and the file's candidacy code.
+
+    The book prints each elected councillor's votes. A group of seats belongs to the one contest of its dignity whose
+    candidates include every printed vote total; when several fit, the canton named beside the seats decides. A
+    councillor is named only where exactly one candidacy of the contest holds the printed votes."""
+    frame, _ = sav(LOCAL_2019)
+    _, cantons, _ = places((LOCAL_2019,))
+    totals = (
+        frame.filter(pl.col("DIGNIDAD_CODIGO").is_in([3.0, 5.0]))
+        .group_by(["DIGNIDAD_CODIGO", "CANTON_CODIGO", "CIRCUNSCRIPCION_CODIGO", "CANDIDATO_CODIGO"])
+        .agg(pl.col("VOTOS").sum())
+    )
+    index: dict[tuple[str, str, int], dict[int, list[str]]] = {}
+    for dignity, canton, circumscription, candidacy, votes in totals.iter_rows():
+        contest = (code(dignity), code(canton), int(circumscription))
+        index.setdefault(contest, {}).setdefault(int(votes), []).append(code(candidacy))
+    found: dict[tuple[str, str, int], dict[str, Councillor]] = {}
+    for group, around in councillors():
+        fits = [k for k, v in index.items() if k[0] == group[0].dignity and all(r.votes in v for r in group)]
+        if len(fits) > 1:
+            text = slug(around)
+            fits = [k for k in fits if slug(cantons[k[1]][0]) in text] or fits
+        if len(fits) != 1 or fits[0] in found:
+            continue
+        found[fits[0]] = {holders[0]: row for row in group if len(holders := index[fits[0]][row.votes]) == 1}
+    return found
+
+
 class Local:
     """Contest and option bookkeeping for one election's contests."""
 
@@ -392,7 +472,7 @@ def _local(p: Package, day: str) -> None:
     frame, labels = sav(LOCAL_2019)
     p.uses(artifact(LOCAL_2019))
     p.uses(artifact(BOOK_2019))
-    provinces, cantons, parishes = places()
+    provinces, cantons, parishes = places((LOCAL_2019,))
     election = _election(
         p,
         "local",
@@ -404,6 +484,7 @@ def _local(p: Package, day: str) -> None:
     )
     names = {code(k): clean(v) for k, v in labels["DIGNIDAD_NOMBRE"].items()}
     by_prefect, by_mayor = book()
+    councillor = council_names()
     local = Local(p, day, election)
     seen: set[str] = set()
     people: set[str] = set()
@@ -463,6 +544,7 @@ def _local(p: Package, day: str) -> None:
             contest = local.contest(name, english, spanish, f"{names[dignity]} {place}", kind, district, **fields)
             result_set = _result_set(p, election, contest, name)
             options: dict[str, str] = {}
+            single = dignity in ("2", "4")
             ordered = sorted({code(v) for v in rows["CANDIDATO_CODIGO"].to_list()}, key=int)
             totals = {
                 code(k): int(v) for k, v in rows.group_by("CANDIDATO_CODIGO").agg(pl.col("VOTOS").sum()).iter_rows()
@@ -481,6 +563,13 @@ def _local(p: Package, day: str) -> None:
                     if len(named) == 1:
                         _, person_name, org = named[0]
                         label = f"{person_name}, {org}"
+                elif dignity in ("3", "5") and candidacy in (
+                    seated := councillor.get((dignity, canton, circumscription), {})
+                ):
+                    # the book names each canton's elected councillors, so their votes identify the candidacies
+                    elected = seated[candidacy]
+                    person_name, org = elected.name, elected.org
+                    label = f"{person_name}, {org}" if org else person_name
                 p.add(
                     "contest_option",
                     id=option,
@@ -498,12 +587,11 @@ def _local(p: Package, day: str) -> None:
                         id=key("candidacy", name, candidacy),
                         person_id=person,
                         option_id=option,
-                        role="head",
+                        role="head" if single else "list_member",
                         ballot_name=title(person_name),
                     )
                     p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=None, kind="elected")
                     people.add(person)
-            single = dignity in ("2", "4")
             for parish_rows in rows.partition_by("PARROQUIA_CODIGO", as_dict=False):
                 row = parish_rows.row(0, named=True)
                 unit = _unit(p, day, code(row["PARROQUIA_CODIGO"]), parishes, seen)
