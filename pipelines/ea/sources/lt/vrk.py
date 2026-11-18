@@ -744,6 +744,9 @@ def files(config: Config, item: Part) -> dict[int, list[Frame]]:
                 found.setdefault(round_, []).append(normalize(url, item.prefix))
             elif item.kind == "mayor" and (frame := from_pages(district_urls(config, round_, number))):
                 found.setdefault(round_, []).append(frame)
+            else:
+                # A partial cache would silently drop a round and, with it, parties the registry already holds.
+                raise FileNotFoundError(f"lt.vrk {config.first} {item.kind}: {url} is not cached; run the fetch")
         LOADED[(config.first, item)] = found
     return LOADED[(config.first, item)]
 
