@@ -12,7 +12,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.bd import report1996
+from ea.sources.bd import report1991, report1996
 from ea.sources.bd.bijoy import unicode
 
 SOURCE = "bd.ecs_parliament"
@@ -24,6 +24,7 @@ SCHEME = "bd.constituency"
 VOTES, REGISTERED, CAST, VALID, INVALID = 1, 2, 3, 4, 5
 
 # The Commission's statistical reports of each general election, posted in its Election Report category.
+REPORT_1991 = report1991.URL
 REPORT_1996 = ASSET + "VCgSSqUcjDR8tI1q8QbNACSe96YNm2EYTISFFKtl.pdf"
 REPORT_2001 = ASSET + "WqafvkDhpbk4kb1MV6PNWIHvIngSvbLWrVIhVxEK.pdf"
 REPORT_2008 = ASSET + "36Sa01LjyXk71kuGw5U1oK5zGEvYq8LxRx5sm0MG.pdf"
@@ -72,11 +73,12 @@ class General:
 
 
 GENERAL = {
+    1991: General(date(1991, 2, 27), 5, REPORT_1991, (report1991.FIRST, report1991.LAST), 300),
     1996: General(date(1996, 6, 12), 7, REPORT_1996, (report1996.FIRST, report1996.LAST), 300),
     2001: General(date(2001, 10, 1), 8, REPORT_2001, (208, 324), 300),
     2008: General(date(2008, 12, 29), 9, REPORT_2008, (159, 309), 300),
 }
-ORDINAL = {7: "7th", 8: "8th", 9: "9th"}
+ORDINAL = {5: "5th", 7: "7th", 8: "8th", 9: "9th"}
 
 
 def clean(text: str) -> str:
@@ -701,6 +703,25 @@ def seats_1996() -> list[Seat]:
     return seats
 
 
+@functools.cache
+def seats_1991() -> list[Seat]:
+    """The 1991 constituencies as read by eye from the scanned report, named in English by the 2001 report's names
+    for the same numbers: the delimitation of 1984 held from the 1986 election to the 2001 one."""
+    names = {seat.number: seat.name for seat in seats_2001()}
+    registered = report1991.voters()
+    seats: list[Seat] = []
+    for table in report1991.tables():
+        seat = Seat(table.number, names[table.number], None)
+        seat.registered = registered[table.number]
+        seat.valid, seat.invalid = table.valid, table.invalid
+        # The printed total includes the tendered ballots, cast by voters whose names had already been used and
+        # not counted; ballots cast are the rest.
+        seat.cast = table.valid + table.invalid if table.total is None else table.total - table.tendered
+        seat.candidates = [Candidate(c.name, c.party, c.votes) for c in table.candidates]
+        seats.append(seat)
+    return seats
+
+
 # ----------------------------------------------------------------------------------------------------------------
 
 
@@ -788,18 +809,19 @@ def english(bengali: str) -> str:
 
 
 def seats(year: int) -> list[Seat]:
-    found = {1996: seats_1996, 2001: seats_2001, 2008: seats_2008}[year]()
+    found = {1991: seats_1991, 1996: seats_1996, 2001: seats_2001, 2008: seats_2008}[year]()
     for seat in found:
         if seat.name_bn and not seat.name:
             seat.name = english(seat.name_bn)
     spec = GENERAL[year]
-    if [s.number for s in found] != list(range(1, spec.seats + 1)):
+    left_out = report1991.excluded() if year == 1991 else set()
+    if [s.number for s in found] != [n for n in range(1, spec.seats + 1) if n not in left_out]:
         raise ValueError(f"{year}: the report does not list constituencies 1 to {spec.seats} once each")
     for seat in found:
         total = sum(c.votes for c in seat.candidates)
-        if total != seat.valid:
+        if total != seat.valid and not (year == 1991 and seat.number in report1991.unbalanced()):
             raise ValueError(f"{year} seat {seat.number}: candidates sum to {total}, the report prints {seat.valid}")
-        if seat.valid + seat.invalid != seat.cast:
+        if seat.valid + seat.invalid != seat.cast and not (year == 1991 and seat.number in report1991.unbalanced()):
             raise ValueError(f"{year} seat {seat.number}: valid and cancelled votes do not add to the turnout")
     return found
 
@@ -809,7 +831,7 @@ def packages() -> list[str]:
 
 
 def fetch() -> None:
-    for url in (REPORT_1996, REPORT_2001, REPORT_2008):
+    for url in (REPORT_1991, REPORT_1996, REPORT_2001, REPORT_2008):
         raw.fetch(SOURCE, url, suffix=".pdf")
 
 
@@ -846,7 +868,8 @@ def area(name: str) -> str:
 def constituencies() -> dict[str, tuple[str, str | None]]:
     """Each constituency by its slug: its English name and its Bengali name, where a report prints one."""
     found: dict[str, tuple[str, str | None]] = {}
-    for year in GENERAL:
+    # The 1991 and 1996 constituencies take the 2001 report's names by number, so the later reports name them all.
+    for year in (2001, 2008):
         for seat in seats(year):
             code = changeset.slug(seat.name)
             known = found.get(code, (seat.name, None))
@@ -879,8 +902,98 @@ def party(name: str) -> str:
     return key("party", name.casefold())
 
 
+# The parties that ran in 1996, as the 1996 package names them. Reading them takes the OCR of the whole 1996 scan,
+# so they are listed here for the registry and the geography, and the 1996 package checks the list against its own.
+USED_1996 = (
+    "Bangladesh Awami League",
+    "Bangladesh Bastuhara Parishad",
+    "Bangladesh Bekar Samaj",
+    "Bangladesh Gono Azadi League (Samad)",
+    "Bangladesh Hindu League",
+    "Bangladesh Islami Biplobi Parishad",
+    "Bangladesh Islami Front",
+    "Bangladesh Islami Party",
+    "Bangladesh Janata Party",
+    "Bangladesh Jatiya Agragati Party",
+    "Bangladesh Jatiya League (Sobhan)",
+    "Bangladesh Jatiyabadi Awami League (Mostofa Allama)",
+    "Bangladesh Khelafat Andolon",
+    "Bangladesh Krisak Sramik Janata Party",
+    "Bangladesh Krisak Sramik Mukti Andolon",
+    "Bangladesh Krishak Raj Islami Party (F.Hq. Sardar)",
+    "Bangladesh Manabadhikar Dal (Bamad)",
+    "Bangladesh Mehanati Front",
+    "Bangladesh Muslim League (Jamir Ali)",
+    "Bangladesh National Congress",
+    "Bangladesh Nationalist Party (BNP)",
+    "Bangladesh People's League",
+    "Bangladesh Peoples Party (BPP)",
+    "Bangladesh Samajtantrik Dal (BASAD-Khalekuzzaman)",
+    "Bangladesh Samajtantrik Dal (Mahbub)",
+    "Bangladesh Samajtantrik Samsad (Darshan Shava)",
+    "Bangladesh Sammyabadi Dal (Marx-Lenin)",
+    "Bangladesh Sarbahara Party",
+    "Bangladesh Tafsil Jati Federation (S.K. Mandal)",
+    "Bangladesh Tafsili Federation (Sudir)",
+    "Bangladesh Tanjimul Muslimin",
+    "Bangladesh Vasani Adarsha Bastabayan Parishad",
+    "Bangladesh Workers Party",
+    "Bangladesher Communist Party",
+    "Bhasani Front",
+    "Communist Kendra",
+    "Democratic Republican Party",
+    "Desh Prem Party",
+    "Freedom Party",
+    "Gono Forum",
+    "Gono Oikkya Front (Guff)",
+    "Gonotantri Party",
+    "Gontantrik Sarbahara Party",
+    "Hak Kathar Mancha",
+    "Islami Al Zihad Dal",
+    "Islami Oikya Jote",
+    "Islami Shasantantra Andolon",
+    "Islamic Dal Bangladesh (Saifur)",
+    "Jaker Party",
+    "Jamaat-e-Islami Bangladesh",
+    "Jamiate Ulamae Islam Bangladesh",
+    "Jana Dal",
+    "Jatiya Biplobi Front",
+    "Jatiya Daridra Party",
+    "Jatiya Janata Party (Nurul Islam)",
+    "Jatiya Janata Party (Sheik Asad)",
+    "Jatiya Party (Ershad)",
+    "Jatiya Samajtantrik Dal (Inu)",
+    "Jatiya Samajtantrik Dal (Mahiuddin)",
+    "Jatiya Samajtantrik Dal (Rab)",
+    "Jatiya Seba Dal",
+    "National Awami Party (NAP)",
+    "National Awami Party (NAP-Bhasani)",
+    "National Awami Party (NAP-Vasani Mushtaq)",
+    "National Democratic Party",
+    "National Patriotic Party",
+    "Oikya Prokria",
+    "People's Muslim League",
+    "Pragatishil Gonotantrik Shakti (Pragash)",
+    "Progotisil Jatiatabadi Dal (Nurul A Moula)",
+    "Quran Darshan Sangstha Bangladesh",
+    "Quran and Sunnah Bastabayan Party",
+    "Saat Dalya Jote (Mirpur)",
+    "Sammilita Sangram Parishad",
+    "Samridha Bangladesh Andolon",
+    "Samridhya Bangladesh Babosai Samproday",
+    "Social Democratic Party",
+    "Sramajibi Oikya Foram",
+    "Sramik Krishak Samajbadi Dal",
+    "Taherikay Olama-E-Bangladesh",
+    "United People's Party",
+)
+
+
 def used_parties() -> list[str]:
-    found = {c.party for year in GENERAL for seat in seats(year) for c in seat.candidates if not c.none_of_above}
+    found = set(USED_1996)
+    for year in GENERAL:
+        if year != 1996:
+            found |= {c.party for seat in seats(year) for c in seat.candidates if not c.none_of_above}
     return sorted(found - {"Independent"})
 
 
@@ -888,7 +1001,8 @@ def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "Bangladesh's parties of the 1996, 2001, and 2008 general elections, the Jatiya Sangsad, and its electoral system",
+        "Bangladesh's parties of the 1991, 1996, 2001, and 2008 general elections, the Jatiya Sangsad, and its "
+        "electoral system",
         depends=[f"{SOURCE}/geo"],
     )
     p.external.add(BANGLADESH)
@@ -911,10 +1025,22 @@ def registry() -> Package:
         p.name(id, name, "en", "official")
         if name in BENGALI:
             p.name(id, BENGALI[name], "bn", "official")
+        elif name in report1991.BENGALI:
+            p.name(id, report1991.BENGALI[name], "bn", "official")
     return p
 
 
 METHOD = {
+    1991: (
+        "Counted by the Bangladesh Election Commission for each constituency, as appendix 47 of its report on the "
+        "1991 election prints them, with the registered voters of each constituency from the same report's table "
+        "of voters. The report is a Bengali scan with no text layer, so every number and name was read by eye "
+        "from the page images, and a constituency was kept only where its candidates' votes add to the printed "
+        "sum and the printed valid votes, and its valid, cancelled, and tendered ballots add to the printed total. "
+        "Ballots cast are the valid and cancelled ballots; the tendered ballots, which the report prints beside "
+        "them, are not counted. The candidate with the most votes is stored as elected. Constituencies are "
+        "matched to the 2001 report's by number, under the same delimitation of 1984."
+    ),
     1996: (
         "Counted by the Bangladesh Election Commission for each constituency, as chapter 6 of its statistical "
         'report on the 1996 election ("Detailed Results as Described in the Result Sheet furnished by the Returning '
@@ -969,16 +1095,17 @@ def election(year: int) -> Package:
     p.add("slug", path=path, entity_id=id, is_current=True)
     # Two general elections were held in 1996, on 15 February and 12 June, so the June one carries its month.
     p.name(id, f"{'June ' if year == 1996 else ''}{year} Bangladeshi general election", "en", "official")
-    lang = "bn" if year == 2008 else "en"
-    scanned = year == 1996
+    lang = "bn" if year in (1991, 2008) else "en"
+    scanned = year in (1991, 1996)
+    tables = tables_1996() if year == 1996 else {}
+    read = {t.number: t for t in report1991.tables()} if year == 1991 else {}
+    pages: dict[int, str] = {}
     if scanned:
         stored = raw.cached(SOURCE, spec.url)
         artifact = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{ECS}\x1f{stored.storage_key}"))
-        tables = tables_1996()
-        pages: dict[int, str] = {}
-        for number in sorted(
-            {t.page for t, _ in tables.values()} | {r.page for t, _ in tables.values() for r in t.rows}
-        ):
+        used = {t.page for t, _ in tables.values()} | {r.page for t, _ in tables.values() for r in t.rows}
+        used |= {t.page for t in read.values()} | {c.page for t in read.values() for c in t.candidates}
+        for number in sorted(used):
             pages[number] = key("page", day, number)
             p.add(
                 "source_page",
@@ -989,6 +1116,23 @@ def election(year: int) -> Package:
                 width=PAGE_WIDTH,
                 height=PAGE_HEIGHT,
             )
+    if year == 1991:
+        p.accept(
+            "accounting.votes_valid",
+            "In 9 constituencies (11, 94, 132, 140, 157, 188, 194, 218, and 57) the 1991 report's candidates' votes, "
+            "each legible, add to a different number than the valid votes it prints both as the column's sum and "
+            "beside the table; both are stored as printed, and each result set's note gives the two figures.",
+        )
+        p.accept(
+            "accounting.ballots_sum",
+            "In 3 constituencies (57, 128, and 136) the 1991 report prints a total of ballots that its valid, "
+            "cancelled, and tendered ballots do not add to; ballots cast are the printed total less the tendered "
+            "ballots, and each result set's note gives the printed figures.",
+        )
+    if year == 1996:
+        ran = {c.party for seat in seats(year) for c in seat.candidates} - {"Independent"}
+        if ran != set(USED_1996):
+            raise ValueError(f"1996: the parties read differ from USED_1996: {sorted(ran ^ set(USED_1996))}")
     for seat in seats(year):
         tag = f"{day}:{seat.number}"
         district = area(seat.name)
@@ -1037,8 +1181,10 @@ def election(year: int) -> Package:
         method = METHOD[year]
         if seat.day:
             method = f"{method} {LATE_NOTE.format(day=seat.day)}"
-        if scanned and (footnote := tables[seat.number][0].footnote):
+        if year == 1996 and (footnote := tables[seat.number][0].footnote):
             method = f"{method} {FOOTNOTES_1996[footnote]}"
+        if year == 1991 and (note := read[seat.number].note()):
+            method = f"{method} {note}"
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
         real = [c for c in seat.candidates if not c.none_of_above]
         ranked = sorted((c.votes for c in real), reverse=True)
@@ -1081,10 +1227,13 @@ def election(year: int) -> Package:
             if c.votes == ranked[0] and (len(ranked) < 2 or ranked[0] > ranked[1]):
                 p.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
             put(p, result_set, unit, option, VOTES, c.votes, scanned)
-            rows = tables[seat.number][0].rows if scanned else []
-            if scanned and len(rows) == len(seat.candidates):
+            rows = tables[seat.number][0].rows if year == 1996 else []
+            if rows and len(rows) == len(seat.candidates):
                 row = rows[index - 1]
                 locate(p, result_set, unit, option, VOTES, pages[row.page], row.box)
+            if year == 1991 and (box := read[seat.number].candidates[index - 1].box):
+                spot = read[seat.number].candidates[index - 1].page
+                locate(p, result_set, unit, option, VOTES, pages[spot], box, report1991.DPI)
         for measure, value in (
             (REGISTERED, seat.registered),
             (CAST, seat.cast),
@@ -1092,7 +1241,9 @@ def election(year: int) -> Package:
             (VALID, seat.valid),
         ):
             put(p, result_set, unit, None, measure, value, scanned)
-            if scanned:
+            if year == 1991 and measure == VALID and (box := read[seat.number].valid_box):
+                locate(p, result_set, unit, None, measure, pages[read[seat.number].valid_page], box, report1991.DPI)
+            if year == 1996:
                 spot = tables[seat.number][0].boxes.get(MEASURES[measure])
                 if spot is not None:
                     locate(p, result_set, unit, None, measure, pages[spot[0]], spot[1])
@@ -1108,9 +1259,18 @@ DIGITIZED = 8
 
 
 def locate(
-    p: Package, result_set: str, unit: str, option: str | None, measure: int, page: str, box: report1996.Box
+    p: Package,
+    result_set: str,
+    unit: str,
+    option: str | None,
+    measure: int,
+    page: str,
+    box: report1996.Box,
+    dpi: int = report1996.DPI,
 ) -> None:
+    """A value's box on its page, from its box in pixels on the page rendered at `dpi`."""
     x0, y0, x1, y1 = box
+    width, height = SCAN_WIDTH * dpi / report1996.DPI, SCAN_HEIGHT * dpi / report1996.DPI
     p.add(
         "value_locator",
         result_set_id=result_set,
@@ -1121,10 +1281,10 @@ def locate(
         count_round=0,
         page_id=page,
         source_id=None,
-        x0=round(max(x0, 0) / SCAN_WIDTH, 4),
-        y0=round(max(y0, 0) / SCAN_HEIGHT, 4),
-        x1=round(min(x1, SCAN_WIDTH) / SCAN_WIDTH, 4),
-        y1=round(min(y1, SCAN_HEIGHT) / SCAN_HEIGHT, 4),
+        x0=round(max(x0, 0) / width, 4),
+        y0=round(max(y0, 0) / height, 4),
+        x1=round(min(x1, width) / width, 4),
+        y1=round(min(y1, height) / height, 4),
     )
 
 
