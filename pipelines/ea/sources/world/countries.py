@@ -250,7 +250,7 @@ POLITIES: dict[str, tuple[str, str | None, str, list[tuple[str, str]], str, str,
         "1918-11-12",
     ),
     "XWI": ("historical_state", None, "West Indies Federation", [], "1958-01-03", "day", "1962-06-01"),
-    "XFR": ("historical_state", None, "Federation of Rhodesia and Nyasaland", [], "1953-08-01", "day", "1963-12-31"),
+    "XFR": ("historical_state", None, "Federation of Rhodesia and Nyasaland", [], "1953-08-01", "day", "1964-01-01"),
 }
 
 
