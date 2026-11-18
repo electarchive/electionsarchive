@@ -101,6 +101,18 @@
    "url": "https://www.cvk.gov.ua/pls/vm2020/wm001.html",
    "kind": "official_body",
    "note": "Summary pages pvm005 (councils and seats), pvm004 (heads), and pvm006 (territorial commissions) for election 695, the regular local elections of 25 October 2020, and list pages wm002 for the later local election days of 2020-2022."
+  },
+  "cvk_vnd1998": {
+   "title": "WWW ІАС «Вибори народних депутатів України 1998»: Результати голосування в одномандатних округах",
+   "publisher": "Центральна виборча комісія України",
+   "url": "https://www.cvk.gov.ua/pls/vnd1998/webproc73vfc93.html?kodvib=1",
+   "kind": "official_body"
+  },
+  "cvk_vnd2002": {
+   "title": "WWW ІАС «Вибори народних депутатів України 2002»: Результати голосування в одномандатних округах",
+   "publisher": "Центральна виборча комісія України",
+   "url": "https://www.cvk.gov.ua/pls/vnd2002/webproc73vb639.html?kodvib=400",
+   "kind": "official_body"
   }
  },
  "tiers": [
@@ -332,11 +344,17 @@
     },
     {
      "date": "1998-03-29",
-     "note": "225 single-member districts and one nationwide list. Not counted from a fetched source."
+     "note": "225 single-member districts and one nationwide list; counted per single-member district.",
+     "contests": 226,
+     "source": "cvk_vnd1998",
+     "quote": "Загальна кількість виборчих округів 225"
     },
     {
      "date": "2002-03-31",
-     "note": "225 single-member districts and one nationwide list. Not counted from a fetched source."
+     "note": "225 single-member districts and one nationwide list; counted per single-member district.",
+     "contests": 226,
+     "source": "cvk_vnd2002",
+     "quote": "Загальна кількість виборчих округів 225"
     },
     {
      "date": "2006-03-26",
