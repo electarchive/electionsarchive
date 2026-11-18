@@ -78,7 +78,7 @@ def json_url(kind: str, day: str) -> str:
 
 
 def fetch() -> None:
-    from ea.sources.tw import cec_by, cec_recall, cec_referendum, cec_township, cec_village
+    from ea.sources.tw import cec_abolished, cec_by, cec_recall, cec_referendum, cec_township, cec_village
 
     for day in PRESIDENT:
         for url, suffix in (
@@ -89,6 +89,7 @@ def fetch() -> None:
             raw.fetch(SOURCE, url, suffix=suffix)
     fetch_legislative()
     cec_by.fetch()
+    cec_abolished.fetch()
     local_fetch()
     cec_township.fetch()
     cec_village.fetch()
@@ -116,7 +117,7 @@ def office(county: str) -> str:
 
 
 def packages() -> list[str]:
-    from ea.sources.tw import cec_by, cec_recall, cec_referendum, cec_township, cec_village
+    from ea.sources.tw import cec_abolished, cec_by, cec_recall, cec_referendum, cec_township, cec_village
 
     return [
         "tw.cec/geo",
@@ -124,6 +125,7 @@ def packages() -> list[str]:
         *(f"tw.cec/prez-{day}" for day in PRESIDENT),
         *(f"tw.cec/leg-{day}" for day in leg_days()),
         *cec_by.packages(),
+        *cec_abolished.packages(),
         *(f"tw.cec/local-{day}" for day in LOCAL_DAYS),
         *cec_township.packages(),
         *cec_village.packages(),
@@ -133,7 +135,7 @@ def packages() -> list[str]:
 
 
 def parse() -> None:
-    from ea.sources.tw import cec_by, cec_recall, cec_referendum, cec_township, cec_village
+    from ea.sources.tw import cec_abolished, cec_by, cec_recall, cec_referendum, cec_township, cec_village
 
     geo().write()
     registry().write()
@@ -142,6 +144,7 @@ def parse() -> None:
     for day in leg_days():
         legislative(day).write()
     cec_by.parse()
+    cec_abolished.parse()
     for day in LOCAL_DAYS:
         local(day).write()
     cec_township.parse()
