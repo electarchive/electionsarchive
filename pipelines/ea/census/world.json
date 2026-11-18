@@ -868,10 +868,11 @@
       "kind": "compendium"
     },
     "vdr": {
-      "publisher": "Voice of Vietnam (VOV)",
-      "title": "History of National Assembly elections in Vietnam",
-      "url": "https://english.vov.vn/en/politics/history-of-national-assembly-elections-in-vietnam-post1273487.vov",
-      "kind": "compendium"
+      "publisher": "Cổng Thông tin điện tử Chính phủ",
+      "title": "I- Từ Ủy ban Dân tộc giải phóng đến Chính phủ lâm thời nước Việt Nam Dân chủ Cộng hòa",
+      "url": "https://chinhphu.vn/giai-doan-1945-1954-khang-chien-va-kien-quoc/i-tu-uy-ban-dan-toc-giai-phong-den-chinh-phu-lam-thoi-nuoc-viet-nam-dan-chu-cong-hoa-10001588",
+      "kind": "official_body",
+      "note": "The Government of Vietnam's history of the Democratic Republic's founding: the Provisional Government's proclamation and the Declaration of Independence in Ba Đình Square on 2 September 1945. The end date is the first session of the Sixth National Assembly, which on 2 July 1976 named the reunified state the Socialist Republic of Vietnam, as the same history records (chinhphu.vn/giai-doan-1976-1985-dat-nuoc-thong-nhat-xay-dung-va-bao-ve-to-quoc-xhcn/i-chinh-phu-nhiem-ky-quoc-hoi-khoa-vi-1976-1981-2892); the IPU PARLINE archive files the 1975 election under the Democratic Republic and the 1976 election under the Socialist Republic (archive.ipu.org/parline-e/reports/2349_arc.htm)."
     },
     "xot": {
       "publisher": "Istanbul Tarihi",
@@ -3366,9 +3367,9 @@
       "iso": "VDR",
       "name_en": "North Vietnam",
       "status": "former",
-      "reason": "National Assembly elections from 1946 to 1971.",
+      "reason": "Proclaimed on 2 September 1945, when the Provisional Government read the Declaration of Independence in Hanoi, and ended on 2 July 1976, when the National Assembly of the reunified country, elected on 25 April 1976, named the state the Socialist Republic of Vietnam. It held five general elections of the National Assembly: across the whole country on 6 January 1946, then in the north only on 8 May 1960, 26 April 1964, 11 April 1971, and 6 April 1975.",
       "source": "vdr",
-      "locator": "https://english.vov.vn/en/politics/history-of-national-assembly-elections-in-vietnam-post1273487.vov"
+      "locator": "https://chinhphu.vn/giai-doan-1945-1954-khang-chien-va-kien-quoc/i-tu-uy-ban-dan-toc-giai-phong-den-chinh-phu-lam-thoi-nuoc-viet-nam-dan-chu-cong-hoa-10001588 (Ngày 2-9-1945, Chủ tịch Hồ Chí Minh và Chính phủ lâm thời đã làm lễ ra mắt quốc dân tại Quảng trường Ba Đình, Hà Nội)"
     },
     {
       "iso": "XOT",
