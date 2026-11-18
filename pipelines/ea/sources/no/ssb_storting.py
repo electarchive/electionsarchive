@@ -12,7 +12,6 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.no import valg
 
 Doc = dict[str, Any]
 SOURCE = "no.ssb_storting"
@@ -324,7 +323,15 @@ def geo() -> Package:
     p.external |= {NORWAY, COUNTRY}
     _sources(p)
     _used(p)
-    p.add("scheme", code=DISTRICT, polity_id=NORWAY, kind="electoral", rank=1, noun="constituency", code_system="ssb")
+    p.add(
+        "scheme",
+        code=DISTRICT,
+        polity_id=NORWAY,
+        kind="electoral_district",
+        rank=1,
+        noun="constituency",
+        code_system="ssb",
+    )
     p.add(
         "scheme",
         code=MUNICIPALITY,
@@ -349,6 +356,9 @@ def geo() -> Package:
     return p
 
 
+STORTING = key("body", "storting")
+
+
 def party(code: str) -> str:
     return key("party", code)
 
@@ -360,8 +370,11 @@ def registry() -> Package:
         "The lists on the Storting ballots from 1945 to 2005, as Statistics Norway's Statbank names them",
         depends=[f"{SOURCE}/geo"],
     )
-    p.external |= {NORWAY, valg.STORTING}
+    p.external |= {NORWAY}
     _used(p)
+    p.add("body", id=STORTING, polity_id=NORWAY, kind="unicameral")
+    p.name(STORTING, "Storting", "en", "official")
+    p.name(STORTING, "Stortinget", "nb", "native", False)
     for code, text in sorted(parties().items()):
         if code in COLLECTIVE:
             continue
@@ -420,7 +433,7 @@ def election(year: int) -> Package:
         f"Norway's Storting election of {year} by municipality",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
-    p.external |= {NORWAY, COUNTRY, valg.STORTING}
+    p.external |= {NORWAY, COUNTRY}
     names = parties()
     day = DAYS[year]
     for table in TABLES:
@@ -452,7 +465,7 @@ def election(year: int) -> Package:
             id=contest_id,
             election_id=election_id,
             kind="list_allocation",
-            body_id=valg.STORTING,
+            body_id=STORTING,
             district_area_id=COUNTRY if contest.code == "0" else area(DISTRICT, contest.code),
             magnitude=sum(contest.seats.values()) or None,
             round_number=1,
