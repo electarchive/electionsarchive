@@ -1,0 +1,770 @@
+{
+  "polity": "GE-AB",
+  "name": "Republic of Abkhazia",
+  "sources": {
+    "const": {
+      "title": "Конституция Республики Абхазия",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/upload/iblock/75c/75cf64179cef912eb881ebfd5dbf00ca.doc",
+      "kind": "official_body",
+      "note": "Adopted by the Supreme Council on 26 November 1994 (No. 187-s). Arts. 37 (35 deputies, five-year term), 49 (President elected directly for five years), 54 (Vice-President elected with the President), 78-79 (local self-government; heads of district and city administrations appointed by the President), and the constitutional law on its entry into force (point 5: the first President elected by Parliament; point 7: a new Parliament elected in 1995)."
+    },
+    "law-parl": {
+      "title": "Конституционный закон Республики Абхазия «О выборах депутатов Народного Собрания – Парламента Республики Абхазия»",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/upload/iblock/343/343860cd1d7def4f8118e1837a94eef8.doc",
+      "kind": "official_body",
+      "note": "Consolidated text as amended to 25 November 2009. Arts. 1 (35 single-member districts), 4 (called by the President), 9 (districts formed by the Central Election Commission), 34 (25% turnout), 35 (results published by the Commission within seven days), 36 (runoff of the top two within two weeks), 37 (repeat elections and by-elections within two months)."
+    },
+    "law-pres": {
+      "title": "Конституционный закон Республики Абхазия «О выборах Президента Республики Абхазия»",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/upload/iblock/31a/31a848c55af9f77e7a0f17ef41671e1c.doc",
+      "kind": "official_body",
+      "note": "Consolidated text as amended to 25 November 2009. Arts. 4 (called by the People's Assembly; early election within three months of a vacancy) and 25 (absolute majority of those voting with 50% turnout; runoff of the top two within two weeks; repeat election)."
+    },
+    "law-local": {
+      "title": "Закон Республики Абхазия «О выборах в органы местного самоуправления»",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/upload/iblock/ae8/ae8abda12e1c86066daa33e98dfb3508.doc",
+      "kind": "official_body",
+      "note": "Arts. 1 (assemblies of the city, districts, towns, settlements, and villages elected in single-member districts for four years) and 5 (all held on one day, called by the President)."
+    },
+    "law-ref": {
+      "title": "Закон Республики Абхазия «О всенародном голосовании (референдуме)»",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/upload/iblock/1ff/1ff8b18e67431adfcd218508c94f30ef.doc",
+      "kind": "official_body"
+    },
+    "law-atu": {
+      "title": "Закон Республики Абхазия «Об управлении в административно-территориальных единицах Республики Абхазия»",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/upload/iblock/89b/89b52988ef9de37d281be8c78f1a9640.doc",
+      "kind": "official_body",
+      "note": "Art. 2: the city of Sukhum; the district towns Gagra, Gudauta, Ochamchyra, Tkuarchal, and Gal; the town of New Athos; and the Gagra, Gudauta, Sukhum, Gulripsh, Ochamchyra, Tkuarchal, and Gal districts. Local self-government acts through the assemblies (Sobraniye) of the district, city, town, settlement, and village."
+    },
+    "parl-structure": {
+      "title": "Структура законодательного собрания",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/sostav-i-struktura/struktura-zakonodatelnogo-sobraniya/",
+      "kind": "official_body"
+    },
+    "pres-history": {
+      "title": "История",
+      "publisher": "Администрация Президента Республики Абхазия",
+      "url": "https://president.apsny.land/istoriya",
+      "kind": "official_body"
+    },
+    "pres-info": {
+      "title": "Общая информация",
+      "publisher": "Администрация Президента Республики Абхазия",
+      "url": "https://president.apsny.land/obshchaya-informatsiya",
+      "kind": "official_body"
+    },
+    "pres-bio": {
+      "title": "Биография Президента Республики Абхазия",
+      "publisher": "Администрация Президента Республики Абхазия",
+      "url": "https://president.apsny.land/prezident/biografiya",
+      "kind": "official_body"
+    },
+    "cec": {
+      "title": "Центральная избирательная комиссия Республики Абхазия",
+      "publisher": "Центральная избирательная комиссия Республики Абхазия",
+      "url": "https://cikra.org/",
+      "kind": "official_body",
+      "note": "Administers parliamentary, presidential, and referendum votes and publishes their results; the site did not answer from a cloud network on 18 November 2026."
+    },
+    "parl-1996": {
+      "title": "Скончался депутат Народного Собрания – Парламента Республики Абхазия второго созыва",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/novosti/807.html",
+      "kind": "official_body"
+    },
+    "parl-2002": {
+      "title": "Ушел из жизни депутат Народного Собрания – Парламента Республики Абхазия III и IV созывов Валерий Кондаков",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/novosti/4561.html",
+      "kind": "official_body"
+    },
+    "parl-deputies": {
+      "title": "Новости, 9 февраля 2018 года (биография депутата IV, V и VI созывов)",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/novosti/1462.html",
+      "kind": "official_body"
+    },
+    "parl-2014": {
+      "title": "Заявление Миссии международных наблюдателей от Соединённого Королевства о досрочных выборах Президента Республики Абхазия 24 августа 2014 года",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/novosti/1054.html",
+      "kind": "official_body"
+    },
+    "parl-2022": {
+      "title": "В Республику Абхазия прибыла делегация Совета Федерации Федерального Собрания Российской Федерации",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/novosti/2304.html",
+      "kind": "official_body"
+    },
+    "parl-2025-term": {
+      "title": "Состоялось внеочередное заседание сессии Парламента Республики Абхазия, 18 февраля 2025 года",
+      "publisher": "Народное Собрание – Парламент Республики Абхазия",
+      "url": "https://parlamentra.org/novosti/4708.html",
+      "kind": "official_body"
+    },
+    "decree-2021": {
+      "title": "Указ «О назначении выборов в Народное Собрание – Парламент Республики Абхазия», 13 декабря 2021 года",
+      "publisher": "Администрация Президента Республики Абхазия",
+      "url": "https://president.apsny.land/545465/ukazy-i-rasporyazheniya-prezidenta/item/1122-ukaz-o-naznachenii-vyborov-v-narodnoe-sobranie-parlament-ra",
+      "kind": "official_body"
+    },
+    "decree-local-2025": {
+      "title": "Указ «О назначении выборов в органы местного самоуправления Республики Абхазия», 7 февраля 2025 года",
+      "publisher": "Администрация Президента Республики Абхазия",
+      "url": "https://president.apsny.land/545465/ukazy-i-rasporyazheniya-prezidenta/item/818-ispolnyayushchij-obyazannosti-prezidenta-valerij-bganba-podpisal-ukaz-o-naznachenii-vyborov-v-organy-mestnogo-samoupravleniya-respubliki-abkhaziya",
+      "kind": "official_body"
+    },
+    "decree-local-2025-void": {
+      "title": "Указ «О признании утратившим силу Указа Президента Республики Абхазия «О назначении выборов в органы местного самоуправления Республики Абхазия»», 19 февраля 2025 года",
+      "publisher": "Администрация Президента Республики Абхазия",
+      "url": "https://president.apsny.land/545465/ukazy-i-rasporyazheniya-prezidenta/item/811-ukaz-o-priznanii-utrativshim-silu-ukaza-prezidenta-ra-o-naznachenii-vyborov-v-organy-mestnogo-samoupravleniya-respubliki-abkhaziya",
+      "kind": "official_body"
+    },
+    "pres-local-2025": {
+      "title": "Президент назначил выборы в органы местного самоуправления",
+      "publisher": "Администрация Президента Республики Абхазия",
+      "url": "https://president.apsny.land/novosti/item/611-prezident-naznachil-vybory-v-organy-mestnogo-samoupravleniya",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Республика Абхазия (Аҧсны)",
+      "name_en": "Republic of Abkhazia",
+      "parent": null,
+      "polity_kind": "de_facto_state",
+      "valid_from": "1992-07-23",
+      "source": "pres-history"
+    },
+    {
+      "key": "okrug",
+      "name": "Избирательные округа по выборам в Парламент",
+      "name_en": "People's Assembly constituencies",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "ge-ab.okrug",
+      "elects": false,
+      "source": "law-parl",
+      "counts": [
+        {
+          "date": "2009-11-25",
+          "value": 35,
+          "source": "law-parl",
+          "locator": "https://parlamentra.org/upload/iblock/343/343860cd1d7def4f8118e1837a94eef8.doc (art. 1: \"Выборы депутатов проводятся по одномандатным (один округ – один депутат) избирательным округам ... Парламент состоит из 35 депутатов\"; text as amended to 25 November 2009)"
+        }
+      ]
+    },
+    {
+      "key": "raion",
+      "name": "Районы и город Сухум",
+      "name_en": "Districts and the city of Sukhum",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "ge-ab.raion",
+      "source": "law-atu",
+      "counts": [
+        {
+          "date": "2010-03-02",
+          "value": 8,
+          "source": "law-atu",
+          "locator": "https://parlamentra.org/upload/iblock/89b/89b52988ef9de37d281be8c78f1a9640.doc (art. 2: \"город - город Сухум ... районы - Гагрский, Гудаутский, Сухумский, Гулрыпшский, Очамчырский, Ткуарчалский, Гальский\"; text as amended to 2 March 2010)"
+        }
+      ]
+    },
+    {
+      "key": "settlement",
+      "name": "Города в районе, поселки и села",
+      "name_en": "Towns, settlements, and villages",
+      "parent": "raion",
+      "polity_kind": "municipality",
+      "scheme": "ge-ab.settlement",
+      "source": "law-atu"
+    }
+  ],
+  "classes": [
+    {
+      "key": "narodnoe_sobranie",
+      "tier": "national",
+      "name": "Выборы депутатов Народного Собрания – Парламента Республики Абхазия",
+      "name_en": "People's Assembly (Parliament)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1994-11-26",
+      "first_held": "1996-11-23",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "ge-ab.okrug"
+        ],
+        "fine": [
+          "ge-ab.okrug",
+          "ge-ab.uchastok"
+        ]
+      },
+      "finest_note": "The Central Election Commission declares results by constituency; precinct protocols are posted by the constituency commissions.",
+      "source": "law-parl",
+      "locator": "https://parlamentra.org/upload/iblock/343/343860cd1d7def4f8118e1837a94eef8.doc (arts. 1, 4, 34-37)",
+      "note": "35 deputies elected for five years in single-member constituencies (Constitution art. 37). A candidate needs an absolute majority with at least 25% turnout; otherwise the top two meet in a runoff within two weeks (law arts. 34, 36). The Supreme Council elected in the autumn of 1991, before the Republic's span here, sat as the first convocation until 1996 under the 1994 Constitution's transitional provisions; that election belongs to Georgia's census.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GE-AB"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "runoff": "majority",
+          "runoff_rule": "Top two in a constituency within two weeks where no candidate won an absolute majority",
+          "administered_by": "Центральная избирательная комиссия Республики Абхазия",
+          "source": "const",
+          "locator": "https://parlamentra.org/upload/iblock/75c/75cf64179cef912eb881ebfd5dbf00ca.doc (art. 37: \"Срок полномочий Парламента пять лет\")"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия Республики Абхазия",
+          "url": "https://cikra.org/",
+          "format": "html (announcements and protocols of results)",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "cec",
+          "role": "administers",
+          "evidence": "The Commission's site refused the connection from a cloud network on 18 November 2026; its result pages have not been read",
+          "first_date": "1996-11-23",
+          "last_date": "2022-03-26",
+          "finest": "ge-ab.okrug"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1996-11-23",
+          "election_kind": "general",
+          "contests": 35,
+          "seats": 35,
+          "source": "parl-1996",
+          "quote": "В ноябре 1996 г. он был избран депутатом Народного Собрания – Парламента Республики Абхазия по Чубурхинджскому избирательному округу №33",
+          "note": "Second convocation (1996-2002), the first People's Assembly elected under the 1994 Constitution; the cited page gives the month. Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        },
+        {
+          "date": "2002-03-02",
+          "election_kind": "general",
+          "contests": 35,
+          "seats": 35,
+          "source": "parl-2002",
+          "quote": "В 2002 году Валерий Михайлович был избран депутатом Народного Собрания – Парламента Республики Абхазия по Гагрскому городскому округу и в течение всего III созыва",
+          "note": "Third convocation; the cited page gives the year. Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        },
+        {
+          "date": "2007-03-04",
+          "election_kind": "general",
+          "contests": 35,
+          "seats": 35,
+          "source": "parl-deputies",
+          "quote": "С 2007 – 2012 гг. – депутат Народного Собрания – Парламента Республики Абхазия IV созыва, избран по избирательному округу № 21",
+          "note": "Fourth convocation; the cited page gives the year. Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        },
+        {
+          "date": "2012-03-10",
+          "election_kind": "general",
+          "contests": 35,
+          "seats": 35,
+          "deferred": [
+            "2012-03-24"
+          ],
+          "source": "parl-deputies",
+          "quote": "С 2012 по 2017 гг. – депутат Народного Собрания – Парламента Республики Абхазия V созыва, избран по избирательному округу № 21",
+          "note": "Fifth convocation; the cited page gives the year. Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        },
+        {
+          "date": "2017-03-12",
+          "election_kind": "general",
+          "contests": 35,
+          "seats": 35,
+          "deferred": [
+            "2017-03-26"
+          ],
+          "source": "parl-deputies",
+          "quote": "В марте 2017 года избран депутатом Народного Собрания – Парламента Республики Абхазия VI созыва по избирательному округу № 23",
+          "note": "Sixth convocation; the cited page gives the month. Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        },
+        {
+          "date": "2022-03-12",
+          "election_kind": "general",
+          "contests": 35,
+          "seats": 35,
+          "deferred": [
+            "2022-03-26"
+          ],
+          "source": "parl-2022",
+          "quote": "выборов депутатов Народного Собрания – Парламента Республики Абхазия, которые состоятся 12 марта 2022 г.",
+          "note": "Seventh convocation, called by presidential decree of 13 December 2021; runoffs on 26 March 2022 (not quoted from a fetched source)."
+        }
+      ],
+      "est_votes": 85000,
+      "effort": 3
+    },
+    {
+      "key": "narodnoe_sobranie_povtornye",
+      "tier": "national",
+      "name": "Повторные выборы и выборы депутатов Народного Собрания – Парламента Республики Абхазия вместо выбывших",
+      "name_en": "People's Assembly repeat elections and by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1994-11-26",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "ge-ab.okrug"
+        ]
+      },
+      "source": "law-parl",
+      "locator": "https://parlamentra.org/upload/iblock/343/343860cd1d7def4f8118e1837a94eef8.doc (art. 37)",
+      "note": "The Central Election Commission calls a repeat election within two weeks where no deputy was elected or the election failed or was annulled, and a by-election when a seat falls vacant more than five months before the end of the term; either is held within two months (law art. 37).",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GE-AB"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия Республики Абхазия",
+          "url": "https://cikra.org/",
+          "format": "html (announcements and protocols of results)",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "cec",
+          "role": "administers",
+          "evidence": "The Commission's site refused the connection from a cloud network on 18 November 2026; its result pages have not been read",
+          "finest": "ge-ab.okrug"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1997-01-01",
+          "election_kind": "by_election",
+          "precision": "year",
+          "through": "2026-12-31",
+          "source": "law-parl",
+          "quote": "Если по избирательному округу не был избран ни один депутат, либо выборы по избирательному округу были признаны несостоявшимися или недействительными, либо в случае досрочного выбытия депутата Парламента, Центральная избирательная комиссия назначает в двухнедельный срок повторные выборы",
+          "note": "Repeat elections and by-elections in single constituencies across every convocation; not yet listed from the Commission's announcements."
+        }
+      ],
+      "est_votes": 5000,
+      "effort": 3
+    },
+    {
+      "key": "prezident",
+      "tier": "national",
+      "name": "Выборы Президента Республики Абхазия",
+      "name_en": "President and Vice-President",
+      "category": "executive",
+      "goal": "national",
+      "valid_from": "1994-11-26",
+      "first_held": "1999-10-03",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ge-ab.raion"
+        ],
+        "fine": [
+          "ge-ab.uchastok"
+        ]
+      },
+      "finest_note": "The Central Election Commission publishes the national result and the count by district and city.",
+      "source": "law-pres",
+      "locator": "https://parlamentra.org/upload/iblock/31a/31a848c55af9f77e7a0f17ef41671e1c.doc (arts. 4, 25)",
+      "note": "The President and Vice-President are elected together for five years (Constitution arts. 49, 54). A candidate needs more than half of those voting, with turnout of at least half the register; otherwise the top two meet within two weeks, where a plurality wins with 25% turnout (law art. 25). A vacancy is filled within three months (art. 4). The 3 October 2004 election, which the Commission declared for Sergei Bagapsh, was repeated on 12 January 2005.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "GE-AB"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "runoff": "majority",
+          "runoff_rule": "Top two within two weeks of the first round",
+          "administered_by": "Центральная избирательная комиссия Республики Абхазия",
+          "vacancy_rule": "Early election within three months of the vacancy, called by the People's Assembly",
+          "source": "law-pres",
+          "locator": "https://parlamentra.org/upload/iblock/31a/31a848c55af9f77e7a0f17ef41671e1c.doc (art. 4: \"Выборы должны быть проведены в трехмесячный срок\"; art. 25: runoff)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия Республики Абхазия",
+          "url": "https://cikra.org/",
+          "format": "html (announcements and protocols of results)",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "cec",
+          "role": "administers",
+          "evidence": "The Commission's site refused the connection from a cloud network on 18 November 2026; its result pages have not been read",
+          "first_date": "1999-10-03",
+          "last_date": "2025-03-01",
+          "finest": "ge-ab.raion"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1999-10-03",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cec",
+          "note": "First direct presidential election, held with the constitutional referendum; Vladislav Ardzinba was the only candidate. Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        },
+        {
+          "date": "2004-10-03",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cec",
+          "note": "Disputed result declared for Sergei Bagapsh; repeated on 12 January 2005. Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        },
+        {
+          "date": "2005-01-12",
+          "election_kind": "special",
+          "contests": 1,
+          "seats": 1,
+          "source": "pres-history",
+          "quote": "В январе 2005 г. президентом Абхазии был избран Сергей Васильевич Багапш",
+          "note": "Repeat election; the cited page gives the month. Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        },
+        {
+          "date": "2009-12-12",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cec",
+          "note": "Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        },
+        {
+          "date": "2011-08-26",
+          "election_kind": "special",
+          "contests": 1,
+          "seats": 1,
+          "source": "pres-history",
+          "quote": "В августе 2011 г. в ходе внеочередных президентских выборов, президентом Республики Абхазия был избран Александр Золотинскович Анкваб",
+          "note": "Early election after the death of Sergei Bagapsh on 29 May 2011; the cited page gives the month. Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        },
+        {
+          "date": "2014-08-24",
+          "election_kind": "special",
+          "contests": 1,
+          "seats": 1,
+          "source": "pres-history",
+          "quote": "24 августа 2014 г. президентом Республики Абхазия был избран Рауль Джумкович Хаджимба",
+          "note": "Early election after the resignation of Alexander Ankvab."
+        },
+        {
+          "date": "2019-08-25",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cec",
+          "note": "First round; the People's Assembly had moved the election from its first date. Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        },
+        {
+          "date": "2019-09-08",
+          "election_kind": "runoff",
+          "contests": 1,
+          "seats": 1,
+          "source": "pres-history",
+          "quote": "8 сентября 2019 г. на состоявшихся выборах Президента Республики Абхазия был переизбран Рауль Джумкович Хаджимба"
+        },
+        {
+          "date": "2020-03-22",
+          "election_kind": "special",
+          "contests": 1,
+          "seats": 1,
+          "source": "pres-bio",
+          "quote": "22 марта 2020 года избран Вице-президентом Республики Абхазия",
+          "note": "Repeat election after the Supreme Court annulled the 2019 result; the Vice-President is elected on the President's ticket."
+        },
+        {
+          "date": "2025-02-15",
+          "election_kind": "special",
+          "contests": 1,
+          "seats": 1,
+          "source": "cec",
+          "note": "Early election after the resignation of Aslan Bzhania in November 2024; first round. Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        },
+        {
+          "date": "2025-03-01",
+          "election_kind": "runoff",
+          "contests": 1,
+          "seats": 1,
+          "source": "pres-bio",
+          "quote": "1 марта 2025 года избран Президентом Республики Абхазия"
+        }
+      ],
+      "est_votes": 90000,
+      "effort": 2
+    },
+    {
+      "key": "prezident_parlament",
+      "tier": "national",
+      "name": "Избрание первого Президента Республики Абхазия Парламентом",
+      "name_en": "First President, elected by Parliament",
+      "category": "indirect",
+      "goal": "national",
+      "valid_from": "1994-11-26",
+      "valid_to": "1994-11-27",
+      "first_held": "1994-11-26",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "locator": "https://parlamentra.org/upload/iblock/75c/75cf64179cef912eb881ebfd5dbf00ca.doc (constitutional law on the entry into force of the Constitution, point 5: \"Первый Президент Республики Абхазия и первый Вице-президент Республики Абхазия избираются Парламентом Республики Абхазия\")",
+      "note": "The Supreme Council, renamed the People's Assembly, elected Vladislav Ardzinba the first President on the day it adopted the Constitution.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "GE-AB"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1994-11-26",
+          "election_kind": "indirect",
+          "contests": 1,
+          "seats": 1,
+          "source": "pres-history",
+          "quote": "26 ноября 1994 г. была принята новая Конституция Республики Абхазия, первым президентом Абхазии был избран В. Г. Ардзинба"
+        }
+      ],
+      "est_votes": 0,
+      "effort": 1
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Всенародное голосование (референдум)",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "1999-10-03",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ge-ab.raion"
+        ]
+      },
+      "source": "law-ref",
+      "note": "Called by the President on his own initiative or at the request of the People's Assembly or the Supreme Court (Constitution art. 53(19)). The 10 July 2016 referendum on an early presidential election failed for low turnout. The 17 March 1991 Soviet referendum predates the Republic's span here.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "GE-AB"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия Республики Абхазия",
+          "url": "https://cikra.org/",
+          "format": "html (announcements and protocols of results)",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "source": "cec",
+          "role": "administers",
+          "evidence": "The Commission's site refused the connection from a cloud network on 18 November 2026; its result pages have not been read",
+          "first_date": "1999-10-03",
+          "last_date": "2016-07-10",
+          "finest": "ge-ab.raion"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1999-10-03",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "pres-info",
+          "quote": "одобрена всенародным голосованием 3 октября 1999 года с изменением, принятым на всенародном голосовании (референдуме) 3 октября 1999 г.",
+          "note": "Approval of the 1994 Constitution, with an amendment; the Act of State Independence followed on 12 October 1999."
+        },
+        {
+          "date": "2016-07-10",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "cec",
+          "note": "On holding an early presidential election; declared invalid for turnout below the legal minimum. Day from the Central Election Commission's calendar, not quoted from a fetched source."
+        }
+      ],
+      "est_votes": 70000,
+      "effort": 1
+    },
+    {
+      "key": "sobranie_raiona",
+      "tier": "raion",
+      "name": "Выборы депутатов Собраний районов и города Сухум",
+      "name_en": "District and Sukhum city assemblies",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "ge-ab.raion"
+        ]
+      },
+      "source": "law-local",
+      "locator": "https://parlamentra.org/upload/iblock/ae8/ae8abda12e1c86066daa33e98dfb3508.doc (arts. 1, 5)",
+      "note": "Each district assembly and the Sukhum city assembly is elected for four years in single-member constituencies, all local assemblies on one day called by the President (law arts. 1, 5). The heads of the district and city administrations are appointed by the President from the assembly's members (Constitution art. 79), so there is no mayoral election. Each election is run by the territory's own election commission.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Избирательные комиссии районов и города Сухум",
+          "source": "law-local",
+          "locator": "https://parlamentra.org/upload/iblock/ae8/ae8abda12e1c86066daa33e98dfb3508.doc (art. 1: \"Депутаты Собрания избираются сроком на четыре года\"; art. 5)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1995-01-01",
+          "election_kind": "local",
+          "precision": "year",
+          "through": "2021-12-31",
+          "source": "law-local",
+          "quote": "Выборы депутатов Собрания города, района, города в районе, поселка, села проводятся одновременно и назначаются Президентом Республики Абхазия",
+          "note": "Local general elections every four years before 2025; not yet listed from the presidential decrees that called them."
+        },
+        {
+          "date": "2025-11-08",
+          "election_kind": "local",
+          "source": "pres-local-2025",
+          "quote": "Президент Абхазии Бадра Гунба подписал Указ о назначении выборов в органы местного самоуправления. Выборы состоятся 8 ноября 2025 года.",
+          "note": "First set for 6 April 2025 (decree of 7 February 2025), then voided on 19 February 2025 when the People's Assembly extended the assemblies' terms past the early presidential election."
+        }
+      ],
+      "est_votes": 70000,
+      "effort": 4
+    },
+    {
+      "key": "sobranie_poseleniya",
+      "tier": "settlement",
+      "name": "Выборы депутатов Собраний городов в районе, поселков и сел",
+      "name_en": "Town, settlement, and village assemblies",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "ge-ab.settlement"
+        ]
+      },
+      "source": "law-local",
+      "locator": "https://parlamentra.org/upload/iblock/ae8/ae8abda12e1c86066daa33e98dfb3508.doc (arts. 1, 5)",
+      "note": "Elected for four years in single-member constituencies on the same day as the district and city assemblies (law arts. 1, 5).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election",
+            "general",
+            "runoff"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality",
+            "submunicipal"
+          ]
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Избирательные комиссии городов в районе, поселков и сел",
+          "source": "law-local",
+          "locator": "https://parlamentra.org/upload/iblock/ae8/ae8abda12e1c86066daa33e98dfb3508.doc (art. 1: \"Депутаты Собрания избираются сроком на четыре года\"; art. 5)"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1995-01-01",
+          "election_kind": "local",
+          "precision": "year",
+          "through": "2021-12-31",
+          "source": "law-local",
+          "quote": "Выборы депутатов Собрания города, района, города в районе, поселка, села проводятся одновременно и назначаются Президентом Республики Абхазия",
+          "note": "Held with the district and city assemblies; not yet listed."
+        },
+        {
+          "date": "2025-11-08",
+          "election_kind": "local",
+          "source": "pres-local-2025",
+          "quote": "Президент Абхазии Бадра Гунба подписал Указ о назначении выборов в органы местного самоуправления. Выборы состоятся 8 ноября 2025 года."
+        }
+      ],
+      "est_votes": 40000,
+      "effort": 5
+    }
+  ]
+}
