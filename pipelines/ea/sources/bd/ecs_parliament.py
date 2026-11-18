@@ -12,7 +12,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.bd import report1991, report1996
+from ea.sources.bd import report1991, report1996, report2014
 from ea.sources.bd.bijoy import unicode
 
 SOURCE = "bd.ecs_parliament"
@@ -28,6 +28,7 @@ REPORT_1991 = report1991.URL
 REPORT_1996 = ASSET + "VCgSSqUcjDR8tI1q8QbNACSe96YNm2EYTISFFKtl.pdf"
 REPORT_2001 = ASSET + "WqafvkDhpbk4kb1MV6PNWIHvIngSvbLWrVIhVxEK.pdf"
 REPORT_2008 = ASSET + "36Sa01LjyXk71kuGw5U1oK5zGEvYq8LxRx5sm0MG.pdf"
+REPORT_2014 = report2014.URL
 
 
 def key(kind: str, *parts: object) -> str:
@@ -61,6 +62,8 @@ class Seat:
     reported: int | None = None
     suspended: int | None = None
     day: date | None = None  # when the seat polled on another day than the general election
+    unopposed: bool = False  # the sole candidate was declared elected without a poll
+    remark: str | None = None  # the report's remark on the constituency's polling, in Bengali
 
 
 @dataclass(frozen=True)
@@ -77,8 +80,9 @@ GENERAL = {
     1996: General(date(1996, 6, 12), 7, REPORT_1996, (report1996.FIRST, report1996.LAST), 300),
     2001: General(date(2001, 10, 1), 8, REPORT_2001, (208, 324), 300),
     2008: General(date(2008, 12, 29), 9, REPORT_2008, (159, 309), 300),
+    2014: General(date(2014, 1, 5), 10, REPORT_2014, (report2014.FIRST, report2014.LAST), 300),
 }
-ORDINAL = {5: "5th", 7: "7th", 8: "8th", 9: "9th"}
+ORDINAL = {5: "5th", 7: "7th", 8: "8th", 9: "9th", 10: "10th"}
 
 
 def clean(text: str) -> str:
@@ -722,6 +726,36 @@ def seats_1991() -> list[Seat]:
     return seats
 
 
+@functools.cache
+def seats_2014() -> list[Seat]:
+    """The 2014 constituencies as read by eye from the scanned report, named in English by the 2008 report's names
+    for the same numbers. The unopposed seats name their member alone."""
+    names = {seat.number: seat.name for seat in seats(2008)}
+    found: dict[int, Seat] = {}
+    for entry in report2014.transcript()["contested"]:
+        seat = Seat(entry["number"], names[entry["number"]], report2014.nfc(entry["name"]))
+        seat.registered, seat.valid, seat.invalid, seat.cast = (
+            entry["registered"],
+            entry["valid"],
+            entry["rejected"],
+            entry["cast"],
+        )
+        seat.centers = entry["centres"]
+        seat.suspended = entry["suspended"]
+        seat.remark = entry["remark"]
+        seat.candidates = [
+            Candidate(report2014.nfc(c["name"]), report2014.party(c["party"]), c["votes"]) for c in entry["candidates"]
+        ]
+        found[seat.number] = seat
+    for alone in report2014.transcript()["unopposed"]:
+        if alone["number"] in found:
+            raise ValueError(f"2014: constituency {alone['number']} is both contested and unopposed")
+        seat = Seat(alone["number"], names[alone["number"]], report2014.nfc(alone["name"]), unopposed=True)
+        seat.candidates = [Candidate(report2014.nfc(alone["winner"]), report2014.party(alone["party"]), 0)]
+        found[seat.number] = seat
+    return [found[n] for n in sorted(found)]
+
+
 # ----------------------------------------------------------------------------------------------------------------
 
 
@@ -809,7 +843,7 @@ def english(bengali: str) -> str:
 
 
 def seats(year: int) -> list[Seat]:
-    found = {1991: seats_1991, 1996: seats_1996, 2001: seats_2001, 2008: seats_2008}[year]()
+    found = {1991: seats_1991, 1996: seats_1996, 2001: seats_2001, 2008: seats_2008, 2014: seats_2014}[year]()
     for seat in found:
         if seat.name_bn and not seat.name:
             seat.name = english(seat.name_bn)
@@ -818,6 +852,10 @@ def seats(year: int) -> list[Seat]:
     if [s.number for s in found] != [n for n in range(1, spec.seats + 1) if n not in left_out]:
         raise ValueError(f"{year}: the report does not list constituencies 1 to {spec.seats} once each")
     for seat in found:
+        if seat.unopposed:
+            if len(seat.candidates) != 1:
+                raise ValueError(f"{year} seat {seat.number}: an unopposed seat names one member")
+            continue
         total = sum(c.votes for c in seat.candidates)
         if total != seat.valid and not (year == 1991 and seat.number in report1991.unbalanced()):
             raise ValueError(f"{year} seat {seat.number}: candidates sum to {total}, the report prints {seat.valid}")
@@ -831,7 +869,7 @@ def packages() -> list[str]:
 
 
 def fetch() -> None:
-    for url in (REPORT_1991, REPORT_1996, REPORT_2001, REPORT_2008):
+    for url in (REPORT_1991, REPORT_1996, REPORT_2001, REPORT_2008, REPORT_2014):
         raw.fetch(SOURCE, url, suffix=".pdf")
 
 
@@ -1001,7 +1039,7 @@ def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "Bangladesh's parties of the 1991, 1996, 2001, and 2008 general elections, the Jatiya Sangsad, and its "
+        "Bangladesh's parties of the 1991, 1996, 2001, 2008, and 2014 general elections, the Jatiya Sangsad, and its "
         "electoral system",
         depends=[f"{SOURCE}/geo"],
     )
@@ -1027,6 +1065,8 @@ def registry() -> Package:
             p.name(id, BENGALI[name], "bn", "official")
         elif name in report1991.BENGALI:
             p.name(id, report1991.BENGALI[name], "bn", "official")
+        elif name in report2014.BENGALI:
+            p.name(id, report2014.BENGALI[name], "bn", "official")
     return p
 
 
@@ -1067,6 +1107,27 @@ METHOD = {
         "together, and registered voters are the roll. The candidate with the most votes is stored as elected. "
         "Constituencies are matched across elections by name, and the Commission redrew them in 2008."
     ),
+    2014: (
+        "Counted by the Bangladesh Election Commission for each constituency, as the constituency-wise analysis of "
+        "results in its statistical report on the 2014 election prints them. The report is a Bengali scan with no "
+        "text layer, so every number and name was read by eye from the page images, and a constituency was kept "
+        "only where its candidates' votes add to the printed valid votes, its valid and rejected votes add to the "
+        "printed votes cast, and its voters and votes agree with the same report's separate table of voters, "
+        "centres, and turnout. Registered voters are the whole roll of the constituency. The candidate with the "
+        "most votes is stored as elected. Constituencies are matched across elections by name; the Commission "
+        "redrew some of them in 2013."
+    ),
+}
+# The result sets of the seats whose sole candidate was declared elected unopposed.
+UNOPPOSED_2014 = (
+    "No poll was held here: the sole candidate left after the withdrawal of the others was declared elected "
+    "unopposed, as the Bangladesh Election Commission's statistical report on the 2014 election lists among the "
+    "300 members elected. 153 of the 300 constituencies were decided this way."
+)
+# What the result set says where the 2014 report's own figures for a constituency disagree.
+NOTES_2014 = {
+    144: "The report prints 308,457 voters here in both of its tables, and a turnout of 56.68%, which is the votes "
+    "cast as a share of 304,457; the voters are stored as printed.",
 }
 FOOTNOTES_1996 = {
     "decisive": "Polling was suspended at some centres here, and the Commission declared the result decisive without "
@@ -1075,6 +1136,25 @@ FOOTNOTES_1996 = {
     "the repoll.",
 }
 LATE_NOTE = "This constituency polled on {day:%-d %B %Y}, after the general election."
+
+
+BENGALI_DIGITS = str.maketrans("০১২৩৪৫৬৭৮৯", "0123456789")
+
+
+def polling_2014(seat: Seat) -> str | None:
+    """What the result set says of the polling centres where voting was stopped, or held again, in 2014."""
+    notes = []
+    if seat.suspended:
+        notes.append(
+            f"Polling was stopped at {seat.suspended} of the {seat.centers} polling centres here, and the Commission "
+            "found no need to hold it again there; the votes are those of the other centres."
+        )
+    remark = (seat.remark or "").translate(BENGALI_DIGITS)
+    if again := re.search(r"(\d+)\s*টি কেন্দ্রে পুনঃ", remark):
+        notes.append(f"Polling was held again at {int(again.group(1))} polling centres; the votes include it.")
+    if seat.number in NOTES_2014:
+        notes.append(NOTES_2014[seat.number])
+    return " ".join(notes) or None
 
 
 def election(year: int) -> Package:
@@ -1095,16 +1175,19 @@ def election(year: int) -> Package:
     p.add("slug", path=path, entity_id=id, is_current=True)
     # Two general elections were held in 1996, on 15 February and 12 June, so the June one carries its month.
     p.name(id, f"{'June ' if year == 1996 else ''}{year} Bangladeshi general election", "en", "official")
-    lang = "bn" if year in (1991, 2008) else "en"
-    scanned = year in (1991, 1996)
+    lang = "bn" if year in (1991, 2008, 2014) else "en"
+    scanned = year in (1991, 1996, 2014)
     tables = tables_1996() if year == 1996 else {}
     read = {t.number: t for t in report1991.tables()} if year == 1991 else {}
+    read_2014 = {e["number"]: e for e in report2014.transcript()["contested"]} if year == 2014 else {}
+    grids = report2014.grids(raw.cached(SOURCE, spec.url).path) if year == 2014 else {}
     pages: dict[int, str] = {}
     if scanned:
         stored = raw.cached(SOURCE, spec.url)
         artifact = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{ECS}\x1f{stored.storage_key}"))
         used = {t.page for t, _ in tables.values()} | {r.page for t, _ in tables.values() for r in t.rows}
         used |= {t.page for t in read.values()} | {c.page for t in read.values() for c in t.candidates}
+        used |= set(grids)
         for number in sorted(used):
             pages[number] = key("page", day, number)
             p.add(
@@ -1113,8 +1196,8 @@ def election(year: int) -> Package:
                 artifact_id=artifact,
                 page_number=number,
                 image_key=f"pages/{SOURCE}/{stored.sha256}-{number}.png",
-                width=PAGE_WIDTH,
-                height=PAGE_HEIGHT,
+                width=LETTER[0] if year == 2014 else PAGE_WIDTH,
+                height=LETTER[1] if year == 2014 else PAGE_HEIGHT,
             )
     if year == 1991:
         p.accept(
@@ -1159,7 +1242,7 @@ def election(year: int) -> Package:
             magnitude=1,
             round_number=1,
             electoral_system_id=FPTP,
-            default_result_kind="counted",
+            default_result_kind="tacit" if seat.unopposed else "counted",
         )
         p.name(
             contest, f"{'June ' if year == 1996 else ''}{year} Jatiya Sangsad election, {seat.name}", "en", "official"
@@ -1172,22 +1255,25 @@ def election(year: int) -> Package:
             election_id=id,
             contest_id=contest,
             stage="official",
-            kind="counted",
+            kind="tacit" if seat.unopposed else "counted",
             source_id=ECS,
             status="active",
             is_default=True,
-            completeness=1.0,
+            completeness=0.0 if seat.unopposed else 1.0,
         )
-        method = METHOD[year]
+        method = UNOPPOSED_2014 if seat.unopposed else METHOD[year]
         if seat.day:
             method = f"{method} {LATE_NOTE.format(day=seat.day)}"
         if year == 1996 and (footnote := tables[seat.number][0].footnote):
             method = f"{method} {FOOTNOTES_1996[footnote]}"
         if year == 1991 and (note := read[seat.number].note()):
             method = f"{method} {note}"
+        if year == 2014 and (note := polling_2014(seat)):
+            method = f"{method} {note}"
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
         real = [c for c in seat.candidates if not c.none_of_above]
         ranked = sorted((c.votes for c in real), reverse=True)
+        entry = read_2014.get(seat.number)
         for index, c in enumerate(seat.candidates, start=1):
             option = key("option", tag, index)
             if c.none_of_above:
@@ -1226,7 +1312,12 @@ def election(year: int) -> Package:
             )
             if c.votes == ranked[0] and (len(ranked) < 2 or ranked[0] > ranked[1]):
                 p.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
+            if seat.unopposed:
+                continue
             put(p, result_set, unit, option, VOTES, c.votes, scanned)
+            if entry is not None:
+                row = entry["candidates"][index - 1]
+                cell(p, grids, pages, result_set, unit, option, VOTES, row["page"], row["row"], report2014.VOTES_COLUMN)
             rows = tables[seat.number][0].rows if year == 1996 else []
             if rows and len(rows) == len(seat.candidates):
                 row = rows[index - 1]
@@ -1234,6 +1325,8 @@ def election(year: int) -> Package:
             if year == 1991 and (box := read[seat.number].candidates[index - 1].box):
                 spot = read[seat.number].candidates[index - 1].page
                 locate(p, result_set, unit, option, VOTES, pages[spot], box, report1991.DPI)
+        if seat.unopposed:
+            continue
         for measure, value in (
             (REGISTERED, seat.registered),
             (CAST, seat.cast),
@@ -1243,6 +1336,14 @@ def election(year: int) -> Package:
             put(p, result_set, unit, None, measure, value, scanned)
             if year == 1991 and measure == VALID and (box := read[seat.number].valid_box):
                 locate(p, result_set, unit, None, measure, pages[read[seat.number].valid_page], box, report1991.DPI)
+            if entry is not None:
+                column = {
+                    REGISTERED: report2014.VOTERS_COLUMN,
+                    CAST: report2014.CAST_COLUMN,
+                    INVALID: report2014.REJECTED_COLUMN,
+                }
+                spot = column.get(measure, report2014.VOTES_COLUMN)
+                cell(p, grids, pages, result_set, unit, None, measure, entry["page"], entry["row"], spot)
             if year == 1996:
                 spot = tables[seat.number][0].boxes.get(MEASURES[measure])
                 if spot is not None:
@@ -1253,6 +1354,8 @@ def election(year: int) -> Package:
 # The size of a page of the 1996 scan at 100 dpi, the scale its page images are kept at, and the 300 dpi the cells
 # were read at.
 PAGE_WIDTH, PAGE_HEIGHT = 827, 1170
+# The size of a page of the 2014 report, a US letter scan, at 100 dpi.
+LETTER = (850, 1100)
 SCAN_WIDTH, SCAN_HEIGHT = 2480, 3509
 MEASURES = {REGISTERED: "registered", CAST: "cast", INVALID: "invalid", VALID: "valid"}
 DIGITIZED = 8
@@ -1267,10 +1370,11 @@ def locate(
     page: str,
     box: report1996.Box,
     dpi: int = report1996.DPI,
+    size: tuple[int, int] | None = None,
 ) -> None:
-    """A value's box on its page, from its box in pixels on the page rendered at `dpi`."""
+    """A value's box on its page, from its box in pixels on the page rendered at `dpi`, or of `size` there."""
     x0, y0, x1, y1 = box
-    width, height = SCAN_WIDTH * dpi / report1996.DPI, SCAN_HEIGHT * dpi / report1996.DPI
+    width, height = size or (SCAN_WIDTH * dpi / report1996.DPI, SCAN_HEIGHT * dpi / report1996.DPI)
     p.add(
         "value_locator",
         result_set_id=result_set,
@@ -1286,6 +1390,24 @@ def locate(
         x1=round(min(x1, width) / width, 4),
         y1=round(min(y1, height) / height, 4),
     )
+
+
+def cell(
+    p: Package,
+    grids: dict[int, report2014.Grid],
+    pages: dict[int, str],
+    result_set: str,
+    unit: str,
+    option: str | None,
+    measure: int,
+    page: int,
+    row: int,
+    column: int,
+) -> None:
+    """The locator of a 2014 figure, from its row and column in the ruled table of its page."""
+    if page not in grids or (spot := report2014.box(grids[page], row, column)) is None:
+        return
+    locate(p, result_set, unit, option, measure, pages[page], spot, report2014.DPI, LETTER)
 
 
 def put(
