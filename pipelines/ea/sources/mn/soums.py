@@ -188,8 +188,21 @@ def units(sheet: Sheet) -> list[Unit]:
     return out
 
 
+# Soums the sheets spell differently from the Commission's other workbooks, keyed by province code.
+SPELLINGS = {
+    ("039", "Баян-Адрага"): "Баян-Адарга",
+    ("039", "Дэлгэрхээн"): "Дэлгэрхаан",
+    ("043", "Мөнхайрхан"): "Мөнххайрхан",
+    ("047", "Сүмбар"): "Сүмбэр",
+    ("047", "Эрдэнэсэнт"): "Эрдэнэсант",
+    ("057", "Сантмаргаз"): "Сантмаргац",
+    ("065", "Дарви"): "Дарив",
+}
+
+
 def place(aimag: str, soum: str) -> places.Place:
-    found = places.place_of(aimag, soum)
+    code = places.aimag_code(aimag)
+    found = places.place_of(aimag, SPELLINGS.get((code or "", soum), soum))
     if found is None:
         raise ValueError(f"{aimag} / {soum}: no place")
     return found

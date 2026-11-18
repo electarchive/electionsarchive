@@ -1435,16 +1435,11 @@ def legislature_2016_soums() -> Package:
     p.external |= {MONGOLIA, TERRITORY}
     for name in (*soums.BOOKS, soums.TURNOUT):
         p.artifact(raw.cached(SOURCE, sheets.url(name)), GEC_SOURCE)
-    # The soums of the sheets join the geo package's soums: a soum the geo package already holds has the same id and
-    # the same rows, so loading it again changes nothing.
-    for place in sorted(
-        {soums.place(unit.aimag, unit.soum) for unit in soum_units_2016()}, key=lambda place: place.code
-    ):
-        id = area("mn.soum", place.code)
-        p.add("area", id=id, scheme_code="mn.soum")
-        p.add("area_code", area_id=id, code=place.code)
-        p.add("area_parent", area_id=id, parent_id=area("mn.aimag", place.aimag))
-        p.name(id, place.soum, "mn", "native")
+    # Every soum of the sheets is one the geo package holds.
+    held = _places()
+    for unit in soum_units_2016():
+        if soums.place(unit.aimag, unit.soum).code not in held:
+            raise ValueError(f"{unit.aimag} / {unit.soum}: not in the geo package")
     known = {contest.number: contest for contest in early.parliament_2016()}
     rows = soum_units_2016()
     elsewhere: dict[str, set[int]] = {}
@@ -1504,7 +1499,7 @@ def legislature_2016_soums() -> Package:
                 area_id=area("mn.soum", place.code),
                 kind="aggregate",
             )
-            p.name(id, unit.soum if whole else f"{unit.soum}, {number}-р тойрог", "mn", "official")
+            p.name(id, place.soum if whole else f"{place.soum}, {number}-р тойрог", "mn", "official")
             for measure, value in ((2, unit.registered), (3, unit.ballots), (4, unit.valid), (6, unit.blank)):
                 _value(p, result_set, id, None, measure, value)
             for option, value in zip(options, unit.votes, strict=True):
