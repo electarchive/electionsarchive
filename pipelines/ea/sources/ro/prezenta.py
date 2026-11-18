@@ -38,6 +38,19 @@ URLS = {
     "prezidentiale18052025": f"{SITE}/prezidentiale18052025/data/json/sicpv/",
     "locale07122025": f"{SITE}/locale07122025/data/json/sicpv/",
 }
+BEC_RUNOFF = "https://prezidentiale2025.bec.ro/wp-content/uploads/2025/05/RFT1_2.pdf"
+BEC_LOCAL = tuple(f"https://locale2024.bec.ro/wp-content/uploads/2024/07/{name}.pdf" for name in ("PV_P", "PV_PCJ"))
+RUNOFF_WINNER = "NICUȘOR-DANIEL DAN"
+# the Central Electoral Bureau's record of 2024 for the county council presidents (point i): the mandates won by each
+# party or alliance, which the county presidents declared elected on 9 June 2024 must add up to
+PRESIDENT_MANDATES = {
+    "PARTIDUL SOCIAL DEMOCRAT": 24,
+    "PARTIDUL NAȚIONAL LIBERAL": 11,
+    "UNIUNEA DEMOCRATĂ MAGHIARĂ DIN ROMÂNIA": 4,
+    "ALIANȚA ELECTORALĂ PSD PNL": 2,
+}
+# its record for the mayors (point g), which covers the rounds of 9 June, 23 June, and 7 July 2024
+MAYOR_MANDATES = 3186
 FOLD = str.maketrans({"Ş": "Ș", "ş": "ș", "Ţ": "Ț", "ţ": "ț", "“": "", "”": "", '"': "", "–": "-", "„": ""})
 DISPLAY = str.maketrans({"Ş": "Ș", "ş": "ș", "Ţ": "Ț", "ţ": "ț"})
 ORGANIZATION = re.compile(
@@ -146,7 +159,7 @@ def fetch() -> None:
     """The portal refuses scripted requests; the files were saved from a browser and stored with `raw.store`."""
     for url in URLS.values():
         raw.fetch(SOURCE, url, suffix=".json")
-    for url in prezenta_seats.URLS:
+    for url in (*prezenta_seats.URLS, BEC_RUNOFF, *BEC_LOCAL):
         raw.fetch(SOURCE, url, suffix=".pdf")
 
 
@@ -241,6 +254,7 @@ class Build:
     independent: dict[str, bool | None] = field(default_factory=dict)
     values: list[tuple[str, str, str | None, int, int, int]] = field(default_factory=list)
     declared: list[tuple[str, str | None, int, int]] = field(default_factory=list)
+    elected: list[tuple[str, str]] = field(default_factory=list)
     seats: dict[tuple[str, str], int] = field(default_factory=dict)
     people: dict[str, tuple[str, str]] = field(default_factory=dict)
     labels: set[str] = field(default_factory=set)
@@ -493,15 +507,18 @@ class Build:
                     schema_overrides={"measure": pl.Int16, "value": pl.Int64},
                 ),
             )
-        if self.seats:
+        outcomes = [(c, o, "won", n) for (c, o), n in self.seats.items()] + [
+            (c, o, "elected", 1) for c, o in self.elected
+        ]
+        if outcomes:
             p.frame(
                 "outcome",
                 pl.DataFrame(
                     {
-                        "result_set_id": [set_ids[c] for c, _ in self.seats],
-                        "option_id": [o for _, o in self.seats],
-                        "kind": "won",
-                        "seats": list(self.seats.values()),
+                        "result_set_id": [set_ids[c] for c, _, _, _ in outcomes],
+                        "option_id": [o for _, o, _, _ in outcomes],
+                        "kind": [k for _, _, k, _ in outcomes],
+                        "seats": [n for _, _, _, n in outcomes],
                     },
                     schema_overrides={"seats": pl.Int32},
                 ),
@@ -634,6 +651,12 @@ def presidential(day: str, parties: set[str]) -> tuple[Package, Build]:
             votes = whole(line["votes"])
             if votes is not None:
                 b.values.append((contest, unit, option, POSTAL if postal else 0, VOTES, votes))
+    if runoff:
+        p.artifact(raw.cached(SOURCE, BEC_RUNOFF), BEC_SOURCE)
+        found = b.options.get((contest, ident(RUNOFF_WINNER, None)))
+        if found is None:
+            raise ValueError(f"{day}: the declared winner {RUNOFF_WINNER} has no ballot line")
+        b.elected.append((contest, found[0]))
     b.stage()
     accept(p)
     if annulled:
@@ -858,6 +881,14 @@ PARTIAL_NOTE = (
 )
 
 
+ELECTED_NOTE = (
+    "The mayors and county council presidents declared elected are those with the most votes in the record of the "
+    "constituency's or county's electoral bureau; where two candidates tied for the most votes, no one is declared "
+    "elected in that round. The Central Electoral Bureau's national records of 2024 give the mandates won by each "
+    "party, and the pipeline checks the declared mayors and county presidents against them."
+)
+
+
 def local_kind(row: Row) -> str:
     code = row.code.split("_")[0]
     return code if code in LOCAL else row.category
@@ -953,6 +984,12 @@ def local(day: str, parties: set[str]) -> tuple[Package, Build]:
             if votes is not None:
                 b.values.append((contest, unit, option, 0, VOTES, votes))
     declare(b, [r for r in rows if r.scope in ("UAT", "CNTY")], day)
+    if b.elected:
+        for url in BEC_LOCAL:
+            p.artifact(raw.cached(SOURCE, url), BEC_SOURCE)
+        p.add("note", id=key("note", eid, "elected"), entity_id=eid, kind="context", body_md=ELECTED_NOTE, lang="en")
+    if day == "2024-06-09":
+        check_presidents(b)
     b.stage()
     accept(p)
     return p, b
@@ -1008,6 +1045,27 @@ def declare(b: Build, rows: list[Row], day: str) -> None:
                     total += seats
         if listed and total:
             b.contests[contest].magnitude = total
+        if not listed:
+            best = [(whole(line["votes"]) or 0, str(line["candidate"]), nominator(line)) for line in row.lines]
+            top = max((votes for votes, _, _ in best), default=0)
+            leaders = [(label, party) for votes, label, party in best if votes == top and top > 0]
+            if len(leaders) == 1:
+                found = b.options.get((contest, ident(*leaders[0])))
+                if found is not None:
+                    b.elected.append((contest, found[0]))
+
+
+def check_presidents(b: Build) -> None:
+    """The county council presidents elected on 9 June 2024 add up to the mandates of the Bureau's national record."""
+    party = {found[0]: found[2] for found in b.options.values()}
+    won: dict[str, int] = {}
+    for contest, option in b.elected:
+        if b.contests[contest].office == COUNTY_PRESIDENT:
+            name = canon(party.get(option) or INDEPENDENT)
+            won[name] = won.get(name, 0) + 1
+    expected = {canon(name): n for name, n in PRESIDENT_MANDATES.items()}
+    if won != expected:
+        raise ValueError(f"county council presidents elected by party {won} differ from the Bureau's {expected}")
 
 
 # Registry
@@ -1036,8 +1094,8 @@ def registry(labels: set[str], people: dict[str, str]) -> Package:
         id=BEC_SOURCE,
         kind="official_body",
         publisher="Biroul Electoral Central",
-        title="Final results of the parliamentary elections of 1 December 2024 (parlamentare2024.bec.ro)",
-        url="https://parlamentare2024.bec.ro",
+        title="Final results published by the Central Electoral Bureau (bec.ro)",
+        url="https://www.bec.ro",
         attribution="Biroul Electoral Central",
     )
     for body, kind, english, romanian in (
@@ -1157,11 +1215,16 @@ def parse() -> None:
     parties = known_parties()
     labels: set[str] = set()
     people: dict[str, str] = {}
+    mayors = 0
     for name in ELECTIONS:
         p, b = build(name, parties)
         p.write()
         labels |= b.labels
         people |= b.shared
+        if name[:10] in ("2024-06-09", "2024-06-23", "2024-07-07") and name.endswith("-local"):
+            mayors += sum(1 for c, _ in b.elected if b.contests[c].office == MAYOR)
+    if mayors != MAYOR_MANDATES:
+        raise ValueError(f"{mayors} mayors declared elected in 2024, the Bureau's record has {MAYOR_MANDATES}")
     registry(labels, people).write()
 
 
