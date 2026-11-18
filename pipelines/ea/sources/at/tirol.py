@@ -563,6 +563,11 @@ def districts(
         p.add("declared", result_set_id=result_set, option_id=options[position], measure=1, value=state.votes[name])
         if state.seats.get(name):
             p.add("outcome", result_set_id=result_set, option_id=options[position], kind="won", seats=state.seats[name])
+    p.accept(
+        "accounting.declared",
+        "the polling-district file prints no registered voters, so the state's registered voters are declared "
+        "with no unit values to add up to them",
+    )
     names = {row.code: row.name for row in rows}
     for code, items in sorted(found.items()):
         for leaf in items:
