@@ -154,7 +154,17 @@ class Commune:
 class Atlas:
     communes: dict[str, Commune]
     cantons: dict[str, Commune]
+    circonscriptions: dict[str, Commune]
     artifacts: list[raw.Artifact]
+
+
+def fetch() -> None:
+    """Cache the period files, the list of mergers, and the authority's lists of communes."""
+    raw.fetch(SOURCE, MERGERS_PDF, suffix=".pdf")
+    for url in LISTS:
+        raw.fetch(SOURCE, url, suffix=".csv")
+    for period in PERIODS:
+        raw.fetch(SOURCE, period.url, suffix=".zip")
 
 
 def _open(zf: zipfile.ZipFile, member: str) -> shapefile.Reader:
@@ -213,6 +223,7 @@ def load() -> Atlas:
     """Read every period's communes and cantons, and check them against the authority's list of mergers."""
     communes: dict[str, Commune] = {}
     cantons: dict[str, Commune] = {}
+    circles: dict[str, Commune] = {}
     artifacts = [raw.cached(SOURCE, MERGERS_PDF), *(raw.cached(SOURCE, url) for url in LISTS)]
     names: list[dict[str, str]] = []
     for period in PERIODS:
@@ -242,8 +253,37 @@ def load() -> Atlas:
             }
         for key, shape in dissolved.items():
             _extend(cantons, key, spelling[key], key, period, shape)
+        _circles(circles, artifact, layer, period)
     _check(names)
-    return Atlas(communes, cantons, artifacts)
+    return Atlas(communes, cantons, circles, artifacts)
+
+
+def _circles(
+    found: dict[str, Commune],
+    artifact: raw.Artifact,
+    layer: list[tuple[dict[str, object], shapely.Geometry]],
+    period: Period,
+) -> None:
+    """The legislative constituencies of one period: the current file's own layer, or the period file's communes
+    dissolved by their constituency. Files before 2006 carry no constituency column and add nothing."""
+    if period.end is None:
+        shapes = {
+            slug(str(row["NAME"])): (str(row["NAME"]), shape) for row, shape in _layer(artifact, "LIMADM_LEGISLATIVE")
+        }
+    elif "CIRCONSCRI" in layer[0][0]:
+        members: dict[str, list[shapely.Geometry]] = {}
+        spelling: dict[str, str] = {}
+        for row, shape in layer:
+            key = slug(str(row["CIRCONSCRI"]))
+            members.setdefault(key, []).append(shapely.make_valid(shape))
+            spelling[key] = str(row["CIRCONSCRI"])
+        shapes = {key: (spelling[key], shapely.union_all(parts)) for key, parts in members.items()}
+    else:
+        return
+    if set(shapes) != {"sud", "centre", "nord", "est"}:
+        raise ValueError(f"{period.vintage}: expected four constituencies, found {sorted(shapes)}")
+    for key, (name, shape) in shapes.items():
+        _extend(found, key, name, key, period, shape)
 
 
 def _check(names: list[dict[str, str]]) -> None:
