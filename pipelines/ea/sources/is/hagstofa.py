@@ -11,6 +11,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import date
 from html import unescape
+from types import ModuleType
 from uuid import uuid5
 
 from ea import changeset, package, raw
@@ -110,7 +111,12 @@ def body(table: str) -> dict[str, object]:
     }
 
 
+def boundaries() -> ModuleType:
+    return importlib.import_module("ea.sources.is.lmi")
+
+
 def fetch() -> None:
+    boundaries().fetch()
     for notice in NOTICES.values():
         raw.fetch(COMMISSION, notice, suffix=".html")
     raw.fetch(COMMISSION, REPORT, suffix=".pdf")
@@ -502,8 +508,10 @@ def geo() -> Package:
         "is.hagstofa/geo",
         SOURCE,
         "Iceland's Althing constituencies of 1959 to 1999 and since 2003, and the municipalities that Statistics "
-        "Iceland names in its election tables",
+        "Iceland names in its election tables, with their boundaries from the National Land Survey of Iceland",
     )
+    lmi = boundaries()
+    lmi.add_source(p)
     p.external |= {ICELAND, TERRITORY}
     p.add("scheme", code="is.landid", polity_id=ICELAND, kind="administrative", rank=0, noun="country")
     p.add("scheme", code="is.kjordaemi", polity_id=ICELAND, kind="electoral_district", rank=1, noun="constituency")
@@ -522,6 +530,13 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=name)
         p.add("area_parent", area_id=id, parent_id=TERRITORY)
         p.name(id, name, "is", "official")
+    for code, spans in lmi.constituencies().items():
+        for first, until, shape in spans:
+            lmi.outline(p, area("is.kjordaemi", code), first, until, shape)
+    shapes, _ = lmi.municipalities(set(municipalities()), ALIASES)
+    for name, spans in shapes.items():
+        for first, until, shape in spans:
+            lmi.outline(p, area("is.sveitarfelag", name), first, until, shape)
     return p
 
 
