@@ -862,10 +862,11 @@
       "kind": "compendium"
     },
     "skm": {
-      "publisher": "PolSci Institute",
-      "title": "Sikkim's Integration into Northeast India: From Protectorate to State",
-      "url": "https://polsci.institute/democracy-and-development-northeast-india/sikkim-integration-northeast-india/",
-      "kind": "compendium"
+      "publisher": "Lok Sabha Secretariat",
+      "title": "Journal of Parliamentary Information, Vol. XXI, No. 3 (July-September 1975): Parliamentary and Constitutional Developments; Sessional Reviews",
+      "url": "https://archive.org/details/eparlib.nic.in.761998",
+      "kind": "official_body",
+      "note": "The Internet Archive's copy of the Lok Sabha Digital Library item eparlib.sansad.in/handle/123456789/761998. It records the Sikkim Assembly's resolution of 10 April 1975 abolishing the Chogyal, the referendum of 14 April 1975 (59,637 for, 1,496 against), the Rajya Sabha's passage of the statehood Bill on 26 April 1975, the day from which the Constitution (Thirty-sixth Amendment) Act is deemed in force (Legislative Department, legislative.gov.in/constitution-thirty-sixth-amendment-act-1975; the Government of Sikkim's Sikkim Code dates statehood from 26 April 1975), and the President's assent on 16 May 1975. The Journal's January-March 1975 issue (archive.org/details/eparlib.nic.in.764118) describes the Indo-Sikkim treaty of 1950 and the Assembly elected in April 1974."
     },
     "vdr": {
       "publisher": "Cổng Thông tin điện tử Chính phủ",
@@ -3363,9 +3364,9 @@
       "iso": "SKM",
       "name_en": "Sikkim",
       "status": "former",
-      "reason": "State Council elections from 1953 to 1974.",
+      "reason": "Protectorate of India under the treaty signed at Gangtok on 5 December 1950 until it became the twenty-second State of India on 26 April 1975, the day the Council of States passed the Constitution (Thirty-sixth Amendment) Bill, from which the Act (assented on 16 May 1975) is deemed in force. It elected the Sikkim Council under the Chogyal's proclamations from 1953 to 1973 (twelve to eighteen elected seats among seventeen to twenty-four), a 32-member Assembly in April 1974 under the Agreement of 8 May 1973, and voted on 14 April 1975 in a special poll approving the Assembly's resolution abolishing the Chogyal; village panchayats were first elected in December 1950.",
       "source": "skm",
-      "locator": "https://polsci.institute/democracy-and-development-northeast-india/sikkim-integration-northeast-india/"
+      "locator": "https://archive.org/details/eparlib.nic.in.761998 (Parliamentary and Constitutional Developments, Sikkim: the referendum of April 14, 1975; Sessional Review, Rajya Sabha: the Constitution (Thirty-sixth Amendment) Bill passed on April 26, 1975; footnote: the President's assent on May 16, 1975)"
     },
     {
       "iso": "VDR",
