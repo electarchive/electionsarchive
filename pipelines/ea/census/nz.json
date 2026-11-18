@@ -345,7 +345,7 @@
    "locator": "https://www.legislation.govt.nz/act/public/1993/0087/latest/whole.html (Parts 1, 6, and 7; s 191 and Schedule 2: allocation of list seats by the Sainte-Laguë formula)",
    "first_held": "1853-07-14",
    "earliest_record": "1853-07-14",
-   "note": "First past the post in single- and multi-member electorates from 1853 to 1993 (second ballots in 1908 and 1911; four Māori electorates from 1868); mixed-member proportional representation since 1996, with a party vote for 120 seats less overhang, a 5 percent or one-electorate threshold, and electorate seats by first past the post in general and Māori electorates. Unicameral since the Legislative Council was abolished on 1 January 1951. Terms run three years from the return of the writs (Constitution Act 1986 s 17) and an election may be called early. The archive holds 2002-2023 from the Electoral Commission's results (2017-2023 by voting place, 2002-2014 party votes by electorate). Contest counts per election are not yet taken from an official table, because the Electoral Commission's sites refused scripted requests.",
+   "note": "First past the post in single- and multi-member electorates from 1853 to 1993 (second ballots in 1908 and 1911; four Māori electorates from 1868); mixed-member proportional representation since 1996, with a party vote for 120 seats less overhang, a 5 percent or one-electorate threshold, and electorate seats by first past the post in general and Māori electorates. Unicameral since the Legislative Council was abolished on 1 January 1951. Terms run three years from the return of the writs (Constitution Act 1986 s 17) and an election may be called early. The archive holds 2002-2023 from the Electoral Commission's results (2017-2023 by voting place, 2002-2014 party votes by electorate). Contest and seat counts for 1996-2023 come from the Electoral Commission's overall result tables; counts before 1996 wait for the Commission's history tables (dates and turnout from 1853, and seats won from 1890), which elections.nz withholds from scripted requests.",
    "est_votes": 95000000,
    "effort": 3,
    "match": [
@@ -602,44 +602,84 @@
     {
      "date": "1996-10-12",
      "election_kind": "general",
-     "note": "The first general election under mixed-member proportional representation (MMP)."
+     "note": "The first general election under mixed-member proportional representation (MMP).",
+     "contests": 65,
+     "seats": 120,
+     "source": "ec_results",
+     "quote": "Part I - Summary of Party List and Electorate Candidate Seats (1996 summary of overall results): \"55 Seats Allocated\" (party list), \"65 Seats Won\" (electorate candidates); State of the Parties: \"Seats 55 65 120\""
     },
     {
      "date": "1999-11-27",
-     "election_kind": "general"
+     "election_kind": "general",
+     "contests": 67,
+     "seats": 120,
+     "source": "ec_results",
+     "quote": "Summary of overall results (partI.csv): \"Seats,53,67,120\" (party list, electorate, total); Part VI - Elected Candidate Votes lists 67 electoral districts"
     },
     {
      "date": "2002-07-27",
-     "election_kind": "general"
+     "election_kind": "general",
+     "contests": 69,
+     "seats": 120,
+     "source": "ec_results",
+     "quote": "Official Count Results -- Overall Status, updated 10 August 2002: totals \"69|51|120\" (electorate, list, total seats)"
     },
     {
      "date": "2005-09-17",
-     "election_kind": "general"
+     "election_kind": "general",
+     "contests": 69,
+     "seats": 121,
+     "source": "ec_results",
+     "quote": "Official Count Results -- Overall Status, updated 1 October 2005: totals \"69|52|121\" (electorate, list, total seats)"
     },
     {
      "date": "2008-11-08",
-     "election_kind": "general"
+     "election_kind": "general",
+     "contests": 70,
+     "seats": 122,
+     "source": "ec_results",
+     "quote": "Official Count Results -- Overall Status, updated 22 November 2008: totals \"70|52|122\" (electorate, list, total seats)"
     },
     {
      "date": "2011-11-26",
-     "election_kind": "general"
+     "election_kind": "general",
+     "contests": 70,
+     "seats": 121,
+     "source": "ec_results",
+     "quote": "Official Count Results -- Overall Status, updated 17 December 2011: totals \"70|51|121\" (electorate, list, total seats)"
     },
     {
      "date": "2014-09-20",
-     "election_kind": "general"
+     "election_kind": "general",
+     "contests": 71,
+     "seats": 121,
+     "source": "ec_results",
+     "quote": "Official Count Results -- Overall Status, updated 17 October 2014: totals \"71|50|121\" (electorate, list, total seats)"
     },
     {
      "date": "2017-09-23",
-     "election_kind": "general"
+     "election_kind": "general",
+     "contests": 71,
+     "seats": 120,
+     "source": "ec_results",
+     "quote": "Summary of Overall Results (2017): State of the Parties, \",Seats,49,71,120\" (list, electorate, total)"
     },
     {
      "date": "2020-10-17",
-     "election_kind": "general"
+     "election_kind": "general",
+     "contests": 72,
+     "seats": 120,
+     "source": "ec_results",
+     "quote": "Summary of Overall Results (2020): State of the Parties, \",Seats,48,72,120\" (list, electorate, total)"
     },
     {
      "date": "2023-10-14",
      "election_kind": "general",
-     "note": "Port Waikato's poll was cancelled after a candidate died; its seat was filled at a by-election on 25 November 2023 (house_by)."
+     "note": "Port Waikato's poll was cancelled after a candidate died; its seat was filled at a by-election on 25 November 2023 (house_by).",
+     "contests": 71,
+     "seats": 122,
+     "source": "ec_results",
+     "quote": "Summary of Overall Results (2023): State of the Parties, \",Seats,51,71,122\" (list, electorate, total); the winning electorate candidates file lists 71 electorates, Port Waikato having no poll"
     },
     {
      "date": "2026-11-07",
@@ -728,89 +768,169 @@
     {
      "date": "1854-01-01",
      "precision": "year",
+     "through": "1993-12-31",
+     "election_kind": "by_election",
+     "note": "By-elections from the first Parliament to the last first-past-the-post Parliament before the 1994 Selwyn poll; listed in the Electoral Commission's history and returned in the Appendix to the Journals, not yet dated or counted here."
+    },
+    {
+     "date": "1994-08-13",
+     "election_kind": "by_election",
+     "note": "Selwyn.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Part XIV - Selwyn By-election, Votes Recorded at Each Polling Place: \"By-election held 13 August 1994\"; \"D Carter - NZ National Party majority 418\""
+    },
+    {
+     "date": "1995-01-01",
+     "precision": "year",
      "through": "1997-12-31",
      "election_kind": "by_election",
-     "note": "By-elections from the first Parliament to the first MMP Parliament; listed in the Electoral Commission's history and returned in the Appendix to the Journals, not yet counted here."
+     "note": "By-elections after the Selwyn poll and before the 1998 Taranaki-King Country poll, if any; the Electoral Commission's history lists them and its results files for 1995-1997 were not reachable, so they are not yet dated or counted here."
     },
     {
      "date": "1998-05-02",
      "election_kind": "by_election",
-     "note": "Taranaki-King Country; the Electoral Commission's results file prints the poll as held on 2 May 1998."
+     "note": "Taranaki-King Country; the Electoral Commission's results file prints the poll as held on 2 May 1998.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "partXV.csv: \"By-election held 2 May 1998 Polling Places\""
     },
     {
      "date": "2004-07-10",
      "election_kind": "by_election",
-     "note": "Te Tai Hauāuru."
+     "note": "Te Tai Hauāuru.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Part VIII - Electorate Candidate Votes recorded at each Polling Place: \"Te Tai Hauauru 66 Candidate Vote Details\""
     },
     {
      "date": "2009-06-13",
      "election_kind": "by_election",
-     "note": "Mount Albert."
+     "note": "Mount Albert.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Candidate sheet header: \"Mt Albert 26 Candidate Vote Details\""
     },
     {
      "date": "2010-11-20",
      "election_kind": "by_election",
-     "note": "Mana."
+     "note": "Mana.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Section 1 - Electorate Candidate Votes Recorded at each Polling Place: \"Mana 21 Candidate Vote Details\""
     },
     {
      "date": "2011-03-05",
      "election_kind": "by_election",
-     "note": "Botany."
+     "note": "Botany.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Section 1 - Electorate Candidate Votes Recorded at each Polling Place: \"Botany 3 Candidate Vote Details\""
     },
     {
      "date": "2011-06-25",
      "election_kind": "by_election",
-     "note": "Te Tai Tokerau."
+     "note": "Te Tai Tokerau.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Candidate sheet header: \"Te Tai Tokerau 68 Candidate Vote Details\""
     },
     {
      "date": "2013-06-29",
      "election_kind": "by_election",
-     "note": "Ikaroa-Rāwhiti."
+     "note": "Ikaroa-Rāwhiti.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Candidate sheet header: \"Ikaroa-Rāwhiti 65 Candidate Vote Details\""
     },
     {
      "date": "2013-11-30",
      "election_kind": "by_election",
-     "note": "Christchurch East."
+     "note": "Christchurch East.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Candidate sheet header: \"Christchurch East 5 Candidate Vote Details\""
     },
     {
      "date": "2015-03-28",
      "election_kind": "by_election",
-     "note": "Northland."
+     "note": "Northland.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Candidate sheet header: \"Northland 35 Candidate Vote Details\""
     },
     {
      "date": "2016-12-03",
      "election_kind": "by_election",
-     "note": "Mount Roskill."
+     "note": "Mount Roskill.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_history",
+     "quote": "Past elections list, Dec 2016: \"2016 Mt Roskill by-election\"; the page title \"Find results, statistics and candidate expenses and donations for the 2016 Mt Roskill by-election.\" (a by-election fills one electorate seat; the poll's own file was not fetched)"
     },
     {
      "date": "2017-02-25",
      "election_kind": "by_election",
-     "note": "Mount Albert."
+     "note": "Mount Albert.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_history",
+     "quote": "Past elections list, Feb 2017: \"2017 Mt Albert by-election\"; \"Find results, statistics and candidate expenses and donations for the 2017 Mt Albert by-election.\" (a by-election fills one electorate seat; the poll's own file was not fetched)"
     },
     {
      "date": "2018-06-09",
      "election_kind": "by_election",
-     "note": "Northcote."
+     "note": "Northcote.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Candidate sheet header: \"Northcote 34 Candidate Vote Details\""
     },
     {
      "date": "2022-06-18",
      "election_kind": "by_election",
-     "note": "Tauranga."
+     "note": "Tauranga.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Candidate sheet header: \"Tauranga 52 Candidate Vote Details\""
     },
     {
      "date": "2022-12-10",
      "election_kind": "by_election",
-     "note": "Hamilton West."
+     "note": "Hamilton West.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Hamilton West By-Election, Electorate Details: \"Hamilton West - Official Result\""
     },
     {
      "date": "2023-11-25",
      "election_kind": "by_election",
-     "note": "Port Waikato, in place of the poll cancelled at the 2023 general election."
+     "note": "Port Waikato, in place of the poll cancelled at the 2023 general election.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "2023 Port Waikato By-election, Electorate Details: \"Port Waikato - Official Result\""
     },
     {
      "date": "2025-09-06",
      "election_kind": "by_election",
-     "note": "Tāmaki Makaurau."
+     "note": "Tāmaki Makaurau.",
+     "contests": 1,
+     "seats": 1,
+     "source": "ec_results",
+     "quote": "Candidate sheet header: \"Tāmaki Makaurau 68 Candidate Vote Details\""
     }
    ]
   },
@@ -941,7 +1061,10 @@
     {
      "date": "2011-11-26",
      "election_kind": "referendum",
-     "note": "Referendum on the voting system, in two parts, held with the general election."
+     "note": "Referendum on the voting system, in two parts, held with the general election.",
+     "contests": 2,
+     "source": "ec_results",
+     "quote": "Overall Results - 2011 Referendum on the Voting System: \"Part A - Should New Zealand keep the Mixed Member Proportional (MMP) voting system?\"; \"Part B - If New Zealand were to change to another voting system, which voting system would you choose?\""
     },
     {
      "date": "2013-12-13",
@@ -961,7 +1084,10 @@
     {
      "date": "2020-10-17",
      "election_kind": "referendum",
-     "note": "End of Life Choice Act 2019 (binding) and cannabis legalisation (indicative), held with the general election."
+     "note": "End of Life Choice Act 2019 (binding) and cannabis legalisation (indicative), held with the general election.",
+     "contests": 2,
+     "source": "ec_results",
+     "quote": "2020 General Election and Referendums, referendum results: \"End of Life Choice Referendum: Do you support the End of Life Choice Act 2019 coming into force?\"; \"Cannabis Referendum: Do you support the proposed Cannabis Legalisation and Control Bill?\""
     }
    ]
   },
