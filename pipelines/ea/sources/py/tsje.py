@@ -260,7 +260,7 @@ def parse() -> None:
     registry().write()
     election().write()
     history().write()
-    for build in (general_2008, municipal_2015, general_2018, municipal_2021):
+    for build in (vice_2000, general_2008, municipal_2015, general_2018, municipal_2021):
         build().write()
 
 
@@ -1024,6 +1024,12 @@ MUNICIPAL_2015_FILES = {
     "candidatos": f"{ARCHIVE}/20151119114116id_/http://tsje.gov.py:80/static/ups/docs/archivos/2015/boletines/candidatos-distrito-09-11-2015.xlsx",
 }
 MEMORIA_2008 = f"{ARCHIVE}/20160808124710id_/http://tsje.gov.py/static/ups/libros/pdf/2008_resultados.pdf"
+# The Tribunal's district-level file for the 2000 vice-presidential election and the 2011 referendum, as the national open-data portal
+# published it. Only its 2000 rows are read.
+VICE_2000_FILE = (
+    f"{ARCHIVE}/20250507113347/https://www.datos.gov.py/sites/default/files/"
+    "resultados-2000-y-2011-vicepresidente-y-referendum-por-distrito.csv"
+)
 HISTORY_FILES = {
     **{url: ".xlsx" if "RESULTADOS_POR_MESA" in url else ".xls" for url in GENERAL_2018_FILES.values()},
     **{url: ".xlsx" for url in MUNICIPAL_2021_FILES.values()},
@@ -1031,12 +1037,14 @@ HISTORY_FILES = {
     MUNICIPAL_2015_FILES["resultados"]: ".pdf",
     MUNICIPAL_2015_FILES["candidatos"]: ".xlsx",
     MEMORIA_2008: ".pdf",
+    VICE_2000_FILE: ".csv",
 }
 GENERAL_2008 = date(2008, 4, 20)
 GENERAL_2018 = date(2018, 4, 22)
 MUNICIPAL_2021 = date(2021, 10, 10)
+VICE_2000 = date(2000, 8, 13)
 MUNICIPAL_2015 = date(2015, 11, 15)
-HISTORY_DAYS = (GENERAL_2008, MUNICIPAL_2015, GENERAL_2018, MUNICIPAL_2021)
+HISTORY_DAYS = (VICE_2000, GENERAL_2008, MUNICIPAL_2015, GENERAL_2018, MUNICIPAL_2021)
 ABROAD = 18
 UNIT_KEY = ("dep", "dis", "zona", "local", "mesa")
 OPEN_DATA = "Public official records of the Republic of Paraguay; reuse with the source acknowledged"
@@ -3063,5 +3071,171 @@ def general_2008() -> Package:
         pl.concat(values).with_columns(
             channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)
         ),
+    )
+    return p
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The election of 13 August 2000 to fill the vacant vice presidency.
+
+VICE_PRESIDENCY = key("office", "vice-president")
+VICE_SYSTEM = key("electoral_system", "vice-president", 1992)
+VICE_2000_SOURCE = (
+    "https://www.datos.gov.py/sites/default/files/resultados-2000-y-2011-vicepresidente-y-referendum-por-distrito.csv"
+)
+VICE_2000_LISTS = {
+    "lista1anr": (1, "ANR", NATIONAL_PARTIES[(1, "ANR")]),
+    "lista2plra": (2, "PLRA", NATIONAL_PARTIES[(2, "PLRA")]),
+    "lista5ph": (5, "PH", None),
+}
+VICE_2000_NOTE = (
+    "Counted by the Tribunal Superior de Justicia Electoral and published, by municipality (distrito), in the open-data "
+    "file of the vice-presidential election of 13 August 2000, called under the Electoral Code to fill the vacant "
+    "vice presidency. Each district row gives the ballots cast, the blank and null ballots, and the votes of the three "
+    "lists, numbered as the file numbers them (1 ANR, 2 PLRA, 5 PH); ballots cast equal the three lists plus blank and "
+    "null ballots in every district. The file prints no registered voters, no candidate names, no results by polling "
+    "table, and no national or department totals, and it does not say who was elected, so no outcome is stored. "
+    "Districts are keyed by the Tribunal's current district codes, which every district of the file carries; "
+    "municipalities created after 2000 do not appear, and their territory then belonged to the districts of the file. "
+    "The labels of the lists are the file's own abbreviations; the file does not name the lists' parties, so the "
+    "PH list is not tied to a party record."
+)
+
+
+@functools.cache
+def vice2000() -> pl.DataFrame:
+    """(dep, dis, name, total, blank, invalid, and one column per list) per district for 2000."""
+    text = raw.cached(SOURCE, VICE_2000_FILE).path.read_bytes().decode("latin-1")
+    frame = pl.read_csv(text.encode("utf-8"), separator=";", infer_schema=False).filter(pl.col("2000") == "2000")
+    frame = frame.rename({"departamento": "dep", "distrito": "dis", "descripcion-distrito": "name"})
+    return frame.select(
+        _int("dep"),
+        _int("dis"),
+        pl.col("name"),
+        total=_int("total"),
+        blank=_int("votos-blancos"),
+        invalid=_int("votos-nulos"),
+        **{column: _int(column) for column in VICE_2000_LISTS},
+    )
+
+
+def compare2000() -> dict[str, int]:
+    """Check that every district adds up, and return the national sums of the file."""
+    frame = vice2000()
+    if frame.select("dep", "dis").n_unique() != frame.height:
+        raise ValueError("a district appears twice in the 2000 file")
+    summed = frame.select(pl.sum_horizontal("blank", "invalid", *VICE_2000_LISTS)).to_series()
+    if (summed != frame["total"]).any():
+        raise ValueError("a district of the 2000 file does not add up to its total")
+    known = set(districts().select("dep", "dis").iter_rows())
+    unknown = [row for row in frame.select("dep", "dis").iter_rows() if row not in known]
+    if unknown:
+        raise ValueError(f"districts of the 2000 file the geography lacks: {unknown}")
+    return {column: int(frame[column].sum()) for column in ("total", "blank", "invalid", *VICE_2000_LISTS)}
+
+
+def vice_2000() -> Package:
+    day = VICE_2000
+    compare2000()
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        "Paraguay's election of 13 August 2000 to fill the vacant vice presidency, by municipality, from the "
+        "Tribunal Superior de Justicia Electoral",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {PARAGUAY, COUNTRY}
+    source_id = key("source", SOURCE, "vice-2000")
+    _source(
+        p,
+        source_id,
+        "Resultados 2000 y 2011: vicepresidente y referéndum, por distrito",
+        VICE_2000_SOURCE,
+        [VICE_2000_FILE],
+    )
+    p.add("office", id=VICE_PRESIDENCY, polity_id=PARAGUAY, kind="other")
+    p.name(VICE_PRESIDENCY, "Vice President of Paraguay", "en", "official")
+    p.name(VICE_PRESIDENCY, "Vicepresidente de la República del Paraguay", "es", "native", False)
+    p.add(
+        "electoral_system",
+        id=VICE_SYSTEM,
+        polity_id=PARAGUAY,
+        valid_from=date(1992, 6, 20),
+        valid_to=None,
+        rules={"formula": "fptp"},
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", VICE_SYSTEM),
+        entity_id=VICE_SYSTEM,
+        kind="methodology",
+        body_md="A vacant vice presidency is filled by direct election in a single round; the candidate with the most "
+        "votes is elected.",
+        lang="en",
+    )
+    election_id = key("election", day)
+    path = f"py/{day}-vice-presidential"
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=PARAGUAY,
+        kind="by_election",
+        date_from=day,
+        date_to=day,
+        date_precision="day",
+        status="held",
+    )
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    p.name(election_id, "2000 Paraguayan vice-presidential election", "en", "official")
+    p.name(election_id, "Elección de vicepresidente 2000", "es", "native", False)
+
+    frame = vice2000().with_columns(code=pl.concat_str(pl.lit(str(day)), "dep", "dis", separator=":"))
+    frame = frame.with_columns(unit_id=pl.col("code").map_elements(lambda c: key("unit", c), return_dtype=pl.String))
+    p.frame(
+        "reporting_unit",
+        frame.select(
+            id="unit_id",
+            polity_id=pl.lit(PARAGUAY),
+            scheme_code=pl.lit("py.distrito"),
+            code="code",
+            area_relation=pl.lit("equals"),
+            area_id=pl.struct("dep", "dis").map_elements(
+                lambda row: area("py.distrito", f"{row['dep']}:{row['dis']}"), return_dtype=pl.String
+            ),
+            kind=pl.lit("aggregate"),
+        ),
+    )
+    rows = frame.select("unit_id", *VICE_2000_LISTS).unpivot(
+        index="unit_id", variable_name="column", value_name="votes"
+    )
+    rows = rows.with_columns(
+        lista=pl.col("column").replace_strict({c: n for c, (n, _, _) in VICE_2000_LISTS.items()}, return_dtype=pl.Int64)
+    ).select("unit_id", "lista", "votes")
+    labels = {number: (acronym, party(name) if name else None) for number, acronym, name in VICE_2000_LISTS.values()}
+    tally = Tally(
+        rows=rows,
+        totals=frame.select(
+            "unit_id", registered=pl.lit(None, pl.Int64), total="total", blank="blank", invalid="invalid"
+        ),
+        labels=labels,
+    )
+    spec = Spec(
+        "vice",
+        "office",
+        "2000 Paraguayan vice-presidential election",
+        "Elección de vicepresidente 2000",
+        "vice-president",
+        COUNTRY,
+        VICE_PRESIDENCY,
+        None,
+        VICE_SYSTEM,
+        1,
+        "candidate",
+    )
+    values = _add_contest(p, election_id, day, path, spec, tally, source_id, VICE_2000_NOTE)
+    p.frame(
+        "result_value",
+        values.with_columns(channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)),
     )
     return p
