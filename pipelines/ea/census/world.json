@@ -830,10 +830,11 @@
       "kind": "official_body"
     },
     "scg": {
-      "publisher": "Council of Europe, Parliamentary Assembly",
-      "title": "Consequences of the referendum in Montenegro",
-      "url": "https://pace.coe.int/files/11480/html",
-      "kind": "official_body"
+      "publisher": "Архив Југославије",
+      "title": "Уставна повеља Србије и Црне Горе, 4. фебруар 2003.",
+      "url": "https://www.arhivyu.gov.rs/active/sr-latin/home/glavna_navigacija/leksikon_jugoslavije/konstitutivni_akti_jugoslavije/ustavna_povelja_dzscg_2003.html",
+      "kind": "official_body",
+      "note": "The Archives of Yugoslavia, the national archive of the State Union's successor, on the Constitutional Charter the Federal Assembly proclaimed on 4 February 2003. The end date is the Montenegrin parliament's declaration of independence of 3 June 2006, as the IPU PARLINE archive records it (archive.ipu.org/parline-e/reports/2355_arc.htm and arc/2385_06.htm)."
     },
     "ddr": {
       "publisher": "Deutscher Bundestag",
@@ -3316,9 +3317,9 @@
       "iso": "SCG",
       "name_en": "Serbia and Montenegro",
       "status": "former",
-      "reason": "State Union Assembly seats filled from 2003 to 2006.",
+      "reason": "Established on 4 February 2003, when the Federal Assembly of Yugoslavia proclaimed the Constitutional Charter, and ended on 3 June 2006, when Montenegro's parliament declared independence and Serbia became the successor. Its only election was indirect: the parliaments of Serbia and Montenegro chose the 126 deputies of the State Union Assembly on 25 February 2003, and the direct election the Charter provided for was never held.",
       "source": "scg",
-      "locator": "https://pace.coe.int/files/11480/html"
+      "locator": "https://www.arhivyu.gov.rs/active/sr-latin/home/glavna_navigacija/leksikon_jugoslavije/konstitutivni_akti_jugoslavije/ustavna_povelja_dzscg_2003.html (Ustavna povelja Srbije i Crne Gore, 4. februar 2003.)"
     },
     {
       "iso": "DDR",
