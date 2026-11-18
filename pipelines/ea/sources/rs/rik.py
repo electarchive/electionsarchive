@@ -65,6 +65,9 @@ class Layout:
     label: int | None = None
     national: int | None = None  # the row of the national totals, when the table carries them
     leaves: tuple[str, ...] = ()  # rows that report a whole group of voters with no polling stations beneath them
+    unnamed: str = (
+        ""  # numbered rows with no name in the name column that follow a zone's group row belong to this zone
+    )
 
 
 @dataclass(frozen=True)
@@ -662,6 +665,9 @@ def _from_layout(e: Election) -> Table:
             low = first.lower()
             zone = "abroad" if low.startswith("иностран") else "prison" if low.startswith("завод") else zone
         number = figure(row, lay.number)
+        if number is not None and not first and lay.unnamed and zone:
+            zone = lay.unnamed
+            first = "Заводи за извршење заводских санкција"
         if number is None and first and any(first.startswith(leaf) for leaf in lay.leaves):
             low = first.lower()
             group = ABROAD if low.startswith("иностран") else PRISONS if low.startswith("завод") else "GROUP"
@@ -1341,7 +1347,7 @@ def _legacy() -> list[Election]:
     runoff(jun13, jun27, 2004, Layout("2004-president", "drugi krug", 2, 3, 1, latin, 9, 1, None, 0))
     figures08 = ((REGISTERED, 3), (VOTERS, 4), (CAST, 6))
     jan20, feb3 = date(2008, 1, 20), date(2008, 2, 3)
-    layout08 = Layout("2008-president", "Први круг", 2, 4, 1, figures08, 8, 1, 0, None, None, 2, 3)
+    layout08 = Layout("2008-president", "Први круг", 2, 4, 1, figures08, 8, 1, 0, None, None, 2, 3, unnamed="prison")
     first_round(jan20, 2008, layout08, ", first round")
     runoff(
         jan20,
