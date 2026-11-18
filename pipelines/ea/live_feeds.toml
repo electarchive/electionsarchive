@@ -9,6 +9,7 @@ url = "https://arkansas.tally-enr.com/"
 [[feed]]
 id = "us.enr_2026.az"
 adapter = "us.enr_2026"
+enabled = false
 interval = 90
 params = { state = "AZ" }
 publisher = "Arizona Secretary of State"
@@ -34,6 +35,7 @@ url = "https://results.enr.clarityelections.com/CO/"
 [[feed]]
 id = "us.enr_2026.nv"
 adapter = "us.enr_2026"
+enabled = false
 params = { state = "NV" }
 publisher = "Clark County Election Department"
 url = "https://elections.clarkcountynv.gov/ElectionResultsTV/ENR.aspx"
@@ -114,6 +116,7 @@ url = "https://sos.ks.gov/elections/election-results.html"
 [[feed]]
 id = "us.enr_2026.ky"
 adapter = "us.enr_2026"
+enabled = false
 interval = 120
 params = { state = "KY" }
 publisher = "Hardin County Clerk"
@@ -123,6 +126,7 @@ note = "Hardin County only; the State Board of Elections live results service bl
 [[feed]]
 id = "us.enr_2026.la"
 adapter = "us.enr_2026"
+enabled = false
 interval = 60
 params = { state = "LA" }
 publisher = "Louisiana Secretary of State"
@@ -138,6 +142,7 @@ url = "https://elections.maryland.gov/elections/2026/general_results/"
 [[feed]]
 id = "us.enr_2026.mn"
 adapter = "us.enr_2026"
+enabled = false
 params = { state = "MN" }
 publisher = "Minnesota Secretary of State"
 url = "https://electionresultsfiles.sos.mn.gov/20260811/"
@@ -145,6 +150,7 @@ url = "https://electionresultsfiles.sos.mn.gov/20260811/"
 [[feed]]
 id = "us.enr_2026.nc"
 adapter = "us.enr_2026"
+enabled = false
 params = { state = "NC" }
 publisher = "North Carolina State Board of Elections"
 url = "https://www.ncsbe.gov/results-data"
@@ -343,6 +349,7 @@ url = "https://electionresults.sos.nm.gov/"
 [[feed]]
 id = "us.enr_2026.sd"
 adapter = "us.enr_2026"
+enabled = false
 params = { state = "SD" }
 publisher = "South Dakota Secretary of State"
 url = "https://electionresults.sd.gov/"
@@ -350,6 +357,7 @@ url = "https://electionresults.sd.gov/"
 [[feed]]
 id = "us.enr_2026.nd"
 adapter = "us.enr_2026"
+enabled = false
 params = { state = "ND" }
 publisher = "North Dakota Secretary of State"
 url = "https://results.sos.nd.gov/"
@@ -357,6 +365,7 @@ url = "https://results.sos.nd.gov/"
 [[feed]]
 id = "us.enr_2026.de"
 adapter = "us.enr_2026"
+enabled = false
 params = { state = "DE" }
 publisher = "Delaware Department of Elections"
 url = "https://elections.delaware.gov/results/enr/GE2026.html"
@@ -364,6 +373,7 @@ url = "https://elections.delaware.gov/results/enr/GE2026.html"
 [[feed]]
 id = "us.enr_2026.vt"
 adapter = "us.enr_2026"
+enabled = false
 params = { state = "VT" }
 publisher = "Vermont Secretary of State"
 url = "https://electionresults.vermont.gov/"
@@ -398,6 +408,7 @@ note = "statewide and legislative summary PDFs by county, read with pdftotext, s
 [[feed]]
 id = "us.nyc_enr"
 adapter = "us.nyc_enr"
+enabled = false
 publisher = "Board of Elections in the City of New York"
 url = "https://enr.boenyc.gov/"
 note = "city contests and districts inside the city; statewide races and districts that cross the city line wait for a statewide feed"
@@ -634,6 +645,7 @@ url = "https://apps.npr.org/2026-election-results/alaska.html"
 [[feed]]
 id = "us.npr.al"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Alabama's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "AL" }
@@ -643,6 +655,7 @@ url = "https://apps.npr.org/2026-election-results/alabama.html"
 [[feed]]
 id = "us.npr.ar"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Arkansas's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "AR" }
@@ -652,6 +665,7 @@ url = "https://apps.npr.org/2026-election-results/arkansas.html"
 [[feed]]
 id = "us.npr.az"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Arizona's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "AZ" }
@@ -670,6 +684,7 @@ url = "https://apps.npr.org/2026-election-results/california.html"
 [[feed]]
 id = "us.npr.co"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Colorado's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "CO" }
@@ -688,6 +703,7 @@ url = "https://apps.npr.org/2026-election-results/connecticut.html"
 [[feed]]
 id = "us.npr.dc"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for District of Columbia's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "DC" }
@@ -697,6 +713,7 @@ url = "https://apps.npr.org/2026-election-results/district-of-columbia.html"
 [[feed]]
 id = "us.npr.de"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Delaware's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "DE" }
@@ -716,6 +733,7 @@ url = "https://apps.npr.org/2026-election-results/florida.html"
 [[feed]]
 id = "us.npr.ga"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Georgia's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "GA" }
@@ -744,6 +762,7 @@ url = "https://apps.npr.org/2026-election-results/iowa.html"
 [[feed]]
 id = "us.npr.id"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Idaho's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "ID" }
@@ -762,6 +781,7 @@ url = "https://apps.npr.org/2026-election-results/illinois.html"
 [[feed]]
 id = "us.npr.in"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Indiana's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "IN" }
@@ -790,6 +810,7 @@ url = "https://apps.npr.org/2026-election-results/kentucky.html"
 [[feed]]
 id = "us.npr.la"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Louisiana's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "LA" }
@@ -817,6 +838,7 @@ url = "https://apps.npr.org/2026-election-results/maryland.html"
 [[feed]]
 id = "us.npr.me"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Maine's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "ME" }
@@ -835,6 +857,7 @@ url = "https://apps.npr.org/2026-election-results/michigan.html"
 [[feed]]
 id = "us.npr.mn"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Minnesota's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "MN" }
@@ -862,6 +885,7 @@ url = "https://apps.npr.org/2026-election-results/mississippi.html"
 [[feed]]
 id = "us.npr.mt"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Montana's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "MT" }
@@ -880,6 +904,7 @@ url = "https://apps.npr.org/2026-election-results/north-carolina.html"
 [[feed]]
 id = "us.npr.nd"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for North Dakota's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "ND" }
@@ -917,6 +942,7 @@ url = "https://apps.npr.org/2026-election-results/new-jersey.html"
 [[feed]]
 id = "us.npr.nm"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for New Mexico's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "NM" }
@@ -926,6 +952,7 @@ url = "https://apps.npr.org/2026-election-results/new-mexico.html"
 [[feed]]
 id = "us.npr.nv"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Nevada's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "NV" }
@@ -963,6 +990,7 @@ url = "https://apps.npr.org/2026-election-results/oklahoma.html"
 [[feed]]
 id = "us.npr.or"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Oregon's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "OR" }
@@ -981,6 +1009,7 @@ url = "https://apps.npr.org/2026-election-results/pennsylvania.html"
 [[feed]]
 id = "us.npr.ri"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Rhode Island's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "RI" }
@@ -1037,6 +1066,7 @@ url = "https://apps.npr.org/2026-election-results/utah.html"
 [[feed]]
 id = "us.npr.va"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Virginia's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "VA" }
@@ -1046,6 +1076,7 @@ url = "https://apps.npr.org/2026-election-results/virginia.html"
 [[feed]]
 id = "us.npr.vt"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Vermont's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "VT" }
@@ -1064,6 +1095,7 @@ url = "https://apps.npr.org/2026-election-results/washington.html"
 [[feed]]
 id = "us.npr.wi"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for Wisconsin's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "WI" }
@@ -1073,6 +1105,7 @@ url = "https://apps.npr.org/2026-election-results/wisconsin.html"
 [[feed]]
 id = "us.npr.wv"
 adapter = "us.npr"
+enabled = false
 interval = 60
 note = "Unofficial Associated Press tabulation republished by NPR for West Virginia's statewide offices, U.S. House seats, and statewide measures; U.S. Senate and governor by county; pages show it only where no official feed has a current count"
 params = { state = "WV" }
@@ -1486,6 +1519,7 @@ url = "https://results.enr.clarityelections.com/FL/Orange/127356/"
 [[feed]]
 id = "us.county_live.st_lucie"
 adapter = "us.county_live"
+enabled = false
 interval = 180
 note = "Florida's state site has no city races, so Port St. Lucie's mayor and District 1 council race come from the St. Lucie County Supervisor of Elections' results page."
 params = { revision = "2026-11-05", kind = "electionsfl", state = "FL", county = "St. Lucie", url = "https://enr.electionsfl.org/STL/4089/Summary/" }
@@ -1495,6 +1529,7 @@ url = "https://enr.electionsfl.org/STL/4089/Summary/"
 [[feed]]
 id = "us.county_live.lee"
 adapter = "us.county_live"
+enabled = false
 interval = 180
 note = "Florida's state site has no city races, so Cape Coral's, Fort Myers's, and other Lee County city races come from the county Supervisor of Elections' results page."
 params = { revision = "2026-11-05-2", kind = "electionsfl", state = "FL", county = "Lee", url = "https://enr.electionsfl.org/LEE/4111/Summary/" }
@@ -1504,6 +1539,7 @@ url = "https://enr.electionsfl.org/LEE/4111/Summary/"
 [[feed]]
 id = "us.county_live.leon"
 adapter = "us.county_live"
+enabled = false
 interval = 180
 note = "Florida's state site has no city races, so Tallahassee's mayor and commissioners come from the Leon County Supervisor of Elections' results page."
 params = { kind = "electionsfl", state = "FL", county = "Leon", url = "https://enr.electionsfl.org/LEO/4072/Summary/" }
@@ -1513,6 +1549,7 @@ url = "https://enr.electionsfl.org/LEO/4072/Summary/"
 [[feed]]
 id = "us.county_live.monterey"
 adapter = "us.county_live"
+enabled = false
 interval = 180
 note = "California's state site has no city races, so Salinas's and other Monterey County city races come from the county's election summary report. The report carries no time stamp."
 params = { kind = "summary_xml", state = "CA", county = "Monterey", url = "https://www.countyofmonterey.gov/home/showdocument?id=136040" }
