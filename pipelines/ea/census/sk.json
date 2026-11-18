@@ -146,6 +146,20 @@
    "kind": "official_body",
    "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
   },
+  "oso_nove2014": {
+   "title": "Nové voľby do orgánov samosprávy obcí 2014 – 2018",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "http://volby.statistics.sk/oso/doplnkove2014/sk/",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
+  "oso_nove2018": {
+   "title": "Nové voľby do orgánov samosprávy obcí 2018 – 2022",
+   "publisher": "Štatistický úrad Slovenskej republiky",
+   "url": "http://volby.statistics.sk/oso/doplnkove2018/sk/",
+   "kind": "official_body",
+   "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged"
+  },
   "oso_nove": {
    "title": "Nové voľby do orgánov samosprávy obcí 2022 – 2026",
    "publisher": "Štatistický úrad Slovenskej republiky",
@@ -2035,8 +2049,8 @@
     ],
     "unit": "contest"
    },
-   "finest_note": "The office publishes each by-election day by municipality, as open data (2015) and as web pages for each term from 2014.",
-   "note": "Called by the Speaker of the National Council when a mayor's office falls vacant or a council cannot be completed from substitutes, or where no election was held at the regular date; several days a year.",
+   "finest_note": "The office publishes each by-election day by polling district (okrsok) from March 2022 and by municipality before, as web pages and open data for each term from 2014. It publishes no by-election before 7 March 2015.",
+   "note": "Called by the Speaker of the National Council when a mayor's office falls vacant or a council cannot be completed from substitutes, or where no election was held at the regular date; 21 days from 7 March 2015 to 21 March 2026, each in a few municipalities. The office prints only the elected councillors' votes for councils from 2015 to 2021, and every candidate's votes for mayors throughout.",
    "source": "zvp",
    "locator": "https://www.slov-lex.sk/ezbierky/pravne-predpisy/SK/ZZ/2014/180/ (§ 191)",
    "valid_from": "1990-11-01",
@@ -2052,9 +2066,9 @@
      "access": "open",
      "checked_at": "2026-11-17T00:00:00Z",
      "first_date": "2015-03-07",
-     "finest": "sk.obec",
+     "finest": "sk.okrsok",
      "license": "Open data of the Statistical Office of the Slovak Republic: free reuse with the source acknowledged",
-     "evidence": "Pages for the terms 2014–2018, 2018–2022, and 2022–2026, each listing its days and results by municipality."
+     "evidence": "Pages for the terms 2014–2018, 2018–2022, and 2022–2026 list each term's days with the Speaker's decisions; results are open-data tables (March and June 2015) and spreadsheet bundles (every other day), by municipality to 2021 and by polling district from March 2022."
     }
    ],
    "match": [
@@ -2082,10 +2096,151 @@
    ],
    "dates": [
     {
-     "date": "1991-01-01",
-     "precision": "year",
-     "through": "2026-10-23",
-     "note": "By-election days between regular elections, not yet counted."
+     "date": "2015-03-07",
+     "contests": 29,
+     "seats": 51,
+     "source": "oso_nove2014",
+     "quote": "Deň konania volieb je určený na sobotu 7. marca 2015"
+    },
+    {
+     "date": "2015-06-13",
+     "contests": 14,
+     "seats": 16,
+     "source": "oso_nove2014",
+     "quote": "Deň konania volieb je určený na sobotu 13. júna 2015"
+    },
+    {
+     "date": "2015-10-24",
+     "contests": 7,
+     "seats": 8,
+     "source": "oso_nove2014",
+     "quote": "Deň konania volieb je určený na sobotu 24. októbra 2015"
+    },
+    {
+     "date": "2016-04-09",
+     "contests": 14,
+     "seats": 15,
+     "source": "oso_nove2014",
+     "quote": "Deň konania volieb je určený na sobotu 9. apríla 2016"
+    },
+    {
+     "date": "2016-11-05",
+     "contests": 44,
+     "seats": 48,
+     "source": "oso_nove2014",
+     "quote": "Deň konania volieb je určený na sobotu 5. novembra 2016"
+    },
+    {
+     "date": "2017-04-08",
+     "contests": 24,
+     "seats": 27,
+     "source": "oso_nove2014",
+     "quote": "Deň konania volieb je určený na sobotu 8. apríla 2017"
+    },
+    {
+     "date": "2017-10-14",
+     "contests": 26,
+     "seats": 31,
+     "source": "oso_nove2014",
+     "quote": "Deň konania volieb je určený na sobotu 14. októbra 2017"
+    },
+    {
+     "date": "2018-01-27",
+     "contests": 10,
+     "seats": 17,
+     "source": "oso_nove2014",
+     "quote": "Deň konania volieb je určený na sobotu 27. januára 2018"
+    },
+    {
+     "date": "2019-04-13",
+     "contests": 48,
+     "seats": 70,
+     "source": "oso_nove2018",
+     "quote": "Deň konania volieb určil na sobotu 13. apríla 2019"
+    },
+    {
+     "date": "2019-09-21",
+     "contests": 26,
+     "seats": 34,
+     "source": "oso_nove2018",
+     "quote": "Deň konania volieb určil na sobotu 21. septembra 2019"
+    },
+    {
+     "date": "2020-10-03",
+     "contests": 52,
+     "seats": 59,
+     "source": "oso_nove2018",
+     "quote": "Deň konania volieb určil na sobotu 3. októbra 2020"
+    },
+    {
+     "date": "2021-05-15",
+     "contests": 30,
+     "seats": 38,
+     "source": "oso_nove2018",
+     "quote": "Deň konania volieb určil na sobotu 15. mája 2021"
+    },
+    {
+     "date": "2021-10-23",
+     "contests": 26,
+     "seats": 32,
+     "source": "oso_nove2018",
+     "quote": "Deň konania volieb určil na sobotu 23. októbra 2021"
+    },
+    {
+     "date": "2022-03-19",
+     "contests": 15,
+     "seats": 15,
+     "source": "oso_nove2018",
+     "quote": "Deň konania volieb určil na sobotu 19. marca 2022"
+    },
+    {
+     "date": "2023-03-25",
+     "contests": 63,
+     "seats": 113,
+     "source": "oso_nove",
+     "quote": "Deň konania volieb určil na sobotu 25. marca 2023"
+    },
+    {
+     "date": "2023-09-09",
+     "contests": 31,
+     "seats": 44,
+     "source": "oso_nove",
+     "quote": "Deň konania volieb určil na sobotu 9. septembra 2023"
+    },
+    {
+     "date": "2024-02-10",
+     "contests": 19,
+     "seats": 22,
+     "source": "oso_nove",
+     "quote": "Deň konania volieb určil na sobotu 10. februára 2024"
+    },
+    {
+     "date": "2024-10-05",
+     "contests": 40,
+     "seats": 42,
+     "source": "oso_nove",
+     "quote": "Deň konania volieb určil na sobotu 5. októbra 2024"
+    },
+    {
+     "date": "2025-03-15",
+     "contests": 27,
+     "seats": 33,
+     "source": "oso_nove",
+     "quote": "Deň konania volieb bol určený na sobotu 15. marca 2025"
+    },
+    {
+     "date": "2025-09-06",
+     "contests": 34,
+     "seats": 36,
+     "source": "oso_nove",
+     "quote": "Deň konania volieb bol určený na 6. septembra 2025"
+    },
+    {
+     "date": "2026-03-21",
+     "contests": 18,
+     "seats": 19,
+     "source": "oso_nove",
+     "quote": "Deň konania volieb bol určený na 21. marca 2026"
     }
    ]
   },

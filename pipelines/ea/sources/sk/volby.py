@@ -14,6 +14,7 @@ import html
 import io
 import re
 import unicodedata
+import zipfile
 from collections import Counter
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
@@ -1417,6 +1418,8 @@ def _register() -> None:
         reader(functools.partial(oso_modern, year), f"oso-{year}")
     for year in (2014, 2018):
         reader(functools.partial(oso_mayors, year), f"oso-{year}")
+    for day in NOVE_DAYS:
+        reader(functools.partial(nove_day, day), f"nove-{day}")
 
 
 @functools.cache
@@ -1466,6 +1469,11 @@ def fetch() -> None:
         raw.fetch(SOURCE, snr_image(year), suffix=".jpg")
     for path in files():
         raw.fetch(SOURCE, url(path), suffix=".csv")
+    for page in NOVE_PAGES:
+        raw.fetch(SOURCE, page, suffix=".html")
+    for _, source in NOVE_DAYS.values():
+        if source.endswith(".zip"):
+            raw.fetch(SOURCE, source, suffix=".zip")
 
 
 def parse() -> None:
@@ -3711,6 +3719,472 @@ def osk_old(year: int) -> Day:
         pl.DataFrame(list(table_units.values()), schema={**UNIT_SCHEMA, "area": pl.String(), "relation": pl.String()})
     )
     return d
+
+
+# Municipal by-elections (nové voľby). The Speaker of the National Council calls them for a municipality whose mayor's
+# office fell vacant or whose council could not be completed, on a few Saturdays a year. The office publishes each
+# day's results as its own set of tables: by municipality name for the 2014 to 2018 term (open-data CSV for the first
+# two days, spreadsheets after), by municipality code with the elected councillors' votes for 2019 to 2021, and by
+# polling district with every candidate's votes from March 2022.
+
+NOVE_FILES = "https://volby.statistics.sk/oso/doplnkove{term}/files/{name}"
+NOVE_DAYS: dict[date, tuple[str, str]] = {
+    date(2015, 3, 7): ("csv", "oso/2015/03/OSO_2015_03_tab{}.csv"),
+    date(2015, 6, 13): ("csv", "oso/2015/06/OSO_2015_06_tab{}.csv"),
+    date(2015, 10, 24): ("names", NOVE_FILES.format(term=2014, name="oso_201510_xlsx.zip")),
+    date(2016, 4, 9): ("names", NOVE_FILES.format(term=2014, name="oso_201604_xlsx.zip")),
+    date(2016, 11, 5): ("names", NOVE_FILES.format(term=2014, name="oso_201611_xlsx.zip")),
+    date(2017, 4, 8): ("names", NOVE_FILES.format(term=2014, name="oso_201704_xlsx.zip")),
+    date(2017, 10, 14): ("names", NOVE_FILES.format(term=2014, name="oso_201710_xlsx.zip")),
+    date(2018, 1, 27): ("names", NOVE_FILES.format(term=2014, name="oso_201801_xlsx.zip")),
+    date(2019, 4, 13): ("codes", NOVE_FILES.format(term=2018, name="OSO_201904_xlsx.zip")),
+    date(2019, 9, 21): ("codes", NOVE_FILES.format(term=2018, name="OSO_201909_xlsx.zip")),
+    date(2020, 10, 3): ("codes", NOVE_FILES.format(term=2018, name="OSO_202010_xlsx.zip")),
+    date(2021, 5, 15): ("codes", NOVE_FILES.format(term=2018, name="OSO_202105_xlsx.zip")),
+    date(2021, 10, 23): ("codes", NOVE_FILES.format(term=2018, name="OSO_202110_xlsx.zip")),
+    date(2022, 3, 19): ("full", NOVE_FILES.format(term=2018, name="OSO_202203_xlsx.zip")),
+    date(2023, 3, 25): ("full", NOVE_FILES.format(term=2022, name="OSO202303_SK_xlsx.zip")),
+    date(2023, 9, 9): ("full", NOVE_FILES.format(term=2022, name="OSO202309_SK_xlsx.zip")),
+    date(2024, 2, 10): ("full", NOVE_FILES.format(term=2022, name="OSO202402_SK_xlsx.zip")),
+    date(2024, 10, 5): ("full", NOVE_FILES.format(term=2022, name="OSO202410_SK_xlsx.zip")),
+    date(2025, 3, 15): ("full", NOVE_FILES.format(term=2022, name="OSO202503_SK_xlsx.zip")),
+    date(2025, 9, 6): ("full", NOVE_FILES.format(term=2022, name="OSO202509_SK_xlsx.zip")),
+    date(2026, 3, 21): ("full", NOVE_FILES.format(term=2022, name="OSO202603_SK_xlsx.zip")),
+}
+NOVE_PAGES = [f"http://volby.statistics.sk/oso/doplnkove{term}/sk/" for term in (2014, 2018, 2022)]
+"""The pages that list each term's by-election days with the decisions of the Speaker that called them."""
+SK_MONTHS = [
+    "januára",
+    "februára",
+    "marca",
+    "apríla",
+    "mája",
+    "júna",
+    "júla",
+    "augusta",
+    "septembra",
+    "októbra",
+    "novembra",
+    "decembra",
+]
+
+
+@functools.cache
+def xbook(path: str) -> dict[str, list[list[str]]]:
+    """A spreadsheet bundle: each worksheet's table suffix ("12", "02bf") → its rows of cleaned cells."""
+    out: dict[str, list[list[str]]] = {}
+    with zipfile.ZipFile(raw.cached(SOURCE, path).path) as bundle:
+        for name in bundle.namelist():
+            found = re.search(r"_tab(\w+)\.xlsx$", name)
+            if found:
+                sheet = pl.read_excel(io.BytesIO(bundle.read(name)), has_header=False, infer_schema_length=0)
+                out[found.group(1)] = [[clean(cell) for cell in row] for row in sheet.iter_rows()]
+    return out
+
+
+def xframe(path: str, *suffixes: str) -> pl.DataFrame:
+    """The first of these worksheets the bundle holds, as strings under its header row (the first with two cells)."""
+    book = xbook(path)
+    rows = book[next(s for s in suffixes if s in book)]
+    start = next(i for i, row in enumerate(rows) if sum(1 for cell in row if cell) >= 2)
+    names = [name or f"_{i}" for i, name in enumerate(rows[start])]
+    body = [[cell or None for cell in row] for row in rows[start + 1 :] if any(row)]
+    return pl.DataFrame(body, schema={n: pl.String for n in names}, orient="row")
+
+
+def has_sheet(path: str, suffix: str) -> bool:
+    return suffix in xbook(path)
+
+
+def nove_election(day: date) -> Election:
+    return Election(
+        "oso",
+        "by_election",
+        day,
+        day,
+        f"{day:%-d %B %Y} Slovak municipal by-elections",
+        f"Nové voľby do orgánov samosprávy obcí {day.day}. {SK_MONTHS[day.month - 1]} {day.year}",
+        f"sk/{day}-municipal-by-election",
+    )
+
+
+@dataclass
+class NoveRows:
+    """One day's tables in the shape every reader returns."""
+
+    units: pl.DataFrame  # obec, okrsok, registered, voters, cast, valid_mayor, valid_council
+    candidates: pl.DataFrame  # contest, number, name, party, status
+    votes: pl.DataFrame  # contest, obec, okrsok, number, value
+    seats: dict[str, int]  # council contest → seats the office says were to be filled
+    published: dict[str, int]  # the office's own totals for the day
+    paths: list[str]
+    note: str = ""
+
+
+UNIT_COLUMNS = ("registered", "voters", "cast", "valid_mayor", "valid_council")
+Cells = list[str]
+
+
+def finish_rows(
+    units: list[dict[str, str | int | None]],
+    cand: list[tuple[str, str, str, str, str | None]],
+    vote: list[tuple[str, str, str | None, str, int | None]],
+    seats: dict[str, int],
+    published: dict[str, int],
+    paths: list[str],
+) -> NoveRows:
+    schema = {"obec": pl.String, "okrsok": pl.String, **{name: pl.Int64 for name in UNIT_COLUMNS}}
+    return NoveRows(
+        pl.DataFrame(units, schema=schema),
+        pl.DataFrame(cand, schema=["contest", "number", "name", "party", "status"], orient="row"),
+        pl.DataFrame(
+            vote,
+            schema={
+                "contest": pl.String,
+                "obec": pl.String,
+                "okrsok": pl.String,
+                "number": pl.String,
+                "value": pl.Int64,
+            },
+            orient="row",
+        ).filter(pl.col("value").is_not_null()),
+        seats,
+        published,
+        paths,
+    )
+
+
+def grouped(rows: list[list[str]]) -> list[tuple[str, str, Cells]]:
+    """Rows that print a district's name (obvod, the okres) only on the first of its rows, as (district, row)."""
+    out, group = [], ""
+    for row in rows:
+        group = row[0] or group
+        out.append((group, row[1], row[2:]))
+    return out
+
+
+def hierarchical(rows: list[list[str]]) -> list[tuple[str, str, Cells]]:
+    """The candidate worksheets of 2015 to 2018, which print a district line, a municipality line, and then the
+    municipality's people, each with a name and its figures: (district, municipality, cells)."""
+    out: list[tuple[str, str, Cells]] = []
+    pending: list[str] = []
+    okres = ""
+    for row in rows:
+        if not any(row):
+            continue
+        if not any(row[1:]):
+            pending.append(row[0])
+            continue
+        if len(pending) >= 2:
+            okres = pending[-2]
+        obec = pending[-1] if pending else out[-1][1]
+        pending = []
+        out.append((okres, obec, row))
+    return out
+
+
+def csv_rows(path: str) -> list[list[str]]:
+    return [[cell or "" for cell in row] for row in table(path).iter_rows()]
+
+
+def total_cells(rows: list[list[str]]) -> Cells:
+    return next(row for row in rows if fold(row[0]).startswith(("spolu", "s p o l u")))
+
+
+def nove_names(day: date, kind: str, source: str) -> NoveRows:
+    """2015 to 2018: municipalities by name within their district. The councillors are those elected."""
+    if kind == "csv":
+        paths = [source.format(n) for n in ("01", "07", "10", "11")]
+        summary, units_, councillors_, mayors_ = (csv_rows(p) for p in paths)
+        unit_rows = grouped(units_)
+        council_rows = grouped(councillors_)  # obvod, obec, name, party, votes
+        mayor_rows = grouped(mayors_)  # obvod, obec, name, votes, elected, party
+    else:
+        paths = [source]
+        book = xbook(source)
+        summary = book["01"]
+        unit_rows = grouped(
+            [row for row in book["12"] if len(row) >= 13 and row[1] and re.fullmatch(r"[\d\s.]+", row[2])]
+        )
+        council_rows = [(g, o, c[:3]) for g, o, c in hierarchical(book["14"][2:])]  # name, party, votes
+        mayor_rows = [(g, o, c[:4]) for g, o, c in hierarchical(book["15"][2:])]  # name, votes, elected, party
+    codes = resolve([(name, group) for group, name, _ in unit_rows])
+    missing = [name for (_, name, _), code in zip(unit_rows, codes, strict=True) if code is None]
+    if missing:
+        raise ValueError(f"{day}: municipalities without a code: {missing}")
+    code_of = {(fold(group), fold(name)): str(code) for (group, name, _), code in zip(unit_rows, codes, strict=True)}
+    unit_codes = [str(code) for code in codes]
+    units = [
+        {
+            "obec": code,
+            "okrsok": None,
+            "registered": number(cells[0]),
+            "voters": number(cells[1]),
+            "cast": number(cells[3]),
+            "valid_council": number(cells[4]),
+            "valid_mayor": number(cells[5]),
+        }
+        for (_, _, cells), code in zip(unit_rows, unit_codes, strict=True)
+    ]
+    cand: list[tuple[str, str, str, str, str | None]] = []
+    vote: list[tuple[str, str, str | None, str, int | None]] = []
+    counted: Counter[str] = Counter()
+    for group, name, cells in mayor_rows:
+        obec = code_of[(fold(group), fold(name))]
+        counted[obec] += 1
+        contest, n = f"mayor:{obec}", str(counted[obec])
+        elected = fold(cells[2]) in ("zvoleny", "1")
+        cand.append((contest, n, clean(cells[0]), clean(cells[3]), "elected" if elected else None))
+        vote.append((contest, obec, None, n, number(cells[1])))
+    counted = Counter()
+    for group, name, cells in council_rows:
+        obec = code_of[(fold(group), fold(name))]
+        counted[obec] += 1
+        contest, n = f"council:{obec}:1", str(counted[obec])
+        cand.append((contest, n, clean(cells[0]), clean(cells[1]), "elected"))
+        vote.append((contest, obec, None, n, number(cells[2])))
+    total = total_cells(summary)
+    published = {
+        "obec": number(total[1]) or 0,
+        "registered": number(total[4]) or 0,
+        "voters": number(total[5]) or 0,
+        "cast": number(total[7]) or 0,
+        "valid_council": number(total[8]) or 0,
+        "valid_mayor": number(total[9]) or 0,
+        "councillors": number(total[11]) or 0,
+        "mayors": number(total[3]) or 0,
+    }
+    seats = {}
+    for (group, name, cells), code in zip(unit_rows, unit_codes, strict=True):
+        if (number(cells[9]) or 0) > 0:
+            seats[f"council:{code}:1"] = number(cells[9]) or 0
+    return finish_rows(units, cand, vote, seats, published, paths)
+
+
+def nove_codes(day: date, source: str) -> NoveRows:
+    """2019 to 2021: municipalities by code; every mayoral candidate's votes, and the elected councillors'."""
+    units_ = xframe(source, "02bd")
+    units = [
+        {
+            "obec": r[col(units_, "kod obce")],
+            "okrsok": None,
+            "registered": number(r[col(units_, "zapisanych")]),
+            "voters": number(r[col(units_, "vydanych", "obalok")]),
+            "cast": number(r[col(units_, "odovzdanych obalok", exclude=["podiel"])]),
+            "valid_council": number(r[col(units_, "platnych", "zastupitel", exclude=["podiel"])]),
+            "valid_mayor": number(r[col(units_, "platnych", "starost", exclude=["podiel"])]),
+        }
+        for r in units_.iter_rows(named=True)
+    ]
+    cand: list[tuple[str, str, str, str, str | None]] = []
+    vote: list[tuple[str, str, str | None, str, int | None]] = []
+    mayors_ = xframe(source, "05")
+    for r in mayors_.iter_rows(named=True):
+        obec = r[col(mayors_, "kod obce")]
+        contest, n = f"mayor:{obec}", str(int(r[col(mayors_, "poradie")] or 0))
+        name = clean(f"{r[col(mayors_, 'meno', exclude=['priezvisko'])]} {r[col(mayors_, 'priezvisko')]}")
+        elected = fold(r[col(mayors_, "kandidat")]) == "zvoleny"
+        cand.append((contest, n, name, r[col(mayors_, "politicky subjekt")] or "", "elected" if elected else None))
+        vote.append((contest, obec, None, n, number(r[col(mayors_, "pocet platnych hlasov")])))
+    councillors_ = xframe(source, "06")
+    for r in councillors_.iter_rows(named=True):
+        obec, vo = r[col(councillors_, "kod obce")], r[col(councillors_, "volebny obvod")]
+        contest, n = f"council:{obec}:{vo}", str(int(r[col(councillors_, "poradie")] or 0))
+        cand.append(
+            (
+                contest,
+                n,
+                clean(r[col(councillors_, "meno a priezvisko")]),
+                r[col(councillors_, "politicky subjekt")] or "",
+                "elected",
+            )
+        )
+        vote.append((contest, obec, None, n, number(r[col(councillors_, "pocet platnych hlasov")])))
+    terr = xframe(source, "0c")
+    seats: dict[str, int] = {}
+    counts = Counter(c for c, *_ in cand if c.startswith("council:"))
+    for r in terr.iter_rows(named=True):
+        want = number(r[col(terr, "pocet volenych")]) or 0
+        obec = r[col(terr, "kod obce")]
+        mine = [c for c in counts if c.startswith(f"council:{obec}:")]
+        if want and len(mine) == 1:
+            seats[mine[0]] = want
+    by_obvod = xframe(source, "02ab")
+    published = {
+        "obec": sum(number(v) or 0 for v in by_obvod[col(by_obvod, "pocet obci", "konali")]),
+        "councillors": sum(number(v) or 0 for v in by_obvod[col(by_obvod, "pocet zvolenych poslancov")]),
+        "mayors": sum(number(v) or 0 for v in by_obvod[col(by_obvod, "zvoleny starosta")]),
+    }
+    return finish_rows(units, cand, vote, seats, published, [source])
+
+
+def nove_full(day: date, source: str) -> NoveRows:
+    """March 2022 on: polling districts, every candidate's votes."""
+
+    def first(*names: str) -> pl.DataFrame:
+        return xframe(source, *names)
+
+    units_ = first("02bf")
+    obec_c, okrsok_c = col(units_, "kod obce"), col(units_, "okrsok")
+    voters_c = col(units_, "vydanych", "obalok") if has(units_, "vydanych", "obalok") else col(units_, "zucastnenych")
+    units = [
+        {
+            "obec": r[obec_c],
+            "okrsok": r[okrsok_c],
+            "registered": number(r[col(units_, "zapisanych")]),
+            "voters": number(r[voters_c]),
+            "cast": number(r[col(units_, "odovzdanych obalok", exclude=["podiel"])]),
+            "valid_council": number(r[col(units_, "platnych", "zastupitel", exclude=["podiel"])]),
+            "valid_mayor": number(r[col(units_, "platnych", "starost", exclude=["podiel"])]),
+        }
+        for r in units_.iter_rows(named=True)
+    ]
+    elected_mayors = first("04d", "04")
+    won_mayor = {
+        (
+            r[col(elected_mayors, "kod obce")],
+            fold(f"{r[col(elected_mayors, 'meno', exclude=['priezvisko'])]} {r[col(elected_mayors, 'priezvisko')]}"),
+        )
+        for r in elected_mayors.iter_rows(named=True)
+    }
+    elected_councillors = first("06d", "06")
+    won_council = set()
+    for r in elected_councillors.iter_rows(named=True):
+        who = pl.DataFrame([r]).select(_names(elected_councillors)).item()
+        won_council.add(
+            (
+                f"council:{r[col(elected_councillors, 'kod obce')]}:{r[col(elected_councillors, 'volebny obvod')]}",
+                fold(who),
+            )
+        )
+    cand: list[tuple[str, str, str, str, str | None]] = []
+    for sheet, kind in ((first("0ad", "0a"), "mayor"), (first("0bd", "0d"), "council")):
+        note = col(sheet, "poznamka") if has(sheet, "poznamka") else None
+        for r in sheet.iter_rows(named=True):
+            obec = r[col(sheet, "kod obce")]
+            contest = f"mayor:{obec}" if kind == "mayor" else f"council:{obec}:{r[col(sheet, 'volebny obvod')]}"
+            name = pl.DataFrame([r]).select(_names(sheet)).item()
+            status = "withdrew" if note and fold(r[note]) == "x" else None
+            if status is None and (
+                (contest.startswith("mayor") and (obec, fold(name)) in won_mayor)
+                or (contest, fold(name)) in won_council
+            ):
+                status = "elected"
+            cand.append(
+                (
+                    contest,
+                    str(int(r[col(sheet, "poradie")])),
+                    clean(name),
+                    r[col(sheet, "politicky subjekt")] or "",
+                    status,
+                )
+            )
+    vote: list[tuple[str, str, str | None, str, int | None]] = []
+    for sheet, kind in ((first("05f"), "mayor"), (first("08f"), "council")):
+        for r in sheet.iter_rows(named=True):
+            obec = r[col(sheet, "kod obce")]
+            vo = r[col(sheet, "volebny obvod")]
+            contest = f"mayor:{obec}" if kind == "mayor" else f"council:{obec}:{vo}"
+            vote.append(
+                (
+                    contest,
+                    obec,
+                    r[col(sheet, "okrsok")],
+                    str(int(r[col(sheet, "poradie")])),
+                    number(r[col(sheet, "pocet platnych hlasov")]),
+                )
+            )
+    terr = first("0dd", "0c")
+    seats: dict[str, int] = {}
+    for r in terr.iter_rows(named=True):
+        want = number(r[col(terr, "pocet volenych")]) or 0
+        obec = r[col(terr, "kod obce")]
+        mine = sorted({c for c, *_ in cand if c.startswith(f"council:{obec}:")})
+        if want and len(mine) == 1:
+            seats[mine[0]] = want
+    published: dict[str, int] = {}
+    by_obvod = first("02ab")
+    published = {
+        "obec": sum(number(v) or 0 for v in by_obvod[col(by_obvod, "pocet obci", "konali")]),
+        "councillors": sum(number(v) or 0 for v in by_obvod[col(by_obvod, "pocet zvolenych poslancov")]),
+        "mayors": sum(number(v) or 0 for v in by_obvod[col(by_obvod, "zvoleny starosta")]),
+    }
+    if has_sheet(source, "01"):
+        total = xbook(source)["01"][2]
+        published |= {
+            "registered": number(total[3]) or 0,
+            "voters": number(total[4]) or 0,
+            "cast": number(total[6]) or 0,
+        }
+    return finish_rows(units, cand, vote, seats, published, [source])
+
+
+def nove_day(day: date) -> Day:
+    kind, source = NOVE_DAYS[day]
+    rows = (
+        nove_names(day, kind, source)
+        if kind in ("csv", "names")
+        else nove_codes(day, source)
+        if kind == "codes"
+        else nove_full(day, source)
+    )
+    d = Day(
+        str(day),
+        f"The municipal by-elections of {day:%-d %B %Y}, mayors and councils",
+        [],
+    )
+    d.method = (
+        " By-elections fill a municipality's vacant mayor's office or a council that could not be completed from its "
+        "substitutes. Each municipality elects as the regular elections do: the mayor by plurality and the council by "
+        "block voting in its electoral districts."
+    )
+    d.paths += rows.paths
+    d.elections.append(nove_election(day))
+    meta: dict[str, Contest] = {}
+    for contest_key in rows.candidates["contest"].unique().sort().to_list():
+        parts = contest_key.split(":")
+        meta[contest_key] = (
+            mayor_contest(parts[1])
+            if parts[0] == "mayor"
+            else council_contest(parts[1], parts[2], rows.seats.get(contest_key))
+        )
+    unknown = set(rows.votes["contest"].unique()) - set(meta)
+    if unknown:
+        raise ValueError(f"{day}: votes for contests without candidates: {sorted(unknown)[:5]}")
+    rows.units = rows.units.filter(pl.col("obec").is_not_null())
+    if kind != "full":
+        for c in meta.values():
+            if c.body:
+                c.note = (
+                    "Úrad zverejňuje pre tieto voľby len hlasy zvolených poslancov, nie hlasy ostatných kandidátov."
+                )
+        d.accepts["accounting.votes_valid"] = (
+            "the office prints only the elected councillors' votes for this day's councils, so a council that elects "
+            "one councillor has one candidate's votes against all its valid ballots; the mayoral contests add up"
+        )
+    check_nove(day, rows)
+    add_local(d, day, Local(rows.candidates, rows.votes, rows.units, meta))
+    return d
+
+
+NOVE_CHECKS: dict[date, str] = {}
+
+
+def check_nove(day: date, rows: NoveRows) -> None:
+    """Add up the municipalities and compare with the totals the office prints for the day."""
+    elected = rows.candidates.filter(pl.col("status") == "elected")
+    got = {
+        "obec": rows.units["obec"].n_unique(),
+        "mayors": elected.filter(pl.col("contest").str.starts_with("mayor:"))["contest"].n_unique(),
+        "councillors": elected.filter(pl.col("contest").str.starts_with("council:")).height,
+        **{name: int(rows.units[name].sum() or 0) for name in UNIT_COLUMNS},
+    }
+    if "okrsok" in rows.units.columns and rows.units["okrsok"].null_count() == 0:
+        got["registered"] = int(rows.units["registered"].sum() or 0)
+    wrong = {k: (got[k], v) for k, v in rows.published.items() if got.get(k) != v}
+    if wrong:
+        raise ValueError(f"{day}: totals differ from the office's (ours, theirs): {wrong}")
+    NOVE_CHECKS[day] = ", ".join(f"{k} {v:,}" for k, v in sorted(rows.published.items()))
 
 
 _register()
