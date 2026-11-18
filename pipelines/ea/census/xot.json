@@ -1,0 +1,413 @@
+{
+  "polity": "XOT",
+  "name": "Devlet-i Aliyye-i Osmaniyye",
+  "sources": {
+    "tbmm-tpt-1": {
+      "title": "Türk Parlamento Tarihi: Meşrutiyete Geçiş Süreci, I. ve II. Meşrutiyet, I. Cilt (İhsan Güneş, TBMM Vakfı Yayınları No. 15, 1997)",
+      "publisher": "Türkiye Büyük Millet Meclisi Vakfı",
+      "url": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/f15b6978-9e25-4763-967b-d4b12beff61d/content",
+      "kind": "official_body",
+      "note": "Parliamentary history published by the foundation of the Grand National Assembly of Turkey, the successor parliament, and kept in the Assembly library's open repository (handle 11543/2636). Pages 40-45: the elected members of the Muhassıllık Meclisleri (1840) and of the idare meclisleri under the Vilayet Nizamnamesi of 7 November 1864; pages 73-81: the Talimat-ı Muvakkate of 28 October 1876 and the 1877 elections in the provinces and in Istanbul; pages 165-166: the second 1877 elections by the same method; pages 243-270: the Intihab-ı Mebusan Kanunu applied from 1908 and the elections of 1908, 1912, and 1913-1914, citing the Takvim-i Vekayi, the Düstur, and the Ottoman Archives (BOA DH-SYS); pages 571-572: the 1919 elections and the last Chamber."
+    },
+    "tbmm-tpt-2": {
+      "title": "Türk Parlamento Tarihi: Meşrutiyete Geçiş Süreci, I. ve II. Meşrutiyet, II. Cilt: Ayan ve Mebûsân Meclisleri Üyelerinin Özgeçmişleri (İhsan Güneş, TBMM Vakfı Yayınları No. 15, 1997)",
+      "publisher": "Türkiye Büyük Millet Meclisi Vakfı",
+      "url": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/22c08ec6-0f7c-4db4-bbe1-e77fd9b7664d/content",
+      "kind": "official_body",
+      "note": "Lists of the appointed members of the Meclis-i Ayan and the elected members of the Meclis-i Mebusan by period, compiled by Fahri Çoker, with biographies; kept in the Assembly library's open repository (handle 11543/2636)."
+    },
+    "tbmm-album-1992": {
+      "title": "Türkiye Büyük Millet Meclisi (1920-1992) ve Osmanlı Meclisi Mebusanı (1877-1920) (İhsan Ezherli, TBMM Kültür, Sanat ve Yayın Kurulu Yayınları No. 54, 1992)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/27cf03a7-9529-445b-87d2-2216e1200139/content",
+      "kind": "official_body",
+      "note": "Published by the Grand National Assembly of Turkey (handle 11543/1806). Its Ottoman part gives the 115 members of the Chamber of 1877, the 126 electoral districts, the sittings of each period from 1877 to 1920, and the alphabetical list of deputies of periods 1-4 compiled from the Chamber's own register (Osmanlı Meclisi Mebusan Mebuslarının Sicil Defteri, TBMM Arşivi 11-d/1) and the deputies' election certificates in the Assembly archive."
+    },
+    "tbmm-anayasa": {
+      "title": "Osmanlı'dan Günümüze Türk Anayasa Metinleri (TBMM Kütüphane ve Arşiv Hizmetleri Başkanlığı, 2023)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/9f1d9794-4972-4d50-b43f-d596b584da5f/content",
+      "kind": "official_body",
+      "note": "Text of the Kanun-ı Esasi of 7 Zilhicce 1293 (23 December 1876) and its amendments of 1909, 1914, 1915, 1916, and 1918, as published by the Grand National Assembly of Turkey (handle 11543/3279)."
+    },
+    "tbmm-zc-1922": {
+      "title": "T.B.M.M. Zabıt Ceridesi, Devre I, Cilt 24, İçtima Senesi 3, Yüz otuzuncu İçtima, 1.11.1338 (1 November 1922)",
+      "publisher": "Türkiye Büyük Millet Meclisi",
+      "url": "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d01/c024/tbmm01024130.pdf",
+      "kind": "official_body",
+      "note": "Minutes of the sitting at which the Grand National Assembly adopted the joint committees' declaration that the personal-sovereignty government in Istanbul had passed into history from 16 March 1336 (1920), separating the caliphate from the sultanate."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Devlet-i Aliyye-i Osmaniyye",
+      "name_en": "Ottoman Empire",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1299-01-01",
+      "valid_to": "1922-11-01",
+      "source": "tbmm-zc-1922"
+    },
+    {
+      "key": "vilayet",
+      "name": "Vilayetler",
+      "name_en": "Provinces (vilayets, earlier eyalets)",
+      "parent": "national",
+      "polity_kind": "region",
+      "valid_to": "1922-11-01",
+      "source": "tbmm-tpt-1"
+    },
+    {
+      "key": "sancak",
+      "name": "Sancaklar (livalar)",
+      "name_en": "Sancaks (livas), the electoral districts of the Chamber of Deputies",
+      "parent": "vilayet",
+      "polity_kind": "county",
+      "valid_to": "1922-11-01",
+      "source": "tbmm-tpt-1"
+    },
+    {
+      "key": "kaza",
+      "name": "Kazalar",
+      "name_en": "Kazas (districts)",
+      "parent": "sancak",
+      "valid_to": "1922-11-01",
+      "source": "tbmm-tpt-1"
+    },
+    {
+      "key": "belediye",
+      "name": "Belediyeler",
+      "name_en": "Municipalities (Dersaadet and provincial towns)",
+      "parent": "kaza",
+      "polity_kind": "municipality",
+      "valid_to": "1922-11-01",
+      "source": "tbmm-anayasa"
+    },
+    {
+      "key": "imtiyazli",
+      "name": "İmtiyazlı ve özel statülü yerler",
+      "name_en": "Privileged provinces and tributary principalities",
+      "parent": "national",
+      "polity_kind": "region",
+      "elects": true,
+      "valid_to": "1922-11-01",
+      "source": "tbmm-tpt-1"
+    }
+  ],
+  "classes": [
+    {
+      "key": "meclis_i_mebusan",
+      "tier": "national",
+      "name": "Meclis-i Mebusan intihabı",
+      "name_en": "Chamber of Deputies (Meclis-i Mebusan)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1876-10-28",
+      "valid_to": "1922-11-01",
+      "first_held": "1876-10-28",
+      "earliest_record": "1876-10-28",
+      "measure": {
+        "unit": "constituency"
+      },
+      "finest_note": "From 1908 the deputies were elected by the second-stage electors of a sancak (126 electoral districts at most); the sancak inspection committee tallied each candidate's votes and issued each deputy an election certificate (mazbata), and the certificates are kept in the deputies' files in the archive of the Grand National Assembly. No count by sancak or nahiye was ever published.",
+      "source": "tbmm-anayasa",
+      "locator": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/9f1d9794-4972-4d50-b43f-d596b584da5f/content (Talimat-ı Muvakkate of 28 October 1876 for the first Chamber; Kanun-ı Esasi art. 42: two chambers, Heyet-i Ayan and Heyet-i Mebusan; art. 65: one deputy per 50,000 male Ottoman subjects; art. 66: secret ballot; art. 69: general election every four years; art. 73: new elections within six months of a dissolution)",
+      "note": "The lower chamber of the Meclis-i Umumi under the Kanun-ı Esasi of 23 December 1876. The deputies of 1877 were chosen under the provisional Talimat-ı Muvakkate of 28 October 1876: in the provinces by the members of the vilayet, liva, and kaza administrative councils voting by sealed ballot, and in Istanbul in two stages (40 electors from 20 districts, then 10 deputies, 5 Muslim and 5 non-Muslim); the same method was used again in the autumn of 1877. Abdülhamid II prorogued the Meclis-i Umumi on 14 February 1878 and it did not meet again for thirty years. After the constitution was restored on 23 July 1908, every election (1908, 1912, 1913-1914, 1919) was held in two stages under the Intihab-ı Mebusan Kanunu: male subjects aged 25 and over who paid some tax chose second electors in each nahiye, and the second electors of each sancak met in the kaza centers to elect the sancak's deputies. Elections ran over weeks or months, so each date row spans the call and the opening of the Chamber. Names of candidates and deputies were printed in the Takvim-i Vekayi; the Ministry of the Interior (Dahiliye Nezareti) and the Chamber kept the certificates. The Chamber of the fourth period met from 12 January to 18 March 1920, when it adjourned after the Allied occupation of Istanbul; it never met again.",
+      "disposition": "blocked",
+      "disposition_reason": "No returns were published: the government printed only the names of candidates and deputies in the Takvim-i Vekayi, and the second-stage votes survive only on each deputy's election certificate in the archive of the Grand National Assembly and in the Interior Ministry files of the Ottoman Archives, neither of which is online.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "XOT"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Şura-yı Devlet and the vilayet administrative councils; in Istanbul the Şehremaneti",
+          "valid_to": "1878-02-14",
+          "source": "tbmm-tpt-1",
+          "locator": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/f15b6978-9e25-4763-967b-d4b12beff61d/content (pp. 76-80: the Talimat-ı Muvakkate of 10 Şevval 1293 / 28 October 1876; provincial deputies chosen by the vilayet, liva, and kaza administrative councils, their papers sent to the Şura-yı Devlet; Istanbul elections run by the Şehremaneti)"
+        },
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": true,
+          "administered_by": "Dahiliye Nezareti, through the kaza and sancak inspection committees (heyet-i teftişiye)",
+          "valid_from": "1908-08-02",
+          "source": "tbmm-tpt-1",
+          "locator": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/f15b6978-9e25-4763-967b-d4b12beff61d/content (pp. 243-249: the Intihab-ı Mebusan Kanunu of 83 articles, applied by the Council of Ministers' decision of 2 August 1908 and the basis of the 1908, 1912, 1914, and 1919 elections; sancaks as electoral districts and nahiyes as polling branches; two-stage voting; elections every four years)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Archive of the Grand National Assembly of Turkey (deputies' files and the Sicil Defteri of the Meclis-i Mebusan, TBMM Arşivi 11-d/1)",
+          "url": "https://www.tbmm.gov.tr/",
+          "format": "paper (archive files)",
+          "access": "manual",
+          "checked_at": "2026-11-18",
+          "role": "administers",
+          "source": "tbmm-album-1992",
+          "first_date": "1876-10-28",
+          "last_date": "1919-10-07",
+          "evidence": "The Assembly's 1992 album compiles its list of the deputies of periods 1-4 from the Chamber's handwritten register and checks it against the election certificates in the deputies' files in the Assembly archive"
+        },
+        {
+          "platform": "TBMM Kütüphanesi Açık Erişim Sistemi",
+          "url": "https://acikerisim.tbmm.gov.tr/handle/11543/1806",
+          "format": "pdf (scanned)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "role": "publishes",
+          "source": "tbmm-album-1992",
+          "first_date": "1876-10-28",
+          "last_date": "1919-10-07",
+          "evidence": "Names of the deputies of each period with their electoral district (no votes); the companion volume of the Türk Parlamento Tarihi (handle 11543/2636) lists the deputies of each election by period"
+        }
+      ],
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1876-10-28",
+          "through": "1877-03-19",
+          "election_kind": "general",
+          "seats": 115,
+          "source": "tbmm-album-1992",
+          "quote": "28 Ekim 1876 tarihli \"Talimat-ı Muvakkate\"ye göre yapılan iki dereceli seçimler sonucu Heyet-i Mebusan 69'u müslüman, 46'sı müslüman olmayan 115 üyeden oluşmuştu.",
+          "note": "First elections, from the Talimat-ı Muvakkate of 28 October 1876 to the opening of the Meclis-i Umumi on 19 March 1877; Istanbul's 40 second electors were chosen by 18 February 1877. Provincial deputies were chosen by the members of the administrative councils; Istanbul's 10 deputies by 40 second electors. The Talimat planned 120 deputies; Egypt, Tunis, Romania, Serbia, Montenegro, Lebanon, and Crete sent none."
+        },
+        {
+          "date": "1877-08-25",
+          "through": "1877-12-13",
+          "election_kind": "general",
+          "source": "tbmm-tpt-1",
+          "quote": "O nedenle hükümet bir önceki uygulamaya devam ederek mebusların Vilayet İdare Meclisi üyeleri arasından seçilmesini uygun buldu. Bu kararı Padişah da benimsedi (25 Ağustos 1877)",
+          "note": "Elections for the second session, again by the administrative councils because the electoral law passed by the Chamber in June 1877 never took effect. The span runs from the Sultan's approval to the opening of the Meclis-i Umumi on 13 December 1877; it was prorogued on 14 February 1878."
+        },
+        {
+          "date": "1908-08-02",
+          "through": "1908-12-17",
+          "election_kind": "general",
+          "source": "tbmm-tpt-1",
+          "quote": "Meclis-i Mebusan'ın açılma tarihini saptama çalışmaları da hızlanmış ve 4 Kânunuevvel 1324/17 Aralık 1908'de Perşembe günü törenle açılması kararlaştırılmıştır",
+          "note": "First election of the Second Constitutional Period, the first under the Intihab-ı Mebusan Kanunu, from the Council of Ministers' decision of 2 August 1908 to apply it to the opening of the Chamber on 17 December 1908; some sancaks finished in early October 1908."
+        },
+        {
+          "date": "1912-01-18",
+          "through": "1912-04-18",
+          "election_kind": "general",
+          "source": "tbmm-tpt-1",
+          "quote": "5 Kânun-i Sani 1327 (18 Ocak 1912)'de yayımlanan irade-i seniyye ile Meclis-i Mebusan feshedilerek ... Böylece 1912 seçimi Osmanlı tarihinin ilk erken genel seçimi olarak tarihe geçmiştir.",
+          "note": "Early election after the dissolution of 18 January 1912, known for the pressure on the opposition Hürriyet ve İtilaf Fırkası; voting began by 23 January 1912 and the Chamber opened on 5 Nisan 1328 (18 April 1912). It was dissolved on 22 Temmuz 1328 (4 August 1912)."
+        },
+        {
+          "date": "1913-10-14",
+          "through": "1914-05-14",
+          "election_kind": "general",
+          "source": "tbmm-tpt-1",
+          "quote": "seçimlerin yapılması konusunda 1 Teşrinievvel 1329/14 Ekim 1913'te Dahiliye Nezaretine yetki verdi",
+          "note": "The election called after the dissolution of August 1912 was begun in some places and postponed on 25 October 1912 because of the Balkan War; the government ordered it held anew, with new population registers, on 14 October 1913. The Chamber of the third period opened on 1 Mayıs 1330 (14 May 1914) and sat until 21 December 1918."
+        },
+        {
+          "date": "1919-10-07",
+          "through": "1920-01-12",
+          "election_kind": "general",
+          "source": "tbmm-tpt-1",
+          "quote": "7 Ekim 1919'da Meclis-i Mebusan'ın açılması için fiilen çalışmaları başlatılmış \"mebusların seçimine mahsus kararname\" yayınlanmıştır.",
+          "note": "Last Ottoman election, held under the Armistice; the Hürriyet ve İtilaf party stayed out and most deputies elected supported the Anatolian Müdafaa-i Hukuk movement. The Chamber opened on 12 January 1920 and adjourned on 18 March 1920 after the occupation of Istanbul."
+        },
+        {
+          "date": "1909-01-01",
+          "precision": "year",
+          "through": "1918-12-31",
+          "election_kind": "by_election",
+          "source": "tbmm-tpt-1",
+          "quote": "İttihat ve Terakki Cemiyeti perde arkasından siyasal iktidarı elinde tutmasına rağmen İstanbul'da yapılan ara seçimi bir oy ile kaybetmişti.",
+          "note": "Vacancies were filled by election in the sancak concerned (Kanun-ı Esasi art. 74); an Istanbul by-election that the Committee of Union and Progress lost by one vote led to the dissolution of January 1912. The by-elections are not listed one by one in any published source."
+        }
+      ]
+    },
+    {
+      "key": "meclis_i_ayan",
+      "tier": "national",
+      "name": "Meclis-i Ayan",
+      "name_en": "Senate (Meclis-i Ayan)",
+      "category": "legislature",
+      "goal": "national",
+      "valid_from": "1876-12-23",
+      "valid_to": "1922-11-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "tbmm-anayasa",
+      "locator": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/9f1d9794-4972-4d50-b43f-d596b584da5f/content (Kanun-ı Esasi art. 60: the president and members of the Heyet-i Ayan, at most a third of the Heyet-i Mebusan, are appointed directly by the Sultan; art. 61: aged at least forty)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Every member of the upper chamber was appointed for life by the Sultan (Kanun-ı Esasi art. 60), the first 27 on 17 March 1877; no member was ever elected.",
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "XOT"
+        }
+      ]
+    },
+    {
+      "key": "padisah",
+      "tier": "national",
+      "name": "Padişah ve Halife",
+      "name_en": "Sultan and Caliph",
+      "category": "executive",
+      "goal": "national",
+      "valid_from": "1299-01-01",
+      "valid_to": "1922-11-01",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "tbmm-anayasa",
+      "locator": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/9f1d9794-4972-4d50-b43f-d596b584da5f/content (Kanun-ı Esasi art. 3: the Ottoman sultanate, holding the supreme caliphate of Islam, belongs to the eldest of the House of Osman; art. 4: the Sultan, as caliph, is protector of Islam)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The sultanate and caliphate were hereditary in the House of Osman; ministers and the Grand Vizier were appointed by the Sultan. The Grand National Assembly abolished the sultanate on 1 November 1922 and itself chose the next caliph, so no Ottoman head of state was ever elected by voters.",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "XOT"
+        }
+      ]
+    },
+    {
+      "key": "referandum",
+      "tier": "national",
+      "name": "Halk oylaması",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "valid_from": "1876-12-23",
+      "valid_to": "1922-11-01",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "tbmm-anayasa",
+      "locator": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/9f1d9794-4972-4d50-b43f-d596b584da5f/content (Kanun-ı Esasi of 1876 and its amendments of 1909-1918: art. 116: amendments by two-thirds of each chamber and the Sultan's assent; no popular vote on any question)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Neither the Kanun-ı Esasi nor its amendments provided for a referendum or popular initiative, and none was held.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "XOT"
+        }
+      ]
+    },
+    {
+      "key": "muhassillik_meclisleri",
+      "tier": "sancak",
+      "name": "Muhassıllık, memleket ve eyalet meclisleri",
+      "name_en": "Muhassıllık councils and their successors (1840-1864)",
+      "category": "indirect",
+      "goal": "subnational",
+      "valid_to": "1864-11-07",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "tbmm-tpt-1",
+      "locator": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/f15b6978-9e25-4763-967b-d4b12beff61d/content (pp. 40-42: four local members of each Muhassıllık Meclisi elected by an assembly of five villagers per village and 20 to 50 townsmen drawn by lot, by open vote; renamed memleket meclisleri in 1842 and eyalet meclisleri on 15 January 1849)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The four elected members of each sancak council were chosen by an assembly of delegates drawn by lot from the villages and the kaza, by open vote; no voters cast ballots and no results were published.",
+      "match": []
+    },
+    {
+      "key": "idare_meclisleri",
+      "tier": "vilayet",
+      "name": "Vilayet, liva ve kaza idare meclisleri ile vilayet meclis-i umumileri",
+      "name_en": "Provincial, liva, and kaza administrative councils and provincial general councils",
+      "category": "council",
+      "goal": "subnational",
+      "valid_from": "1864-11-07",
+      "valid_to": "1922-11-01",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "tbmm-tpt-1",
+      "locator": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/f15b6978-9e25-4763-967b-d4b12beff61d/content (pp. 42-45: the Vilayet Nizamnamesi of 7 November 1864 creates the Vilayet İdare Meclisi, Vilayet Umum Meclisi, Liva İdare Meclisi, and Kaza İdare Meclisi, each with appointed officials and four elected members, two Muslim and two non-Muslim)",
+      "note": "Under the 1864 Vilayet Nizamnamesi a selection committee (cemiyet-i tefrik) chaired by the governor drew up twelve candidates from taxpayers aged over thirty, six Muslim and six non-Muslim; the village councils of elders voted on them, the committee counted the votes, and the mutasarrıf appointed four of the eight with most votes, two Muslim and two non-Muslim; the same was done in the livas and vilayets. Kanun-ı Esasi art. 109 promised a law widening the election of the administrative councils and of the general council that met once a year in each provincial center.",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The members were appointed by the mutasarrıf or governor from the candidates the village councils of elders ranked highest on lists drawn up by an official selection committee; no voter cast a ballot and no returns were published.",
+      "match": []
+    },
+    {
+      "key": "belediye_meclisleri",
+      "tier": "belediye",
+      "name": "Belediye meclisleri intihabı",
+      "name_en": "Municipal councils (Dersaadet and provincial municipalities)",
+      "category": "council",
+      "goal": "local",
+      "valid_from": "1876-12-23",
+      "valid_to": "1922-11-01",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "tbmm-anayasa",
+      "locator": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/9f1d9794-4972-4d50-b43f-d596b584da5f/content (Kanun-ı Esasi art. 112: municipal affairs in Dersaadet and the provinces are run by elected municipal councils, their election set by a special law)",
+      "note": "The Chamber of 1877 debated the municipal laws for Dersaadet (Istanbul) and for the provincial municipalities, which the 1992 album of the Grand National Assembly counts among its main legislative work.",
+      "disposition": "blocked",
+      "disposition_reason": "No returns of any Ottoman municipal election were published or are online; only the names of members appear in the yearbooks and the press.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "iso_pattern": "XOT"
+        }
+      ]
+    },
+    {
+      "key": "cemaat_meclisleri",
+      "tier": "kaza",
+      "name": "Cemaat meclisleri",
+      "name_en": "Community councils of each millet",
+      "category": "non_territorial",
+      "goal": "local",
+      "valid_from": "1876-12-23",
+      "valid_to": "1922-11-01",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "tbmm-anayasa",
+      "locator": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/9f1d9794-4972-4d50-b43f-d596b584da5f/content (Kanun-ı Esasi art. 111: in each kaza a community council of each millet, made up of its elected members under its own regulations, oversees pious foundations, bequests, and orphans' property)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The councils of each religious community were chosen by its own members under the community's own regulations (Kanun-ı Esasi art. 111), not in public elections, and the state published no returns.",
+      "match": []
+    },
+    {
+      "key": "imtiyazli_meclisler",
+      "tier": "imtiyazli",
+      "name": "İmtiyazlı ve özel statülü yerlerin meclisleri",
+      "name_en": "Assemblies of the privileged provinces and tributary principalities",
+      "category": "legislature",
+      "goal": "subnational",
+      "valid_to": "1922-11-01",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "tbmm-tpt-1",
+      "locator": "https://acikerisim.tbmm.gov.tr/server/api/core/bitstreams/f15b6978-9e25-4763-967b-d4b12beff61d/content (p. 81: the government wanted Romania, Serbia, Montenegro, Egypt, Tunis, Lebanon, and Crete to hold elections for the Chamber of Deputies, but they sent no deputies)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Places with their own status, such as Romania, Serbia, Montenegro, Egypt, Tunis, Mount Lebanon, and Crete, elected their own assemblies under their own statutes and sent no deputies to the Chamber; their elections are counted in the census of each successor state, not again here.",
+      "match": []
+    }
+  ]
+}
