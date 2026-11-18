@@ -141,6 +141,35 @@ ELECTIONS: dict[int, Election] = {
             "counted on election day, before the cancellations it lists."
         ),
     ),
+    1952: Election(
+        date(1952, 9, 4),
+        "general",
+        BROWSER + "1952.pdf",
+        "1937",
+        (
+            _c("ibanez", "Carlos Ibáñez del Campo"),
+            _c("matte", "Arturo Matte Larraín"),
+            _c("alfonso", "Pedro E. Alfonso Barrios"),
+            _c("allende", "Salvador Allende Gossens"),
+            Column("invalid", "invalid", "Votos nulos y en blanco"),
+            TOTAL,
+        ),
+        "ibanez",
+        None,
+        "4 de septiembre de 1952",
+        (
+            "Province totals from the Tribunal Calificador's summary table by province. The table also prints each "
+            "candidate's figure and the null and blank votes for the men's and the women's registers, and the "
+            "registered voters by province; this result set holds the totals only, and the men's and women's figures "
+            "are keyed to check them. Null and blank votes are printed as one figure for each register, stored here "
+            "as invalid ballots. In Valparaíso, Arauco and Valdivia the men's null-and-blank figure is smudged on the "
+            "scan; it is set so that valid votes plus null and blank votes equal the printed total of voters, which "
+            "also makes the nation's men's figure add up. No candidate won an absolute majority, so the Congreso "
+            "Pleno chose between Carlos Ibáñez del Campo and Arturo Matte Larraín, and elected Ibáñez; its vote is "
+            "not part of these returns."
+        ),
+        ("ibanez", "matte"),
+    ),
     1958: Election(
         date(1958, 9, 4),
         "general",
@@ -325,6 +354,11 @@ def _cached(election: Election) -> raw.Artifact:
     return raw.cached(SOURCE, index.get(election.file, {}).get("source", election.file))
 
 
+def sexed(column: str) -> bool:
+    """Whether a keyed column is a men's or women's figure, kept to check the totals and never stored."""
+    return column.endswith(("_m", "_f"))
+
+
 def values() -> pl.DataFrame:
     """Every keyed number, with province rows printed in parts (one per department) added together."""
     frame = pl.read_csv(VALUES, separator="\t", schema_overrides={"value": pl.Int64})
@@ -350,16 +384,21 @@ def parse() -> None:
         if sorted(names) != sorted(PROVINCES[election.period]):
             raise ValueError(f"{year}: provinces {names} differ from the {election.period} division")
         keys = {c.key for c in election.columns}
-        if set(rows["column"]) != keys:
+        if {c for c in rows["column"] if not sexed(c)} != keys:
             raise ValueError(f"{year}: columns {sorted(set(rows['column']))}, expected {sorted(keys)}")
         parts = [c.key for c in election.columns if c.kind != "cast"]
         for name in names:
             row = dict(provinces.filter(pl.col("province") == name).select("column", "value").iter_rows())
             if sum(row.get(k, 0) for k in parts) != row["total"]:
                 raise ValueError(f"{year} {name}: the parts do not add up to the printed total")
+            for k in parts:
+                if f"{k}_m" in row and row[f"{k}_m"] + row[f"{k}_f"] != row[k]:
+                    raise ValueError(f"{year} {name} {k}: the men's and women's figures do not add up to the total")
         national = dict(rows.filter(pl.col("province") == "TOTAL").select("column", "value").iter_rows())
         summed = provinces.group_by("column").agg(pl.col("value").sum())
         for column, value in summed.iter_rows():
+            if sexed(column):
+                continue
             if national.get(column) != value:
                 raise ValueError(
                     f"{year} {column}: provinces add up to {value}, not the printed {national.get(column)}"
@@ -435,7 +474,7 @@ def build(year: int) -> Package:
     source = key("source")
     artifact = _cached(election)
     artifact_id = p.artifact(artifact, source)
-    frame = values().filter(pl.col("year") == year)
+    frame = values().filter(pl.col("year") == year, ~pl.col("column").str.contains("_[mf]$"))
 
     election_id = key("election", day)
     p.add(
