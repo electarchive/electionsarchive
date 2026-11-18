@@ -5,6 +5,7 @@ from collections.abc import Callable
 from datetime import date
 from functools import cache
 from html import unescape
+from pathlib import Path
 from typing import NamedTuple
 from urllib.parse import quote
 from uuid import uuid5
@@ -222,6 +223,9 @@ def fetch() -> None:
         regions = region_slugs(year)
         raw.fetch_many(SOURCE, [region_url(year, slug) for slug in regions], suffix=".html")
         raw.fetch_many(SOURCE, [received_url(year, slug) for slug in regions], suffix=".xls")
+    from . import vec_by
+
+    vec_by.fetch()
 
 
 # Parsing --------------------------------------------------------------------------------------------------------
@@ -287,7 +291,10 @@ def _text(cell: str) -> str:
 
 def legacy_sheet(year: int, slug: str) -> tuple[str, int, int, int, list[tuple[str, str, int]], list[Row]]:
     """One district's spreadsheet: its name, enrolment, formal and informal votes, candidate totals, and voting centre rows."""
-    path = raw.cached(SOURCE, sheet_url(year, slug)).path
+    return parse_legacy_sheet(raw.cached(SOURCE, sheet_url(year, slug)).path)
+
+
+def parse_legacy_sheet(path: Path) -> tuple[str, int, int, int, list[tuple[str, str, int]], list[Row]]:
     grid = fastexcel.read_excel(str(path)).load_sheet(0, header_row=None, dtypes="string").to_polars().rows()
     cells = [[(c or "").strip() for c in row] for row in grid]
     name = re.sub(r"\s*District.*", "", cells[3][0]).strip()
@@ -332,7 +339,7 @@ def _legend(html: str) -> dict[str, str]:
 
 def _district_name(html: str) -> str:
     heading = re.search(r"<h2>(.*?)</h2>", html, flags=re.DOTALL)
-    named = re.match(r"(.+?) District", _text(heading.group(1))) if heading else None
+    named = re.match(r"(?:.*?: )?(.+?) District", _text(heading.group(1))) if heading else None
     if not named:
         raise ValueError("the page names no district")
     return named.group(1)
@@ -341,6 +348,12 @@ def _district_name(html: str) -> str:
 def html_page(year: int, slug: str) -> tuple[Page, list[Row]]:
     """A district page and its first preferences by voting centre page, which the 2006 to 2014 elections publish as HTML."""
     html = raw.cached(SOURCE, district_url(year, slug)).path.read_text(encoding="utf-8")
+    sheet = raw.cached(SOURCE, sheet_url(year, slug)).path.read_text(encoding="utf-8")
+    return parse_html_page(f"{year} {slug}", html, sheet)
+
+
+def parse_html_page(label: str, html: str, sheet: str) -> tuple[Page, list[Row]]:
+    """Parse a district page and its voting centre page, given as HTML."""
     body = html[html.index("<body") :]
     text = _text(re.sub(r"<script.*?</script>|<style.*?</style>", "", body, flags=re.DOTALL))
     elected = re.search(r'<span class="bold-text">([^<]+)</span>', body)
@@ -350,7 +363,7 @@ def html_page(year: int, slug: str) -> tuple[Page, list[Row]]:
     first_table = re.search(r"1st pref votes.*?</table>", body, flags=re.DOTALL)
     distribution = re.search(r"Votes after distribution.*?</table>", body, flags=re.DOTALL)
     if not (elected and enrolment and formal and informal and first_table):
-        raise ValueError(f"{year} {slug}: the district page has an unexpected layout")
+        raise ValueError(f"{label}: the district page has an unexpected layout")
 
     def table(source: str) -> list[list[str]]:
         found = [
@@ -373,9 +386,8 @@ def html_page(year: int, slug: str) -> tuple[Page, list[Row]]:
         final,
     )
 
-    sheet = raw.cached(SOURCE, sheet_url(year, slug)).path.read_text(encoding="utf-8")
     if _district_name(sheet) != name:
-        raise ValueError(f"{year} {slug}: the voting centre page is for another district")
+        raise ValueError(f"{label}: the voting centre page is for another district")
     if "not available where a recount took place" in sheet:
         # The commission publishes no voting centre figures for a recounted district: store its totals as one unit.
         total = [Row(name, "All Votes", "declaration", n, i, p, v) for i, (n, p, v) in enumerate(first, 1)]
@@ -392,7 +404,7 @@ def html_page(year: int, slug: str) -> tuple[Page, list[Row]]:
         if ", " in _text(th)
     ]
     if [tokens(h) for h in heads] != [tokens(n) for n, _, _ in first]:
-        raise ValueError(f"{year} {slug}: the candidates on the voting centre page differ from the district page")
+        raise ValueError(f"{label}: the candidates on the voting centre page differ from the district page")
     out: list[Row] = []
     state = "ordinary"
     for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", sheet, flags=re.DOTALL):
@@ -413,7 +425,7 @@ def html_page(year: int, slug: str) -> tuple[Page, list[Row]]:
         out.append(Row(name, place, state, "Informal Votes", len(first) + 1, "", numbers[-2]))
         out.append(Row(name, place, state, "Total Votes", len(first) + 2, "", numbers[-1]))
     if not out:
-        raise ValueError(f"{year} {slug}: no voting centre rows")
+        raise ValueError(f"{label}: no voting centre rows")
     return detail, out
 
 
@@ -453,15 +465,20 @@ def page(year: int, slug: str) -> Page:
         first = [(n, p, v) for n, p, v in totals if not n.startswith(("Informal", "Total"))]
         return Page(name, elected.group(1), enrolment, formal, informal, first, final)
     html = raw.cached(SOURCE, district_url(year, slug)).path.read_text(encoding="utf-8")
+    return parse_main_page(f"{year} {slug}", slug.replace("-", " "), html)
+
+
+def parse_main_page(label: str, name: str, html: str) -> Page:
+    """A district page in the layout the commission has used since 2022, whose district is named `name`."""
     body = html[html.index("<main") :]
     text = _text(re.sub(r"<script.*?</script>|<style.*?</style>", "", body, flags=re.DOTALL))
     elected = re.search(r"Elected member (.+?) (?:Votes counted|Total enrolment)", text)
-    enrolment = re.search(r"Total enrolment as at close of rolls: ([\d,]+)", text)
+    enrolment = re.search(r"Total enrol(?:ment as at close of rolls|led voters): ([\d,]+)", text)
     formal = re.search(r"Formal votes: ([\d,]+)", text)
     informal = re.search(r"Informal votes: ([\d,]+)", text)
     tables = re.findall(r"<table.*?</table>", body, flags=re.DOTALL)
     if not (elected and enrolment and formal and informal) or len(tables) < 2:
-        raise ValueError(f"{year} {slug}: the district page has an unexpected layout")
+        raise ValueError(f"{label}: the district page has an unexpected layout")
 
     def rows(table: str) -> list[tuple[str, str, int]]:
         out = []
@@ -471,10 +488,9 @@ def page(year: int, slug: str) -> Page:
                 out.append((cells[0], cells[1], _number(cells[2])))
         return out
 
-    name = elected.group(1)
     return Page(
-        slug.replace("-", " "),
         name,
+        elected.group(1),
         _number(enrolment.group(1)),
         _number(formal.group(1)),
         _number(informal.group(1)),
@@ -726,8 +742,9 @@ def regions(years: list[int]) -> dict[tuple[str, str], str]:
     }
 
 
-def geo(years: list[int]) -> Package:
-    found = districts(years)
+def geo(years: list[int], extra: dict[tuple[str, str], str] | None = None, files: list[str] | None = None) -> Package:
+    """The geography of the elections in `years`, and of the by-elections, whose districts and files come as `extra`."""
+    found = districts(years) | (extra or {})
     zones = regions(years)
     p = Package(
         f"{SOURCE}/geo",
@@ -740,6 +757,8 @@ def geo(years: list[int]) -> Package:
     for year in years:
         for url in [*urls(year), *region_urls(year)]:
             p.artifact(raw.cached(SOURCE, url), VEC)
+    for url in files or []:
+        p.artifact(raw.cached(SOURCE, url), VEC)
     for code, rank, kind, noun in (
         ("au-vic.state", 1, "administrative", "state"),
         ("au-vic.region", 2, "electoral_district", "region"),
@@ -781,8 +800,12 @@ def geo(years: list[int]) -> Package:
 # Registry -------------------------------------------------------------------------------------------------------
 
 
-def registry(years: list[int]) -> Package:
+def registry(years: list[int], extra: dict[str, str] | None = None) -> Package:
+    """The registry of the elections in `years`, with the parties of the by-elections, which come as `extra`."""
     names = parties(years)
+    for code, name in (extra or {}).items():
+        if code not in names or names[code].isupper():
+            names[code] = name
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
@@ -1158,15 +1181,26 @@ def days() -> list[date]:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in days())]
+    from . import vec_by
+
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/{day}" for day in days()),
+        *vec_by.packages(),
+    ]
 
 
 def parse() -> None:
+    from . import vec_by
+
     years = sorted(YEARS)
-    geo(years).write()
-    registry(years).write()
+    geo(years, vec_by.districts(), vec_by.files()).write()
+    registry(years, vec_by.parties()).write()
     for year in years:
         election(year).write()
+    for day in vec_by.days():
+        vec_by.election(day).write()
 
 
 def emit() -> None:
