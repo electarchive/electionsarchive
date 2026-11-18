@@ -278,6 +278,7 @@ def fetch_many(
     workers: int = 16,
     batch: int = 2000,
     attempts: int = 4,
+    verify: ssl.SSLContext | bool = True,
 ) -> dict[str, Artifact]:
     """Fetch many GET URLs into the cache concurrently, writing the index once per batch instead of once per file,
     so a source of tens of thousands of small API responses does not rewrite its index for each one. Cached URLs are
@@ -290,7 +291,7 @@ def fetch_many(
     index = _read(source)
     out = {url: _artifact(source, url, index[url]) for url in urls if url in index}
     pending = [url for url in dict.fromkeys(urls) if url not in index]
-    client = httpx.Client(headers={"User-Agent": USER_AGENT}, follow_redirects=True, timeout=120)
+    client = httpx.Client(headers={"User-Agent": USER_AGENT}, follow_redirects=True, timeout=120, verify=verify)
 
     def one(url: str) -> tuple[str, dict[str, str | int | None]] | None:
         for attempt in range(attempts):
