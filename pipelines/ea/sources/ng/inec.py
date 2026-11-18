@@ -16,7 +16,7 @@ import shapely
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.ng import general2023, report, tables
+from ea.sources.ng import general2023, inec2022, report, tables
 from ea.sources.ng.general2023 import Report
 from ea.sources.ng.tables import Candidate, Seat
 
@@ -172,6 +172,7 @@ def fetch() -> None:
     raw.fetch(SHAPES, OUTLINES, suffix=".geojson")
     # The 2023 report is gone from the Commission's site; its archived copy was stored with `raw.store`.
     general2023.fetched()
+    inec2022.fetch()
 
 
 def packages() -> list[str]:
@@ -180,6 +181,7 @@ def packages() -> list[str]:
         f"{SOURCE}/registry",
         f"{SOURCE}/{FEDERAL_DAY}",
         f"{SOURCE}/{STATE_DAYS[0]}",
+        inec2022.KEY,
         f"{SOURCE}/{general2023.FEDERAL_DAY}",
         f"{SOURCE}/{general2023.STATE_DAYS[0]}",
     ]
@@ -197,6 +199,7 @@ def parse() -> None:
     states(seats).write()
     federal2023(later, districts).write()
     states2023(later, matched).write()
+    inec2022.parse()
 
 
 def emit() -> None:
