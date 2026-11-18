@@ -1,0 +1,114 @@
+# Appendix I, polling station rows, columns in ballot order: candidate surnames, valid, rejected, electorate
+D|Bacolet/Mt. St. George|Jack|Morrison
+S|*4915|Scarborough Methodist Primary School|111|73|184|0|324
+S|4920-01|Old Scarborough R.C. Primary School|132|86|218|2|559
+S|4920-02|Old Scarborough R.C. Primary School|150|110|260|1|594
+S|4921|Kidsville Nursery School|91|53|144|0|318
+S|4925-01|Tobago Teachers' Professional Centre|118|68|186|1|325
+S|4925-02|Hope Anglican Primary School|146|96|242|0|425
+S|4935-01|Mt. St. George Community Centre|156|123|279|1|484
+S|4935-02|Mt. St. George Community Centre|146|112|258|0|433
+S|4947|Scarborough Methodist Primary School|119|59|178|0|392
+D|Belle Garden East/Roxborough/Delaford|Beckles|Duke
+S|*5025|St. Paul's Anglican Primary School|83|136|219|2|294
+S|5030|St. Paul's Anglican Primary School|191|185|376|1|620
+S|5035-01|Betsey's Hope/Louis D'Or Multi-Purpose Facility|120|224|344|3|561
+S|5035-02|Betsey's Hope/Louis D'Or Multi-Purpose Facility|139|230|369|4|570
+S|5040-01|St. Barnabas Anglican Primary School|170|177|347|2|568
+S|5040-02|St. Barnabas Anglican Primary School|153|197|350|3|510
+S|5045|Belle Garden Multi-Purpose Telecentre|158|268|426|2|734
+D|Bethel/Mt. Irvine|Baynes|Hector
+S|*4865|Montgomery Government Primary School|65|106|171|1|265
+S|4866-01|Bethel Community Centre|155|90|245|2|497
+S|4866-02|Bethel Community Centre|150|77|227|0|457
+S|4870|Black Rock Regional Multi-Purpose Complex|77|167|244|4|586
+S|4875-01|Montgomery Government Primary School|116|108|224|0|524
+S|4875-02|Montgomery Government Primary School|105|119|224|1|530
+S|4875-03|Montgomery Government Primary School|117|126|243|0|567
+S|4876-01|Montgomery Government Primary School|129|115|244|3|595
+S|4876-02|Montgomery Government Primary School|131|120|251|1|581
+D|Black Rock/Whim/Spring Garden|Hector|Morris|Taylor
+S|4871-01|Black Rock Government Primary School|2|159|130|291|1|621
+S|4871-02|St. Michael's Anglican Primary School|0|58|44|102|0|273
+S|4890|Bishop's High School|4|136|77|217|0|543
+S|4892|Bishop's High School|0|90|73|163|1|444
+S|4895|SWUM Community Centre|2|260|119|381|2|717
+S|4896-01|Glen Road Community Centre|1|125|80|206|0|490
+S|4896-02|Glen Road Community Centre|1|96|65|162|0|414
+S|4950|St. Michael's Anglican Primary School|1|264|121|386|3|758
+S|*4951|Les Coteaux Early Childhood Centre|1|140|111|252|0|404
+D|Buccoo/Mt. Pleasant|Baird|Dennis|Phillip|Phillips
+S|*4852-01|Canaan/Bon Accord Multi-Purpose Facility|89|147|0|0|236|0|413
+S|4852-02|Canaan/Bon Accord Multi-Purpose Facility|75|77|0|1|153|1|390
+S|4855|Dixieland Steel Orchestra Compound|118|162|0|1|281|2|664
+S|4856-01|St. Patrick's Anglican Primary School|73|125|3|0|201|0|515
+S|4856-02|St. Patrick's Anglican Primary School|58|123|0|0|181|2|460
+S|4857|Buccoo Government Primary School|110|159|1|0|270|0|540
+S|4858-01|Carnbee/Mt. Pleasant Early Childhood Centre|67|128|2|1|198|0|536
+S|4858-02|Carnbee/Mt. Pleasant Community Centre|67|108|1|0|176|1|504
+S|4860|Buccoo Multi-Purpose Facility|87|180|2|6|275|2|543
+D|Canaan/Bon Accord|Jacob|Sampson
+S|4845-01|Bon Accord Government Primary School|126|86|212|1|475
+S|4845-02|Bon Accord Government Primary School|121|79|200|2|434
+S|4846-01|Bon Accord Government Primary School|108|139|247|1|549
+S|4846-02|Bon Accord Government Primary School|115|139|254|1|537
+S|4847-01|Bon Accord Government Primary School|138|152|290|0|562
+S|4847-02|Bon Accord Government Primary School|144|124|268|0|571
+S|*4850|School for the Deaf|76|79|155|0|241
+S|4851-01|Tobago Technology Centre (MICIT)|109|90|199|1|402
+S|4851-02|Tobago Technology Centre (MICIT)|105|96|201|3|391
+D|Goodwood/Belle Garden West|Yisrael|Bailey
+S|4930|Mt. St. George Methodist Primary School|228|160|388|0|740
+S|5050-01|St. Edward's Anglican Primary School|120|155|275|3|441
+S|5050-02|St. Edward's Anglican Primary School|144|143|287|0|442
+S|*5055|John Roberts Memorial School of S.D.A.|261|154|415|0|594
+S|5060-01|St. Mary's Anglican Primary School|154|86|240|0|477
+S|5060-02|St. Mary's Anglican Primary School|134|135|269|0|484
+S|5065-01|Goodwood High School|173|144|317|0|539
+S|5065-02|Goodwood High School|191|169|360|0|592
+D|Lambeau/Signal Hill|Clarke|Davidson-Celestine
+S|4880-01|Signal Hill Secondary School|109|137|246|0|502
+S|4880-02|Signal Hill Secondary School|95|142|237|0|457
+S|4881-01|Patience Hill Government Primary School|76|179|255|0|555
+S|4881-02|Patience Hill Government Primary School|97|226|323|2|665
+S|*4885|Lambeau Multi-Purpose Facility|120|158|278|0|513
+S|4886|Lambeau Anglican Primary School|155|158|313|0|612
+S|4887|Lambeau Anglican Primary School|281|140|421|1|773
+S|4891|Bishop's High School|107|116|223|1|499
+D|Parlatuvier/L'Anse Fourmi/Speyside|Augustine|Dillon
+S|4985|Castara Government Primary School|193|86|279|0|559
+S|4990|Parlatuvier Multi-Purpose Facility|105|65|170|0|298
+S|4995-01|Bloody Bay Community Centre|44|43|87|0|137
+S|4995-02|L'Anse Fourmi Community Centre|107|64|171|1|245
+S|5000|Charlotteville Library Auditorium|123|115|238|0|387
+S|5005|Charlotteville Methodist Primary School|198|286|484|3|740
+S|5010-01|St. John's Anglican Primary School|187|134|321|0|463
+S|5010-02|St. John's Anglican Primary School|244|108|352|0|525
+S|*5020|Delaford R.C. Primary School|166|146|312|2|418
+D|Plymouth/Golden Lane|Hackett|James-Guy
+S|4955-01|St. David's Anglican Primary School|131|146|277|1|500
+S|4955-02|St. David's Anglican Primary School|130|126|256|1|521
+S|4960-01|Bethesda Multi-Purpose Facility|171|165|336|0|646
+S|4960-02|Bethesda Multi-Purpose Facility|164|139|303|1|540
+S|*4965|Les Coteaux Community Centre|205|191|396|0|606
+S|4970-01|Golden Lane Government Primary School|206|124|330|0|613
+S|4970-02|Golden Lane Government Primary School|205|119|324|0|586
+D|Providence/Mason Hall/Moriah|Des Vignes|Pollard
+S|4906|Mt. Grace Community Centre (Annexe)|143|142|285|0|611
+S|4940-01|Mason Hall Secondary School|141|197|338|0|574
+S|4940-02|Mason Hall Secondary School|150|203|353|3|659
+S|4946-01|Mason Hall Government Primary School|131|125|256|1|520
+S|4946-02|Mason Hall Government Primary School|143|107|250|0|505
+S|4975-01|Moriah Government Primary School|101|97|198|1|456
+S|4975-02|Moriah Government Primary School|103|85|188|0|378
+S|*4976|Moriah Community Centre|107|92|199|3|299
+S|4980|Des Vignes Road Government Primary School|82|137|219|2|449
+D|Scarborough/Calder Hall|James|Melville-Jack|Tsoiafatt-Angus
+S|4900|Harmon School of S.D.A.|106|159|41|306|1|716
+S|4901|Harmon School of S.D.A.|78|113|44|235|1|552
+S|*4905-01|Mt. Grace Community Centre|92|117|28|237|0|424
+S|4905-02|Mt. Grace Community Centre|80|66|28|174|0|423
+S|4910-01|St. Andrew's Anglican Primary School|85|164|55|304|0|618
+S|4910-02|St. Andrew's Anglican Primary School|96|123|42|261|0|536
+S|4945-01|Mason Hall Government Primary School|140|105|9|254|1|506
+S|4945-02|Mason Hall Government Primary School|122|92|22|236|1|463
