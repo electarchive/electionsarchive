@@ -203,7 +203,7 @@ POLITIES: dict[str, tuple[str, str | None, str, list[tuple[str, str]], str, str,
         "1990-05-22",
     ),
     "RHO": ("historical_state", None, "Southern Rhodesia", [], "1923-10-01", "day", "1980-04-18"),
-    "SKM": ("historical_state", None, "Kingdom of Sikkim", [], "1950-12-05", "day", "1975-05-16"),
+    "SKM": ("historical_state", None, "Kingdom of Sikkim", [], "1950-12-05", "day", "1975-04-26"),
     "VDR": (
         "historical_state",
         None,
