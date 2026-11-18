@@ -1,9 +1,12 @@
 import functools
+import html
+import json
 import re
 from datetime import date
 from pathlib import Path
 from uuid import uuid5
 
+import httpx
 import polars as pl
 
 from ea import changeset, package, raw
@@ -31,6 +34,98 @@ FILES = {
 }
 
 
+PORTAL = "https://mec.org.mw/GEResults2025/results"
+DAY_2025 = date(2025, 9, 16)
+LEVELS_2025 = ("region_id", "council_id", "constituency_id", "ward_id")
+SCHEMES_2025 = {
+    "council_id": ("mw.council_2025", 2, "administrative", "council"),
+    "constituency_id": ("mw.constituency_2025", 3, "electoral_district", "constituency"),
+    "ward_id": ("mw.ward_2025", 4, "electoral_district", "ward"),
+}
+
+
+def portal(tab: str, **filters: str) -> str:
+    """A page of the Commission's 2025 results portal, with its filters in the portal's own order."""
+    query = "&".join(f"{name}={value}" for name, value in filters.items())
+    return f"{PORTAL}?tab={tab}" + (f"&{query}&sort=name" if query else "")
+
+
+def areas_2025() -> list[dict[str, str]]:
+    """Every 2025 ward with its constituency, council, and region codes and names, read in order from the tree of
+    the local government index page."""
+    text = html.unescape(raw.cached(SOURCE, portal("local_government")).path.read_text())
+    tree = text[text.index('class="parliamentary-tree region-listing-page"') :]
+    names: dict[str, str] = {}
+    rows: list[dict[str, str]] = []
+    for node, label, link, ward in re.findall(
+        r'<details class="parliamentary-tree-node (region|district|constituency)-node".*?<strong>([^<]*)</strong>'
+        r'|<a class="constituency-tree-link ward-tree-link" href="([^"]*)">.*?<strong>([^<]*)</strong>',
+        tree,
+        re.DOTALL,
+    ):
+        if node:
+            names[node] = label.strip()
+            continue
+        query = dict(part.split("=") for part in link.split("?")[1].split("&"))
+        row = {level: query[level] for level in LEVELS_2025}
+        rows.append(
+            {
+                **row,
+                "region_name": names["region"],
+                "council_name": names["district"],
+                "constituency_name": names["constituency"],
+                "ward_name": ward.strip(),
+            }
+        )
+    if len({row["ward_id"] for row in rows}) != len(rows):
+        raise ValueError("a ward is listed twice")
+    return rows
+
+
+def pages_2025() -> dict[str, list[str]]:
+    """The portal pages the 2025 packages read: President and local councillors by ward, the National Assembly by
+    constituency."""
+    wards = areas_2025()
+    constituencies = [
+        {k: row[k] for k in LEVELS_2025[:3]} for row in {row["constituency_id"]: row for row in wards}.values()
+    ]
+    return {
+        "parliamentary": [portal("parliamentary", **row) for row in constituencies],
+        "presidential": [portal("presidential", **{k: row[k] for k in LEVELS_2025}) for row in wards],
+        "local_government": [portal("local_government", **row) for row in wards],
+    }
+
+
+def fetch_2025(workers: int = 8) -> None:
+    """Fetch the 2025 portal. It answers each page in a minute or more, so pages are fetched side by side and a page
+    the server times out on is tried again."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    raw.fetch(SOURCE, portal("local_government"), suffix=".html", check=_complete)
+    pending = [page for pages in pages_2025().values() for page in pages if page not in raw.keys(SOURCE)]
+
+    def one(page: str) -> None:
+        for _ in range(4):
+            try:
+                raw.fetch(SOURCE, page, suffix=".html", check=_complete)
+                return
+            except (httpx.HTTPError, ValueError) as failure:
+                print(f"{page}: {failure}", flush=True)
+
+    with ThreadPoolExecutor(workers) as pool:
+        list(pool.map(one, pending))
+
+
+FAILURES = ("took too long to respond", "returned an invalid response")
+UNAVAILABLE = "Vote totals are currently unavailable"
+
+
+def _complete(path: Path) -> None:
+    text = path.read_text(errors="replace")
+    if "2025 General Election" not in text or "</html>" not in text or any(failure in text for failure in FAILURES):
+        raise ValueError(f"{path} is not a results page")
+
+
 def url(name: str) -> str:
     return f"{BASE}/{FILES[name]}"
 
@@ -38,6 +133,7 @@ def url(name: str) -> str:
 def fetch() -> None:
     for name in FILES:
         raw.fetch(SOURCE, url(name), suffix=".pdf")
+    fetch_2025()
 
 
 def path(name: str) -> Path:
@@ -134,7 +230,7 @@ def parties() -> list[str]:
     for year in DAYS:
         for result in [*books(year)[0], *books(year)[1]]:
             found |= {code for _, code, _ in result.candidates}
-    return sorted({norm(code) for code in found if not independent(code)})
+    return sorted({norm(code) for code in found if not independent(code)} | set(parties_2025()))
 
 
 def independent(code: str) -> bool:
@@ -169,7 +265,18 @@ def packages() -> list[str]:
         *(f"{SOURCE}/{day}" for day in DAYS.values()),
         f"{SOURCE}/{DAY_2019}",
         f"{SOURCE}/{DAY_2020}",
+        f"{SOURCE}/geo-2025",
+        *([f"{SOURCE}/{DAY_2025}"] if held_2025() else []),
     ]
+
+
+def held_2025() -> bool:
+    """Whether the raw cache holds enough of the 2025 portal for an election package: a National Assembly or local
+    council page, or every ward's presidential page."""
+    pages = cached_2025()
+    return bool(pages["parliamentary"] or pages["local_government"]) or (
+        len(pages["presidential"]) == len(pages_2025()["presidential"])
+    )
 
 
 def parse() -> None:
@@ -179,6 +286,9 @@ def parse() -> None:
         general(year).write()
     tripartite().write()
     fresh().write()
+    geo_2025().write()
+    if held_2025():
+        tripartite_2025().write()
 
 
 def emit() -> None:
@@ -284,11 +394,14 @@ def registry() -> Package:
             "electoral_system", id=id, polity_id=MALAWI, valid_from=since, valid_to=until, rules=rules, rules_version=1
         )
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=method, lang="en")
+    names = parties_2025()
     for code in parties():
         id = party(code)
         p.add("party", id=id, kind="party", polity_id=MALAWI)
         p.add("external_id", entity_id=id, scheme="mw.mec.party", value=code)
         p.name(id, code, "en", "abbreviation")
+        if code in names:
+            p.name(id, names[code], "en", "official")
     return p
 
 
@@ -840,3 +953,322 @@ def _legacy_contest(
             mismatched.append(
                 f"{result.name} ({result.code or 'district'}: printed {result.valid:,}, candidates {total:,})"
             )
+
+
+METHOD_2025 = (
+    "Counted by the Malawi Electoral Commission and read from its 2025 results portal, which prints each candidate's "
+    "votes for a selected area: President and local councillor by ward, and the National Assembly by constituency. "
+    "The portal prints no null and void, total, or registered figures and declares no winners, so none are stored."
+)
+
+
+def _selected(text: str, code: str) -> str:
+    found = re.search(rf'<option value="{code}" selected>([^<]*)', text)
+    if found is None:
+        raise ValueError(f"the page does not select {code}")
+    return html.unescape(found[1]).strip()
+
+
+def _chart(text: str, tab: str) -> list[dict[str, object]]:
+    """The candidate totals a portal page prints for its area, read from the chart data and checked against the
+    candidate cards when the page lists them all."""
+    if UNAVAILABLE in text:
+        votes = re.findall(r"Votes</span><strong>([\d,]+)</strong>", text)
+        if any(value != "0" for value in votes):
+            raise ValueError("a page without vote totals prints votes")
+        return []
+    blocks = re.findall(r'<script type="application/json" id="[a-z_-]*chart-data">(.*?)</script>', text, re.DOTALL)
+    if not blocks:
+        raise ValueError(f"no {tab} chart data")
+    rows: list[dict[str, object]] = json.loads(blocks[0])
+    for other in blocks[1:]:
+        if json.loads(other) != rows:
+            raise ValueError("the page's charts disagree")
+    if 'data-next-page=""' in text:
+        cards = {
+            html.unescape(n).strip(): int(v.replace(",", ""))
+            for n, v in re.findall(
+                r"<h3>([^<]*)</h3>.*?<strong>([\d,]+)</strong>", text.split('id="results-list"', 1)[1], re.DOTALL
+            )
+        }
+        if cards != {str(row["name"]).strip(): int(str(row["votes"])) for row in rows}:
+            raise ValueError("the candidate cards disagree with the chart")
+    return rows
+
+
+def cached_2025() -> dict[str, list[str]]:
+    """The portal pages of each tab that the raw cache holds."""
+    held = raw.keys(SOURCE)
+    return {tab: [page for page in pages if page in held] for tab, pages in pages_2025().items()}
+
+
+@functools.cache
+def results_2025() -> pl.DataFrame:
+    """One line per candidate and area of the cached 2025 portal pages, with the area's names."""
+    areas = {row["ward_id"]: row for row in areas_2025()} | {
+        row["constituency_id"]: {k: v for k, v in row.items() if not k.startswith("ward")} for row in areas_2025()
+    }
+    rows: list[dict[str, object]] = []
+    for tab, pages in cached_2025().items():
+        for page in pages:
+            filters = dict(part.split("=") for part in page.split("?")[1].split("&"))
+            place = areas[filters.get("ward_id") or filters["constituency_id"]]
+            text = raw.cached(SOURCE, page).path.read_text()
+            for level in LEVELS_2025:
+                if level in filters and _selected(text, filters[level]) != place[f"{level[:-3]}_name"]:
+                    raise ValueError(f"{page} selects another {level[:-3]}")
+            for row in _chart(text, tab):
+                rows.append(
+                    {
+                        "tab": tab,
+                        **{name: place.get(name) for name in (*LEVELS_2025, *(f"{x[:-3]}_name" for x in LEVELS_2025))},
+                        "ref": str(row["candidate_ref"]),
+                        "candidate": " ".join(str(row["name"]).split()),
+                        "party": str(row.get("party_abbreviation") or "Independent").strip(),
+                        "party_name": str(row.get("party_name") or "Independent").strip(),
+                        "votes": int(str(row["votes"])),
+                    }
+                )
+    names = ["tab", *LEVELS_2025, *(f"{level[:-3]}_name" for level in LEVELS_2025), "ref", "candidate", "party"]
+    schema = {name: pl.String for name in [*names, "party_name"]} | {"votes": pl.Int64}
+    return pl.DataFrame(rows, schema=schema)
+
+
+def parties_2025() -> dict[str, str]:
+    """Each 2025 party's abbreviation with the full name the portal prints for it."""
+    frame = results_2025().filter(~pl.col("party").map_elements(independent, return_dtype=pl.Boolean))
+    return {norm(code): name for code, name in frame.select("party", "party_name").unique().sort("party").iter_rows()}
+
+
+def geo_2025() -> Package:
+    p = Package(
+        f"{SOURCE}/geo-2025",
+        SOURCE,
+        "Malawi's councils, 229 constituencies, and 509 wards of the 2025 tripartite elections, as the Malawi "
+        "Electoral Commission's results portal lists them",
+        depends=[f"{SOURCE}/geo"],
+    )
+    p.external |= {MALAWI}
+    p.artifact(raw.cached(SOURCE, portal("local_government")), MEC_SOURCE)
+    for code, rank, kind, noun in SCHEMES_2025.values():
+        p.add("scheme", code=code, polity_id=MALAWI, kind=kind, rank=rank, noun=noun, code_system=None)
+    frame = pl.DataFrame(areas_2025())
+    regions = {"NORTHERN": "1", "CENTRAL": "2", "SOUTHERN": "3"}
+    parents = {"council_id": "region_id", "constituency_id": "council_id", "ward_id": "constituency_id"}
+    for level, (scheme, *_) in SCHEMES_2025.items():
+        parent = parents[level]
+        for row in frame.unique(level).sort(level).iter_rows(named=True):
+            id = area(scheme, row[level])
+            p.add("area", id=id, scheme_code=scheme)
+            p.add("area_code", area_id=id, code=row[level])
+            if parent == "region_id":
+                region = regions[row["region_name"]]
+                if row["region_id"] != f"010{region}000000000":
+                    raise ValueError(f"{row['region_name']} has code {row['region_id']}")
+                above = area("mw.region", region)
+            else:
+                above = area(SCHEMES_2025[parent][0], row[parent])
+            p.add("area_parent", area_id=id, parent_id=above)
+            p.name(id, row[f"{level[:-3]}_name"], "en", "official")
+    return p
+
+
+def _units_2025(p: Package, level: str, codes: list[str]) -> dict[str, str]:
+    scheme = SCHEMES_2025[level][0]
+    units: dict[str, str] = {}
+    for code in codes:
+        unit = units[code] = key("unit", DAY_2025, code)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=MALAWI,
+            scheme_code=scheme,
+            code=code,
+            area_relation="equals",
+            area_id=area(scheme, code),
+            kind="standard",
+        )
+    return units
+
+
+def _contest_2025(
+    p: Package,
+    election: str,
+    tag: str,
+    frame: pl.DataFrame,
+    units: dict[str, str],
+    level: str,
+    *,
+    path: str,
+    name: str,
+    kind: str,
+    district: str,
+    system: str,
+    body: str | None,
+    office: str | None,
+) -> None:
+    contest = key("contest", tag)
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind=kind,
+        office_id=office,
+        body_id=body,
+        district_area_id=district,
+        magnitude=1,
+        round_number=1,
+        electoral_system_id=system,
+        default_result_kind="counted",
+    )
+    p.name(contest, name, "en", "official")
+    p.add("slug", path=path, entity_id=contest, is_current=True)
+    result_set = key("result_set", tag)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=MEC_SOURCE,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD_2025, lang="en")
+    candidates = frame.select("ref", "candidate", "party").unique().sort("candidate", "ref")
+    if candidates["ref"].n_unique() != len(candidates):
+        raise ValueError(f"{tag}: a candidate is printed with two names or parties")
+    options: dict[str, str] = {}
+    for ref, candidate, code in candidates.iter_rows():
+        option = options[ref] = key("option", tag, ref)
+        solo = independent(code)
+        person = key("person", tag, ref)
+        p.add("person", id=person)
+        p.name(person, candidate, "en", "official")
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="candidate",
+            party_id=None if solo else party(code),
+            ballot_label=candidate,
+        )
+        p.add(
+            "candidacy",
+            id=key("candidacy", tag, ref),
+            person_id=person,
+            option_id=option,
+            role="head",
+            ballot_name=candidate,
+            member_of_party_id=None if solo else party(code),
+            is_independent=solo,
+        )
+    p.frame(
+        "result_value",
+        frame.select(
+            pl.lit(result_set).alias("result_set_id"),
+            pl.col(level).replace_strict(units, return_dtype=pl.String).alias("unit_id"),
+            pl.col("ref").replace_strict(options, return_dtype=pl.String).alias("option_id"),
+            pl.lit(0).alias("channel"),
+            pl.lit(1).alias("measure"),
+            pl.lit(0).alias("count_round"),
+            pl.lit(0).alias("flags"),
+            pl.col("votes").alias("value"),
+        ),
+    )
+
+
+def tripartite_2025() -> Package:
+    pages = cached_2025()
+    president = len(pages["presidential"]) == len(pages_2025()["presidential"])
+    if not president:
+        pages["presidential"] = []
+    frame = results_2025().filter((pl.col("tab") != "presidential") | president)
+    counts = {
+        tab: frame.filter(pl.col("tab") == tab)["constituency_id" if tab == "parliamentary" else "ward_id"].n_unique()
+        for tab in pages
+    }
+    p = Package(
+        f"{SOURCE}/{DAY_2025}",
+        SOURCE,
+        "The 16 September 2025 tripartite elections: "
+        + ("President by ward, " if president else "")
+        + f"the National Assembly in {counts['parliamentary']} constituencies, and local councillors in "
+        + f"{counts['local_government']} wards",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/geo-2025"],
+    )
+    p.external |= {MALAWI, COUNTRY}
+    for page in [page for tab in pages.values() for page in tab]:
+        p.uses(raw.cached(SOURCE, page))
+    wards = sorted(set(frame.filter(pl.col("tab") != "parliamentary")["ward_id"]))
+    constituencies = sorted(set(frame.filter(pl.col("tab") == "parliamentary")["constituency_id"]))
+    ward_units = _units_2025(p, "ward_id", wards)
+    constituency_units = _units_2025(p, "constituency_id", constituencies)
+    election = key("election", DAY_2025)
+    path_ = f"mw/{DAY_2025}"
+    p.add(
+        "election", id=election, polity_id=MALAWI, kind="general", date_from=DAY_2025, date_to=DAY_2025, status="held"
+    )
+    p.add("slug", path=path_, entity_id=election, is_current=True)
+    p.name(election, "2025 Malawi tripartite elections", "en", "official")
+    if president:
+        _president_2025(p, election, frame.filter(pl.col("tab") == "presidential"), ward_units)
+    parliament = frame.filter(pl.col("tab") == "parliamentary")
+    for code in sorted(set(parliament["constituency_id"])):
+        part = parliament.filter(pl.col("constituency_id") == code)
+        name = part["constituency_name"][0]
+        _contest_2025(
+            p,
+            election,
+            f"{DAY_2025}:parliament:{code}",
+            part,
+            constituency_units,
+            "constituency_id",
+            path=f"{path_}/parliament/{code}-{changeset.slug(name)}",
+            name=f"2025 National Assembly election, {name}",
+            kind="body_seats",
+            district=area("mw.constituency_2025", code),
+            system=SYSTEM_FPTP,
+            body=ASSEMBLY,
+            office=None,
+        )
+    local = frame.filter(pl.col("tab") == "local_government")
+    for code in sorted(set(local["ward_id"])):
+        part = local.filter(pl.col("ward_id") == code)
+        name = part["ward_name"][0]
+        _contest_2025(
+            p,
+            election,
+            f"{DAY_2025}:local:{code}",
+            part,
+            ward_units,
+            "ward_id",
+            path=f"{path_}/local/{code}-{changeset.slug(name)}",
+            name=f"2025 local government election, {name} ward ({part['council_name'][0]})",
+            kind="body_seats",
+            district=area("mw.ward_2025", code),
+            system=SYSTEM_FPTP,
+            body=COUNCILS,
+            office=None,
+        )
+    return p
+
+
+def _president_2025(p: Package, election: str, frame: pl.DataFrame, units: dict[str, str]) -> None:
+    _contest_2025(
+        p,
+        election,
+        f"{DAY_2025}:president",
+        frame,
+        units,
+        "ward_id",
+        path=f"mw/{DAY_2025}/president",
+        name="2025 Malawi presidential election",
+        kind="office",
+        district=COUNTRY,
+        system=SYSTEM_PRESIDENT_MAJORITY,
+        body=None,
+        office=PRESIDENCY,
+    )
