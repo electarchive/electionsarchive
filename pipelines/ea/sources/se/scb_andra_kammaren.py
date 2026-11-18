@@ -1,4 +1,4 @@
-"""Sweden's Second Chamber (andra kammaren) elections of 1924 to 1968 by constituency, digitized from Statistics
+"""Sweden's Second Chamber (andra kammaren) elections of 1921 to 1968 by constituency, digitized from Statistics
 Sweden's Riksdagsmannavalen volumes.
 
 Each volume of Riksdagsmannavalen (Sveriges officiella statistik) prints a table of valid ballots by party and members
@@ -11,6 +11,7 @@ every figure on its page.
 
 The volumes and the tables used:
 
+- Riksdagsmannavalen år 1921, table 5: 1921, each constituency's rural districts and towns apart.
 - Riksdagsmannavalen åren 1925–1928, table 3: 1928 and 1924.
 - Riksdagsmannavalen åren 1933–1936, table 3: 1936 and 1932.
 - Riksdagsmannavalen åren 1941–1944, table 4: 1944 and 1940.
@@ -80,6 +81,13 @@ VOLUMES = {
     v.key: v
     for v in (
         Volume(
+            "1921",
+            "1921",
+            "Riksdagsmannavalen år 1921",
+            "tab. 5",
+            {152: "H B L S", 153: "VS K O total invalid seats*"},
+        ),
+        Volume(
             "1925-1928",
             "1925-1926-1927-1928",
             "Riksdagsmannavalen åren 1925–1928",
@@ -146,6 +154,15 @@ class Election:
 
 
 ELECTIONS = [
+    Election(
+        1921,
+        "1921",
+        date(1921, 9, 10),
+        date(1921, 9, 26),
+        "The first Second Chamber election with universal suffrage for women and men. Most constituencies voted on "
+        "Sunday 11 or 18 September (some towns on the Saturday before); the Fyrstadskretsen constituency voted on 10 "
+        "September, Stockholms stad and Göteborgs stad on 16 September, and Norrbottens län on Monday 26 September.",
+    ),
     Election(
         1924,
         "1925-1928",
@@ -284,6 +301,7 @@ PARTIES = {
         english="Centre Party",
         historical=(("Bondeförbundet", None, date(1957, 6, 1)),),
     ),
+    "LS": Party("Liberala samlingspartiet", "L", english="Liberal Coalition Party"),
     "L": Party("Sveriges liberala parti", "L", english="Liberal Party of Sweden"),
     "F": Party("Frisinnade folkpartiet", "F", english="Free-minded People's Party"),
     "LF": Party(
@@ -294,6 +312,7 @@ PARTIES = {
     ),
     "FP": Party("Folkpartiet", "FP", english="People's Party"),
     "S": Party("Sveriges socialdemokratiska arbetareparti", "S", english="Social Democrats"),
+    "VS": Party("Sveriges socialdemokratiska vänsterparti", "VS", english="Left Social Democrats"),
     "KH": Party("Sveriges kommunistiska parti (Höglundsriktningen)", "K (Höglund)", english="Höglund Communists"),
     "K": Party("Sveriges kommunistiska parti", "K", english="Communist Party of Sweden"),
     "SP": Party(
@@ -310,6 +329,8 @@ PARTIES = {
 
 # The party behind each column, where it differs from the column's own name.
 COLUMN_PARTY: dict[tuple[int, str], str] = {
+    (1921, "B"): "C",
+    (1921, "L"): "LS",
     (1924, "B"): "C",
     (1928, "B"): "C",
     (1932, "B"): "C",
@@ -328,6 +349,7 @@ LABELS: dict[str, str] = {
     "F": "Frisinnade",
     "FP": "Folkpartiet",
     "S": "Socialdemokrater",
+    "VS": "Vänstersocialister",
     "KH": "Kommunister (Höglundsriktningen)",
     "K": "Kommunister",
     "SP": "Socialistiska partiet",
@@ -387,25 +409,44 @@ def seat_columns(volume: str) -> list[str]:
     return [c for c in columns(volume) if c.startswith("seats:")]
 
 
+# Rows whose printed party ballots do not add up to their printed total, by the difference (total minus sum). The
+# figures were checked against the page; the national row of the same part repeats the difference.
+PRINTED: dict[tuple[str, int, str], int] = {
+    ("1921", 1921, "kristianstad/lb"): 1,
+    ("1921", 1921, "kristianstad/st"): -1,
+    ("1921", 1921, "riket/lb"): 1,
+    ("1921", 1921, "riket/st"): -1,
+}
+
+
+def base(krets: str) -> str:
+    """The constituency of a row: kalmar/lb (the rural districts of Kalmar läns valkrets) is kalmar."""
+    return krets.split("/")[0]
+
+
 def check(volume: str) -> None:
-    """Every row adds up to its printed totals, and every column to the printed national row."""
+    """Every row adds up to its printed totals, and every column to the printed national row (and a part's column,
+    where a table prints the rural districts and towns apart, to the national row of that part)."""
     found = rows(volume)
     parties, seats = party_columns(volume), seat_columns(volume)
     for year, krets, row in found:
-        if sum(row[c] or 0 for c in parties) != row["total"]:
+        if sum(row[c] or 0 for c in parties) + PRINTED.get((volume, year, krets), 0) != row["total"]:
             raise ValueError(f"{volume} {year} {krets}: the party ballots do not add up to the printed total")
-        if sum(row[c] or 0 for c in seats) != row["seats"]:
+        if sum(row[c] or 0 for c in seats) != (row["seats"] or 0):
             raise ValueError(f"{volume} {year} {krets}: the party seats do not add up to the printed total")
-        if krets != "riket" and krets not in KRETSAR:
+        if base(krets) != "riket" and base(krets) not in KRETSAR:
             raise ValueError(f"{volume}: unknown constituency {krets}")
     for year in sorted({y for y, _, _ in found}):
-        units = [row for y, k, row in found if y == year and k != "riket"]
-        national = [row for y, k, row in found if y == year and k == "riket"]
-        if len(units) != len(KRETSAR) or len(national) != 1:
-            raise ValueError(f"{volume} {year}: expected {len(KRETSAR)} constituencies and a national row")
-        for column in columns(volume):
-            if sum(row[column] or 0 for row in units) != (national[0][column] or 0):
-                raise ValueError(f"{volume} {year}: column {column} does not add up to the national row")
+        units = [(k, row) for y, k, row in found if y == year and base(k) != "riket"]
+        if {base(k) for k, _ in units} != set(KRETSAR):
+            raise ValueError(f"{volume} {year}: expected the {len(KRETSAR)} constituencies")
+        for total in (k for y, k, _ in found if y == year and base(k) == "riket"):
+            part = total.partition("/")[2]
+            national = next(row for y, k, row in found if y == year and k == total)
+            members = [row for k, row in units if not part or k.endswith(f"/{part}") or (part == "st" and "/" not in k)]
+            for column in columns(volume):
+                if sum(row[column] or 0 for row in members) != (national[column] or 0):
+                    raise ValueError(f"{volume} {year}: column {column} does not add up to the {total} row")
 
 
 def page_sizes() -> dict[tuple[str, int], tuple[int, int]]:
@@ -506,7 +547,7 @@ def registry() -> Package:
     p = Package(
         REGISTRY,
         SOURCE,
-        "The Second Chamber of the bicameral Riksdag, its electoral systems, the parties of its elections of 1924 to "
+        "The Second Chamber of the bicameral Riksdag, its electoral systems, the parties of its elections of 1921 to "
         "1968, and the Riksdagsmannavalen volumes they are digitized from",
     )
     p.external.add(SWEDEN)
@@ -603,6 +644,14 @@ INVALID_1968 = (
 )
 
 
+PARTS = (
+    " The table prints each constituency's rural districts (landsbygd) and towns (städer) apart, and each is a "
+    "reporting unit within the constituency; the seats are the table's own split by where the members lived, summed "
+    "for the constituency."
+)
+PART_NAMES = {"lb": "landsbygd", "st": "städer"}
+
+
 @dataclass
 class Build:
     p: Package
@@ -646,16 +695,20 @@ def election(e: Election) -> Package:
     boxes = locators()
     b = Build(p, e)
     parties = party_columns(e.volume)
-    found = [(k, row) for y, k, row in rows(e.volume) if y == e.year and k != "riket"]
+    found = [(k, row) for y, k, row in rows(e.volume) if y == e.year and base(k) != "riket"]
     method = METHOD.format(
         table=volume.table,
         title=volume.title,
         invalid=INVALID_1968 if e.year == 1968 else INVALID_TEXT,
     )
-    for krets_key, row in found:
+    if any("/" in k for k, _ in found):
+        method += PARTS
+    groups: dict[str, list[tuple[str, Row]]] = {}
+    for key, row in found:
+        groups.setdefault(base(key), []).append((key, row))
+    for krets_key, members in groups.items():
         krets = KRETSAR[krets_key]
         contest = scb.key("contest", "andra-kammaren", e.year, krets_key)
-        seats = row["seats"] or 0
         p.add(
             "contest",
             id=contest,
@@ -663,7 +716,7 @@ def election(e: Election) -> Package:
             kind="list_allocation",
             body_id=BODY,
             district_area_id=krets.area,
-            magnitude=seats,
+            magnitude=sum(row["seats"] or 0 for _, row in members),
             round_number=1,
             electoral_system_id=system(e.year),
             default_result_kind="counted",
@@ -686,34 +739,13 @@ def election(e: Election) -> Package:
         p.add(
             "note", id=scb.key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en"
         )
-        unit = scb.key("unit", "andra-kammaren", e.year, krets_key)
-        p.add(
-            "reporting_unit",
-            id=unit,
-            polity_id=SWEDEN,
-            scheme_code=krets.scheme,
-            code=f"{e.day}:ak:{krets_key}",
-            area_relation="equals",
-            area_id=krets.area,
-            kind="standard",
-        )
-        p.name(unit, krets.name, "sv", "official")
-
-        def put(option: str | None, measure: int, value: int, column: str | None) -> None:
-            flags = 0
-            if column is not None:
-                flags = DIGITIZED
-                page, x0, y0, x1, y1 = boxes[(e.volume, e.year, krets_key, column)]
-                b.pages.add(page)
-                b.boxes.append((result_set, unit, option, measure, page_id(volume, page), x0, y0, x1, y1))
-            b.values.append((result_set, unit, option, measure, value, flags))
-
+        options: dict[str, str] = {}
         for position, column in enumerate(parties, start=1):
-            votes = row[column]
-            won = row.get(f"seats:{column}") or 0
-            if votes is None and not won:
+            votes = [row[column] for _, row in members if row[column] is not None]
+            won = sum(row.get(f"seats:{column}") or 0 for _, row in members)
+            if not votes and not won:
                 continue
-            option = scb.key("option", "andra-kammaren", e.year, krets_key, column)
+            option = options[column] = scb.key("option", "andra-kammaren", e.year, krets_key, column)
             label = YEAR_LABELS.get((e.year, column), LABELS[column])
             if e.year >= 1957 and column == "C":
                 label = "Centerpartiet"
@@ -726,16 +758,49 @@ def election(e: Election) -> Package:
                 ballot_position=position,
                 ballot_label=label,
             )
-            if votes is not None:
-                put(option, VOTES, votes, column)
             if won:
                 p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=won)
-        total, invalid = row["total"] or 0, row["invalid"] or 0
-        put(None, VALID, total, "total")
-        put(None, INVALID, invalid, "invalid")
-        put(None, CAST, total + invalid, None)
-        if "registered" in row and row["registered"] is not None:
-            put(None, REGISTERED, row["registered"], "registered")
+        for key, row in members:
+            part = key.partition("/")[2]
+            unit = scb.key("unit", "andra-kammaren", e.year, key)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=SWEDEN,
+                scheme_code=krets.scheme,
+                code=f"{e.day}:ak:{key}",
+                area_relation="within" if part else "equals",
+                area_id=krets.area,
+                kind="standard",
+            )
+            p.name(unit, f"{krets.name}, {PART_NAMES[part]}" if part else krets.name, "sv", "official")
+
+            def put(option: str | None, measure: int, value: int, column: str | None) -> None:
+                flags = 0
+                if column is not None:
+                    flags = DIGITIZED
+                    page, x0, y0, x1, y1 = boxes[(e.volume, e.year, key, column)]
+                    b.pages.add(page)
+                    b.boxes.append((result_set, unit, option, measure, page_id(volume, page), x0, y0, x1, y1))
+                b.values.append((result_set, unit, option, measure, value, flags))
+
+            for column, option in options.items():
+                if (votes := row[column]) is not None:
+                    put(option, VOTES, votes, column)
+            total, invalid = row["total"] or 0, row["invalid"] or 0
+            put(None, VALID, total, "total")
+            put(None, INVALID, invalid, "invalid")
+            put(None, CAST, total + invalid, None)
+            if (registered := row.get("registered")) is not None:
+                put(None, REGISTERED, registered, "registered")
+            if (e.volume, e.year, key) in PRINTED:
+                p.accept(
+                    "accounting.votes_valid",
+                    "Riksdagsmannavalen år 1921, table 5, prints Kristianstads läns valkrets with party ballots that "
+                    "add up to 62,304 in the rural districts against a printed total of 62,305, and to 7,714 in the "
+                    "towns against 7,713; the national rows of the two parts repeat the difference, and the "
+                    "constituency's total is right. The figures are stored as printed.",
+                )
     _write(b, volume)
     return p
 
@@ -797,9 +862,11 @@ def _write(b: Build, volume: Volume) -> None:
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Locating the figures. `locate` is run by hand after a table is transcribed: it renders each table page at 300 dpi,
-# reads its words and their boxes with Tesseract, finds each transcribed figure among them, and writes the boxes to
-# locators.tsv and the page sizes to pages.tsv. A figure that the OCR misread takes its row's band and its column's
-# median edges. It reports how many figures the OCR read the same as the transcription.
+# reads its words and their boxes with Tesseract, and finds the transcribed figures among them. A figure of 100 or
+# more that only one line of the page spells anchors its row to that line; the rows between anchors are placed by
+# their order. A figure the OCR read differently takes its row's band and its column's median edges. The boxes go to
+# locators.tsv and the page sizes to pages.tsv, and it reports how many figures the OCR read the same as the
+# transcription. Seats are outcomes and need no box.
 
 type Word = tuple[str, int, int, int, int]
 
@@ -859,6 +926,27 @@ def _numbers(line: list[Word]) -> list[tuple[int, tuple[int, int, int, int]]]:
     return out
 
 
+def _increasing(points: list[tuple[int, float]]) -> list[tuple[int, float]]:
+    """The longest run of (row, y) points whose y rises with the row."""
+    best: list[list[tuple[int, float]]] = []
+    for point in sorted(points):
+        chains = [chain for chain in best if chain[-1][0] < point[0] and chain[-1][1] < point[1]]
+        best.append([*max(chains, key=len, default=[]), point])
+    return max(best, key=len, default=[])
+
+
+def _interpolate(anchors: list[tuple[int, float]], index: int) -> float:
+    before = [a for a in anchors if a[0] <= index]
+    after = [a for a in anchors if a[0] >= index]
+    if before and after:
+        (i0, y0), (i1, y1) = before[-1], after[0]
+    elif len(anchors) >= 2:
+        (i0, y0), (i1, y1) = (anchors[0], anchors[1]) if not before else (anchors[-2], anchors[-1])
+    else:
+        return anchors[0][1]
+    return y0 if i0 == i1 else y0 + (index - i0) * (y1 - y0) / (i1 - i0)
+
+
 def locate() -> None:
     import statistics
     import tempfile
@@ -878,98 +966,69 @@ def locate() -> None:
                 words, width, height = _words(pdf, page, Path(folder))
                 here = volume.page_columns(page)
                 sizes.append([volume.key, page, round(width / 3), round(height / 3)])
-                lines = [(line, _numbers(line)) for line in _lines(words)]
-                # Align the table's rows with the page's lines: each row takes the line, below the last one taken,
-                # that spells the most of its figures of 10 or more.
-                at: dict[int, int] = {}
-                start = 0
-                for index, (_, _, row) in enumerate(found):
-                    targets = {v for c, v in row.items() if c in here and v is not None and v >= 10}
-                    best, score = None, 0
-                    for li in range(start, len(lines)):
-                        hits = len(targets & {n for n, _ in lines[li][1]})
-                        if hits > score:
-                            best, score = li, hits
-                        if best is not None and li > best + 6:
-                            break
-                    if best is not None and score >= 2:
-                        at[index] = best
-                        start = best + 1
-                if len(at) < len(found) // 2:
-                    # A page of small figures (seats alone): its rows are the lines with a cell for nearly every
-                    # column, in order.
-                    full = [
-                        li
-                        for li, (line, _) in enumerate(lines)
-                        if sum(
-                            w[0].strip(".,:;)|") in ("-", "—", "–", "_") or w[0].strip(".,:;)|").isdigit() for w in line
-                        )
-                        >= len(here) - 2
-                    ]
-                    if len(full) == len(found):
-                        at = dict(enumerate(full))
-                hits: dict[str, list[tuple[int, int, int, int]]] = {}
-                for index, li in at.items():
+                lines = _lines(words)
+                spelled = [_numbers(line) for line in lines]
+                middles = [statistics.median((w[2] + w[4]) / 2 for w in line) for line in lines]
+                heights = [statistics.median(w[4] - w[2] for w in line) for line in lines]
+                # Anchors: a figure of 100 or more that one line of the page spells, and only one row of the table
+                # holds, places its row on that line.
+                counts: dict[int, int] = {}
+                for _, _, row in found:
                     for column in here:
-                        value = found[index][2][column]
-                        if value is None:
+                        if (value := row.get(column)) is not None:
+                            counts[value] = counts.get(value, 0) + 1
+                points: list[tuple[int, float]] = []
+                hits: dict[str, list[tuple[int, int, int, int]]] = {}
+                exact: dict[tuple[int, str], tuple[int, int, int, int]] = {}
+                for index, (_, _, row) in enumerate(found):
+                    for column in here:
+                        value = row.get(column)
+                        if value is None or value < 100 or counts[value] > 1:
                             continue
-                        spans = [box for n, box in lines[li][1] if n == value]
-                        if value >= 10 and len(spans) >= 1:
-                            hits.setdefault(column, []).append(spans[0])
-                            x0, y0, x1, y1 = spans[0]
-                            boxes[(index, column)] = (page, x0 / 3, y0 / 3, x1 / 3, y1 / 3)
+                        where = [(li, box) for li, numbers in enumerate(spelled) for n, box in numbers if n == value]
+                        if len({li for li, _ in where}) == 1:
+                            li, box = where[0]
+                            points.append((index, middles[li]))
+                            exact[(index, column)] = box
+                anchors = _increasing(points)
+                kept = set(anchors)
+                for (index, column), box in exact.items():
+                    if any(a[0] == index for a in kept):
+                        hits.setdefault(column, []).append(box)
+                        boxes[(index, column)] = (page, box[0] / 3, box[1] / 3, box[2] / 3, box[3] / 3)
+                        read.add((index, column))
+                if not anchors:
+                    continue
+                pitch = statistics.median(heights) / 2 + 2
+                band = {index: _interpolate(anchors, index) for index in range(len(found))}
+                nearest = {
+                    index: min(range(len(lines)), key=lambda li, y=y: abs(middles[li] - y)) for index, y in band.items()
+                }
+                # Smaller figures, read on the line their row's band falls on.
+                for index, li in nearest.items():
+                    if abs(middles[li] - band[index]) > pitch:
+                        continue
+                    for column in here:
+                        value = found[index][2].get(column)
+                        if value is None or (index, column) in boxes or column.startswith("seats"):
+                            continue
+                        spans = [box for n, box in spelled[li] if n == value]
+                        if value >= 10 and len(spans) == 1:
+                            box = spans[0]
+                            hits.setdefault(column, []).append(box)
+                            boxes[(index, column)] = (page, box[0] / 3, box[1] / 3, box[2] / 3, box[3] / 3)
                             read.add((index, column))
-                # Seat figures are single digits the OCR cannot place by value: in each line, the digits and dashes
-                # right of the invalid ballots column (or, on a page of seats alone, all of them) are the seat
-                # columns in order.
-                seat_cols = [c for c in here if c.startswith("seats")]
-                limit = max((b[2] for b in hits.get("invalid", [])), default=0)
-                for index, li in at.items() if seat_cols else ():
-                    cells = [
-                        w
-                        for w in lines[li][0]
-                        if w[1] > limit
-                        and (w[0].strip(".,:;)|") in ("-", "—", "–", "_") or w[0].strip(".,:;)|").isdigit())
-                    ]
-                    if len(cells) >= len(seat_cols):
-                        for column, w in zip(seat_cols, cells, strict=False):
-                            hits.setdefault(column, []).append((w[1], w[2], w[3], w[4]))
-                            value = found[index][2][column]
-                            if value is not None and w[0].strip(".,:;)|") == str(value):
-                                boxes[(index, column)] = (page, w[1] / 3, w[2] / 3, w[3] / 3, w[4] / 3)
-                                read.add((index, column))
-                # Columns on this page, with their median edges.
                 edges = {
                     column: (statistics.median(b[0] for b in bs), statistics.median(b[2] for b in bs))
                     for column, bs in hits.items()
                 }
-                # Each row's band: its line's, or, for a row the OCR did not align, one interpolated from the rows
-                # around it.
-                bands: dict[int, tuple[float, float]] = {}
-                for index, li in at.items():
-                    line = lines[li][0]
-                    bands[index] = (statistics.median(w[2] for w in line), statistics.median(w[4] for w in line))
-                known = sorted(bands)
-                for index in range(len(found)) if len(known) >= 2 else ():
-                    if index in bands:
-                        continue
-                    before = max((k for k in known if k < index), default=known[0])
-                    after = min((k for k in known if k > index), default=known[-1])
-                    if before == after or before > index or after < index:
-                        before, after = (known[0], known[1]) if index < known[0] else (known[-2], known[-1])
-                    share = (index - before) / (after - before)
-                    bands[index] = (
-                        bands[before][0] + share * (bands[after][0] - bands[before][0]),
-                        bands[before][1] + share * (bands[after][1] - bands[before][1]),
-                    )
-                for index, (top, bottom) in bands.items():
+                for index, y in band.items():
                     for column, (x0, x1) in edges.items():
-                        if found[index][2][column] is not None and (index, column) not in boxes:
-                            boxes[(index, column)] = (page, x0 / 3, top / 3, x1 / 3, bottom / 3)
+                        if found[index][2].get(column) is not None and (index, column) not in boxes:
+                            boxes[(index, column)] = (page, x0 / 3, (y - pitch) / 3, x1 / 3, (y + pitch) / 3)
         for index, (year, krets, row) in enumerate(found):
             for column in cols:
-                if row[column] is None:
+                if row[column] is None or column.startswith("seats"):
                     continue
                 wanted += 1
                 if (index, column) in boxes:
