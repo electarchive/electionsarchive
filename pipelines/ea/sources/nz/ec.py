@@ -69,7 +69,11 @@ REFERENDUMS_PAGE = f"{SITE}/electionresults_2020/referendums-results.html"
 REFERENDUMS_SHEET = f"{SITE}/electionresults_2020/referendums-statistics/ElectorateReferendumResults.xlsx"
 # The voting-place files of the 2020 general election that a person saved from the results site in a browser are one
 # file for all the electorates: each electorate's file in turn, after a line giving the address of the file it is.
-SAVED_BUNDLE = re.compile(r"/nz-(\d{4})-(?:candidate|party)-votes-by-voting-place-all-electorates\.csv$")
+SAVED_BUNDLE = re.compile(
+    r"/nz-(\d{4})-(?:(?:candidate|party)-votes-by-voting-place-all-electorates|e9_part8_(?:cand|party)-complete)\.csv$"
+)
+# The 2014 per-electorate files saved from a browser keep the authority's own file names, under a folder for the year.
+SAVED_E9 = re.compile(r"^browser://[^/]+/(\d{4})/(e9_part8_(?:cand|party)_\d+\.csv)$")
 SAVED_MARK = "# SOURCE: "
 
 METHOD = (
@@ -112,7 +116,10 @@ def _held() -> dict[str, str]:
     for stored in raw.keys(SOURCE):
         if bundle_year(stored) or SAVED_BUNDLE.search(stored):
             continue
-        if stored.startswith("browser://"):
+        saved = SAVED_E9.match(stored)
+        if saved:
+            original = e9_url(int(saved.group(1)), saved.group(2))
+        elif stored.startswith("browser://"):
             original = csv_url(SAVED_YEAR, stored.rsplit("/", 1)[1])
         elif "web.archive.org/web/" in stored and "id_/" in stored:
             original = stored.split("id_/", 1)[1]
@@ -368,24 +375,49 @@ def bundle_art(year: int) -> raw.Artifact | None:
     return None
 
 
+def part8_urls(year: int) -> list[str]:
+    """The per-electorate files of 2002 to 2014 that are cached under the authority's own addresses."""
+    return [
+        url for kind in ("cand", "party") for n in range(1, 80) if has(url := e9_url(year, f"e9_part8_{kind}_{n}.csv"))
+    ]
+
+
+def bundle_arts(year: int) -> list[raw.Artifact]:
+    """What a bundled year's polling-place files are read from: its one bundle, or else its per-electorate files."""
+    whole = bundle_art(year)
+    if whole is not None:
+        return [whole]
+    return [art(url) for url in part8_urls(year)] if year in E9_YEARS else []
+
+
 def bundled(year: int) -> bool:
-    return year in BUNDLE_YEARS and bundle_art(year) is not None
+    return year in BUNDLE_YEARS and bool(bundle_arts(year))
+
+
+def _repaired(text_: str) -> str:
+    for broken, fixed in LOST.items():
+        text_ = text_.replace(broken, fixed)
+    # What is left is an apostrophe: the saved files lost it in names such as O'Brien and in places such as St Paul's.
+    return re.sub(r"(?<=\w)\ufffd(?=\w)", "'", text_)
 
 
 @functools.cache
 def bundle_files(year: int) -> dict[str, list[list[str]]]:
-    """The files of a year's bundle, by the address each says it is, as rows of cells."""
-    art_ = bundle_art(year)
-    if art_ is None:
-        raise LookupError(f"{year}: no bundle of polling-place files is cached")
-    text_ = art_.path.read_text("utf-8-sig")
-    for broken, fixed in LOST.items():
-        text_ = text_.replace(broken, fixed)
-    # What is left is an apostrophe: the saved files lost it in names such as O'Brien and in places such as St Paul's.
-    text_ = re.sub(r"(?<=\w)\ufffd(?=\w)", "'", text_)
+    """A year's polling-place files, by the address each says it is, as rows of cells."""
+    arts = bundle_arts(year)
+    if not arts:
+        raise LookupError(f"{year}: no polling-place files are cached")
+    files: dict[str, list[list[str]]] = {}
+    if bundle_art(year) is None:
+        for url, art_ in zip(part8_urls(year), arts, strict=True):
+            text_ = _repaired(art_.path.read_text("utf-8-sig"))
+            if "\ufffd" in text_:
+                raise ValueError(f"{url}: the file holds a character that did not survive the save")
+            files[url] = [[cell.strip() for cell in row] for row in csv.reader(io.StringIO(text_))]
+        return files
+    text_ = _repaired(arts[0].path.read_text("utf-8-sig"))
     if "\ufffd" in text_:
         raise ValueError(f"{year}: the bundle holds a character that did not survive the save")
-    files: dict[str, list[list[str]]] = {}
     for chunk in re.split(rf"^(?={BUNDLE_MARK})", text_, flags=re.MULTILINE):
         if chunk.startswith(BUNDLE_MARK):
             head, _, body = chunk.partition("\n")
@@ -563,7 +595,8 @@ def summary(year: int) -> Summary:
     """The national party votes and each party's seats (list and electorate together), as the authority prints them:
     from its summary of overall results, or else from the results home page."""
     url = summary_url(year)
-    if url is None and bundled(year):
+    # A results home page of these years charts the shares and seats of the largest parties and prints no table.
+    if bundled(year) and url in (None, home_url(year)):
         return _derived_summary(year)
     if url is None:
         raise LookupError(f"{year}: no summary of overall results is cached")
@@ -651,9 +684,7 @@ def _derived_summary(year: int) -> Summary:
     informal = sum(page.total[-1] for page in pages_.values())
     if sum(votes.values()) != valid:
         raise ValueError(f"{year}: the party votes sum to {sum(votes.values())}, but the valid total is {valid}")
-    art_ = bundle_art(year)
-    assert art_ is not None
-    return Summary(art_.url, {}, votes, valid, informal, None, derived=True)
+    return Summary(bundle_arts(year)[0].url, {}, votes, valid, informal, None, derived=True)
 
 
 def _home_summary(year: int, url: str) -> Summary:
@@ -1518,10 +1549,11 @@ def _voting_places(p: Package, day: str, election: str, party_set: str, options:
     candidate_pages = pages(year, "candidate")
     party_pages = pages(year, "party")
     names = electorates(year)
-    whole = bundle_art(year) if bundled(year) else None
+    whole = bundle_arts(year) if bundled(year) else []
     won = winners(year) if not whole and has(csv_url(year, "winning-electorate-candidates.csv")) else {}
     if whole:
-        p.uses(whole)
+        for each in whole:
+            p.uses(each)
     else:
         _cite(
             p,
