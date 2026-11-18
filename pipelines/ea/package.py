@@ -78,6 +78,8 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
         ("id",),
         {"id": U, "artifact_id": U, "page_number": I32, "image_key": U, "width": I32, "height": I32},
     ),
+    "polity": (("id",), {"id": U, "kind": U, "iso_code": U}),
+    "polity_parent": (None, {"polity_id": U, "parent_id": U, "valid_from": D, "valid_to": D}),
     "scheme": (
         ("code",),
         {"code": U, "polity_id": U, "kind": U, "rank": I16, "noun": U, "kinds": U, "code_system": U},
@@ -102,6 +104,7 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
         ("id",),
         {"id": U, "scheme_code": U, "vintage": U, "valid_from": D, "valid_to": D, "as_of": D},
     ),
+    "polity_territory": (None, {"polity_id": U, "area_id": U, "valid_from": D, "valid_to": D}),
     "area_event": (
         ("id",),
         {"id": U, "kind": U, "date": D, "date_precision": U, "source_id": U, "notes": U},
@@ -594,6 +597,8 @@ def _digest(out: Path, tables: Iterable[str], con: duckdb.DuckDBPyConnection | N
 
 REFERENCES = [
     ("source_artifact", "source_id", "source"),
+    ("polity_parent", "polity_id", "polity"),
+    ("polity_parent", "parent_id", "polity"),
     ("scheme", "polity_id", "polity"),
     ("area", "scheme_code", "scheme"),
     ("area_code", "area_id", "area"),
@@ -602,6 +607,8 @@ REFERENCES = [
     ("area_parent", "parent_id", "area"),
     ("area_geometry", "area_id", "area"),
     ("area_geometry", "source_id", "source"),
+    ("polity_territory", "polity_id", "polity"),
+    ("polity_territory", "area_id", "area"),
     ("area_event", "source_id", "source"),
     ("area_event_member", "event_id", "area_event"),
     ("area_event_member", "area_id", "area"),
@@ -817,11 +824,7 @@ def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
             findings.append((f"unique.{table}", len(rows), rows[:5]))
     for table, column, target in REFERENCES:
         target_key = TARGET_KEY.get(target, "id")
-        known = (
-            "select id as v from external"
-            if target == "polity"
-            else f'select "{target_key}" as v from "all_{target}" union all select id as v from external'
-        )
+        known = f'select "{target_key}" as v from "all_{target}" union all select id as v from external'
         rows = con.execute(
             f'select distinct "{column}" from "{table}" where "{column}" is not null '
             f'and not exists (select 1 from ({known}) k where k.v = "{table}"."{column}")'
@@ -1603,11 +1606,7 @@ def _seal(
     for table, column, target in REFERENCES:
         if table not in counts:
             continue
-        known = (
-            ""
-            if target == "polity"
-            else f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
-        )
+        known = f' and "{column}" not in (select "{TARGET_KEY.get(target, "id")}" from "{target}")'
         rows = con.execute(
             f'select distinct "{column}"::varchar from "{table}" where "{column}" is not null{known}'
         ).fetchall()
