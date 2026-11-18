@@ -15,6 +15,7 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.ro import prezenta_seats
 
 SOURCE = "ro.prezenta"
 ROMANIA = str(uuid5(package.NAMESPACE, "polity\x1fRO"))
@@ -77,6 +78,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 AEP_SOURCE = key("source", "aep")
+BEC_SOURCE = key("source", "bec")
 PRESIDENT = key("office", "president")
 MAYOR = key("office", "mayor")
 GENERAL_MAYOR = key("office", "general-mayor")
@@ -144,6 +146,8 @@ def fetch() -> None:
     """The portal refuses scripted requests; the files were saved from a browser and stored with `raw.store`."""
     for url in URLS.values():
         raw.fetch(SOURCE, url, suffix=".json")
+    for url in prezenta_seats.URLS:
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 @dataclass
@@ -656,6 +660,8 @@ def parliament(parties: set[str]) -> tuple[Package, Build]:
         "the Senate, from the Permanent Electoral Authority's results portal",
     )
     p.artifact(raw.cached(SOURCE, URLS[name]), AEP_SOURCE)
+    for url in prezenta_seats.URLS:
+        p.artifact(raw.cached(SOURCE, url), BEC_SOURCE)
     eid = election(
         p,
         f"parliament-{day}",
@@ -716,6 +722,7 @@ def parliament(parties: set[str]) -> tuple[Package, Build]:
             votes = whole(line["votes"])
             if votes is not None:
                 b.values.append((contest, unit, option, POSTAL if postal else 0, VOTES, votes))
+    allocate(b, day)
     b.stage()
     accept(p)
     p.accept(
@@ -724,6 +731,22 @@ def parliament(parties: set[str]) -> tuple[Package, Build]:
         "because voters left without casting a ballot; stored as printed",
     )
     return p, b
+
+
+def allocate(b: Build, day: str) -> None:
+    """The seats each list won in each constituency, and the seats each constituency fills, as the Central Electoral
+    Bureau declared them."""
+    for chamber in ("CD", "S"):
+        for circ, seats in prezenta_seats.won(chamber).items():
+            contest = f"{day}-{chamber}-{circ}"
+            if contest not in b.contests:
+                raise ValueError(f"{contest}: seats declared for a constituency without station records")
+            for label, count in seats.items():
+                found = b.options.get((contest, canon(label)))
+                if found is None:
+                    raise ValueError(f"{contest}: seats declared for {label} without a ballot line")
+                b.seats[(contest, found[0])] = count
+            b.contests[contest].magnitude = sum(seats.values())
 
 
 # European Parliament
@@ -1007,6 +1030,15 @@ def registry(labels: set[str], people: dict[str, str]) -> Package:
         title="Results portal of the Permanent Electoral Authority (prezenta.roaep.ro)",
         url=SITE,
         attribution="Autoritatea Electorală Permanentă",
+    )
+    p.add(
+        "source",
+        id=BEC_SOURCE,
+        kind="official_body",
+        publisher="Biroul Electoral Central",
+        title="Final results of the parliamentary elections of 1 December 2024 (parlamentare2024.bec.ro)",
+        url="https://parlamentare2024.bec.ro",
+        attribution="Biroul Electoral Central",
     )
     for body, kind, english, romanian in (
         (CHAMBER, "lower_house", "Chamber of Deputies of Romania", "Camera Deputaților"),
