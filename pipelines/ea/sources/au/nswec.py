@@ -180,6 +180,9 @@ def fetch() -> None:
         else:
             raw.fetch(SOURCE, state_url(year), suffix=".xlsx")
     fetch_dop()
+    from ea.sources.au import nswec_lgw
+
+    nswec_lgw.fetch()
     for config in COUNCIL.values():
         if config.workbook is not None:
             raw.fetch(SOURCE, config.workbook, suffix=".xlsx")
@@ -985,7 +988,13 @@ def local_election(year: int) -> Package:
         SOURCE,
         f"The {year} New South Wales local government elections, councillor first preferences by voting venue, from "
         "the NSW Electoral Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[
+            f"{SOURCE}/geo",
+            f"{SOURCE}/registry",
+            f"{SOURCE}/geo-lgw",
+            f"{SOURCE}/registry-lgw",
+            f"{SOURCE}/geo-lg{year}",
+        ],
     )
     p.external |= {AUSTRALIA}
     p.uses(raw.cached(SOURCE, config.combined))
@@ -1114,6 +1123,9 @@ def local_election(year: int) -> Package:
             values.add(result_set, unit, None, 4, formal)
             values.add(result_set, unit, None, 5, informal)
             values.add(result_set, unit, None, 3, cast)
+    from ea.sources.au import nswec_lgw
+
+    nswec_lgw.add_contests(p, year, election_id, path, values)
     p.frame("result_value", values.frame())
     return p
 
@@ -2026,6 +2038,9 @@ def packages() -> list[str]:
         f"{SOURCE}/registry",
         f"{SOURCE}/geo-2011",
         f"{SOURCE}/registry-2011",
+        f"{SOURCE}/geo-lgw",
+        f"{SOURCE}/registry-lgw",
+        *(f"{SOURCE}/geo-lg{y}" for y in LOCAL),
         *(f"{SOURCE}/{c.day}" for c in STATE.values()),
         *(f"{SOURCE}/{c.day}" for c in LOCAL.values()),
         f"{SOURCE}/lc-registry",
@@ -2044,7 +2059,14 @@ def parse() -> None:
     registry_2011().write()
     for year in sorted(STATE):
         state_election(year).write()
+    from ea.sources.au import nswec_lgw
+
+    wards = {y: nswec_lgw.ward_contests(y) for y in locals_}
+    mayors = {y: nswec_lgw.mayor_contests(y) for y in locals_}
+    nswec_lgw.geo_councils(wards, mayors).write()
+    nswec_lgw.registry(wards, mayors).write()
     for year in locals_:
+        nswec_lgw.geo(year, wards[year]).write()
         local_election(year).write()
     for day, items in bye_groups().items():
         bye_election(day, items).write()
