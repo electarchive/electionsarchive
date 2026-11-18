@@ -142,7 +142,7 @@ def build(day: str) -> Package:
         f"The Romanian presidential election of {first}"
         + (", second round," if runoff else "")
         + " by polling station, from the results portal of the Electoral Bureau",
-        depends=[REGISTRY, *([f"ro.aep/{first_day}-presidential"] if runoff else [])],
+        depends=["ro.aep/registry", REGISTRY, *([f"ro.aep/{first_day}-presidential"] if runoff else [])],
     )
     p.external.add(ROMANIA)
     p.artifact(raw.cached(SOURCE, FILES[day]), AEP_SOURCE)
