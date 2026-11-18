@@ -60,6 +60,8 @@ LOCAL_DAYS = {
     2025: date(2025, 11, 18),
 }
 DETAIL_LOCAL = ("KV25TOTA", "RV25TOTA")
+SEATS = "FVKAND"
+SEATS_BY_AGE = "LIGEDB1"
 LOCAL_RESULTS = "KVRES"
 LOCAL_PARTIES = ("VALGK3", "VALGK3X")
 REGION_PARTIES = ("AKVA3", "AKVA3X")
@@ -70,7 +72,7 @@ def tables() -> list[str]:
     for group in (FOLKETING, EUROPEAN, REFERENDUM):
         for names, total in group.values():
             found += [*names, *([total] if total else [])]
-    return [*found, *DETAIL_LOCAL, LOCAL_RESULTS, *LOCAL_PARTIES, *REGION_PARTIES]
+    return [*found, SEATS, SEATS_BY_AGE, *DETAIL_LOCAL, LOCAL_RESULTS, *LOCAL_PARTIES, *REGION_PARTIES]
 
 
 def info_url(table: str) -> str:
@@ -399,6 +401,43 @@ def list_contest(
     return contest
 
 
+def attach_seats(contest: Contest, year: int) -> None:
+    """The seats of each party: the candidates elected for it, men and women, in Statistics Denmark's candidate table.
+
+    The table counts the elected per party and sex (and, in a second table, per sex and age) but names nobody, so
+    the seats are stored per party and no candidate is marked elected. A party is the same in the ballot tables and
+    this one when its Statbank code agrees (Ny Alliance of 2007 is the table's Liberal Alliance); a code the ballot
+    tables lack is matched by letter and name. Both tables must add up to 175."""
+    names = labels(SEATS, "PARTI")
+    by_party: dict[str, int] = defaultdict(int)
+    for cell in sheet(SEATS):
+        if cell["Tid"] == str(year) and cell["KANDIDAT"] in ("MVALGT", "KVALGT"):
+            by_party[cell["PARTI"]] += int(cell["value"])
+    lists = {(o.ballot, o.party): code for code, o in contest.options.items() if o.kind == "list"}
+    others = next(code for code, o in contest.options.items() if o.kind == "others")
+    for code, count in by_party.items():
+        if not count:
+            continue
+        found = (
+            code
+            if contest.options.get(code) and contest.options[code].kind == "list"
+            else lists.get(party_name(names[code]))
+        )
+        if found is None and code == "9999":
+            found = others
+        if found is None:
+            raise LookupError(f"{year}: {names[code]} holds {count} seats but is not on the ballot tables")
+        contest.seats[found] = contest.seats.get(found, 0) + count
+    elected = sum(
+        int(cell["value"])
+        for cell in sheet(SEATS_BY_AGE)
+        if cell["Tid"] == str(year) and cell["KANDIDAT"] == "VK" and cell["KØN"] == "TOT" and cell["ALDER"] == "TOT"
+    )
+    total = sum(contest.seats.values())
+    if not total == elected == 175:
+        raise ValueError(f"{year}: {total} seats by party, {elected} elected by age, expected 175")
+
+
 def sheet(name: str) -> list[dict[str, str]]:
     """Every non-empty cell of a table, with each variable's code and a `value` entry."""
     ids = [str(v["id"]) for v in variables(name)]
@@ -679,7 +718,7 @@ REFERENDA = {
 
 
 @functools.cache
-def elections() -> list[Election]:
+def folketing_elections() -> list[Election]:
     found: list[Election] = []
     for day, (names, total) in FOLKETING.items():
         election = Election(
@@ -697,9 +736,17 @@ def elections() -> list[Election]:
         contest.system = SYSTEM_FOLKETING
         contest.notes.append(
             "The 175 seats of the Folketing in Denmark proper are allocated by constituency and levelling seats. "
-            "Seats are not stored here yet."
+            "The seats per party are the elected candidates Statistics Denmark counts per party; the four seats of "
+            "Greenland and the Faroe Islands are not part of these tables."
         )
+        attach_seats(contest, day.year)
         found.append(election)
+    return found
+
+
+@functools.cache
+def elections() -> list[Election]:
+    found: list[Election] = list(folketing_elections())
     for day, (names, total) in EUROPEAN.items():
         election = Election(
             f"ep{day.year}",
@@ -876,7 +923,7 @@ def registry() -> Package:
 
 
 def build(day: date) -> Package:
-    found = [e for e in elections() if e.day == day]
+    found = [e for e in (folketing_elections() if day in FOLKETING else elections()) if e.day == day]
     finer = day in valgdatabasen.LOCAL
     p = Package(
         f"dk.dst/{day}",
@@ -934,7 +981,7 @@ def write_contest(p: Package, election: Election, election_id: str, c: Contest) 
     p.add("slug", path=f"{election.path}/{c.code}", entity_id=contest, is_current=True)
     if c.kind == "ballot_question":
         p.add("ballot_question", contest_id=contest, type="referendum")
-    for table in c.tables:
+    for table in [*c.tables, *([SEATS, SEATS_BY_AGE] if c.body == FOLKETING_BODY else [])]:
         p.uses(raw.cached(SOURCE, info_url(table)))
         p.uses(raw.cached(SOURCE, data_url(), body(table)))
     result_set = key("result_set", election.slug, c.code)
