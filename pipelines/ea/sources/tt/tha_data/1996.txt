@@ -1,0 +1,40 @@
+# 1996-12-09 | Appendix VI (candidate votes), Appendix I summary (electorate)
+D|Canaan/Bon Accord|3052|2|23
+C|Dolores Edwards|N.A.R.|932
+C|Moses Orlando Thomas|P.N.M.|398
+D|Buccoo/Lambeau|3186|4|23
+C|William McKenzie|P.N.M.|734
+C|Reginald O. Phillips|N.A.R.|605
+D|Bethel/Patience Hill|2916|12|23
+C|Deborah Moore-Miggins|IND.|768
+C|Felton S. B. Leith|N.A.R.|689
+C|Haynes Cowie-Clarke|P.N.M.|143
+D|Black Rock/Whim|2799|3|23
+C|Beverley Ramsey-Moore|N.A.R.|749
+C|Garnet Peters|P.N.M.|432
+D|Plymouth/Golden Lane|2918|16|24
+C|Richard Alfred|N.A.R.|839
+C|Desmond Woods|P.N.M.|525
+D|Moriah/Parlatuvier|2791|10|24
+C|Hochoy A. Charles|N.A.R.|797
+C|Lennox Henry|P.N.M.|429
+D|L'Anse Fourmi/Speyside|2633|9|24
+C|Carlyle Dick|N.A.R.|755
+C|Greville Nicholson|P.N.M.|440
+D|Roxborough/Delaford|2639|16|24
+C|Cecil W. Caruth|N.A.R.|836
+C|Pearl A. Pollard|IND.|129
+C|George McEachnie|P.N.M.|101
+D|Belle Garden/Goodwood|2928|12|25
+C|Max James|N.A.R.|831
+C|Donna Reid|P.N.M.|278
+C|Morgril Polson|IND.|38
+D|Providence/Calder Hall|3009|5|25
+C|Ashworth M. Jack|N.A.R.|691
+C|Goslyn Lorane|P.N.M.|482
+D|Bacolet/Mount St. George|2685|4|25
+C|Eutrice Thornhill|N.A.R.|717
+C|Cynthia Loretta Alfred|P.N.M.|533
+D|Scarborough/Signal Hill|2689|10|25
+C|Judy Michelle Bobb|N.A.R.|532
+C|Orville D. London|P.N.M.|528

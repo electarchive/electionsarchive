@@ -1,0 +1,38 @@
+# 1988-11-29 | Appendix VI (candidate votes and electorate)
+D|Canaan/Bon Accord|2553|5|20
+C|George Archer|NAR|912
+C|Kenneth Ranjitsingh|PNM|448
+D|Buccoo/Lambeau|2825|6|20
+C|William Mc Kenzie|PNM|825
+C|Clifford Baynes|NAR|742
+D|Bethel/Patience Hill|2554|7|20
+C|Henry James|NAR|1014
+C|Duport Ewing|PNM|325
+D|Black Rock/Whim|2497|7|20
+C|Gerald Mac Farlane|NAR|790
+C|Lydia Paul|PNM|547
+D|Plymouth/Golden Lane|2696|5|20
+C|Claude Benoit|NAR|937
+C|Ruth Campbell-Roberts|PNM|574
+D|Moriah/Parlatuvier|2575|10|20
+C|Claude Job|NAR|912
+C|Winfield Carrington|PNM|530
+D|L'Anse Fourmi/Speyside|2249|2|21
+C|Kenneth Murray|NAR|769
+C|Dave Alleyne|PNM|500
+D|Roxborough/Delaford|2255|3|21
+C|Regis M. Caruth|NAR|955
+C|George Mc Eachnie|PNM|263
+D|Belle Garden/Goodwood|2698|3|21
+C|Jefferson G. Davidson|NAR|874
+C|Oliver Keith|PNM|375
+C|Morgril Polson|IND|73
+D|Providence/Calder Hall|2734|1|21
+C|Pearl Solomon|NAR|796
+C|Renrick Prescott|PNM|563
+D|Bacolet/Mt. St. George|2830|7|21
+C|Norris Jordan|NAR|1086
+C|Gordon A. Bacchus|PNM|454
+D|Scarborough/Signal Hill|2758|4|21
+C|Lennox A. Denoon|NAR|823
+C|Louis Patrick Arnold|PNM|573

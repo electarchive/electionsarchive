@@ -1,0 +1,41 @@
+# 2021-01-25 | Appendix VII (candidate votes), Appendix III (electorate)
+D|Bacolet/Mt. St. George|3854|5|44
+C|Joel Jack|P.N.M.|1169
+C|Megan Morrison|P.D.P.|780
+D|Belle Garden East/Roxborough/Delaford|3857|17|44
+C|Watson Solomon Duke|P.D.P.|1417
+C|Neil Beckles|P.N.M.|1014
+D|Bethel/Mt. Irvine|4602|12|44
+C|Terance Learie Baynes|P.D.P.|1045
+C|Shomari Ajani Hector|P.N.M.|1028
+D|Black Rock/Whim/Spring Garden|4664|7|44
+C|Kelvon Morris|P.N.M.|1328
+C|Abby Tinica Taylor|P.D.P.|820
+C|Anthony Randolph Hector|IND.|12
+D|Buccoo/Mt. Pleasant|4565|8|44
+C|Ancil K. Dennis|P.N.M.|1209
+C|Jaime Mary Baird|P.D.P.|744
+C|Ricardo Sammy Phillip|C.A.R.M.|9
+C|Nickocy Darias Darielle Phillips|UNITY OF THE PEOPLE|9
+D|Canaan/Bon Accord|4162|9|44
+C|Clarence Roy Jacob|P.N.M.|1042
+C|Joel Marcus Sampson|P.D.P.|984
+D|Goodwood/Belle Garden West|4309|3|45
+C|Faith B.Yisrael|P.D.P.|1405
+C|Boxil Bailey|P.N.M.|1146
+D|Lambeau/Signal Hill|4576|4|45
+C|Tracy Davidson-Celestine|P.N.M.|1256
+C|Wane Clarke|P.D.P.|1040
+D|Parlatuvier/L'Anse Fourmi/Speyside|3772|6|45
+C|Farley Chavez Augustine|P.D.P.|1367
+C|Rory Chester Dillon|P.N.M.|1047
+D|Plymouth/Golden Lane|4012|3|45
+C|Zorisha Amena Hackett|P.D.P.|1212
+C|Melissa James-Guy|P.N.M.|1010
+D|Providence/Mason Hall/Moriah|4451|10|45
+C|Ian Anthony Pollard|P.D.P.|1185
+C|Kwesi Des Vignes|P.N.M.|1101
+D|Scarborough/Calder Hall|4238|4|45
+C|Marslyn Erica Melville-Jack|P.N.M.|939
+C|Trevor Williamson James|P.D.P.|799
+C|Denise Tsoiafatt-Angus|IND.|269

@@ -1,0 +1,49 @@
+# 1984-11-26 | Appendix VI (candidate votes), Appendix I (electorate). D|district|electorate|rejected|page
+D|Bacolet/Mt. St. George|2581|2|22
+C|Edwin Caesar|D.A.C.|1035
+C|Raphael Joseph Alfred|P.N.M.|760
+C|Moheni Thuku|N.J.A.C.|47
+D|Belle Garden/Goodwood|2345|8|22
+C|Jefferson G. Davidson|D.A.C.|1062
+C|John Robley|P.N.M.|466
+C|Opoku Ware|N.J.A.C.|24
+D|Bethel/Patience Hill|2374|7|22
+C|Mirian Caesar-Moore|D.A.C.|1061
+C|Gwendoline Brebnor|P.N.M.|649
+C|Raymond Alleyne|N.J.A.C.|8
+D|Buccoo/Lambeau|2469|9|22
+C|William Mc Kenzie|P.N.M.|897
+C|Clifford Baynes|D.A.C.|790
+C|Zahir Abdul-Quayyum|N.J.A.C.|31
+D|Canaan/Bon Accord|2157|5|22
+C|George Archer|D.A.C.|933
+C|Hilton Bobb|P.N.M.|669
+C|Ismail Abdul-Hakim|N.J.A.C.|11
+D|L'Anse Fourmi/Speyside|2180|20|22
+C|Kenneth Murray|D.A.C.|845
+C|Thomas Denoon|P.N.M.|737
+C|Ayodele Moheni|N.J.A.C.|18
+D|Les Coteaux/Golden Lane|2089|13|23
+C|Hochoy A. Charles|D.A.C.|843
+C|Hilson Sylvanus Phillips|P.N.M.|584
+C|Leslie Trim|N.J.A.C.|21
+D|Moriah/Parlatuvier|2432|13|23
+C|Bernadette Des Vignes|D.A.C.|981
+C|Erica Sampson|P.N.M.|690
+C|Trevorgath Headley|N.J.A.C.|26
+D|Plymouth/Whim|2635|9|23
+C|Gerald Mac Farlane|D.A.C.|957
+C|Stanford Callender|P.N.M.|865
+C|David Williams|N.J.A.C.|13
+D|Providence/Calder Hall|2466|21|23
+C|Clarence Emanuel Warner|D.A.C.|918
+C|Vernon Selwyn Dennis|P.N.M.|683
+C|Ava Joseph Ware|N.J.A.C.|37
+D|Roxborough/Delaford|2062|12|23
+C|Arthur N.R. Robinson|D.A.C.|995
+C|Marella Small|P.N.M.|432
+C|Eugene St. Louis|N.J.A.C.|15
+D|Scarborough/Signal Hill|2430|4|23
+C|Stanley George Beard|D.A.C.|769
+C|Beatrice Ursula Julien|P.N.M.|768
+C|Embau Amen-Em Hat Moheni|N.J.A.C.|23

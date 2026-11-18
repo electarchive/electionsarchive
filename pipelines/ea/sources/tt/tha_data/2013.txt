@@ -1,0 +1,49 @@
+# 2013-01-21 | Appendix VI (candidate votes), Appendix II (electorate)
+D|Bacolet/Mt. St. George|3505|5|33
+C|Joel Duport Albert Jack|P.N.M.|1518
+C|Gladstone Solomon|T.O.P.|905
+C|Juliana Henry-King|T.P.T.|42
+D|Belle Garden East/Roxborough/Delaford|3624|7|33
+C|Hilton Errol Sandy|P.N.M.|1420
+C|Anselm Richards|T.O.P.|1198
+C|Senya Martin|T.P.T.|19
+D|Bethel/Mt. Irvine|4058|9|33
+C|Handel Marlin Beckles|P.N.M.|1617
+C|Sherry-Anne Rollocks-Hackett|T.O.P.|1116
+C|Haynes Cowie-Clarke|T.P.T.|58
+D|Black Rock/Whim/Spring Garden|4288|10|33
+C|Claudia Groome-Duke|P.N.M.|1901
+C|Theodil B. Mc Pherson|T.O.P.|925
+C|Curtis Douglas|T.P.T.|67
+D|Buccoo/Mt. Pleasant|4041|7|34
+C|Ancil Dennis|P.N.M.|1802
+C|Richard Alfred|T.O.P.|856
+C|Ricardo Phillip|T.P.T.|33
+D|Canaan/Bon Accord|3774|14|34
+C|Huey Newton Cadette|P.N.M.|1564
+C|Rolly Quaccoo|T.O.P.|905
+C|Barry Nelson|T.P.T.|50
+D|Goodwood/Belle Garden West|3959|24|34
+C|Hayden Spencer|P.N.M.|1587
+C|Steve Jack|T.O.P.|1251
+C|Pertrina Shanghie|T.P.T.|50
+D|Lambeau/Signal Hill|4117|15|34
+C|Raoul Jomo Pitt|P.N.M.|1953
+C|Robinson Alleyne|T.O.P.|783
+C|David Fraser|T.P.T.|47
+D|Parlatuvier/L'Anse Fourmi/Speyside|3512|11|35
+C|Tracy Davidson-Celestine|P.N.M.|1478
+C|Fitz Herbert Taylor|T.O.P.|1175
+C|Samuel Mapp|T.P.T.|24
+D|Plymouth/Golden Lane|3701|16|35
+C|Godwin Adams|P.N.M.|1600
+C|Certica Williams-Orr|T.O.P.|849
+C|Hochoy Charles|T.P.T.|174
+D|Providence/Mason Hall/Moriah|4084|12|35
+C|Sheldon Cunningham|P.N.M.|1706
+C|Ashworth Michael Jack|T.O.P.|1129
+C|Ernest Belfon|T.P.T.|61
+D|Scarborough/Calder Hall|3938|6|35
+C|Orville London|P.N.M.|1830
+C|Anthony Roosevelt Arnold|T.O.P.|778
+C|Andre Phillips|T.P.T.|50

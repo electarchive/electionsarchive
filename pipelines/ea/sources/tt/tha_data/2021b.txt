@@ -1,0 +1,61 @@
+# 2021-12-06 | Appendix VII results of the poll by district; electorate from Appendix III
+D|BAGATELLE/BACOLET|3149|2|0
+C|Nathisha Charles-Pantin|P.D.P.|872
+C|Joel Jack|P.N.M.|736
+C|Keon Dale Clarke|I.D.A.|31
+D|BELLE GARDEN/GLAMORGAN|3178|3|0
+C|Faith B.Yisrael|P.D.P.|1352
+C|Kenneth Thomas|P.N.M.|657
+D|BETHEL/NEW GRANGE|3798|10|0
+C|Terance Learie Baynes|P.D.P.|1300
+C|Downie Akil Marcelle|P.N.M.|888
+C|Denise Georgia Tsoiafatt-Angus|I.D.A.|33
+D|BETHESDA/LES COTEAUX|3419|5|0
+C|Zorisha Amena Hackett|P.D.P.|1304
+C|Brian Thomas|P.N.M.|717
+C|Adonnii Adonnijah Jacob|I.D.A.|6
+D|BON ACCORD/CROWN POINT|3132|2|0
+C|Joel Sampson|P.D.P.|1013
+C|Clarence Roy Junior Jacob|P.N.M.|761
+C|Kaye Wendy-Ann Trotman|I.D.A.|17
+D|BUCCOO/MT. PLEASANT|3661|8|0
+C|Sonny Craig|P.D.P.|924
+C|Ancil K. Dennis|P.N.M.|920
+C|Nichola Tricia Wint|I.D.A.|30
+C|Nickocy Darias Darrielle Phillips|UNITY OF THE PEOPLE|6
+C|Ricardo Sammy Phillip|C.A.R.M.|1
+D|DARREL SPRING/WHIM|3316|2|0
+C|Kelvon Morris|P.N.M.|849
+C|Abby Tinica Taylor|P.D.P.|846
+C|Elon Mhendi Berkeley|I.D.A.|18
+D|LAMBEAU/LOWLANDS|3275|12|0
+C|Wane Clarke|P.D.P.|874
+C|Kino Ogester Mc Kenzie|P.N.M.|746
+C|Leroy Richard Kelton George|I.D.A.|17
+D|MASON HALL/MORIAH|3905|10|0
+C|Ian Anthony Pollard|P.D.P.|1494
+C|Laurence Sandiford Hislop|P.N.M.|807
+C|Keach Akinola Gibbs|I.D.A.|16
+D|MT. ST. GEORGE/GOODWOOD|3559|6|0
+C|Megan Morrison|P.D.P.|1282
+C|Charles Adams|P.N.M.|905
+C|Avernell Riane Manswell|I.D.A.|36
+D|PARLATUVIER/L'ANSE FOURMI/SPEYSIDE|3798|9|0
+C|Farley Chavez Augustine|P.D.P.|1619
+C|Franka Akimba Cordner|P.N.M.|731
+C|Stacy Cindy Herbert|I.D.A.|5
+D|PLYMOUTH/BLACK ROCK|3544|7|0
+C|Niall Akil Jahi George|P.D.P.|955
+C|Learie Gasper Eric Paul|P.N.M.|872
+C|Marlon Damian Brizan|I.D.A.|32
+D|ROXBOROUGH/ARGYLE|3134|8|0
+C|Watson Solomon Duke|P.D.P.|1290
+C|Nadine Stewart-Phillips|P.N.M.|696
+D|SCARBOROUGH/MT. GRACE|3170|3|0
+C|Trevor Williamson James|P.D.P.|880
+C|Marslyn Erica Melville-Jack|P.N.M.|750
+C|Aldrin Wayne Phillips|I.D.A.|28
+D|SIGNAL HILL/PATIENCE HILL|3345|11|0
+C|Nigel Dave Taitt|P.D.P.|927
+C|Tracy Petulia Davidson Celestine|P.N.M.|906
+C|Kemisha Aneika Kerr|I.D.A.|26
