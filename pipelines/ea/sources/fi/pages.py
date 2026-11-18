@@ -9,10 +9,13 @@ municipality, with `ehd`-prefixed twins that hold the votes of each candidate fo
 import html
 import json
 import re
+import time
 from dataclasses import dataclass
 from datetime import date
 from functools import cache
 from html.parser import HTMLParser
+
+import httpx
 
 from ea import raw
 
@@ -59,6 +62,38 @@ STATFIN_TABLES = {
 }
 
 
+def candidate_tables(folder: str) -> list[str]:
+    """Statistics Finland's tables that print each candidate's selection: the 2007 parliamentary election's candidate
+    tables, one per constituency, and the 2008 municipal election's candidate tables, one per constituency but Åland."""
+    if folder == "E2007":
+        return [f"evaa/oi57_statfin_ehdok{n:02d}_2007_fi.px" for n in range(1, 16)]
+    if folder == "K2008":
+        return [
+            f"kvaa/{n}_kvaa_2008_{'2012-10-12' if n == 330 else '2009-11-02'}_tau_{108 + (n - 210) // 10}_fi.px"
+            for n in range(210, 360, 10)
+            if n != 250
+        ]
+    return []
+
+
+def candidate_query(folder: str, table: str) -> dict[str, object]:
+    everything = {"filter": "all", "values": ["*"]}
+    measures = {"filter": "item", "values": ["Sar1", "Sar3", "Sar5" if folder == "E2007" else "Val"]}
+    query = [
+        {"code": "Ehdokas", "selection": everything},
+        {"code": "Äänestystiedot", "selection": measures},
+    ]
+    if folder == "E2007":
+        # Only the constituency's own row, because the table is also cut by every voting district
+        number = re.search(r"ehdok(\d\d)_", table)
+        assert number is not None
+        query.append({"code": "Alue", "selection": {"filter": "item", "values": [f"VP{number[1]}"]}})
+    return {
+        "query": query,
+        "response": {"format": "json-stat2"},
+    }
+
+
 def page_url(page: Page, name: str) -> str:
     return f"{BASE}/{page.folder}/s/tulos/{name}"
 
@@ -84,6 +119,19 @@ def links(content: str, prefix: str) -> list[str]:
     return list(dict.fromkeys(re.findall(rf'href="({prefix}[a-z0-9_]*\.html)"', content, re.IGNORECASE)))
 
 
+def fetch_table(table: str, body: dict[str, object] | None) -> None:
+    """One StatFin call, paced and retried, since the API refuses a client that sends too many in a short while."""
+    for attempt in range(6):
+        try:
+            raw.fetch(SOURCE, statfin_url(table), suffix=".json", body=body)
+            break
+        except httpx.HTTPStatusError as error:
+            if error.response.status_code != 403 or attempt == 5:
+                raise
+        time.sleep(15 * (attempt + 1))
+    time.sleep(1)
+
+
 def fetch() -> None:
     for page in PAGES:
         raw.fetch(SOURCE, page_url(page, "lasktila.html"), suffix=".html")
@@ -100,6 +148,10 @@ def fetch() -> None:
         ]
         urls += [page_url(page, name) for name in names]
     raw.fetch_many(SOURCE, urls, suffix=".html", workers=12)
+    for page in PAGES:
+        for table in candidate_tables(page.folder):
+            fetch_table(table, None)
+            fetch_table(table, candidate_query(page.folder, table))
     candidate: list[str] = []
     for page in PAGES:
         index = get(page, "lasktila.html")
@@ -406,6 +458,44 @@ class Group:
     units: list[Unit]
 
 
+@dataclass(frozen=True)
+class Selection:
+    """A candidate's number, votes, and selection as Statistics Finland's candidate table prints them: 1 for elected, 2
+    for deputy, and 3 for neither."""
+
+    number: int
+    votes: int
+    status: int
+    name: str
+
+
+def selections(folder: str) -> dict[tuple[str, int], Selection]:
+    """Each candidate's selection by (constituency name or municipality number, candidate number)."""
+    found: dict[tuple[str, int], Selection] = {}
+    for table in candidate_tables(folder):
+        meta = json.loads(raw.cached(SOURCE, statfin_url(table)).path.read_bytes())
+        data = json.loads(raw.cached(SOURCE, statfin_url(table), candidate_query(folder, table)).path.read_bytes())
+        constituency = meta["title"].rpartition(", ")[2]
+        labels = data["dimension"]["Ehdokas"]["category"]["label"]
+        candidates = list(data["dimension"]["Ehdokas"]["category"]["index"])
+        measures = list(data["dimension"]["Äänestystiedot"]["category"]["index"])
+        wide = len(measures)
+        values = data["value"]
+        if len(values) != len(candidates) * wide:
+            raise ValueError(f"{table}: {len(values)} values for {len(candidates)} candidates")
+        for i, code in enumerate(candidates):
+            row = dict(zip(measures, values[i * wide : (i + 1) * wide], strict=True))
+            status = row.get("Sar5", row.get("Val"))
+            if status not in (1, 2, 3):
+                raise ValueError(f"{table}: candidate {code} has selection {status!r}")
+            area = constituency if folder == "E2007" else code[2:5]
+            key = (area, row["Sar1"])
+            if key in found:
+                raise ValueError(f"{table}: candidate {key} appears twice")
+            found[key] = Selection(row["Sar1"], row["Sar3"], status, labels[code].partition(" / ")[0])
+    return found
+
+
 @dataclass
 class Election:
     page: Page
@@ -470,6 +560,11 @@ def load(folder: str) -> Election:
             groups.append(current)
         area = clean_title(result.area)
         current.units.append(Unit(name, area, municipality(page, area), result, candidates(name), turnout.get(area)))
+    for table in candidate_tables(page.folder):
+        cited += [
+            raw.cached(SOURCE, statfin_url(table)),
+            raw.cached(SOURCE, statfin_url(table), candidate_query(folder, table)),
+        ]
     return Election(
         page,
         national,
