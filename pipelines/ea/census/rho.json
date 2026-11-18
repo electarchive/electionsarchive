@@ -1,0 +1,667 @@
+{
+  "polity": "RHO",
+  "name": "Southern Rhodesia",
+  "sources": {
+    "hansard-1923": {
+      "title": "Colonial Office, House of Commons debate of 25 July 1923 (HC Deb vol 167)",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1923/jul/25/colonial-office",
+      "kind": "official_body",
+      "note": "The Secretary of State for the Colonies states that after the referendum the Imperial Government decided that responsible government should be set up in Southern Rhodesia on 1 October 1923, as a self-governing Colony."
+    },
+    "hansard-1922": {
+      "title": "Referendum, Southern Rhodesia, written answers of 22 May 1922 (HC Deb vol 154 cc846-7W)",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/written-answers/1922/may/22/referendum-southern-rhodesia",
+      "kind": "official_body",
+      "note": "The referendum on responsible government was to be put to the voters qualified to vote for the election of members of the Legislative Council."
+    },
+    "hansard-1934": {
+      "title": "Sweepstakes (Referendum, Southern Rhodesia), House of Commons, 13 March 1934",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1934/mar/13/sweepstakes-referendum-southern-rhodesia",
+      "kind": "official_body",
+      "note": "The Under-Secretary for the Dominions reports, from press reports, a referendum in Southern Rhodesia carried by 16,949 to 3,604 in favour of sweepstakes under strict legislative control, with 73 per cent of the electorate voting."
+    },
+    "hansard-1957": {
+      "title": "Rhodesia and Nyasaland (Constitution), House of Commons debate of 25 November 1957",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1957/nov/25/rhodesia-and-nyasaland-constitution",
+      "kind": "official_body",
+      "note": "States that the Southern Rhodesian Assembly has had only 30 members since 1923."
+    },
+    "hansard-1961": {
+      "title": "Southern Rhodesia, House of Commons debate of 22 June 1961",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1961/jun/22/southern-rhodesia-1",
+      "kind": "official_body",
+      "note": "Debate on the 1961 constitutional proposals ahead of the Southern Rhodesian referendum on them, then a few weeks away."
+    },
+    "hansard-1962": {
+      "title": "British Policy in Central Africa, House of Lords debate of 19 December 1962",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/lords/1962/dec/19/british-policy-in-central-africa",
+      "kind": "official_body",
+      "note": "Reports the Southern Rhodesian general election of the previous week: 35 seats to the Rhodesian Front, all in European constituencies, and 29 to the United Federal Party, 14 of them won by Africans in African constituencies."
+    },
+    "hansard-1969": {
+      "title": "Rhodesia, House of Commons statement of 24 June 1969",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1969/jun/24/rhodesia",
+      "kind": "official_body",
+      "note": "The Foreign and Commonwealth Secretary comments on the results of the referendum held in Rhodesia on 20 June 1969."
+    },
+    "hansard-1979": {
+      "title": "Rhodesia, House of Lords debate of 10 July 1979",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/lords/1979/jul/10/rhodesia",
+      "kind": "official_body",
+      "note": "The 1979 constitution was endorsed by a referendum of the white electorate (over 71 per cent turnout, 84 per cent in favour), and the elections of April 1979 led to a new Government under Bishop Muzorewa at the end of May."
+    },
+    "hansard-1980": {
+      "title": "Rhodesia Elections: New Government, House of Lords statement of 4 March 1980",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/lords/1980/mar/04/rhodesia-elections-new-government",
+      "kind": "official_body",
+      "note": "Lord Carrington gives the results of the Common Roll elections announced that morning (ZANU(PF) 57 seats, Patriotic Front 20, UANC 3) and the Election Commissioner's report to the Governor."
+    },
+    "ipu-1980": {
+      "title": "Zimbabwe: parliamentary elections of February 1980 (Chronicle of Parliamentary Elections XIV, 1979-80)",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/ZIMBABWE_1980_E.PDF",
+      "kind": "compendium",
+      "note": "House of Assembly elections of 14 February 1980 (20 White Roll seats, 14 unopposed) and 27-29 February 1980 (80 Common Roll seats in eight electoral districts by party list), the Senate of 19 March 1980 chosen by electoral colleges, and independence on 18 April 1980; national totals of electors, voters, and votes by party."
+    },
+    "zimbabwe-act": {
+      "title": "Zimbabwe Act 1979 (c. 60), as enacted",
+      "publisher": "The National Archives (legislation.gov.uk)",
+      "url": "https://www.legislation.gov.uk/ukpga/1979/60/enacted",
+      "kind": "official_body",
+      "note": "Section 1: on Independence Day, appointed by Order in Council, Southern Rhodesia becomes an independent Republic under the name of Zimbabwe."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Colony of Southern Rhodesia",
+      "name_en": "Southern Rhodesia (Rhodesia, 1964-1979; Zimbabwe Rhodesia, 1979)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "source": "hansard-1923",
+      "valid_from": "1923-10-01",
+      "valid_to": "1980-04-18"
+    },
+    {
+      "key": "constituency",
+      "name": "Electoral districts",
+      "name_en": "Electoral districts and constituencies of the Legislative Assembly and House of Assembly",
+      "parent": "national",
+      "source": "hansard-1957",
+      "valid_from": "1923-10-01",
+      "valid_to": "1980-04-18"
+    },
+    {
+      "key": "local",
+      "name": "Municipalities and town councils",
+      "name_en": "Municipalities, town management boards, and rural and African councils",
+      "parent": "national",
+      "polity_kind": "municipality",
+      "source": "hansard-1923",
+      "valid_from": "1923-10-01",
+      "valid_to": "1980-04-18"
+    }
+  ],
+  "classes": [
+    {
+      "key": "legislative_assembly",
+      "tier": "constituency",
+      "name": "General election to the Legislative Assembly",
+      "name_en": "Legislative Assembly of Southern Rhodesia, general elections 1924-1965",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hansard-1957",
+      "locator": "https://api.parliament.uk/historic-hansard/commons/1957/nov/25/rhodesia-and-nyasaland-constitution (The Southern Rhodesian Assembly has had only 30 members)",
+      "valid_from": "1923-10-01",
+      "valid_to": "1970-03-02",
+      "first_held": "1924-04-29",
+      "disposition": "blocked",
+      "disposition_reason": "Constituency returns were published by the colonial government in the Southern Rhodesia (later Rhodesia) Government Gazette and in the papers of the Legislative Assembly, which are not online; the Parliament of Zimbabwe's site refused automated requests (403) and the National Archives of Zimbabwe's hosts did not answer from here.",
+      "finest_note": "Constituency (electoral district); no official return is online.",
+      "note": "Thirty members from 1924 to 1958 on a qualified, in practice largely European, roll. The 1961 Constitution raised the Assembly to 65 members: 50 constituencies and 15 electoral districts, with A and B rolls and cross-voting, first used in December 1962. The Rhodesian Front won 35 seats in 1962 and every seat on the A roll in 1965. Unilateral independence was declared on 11 November 1965 and the Legislative Assembly sat until the republican Parliament of 1970.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "RHO",
+          "valid_from": "1923-10-01",
+          "valid_to": "1970-03-02"
+        }
+      ],
+      "est_votes": 60000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1924-04-29",
+          "seats": 30,
+          "source": "hansard-1957",
+          "quote": "The Southern Rhodesian Assembly has had only 30 members",
+          "note": "First general election under responsible government. Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1928-09-19",
+          "seats": 30,
+          "source": "hansard-1957",
+          "quote": "The Southern Rhodesian Assembly has had only 30 members",
+          "note": "Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1933-09-06",
+          "seats": 30,
+          "source": "hansard-1957",
+          "quote": "The Southern Rhodesian Assembly has had only 30 members",
+          "note": "Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1934-11-07",
+          "seats": 30,
+          "source": "hansard-1957",
+          "quote": "The Southern Rhodesian Assembly has had only 30 members",
+          "note": "Snap election after the 1933 Parliament was dissolved. Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1939-04-14",
+          "seats": 30,
+          "source": "hansard-1957",
+          "quote": "The Southern Rhodesian Assembly has had only 30 members",
+          "note": "Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1946-04-25",
+          "seats": 30,
+          "source": "hansard-1957",
+          "quote": "The Southern Rhodesian Assembly has had only 30 members",
+          "note": "Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1948-09-15",
+          "seats": 30,
+          "source": "hansard-1957",
+          "quote": "The Southern Rhodesian Assembly has had only 30 members",
+          "note": "Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1954-01-27",
+          "seats": 30,
+          "source": "hansard-1957",
+          "quote": "The Southern Rhodesian Assembly has had only 30 members",
+          "note": "Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1958-06-05",
+          "seats": 30,
+          "source": "hansard-1957",
+          "quote": "The Southern Rhodesian Assembly has had only 30 members",
+          "note": "Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1962-12-14",
+          "source": "hansard-1962",
+          "quote": "All the 35 seats won by the Rhodesian Front were won by Europeans in European constituencies. Out of the 29 seats won by the United Federal Party",
+          "note": "First election under the 1961 Constitution, 65 seats; the Lords debate of 19 December 1962 gives 35 Rhodesian Front and 29 United Federal Party seats. Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1965-05-07",
+          "note": "Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        }
+      ]
+    },
+    {
+      "key": "house_of_assembly",
+      "tier": "constituency",
+      "name": "General election to the House of Assembly",
+      "name_en": "House of Assembly of Rhodesia (1970-1979), Zimbabwe Rhodesia (1979), and the pre-independence election of 1980",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ipu-1980",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/ZIMBABWE_1980_E.PDF (Electoral System; Statistics, 1. Results of the Elections and Distribution of Seats in the House of Assembly)",
+      "valid_from": "1970-03-02",
+      "valid_to": "1980-04-18",
+      "first_held": "1970-04-10",
+      "disposition": "blocked",
+      "disposition_reason": "Constituency returns were published by the colonial government in the Southern Rhodesia (later Rhodesia) Government Gazette and in the papers of the Legislative Assembly, which are not online; the Parliament of Zimbabwe's site refused automated requests (403) and the National Archives of Zimbabwe's hosts did not answer from here. For February 1980 the IPU Chronicle gives national totals only; the Election Commissioner's report to the Governor is not online.",
+      "finest_note": "Constituency for the European (White Roll) seats; electoral district for the 1979 and 1980 Common Roll party-list seats.",
+      "note": "The 1969 Constitution (republic from 2 March 1970) gave a 66-member House: 50 European-roll constituencies, 8 African-roll seats elected directly, and 8 chosen by electoral colleges of chiefs, headmen, and councillors (elections of 1970, 1974, and 1977). The 1979 Constitution of Zimbabwe Rhodesia gave 100 seats, 72 Common Roll seats by party list in eight electoral districts, 20 White Roll constituencies, and 8 further white members; the White Roll polled on 10 April and the Common Roll from 17 to 21 April 1979. Under the British Governor the election of February 1980 chose the first Parliament of Zimbabwe: 20 White Roll constituencies on 14 February and 80 Common Roll seats in eight districts on 27 to 29 February; independence followed on 18 April 1980.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "RHO",
+          "valid_from": "1970-03-02",
+          "valid_to": "1980-04-18"
+        }
+      ],
+      "cadence": [
+        {
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "vacancy_rule": "by-election 14 to 28 days after the vacancy is recorded; a Common Roll seat vacated in 1980 could be filled by the party holding it",
+          "administered_by": "Election Commissioner under the British Governor",
+          "valid_from": "1979-12-12",
+          "valid_to": "1980-04-18",
+          "source": "ipu-1980",
+          "locator": "http://archive.ipu.org/parline-e/reports/arc/ZIMBABWE_1980_E.PDF (Characteristics of Parliament: maximum term of five years; Transitory Provisions)"
+        }
+      ],
+      "est_votes": 2800000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1970-04-10",
+          "note": "First election to the House of Assembly of the 1969 Constitution. Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1974-07-30",
+          "note": "Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1977-08-31",
+          "note": "Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1979-04-10",
+          "note": "White Roll constituencies. Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1979-04-17",
+          "source": "hansard-1979",
+          "quote": "In the Government's view the elections which took place in Rhodesia in April and which led to the formation at the end of May, under Bishop Muzorewa, of a new Government",
+          "note": "Common Roll party-list seats in eight electoral districts, polled from 17 to 21 April 1979. Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1980-02-14",
+          "contests": 20,
+          "seats": 20,
+          "source": "ipu-1980",
+          "quote": "On the 14th, 20 House of Assembly members were elected by voters registered on the White Rolls. The Rhodesian Front of Mr. Ian Smith won all these seats, 14 of them without being opposed.",
+          "note": "Six constituencies were contested; 29,544 registered electors, 16,498 voters."
+        },
+        {
+          "date": "1980-02-27",
+          "contests": 8,
+          "seats": 80,
+          "source": "ipu-1980",
+          "quote": "From the 27th to the 29th, 80 members were elected by voters registered on the Common Rolls.",
+          "note": "Eight electoral districts corresponding to the eight provinces, by party list with a 10% threshold and largest remainders; 2,883,000 registered electors as given, 2,702,275 voters, polled from 27 to 29 February 1980."
+        }
+      ]
+    },
+    {
+      "key": "assembly_by",
+      "tier": "constituency",
+      "name": "By-election",
+      "name_en": "Legislative Assembly and House of Assembly by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ipu-1980",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/ZIMBABWE_1980_E.PDF (Senate or House of Assembly vacancies are filled through by-elections held 14 to 28 days after the vacancy was officially recorded)",
+      "valid_from": "1924-04-30",
+      "valid_to": "1980-04-18",
+      "disposition": "blocked",
+      "disposition_reason": "Constituency returns were published by the colonial government in the Southern Rhodesia (later Rhodesia) Government Gazette and in the papers of the Legislative Assembly, which are not online; the Parliament of Zimbabwe's site refused automated requests (403) and the National Archives of Zimbabwe's hosts did not answer from here.",
+      "note": "Vacancies in single-member constituencies were filled by by-election throughout; no official list of them is online.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "RHO"
+        }
+      ],
+      "est_votes": 40000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1924-04-30",
+          "through": "1980-02-13",
+          "note": "By-elections in this span are not yet counted from an official record."
+        }
+      ]
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Referendum",
+      "name_en": "Colony-wide referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "hansard-1922",
+      "locator": "https://api.parliament.uk/historic-hansard/written-answers/1922/may/22/referendum-southern-rhodesia (the voters should be those qualified to vote for the election of members of the Legislative Council)",
+      "disposition": "blocked",
+      "disposition_reason": "Results by electoral district were published in the Government Gazette, which is not online; the Parliament of Zimbabwe and the National Archives of Zimbabwe could not be reached from here. Only national figures survive in UK parliamentary statements.",
+      "note": "Put to the registered (largely European) electorate: responsible government or union with South Africa (27 October 1922, before the colony; responsible government won), sweepstakes under legislative control (early 1934, by post), joining the Federation of Rhodesia and Nyasaland (9 April 1953), the 1961 Constitution (26 July 1961), independence under the 1961 Constitution (5 November 1964; the chiefs were consulted separately at the Domboshawa indaba, not by ballot), the republic and the 1969 Constitution (two questions, 20 June 1969), and the majority-rule Constitution of 1979 (30 January 1979, white electorate).",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "RHO"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "partisan": false,
+          "source": "hansard-1922",
+          "locator": "https://api.parliament.uk/historic-hansard/written-answers/1922/may/22/referendum-southern-rhodesia"
+        }
+      ],
+      "est_votes": 100000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "1922-10-27",
+          "note": "Responsible government against union with South Africa, under the British South Africa Company administration before the colony; Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1934-01-01",
+          "precision": "year",
+          "contests": 1,
+          "source": "hansard-1934",
+          "quote": "the result of the referendum was a majority of 16,949 to 3,604 in favour of sweepstakes under strict legislative control and that 73 per cent. of the electorate voted",
+          "note": "Postal referendum held before 13 March 1934."
+        },
+        {
+          "date": "1953-04-09",
+          "note": "Federation of Rhodesia and Nyasaland. Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1961-07-26",
+          "source": "hansard-1961",
+          "quote": "a favourable answer to the referendum in a few weeks' time",
+          "note": "1961 Constitution. Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1964-11-05",
+          "note": "Independence under the 1961 Constitution. Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        },
+        {
+          "date": "1969-06-20",
+          "source": "hansard-1969",
+          "quote": "I commented on the results of the referendum held on 20th June.",
+          "note": "Two questions: a republic, and the 1969 constitutional proposals."
+        },
+        {
+          "date": "1979-01-30",
+          "source": "hansard-1979",
+          "quote": "Over 71 per cent. of those entitled to vote did so, and of the votes cast 84 per cent. were in favour.",
+          "note": "The 1979 Constitution, put to the white electorate. Exact dates are taken from the general literature and are not yet confirmed from an official record."
+        }
+      ]
+    },
+    {
+      "key": "legislative_council",
+      "tier": "national",
+      "name": "Legislative Council elections",
+      "name_en": "Legislative Council of Southern Rhodesia, elected members (1899-1923)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hansard-1922",
+      "locator": "https://api.parliament.uk/historic-hansard/written-answers/1922/may/22/referendum-southern-rhodesia (voters qualified to vote for the election of members of the Legislative Council)",
+      "valid_to": "1923-10-01",
+      "first_held": "1899-01-01",
+      "disposition": "blocked",
+      "disposition_reason": "Held under the British South Africa Company administration before the colony; returns were published in the Company's Government Gazette, which is not online, and the National Archives of Zimbabwe could not be reached from here.",
+      "note": "Elected members sat with nominated Company officials under the Southern Rhodesia Order in Council of 1898; the elected members became a majority from 1907. Elections roughly every three years from 1899 to 1914 and in 1920. Years below are not yet confirmed from an official record.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "RHO",
+          "valid_to": "1923-10-01"
+        }
+      ],
+      "est_votes": 15000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1899-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1902-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1905-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1908-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1911-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1914-01-01",
+          "precision": "year"
+        },
+        {
+          "date": "1920-01-01",
+          "precision": "year"
+        }
+      ]
+    },
+    {
+      "key": "senate",
+      "tier": "national",
+      "name": "Senate",
+      "name_en": "Senate of Rhodesia (1970-1979), Zimbabwe Rhodesia (1979), and of 1980",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ipu-1980",
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/ZIMBABWE_1980_E.PDF (Of the 40 Senators, 14 are elected by an electoral college consisting of the House of Assembly members chosen by the 80 Common Roll constituencies)",
+      "valid_from": "1970-03-02",
+      "valid_to": "1980-04-18",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Senators were chosen by electoral colleges of members of the House of Assembly and of the Council of Chiefs, or appointed; there was no popular ballot.",
+      "note": "The 1980 Senate was chosen on 19 March 1980.",
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "RHO"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "local_councils",
+      "tier": "local",
+      "name": "Municipal and local council elections",
+      "name_en": "Municipal councils, town management boards, and rural and African councils",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hansard-1923",
+      "disposition": "blocked",
+      "disposition_reason": "Ward results were declared by each municipality and printed in local newspapers and municipal reports, none of which is online; no colony-wide record of local elections is reachable from here.",
+      "note": "Salisbury, Bulawayo, Umtali, Gwelo, and other municipalities elected ward councillors on ratepayers' rolls; African councils and township advisory boards were partly elected under separate legislation.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "by_election"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "iso_pattern": "RHO*"
+        }
+      ],
+      "est_votes": 30000,
+      "effort": 5,
+      "dates": []
+    },
+    {
+      "key": "federal_assembly",
+      "tier": "constituency",
+      "name": "Federal Assembly of Rhodesia and Nyasaland, Southern Rhodesian seats",
+      "name_en": "Federal Assembly of Rhodesia and Nyasaland (Southern Rhodesia constituencies)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hansard-1957",
+      "valid_from": "1953-08-01",
+      "valid_to": "1964-01-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elections of 1953, 1958, and 1962 to the federal legislature are counted under the Federation of Rhodesia and Nyasaland (XFR), not under the colony.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "head_of_state",
+      "tier": "national",
+      "name": "Governor, Officer Administering the Government, and President",
+      "name_en": "Head of state of the colony, of Rhodesia, and of Zimbabwe Rhodesia",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hansard-1923",
+      "locator": "https://api.parliament.uk/historic-hansard/commons/1923/jul/25/colonial-office (the new self-governing Colony ... its first Governor)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Governor was appointed by the Crown; the Officer Administering the Government (1965-1970) and the President of Rhodesia were appointed by the Executive Council, and the President of Zimbabwe Rhodesia was elected by Parliament in 1979. None was chosen by popular vote.",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "RHO"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "prime_minister",
+      "tier": "national",
+      "name": "Prime Minister",
+      "name_en": "Premier and Prime Minister",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hansard-1980",
+      "locator": "https://api.parliament.uk/historic-hansard/lords/1980/mar/04/rhodesia-elections-new-government",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Appointed by the Governor or President as leader of the majority in the Assembly; there was no separate ballot.",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "RHO"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "speaker",
+      "tier": "national",
+      "name": "Election of the Speaker",
+      "name_en": "Speaker of the Legislative Assembly and House of Assembly, and President of the Senate",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hansard-1957",
+      "disposition": "out_of_scope",
+      "disposition_reason": "An internal vote of the chamber, recorded in its proceedings rather than run or published as an election.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "speaker"
+          ],
+          "iso_pattern": "RHO"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "party_selection",
+      "tier": "constituency",
+      "name": "Party candidate selection",
+      "name_en": "Party selection of constituency candidates and 1979-1980 party lists",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ipu-1980",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run by the parties under their own rules, not by the colony's electoral officers; no results were published officially.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "RHO"
+        }
+      ],
+      "dates": []
+    }
+  ]
+}

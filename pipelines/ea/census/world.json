@@ -856,9 +856,9 @@
       "kind": "official_body"
     },
     "rho": {
-      "publisher": "Wikibooks",
-      "title": "The Story of Rhodesia: Colony of Southern Rhodesia before WWII",
-      "url": "https://en.wikibooks.org/wiki/The_Story_of_Rhodesia/Colony_of_Southern_Rhodesia_before_WWII",
+      "publisher": "Inter-Parliamentary Union (PARLINE archive)",
+      "title": "Zimbabwe: parliamentary elections of February 1980 (Chronicle of Parliamentary Elections XIV, 1979-80)",
+      "url": "http://archive.ipu.org/parline-e/reports/arc/ZIMBABWE_1980_E.PDF",
       "kind": "compendium"
     },
     "skm": {
@@ -3350,9 +3350,9 @@
       "iso": "RHO",
       "name_en": "Southern Rhodesia",
       "status": "former",
-      "reason": "Legislative Assembly elections from 1924 to 1979.",
+      "reason": "Self-governing British colony from 1 October 1923, the date the Imperial Government set for responsible government after the 1922 referendum (House of Commons, 25 July 1923), until it became independent as Zimbabwe on 18 April 1980; it held its own Legislative Assembly elections from 1924 to 1965, House of Assembly elections from 1970 to 1979 (as Rhodesia after the 1965 declaration of independence, and as Zimbabwe Rhodesia in 1979), colony-wide referendums from 1934 to 1979, and, under the British Governor, the House of Assembly elections of 14 and 27-29 February 1980 that chose the first Parliament of Zimbabwe.",
       "source": "rho",
-      "locator": "https://en.wikibooks.org/wiki/The_Story_of_Rhodesia/Colony_of_Southern_Rhodesia_before_WWII"
+      "locator": "http://archive.ipu.org/parline-e/reports/arc/ZIMBABWE_1980_E.PDF (Zimbabwe became an independent State on 18 April 1980; House of Assembly elections of 14 and 27-29 February 1980)"
     },
     {
       "iso": "SKM",
