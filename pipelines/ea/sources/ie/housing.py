@@ -1,4 +1,4 @@
-"""European Parliament elections in Ireland, 2004 to 2019, from the Department of Housing's results volumes.
+"""European Parliament elections in Ireland, 1979 to 2019, from the Department of Housing's results volumes.
 
 Each election date is one package, `ie.housing/ep-<year>`, built on `ie.housing/registry` (the source and the
 parties). The archive already holds each election, its constituency contests, and their reporting units, so a package
@@ -6,6 +6,11 @@ adds one official, candidate-level result set to each contest and references the
 them. The volumes print each candidate's running total after every count. The parser reads
 and checks every count, and the package stores the first count, the first preferences, under count round 1, with
 the declared outcome of the full count.
+
+The 1979 to 1999 volumes are scans. The 1979, 1984, and 1989 brochures print each constituency's count table, and the
+package stores each candidate's first preference votes. The 1994 and 1999 leaflets print only each constituency's
+first preference votes by party, and the package stores those. `ep_early` holds the figures read from the page
+images, and the checks that tie them to the totals the volumes print.
 """
 
 import re
@@ -16,7 +21,7 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
-from ea.sources.ie import ep_text
+from ea.sources.ie import ep_early, ep_text
 
 SOURCE = "ie.housing"
 PORTAL = "https://opendata.housing.gov.ie"
@@ -26,6 +31,46 @@ SCHEME = "ie.ep_constituency"
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED, QUOTA = 1, 2, 3, 4, 5, 21, 26
 DERIVED = 1
 VOLUMES = {
+    1979: (
+        date(1979, 6, 7),
+        (
+            f"{PORTAL}/en_GB/dataset/781fb757-aa77-4c77-aa96-2dd188dc83a8/resource/593d8527-c3fb-4fa4-8a74-9ca29222c311"
+            "/download/european-parliament-election-results-1979.pdf"
+        ),
+        "1979-european-parliament-election-results",
+    ),
+    1984: (
+        date(1984, 6, 14),
+        (
+            f"{PORTAL}/en_GB/dataset/423447f0-7d3f-4f66-88ec-6ce8cc9b0c7d/resource/c2736079-7b5f-448c-9d34-8172eb84d1f6"
+            "/download/european-parliament-election-results-1984.pdf"
+        ),
+        "1984-european-parliament-election-results",
+    ),
+    1989: (
+        date(1989, 6, 15),
+        (
+            f"{PORTAL}/en_GB/dataset/032b3746-1077-4839-800a-e34490ef220f/resource/4eb21bce-3cc9-431c-ab55-935720b50e54"
+            "/download/european-parliament-election-results-1989.pdf"
+        ),
+        "1989-european-parliament-election-results",
+    ),
+    1994: (
+        date(1994, 6, 9),
+        (
+            f"{PORTAL}/en_GB/dataset/1bf37e9c-1bb9-45bc-afd4-7bd18b6e6611/resource/9c8cc5b2-9313-4cff-8c6a-c9e33bad623f"
+            "/download/european-parliament-election-results-1994.pdf"
+        ),
+        "1994-european-parliament-election-results",
+    ),
+    1999: (
+        date(1999, 6, 10),
+        (
+            f"{PORTAL}/en_GB/dataset/6b7f5db1-ebc3-430b-8ebe-fb324b8824db/resource/0e86c42f-7e78-4e2b-81be-eefc0b891c19"
+            "/download/european-parliament-election-results-1999.pdf"
+        ),
+        "1999-european-parliament-election-results",
+    ),
     2004: (
         date(2004, 6, 11),
         (
@@ -89,6 +134,13 @@ PARTIES = {
     "DDI": ("Direct Democracy Ireland", "D.D.I."),
     "CSP": ("Christian Solidarity Party", "C.S.P."),
     "PBPA": ("People Before Profit Alliance", "P.B.P.A."),
+    "PD": ("Progressive Democrats", "P.D."),
+    "DL": ("Democratic Left", "D.L."),
+    "SFWP": ("Sinn Féin The Workers' Party", "S.F.W.P."),
+    "CDI": ("Community Democrats of Ireland", "C.D.I."),
+    "DSP": ("Democratic Socialist Party", "D.S.P."),
+    "GA": ("Green Alliance", "G.A."),
+    "NLP": ("Natural Law Party", "N.L.P."),
     "SPBP": ("Solidarity–People Before Profit", "S.P.B.P."),
     "RI": ("Renua Ireland", "R.I."),
     "FN": ("Fís Nua", "F.N."),
@@ -138,6 +190,9 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".pdf")
 
 
+TEXT_YEARS = [year for year in VOLUMES if year >= 2004]
+
+
 def packages() -> list[str]:
     return [f"{SOURCE}/registry", *(f"{SOURCE}/ep-{year}" for year in VOLUMES)]
 
@@ -156,7 +211,7 @@ def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "The Department of Housing's open data portal as a source, the parties that stood in the 2004 to 2019 "
+        "The Department of Housing's open data portal as a source, the parties that stood in the 1979 to 2019 "
         "European Parliament elections in Ireland, and their electoral system",
     )
     p.external.add(IRELAND)
@@ -236,6 +291,10 @@ def national(pages: list[str], year: int) -> dict[str, int] | None:
 
 
 def ep(year: int) -> Package:
+    return ep_early_package(year) if year < 2004 else ep_text_package(year)
+
+
+def ep_text_package(year: int) -> Package:
     day, url, _ = VOLUMES[year]
     artifact = raw.cached(SOURCE, url)
     pages = ep_text.layout(artifact.path)
@@ -394,12 +453,390 @@ def ep(year: int) -> Package:
     return p
 
 
+EARLY_NOTE = {
+    1979: (
+        "The brochure prints each constituency's count table. Each candidate's votes are the first preferences, the "
+        "first count, stored as count 1, and who was elected follows the brochure's list of those elected. The "
+        "brochure prints the electorate, the total poll, the spoiled votes, the valid poll, the seats, and the quota "
+        "for each constituency; the ballots cast are the valid poll plus the spoiled votes."
+    ),
+    1984: (
+        "The brochure prints each constituency's count table. Each candidate's votes are the first preferences, the "
+        "first count, stored as count 1, and who was elected follows the table's elected column. The brochure prints "
+        "the electorate and the quota for each constituency, and the valid poll and spoiled votes for the whole "
+        "country only. The archive stores each constituency's valid poll as the sum of its candidates' first "
+        "preferences; the four sums add up to the national valid poll the brochure prints."
+    ),
+    1989: (
+        "The brochure prints each constituency's count table. Each candidate's votes are the first preferences, the "
+        "first count, stored as count 1, and who was elected follows the table's elected column. The brochure prints "
+        "the electorate, the total poll, the spoiled votes, the valid poll, the seats, and the quota for each "
+        "constituency; the ballots cast are the valid poll plus the spoiled votes."
+    ),
+    1994: (
+        "The leaflet prints each constituency's first preference votes by party and the seats each party won, and no "
+        "count tables, so the result set holds party votes. The votes of the parties the leaflet groups as others "
+        "are one option. The leaflet prints the electorate, the total poll, the spoiled votes, the valid poll, the "
+        "seats, and the quota for each constituency; the ballots cast are the valid poll plus the spoiled votes."
+    ),
+    1999: (
+        "The leaflet prints each constituency's first preference votes by party and the seats each party won, and no "
+        "count tables, so the result set holds party votes. Candidates who stood for no party are one option, as the "
+        "leaflet groups them. The leaflet prints the electorate, the total poll, the spoiled votes, the valid poll, "
+        "the seats, and the quota for each constituency; the ballots cast are the valid poll plus the spoiled votes."
+    ),
+}
+
+
+def pages_of(p: Package, artifact: raw.Artifact, year: int) -> dict[int, str]:
+    """A `source_page` row for each page of a scanned volume, and the ids by page number."""
+    import pymupdf
+
+    source_artifact = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{source()}\x1f{artifact.storage_key}"))
+    ids: dict[int, str] = {}
+    with pymupdf.open(artifact.path) as document:
+        for page in document:
+            number = page.number + 1
+            ids[number] = p.id("page", year, number)
+            p.add(
+                "source_page",
+                id=ids[number],
+                artifact_id=source_artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{artifact.sha256}-{number}.png",
+                width=round(page.rect.width * 100 / 72),
+                height=round(page.rect.height * 100 / 72),
+            )
+    return ids
+
+
+def ep_early_package(year: int) -> Package:
+    day, url, _ = VOLUMES[year]
+    artifact = raw.cached(SOURCE, url)
+    p = Package(
+        f"{SOURCE}/ep-{year}",
+        SOURCE,
+        f"The {year} European Parliament election in Ireland, "
+        + ("first preferences in each constituency" if year < 1994 else "party votes in each constituency"),
+        depends=[f"{SOURCE}/registry"],
+    )
+    p.uses(artifact)
+    page_ids = pages_of(p, artifact, year)
+    election = election_id(year)
+    p.external.add(election)
+    if year < 1994:
+        build_candidates(p, year, day, artifact, page_ids, election)
+    else:
+        build_parties(p, year, day, artifact, page_ids, election)
+    return p
+
+
+def locator_rows(
+    result_set: str,
+    unit_id: str,
+    found: dict[str, tuple[float, float, float, float]],
+    cells: list[tuple[str, str | None, int, int]],
+    pages: dict[int, str],
+    page_of: dict[str, int],
+) -> list[dict[str, object]]:
+    out: list[dict[str, object]] = []
+    for name, option, measure, count in cells:
+        if name not in found:
+            continue
+        x0, y0, x1, y1 = found[name]
+        out.append(
+            {
+                "result_set_id": result_set,
+                "unit_id": unit_id,
+                "option_id": option,
+                "channel": 0,
+                "measure": measure,
+                "count_round": count,
+                "page_id": pages[page_of[name]],
+                "source_id": source(),
+                "x0": x0,
+                "y0": y0,
+                "x1": x1,
+                "y1": y1,
+            }
+        )
+    return out
+
+
+def accounting(
+    p: Package,
+    result_set: str,
+    unit_id: str,
+    figures: dict[str, int | None],
+    derived: set[str],
+) -> list[tuple[str, int]]:
+    """The unit-level accounting values and declared totals; returns (field, measure) pairs that were stored."""
+    stored: list[tuple[str, int]] = []
+    valid, invalid = figures["valid"], figures["invalid"]
+    items: list[tuple[str, int, int | None, int]] = [
+        ("electorate", REGISTERED, figures["electorate"], 0),
+        ("invalid", INVALID, invalid, 0),
+        ("valid", VALID, valid, DERIVED if "valid" in derived else 0),
+        ("ballots", BALLOTS, None if invalid is None or valid is None else valid + invalid, DERIVED),
+        ("quota", QUOTA, figures["quota"], 0),
+    ]
+    for field, measure, amount, flag in items:
+        if amount is None:
+            continue
+        p.add(
+            "result_value",
+            result_set_id=result_set,
+            unit_id=unit_id,
+            option_id=None,
+            channel=0,
+            measure=measure,
+            count_round=0,
+            flags=flag,
+            value=amount,
+        )
+        if flag == 0:
+            p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=amount)
+        stored.append((field, measure))
+    return stored
+
+
+def build_candidates(
+    p: Package, year: int, day: date, artifact: raw.Artifact, page_ids: dict[int, str], election: str
+) -> None:
+    problems = ep_early.check(year)
+    if problems:
+        raise ValueError("; ".join(problems))
+    for c in ep_early.constituencies(year):
+        contest = contest_id(year, c.code)
+        unit_id = unit(c.code)
+        p.external |= {contest, unit_id}
+        result_set = key("result_set", day, c.code)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=source(),
+            status="active",
+            is_default=False,
+            completeness=1.0,
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=EARLY_NOTE[year],
+            lang="en",
+        )
+        figures: dict[str, int | None] = {
+            "electorate": c.electorate,
+            "invalid": c.invalid,
+            "valid": c.valid,
+            "quota": c.quota,
+        }
+        derived = {"valid"} if year == 1984 else set()
+        stored = accounting(p, result_set, unit_id, figures, derived)
+        # where each printed figure sits: the candidates' votes and the quota on the table's page, the poll figures on
+        # the constituency's summary page
+        on_table = {f"cand:{cand[0]}": cand[2] for cand in c.candidates}
+        page_of = {name: c.page for name in on_table}
+        wanted_summary: dict[str, int] = {}
+        for field, _ in stored:
+            amount = figures.get(field)
+            if field in ("electorate", "invalid", "valid") and field not in derived and amount:
+                wanted_summary[field] = amount
+        found = ep_early.locate(artifact.path, c.page, {**on_table, **({"quota": c.quota} if year != 1979 else {})})
+        for name in wanted_summary:
+            page_of[name] = c.summary
+        if year == 1979:
+            wanted_summary["quota"] = c.quota
+            page_of["quota"] = c.summary
+        else:
+            page_of["quota"] = c.page
+        if c.summary != c.page:
+            found.update(ep_early.locate(artifact.path, c.summary, wanted_summary))
+        else:
+            found.update(ep_early.locate(artifact.path, c.page, wanted_summary))
+        missing = [name for name in on_table if name not in found]
+        if missing:
+            spans = ep_early.rows(artifact.path, c.page, {name: name.removeprefix("cand:") for name in missing})
+            same = [box for name, box in found.items() if name in on_table]
+            if same:
+                x0 = sorted(b[0] for b in same)[len(same) // 2]
+                x1 = sorted(b[2] for b in same)[len(same) // 2]
+                height = sorted(b[3] - b[1] for b in same)[len(same) // 2]
+                for name, (y0, y1) in spans.items():
+                    found[name] = (x0, y0, x1, y1)
+                # a name the read could not make out sits between its printed neighbors in the table's even rows
+                order = list(on_table)
+                for name in [m for m in missing if m not in found]:
+                    at = order.index(name)
+                    left = next((i for i in range(at - 1, -1, -1) if order[i] in found), None)
+                    right = next((i for i in range(at + 1, len(order)) if order[i] in found), None)
+                    if left is not None and right is not None:
+                        top = found[order[left]][1]
+                        mid = top + (found[order[right]][1] - top) * (at - left) / (right - left)
+                        found[name] = (x0, mid, x1, mid + height)
+        cells: list[tuple[str, str | None, int, int]] = [
+            (field, None, measure, 0) for field, measure in stored if field in wanted_summary
+        ]
+        if "quota" in found:
+            cells.append(("quota", None, QUOTA, 0))
+        rows: list[dict[str, object]] = []
+        for cand_label, party_code, votes, won, full in c.candidates:
+            tag = f"{day}:{c.code}:{ep_text.fold(cand_label)}"
+            option = key("option", tag)
+            person = key("person", tag)
+            member = key("party", party_code) if party_code else None
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                party_id=member,
+                ballot_label=cand_label,
+            )
+            p.add("person", id=person, gender=None)
+            p.name(person, full or display(cand_label), "en", "official")
+            p.add(
+                "candidacy",
+                id=key("candidacy", tag),
+                person_id=person,
+                option_id=option,
+                ballot_name=cand_label,
+                member_of_party_id=member,
+                is_independent=member is None,
+                is_incumbent=None,
+            )
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="elected" if won else "lost")
+            rows.append(
+                {
+                    "result_set_id": result_set,
+                    "unit_id": unit_id,
+                    "option_id": option,
+                    "channel": 0,
+                    "measure": VOTES,
+                    "count_round": 1,
+                    "flags": 0,
+                    "value": votes,
+                }
+            )
+            cells.append((f"cand:{cand_label}", option, VOTES, 1))
+        p.frame("result_value", pl.DataFrame(rows, schema=package.FACTS["result_value"], orient="row"))
+        locators = locator_rows(result_set, unit_id, found, cells, page_ids, page_of)
+        absent = len(cells) - len(locators)
+        if absent:
+            raise ValueError(f"{year} {c.code}: {absent} printed figures have no box on their page")
+        p.frame("value_locator", pl.DataFrame(locators, schema=package.FACTS["value_locator"], orient="row"))
+
+
+def build_parties(
+    p: Package, year: int, day: date, artifact: raw.Artifact, page_ids: dict[int, str], election: str
+) -> None:
+    problems = ep_early.check_parties(year)
+    if problems:
+        raise ValueError("; ".join(problems))
+    figures = ep_early.PARTY_FIGURES[year]
+    wanted: dict[str, int] = {}
+    for at, code in enumerate(ep_early.ORDER):
+        for field in ("electorate", "invalid", "valid", "quota"):
+            wanted[f"{code}:{field}"] = figures[field][at]
+        for label, _, _, votes, _ in figures["parties"]:
+            if votes[at] is not None:
+                wanted[f"{code}:{label}"] = votes[at]
+    found = ep_early.locate(artifact.path, figures["page"], wanted, rotate=True)
+    for at, code in enumerate(ep_early.ORDER):
+        contest = contest_id(year, code)
+        unit_id = unit(code)
+        p.external |= {contest, unit_id}
+        result_set = key("result_set", day, code)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=source(),
+            status="active",
+            is_default=False,
+            completeness=1.0,
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=EARLY_NOTE[year],
+            lang="en",
+        )
+        unit_figures: dict[str, int | None] = {f: figures[f][at] for f in ("electorate", "invalid", "valid", "quota")}
+        stored = accounting(p, result_set, unit_id, unit_figures, set())
+        cells: list[tuple[str, str | None, int, int]] = [
+            (f"{code}:{field}", None, measure, 0) for field, measure in stored if field != "ballots"
+        ]
+        rows: list[dict[str, object]] = []
+        for label, party_code, kind, votes, seats in figures["parties"]:
+            if votes[at] is None:
+                continue
+            option = key("option", day, code, label)
+            member = key("party", party_code) if party_code else None
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind=kind,
+                party_id=member,
+                ballot_label=label,
+            )
+            if seats[at]:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=seats[at])
+            rows.append(
+                {
+                    "result_set_id": result_set,
+                    "unit_id": unit_id,
+                    "option_id": option,
+                    "channel": 0,
+                    "measure": VOTES,
+                    "count_round": 0,
+                    "flags": 0,
+                    "value": votes[at],
+                }
+            )
+            cells.append((f"{code}:{label}", option, VOTES, 0))
+        p.frame("result_value", pl.DataFrame(rows, schema=package.FACTS["result_value"], orient="row"))
+        locators = locator_rows(result_set, unit_id, found, cells, page_ids, dict.fromkeys(found, figures["page"]))
+        absent = len(cells) - len(locators)
+        if absent:
+            raise ValueError(f"{year} {code}: {absent} printed figures have no box on their page")
+        p.frame("value_locator", pl.DataFrame(locators, schema=package.FACTS["value_locator"], orient="row"))
+
+
 def report() -> dict[str, object]:
     """National totals of each election against the volume's own, for the run report."""
     out: dict[str, object] = {}
-    for year, (_, url, _) in VOLUMES.items():
+    for year in TEXT_YEARS:
+        url = VOLUMES[year][1]
         pages = ep_text.layout(raw.cached(SOURCE, url).path)
         tables = ep_text.tables(pages)
         sums = {f: sum(t.figures[f] for t in tables) for f in ("electorate", "invalid", "valid", "seats")}
         out[str(year)] = {"constituencies": sums, "printed": national(pages, year)}
+    for year in ep_early.NATIONAL:
+        out[str(year)] = {
+            "constituencies": {
+                f: sum(getattr(c, f) or 0 for c in ep_early.constituencies(year))
+                for f in ("electorate", "invalid", "valid", "seats")
+            },
+            "printed": ep_early.NATIONAL[year],
+            "problems": ep_early.check(year),
+        }
+    for year, figures in ep_early.PARTY_FIGURES.items():
+        out[str(year)] = {
+            "constituencies": {f: sum(figures[f]) for f in ("electorate", "invalid", "valid", "seats")},
+            "printed": figures["national"],
+            "problems": ep_early.check_parties(year),
+        }
     return out
