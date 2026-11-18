@@ -1,5 +1,12 @@
-"""Uzbekistan's presidential elections of 2000, 2007, 2015, 2016, 2021, and 2023 and its national referendums of 2002
-and 2023, nationally, from the Central Election Commission's website.
+"""Uzbekistan's presidential elections of 2000, 2007, 2015, 2016, 2021, and 2023, its national referendums of 2002 and
+2023, and the party-list vote of the 2024 Legislative Chamber election, nationally, from the Central Election
+Commission's website.
+
+The 2024 party-list vote is `LEGISLATIVE`: the Commission's protocol (a Word file attached to decision No. 1412)
+prints the registered voters, the ballots, the votes of the five parties, the invalid ballots, the quotient, and the
+seats each party won in the two distributions. `prove_legislative` checks the figures against the file's text and
+reruns the allocation. The 75 single-member districts of decision No. 1413 are not in the archive: its list gives
+each winner's name and party but no votes, and the archive holds no shapes for the districts.
 
 The referendums are `REFERENDUMS`: the 2002 page and decision No. 1245 print the yes and no votes of each question, the
 registered voters, and the voters who took part, and `prove_referendum` checks each against its printed phrase.
@@ -291,12 +298,61 @@ ANSWER = 1  # the options' position of yes; no is 2
 WON, LOST = "won", "lost"
 
 
+LEGISLATIVE_DAY = date(2024, 10, 27)
+DOCX = (
+    "https://saylov.uz/storage/1ILOVA/oktabr/29.10.2024/"
+    "1.1.%D0%AF%D0%B3%D0%BE%D0%BD%D0%B0_%D0%9C%D0%A1%D0%9A_%D0%B1%D0%B0%D1%91%D0%BD%D0%BD%D0%BE%D0%BC%D0%B0%D1%81%D0%B8.docx"
+)
+URL_1412 = (
+    "https://saylov.uz/oz/cec_decision/1412-yagona-saylov-okrugi-bo-yicha-o-zbekiston-respublikasi-oliy-majlisi-"
+    "qonunchilik-palatasiga-deputatlar-saylovining-natijalari-to-g-risida"
+)
+LEGISLATIVE_SEATS = 75
+LEGISLATIVE_THRESHOLD = 7
+LEGISLATIVE_REGISTERED, LEGISLATIVE_CAST, LEGISLATIVE_INVALID, LEGISLATIVE_QUOTIENT = (
+    20_110_490,
+    15_018_498,
+    72_327,
+    199_282,
+)
+SEATS_MEASURE, VALID = 16, 4
+CHAMBER = key("body", "legislative-chamber")
+CHAMBER_SYSTEM = key("electoral_system", "legislative-chamber-party-list")
+
+
+@dataclass(frozen=True)
+class PartyList:
+    party: str  # a key of PARTIES
+    label: str  # as the protocol prints it
+    votes: int
+    first: int  # seats of the first distribution
+    second: int
+    total: int
+
+
+LEGISLATIVE = (
+    PartyList(
+        "uzlidep",
+        "Тадбиркорлар ва ишбилармонлар ҳаракати – Ўзбекистон Либерал-демократик партияси",
+        5_194_041,
+        26,
+        0,
+        26,
+    ),
+    PartyList("milliy", "Ўзбекистон “Миллий тикланиш” демократик партияси", 2_812_493, 14, 0, 14),
+    PartyList("eco", "Ўзбекистон Экологик партияси", 1_960_764, 9, 1, 10),
+    PartyList("ndpu", "Ўзбекистон Халқ демократик партияси", 2_558_016, 12, 1, 13),
+    PartyList("adolat", "Ўзбекистон “Адолат” социал-демократик партияси", 2_420_857, 12, 0, 12),
+)
+
+
 def packages() -> list[str]:
     return [
         f"{SOURCE}/geo",
         f"{SOURCE}/registry",
         *(f"{SOURCE}/president-{e.year}" for e in ELECTIONS),
         *(f"{SOURCE}/referendum-{r.day.year}" for r in REFERENDUMS),
+        f"{SOURCE}/legislative-2024",
     ]
 
 
@@ -310,6 +366,8 @@ def fetch() -> None:
             raw.fetch(SOURCE, url, suffix=".pdf" if url.endswith(".pdf") else ".html")
     for r in REFERENDUMS:
         raw.fetch(SOURCE, r.url, suffix=".html")
+    raw.fetch(SOURCE, DOCX, suffix=".docx")
+    raw.fetch(SOURCE, URL_1412, suffix=".html")
 
 
 def parse() -> None:
@@ -319,6 +377,7 @@ def parse() -> None:
         build(e).write()
     for r in REFERENDUMS:
         referendum(r).write()
+    legislative().write()
 
 
 def emit() -> None:
@@ -337,6 +396,83 @@ def text(url: str) -> str:
         body = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", path.read_text(encoding="utf-8"), flags=re.DOTALL)
         body = html.unescape(re.sub(r"<[^>]+>", " ", body))
     return re.sub(r"\s+", " ", body)
+
+
+@cache
+def protocol() -> list[str]:
+    """The paragraphs of the Commission's protocol, in order, with spaces collapsed and empty ones dropped."""
+    import zipfile
+
+    with zipfile.ZipFile(raw.cached(SOURCE, DOCX).path) as z:
+        xml = z.read("word/document.xml").decode("utf-8")
+    out = []
+    for paragraph in re.findall(r"<w:p[ >].*?</w:p>", xml, flags=re.DOTALL):
+        words = html.unescape("".join(re.findall(r"<w:t[^>]*>([^<]*)</w:t>", paragraph)))
+        words = re.sub(r"\s+", " ", words).strip()
+        if words:
+            out.append(words)
+    return out
+
+
+def number(words: str) -> int:
+    return int(words.replace(" ", "").replace("\xa0", ""))
+
+
+def grouped(n: int) -> str:
+    return f"{n:,}".replace(",", " ")
+
+
+def prove_legislative() -> None:
+    """Every figure must stand in the protocol, the sums must close, and the allocation must follow from the votes."""
+    lines = protocol()
+
+    def after(label: str, start: int = 0) -> int:
+        for i in range(start, len(lines)):
+            if lines[i].startswith(label):
+                return i
+        raise ValueError(f"the protocol has no line starting {label!r}")
+
+    for label, figure in (
+        ("Ўзбекистон Республикаси бўйича сайловчиларнинг умумий сони", LEGISLATIVE_REGISTERED),
+        ("Овоз беришда иштирок этган сайловчиларнинг умумий сони", LEGISLATIVE_CAST),
+        ("Ҳақиқий эмас деб топилган сайлов бюллетенлари сони", LEGISLATIVE_INVALID),
+    ):
+        if number(lines[after(label) + 1]) != figure:
+            raise ValueError(f"the protocol does not print {figure} after {label!r}")
+    start = after("Ҳар бир сиёсий партияни ёқлаб берилган овозлар сони")
+    for position, entry in enumerate(LEGISLATIVE, 1):
+        at = start + 1 + 3 * (position - 1)
+        if lines[at] != str(position) or number(lines[at + 2]) != entry.votes:
+            raise ValueError(f"party {position}: the protocol's votes are not {entry.votes}")
+    table = after("9. Ягона сайлов округи")
+    rows = lines[table:]
+    for entry in LEGISLATIVE:
+        at = next(i for i, line in enumerate(rows) if line == grouped(entry.votes))
+        printed = tuple(number(rows[at + k]) for k in (3, 4, 5))  # after the share and the quotient result
+        if printed != (entry.first, entry.second, entry.total):
+            raise ValueError(f"{entry.party}: the protocol's seats are {printed}")
+    valid = sum(e.votes for e in LEGISLATIVE)
+    if grouped(valid) not in rows:
+        raise ValueError("the protocol's total of the parties' votes is not their sum")
+    if valid + LEGISLATIVE_INVALID != LEGISLATIVE_CAST:
+        raise ValueError("the parties' votes and the invalid ballots do not make the voters who took part")
+    if valid // LEGISLATIVE_SEATS != LEGISLATIVE_QUOTIENT:
+        raise ValueError("the quotient is not the valid votes divided by the seats")
+    if sum(e.total for e in LEGISLATIVE) != LEGISLATIVE_SEATS:
+        raise ValueError("the seats do not add up")
+    # Hare quota, largest remainders
+    firsts = {e.party: e.votes // LEGISLATIVE_QUOTIENT for e in LEGISLATIVE}
+    left = LEGISLATIVE_SEATS - sum(firsts.values())
+    order = sorted(LEGISLATIVE, key=lambda e: e.votes % LEGISLATIVE_QUOTIENT, reverse=True)
+    for rank, e in enumerate(order):
+        want = firsts[e.party] + (1 if rank < left else 0)
+        if want != e.total or firsts[e.party] != e.first:
+            raise ValueError(
+                f"{e.party}: the votes give {firsts[e.party]} and {want} seats, not {e.first} and {e.total}"
+            )
+    for e in LEGISLATIVE:
+        if e.votes * 100 <= LEGISLATIVE_THRESHOLD * LEGISLATIVE_CAST:
+            raise ValueError(f"{e.party} is under the threshold")
 
 
 def percent(votes: int, base: int) -> Decimal:
@@ -448,6 +584,66 @@ def registry() -> Package:
             attribution="Central Election Commission of the Republic of Uzbekistan, saylov.uz",
         )
         p.artifact(raw.cached(SOURCE, r.url), sid)
+    for sid, title, url in (
+        (
+            source_id("legislative-protocol", 2024),
+            (
+                "Protocol of the Central Election Commission on the results of the 2024 Legislative Chamber "
+                "election in the single nationwide district and the distribution of seats among parties "
+                "(attached to decision No. 1412)"
+            ),
+            DOCX,
+        ),
+        (
+            source_id("legislative-decision", 2024),
+            (
+                "Decision No. 1412 of 29 October 2024 on the results of the election to the Legislative Chamber "
+                "in the single nationwide district"
+            ),
+            URL_1412,
+        ),
+    ):
+        p.add(
+            "source",
+            id=sid,
+            kind="official_body",
+            publisher="Центральная избирательная комиссия Республики Узбекистан (Central Election Commission of "
+            "the Republic of Uzbekistan)",
+            title=title,
+            url=url,
+            license="Official publication; the site asks that its materials be cited when used",
+            attribution="Central Election Commission of the Republic of Uzbekistan, saylov.uz",
+        )
+        p.artifact(raw.cached(SOURCE, url), sid)
+    p.add("body", id=CHAMBER, polity_id=UZBEKISTAN, kind="lower_house")
+    p.name(CHAMBER, "Legislative Chamber of the Oliy Majlis of the Republic of Uzbekistan", "en", "official")
+    p.name(CHAMBER, "Қонунчилик палатаси", "uz", "native", False)
+    p.add(
+        "electoral_system",
+        id=CHAMBER_SYSTEM,
+        polity_id=UZBEKISTAN,
+        valid_from=date(2023, 1, 1),
+        rules={
+            "formula": "hare",
+            "threshold": {"level": "list", "scope": "national", "percent": LEGISLATIVE_THRESHOLD},
+            "lists": {"order": "closed", "vacancy": "next_on_list"},
+        },
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", CHAMBER_SYSTEM),
+        entity_id=CHAMBER_SYSTEM,
+        kind="methodology",
+        body_md=(
+            "Of the Legislative Chamber's 150 deputies, 75 are elected by parties' lists in one nationwide district "
+            "and 75 in single-member districts. A party takes part in the allocation when it wins more than 7 "
+            "percent of the votes of the voters who took part. The quotient is the votes cast for the qualifying "
+            "parties divided by 75, dropping the fraction; each party takes as many seats as the quotient fits into "
+            "its votes, and the seats left go to the largest remainders, one each."
+        ),
+        lang="en",
+    )
     p.add(
         "electoral_system",
         id=REFERENDUM_SYSTEM,
@@ -890,4 +1086,155 @@ def referendum(r: Referendum) -> Package:
         yes_won = q.yes[1] > q.no[1]
         p.add("outcome", result_set_id=result_set, option_id=yes_no["yes"], kind=WON if yes_won else LOST)
         p.add("outcome", result_set_id=result_set, option_id=yes_no["no"], kind=LOST if yes_won else WON)
+    return p
+
+
+def legislative() -> Package:
+    prove_legislative()
+    day = LEGISLATIVE_DAY.isoformat()
+    p = Package(
+        f"{SOURCE}/legislative-2024",
+        SOURCE,
+        "The party-list vote of Uzbekistan's 2024 Legislative Chamber election, national totals and the seats "
+        "each party won, from the Central Election Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {UZBEKISTAN, COUNTRY}
+    p.uses(raw.cached(SOURCE, DOCX))
+    p.uses(raw.cached(SOURCE, URL_1412))
+    source = source_id("legislative-protocol", 2024)
+    election = key("election", day)
+    p.add(
+        "election",
+        id=election,
+        polity_id=UZBEKISTAN,
+        kind="general",
+        date_from=LEGISLATIVE_DAY,
+        date_to=LEGISLATIVE_DAY,
+        status="held",
+    )
+    p.add("slug", path=f"uz/{day}", entity_id=election, is_current=True)
+    p.name(election, "2024 Uzbekistani legislative election", "en", "official")
+    p.name(
+        election,
+        "Ўзбекистон Республикаси Олий Мажлиси Қонунчилик палатаси депутатлари сайлови, 2024",
+        "uz",
+        "native",
+        False,
+    )
+    contest = key("contest", day, "party-list")
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="list_allocation",
+        body_id=CHAMBER,
+        district_area_id=COUNTRY,
+        magnitude=LEGISLATIVE_SEATS,
+        round_number=1,
+        electoral_system_id=CHAMBER_SYSTEM,
+        default_result_kind="counted",
+    )
+    p.name(contest, "2024 Uzbekistani Legislative Chamber election, party lists", "en", "official")
+    p.name(contest, "Қонунчилик палатаси депутатлари сайлови, ягона сайлов округи", "uz", "native", False)
+    p.add("slug", path=f"uz/{day}/party-list", entity_id=contest, is_current=True)
+    result_set = key("result_set", day, "party-list")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=source,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=(
+            "National totals from the Central Election Commission's protocol: registered voters, voters who took "
+            "part, the invalid ballots, each party's votes, and the seats of each distribution. Every figure was "
+            "checked against the protocol's text, the votes and invalid ballots against the voters who took part, "
+            "and the allocation against the votes by the Hare quota with largest remainders. The protocol prints no "
+            "figures below the country."
+        ),
+        lang="en",
+    )
+    p.add(
+        "note",
+        id=key("note", result_set, "caveat"),
+        entity_id=result_set,
+        kind="caveat",
+        body_md=(
+            "The protocol also prints 20,211,042 ballots sent to the commissions, 15,027,529 voters who received "
+            "ballots, and 5,183,513 unused or spoiled ballots; they are not stored. Its 74.72 percent turnout is "
+            "the voters who received ballots over the registered voters, not the 15,018,498 who took part (74.68 "
+            "percent). The election also filled 75 seats in single-member districts, which this archive does not "
+            "hold yet. The protocol's quotient, 199,282, is the parties' 14,946,171 votes divided by 75, dropping "
+            "the fraction."
+        ),
+        lang="en",
+    )
+    p.add("citation", id=key("citation", day), entity_id=result_set, source_id=source_id("legislative-decision", 2024))
+    unit = key("unit", day, "nation")
+    p.add(
+        "reporting_unit",
+        id=unit,
+        polity_id=UZBEKISTAN,
+        scheme_code=SCHEME,
+        code=f"{day}:uz",
+        area_relation="equals",
+        area_id=COUNTRY,
+        kind="aggregate",
+    )
+    p.name(unit, "Республика Узбекистан", "ru", "official")
+    p.name(unit, "Uzbekistan", "en", "official", False)
+    p.add(
+        "reporting_unit_area",
+        unit_id=unit,
+        area_id=COUNTRY,
+        method="official_list",
+        approximate=False,
+        partial=False,
+    )
+
+    def put(option: str | None, measure: int, value: int, flags: int = 0, declare: bool = True) -> None:
+        p.add(
+            "result_value",
+            result_set_id=result_set,
+            unit_id=unit,
+            option_id=option,
+            channel=0,
+            measure=measure,
+            count_round=0,
+            flags=flags,
+            value=value,
+        )
+        if declare:
+            p.add("declared", result_set_id=result_set, option_id=option, measure=measure, value=value)
+
+    put(None, REGISTERED, LEGISLATIVE_REGISTERED)
+    put(None, CAST, LEGISLATIVE_CAST)
+    put(None, INVALID, LEGISLATIVE_INVALID)
+    put(None, VALID, sum(e.votes for e in LEGISLATIVE), DERIVED, declare=False)
+    for position, e in enumerate(LEGISLATIVE, 1):
+        option = key("option", day, position)
+        party = key("party", e.party)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="list",
+            party_id=party,
+            ballot_position=position,
+            ballot_label=e.label,
+        )
+        put(option, VOTES, e.votes)
+        put(option, SEATS_MEASURE, e.total)
+        p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=None, kind="won", seats=e.total)
     return p
