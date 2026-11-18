@@ -139,6 +139,7 @@ def results(election: str, locality: str, group: str, fetch: bool = False) -> di
 
 
 def fetch_infogob() -> None:
+    catalog(fetch=True)
     for election, name in elections():
         info = flags(election, fetch=True)
         places = districts(election, info, fetch=True)
@@ -695,7 +696,7 @@ def geo() -> Package:
         id = district_area(ubigeo)
         p.add("area", id=id, scheme_code=DISTRICT)
         p.add("area_code", area_id=id, code=ubigeo)
-        p.add("area_kind", area_id=id, kind="district", source_id=ONPE)
+        p.add("area_kind", area_id=id, kind="district", source_id=onpe.ONPE)
         p.add("area_parent", area_id=id, parent_id=onpe.area(PROVINCE, ubigeo[:4]))
         p.name(id, title(geo_.ubigeos[ubigeo][2]), "es", "official")
     return p
