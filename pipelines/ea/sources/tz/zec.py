@@ -1,18 +1,31 @@
-"""The Zanzibar Electoral Commission's reports on the general elections of 2020 and 2025.
+"""The Zanzibar Electoral Commission's reports on the general elections of 1995, 2000, 2005, 2010, 2020, and 2025.
 
 Each report prints, as annexes, the results of three elections held on one day: the President of Zanzibar, the members
 of the House of Representatives by constituency (jimbo), and the councillors by ward (wadi). The President's annex
 gives every candidate's votes in each constituency, grouped by district (wilaya), and the House and councillor annexes
 give every candidate's votes with the valid, rejected, and total votes and the registered voters of each constituency
 or ward. The constituency and the ward are the finest units the Commission publishes.
+
+The reports of 1995 to 2010 are scanned page images. Their annexes were read from the pages at 200 dpi. Each number's
+box is Tesseract's box for a word with the same digits in the number's line and column; where Tesseract found none, it
+is the number's cell, from its line and its column, or else its whole line. Where no printed total checks a contest,
+every number Tesseract did not find was read a second time, blind; the two readings agree on all of them but two, which
+are left out. The readings, with the page and box of every number, are kept in zec_returns/{year}.json. Those annexes
+print fewer figures than the later ones: the House and councillor tables give each candidate's votes, with the
+contest's total only in the 1995 House table and in both 2000 tables, and every year but 2005 marks the candidate
+declared elected. In 2000 the region of Mjini Magharibi voted again on 5 November, after its 29 October poll was
+annulled, and the annexes give the counts declared after that day.
 """
 
+import json
 import re
 import subprocess
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
 from functools import cache
+from pathlib import Path
+from typing import Any
 from uuid import uuid5
 
 from ea import package, raw
@@ -23,10 +36,32 @@ COUNTRY = str(uuid5(package.NAMESPACE, "polity\x1fTZ"))
 TERRITORY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fTZA"))
 HOST = "https://www.zec.go.tz/admin_panel/public/taarifa-uchaguzi"
 REPORTS = {
+    1995: f"{HOST}/1771928397_Ripoti%20ya%20uchaguzi%20mkuu.pdf",
+    2000: f"{HOST}/1771928457_Ripoti%20ya%20uchaguzi%20mkuu%202000.pdf",
+    2005: f"{HOST}/1770188715_Ripoti%20ya%20Uchaguzi%20Mkuu%202005.pdf",
+    2010: f"{HOST}/1770188689_Ripoti%20ya%20Uchaguzi%20Mkuu%202010.pdf",
     2020: f"{HOST}/1752063954_RIPOTI%20YA%20UCHAGUZI%20MKUU%20ZANZIBAR%202020.._compressed.pdf",
     2025: f"{HOST}/1789389706_RIPOTI%20YA%20UCHAGUZI%202025%20FINAL.pdf",
 }
-DAYS = {2020: date(2020, 10, 28), 2025: date(2025, 10, 29)}
+DAYS = {
+    1995: date(1995, 10, 22),
+    2000: date(2000, 10, 29),
+    2005: date(2005, 10, 30),
+    2010: date(2010, 10, 31),
+    2020: date(2020, 10, 28),
+    2025: date(2025, 10, 29),
+}
+# The day each year's constituencies and wards gave way to the next set; 2015's election is not in this module.
+UNTIL = {1995: DAYS[2000], 2000: DAYS[2005], 2005: DAYS[2010], 2010: date(2015, 10, 25), 2020: DAYS[2025]}
+# The reports of 1995 to 2010 are scans: their annexes were read from the page images and are kept, with the page
+# and the box of each number, in zec_returns/{year}.json.
+SCANNED = (1995, 2000, 2005, 2010)
+RETURNS = Path(__file__).with_name("zec_returns")
+DPI = 200
+DIGITIZED = 8
+DERIVED = 1
+# The region of Mjini Magharibi voted again on 5 November 2000 (the report's section 17.7).
+LATE = {2000: date(2000, 11, 5)}
 EARLY = {2020: date(2020, 10, 27), 2025: date(2025, 10, 28)}
 VOTES, REGISTERED, CAST, VALID, INVALID = 1, 2, 3, 4, 5
 
@@ -89,6 +124,11 @@ NATIONAL = {
 
 PARTY_NAMES = {
     "AAFP": "African Alliance for Farmers Party",
+    "APPT-Maendeleo": "African Progressive Party of Tanzania-Maendeleo",
+    "CHAUSTA": "Chama cha Haki na Ustawi",
+    "Jahazi Asilia": "Chama cha Jahazi Asilia",
+    "PONA": "Popular National Party",
+    "TADEA": "Tanzania Democratic Alliance",
     "ACT-Wazalendo": "Alliance for Change and Transparency",
     "ADA-TADEA": "African Democratic Alliance",
     "ADC": "Alliance for Democratic Change",
@@ -142,6 +182,10 @@ class Result:
     cast: int | None = None
     registered: int | None = None
     uncontested: bool = False
+    # For a scanned report: the page each figure is printed on and its box there, as fractions of the page.
+    page: int | None = None
+    elected: str | None = None
+    boxes: dict[str, list[float]] = field(default_factory=dict)
 
 
 def key(kind: str, *parts: object) -> str:
@@ -226,8 +270,37 @@ def fragment(raw_line: str) -> bool:
 
 
 @cache
+def returns(year: int) -> dict[str, Any]:
+    return json.loads((RETURNS / f"{year}.json").read_text())
+
+
+def scanned(year: int, name: str) -> list[Result]:
+    found = []
+    for row in returns(year)["house" if name == "house" else "wards"]:
+        found.append(
+            Result(
+                district=row["district"],
+                constituency=row.get("constituency") or "",
+                ward=row.get("ward") or "",
+                candidates=[(c["name"], party(c["party"]), c["votes"]) for c in row["candidates"]],
+                valid=row.get("valid"),
+                invalid=row.get("invalid"),
+                cast=row.get("cast"),
+                registered=row.get("registered"),
+                uncontested=row.get("uncontested", False),
+                page=row["page"],
+                elected=row.get("elected"),
+                boxes=row["boxes"],
+            )
+        )
+    return found
+
+
+@cache
 def contests(year: int, name: str) -> list[Result]:
     """The House or councillor results: a constituency per contest in the House annex, a ward in the councillors'."""
+    if year in SCANNED:
+        return scanned(year, name)
     ward_table = name == "ward"
     known = {r.constituency for r in contests(year, "house")} if ward_table else set()
     found: list[Result] = []
@@ -494,6 +567,26 @@ UNCONTESTED_METHOD = (
     "The Commission's report on the {year} general election prints the sole candidate as nominated unopposed and "
     "declared elected. No votes were cast, and the report gives no voter figures."
 )
+SCANNED_PRESIDENT_METHOD = (
+    "Read from the page images of the Commission's report on the {year} general election, from its annex of the "
+    "President's results by constituency. Each number keeps its page and its box on the page. In every constituency "
+    "the candidates' votes add up to the valid votes and the valid and rejected votes to the ballots cast, and the "
+    "constituencies add up to the national result the annex prints. Figures are stored as printed.{extra}"
+)
+PRESIDENT_EXTRA = {
+    1995: " Bumbwini and Donge print their ballots cast in the column of registered voters.",
+    2010: " The scan cuts the Rahaleo line through its digits: its figures are the national line less the other "
+    "constituencies, flagged as derived, and they agree with the tops of the digits that show.",
+}
+SCANNED_METHOD = (
+    "Read from the page images of the Commission's report on the {year} general election, from its annex of the "
+    "{kind} results. Each number keeps its page and its box on the page. The candidate stored as elected is the one "
+    "the annex marks as elected, or, where it marks none, the candidate with the most votes. Figures are stored as "
+    "printed; where they do not add up, the package's accepted findings name the contests."
+)
+SCANNED_UNCONTESTED_METHOD = (
+    "The Commission's report prints the sole candidate as unopposed and elected. No votes were cast in the contest."
+)
 SIGNIFICANT = {"valid": VALID, "invalid": INVALID, "cast": CAST, "registered": REGISTERED}
 
 SOURCE_ID = key("source", "zec")
@@ -524,7 +617,10 @@ def fetch() -> None:
 
 def parse() -> None:
     for year in REPORTS:
-        check_national(year)
+        if year in SCANNED:
+            check_scanned(year)
+        else:
+            check_national(year)
     geo().write()
     registry().write()
     for year in REPORTS:
@@ -580,7 +676,7 @@ def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "The districts, House of Representatives constituencies, and councillor wards of Zanzibar in 2020 and 2025, by name",
+        "The districts, House of Representatives constituencies, and councillor wards of Zanzibar from 1995 to 2025, by name",
     )
     p.external |= {COUNTRY, TERRITORY}
     for code, rank, kind, noun in SCHEMES:
@@ -597,7 +693,7 @@ def geo() -> Package:
         p.add("area_parent", area_id=area, parent_id=ZANZIBAR)
     for year in REPORTS:
         since = DAYS[year]
-        until = DAYS[2025] if year == 2020 else None
+        until = UNTIL.get(year)
         for result in contests(year, "house"):
             area = constituency_area(year, result.district, result.constituency)
             p.add("area", id=area, scheme_code="tz.constituency")
@@ -626,7 +722,9 @@ def geo() -> Package:
             p.add(
                 "area_parent",
                 area_id=area,
-                parent_id=constituency_area(year, result.district, result.constituency),
+                parent_id=constituency_area(year, result.district, result.constituency)
+                if result.constituency
+                else district_area(result.district),
                 valid_from=since,
                 valid_to=until,
             )
@@ -634,7 +732,7 @@ def geo() -> Package:
 
 
 def party_labels() -> list[str]:
-    labels = {label for year in REPORTS for _, label in PRESIDENTS[year]}
+    labels = {label for year in REPORTS for _, label in presidents_of(year)}
     for year in REPORTS:
         for name in ("house", "ward"):
             labels |= {label for result in contests(year, name) for _, label, _ in result.candidates}
@@ -657,7 +755,7 @@ def registry() -> Package:
         id=SOURCE_ID,
         kind="official_body",
         publisher="Zanzibar Electoral Commission",
-        title="Reports on the general elections of Zanzibar, 2020 and 2025",
+        title="Reports on the general elections of Zanzibar, 1995 to 2025",
         url="https://www.zec.go.tz/",
         license="Official publication; reuse terms are not stated",
         attribution="Zanzibar Electoral Commission",
@@ -706,8 +804,8 @@ def build(year: int) -> Package:
         id=election,
         polity_id=COUNTRY,
         kind="general",
-        date_from=EARLY[year],
-        date_to=day,
+        date_from=EARLY.get(year, day),
+        date_to=LATE.get(year, day),
         status="held",
     )
     path = f"tz/{day}-zanzibar"
@@ -732,7 +830,23 @@ def build(year: int) -> Package:
             p.name(id, name, "sw", "official")
         return units[code]
 
-    president_contest(p, year, election, path, unit)
+    if year in SCANNED:
+        scanned_president(p, year, election, path, unit)
+        artifact = raw.cached(SOURCE, REPORTS[year])
+        artifact_id = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{SOURCE_ID}\x1f{artifact.storage_key}"))
+        for number, (width, height) in sorted(sizes(year).items()):
+            if number in pages_of(year):
+                p.add(
+                    "source_page",
+                    id=key("page", year, number),
+                    artifact_id=artifact_id,
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{artifact.sha256}/{number}.png",
+                    width=width,
+                    height=height,
+                )
+    else:
+        president_contest(p, year, election, path, unit)
     for result in contests(year, "house"):
         local_contest(p, year, election, path, unit, result, ward=False)
     for result in contests(year, "ward"):
@@ -750,17 +864,20 @@ def accept(p: Package, year: int) -> None:
                 continue
             place = f"{result.ward or result.constituency} ({result.district})"
             votes = sum(v or 0 for _, _, v in result.candidates)
-            assert result.valid is not None and result.invalid is not None
-            assert result.cast is not None and result.registered is not None
-            if votes != result.valid:
+            if result.valid is not None and votes != result.valid:
                 found.setdefault("accounting.votes_valid", []).append(
                     f"{place}: the candidates' votes add to {votes}, the valid total printed is {result.valid}"
                 )
-            if result.valid + result.invalid != result.cast:
+            if (
+                result.valid is not None
+                and result.invalid is not None
+                and result.cast is not None
+                and result.valid + result.invalid != result.cast
+            ):
                 found.setdefault("accounting.ballots_sum", []).append(
                     f"{place}: valid {result.valid} and rejected {result.invalid} votes do not add to the {result.cast} cast"
                 )
-            if result.cast > result.registered:
+            if result.cast is not None and result.registered is not None and result.cast > result.registered:
                 found.setdefault("accounting.turnout", []).append(
                     f"{place}: {result.cast} ballots cast against {result.registered} registered voters"
                 )
@@ -768,7 +885,20 @@ def accept(p: Package, year: int) -> None:
         p.accept(code, "The report prints these figures as they are; stored as printed. " + "; ".join(items))
 
 
-def put(p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int) -> None:
+# A scanned figure's year, page, and box on the page as fractions of its width and height.
+type Where = tuple[int, int, list[float]]
+
+
+def put(
+    p: Package,
+    result_set: str,
+    unit: str,
+    option: str | None,
+    measure: int,
+    value: int,
+    where: Where | None = None,
+    derived: bool = False,
+) -> None:
     p.add(
         "result_value",
         result_set_id=result_set,
@@ -777,9 +907,51 @@ def put(p: Package, result_set: str, unit: str, option: str | None, measure: int
         channel=0,
         measure=measure,
         count_round=0,
-        flags=0,
+        flags=(0 if where is None else DIGITIZED) | (DERIVED if derived else 0),
         value=value,
     )
+    if where is None:
+        return
+    year, page, box = where
+    width, height = sizes(year)[page]
+    p.add(
+        "value_locator",
+        result_set_id=result_set,
+        unit_id=unit,
+        option_id=option,
+        channel=0,
+        measure=measure,
+        count_round=0,
+        page_id=key("page", year, page),
+        x0=round(box[0] * width, 1),
+        y0=round(box[1] * height, 1),
+        x1=round(box[2] * width, 1),
+        y1=round(box[3] * height, 1),
+    )
+
+
+def located(year: int, result: Result, slot: str) -> Where | None:
+    return None if result.page is None else at(year, result.boxes[slot])
+
+
+def at(year: int, box: list[float]) -> Where:
+    """A scanned figure's place: its box holds the corners as fractions of the page, OCR's agreement, and the page."""
+    return (year, int(box[5]), box[:4])
+
+
+@cache
+def sizes(year: int) -> dict[int, tuple[int, int]]:
+    """Each page's size in pixels at the resolution its boxes were read at."""
+    out = subprocess.run(
+        ["pdfinfo", "-f", "1", "-l", "9999", str(raw.cached(SOURCE, REPORTS[year]).path)],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    return {
+        int(number): (round(float(width) * DPI / 72), round(float(height) * DPI / 72))
+        for number, width, height in re.findall(r"Page\s+(\d+) size:\s+([\d.]+) x ([\d.]+) pts", out)
+    }
 
 
 def contest_set(p: Package, election: str, contest: str, code: str, method: str, completeness: float = 1.0) -> str:
@@ -897,6 +1069,8 @@ def local_contest(p: Package, year: int, election: str, path: str, unit: Unit, r
     where = f"{slug(result.district)}-{slug(result.constituency)}" + (f"-{slug(result.ward)}" if ward else "")
     p.add("slug", path=f"{path}/{'wards' if ward else 'house'}/{where}", entity_id=contest, is_current=True)
     method = UNCONTESTED_METHOD if result.uncontested else (WARD_METHOD if ward else HOUSE_METHOD)
+    if year in SCANNED:
+        method = SCANNED_UNCONTESTED_METHOD if result.uncontested else SCANNED_METHOD.format(kind=title, year=year)
     result_set = contest_set(p, election, contest, code, method.format(year=year), 0.0 if result.uncontested else 1.0)
     id = unit(
         ward_code(year, result.district, result.constituency, result.ward)
@@ -908,14 +1082,126 @@ def local_contest(p: Package, year: int, election: str, path: str, unit: Unit, r
     )
     if not result.uncontested:
         for label, measure in SIGNIFICANT.items():
-            put(p, result_set, id, None, measure, getattr(result, label))
+            if getattr(result, label) is not None:
+                put(p, result_set, id, None, measure, getattr(result, label), located(year, result, label))
     votes = [v or 0 for _, _, v in result.candidates]
     winner = max(range(len(votes)), key=votes.__getitem__)
-    if len(votes) > 1 and votes.count(max(votes)) > 1:
+    if result.elected is not None:
+        # A scanned annex marks the candidate it declares elected; the declaration is stored as printed.
+        winner = [name for name, _, _ in result.candidates].index(result.elected)
+    elif len(votes) > 1 and votes.count(max(votes)) > 1:
         raise ValueError(f"tie in {code}")
     for rank, (name, label, count) in enumerate(result.candidates, 1):
         option, _ = candidate(p, contest, code, rank, name, label, rank - 1 == winner)
         if rank - 1 == winner:
             p.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
         if count is not None:
-            put(p, result_set, id, option, VOTES, count)
+            put(p, result_set, id, option, VOTES, count, located(year, result, f"cand:{rank - 1}"))
+
+
+@dataclass
+class Line:
+    """One constituency's line in a scanned President's annex."""
+
+    district: str
+    constituency: str
+    votes: dict[str, int | None]
+    totals: dict[str, int | None]
+    page: int
+    boxes: dict[str, list[float]]
+    derived: bool = False
+
+
+def presidents_of(year: int) -> list[tuple[str, str]]:
+    if year in SCANNED:
+        return [(c["name"], party(c["party"])) for c in returns(year)["president"]["candidates"]]
+    return PRESIDENTS[year]
+
+
+def scanned_lines(year: int) -> list[Line]:
+    return [
+        Line(
+            row["district"],
+            row["constituency"],
+            {party(label): votes for label, votes in row["votes"].items()},
+            {label: row.get(label) for label in SIGNIFICANT},
+            row["page"],
+            row["boxes"],
+            row.get("derived", False),
+        )
+        for row in returns(year)["president"]["rows"]
+    ]
+
+
+def pages_of(year: int) -> set[int]:
+    data = returns(year)
+    rows = data["president"]["rows"] + data["house"] + data["wards"]
+    return {int(box[5]) for row in rows for box in row["boxes"].values()}
+
+
+# Where a scanned annex's own national line differs from the sum of its constituencies, and why.
+PRINTED_GAPS = {
+    (1995, "registered"): "Bumbwini and Donge print their ballots cast in the registered column",
+}
+
+
+def check_scanned(year: int) -> None:
+    """Fail unless the constituencies add up to the national presidential result the report prints."""
+    national = returns(year)["president"]["national"]
+    rows = scanned_lines(year)
+    for label, printed in national["votes"].items():
+        if sum(row.votes.get(party(label)) or 0 for row in rows) != printed:
+            raise ValueError(f"{year}: {label}'s constituencies differ from the report's national total")
+    for label in SIGNIFICANT:
+        total = sum(row.totals[label] or 0 for row in rows)
+        if national.get(label) is not None and total != national[label] and (year, label) not in PRINTED_GAPS:
+            raise ValueError(
+                f"{year}: the constituencies' {label} ({total}) differ from the national {national[label]}"
+            )
+
+
+def scanned_president(p: Package, year: int, election: str, path: str, unit: Unit) -> None:
+    code = f"{year}:president"
+    contest = key("contest", code)
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="office",
+        office_id=PRESIDENCY,
+        district_area_id=ZANZIBAR,
+        magnitude=1,
+        round_number=1,
+        electoral_system_id=SYSTEM,
+        default_result_kind="counted",
+    )
+    p.name(contest, f"{year} Zanzibar presidential election", "en", "official")
+    p.add("slug", path=f"{path}/president", entity_id=contest, is_current=True)
+    result_set = contest_set(
+        p, election, contest, code, SCANNED_PRESIDENT_METHOD.format(year=year, extra=PRESIDENT_EXTRA.get(year, ""))
+    )
+    rows = scanned_lines(year)
+    candidates = presidents_of(year)
+    totals = [sum(row.votes.get(label) or 0 for row in rows) for _, label in candidates]
+    winner = max(range(len(totals)), key=totals.__getitem__)
+    options = []
+    for rank, (name, label) in enumerate(candidates, 1):
+        option, _ = candidate(p, contest, code, rank, name, label, rank - 1 == winner)
+        options.append(option)
+        if rank - 1 == winner:
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
+    for row in rows:
+        id = unit(
+            constituency_code(year, row.district, row.constituency),
+            "tz.constituency",
+            constituency_area(year, row.district, row.constituency),
+            row.constituency,
+        )
+        for option, (_, label) in zip(options, candidates, strict=True):
+            count = row.votes.get(label)
+            if count is not None:
+                put(p, result_set, id, option, VOTES, count, at(year, row.boxes[f"votes:{label}"]), row.derived)
+        for label, measure in SIGNIFICANT.items():
+            figure = row.totals[label]
+            if figure is not None:
+                put(p, result_set, id, None, measure, figure, at(year, row.boxes[label]), row.derived)
