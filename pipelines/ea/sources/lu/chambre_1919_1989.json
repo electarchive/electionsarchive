@@ -1,0 +1,722 @@
+[
+  {
+    "date": "1919-10-26",
+    "renewal": "general",
+    "doc": "1919",
+    "notes": [
+      "The Chamber's verification sitting of 4 November 1919 prints no vote figures. For the Centre it names the deputies proclaimed on each list; the Sud, Est, and Nord reports give no breakdown by list that can be read unambiguously, so only the Centre is stored."
+    ],
+    "contests": [
+      {
+        "district": "Centre",
+        "lists": [
+          {"n": 1, "seats": 4, "elected": [["Ludovicy", null], ["Diderich", null], ["Brasseur", null], ["Le Gallais", null]]},
+          {"n": 2, "seats": 6, "elected": [["Altwies", null], ["Philippe", null], ["de Waha", null], ["Jacoby", null], ["Eichhorn", null], ["Kohner", null]]},
+          {"n": 3, "seats": 3, "elected": [["Schettlé", null], ["Clement Marg.", null], ["Hildgen", null]]}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1922-05-28",
+    "renewal": "partial",
+    "doc": "1922",
+    "notes": [
+      "The Chamber's verification sitting of 4 July 1922 prints no list totals. For the Centre it names the deputies elected on each list. For the Nord it reads out candidates' votes without saying which were elected, so the Nord is not stored."
+    ],
+    "contests": [
+      {
+        "district": "Centre",
+        "lists": [
+          {"n": 1, "seats": 0, "elected": []},
+          {"n": 2, "seats": 1, "elected": [["Mark", null]]},
+          {"n": 3, "seats": 6, "elected": [["Philippe", null], ["Altwies", null], ["Kohner", null], ["Jacoby", null], ["Eichhorn", null], ["Ecker", null]]},
+          {"n": 4, "seats": 6, "elected": [["Brasseur", null], ["Diderich", null], ["Cahen", null], ["Le Gallais", null], ["Ludovicy", null], ["Gallé", null]]}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1925-03-01",
+    "renewal": "general",
+    "doc": "1925a",
+    "notes": [
+      "The Chamber's verification sitting of 26 March 1925 prints no vote figures. It names the deputies proclaimed on each list in the Sud and the Est; the Government's dispatch numbers the workers' party list 6 in the Sud, while the rapporteur calls it list 4, and the dispatch's numbering is kept. The Centre and Nord reports do not attribute their deputies to lists, so they are not stored."
+    ],
+    "contests": [
+      {
+        "district": "Sud",
+        "lists": [
+          {"n": 1, "label": "Union nationale indépendante", "seats": 1, "elected": [["Loutsch", null]]},
+          {"n": 2, "label": "Liste des gauches", "seats": 3, "elected": [["Mark", null], ["Kayser", null], ["Albert Clemang", null]]},
+          {"n": 3, "label": "Droite", "seats": 6, "elected": [["Dondelinger", null], ["Dupong", null], ["Collart", null], ["Kirsch", null], ["Wirtgen", null], ["Wagner", null]]},
+          {"n": 6, "label": "Parti ouvrier", "seats": 6, "elected": [["Blum", null], ["Wilhelm", null], ["Krier", null], ["Thilmany", null], ["Biever", null], ["Krieps", null]]}
+        ]
+      },
+      {
+        "district": "Est",
+        "lists": [
+          {"n": 1, "label": "Gauche indépendante", "seats": 2, "elected": [["Godart", null], ["Decker", null]]},
+          {"n": 3, "label": "Droite", "seats": 5, "elected": [["Bech", null], ["Klein", null], ["Didier", null], ["Huss", null], ["Wiltzius", null]]}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1928-06-03",
+    "renewal": "partial",
+    "doc": "1928a",
+    "notes": [],
+    "contests": [
+      {
+        "district": "Sud",
+        "doc": "1928a",
+        "cast": 41108, "blank": 560, "invalid": 1121, "valid": 39427, "votes": 732162, "quotient": 34865,
+        "lists": [
+          {"n": 1, "seats": 1, "elected": [["Loutsch", 8593]]},
+          {"n": 2, "seats": 2, "elected": [["Mark", 8721], ["Krombach", 6553]]},
+          {"n": 3, "seats": 10, "elected": [["Blum", 24340], ["Krier", 21067], ["Biever", 20189], ["Wilhelm", 19787], ["Thilmany", 19688], ["Krieps", 19493], ["Clement", 18460], ["Weirich", 16997], ["Bausch", 16822], ["Hamer", 16467]]},
+          {"n": 4, "seats": 7, "elected": [["Dondelinger", 18271], ["Collart", 17565], ["Wirtgen", 16662], ["Kirsch", 15247], ["Nœsen", 13851], ["Wagner", 13798], ["Rock", 13303]]}
+        ]
+      },
+      {
+        "district": "Est",
+        "doc": "1928b",
+        "cast": 19335, "blank": 174, "invalid": 704, "valid": 18457,
+        "lists": [
+          {"n": 1, "votes": 36773, "seats": 2, "elected": [["Godart", 7838], ["Keiffer", 7732]]},
+          {"n": 2, "votes": 77636, "seats": 5, "elected": [["Bech", 16222], ["Klein", 11588], ["Didier", 10806], ["Schaffner", 10280], ["Wiltzius", 10152]]},
+          {"n": 3, "votes": 8137, "seats": 0, "elected": []}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1931-06-07",
+    "renewal": "partial",
+    "doc": "1931",
+    "notes": [],
+    "contests": [
+      {
+        "district": "Centre",
+        "votes": 484483, "quotient": 32299,
+        "lists": [
+          {"n": 1, "label": "Parti radical-socialiste", "votes": 78464, "seats": 2, "elected": [["Diderich Gaston", 11699], ["Le Gallais Norbert", 7974]]},
+          {"n": 2, "label": "Groupe des indépendants", "votes": 40569, "seats": 1, "elected": [["Kohner Jean-Pierre", 8790]]},
+          {"n": 3, "label": "Parti radical", "votes": 58160, "seats": 2, "elected": [["Cahen Marcel", 9566], ["Pemmers Tony", 8324]]},
+          {"n": 4, "label": "Parti ouvrier", "votes": 115882, "seats": 3, "elected": [["Blum René", 13793], ["Neu François", 10154], ["Moes Dominique", 8824]]},
+          {"n": 5, "label": "Parti de la droite", "votes": 185144, "seats": 6, "elected": [["Origer Jean", 16879], ["Philippe Albert", 16110], ["Jacoby Nicolas", 14973], ["Altwies François", 14591], ["Thorn Auguste", 14546], ["Mackel Nicolas", 14149]]},
+          {"n": 6, "label": "Parti communiste", "votes": 6264, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Nord",
+        "votes": 291280, "quotient": 24274,
+        "lists": [
+          {"n": 1, "label": "Parti radical", "votes": 7701, "seats": 0, "elected": []},
+          {"n": 2, "label": "Parti progressiste-démocrate du Nord", "votes": 35702, "seats": 1, "elected": [["Mathieu Nicolas", 7123]]},
+          {"n": 3, "label": "Parti ouvrier", "votes": 37923, "seats": 1, "elected": [["Erpelding François", 7405]]},
+          {"n": 4, "label": "Parti des agriculteurs et des classes moyennes", "votes": 46446, "seats": 2, "elected": [["Hoffmann Eugène", 10194], ["Wenkin Jean-Pierre", 7223]]},
+          {"n": 5, "label": "Parti de la droite", "votes": 163508, "seats": 7, "elected": [["Reuter Emile", 18804], ["Lamborelle Ernest", 17866], ["Gengler Henri", 17483], ["Simon Joseph", 15683], ["Meyers Nicolas", 15145], ["Hansen Antoine", 14801], ["Delaporte Auguste", 14763]]}
+        ]
+      },
+      {
+        "district": "Sud",
+        "tag": "sud-additional",
+        "title": "two additional seats",
+        "votes": 82007, "quotient": 27336,
+        "lists": [
+          {"n": 1, "label": "Parti de la droite", "votes": 30637, "seats": 1, "elected": [["Reichling Eugène", null]]},
+          {"n": 2, "label": "Parti radical-socialiste", "votes": 10883, "seats": 0, "elected": []},
+          {"n": 3, "label": "Parti communiste", "votes": 4543, "seats": 0, "elected": []},
+          {"n": 4, "label": "Parti ouvrier", "votes": 35944, "seats": 1, "elected": [["Mockel Jean-Pierre", null]]}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1934-06-03",
+    "renewal": "partial",
+    "doc": "1934a",
+    "notes": [
+      "The Chamber's verification sitting of 6 November 1934 prints the Government's dispatch with the deputies elected on each list and their votes, but no list totals. On 27 November 1934 the Chamber invalidated the election of the communist list's deputy, Zénon Bernard; the result is stored as the bureau proclaimed it."
+    ],
+    "contests": [
+      {
+        "district": "Sud",
+        "lists": [
+          {"n": 1, "label": "Parti ouvrier", "seats": 10, "elected": [["Blum René", 24165], ["Biever Nicolas", 21201], ["Krier Pierre", 21031], ["Clement Hubert", 20543], ["Bausch Jean-Pierre", 19938], ["Hamer Pierre", 19441], ["Bodson Victor", 19158], ["Netgen Denis", 19053], ["Krieps Adolphe", 19025], ["Schrœder Joseph", 18952]]},
+          {"n": 2, "label": "Parti radical-libéral", "seats": 3, "elected": [["Theves Will", 11569], ["Mark Emile", 10614], ["Krombach Charles", 8618]]},
+          {"n": 3, "label": "Parti communiste", "seats": 1, "elected": [["Bernard Zénon", 6057]]},
+          {"n": 6, "label": "Parti de la droite", "seats": 8, "elected": [["Dupong Pierre", 22401], ["Reichling Eugène", 18347], ["Wirtgen Nicolas", 17461], ["Rock Jean-Baptiste", 16842], ["Hentgen Aloyse", 16613], ["Kirsch Edouard", 16590], ["Kinsch Léon", 16389], ["Schintgen Marcel", 15854]]}
+        ]
+      },
+      {
+        "district": "Est",
+        "lists": [
+          {"n": 1, "label": "Parti de la droite", "seats": 4, "elected": [["Bech Joseph", 15211], ["Klein Adolphe", 11101], ["Schaffner Mathias", 10629], ["Didier Jean-Baptiste", 10441]]},
+          {"n": 2, "label": "Parti des indépendants", "seats": 3, "elected": [["Decker Othon", 10149], ["Keiffer Auguste", 10064], ["Godart Pierre", 10020]]}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1937-06-06",
+    "renewal": "partial",
+    "doc": "1937",
+    "notes": [
+      "The Chamber's verification sitting of 9 November 1937 gives the Nord's ballots, its total votes, and the deputies elected for each party, without list numbers or list totals; it names the Centre's deputies without their lists, so the Centre is not stored. Blank and invalid ballots are printed only together, as the difference between ballots cast and valid."
+    ],
+    "contests": [
+      {
+        "district": "Nord",
+        "cast": 32746, "valid": 31080, "votes": 317739, "quotient": 26479,
+        "lists": [
+          {"label": "Parti ouvrier", "seats": 2, "elected": [["Erpelding", null], ["Weber", null]]},
+          {"label": "Parti des paysans et classes moyennes", "seats": 0, "elected": []},
+          {"label": "Parti de la droite", "seats": 7, "elected": [["Reuter", null], ["Simon", null], ["Gengler", null], ["Peffer", null], ["Schmit", null], ["Hansen", null], ["Schlœsser", null]]},
+          {"label": "Parti libéral", "seats": 1, "elected": [["Mathieu", null]]},
+          {"n": 5, "seats": 1, "elected": [["Prum", null]]}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1945-10-21",
+    "renewal": "general",
+    "doc": "1945",
+    "notes": [
+      "The Chamber's verification sitting of 16 November 1945 prints only the ballots found and the invalid ballots for the Sud and the Est, and the valid votes, the lists' votes and their seats for the Centre and the Nord. For the Nord's list 4 it prints 4 seats but names seven elected candidates, as the seven seats the votes give it require; seven are stored."
+    ],
+    "contests": [
+      {
+        "district": "Sud",
+        "cast": 58249, "invalid": 1085,
+        "lists": []
+      },
+      {
+        "district": "Est",
+        "cast": 19805, "invalid": 670,
+        "lists": []
+      },
+      {
+        "district": "Centre",
+        "votes": 687331, "quotient": 42959,
+        "lists": [
+          {"n": 1, "votes": 56710, "seats": 1, "elected": [["Schneider", null]]},
+          {"n": 2, "votes": 177051, "seats": 4, "elected": [["Kohner", null], ["Bodson", null], ["Bauer", null], ["Neu", null]]},
+          {"n": 3, "votes": 177801, "seats": 4, "elected": [["Hamilius", null], ["Diderich", null], ["Schaus Eugène", null], ["Jacquemart", null]]},
+          {"n": 4, "votes": 273754, "seats": 6, "elected": [["Konsbruck", null], ["Frieden", null], ["Lœsch", null], ["Schaus Lambert", null], ["Biever Tony", null], ["Kasel", null]]},
+          {"n": 5, "votes": 2015, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Nord",
+        "votes": 295956, "quotient": 26906,
+        "lists": [
+          {"n": 1, "votes": 8869, "seats": 0, "elected": []},
+          {"n": 2, "votes": 48241, "seats": 1, "elected": [["Abens", null]]},
+          {"n": 3, "votes": 58368, "seats": 2, "elected": [["Wenkin", null], ["Mathieu", null]]},
+          {"n": 4, "votes": 180478, "seats": 7, "elected": [["Simon", null], ["Delaporte", null], ["Reuter", null], ["Gengler", null], ["Wagner", null], ["Schmit", null], ["Schiltges", null]]}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1948-06-06",
+    "renewal": "partial",
+    "doc": "1948",
+    "notes": [
+      "The Chamber's verification sitting of 20 July 1948 prints the Est's ballots only, and nothing by list; the Sud report prints no figures, so the Sud is not stored."
+    ],
+    "contests": [
+      {
+        "district": "Est",
+        "cast": 19813, "blank": 436, "invalid": 809, "valid": 18568,
+        "lists": []
+      }
+    ]
+  },
+  {
+    "date": "1951-06-03",
+    "renewal": "partial",
+    "doc": "1951",
+    "notes": [
+      "For the Centre the Chamber's verification sitting of 10 July 1951 prints the ballots and the deputies elected for each party with their votes, but no list numbers or list totals."
+    ],
+    "contests": [
+      {
+        "district": "Centre",
+        "cast": 51773, "blank": 1245, "invalid": 1439, "valid": 49089,
+        "lists": [
+          {"label": "Parti ouvrier socialiste", "seats": 7, "elected": [["Bodson Victor", 22609], ["Wilwertz Paul", 21283], ["Bousser Albert", 21115], ["van Kauvenbergh Adrien", 20983], ["Bauer Jean-Pierre", 20104], ["Wehenkel Antoine", 19846], ["Leick Maurice", 19055]]},
+          {"label": "Parti chrétien-social", "seats": 6, "elected": [["Reuter Emile", 22158], ["Frieden Pierre", 21831], ["Rollinger Nicolas", 19276], ["Loesch Fernand", 18227], ["Biever Tony", 18126], ["Welter Camille", 17668]]},
+          {"label": "Groupement démocratique", "seats": 3, "elected": [["Hamilius Emile", 16278], ["Schaus Eugène", 13517], ["Kœnig Lucien", 12398]]},
+          {"label": "Parti communiste", "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Nord",
+        "cast": 31840, "blank": 474, "invalid": 793, "valid": 30573, "votes": 292827, "quotient": 26621,
+        "lists": [
+          {"n": 1, "label": "Parti chrétien-social", "seats": 6, "elected": [["Wagner Georges", 19518], ["Simon Joseph", 17475], ["Gengler Henri", 16397], ["Schmit Tony", 15815], ["Delaporte Auguste", 15244], ["Schiltges Alphonse", 14872]]},
+          {"n": 2, "label": "Parti communiste", "seats": 0, "elected": []},
+          {"n": 3, "label": "Groupement démocratique", "seats": 2, "elected": [["Schaffner Robert", 11363], ["Wenkin Joseph", 7762]]},
+          {"n": 4, "label": "Parti ouvrier socialiste", "seats": 2, "elected": [["Abens Victor", 10484], ["Ewen Michel", 8841]]}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1954-05-30",
+    "renewal": "general",
+    "doc": "1954",
+    "notes": [
+      "The Chamber's verification sitting of 6 July 1954 prints the ballots, the electoral quotient, and the deputies elected on each list. It prints the total votes of all lists for the Centre and the Nord only, and no list totals."
+    ],
+    "contests": [
+      {
+        "district": "Sud",
+        "cast": 64160, "blank": 1599, "invalid": 1425, "valid": 61136, "quotient": 56052,
+        "lists": [
+          {"n": 1, "seats": 8, "elected": [["Biever Nicolas", null], ["Fohrmann Jean", null], ["Rasquin Michel", null], ["Gansen Pierre", null], ["Fandel Romain", null], ["Krier Antoine", null], ["Netgen Denis", null], ["Steichen Dominique", null]]},
+          {"n": 2, "seats": 3, "elected": [["Useldinger Arthur", null], ["Urbany Dominique", null], ["Grandgenet Joseph", null]]},
+          {"n": 3, "seats": 1, "elected": [["Cigrang François", null]]},
+          {"n": 4, "seats": 8, "elected": [["Colling Emile", null], ["Dupong Jean", null], ["Lommel Joseph", null], ["Margue Nicolas", null], ["Wirtgen Charles", null], ["Rock Jean-Baptiste", null], ["Kinsch Jean", null], ["Werné Alex", null]]},
+          {"n": 5, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Est",
+        "cast": 20523, "blank": 301, "invalid": 742, "valid": 19480, "quotient": 16063,
+        "lists": [
+          {"n": 1, "seats": 1, "elected": [["Decker Othon", null]]},
+          {"n": 2, "seats": 0, "elected": []},
+          {"n": 3, "seats": 1, "elected": [["Schaffner Robert", null]]},
+          {"n": 4, "seats": 4, "elected": [["Bech Joseph", null], ["Thill Nicolas", null], ["Speck Guillaume", null], ["Duhr Aloyse", null]]}
+        ]
+      },
+      {
+        "district": "Centre",
+        "cast": 53675, "blank": 1395, "invalid": 1366, "valid": 50914, "votes": 787349, "quotient": 46315,
+        "lists": [
+          {"n": 1, "seats": 6, "elected": [["Bodson", null], ["Wehenkel", null], ["van Kauvenbergh", null], ["Gremling", null], ["Bousser", null], ["Bauer", null]]},
+          {"n": 2, "seats": 0, "elected": []},
+          {"n": 3, "seats": 3, "elected": [["Hamilius", null], ["Schaus", null], ["Koenig", null]]},
+          {"n": 4, "seats": 7, "elected": [["Werner", null], ["Frieden", null], ["Rollinger", null], ["Reuter", null], ["Biever", null], ["Grégoire", null], ["Fischbach", null]]},
+          {"n": 5, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Nord",
+        "cast": 31734, "blank": 459, "invalid": 769, "valid": 30506, "votes": 291650, "quotient": 26514,
+        "lists": [
+          {"n": 1, "seats": 2, "elected": [["Abens", null], ["Ewen", null]]},
+          {"n": 2, "seats": 0, "elected": []},
+          {"n": 3, "seats": 1, "elected": [["Peusch", null]]},
+          {"n": 4, "seats": 7, "elected": [["Wagner", null], ["Wenkin", null], ["Gengler", null], ["Herr", null], ["Schiltges", null], ["Ferring", null], ["Schmit", null]]}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1959-02-01",
+    "renewal": "general",
+    "doc": "1959",
+    "notes": [
+      "In the Sud the Chamber's verification sitting of 5 March 1959 prints the votes of lists 1 to 4 only; the rapporteur acknowledged in the sitting that he had left out list 5, which won no seat, so its votes (the printed total less the four lists) are not stored."
+    ],
+    "contests": [
+      {
+        "district": "Sud",
+        "cast": 67411, "blank": 1612, "invalid": 1469, "valid": 64330, "votes": 1229200, "quotient": 58534,
+        "lists": [
+          {"n": 1, "votes": 126001, "seats": 2, "elected": [["Cigrang Albert", null], ["Berchem Albert", null]]},
+          {"n": 2, "votes": 405185, "seats": 7, "elected": [["Colling Emile", null], ["Dupong Jean", null], ["Schockmel Pierre", null], ["Lucius Joseph", null], ["Kinsch Jean", null], ["Lommel Joseph", null], ["Wirtgen Charles", null]]},
+          {"n": 3, "votes": 493911, "seats": 8, "elected": [["Biever Nicolas", null], ["Fohrmann Jean", null], ["Krier Antoine", null], ["Gansen Pierre", null], ["Fandel Romain", null], ["Steichen Demy", null], ["Gallion Jean", null], ["Netgen Denis", null]]},
+          {"n": 4, "votes": 188282, "seats": 3, "elected": [["Useldinger Arthur", null], ["Urbany Dominique", null], ["Grandgenet Joseph", null]]},
+          {"n": 5, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Est",
+        "cast": 19903, "blank": 285, "invalid": 705, "valid": 18913, "votes": 108893, "quotient": 15556,
+        "lists": [
+          {"n": 1, "votes": 31302, "seats": 2, "elected": [["Schaffner Robert", null], ["Wagner Charles", null]]},
+          {"n": 2, "votes": 54031, "seats": 3, "elected": [["Bech Joseph", null], ["Duhr Aly", null], ["Speck Guillaume", null]]},
+          {"n": 3, "votes": 23560, "seats": 1, "elected": [["Decker Othon", null]]}
+        ]
+      },
+      {
+        "district": "Centre",
+        "cast": 55779, "blank": 1247, "invalid": 1759, "valid": 52773, "votes": 810402, "quotient": 47671,
+        "lists": [
+          {"n": 1, "label": "Parti démocratique", "votes": 224171, "seats": 5, "elected": [["Schaus Eugène", null], ["Hamilius", null], ["Koenig", null], ["Elvinger", null], ["Wolter", null]]},
+          {"n": 2, "label": "Parti chrétien social", "votes": 304064, "seats": 6, "elected": [["Frieden", null], ["Werner", null], ["Fischbach", null], ["Biever", null], ["Grégoire", null], ["Sinner", null]]},
+          {"n": 3, "label": "Parti ouvrier socialiste", "votes": 250024, "seats": 5, "elected": [["Wilwertz", null], ["Wohlfart", null], ["Wehenkel", null], ["Bousser", null], ["Bodson", null]]},
+          {"n": 4, "label": "Parti communiste", "votes": 32143, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Nord",
+        "cast": 30743, "blank": 358, "invalid": 805, "valid": 29580, "votes": 281501, "quotient": 25591,
+        "lists": [
+          {"n": 1, "votes": 66913, "seats": 2, "elected": [["Henri Diederich", null], ["Jean Peusch", null]]},
+          {"n": 2, "label": "Parti chrétien social", "votes": 133560, "seats": 5, "elected": [["Jean Winkin", null], ["Nicolas Ferring", null], ["Georges Wagner", null], ["Joseph Herr", null], ["Henri Gengler", null]]},
+          {"n": 3, "label": "Parti ouvrier socialiste", "votes": 81028, "seats": 3, "elected": [["Henri Cravatte", null], ["Victor Abens", null], ["Michel Ewen", null]]}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1964-06-07",
+    "renewal": "general",
+    "doc": "1964",
+    "notes": [
+      "The Chamber's verification sitting of 21 July 1964 prints the Est's blank and invalid ballots only together, and no total votes for the Centre or list totals for the Nord. It prints the Est's electoral quotient as 14,594 where its total of 101,528 votes for six seats gives 14,505."
+    ],
+    "contests": [
+      {
+        "district": "Sud",
+        "cast": 68762, "blank": 2261, "invalid": 1723, "valid": 64778, "votes": 1417557, "quotient": 59065,
+        "lists": [
+          {"n": 1, "votes": 593103, "seats": 10, "elected": [["Nicolas Biever", null], ["Jean Fohrmann", null], ["Antoine Krier", null], ["Romain Fandel", null], ["Jean Gallion", null], ["Dominique Steichen", null], ["Pierre Gansen", null], ["Marcel Knauf", null], ["Jules Schreiner", null], ["Théophile Kirsch", null]]},
+          {"n": 2, "votes": 421954, "seats": 7, "elected": [["Emile Colling", null], ["Georges Spautz", null], ["Joseph Lucius", null], ["Jean Dupong", null], ["Pierre Schockmel", null], ["Jean-Pierre Glesener", null], ["Charles Wirtgen", null]]},
+          {"n": 3, "votes": 85630, "seats": 1, "elected": [["Chlecq", null]]},
+          {"n": 4, "votes": 241293, "seats": 4, "elected": [["Useldinger", null], ["Urbany", null], ["Grandgenet", null], ["Hoffmann", null]]},
+          {"n": 5, "votes": 75577, "seats": 1, "elected": [["Berchem", null]]}
+        ]
+      },
+      {
+        "district": "Est",
+        "cast": 19192, "valid": 17929, "votes": 101528, "quotient": 14594,
+        "lists": [
+          {"n": 1, "votes": 25449, "seats": 2, "elected": [["Hurt", null], ["Bodson", null]]},
+          {"n": 2, "votes": 47068, "seats": 3, "elected": [["Duhr", null], ["Kons", null], ["Emile Schaus", null]]},
+          {"n": 3, "votes": 6162, "seats": 0, "elected": []},
+          {"n": 4, "votes": 3100, "seats": 0, "elected": []},
+          {"n": 5, "votes": 19749, "seats": 1, "elected": [["Schaffner", null]]}
+        ]
+      },
+      {
+        "district": "Centre",
+        "cast": 56127, "blank": 1736, "invalid": 1646, "valid": 52745,
+        "lists": [
+          {"n": 1, "label": "Parti ouvrier socialiste", "votes": 303417, "seats": 6, "elected": [["Wohlfart", 21691], ["Wehenkel", 19473], ["Hildgen", 18605], ["Bousser", 18053], ["van Kauvenbergh", 17958], ["Hengel", 17254]]},
+          {"n": 2, "label": "Parti chrétien social", "votes": 306959, "seats": 7, "elected": [["Werner", 23208], ["Grégoire", 21557], ["Fischbach", 18780], ["Tony Biever", 18725], ["Margue", 18186], ["Kollwelter", 17875], ["Mosar", 17343]]},
+          {"n": 3, "label": "Mouvement indépendant populaire", "votes": 60042, "seats": 1, "elected": [["Reisdörfer", 3904]]},
+          {"n": 4, "label": "Parti communiste", "votes": 80569, "seats": 1, "elected": [["Urbany Dominique", 6643]]},
+          {"n": 5, "label": "Parti libéral", "votes": 148785, "seats": 3, "elected": [["Schaus Eugène", 14002], ["Thorn", 11501], ["Elvinger", 11186]]}
+        ]
+      },
+      {
+        "district": "Nord",
+        "cast": 29621, "blank": 646, "invalid": 1269, "valid": 27706, "quotient": 23499,
+        "lists": [
+          {"n": 1, "seats": 3, "elected": [["Cravatte", 13643], ["Abens", 11629], ["Hansen", 10179]]},
+          {"n": 2, "seats": 5, "elected": [["Georges Wagner", null], ["Ney", null], ["Winkin", null], ["Herr", null], ["Ferring", null]]},
+          {"n": 3, "seats": 0, "elected": []},
+          {"n": 4, "seats": 0, "elected": []},
+          {"n": 5, "seats": 1, "elected": [["Henri Diederich", null]]}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1968-12-15",
+    "renewal": "general",
+    "doc": "1969",
+    "notes": [
+      "The Chamber's verification sitting of 5 February 1969 prints no list totals. For the Sud it gives seats per list that add up to 14 of the constituency's 23 (2, 0, 7, 5, 0), so no seats are stored for the Sud. It prints the Est's and the Nord's blank and invalid ballots only together, and the Centre's electoral quotient as 46,978 where its total of 892,588 votes for 18 seats gives 46,979."
+    ],
+    "contests": [
+      {
+        "district": "Sud",
+        "cast": 68207, "blank": 2283, "invalid": 1907, "valid": 64017, "votes": 1383901, "quotient": 57663,
+        "lists": []
+      },
+      {
+        "district": "Centre",
+        "cast": 56014, "blank": 1739, "invalid": 1618, "valid": 52657, "votes": 892588, "quotient": 46978,
+        "lists": [
+          {"n": 1, "label": "Parti démocratique", "seats": 5, "elected": []},
+          {"n": 2, "seats": 0, "elected": []},
+          {"n": 3, "label": "CSV", "seats": 7, "elected": []},
+          {"n": 4, "label": "Parti communiste", "seats": 1, "elected": []},
+          {"n": 5, "label": "Parti ouvrier socialiste luxembourgeois", "seats": 5, "elected": []}
+        ]
+      },
+      {
+        "district": "Est",
+        "cast": 18538, "valid": 17355, "votes": 98666, "quotient": 14096,
+        "lists": [
+          {"n": 1, "seats": 2, "elected": [["Schaffner", null], ["Wagner", null]]},
+          {"n": 3, "seats": 3, "elected": [["Buchler", null], ["Kons", null], ["Duhr", null]]},
+          {"n": 5, "seats": 1, "elected": [["Georges Hurt", null]]}
+        ]
+      },
+      {
+        "district": "Nord",
+        "cast": 27810, "valid": 26155, "votes": 221571, "quotient": 22158,
+        "lists": [
+          {"n": 1, "seats": 2, "elected": [["Alex Wantz", null], ["Henri Diederich", null]]},
+          {"n": 2, "seats": 0, "elected": []},
+          {"n": 3, "seats": 4, "elected": [["Buchler", null], ["Winkin", null], ["Ney", null], ["Emile Gerson", null]]},
+          {"n": 4, "seats": 0, "elected": []},
+          {"n": 5, "seats": 3, "elected": [["Cravatte", null], ["Abens", null], ["Frankie Hansen", null]]}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1974-05-26",
+    "renewal": "general",
+    "doc": "1974",
+    "notes": [
+      "The Chamber's verification sitting of 27 June 1974 prints the Est's and the Nord's blank and invalid ballots only together."
+    ],
+    "contests": [
+      {
+        "district": "Est",
+        "cast": 20644, "valid": 19449, "votes": 111326, "quotient": 15904,
+        "lists": [
+          {"n": 1, "label": "Kommunisten", "votes": 3154, "seats": 0, "elected": []},
+          {"n": 2, "label": "CSV", "votes": 40758, "seats": 2, "elected": [["Urwald", null], ["Büchler", null]]},
+          {"n": 3, "label": "Sozialdemokraten", "votes": 18807, "seats": 1, "elected": [["Hurt", null]]},
+          {"n": 4, "label": "Sozialisten", "votes": 19311, "seats": 1, "elected": [["Schlechter", null]]},
+          {"n": 5, "label": "Parti démocratique", "votes": 29296, "seats": 2, "elected": [["Schaffner", null], ["Wagner", null]]}
+        ]
+      },
+      {
+        "district": "Nord",
+        "cast": 29997, "valid": 28263, "votes": 241313, "quotient": 24132,
+        "lists": [
+          {"n": 1, "label": "Kommunistesch Partei", "votes": 6876, "seats": 0, "elected": []},
+          {"n": 2, "label": "Chrëschtlech-sozial Partei", "votes": 98176, "seats": 4, "elected": [["Ney", null], ["Gerson", null], ["Juncker", null], ["Winkin", null]]},
+          {"n": 3, "label": "SDP", "votes": 30802, "seats": 1, "elected": [["Cravatte", null]]},
+          {"n": 4, "label": "Sozialistesch Arbechterpartei", "votes": 49680, "seats": 2, "elected": [["Abens", null], ["Hansen", null]]},
+          {"n": 5, "label": "Demokratesch Partei", "votes": 54890, "seats": 2, "elected": [["Wantz", null], ["Wolff", null]]},
+          {"n": 6, "votes": 889, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Sud",
+        "cast": 74279, "blank": 1674, "invalid": 2505, "valid": 70100, "votes": 1578395, "quotient": 63136,
+        "lists": [
+          {"n": 1, "label": "Kommunistesch Partei", "votes": 249823, "seats": 4, "elected": [["Useldinger", null], ["Grandgenet", null], ["Flammang", null], ["Meis", null]]},
+          {"n": 2, "label": "Chrëschtlech-sozial Vollekspartei", "votes": 401606, "seats": 6, "elected": [["Spautz", null], ["Weller", null], ["Bürger", null], ["Dupong", null], ["Glesener", null], ["Lucius", null]]},
+          {"n": 3, "label": "Sozial-demokratesch Partei", "votes": 150335, "seats": 2, "elected": [["Lulling", null], ["Schleimer", null]]},
+          {"n": 4, "label": "Sozialistesch Arbechterpartei", "votes": 554682, "seats": 9, "elected": [["Berg", null], ["Vouel", null], ["Poos", null], ["Krier", null], ["Haupert", null], ["Knauf", null], ["Birtz", null], ["Brebsom", null], ["Bigelbach-Fohrmann", null]]},
+          {"n": 5, "label": "Demokratesch Partei", "votes": 213664, "seats": 3, "elected": [["Mart Marcel", null], ["Mart René", null], ["Berchem", null]]},
+          {"n": 6, "label": "Ligue communiste révolutionnaire", "votes": 8285, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Centre",
+        "registered": 68797, "cast": 60607, "valid": 57564, "votes": 1074204, "quotient": 51153,
+        "lists": [
+          {"n": 1, "label": "Parti communiste", "votes": 54782, "seats": 1, "elected": [["Dominique Urbany", null]]},
+          {"n": 2, "label": "Parti chrétien-social", "votes": 296450, "seats": 6, "elected": [["Werner", null], ["Santer", null], ["Grégoire", null], ["Burggraff", null], ["Bollendorff", null], ["Margue", null]]},
+          {"n": 3, "label": "Parti social-démocrate", "votes": 76551, "seats": 1, "elected": [["Bousser", null]]},
+          {"n": 4, "label": "Parti ouvrier-socialiste luxembourgeois", "votes": 252208, "seats": 5, "elected": [["Wohlfart", null], ["Hengel", null], ["Robert Krieps", null], ["Van den Bulcke", null], ["Gremling", null]]},
+          {"n": 5, "label": "Parti démocratique", "votes": 370193, "seats": 7, "elected": [["Thorn", null], ["Flesch", null], ["Polfer", null], ["Emile Krieps", null], ["Konen", null], ["Schaus", null], ["Hellinckx", null]]},
+          {"n": 6, "label": "Ligue communiste révolutionnaire", "votes": 5518, "seats": 0, "elected": []},
+          {"n": 7, "label": "Parti libéral luxembourgeois", "votes": 18502, "seats": 0, "elected": []}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1979-06-10",
+    "renewal": "general",
+    "doc": "1979",
+    "notes": [],
+    "contests": [
+      {
+        "district": "Sud",
+        "cast": 75859, "blank": 3161, "invalid": 2553, "valid": 70145, "votes": 1594849, "quotient": 63794,
+        "lists": [
+          {"n": 1, "label": "POSL", "votes": 482953, "seats": 8, "elected": [["Poos", null], ["Berg", null], ["Schmit", null], ["Thoss", null], ["Regenwetter", null], ["Brebsom", null], ["Krier", null], ["Dondelinger", null]]},
+          {"n": 2, "label": "PSD", "votes": 104799, "seats": 1, "elected": [["Lulling", null]]},
+          {"n": 3, "label": "PC", "votes": 143146, "seats": 2, "elected": [["Urbany", null], ["Bisdorff", null]]},
+          {"n": 4, "label": "PD", "votes": 245261, "seats": 4, "elected": [["Barthel", null], ["Mart", null], ["Berchem", null], ["Eyschen", null]]},
+          {"n": 5, "label": "Alternativ Lëscht Wiert Iech", "votes": 15843, "seats": 0, "elected": []},
+          {"n": 6, "label": "PCS", "votes": 486322, "seats": 8, "elected": [["Wolter", null], ["Spautz", null], ["Reding", null], ["Glesener", null], ["Burger", null], ["Colling", null], ["Lentz-Cornette", null], ["Lucius", null]]},
+          {"n": 7, "label": "LCR", "votes": 4468, "seats": 0, "elected": []},
+          {"n": 9, "label": "EF", "votes": 112057, "seats": 1, "elected": [["Weirich", null]]}
+        ]
+      },
+      {
+        "district": "Est",
+        "cast": 21270, "blank": 629, "invalid": 1039, "valid": 19602, "votes": 112824, "quotient": 16118,
+        "lists": [
+          {"n": 1, "label": "POSL", "votes": 18214, "seats": 1, "elected": [["Schlechter", null]]},
+          {"n": 2, "label": "PSD", "votes": 8275, "seats": 0, "elected": []},
+          {"n": 3, "label": "PC", "votes": 1735, "seats": 0, "elected": []},
+          {"n": 4, "label": "PD", "votes": 27009, "seats": 2, "elected": [["Wagner", null], ["Braun", null]]},
+          {"n": 5, "label": "Alternativ Lëscht Wiert Iech", "votes": 940, "seats": 0, "elected": []},
+          {"n": 6, "label": "PCS", "votes": 48552, "seats": 3, "elected": [["Boden", null], ["Urwald", null], ["Wagener", null]]},
+          {"n": 9, "label": "EF", "votes": 8099, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Centre",
+        "cast": 61808, "blank": 1664, "invalid": 2060, "valid": 58084, "votes": 1094785, "quotient": 52133,
+        "lists": [
+          {"n": 1, "label": "POSL", "votes": 195831, "seats": 4, "elected": [["R. Krieps", null], ["Wohlfart", null], ["Hengel", null], ["Van den Bulcke", null]]},
+          {"n": 2, "label": "PSD", "votes": 45179, "seats": 0, "elected": []},
+          {"n": 3, "label": "PC", "votes": 28766, "seats": 0, "elected": []},
+          {"n": 4, "label": "PD", "votes": 328503, "seats": 7, "elected": [["Thorn", null], ["Flesch", null], ["E. Krieps", null], ["Hamilius", null], ["Konen", null], ["Hellinckx", null], ["Meintz", null]]},
+          {"n": 5, "label": "Alternativ Lëscht Wiert Iech", "votes": 12182, "seats": 0, "elected": []},
+          {"n": 6, "label": "PCS", "votes": 407916, "seats": 8, "elected": [["Werner", null], ["Santer", null], ["Bollendorff", null], ["Muhlen", null], ["Margue", null], ["Rau", null], ["Mosar", null], ["Fischbach", null]]},
+          {"n": 7, "label": "LCR", "votes": 2517, "seats": 0, "elected": []},
+          {"n": 8, "label": "LP", "votes": 6133, "seats": 0, "elected": []},
+          {"n": 10, "label": "Liste Jean Gremling", "votes": 66909, "seats": 1, "elected": [["Gremling", null]]},
+          {"n": 11, "label": "Club des Indépendants", "votes": 849, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Nord",
+        "cast": 29972, "blank": 828, "invalid": 1167, "valid": 27977, "votes": 238795, "quotient": 23880,
+        "lists": [
+          {"n": 1, "label": "POSL", "votes": 40865, "seats": 1, "elected": [["Abens", null]]},
+          {"n": 2, "label": "PSD", "votes": 23552, "seats": 1, "elected": [["Cravatte", null]]},
+          {"n": 3, "label": "PC", "votes": 3639, "seats": 0, "elected": []},
+          {"n": 4, "label": "PD", "votes": 47631, "seats": 2, "elected": [["Goerens", null], ["Hubsch", null]]},
+          {"n": 5, "label": "Alternativ Lëscht Wiert Iech", "votes": 1304, "seats": 0, "elected": []},
+          {"n": 6, "label": "PCS", "votes": 106600, "seats": 5, "elected": [["Ney", null], ["Juncker", null], ["Steichen", null], ["Gerson", null], ["Dichter", null]]},
+          {"n": 9, "label": "EF", "votes": 15204, "seats": 0, "elected": []}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1984-06-17",
+    "renewal": "general",
+    "doc": "1984",
+    "notes": [
+      "The Chamber's verification sitting of 16 July 1984 prints the Sud's ballots as 77,732 found, 3,103 blank, 1,542 invalid (4,646 together) and 73,086 valid, so blank and invalid add up to one fewer than the printed sum; the figures are stored as printed. It names no deputy for the Centre's list 7 (GAP) and gives no seat count for it."
+    ],
+    "contests": [
+      {
+        "district": "Sud",
+        "cast": 77732, "blank": 3103, "invalid": 1542, "valid": 73086, "votes": 1703317, "quotient": 65512,
+        "lists": [
+          {"n": 1, "label": "PC", "votes": 124216, "seats": 2, "elected": [["René Urbany", null]]},
+          {"n": 2, "label": "POSL", "votes": 703259, "seats": 11, "elected": [["Jacques-F. Poos", null], ["Benny Berg", null], ["Jos. Brebsom", null], ["Jean Regenwetter", null], ["Lydie Err", null], ["Maurice Thoss", null], ["Alex Bodry", null], ["Nicolas Eickmann", null], ["Nicolas Birtz", null], ["Jean Asselborn", null], ["Willy Dondelinger", null]]},
+          {"n": 3, "label": "PCS", "votes": 543513, "seats": 8, "elected": [["Jean Spautz", null], ["Jean-Claude Juncker", null], ["François Colling", null], ["Viviane Reding", null], ["Marcelle Lentz-Cornette", null], ["Michel Wolter", null], ["Jean-Pierre Glesener", null], ["Camille Dimmer", null]]},
+          {"n": 4, "label": "PD", "votes": 199874, "seats": 3, "elected": [["Josy Barthel", null], ["René Mart", null], ["Henri Grethen", null]]},
+          {"n": 5, "label": "PSI", "votes": 31634, "seats": 0, "elected": []},
+          {"n": 6, "label": "LCR", "votes": 4047, "seats": 0, "elected": []},
+          {"n": 7, "label": "GAP", "votes": 96774, "seats": 1, "elected": [["Jean Huss", null]]}
+        ]
+      },
+      {
+        "district": "Est",
+        "cast": 22205, "blank": 770, "invalid": 514, "valid": 20921, "votes": 136852, "quotient": 17107,
+        "lists": [
+          {"n": 1, "label": "PC", "votes": 2844, "seats": 0, "elected": []},
+          {"n": 2, "label": "POSL", "votes": 35224, "seats": 2, "elected": [["Marcel Schlechter", null], ["Aly Schroeder", null]]},
+          {"n": 3, "label": "PCS", "votes": 57989, "seats": 3, "elected": [["Fernand Boden", null], ["Pol Wagener", null], ["Jean-Pierre Urwald", null]]},
+          {"n": 4, "label": "PD", "votes": 37501, "seats": 2, "elected": [["Paul Helminger", null], ["Victor Braun", null]]},
+          {"n": 5, "label": "PSI", "votes": 3294, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Centre",
+        "registered": 69603, "cast": 61233, "blank": 2216, "invalid": 1686, "valid": 57331, "votes": 1212024, "quotient": 50502,
+        "lists": [
+          {"n": 1, "label": "PC", "votes": 35191, "seats": 0, "elected": []},
+          {"n": 2, "label": "POSL", "votes": 307584, "seats": 6, "elected": [["Robert Krieps", null], ["René Hengel", null], ["Robert Goebbels", null], ["Joseph Wohlfart", null], ["René Kollwelter", null], ["Henri Ackermann", null]]},
+          {"n": 3, "label": "PCS", "votes": 437313, "seats": 9, "elected": [["Jacques Santer", null], ["Marc Fischbach", null], ["Astrid Lulling", null], ["Léon Bollendorff", null], ["Fernand Rau", null], ["Erna Hennicot-Schoepges", null], ["Ernest Muhlen", null], ["Nicolas Estgen", null], ["Nic. Mosar", null]]},
+          {"n": 4, "label": "PD", "votes": 314742, "seats": 7, "elected": [["Colette Flesch", null], ["Lydie Polfer épouse Wurth", null], ["Emile Krieps", null], ["René Konen", null], ["Carlo Meintz", null], ["Jean Hamilius", null], ["Anne Brasseur épouse Wagner", null]]},
+          {"n": 5, "label": "PSI", "votes": 41467, "seats": 0, "elected": []},
+          {"n": 6, "label": "LCR", "votes": 2639, "seats": 0, "elected": []},
+          {"n": 7, "label": "GAP", "votes": 73088, "elected": []}
+        ]
+      },
+      {
+        "district": "Nord",
+        "cast": 30481, "blank": 1072, "invalid": 753, "valid": 28656, "votes": 238769, "quotient": 23877,
+        "lists": [
+          {"n": 1, "label": "PC", "votes": 3709, "seats": 0, "elected": []},
+          {"n": 2, "label": "POSL", "votes": 58673, "seats": 2, "elected": [["Camille Weiler", null], ["Georges Wohlfart", null]]},
+          {"n": 3, "label": "PCS", "votes": 109270, "seats": 5, "elected": [["Édouard Juncker", null], ["Jean-Pierre Dichter", null], ["René Steichen", null], ["Marie-Josée Jacobs", null], ["Lucien Weiler", null]]},
+          {"n": 4, "label": "PD", "votes": 62510, "seats": 2, "elected": [["Charles Goerens", null], ["René Hubsch", null]]},
+          {"n": 5, "label": "PSI", "votes": 4607, "seats": 0, "elected": []}
+        ]
+      }
+    ]
+  },
+  {
+    "date": "1989-06-18",
+    "renewal": "general",
+    "doc": "1989",
+    "notes": [
+      "The Chamber's verification sitting of 18 July 1989 gives each list by number only; the list names stored are the ones the sitting itself attaches to deputies elected on them."
+    ],
+    "contests": [
+      {
+        "district": "Sud",
+        "cast": 78175, "blank": 2760, "invalid": 1675, "valid": 73740, "votes": 1586609, "quotient": 66109,
+        "lists": [
+          {"n": 1, "votes": 115839, "seats": 1, "elected": [["René Urbany", null]]},
+          {"n": 2, "votes": 148991, "seats": 2, "elected": [["Josy Barthel", null], ["Henri Grethen", null]]},
+          {"n": 3, "votes": 489316, "seats": 8, "elected": [["Jean-Claude Juncker", null], ["Jean Spautz", null], ["François Colling", null], ["Viviane Reding", null], ["Michel Wolter", null], ["René Putzeys", null], ["Marcelle Lentz-Cornette", null], ["Camille Dimmer", null]]},
+          {"n": 4, "votes": 535962, "seats": 9, "elected": [["Jacques F. Poos", null], ["Johny Lahure", null], ["Alex Bodry", null], ["Lucien Lux", null], ["Lydie Err", null], ["Jean Asselborn", null], ["Jos Brebsom", null], ["Mars Di Bartolomeo", null], ["Jean Regenwetter", null]]},
+          {"n": 7, "votes": 60336, "seats": 1, "elected": [["Jim Meisch", null]]},
+          {"n": 8, "votes": 8229, "seats": 0, "elected": []},
+          {"n": 9, "votes": 48556, "seats": 0, "elected": []},
+          {"n": 10, "votes": 77441, "seats": 1, "elected": [["Jean Huss", null]]},
+          {"n": 11, "votes": 101068, "seats": 1, "elected": [["Gaston Gibéryen", null]]},
+          {"n": 14, "votes": 871, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Est",
+        "cast": 22536, "blank": 581, "invalid": 634, "valid": 21321, "votes": 141669, "quotient": 17709,
+        "lists": [
+          {"n": 1, "votes": 2075, "seats": 0, "elected": []},
+          {"n": 2, "votes": 25899, "seats": 1, "elected": [["Robert Gitzinger", null]]},
+          {"n": 3, "votes": 47918, "seats": 3, "elected": [["Fernand Boden", null], ["Norbert Konter", null], ["Fernand Kons", null]]},
+          {"n": 4, "votes": 37328, "seats": 2, "elected": [["Marcel Schlechter", null], ["Jos Scheuer", null]]},
+          {"n": 5, "votes": 849, "seats": 0, "elected": []},
+          {"n": 7, "votes": 4176, "seats": 0, "elected": []},
+          {"n": 9, "votes": 2606, "seats": 0, "elected": []},
+          {"n": 10, "votes": 4636, "seats": 0, "elected": []},
+          {"n": 11, "votes": 16182, "seats": 1, "elected": [["Robert Mehlen", null]]}
+        ]
+      },
+      {
+        "district": "Centre",
+        "cast": 59591, "blank": 1796, "invalid": 1446, "valid": 56349, "votes": 1102619, "quotient": 50120,
+        "lists": [
+          {"n": 1, "votes": 35725, "seats": 0, "elected": []},
+          {"n": 2, "label": "Parti démocratique", "votes": 266981, "seats": 6, "elected": [["Lydie Wurth-Polfer", null], ["Colette Flesch", null], ["Anne Brasseur", null], ["Emile Krieps", null], ["Carlo Meintz", null], ["René Konen", null]]},
+          {"n": 3, "votes": 344500, "seats": 7, "elected": [["Jacques Santer", null], ["Marc Fischbach", null], ["Fernand Rau", null], ["Erna Hennicot-Schoepges", null], ["Willy Bourg", null], ["Alphonse Theis", null], ["Pierre Frieden", null]]},
+          {"n": 4, "votes": 215697, "seats": 5, "elected": [["Mady Delvaux-Stehres", null], ["Robert Goebbels", null], ["René Hengel", null], ["Robert Krieps", null], ["Ben Fayot", null]]},
+          {"n": 6, "votes": 1413, "seats": 0, "elected": []},
+          {"n": 7, "votes": 64992, "seats": 1, "elected": [["Jup Weber", null]]},
+          {"n": 9, "votes": 30847, "seats": 0, "elected": []},
+          {"n": 10, "label": "Gréng Alternativ Partei", "votes": 45530, "seats": 1, "elected": [["Thers Bodé", null]]},
+          {"n": 11, "votes": 83021, "seats": 1, "elected": [["Josy Simon", null]]},
+          {"n": 15, "votes": 5807, "seats": 0, "elected": []},
+          {"n": 16, "votes": 8106, "seats": 0, "elected": []}
+        ]
+      },
+      {
+        "district": "Nord",
+        "cast": 31030, "blank": 948, "invalid": 759, "valid": 29323, "votes": 246490, "quotient": 24650,
+        "lists": [
+          {"n": 1, "votes": 3626, "seats": 0, "elected": []},
+          {"n": 2, "votes": 55760, "seats": 2, "elected": [["Charles Goerens", null], ["Emile Calmes", null]]},
+          {"n": 3, "votes": 92769, "seats": 4, "elected": [["René Steichen", null], ["Edouard Juncker", null], ["Henri Mausen", null], ["Marie-Josée Jacobs", null]]},
+          {"n": 4, "votes": 48900, "seats": 2, "elected": [["Georges Wohlfart", null], ["Camille Weiler", null]]},
+          {"n": 11, "votes": 24773, "seats": 1, "elected": [["Jean-Pierre Koepp", null]]},
+          {"n": 12, "votes": 4013, "seats": 0, "elected": []},
+          {"n": 13, "votes": 16649, "seats": 0, "elected": []}
+        ]
+      }
+    ]
+  }
+]
