@@ -1471,7 +1471,7 @@ def _elect(
             raise ValueError(f"{vote.day}: {label} is missing from the Kandidati sheet")
         if marked[label]:
             won[owner[index]] += 1
-            p.add("outcome", result_set_id=result_set, option_id=options[index], candidacy_id=candidacy, kind="elected")
+            p.add("outcome", result_set_id=result_set, option_id=owner[index], candidacy_id=candidacy, kind="elected")
     if sum(won.values()) != EP_SEATS[vote.day.year]:
         raise ValueError(f"{vote.day}: {sum(won.values())} candidates are marked elected")
     for option, seats in won.items():
