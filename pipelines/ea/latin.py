@@ -38,7 +38,7 @@ BOX = "storagebox:names"
 TICKET = ("5370", "electarchive/ops")
 LIMIT = 300_000
 MODEL = "claude-haiku-5-5"
-EFFORT = "medium"
+EFFORT = "low"
 JOB_CAP = 40.0
 CHUNK_CHARS = 6_000
 GENERATED = ("transliteration", "english", "official")
@@ -192,6 +192,7 @@ TAIWAN_UNITS = {
     "縣": "County",
 }
 DISTRICT = re.compile(r"^[가-힣\d\s]+(?:선거구|제\d+|[시군구읍면동리가][갑을병정무]?)$")
+NUMBERED = re.compile(r"^\d+ - ")
 ROMAN = {"II", "III", "IV", "VI", "VII", "VIII", "IX", "XI", "XII"}
 
 
@@ -538,6 +539,9 @@ def plan(entity: Entity, answers: dict[str, dict[str, object]]) -> tuple[list[Na
             return names, [*wants, want]
         romanized = answer.get("latin")
         if isinstance(romanized, str) and latin(romanized):
+            lead = NUMBERED.match(text)
+            if lead is not None and not romanized.startswith(lead[0]):
+                romanized = lead[0] + romanized
             names.append(Name(id, tidy(romanized), lang, "Latn", "transliteration"))
         return names, wants
     source = cased if group == "person" else titled(text, True)
