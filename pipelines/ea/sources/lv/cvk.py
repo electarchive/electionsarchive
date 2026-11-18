@@ -4,12 +4,14 @@ import xml.etree.ElementTree as ET
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date
+from functools import cache
 from html.parser import HTMLParser
 from typing import Any
 from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.lv import boundaries
 
 SOURCE = "lv.cvk"
 LATVIA = str(uuid5(package.NAMESPACE, "polity\x1fLV"))
@@ -364,9 +366,23 @@ def read(day: str) -> Reading:
     return Reading(nodes, names, _running(prefix), _elected(prefix))
 
 
+@cache
+def pv_plan() -> boundaries.Plan:
+    """The shapes of the councils and districts of 1990 to 2009 and the units of each council election."""
+    days = {
+        day: [boundaries.Council(day, c.code, c.name, c.group) for c in read_local(day).councils] for day in LOCAL_DAYS
+    }
+    return boundaries.build(boundaries.Atlas(), days)
+
+
+def geo_pv() -> Package:
+    return boundaries.geo(boundaries.Atlas(), pv_plan())
+
+
 def packages() -> list[str]:
     return [
         "lv.cvk/geo",
+        "lv.cvk/geo-pv",
         "lv.cvk/registry",
         "lv.cvk/registry-pv",
         *(
@@ -397,10 +413,12 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".html")
     fetch_early()
     fetch_local()
+    boundaries.fetch()
 
 
 def parse() -> None:
     geo().write()
+    geo_pv().write()
     registry().write()
     pv_registry().write()
     for day in DAYS:
@@ -1139,7 +1157,9 @@ def referendum_archive(day: str) -> Package:
         f"lv.cvk/tn-{day}",
         SOURCE,
         f"The {vote.english} from the Central Election Commission's archive",
-        depends=["lv.cvk/geo", "lv.cvk/registry"],
+        depends=["lv.cvk/geo", "lv.cvk/geo-pv", "lv.cvk/registry"]
+        if day == "2003-09-20"
+        else ["lv.cvk/geo", "lv.cvk/registry"],
     )
     p.external |= {LATVIA, COUNTRY}
     page = raw.cached(SOURCE, tn_url(day))
@@ -1209,14 +1229,15 @@ def referendum_archive(day: str) -> Package:
             for territory in territories:
                 code = f"{day}:tn:{territory.name}"
                 unit = key("unit", code)
+                place = pv_plan().district(territory.name)
                 p.add(
                     "reporting_unit",
                     id=unit,
                     polity_id=LATVIA,
                     scheme_code="lv.pasvaldiba",
                     code=code,
-                    area_relation="unlocated",
-                    area_id=None,
+                    area_relation="equals" if place else "unlocated",
+                    area_id=place,
                     kind="standard",
                 )
                 p.name(unit, territory.name, "lv", "official")
@@ -2221,7 +2242,12 @@ def build_legacy(day: str) -> Package:
         f"lv.cvk/{day}",
         SOURCE,
         f"The {english} by the finest unit the Central Election Commission publishes",
-        depends=["lv.cvk/geo", "lv.cvk/registry"],
+        depends=[
+            "lv.cvk/geo",
+            *(["lv.cvk/geo-pv"] if day == "2004-06-12" else []),
+            "lv.cvk/registry",
+            "lv.cvk/registry-pv",
+        ],
     )
     p.external |= {LATVIA, COUNTRY}
     p.uses(raw.cached(SOURCE, legacy_url(day)))
@@ -2300,16 +2326,17 @@ def build_legacy(day: str) -> Package:
                 p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=scope.seats[n])
         for u in scope.units:
             unit = key("unit", u.code)
+            place = pv_plan().district(u.name) if day == "2004-06-12" else None
             p.add(
                 "reporting_unit",
                 id=unit,
                 polity_id=LATVIA,
                 scheme_code=data.level,
                 code=u.code,
-                area_relation="equals" if data.level != "lv.pasvaldiba" else "unlocated",
+                area_relation="equals" if data.level != "lv.pasvaldiba" or place else "unlocated",
                 area_id=(area("lv.apgabals", region) if data.level == "lv.apgabals" and region else COUNTRY)
                 if data.level != "lv.pasvaldiba"
-                else None,
+                else place,
                 kind="aggregate" if data.level != "lv.pasvaldiba" else "standard",
             )
             p.name(unit, u.name, "lv", "official")
@@ -3158,7 +3185,7 @@ def local(day: str) -> Package:
         f"lv.cvk/{day}",
         SOURCE,
         f"The {english} from the Central Election Commission's archive",
-        depends=["lv.cvk/geo", "lv.cvk/registry-pv"],
+        depends=["lv.cvk/geo", "lv.cvk/geo-pv", "lv.cvk/registry-pv"],
     )
     p.external |= {LATVIA, COUNTRY}
     for url in (PV_ROOT, PV_PAGES[day], *data.urls):
@@ -3176,11 +3203,13 @@ def local(day: str) -> Package:
         slug = changeset.slug(council.name)
         used[slug] += 1
         slug = slug if used[slug] == 1 else f"{slug}-{changeset.slug(council.group) or used[slug]}"
+        place = pv_plan().councils.get((day, council.code))
         p.add(
             "contest",
             id=contest,
             election_id=election,
             kind="list_allocation",
+            district_area_id=place,
             magnitude=council.seats,
             round_number=1,
             electoral_system_id=SYSTEM_PV,
@@ -3216,8 +3245,8 @@ def local(day: str) -> Package:
                 polity_id=LATVIA,
                 scheme_code="lv.pasvaldiba",
                 code=council.code,
-                area_relation="unlocated",
-                area_id=None,
+                area_relation="equals" if place else "unlocated",
+                area_id=place,
                 kind="aggregate",
             )
             p.name(unit, council.name, "lv", "official")
