@@ -1689,67 +1689,67 @@
           "note": "IX Ordinary National Assembly. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
         },
         {
-          "date": "1899-04-25",
+          "date": "1899-05-07",
           "seats": 169,
           "source": "nsi_sg1909",
           "quote": "Таблица 2, „Дата на главнитѣ избори“ / „Брой на подлежащитѣ за избиране нар. представ.“: „1899. априлъ 25 — avril 1899 … 169“",
-          "note": "X Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+          "note": "X Ordinary National Assembly. The yearbook prints the Julian (Old Style) date, which is converted here by adding 12 days, the offset before March 1900; Bulgaria adopted the Gregorian calendar only in April 1916, and the converted date falls on a Sunday."
         },
         {
-          "date": "1901-01-28",
+          "date": "1901-02-10",
           "seats": 167,
           "source": "nsi_sg1909",
           "quote": "Таблица 2, „Дата на главнитѣ избори“ / „Брой на подлежащитѣ за избиране нар. представ.“: „1901. януарий 28 — janvier 1901 … 167“",
-          "note": "XI Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+          "note": "XI Ordinary National Assembly. The yearbook prints the Julian (Old Style) date, which is converted here by adding 13 days; Bulgaria adopted the Gregorian calendar only in April 1916, and the converted date falls on a Sunday."
         },
         {
-          "date": "1902-02-17",
+          "date": "1902-03-02",
           "seats": 189,
           "source": "nsi_sg1909",
           "quote": "Таблица 2, „Дата на главнитѣ избори“ / „Брой на подлежащитѣ за избиране нар. представ.“: „1902. февруарий 17 — février 1902 … 189“",
-          "note": "XII Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+          "note": "XII Ordinary National Assembly. The yearbook prints the Julian (Old Style) date, which is converted here by adding 13 days; Bulgaria adopted the Gregorian calendar only in April 1916, and the converted date falls on a Sunday."
         },
         {
-          "date": "1903-10-19",
+          "date": "1903-11-01",
           "seats": 189,
           "source": "nsi_sg1940",
           "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „19. X. 1903 | XIII | 189“",
-          "note": "XIII Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+          "note": "XIII Ordinary National Assembly. The yearbook prints the Julian (Old Style) date, which is converted here by adding 13 days; Bulgaria adopted the Gregorian calendar only in April 1916, and the converted date falls on a Sunday."
         },
         {
-          "date": "1908-05-25",
+          "date": "1908-06-07",
           "seats": 203,
           "source": "nsi_sg1940",
           "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „25. V. 1908 | XIV | 203“",
-          "note": "XIV Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+          "note": "XIV Ordinary National Assembly. The yearbook prints the Julian (Old Style) date, which is converted here by adding 13 days; Bulgaria adopted the Gregorian calendar only in April 1916, and the converted date falls on a Sunday."
         },
         {
-          "date": "1911-06-05",
+          "date": "1911-06-18",
           "seats": 426,
           "source": "nsi_sg1940",
           "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „5. VI. 1911 | V | 426“; бележка: „Изборите, произведени на 5. VI. 1911, се отнасятъ за V-то Велико народно събрание“",
-          "note": "V Grand National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+          "note": "V Grand National Assembly. The yearbook prints the Julian (Old Style) date, which is converted here by adding 13 days; Bulgaria adopted the Gregorian calendar only in April 1916, and the converted date falls on a Sunday."
         },
         {
-          "date": "1911-09-04",
+          "date": "1911-09-17",
           "seats": 213,
           "source": "nsi_sg1940",
           "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „4. IX. 1911 | XV | 170“ и „XV | 43“; бележка: мажоритарна система, „съ изключение на бившите окржзи Пловдивъ и Търново, кждето изборите сж произведени по пропорционалната система“",
-          "note": "XV Ordinary National Assembly: 170 seats by majority and 43 by PR in Plovdiv and Tarnovo, 213 in all. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+          "note": "XV Ordinary National Assembly: 170 seats by majority and 43 by PR in Plovdiv and Tarnovo, 213 in all. The yearbook prints the Julian (Old Style) date, which is converted here by adding 13 days; Bulgaria adopted the Gregorian calendar only in April 1916, and the converted date falls on a Sunday."
         },
         {
-          "date": "1913-11-24",
+          "date": "1913-12-07",
           "seats": 204,
           "source": "nsi_sg1940",
           "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „24. XI. 1913 | XVI | 204“",
-          "note": "XVI Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+          "note": "XVI Ordinary National Assembly. The yearbook prints the Julian (Old Style) date, which is converted here by adding 13 days; Bulgaria adopted the Gregorian calendar only in April 1916, and the converted date falls on a Sunday."
         },
         {
-          "date": "1914-02-23",
+          "date": "1914-03-08",
           "seats": 245,
           "source": "nsi_sg1940",
           "quote": "Таблица 1, „Дата на изборите“ / „Народни събрания“ / „Народни представители“: „23. II. 1914 | XVII | 245“",
-          "note": "XVII Ordinary National Assembly. Date as printed in the yearbook; dates before 1916 are not converted to the Gregorian calendar."
+          "note": "XVII Ordinary National Assembly. The yearbook prints the Julian (Old Style) date, which is converted here by adding 13 days; Bulgaria adopted the Gregorian calendar only in April 1916, and the converted date falls on a Sunday."
         },
         {
           "date": "1919-08-17",
@@ -1832,7 +1832,7 @@
           "access": "manual",
           "checked_at": "2026-11-17T00:00:00Z",
           "source": "nsi_sg1940",
-          "first_date": "1899-04-25",
+          "first_date": "1899-05-07",
           "last_date": "1945-11-18",
           "evidence": "Statistical yearbooks with a table of each legislative election from 1899, and volumes of election statistics by district for the X–XXI Ordinary and V Grand National Assemblies (1899–1927)."
         }
