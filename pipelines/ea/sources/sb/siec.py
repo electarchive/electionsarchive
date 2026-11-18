@@ -26,6 +26,7 @@ GAZETTES = {
     "general": f"{UPLOADS}/Gaz-No.-70-Tuesday-30th-April-2024.pdf",
     "provincial": f"{UPLOADS}/Gaz-No.-71-Tuesday-30th-April-2024.pdf",
     "honiara": f"{UPLOADS}/Gaz-No.-72-Tuesday-30th-April-2024.pdf",
+    "uncontested": f"{UPLOADS}/Gaz-No.-73-Tuesday-30th-April-2024.pdf",
 }
 VOTES, REGISTERED, CAST, INVALID = 1, 2, 3, 5
 
@@ -34,6 +35,11 @@ METHOD = (
     "{place}: each candidate's votes, the rejected votes, the registered electors recorded as voted, and the "
     "registered electors. The Commission publishes no valid-vote total and no national total. Figures are stored as "
     "printed."
+)
+UNCONTESTED_METHOD = (
+    "Published in the Commission's extra-ordinary gazette of 30 April 2024 as the returning officer's declaration that "
+    "the {place} seat was uncontested: one valid nomination was received, so its sole candidate is declared elected. "
+    "No votes were cast, and the notice gives no electors figures."
 )
 # The Kaloka and Matakwalao notices print the form's placeholder, "(Name of province)", where the province belongs;
 # the Commission's page of declared winners lists the seats under Isabel and Malaita.
@@ -65,6 +71,7 @@ class Notice:
     rejected: int
     voted: int
     registered: int
+    uncontested: bool = False
 
 
 def clean(text: str) -> str:
@@ -83,6 +90,35 @@ def text_of(election: str) -> str:
     path = raw.cached(SOURCE, GAZETTES[election]).path
     done = subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True)
     return re.sub(r"^[ \t\f]*\d+[ \t]*\n", "", done.stdout, flags=re.MULTILINE)  # page numbers
+
+
+def uncontested(election: str) -> list[Notice]:
+    """The seats Gazette 73 declares uncontested, each with its sole candidate as printed (surname first)."""
+    found: list[Notice] = []
+    for part in re.split(r"(?=NOTIFICATION OF SUCCESSFUL CANDIDATE)", text_of("uncontested"))[1:]:
+        officer = re.search(
+            r"Returning Officer for the\s+(.+?)\s+(Provincial|Council)\s+Ward\s+in,?\s+(.+?)\s+hereby", part, re.DOTALL
+        )
+        sole = re.search(r"namely\s+(.+?),\s+has\s+met", part, re.DOTALL)
+        if officer is None or sole is None:
+            raise ValueError(f"unreadable uncontested notice: {part[:200]!r}")
+        if (officer.group(2) == "Council") != (election == "honiara"):
+            continue
+        province = "" if election == "honiara" else re.sub(r"\s+Province$", "", clean(officer.group(3)))
+        found.append(
+            Notice(
+                election,
+                clean(officer.group(1)),
+                province,
+                clean(sole.group(1)),
+                [(1, clean(sole.group(1)), 0)],
+                0,
+                0,
+                0,
+                True,
+            )
+        )
+    return found
 
 
 def notices(election: str) -> list[Notice]:
@@ -139,7 +175,7 @@ def notices(election: str) -> list[Notice]:
                 number(registered.group(1)),
             )
         )
-    return found
+    return found + (uncontested(election) if election != "general" else [])
 
 
 def winners() -> list[tuple[str, str, str, str]]:
@@ -314,7 +350,7 @@ def build() -> Package:
         f"{SOURCE}/{DAY}",
         SOURCE,
         "The Solomon Islands joint election of 17 April 2024 by constituency and ward, from the Electoral Commission's "
-        "gazettes",
+        "gazettes, with the three uncontested wards",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external.add(COUNTRY)
@@ -385,14 +421,14 @@ def _contest(
         source_id=SIEC_SOURCE,
         status="active",
         is_default=True,
-        completeness=1.0,
+        completeness=0.0 if notice.uncontested else 1.0,
     )
     p.add(
         "note",
         id=key("note", result_set),
         entity_id=result_set,
         kind="methodology",
-        body_md=METHOD.format(place=place),
+        body_md=(UNCONTESTED_METHOD if notice.uncontested else METHOD).format(place=place),
         lang="en",
     )
     unit = key("unit", code)
@@ -407,8 +443,9 @@ def _contest(
         kind="standard",
     )
     p.name(unit, place, "en", "official")
-    for measure, value in ((REGISTERED, notice.registered), (CAST, notice.voted), (INVALID, notice.rejected)):
-        _put(p, result_set, unit, None, measure, value)
+    if not notice.uncontested:
+        for measure, value in ((REGISTERED, notice.registered), (CAST, notice.voted), (INVALID, notice.rejected)):
+            _put(p, result_set, unit, None, measure, value)
     party = affiliation(election, notice, table)
     for rank, label, votes in notice.candidates:
         option = key("option", code, rank)
@@ -440,7 +477,8 @@ def _contest(
         )
         if winner:
             p.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
-        _put(p, result_set, unit, option, VOTES, votes)
+        if not notice.uncontested:
+            _put(p, result_set, unit, option, VOTES, votes)
 
 
 def _put(p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int) -> None:
