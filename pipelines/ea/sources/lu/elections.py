@@ -904,7 +904,12 @@ def registry() -> Package:
     p.name(CHAMBER, "Chamber of Deputies", "en", "official")
     p.name(CHAMBER, "Chambre des Députés", "fr", "native", False)
     p.name(CHAMBER, "Chamber vun den Deputéierten", "lb", "native", False)
-    communes = {slug(c): c for name in reversed(NAMES_ALL) if family_of(name) == "communal" for c in places_of(name)}
+    communes = {
+        slug(commune_name(c)): commune_name(c)
+        for name in reversed(NAMES_ALL)
+        if family_of(name) == "communal"
+        for c in places_of(name)
+    }
     for commune in sorted(communes.values(), key=slug):
         id = council(commune)
         p.add("body", id=id, polity_id=LUXEMBOURG, kind="council")
