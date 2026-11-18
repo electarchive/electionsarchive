@@ -25,6 +25,7 @@ SOURCE = "pa.te"
 SITE = "https://www.tribunal-electoral.gob.pa"
 BROWSER = "browser://20261116-222948-d9df9f/"
 BROWSER_DECLARED = "browser://20261118-025251-af3923/"
+BROWSER_2004 = "browser://20261118-191617-f79bfe/"
 INBOX = DATA / "inbox" / "pa.te"
 
 # Measures
@@ -36,12 +37,14 @@ DOWNLOAD = SITE + "/wp-content/plugins/download-attachments/includes/download.ph
 
 
 def url(name: str) -> str:
-    """The URL a file was cached under: a full URL, a site download id written `dl:<id>`, or a name saved in the
-    browser."""
+    """The URL a file was cached under: a full URL, a site download id written `dl:<id>`, `d:<name>` for a 2004 table
+    saved in the browser, or a name saved in the browser."""
     if name.startswith("https://"):
         return name
     if name.startswith("dl:"):
         return DOWNLOAD + name[3:]
+    if name.startswith("d:"):
+        return BROWSER_2004 + name[2:]
     return BROWSER_DECLARED + name[2:] if name.startswith("b:") else BROWSER + name
 
 
@@ -669,7 +672,7 @@ def load_2009() -> Election:
 
 def load_2004() -> Election:
     e = Election(2004, date(2004, 5, 2), [])
-    names = ["dl:6948", "dl:6949", "dl:6951", "dl:6955", "dl:6942", "dl:6945"]
+    names = ["dl:6948", *(f"d:cuadro-{n}.xls" for n in ("02", "04", "08", "11", "14"))]
     e.files = names
     president_table(2004, next(iter(grids(names[0]).values())), C1, next(iter(grids(names[1]).values())), e)
     party_table(next(iter(grids(names[2]).values())), "dep", e, "c", "deputy")
