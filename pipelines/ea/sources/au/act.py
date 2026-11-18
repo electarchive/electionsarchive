@@ -11,6 +11,7 @@ import unicodedata
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date
+from html import unescape
 from html.parser import HTMLParser
 from pathlib import Path
 from uuid import uuid5
@@ -66,6 +67,7 @@ DAYS = {
     2024: date(2024, 10, 19),
 }
 BOOKS = {2001: "xls", 2004: "xls", 2012: "xlsx", 2016: "xlsx", 2020: "xlsx", 2024: "xlsx"}
+PLACES = {*BOOKS, 2008}
 SHEETS = {
     "Brindabella": "Brin",
     "Ginninderra": "Ginn",
@@ -512,7 +514,100 @@ def pdf_electorates() -> list[Electorate]:
     enrol = next(line for line in lines if re.match(r"\s+Enrolment\s+\d", line))
     for electorate, value in zip(out, re.findall(r"\d+", enrol), strict=False):
         electorate.enrolled = int(value)
+    pdf_places(out)
     return out
+
+
+@functools.cache
+def pdf_pages(name: str) -> list[list[tuple[float, float, float, str]]]:
+    """The words of each page as (left, right, top, text), from the positions the PDF gives them."""
+    done = subprocess.run(
+        ["pdftotext", "-bbox", str(cached(name).path), "-"], check=True, capture_output=True, text=True
+    )
+    pattern = r'xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="[\d.]+">(.*?)</word>'
+    return [
+        [(float(a), float(c), float(b), unescape(w)) for a, b, c, w in re.findall(pattern, page)]
+        for page in done.stdout.split("<page ")[1:]
+    ]
+
+
+def text_lines(words: list[tuple[float, float, float, str]]) -> list[list[tuple[float, float, float, str]]]:
+    lines: list[list[tuple[float, float, float, str]]] = []
+    for word in sorted(words, key=lambda w: (w[2], w[0])):
+        if lines and abs(word[2] - lines[-1][0][2]) < 3:
+            lines[-1].append(word)
+        else:
+            lines.append([word])
+    return [sorted(line) for line in lines]
+
+
+def pdf_place_page(
+    lines: list[list[tuple[float, float, float, str]]],
+) -> tuple[str, list[str], list[tuple[str, dict[int, int]]]]:
+    """The electorate, the polling place columns, and each row's label with its counts by column, from one page."""
+    title = next(
+        i
+        for i, line in enumerate(lines)
+        if " ".join(w[3] for w in line).startswith("Table 2.") and ":" in " ".join(w[3] for w in line)
+    )
+    electorate = " ".join(w[3] for w in lines[title]).rsplit(":", 1)[1].strip()
+    head = next(i for i, line in enumerate(lines) if line[0][3] == "Candidate")
+    heads: list[tuple[float, list[tuple[float, str]]]] = []
+    for line in lines[title + 1 : head + 1]:
+        phrase: list[tuple[float, float, str]] = []
+        for left, right, _, text in [w for w in line if w[0] > 185] + [(1e9, 1e9, 0.0, "")]:
+            if phrase and left - phrase[-1][1] > 6:
+                centre = (phrase[0][0] + phrase[-1][1]) / 2
+                near = next((h for h in heads if abs(h[0] - centre) < 22), None)
+                if near is None:
+                    near = (centre, [])
+                    heads.append(near)
+                near[1].append((line[0][2], " ".join(t for _, _, t in phrase)))
+                phrase = []
+            phrase.append((left, right, text))
+    heads.sort()
+    names = [clean(" ".join(t for _, t in sorted(h[1]))).replace("Pre- Poll", "Pre-Poll") for h in heads]
+    rows = []
+    for line in lines[head + 1 :]:
+        label = clean(" ".join(w[3] for w in line if w[0] < 150))
+        counts: dict[int, int] = {}
+        for _, right, _, text in line:
+            if right > 185 and re.fullmatch(r"\d+", text):
+                counts[min(range(len(heads)), key=lambda i: abs(heads[i][0] - right))] = int(text)
+        if label and counts:
+            rows.append((label, counts))
+    return electorate, names, rows
+
+
+def pdf_places(electorates: list[Electorate]) -> None:
+    """Add the polling places of Tables 2.1 to 2.3, whose pages each hold a few of the places as columns."""
+    by_name = {e.name: e for e in electorates}
+    for words in pdf_pages("pdf-2008"):
+        lines = text_lines(words)
+        if not any(re.match(r"Table 2\.\d .*:", " ".join(w[3] for w in line)) for line in lines):
+            continue
+        name, columns, rows = pdf_place_page(lines)
+        electorate = by_name[name]
+        candidates = {clean(c.name): c for c in electorate.candidates}
+        places = {}
+        for index, column in enumerate(columns):
+            if column.lower() == "total" or not any(index in counts for _, counts in rows):
+                continue
+            seen = sum(1 for p in electorate.places if p.name == column or p.name.startswith(f"{column} ("))
+            places[index] = Place(column if not seen else f"{column} ({seen + 1})")
+            electorate.places.append(places[index])
+        for label, counts in rows:
+            for index, place in places.items():
+                value = counts.get(index)
+                if label in candidates:
+                    if value is not None:
+                        candidates[label].votes[place.name] = value
+                elif label == "Formal":
+                    place.formal = value
+                elif label == "Informal":
+                    place.informal = value
+                elif label == "Polling place total":
+                    place.cast = value
 
 
 # The territory-wide elections of 1989 and 1992
@@ -746,7 +841,7 @@ def build(year: int) -> Package:
         f"{SOURCE}/{year}",
         SOURCE,
         f"The {year} Australian Capital Territory Legislative Assembly election"
-        + (" by polling place" if year in BOOKS else ""),
+        + (" by polling place" if year in PLACES else ""),
         depends=[f"{SOURCE}/registry"],
     )
     p.external.add(AUSTRALIA)
@@ -845,7 +940,7 @@ def build_territory(p: Package, year: int, election: str, path: str) -> None:
 
 
 def build_electorates(p: Package, year: int, election: str, path: str) -> None:
-    places_held = year in BOOKS
+    places_held = year in PLACES
     mismatched: list[str] = []
     for electorate in electorates(year):
         name = electorate.name
