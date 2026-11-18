@@ -7,7 +7,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.mn import early, local, parliament, places, polls, sheets, translit
+from ea.sources.mn import early, local, parliament, places, polls, sheets, soums, translit
 
 SOURCE = "mn.gec"
 MONGOLIA = str(uuid5(package.NAMESPACE, "polity\x1fMN"))
@@ -302,6 +302,7 @@ def early_packages() -> list[str]:
         f"{SOURCE}/{early.DAY_2012}",
         f"{SOURCE}/{early.DAY_2012}-local",
         f"{SOURCE}/{early.DAY_2016}",
+        f"{SOURCE}/{early.DAY_2016}-soum",
         f"{SOURCE}/{early_local_2016().key}",
     ]
 
@@ -328,6 +329,7 @@ def parse() -> None:
     early_legislature(early.DAY_2012).write()
     early_capital_list_2012().write()
     early_legislature(early.DAY_2016).write()
+    legislature_2016_soums().write()
     councils(early_local_2016()).write()
 
 
@@ -1395,4 +1397,116 @@ def early_capital_list_2012() -> Package:
         "Votes are stored per party or coalition and polling section, as the Commission counted them.",
     )
     _early_list(p, tag, "capital-list", contest_id, result_set, block, units)
+    return p
+
+
+@functools.cache
+def soum_units_2016() -> list[soums.Unit]:
+    return [unit for sheet in soums.read_books() for unit in soums.units(sheet)]
+
+
+SOUM_METHOD = (
+    "Each of the 76 constituencies elects one member, the candidate with the most votes. For the constituencies of "
+    "the provinces the Commission published a count for each soum, with the soum's registered voters, ballots cast, "
+    "valid ballots, and ballots with no mark; votes are stored per candidate and soum as it printed them. A soum "
+    "that lies in more than one constituency is counted for each constituency separately, and the Commission's "
+    "sheets for Darkhan-Uul and Orkhon, which list the polling sections of each soum, are summed to the soum."
+)
+SOUM_NOTES = {
+    11: "The Commission's sheet notes that it voided the 239 votes cast for one candidate of the Mongolian People's "
+    "Revolutionary Party; the sheet still counts them, and they stay in the stored votes.",
+    34: "The soum of Jargalant, the province center, lies in constituencies 34, 35, and 36: its baghs Bugat, Jargalan, "
+    "Rashaant, and Khairkhan are in 34, Baatarkhairkhan, Bichigt, Naran, and Takhilt in 35, and Alagtolgoi, Buyant, "
+    "Magsarjav, and Tsambagarav in 36. The Dörgön line of this sheet counts 426 ballots with no mark, and its "
+    "candidate votes are 422 lower than the same constituency's polling-section count.",
+}
+
+
+def legislature_2016_soums() -> Package:
+    """The 2016 State Great Khural by soum, as a second result set for each province constituency."""
+    day = early.DAY_2016
+    p = Package(
+        f"{SOURCE}/{day}-soum",
+        SOURCE,
+        "The 2016 Mongolian parliamentary election by soum, for the 48 constituencies of the provinces, from the "
+        "General Election Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/early", f"{SOURCE}/{day}"],
+    )
+    p.external |= {MONGOLIA, TERRITORY}
+    for name in (*soums.BOOKS, soums.TURNOUT):
+        p.artifact(raw.cached(SOURCE, sheets.url(name)), GEC_SOURCE)
+    # The soums of the sheets join the geo package's soums: a soum the geo package already holds has the same id and
+    # the same rows, so loading it again changes nothing.
+    for place in sorted(
+        {soums.place(unit.aimag, unit.soum) for unit in soum_units_2016()}, key=lambda place: place.code
+    ):
+        id = area("mn.soum", place.code)
+        p.add("area", id=id, scheme_code="mn.soum")
+        p.add("area_code", area_id=id, code=place.code)
+        p.add("area_parent", area_id=id, parent_id=area("mn.aimag", place.aimag))
+        p.name(id, place.soum, "mn", "native")
+    known = {contest.number: contest for contest in early.parliament_2016()}
+    rows = soum_units_2016()
+    elsewhere: dict[str, set[int]] = {}
+    for unit in rows:
+        elsewhere.setdefault(soums.place(unit.aimag, unit.soum).code, set()).add(unit.constituency)
+    declared: dict[int, soums.Sheet] = {}
+    for sheet in soums.read_books():
+        for number in sheet.contests:
+            declared[number] = sheet
+    election_id = key("election", str(day))
+    suffix = f"{day}-soum"
+    for number in sorted(declared):
+        candidates = declared[number].contests[number]
+        existing = known[number].candidates
+        if [c.label.replace("*", "").replace(" ", "").casefold() for c in candidates] != [
+            c.label.replace(" ", "").casefold() for c in existing
+        ]:
+            raise ValueError(f"constituency {number}: candidates differ from the polling-section workbook")
+        tag = str(number)
+        contest = key("contest", str(day), tag)
+        result_set = key("result_set", suffix, tag)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election_id,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=GEC_SOURCE,
+            status="active",
+            is_default=False,
+            completeness=1.0,
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=" ".join(filter(None, [SOUM_METHOD, SOUM_NOTES.get(number)])),
+            lang="en",
+        )
+        options = [key("option", str(day), tag, index) for index in range(len(candidates))]
+        for option, candidate in zip(options, candidates, strict=True):
+            p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=candidate.total)
+        for unit in (u for u in rows if u.constituency == number):
+            place = soums.place(unit.aimag, unit.soum)
+            whole = elsewhere[place.code] == {number}
+            code = place.code if whole else f"{place.code}:{number}"
+            id = key("unit", suffix, code)
+            p.add(
+                "reporting_unit",
+                id=id,
+                polity_id=MONGOLIA,
+                scheme_code="mn.soum",
+                code=f"{day}:{code}",
+                area_relation="equals" if whole else "within",
+                area_id=area("mn.soum", place.code),
+                kind="aggregate",
+            )
+            p.name(id, unit.soum if whole else f"{unit.soum}, {number}-р тойрог", "mn", "official")
+            for measure, value in ((2, unit.registered), (3, unit.ballots), (4, unit.valid), (6, unit.blank)):
+                _value(p, result_set, id, None, measure, value)
+            for option, value in zip(options, unit.votes, strict=True):
+                _value(p, result_set, id, option, 1, value)
     return p
