@@ -2242,9 +2242,12 @@ def build_legacy(day: str) -> Package:
         f"lv.cvk/{day}",
         SOURCE,
         f"The {english} by the finest unit the Central Election Commission publishes",
-        depends=["lv.cvk/geo", "lv.cvk/geo-pv", "lv.cvk/registry"]
-        if day == "2004-06-12"
-        else ["lv.cvk/geo", "lv.cvk/registry"],
+        depends=[
+            "lv.cvk/geo",
+            *(["lv.cvk/geo-pv"] if day == "2004-06-12" else []),
+            "lv.cvk/registry",
+            "lv.cvk/registry-pv",
+        ],
     )
     p.external |= {LATVIA, COUNTRY}
     p.uses(raw.cached(SOURCE, legacy_url(day)))
