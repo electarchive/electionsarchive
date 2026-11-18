@@ -328,15 +328,22 @@ where not exists (select from dc_geom g where g.area_id = x.district_area_id and
 
 drop table dc_geom;
 
-create table if not exists coverage_cache_unit (result_set_k integer not null, unit_k integer not null,
-    primary key (result_set_k, unit_k));
-
-create table if not exists coverage_cache_measure (result_set_k integer not null, measure smallint not null,
-    primary key (result_set_k, measure));
-
-create table if not exists coverage_cache_done (result_set_k integer primary key);
-
-alter table coverage_cache_done add column if not exists recorded_from timestamptz;
+do $$ begin
+    if to_regclass('coverage_cache_unit') is null then
+        create table coverage_cache_unit (result_set_k integer not null, unit_k integer not null,
+            primary key (result_set_k, unit_k));
+    end if;
+    if to_regclass('coverage_cache_measure') is null then
+        create table coverage_cache_measure (result_set_k integer not null, measure smallint not null,
+            primary key (result_set_k, measure));
+    end if;
+    if to_regclass('coverage_cache_done') is null then
+        create table coverage_cache_done (result_set_k integer primary key, recorded_from timestamptz);
+    end if;
+    if to_regclass('coverage_cache_voted') is null then
+        create table coverage_cache_voted (result_set_k integer primary key, voted boolean not null);
+    end if;
+end $$;
 
 do $$ begin
     if not exists (select from coverage_cache_done where recorded_from is not null) then
@@ -355,8 +362,6 @@ select d.result_set_k as k from coverage_cache_done d where not exists (select f
 delete from coverage_cache_unit where result_set_k in (select k from fresh union all select k from gone);
 
 delete from coverage_cache_measure where result_set_k in (select k from fresh union all select k from gone);
-
-create table if not exists coverage_cache_voted (result_set_k integer primary key, voted boolean not null);
 
 delete from coverage_cache_voted where result_set_k in (select k from fresh union all select k from gone);
 
@@ -843,10 +848,11 @@ def matrix(conn: Connection, scope: list[str], members: list[dict], last: int = 
             pending,
         ) in conn.execute(COUNT_SQL.split(";\n\n")[-1])
     }
-    conn.execute(
-        "create table if not exists coverage_cache_shapes (key text primary key, signature text not null, "
-        "units integer not null, shaped integer not null)"
-    )
+    if next(iter(conn.execute("select to_regclass('coverage_cache_shapes')")))[0] is None:
+        conn.execute(
+            "create table coverage_cache_shapes (key text primary key, signature text not null, "
+            "units integer not null, shaped integer not null)"
+        )
     shaped = conn.execute(
         "select concat_ws(':', count(*), sum(k::bigint), sum(k::bigint * k)) from ug where grain = 'precinct' and shaped"
     ).fetchone()
