@@ -1750,6 +1750,7 @@ def printed_parties() -> dict[str, set[str]]:
     out: dict[str, set[str]] = {}
     lists = [d.candidates for g in GENERALS for d in checked(g.day)]
     lists += [r.candidates for c in COUNCILS for r in council(c.day)]
+    lists += [state_council(day).candidates for day in STATE_COUNCIL]
     for cands in lists:
         for c in cands:
             name = party_name(c.party)
@@ -1887,6 +1888,17 @@ def registry() -> Package:
         "candidate below the line.",
         lang="en",
     )
+    p.add("electoral_system", id=STATE_SYSTEM, polity_id=AUSTRALIA, rules={"formula": "stv"}, rules_version=1)
+    p.add(
+        "note",
+        id=key("note", STATE_SYSTEM),
+        entity_id=STATE_SYSTEM,
+        kind="methodology",
+        body_md="From 2025 the state is one electorate that elects all 37 members of the Legislative Council by the "
+        "single transferable vote. Candidates stand in groups, and a voter marks boxes above the line for groups "
+        "or numbers candidates below it.",
+        lang="en",
+    )
     p.add("body", id=ASSEMBLY, polity_id=AUSTRALIA, kind="lower_house")
     p.name(ASSEMBLY, "Western Australian Legislative Assembly", "en", "official")
     p.add("electoral_system", id=SYSTEM, polity_id=AUSTRALIA, rules={"formula": "irv"}, rules_version=1)
@@ -1942,7 +1954,7 @@ def election(day: str) -> Package:
         f"{SOURCE}/{day}",
         SOURCE,
         f"The {when.year} Western Australian state election's Legislative Assembly results by polling place"
-        + (" and Legislative Council results" if any(c.day == day for c in COUNCILS) else "")
+        + (" and Legislative Council results" if any(c.day == day for c in COUNCILS) or day in STATE_COUNCIL else "")
         + ", from the Western Australian Electoral Commission",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
@@ -2094,6 +2106,8 @@ def election(day: str) -> Package:
             p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
     if any(c.day == day for c in COUNCILS):
         council_contests(p, day, election_id, path, units)
+    if day in STATE_COUNCIL:
+        state_council_contest(p, day, election_id, path, units)
     return p
 
 
@@ -2282,6 +2296,377 @@ def council_contests(p: Package, day: str, election_id: str, path: str, units: d
             (REGISTERED, r.enrolled),
         ):
             p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+
+
+# Legislative Council, whole of state -----------------------------------------------------------------------------
+
+# From 2025 the Legislative Council's members are elected from one electorate, the whole state. The report's section
+# 9 prints the first preference votes of each group (above and below the line together) at each district's ordinary
+# votes, and the absent, postal, and provisional votes once for the state.
+STATE_COUNCIL = {"2025-03-08": R2025}
+STATE_SYSTEM = key("electoral_system", "legislative-council", "stv-statewide")
+GROUPS = [  # the column labels of the primary count, and the party the candidate list prints for the group
+    ("SAP", "Sustainable Australia Party - Anti-corruption"),
+    ("SFF", "SFFPWA"),
+    ("LIB", "Liberal Party"),
+    ("NATS", "The Nationals WA"),
+    ("AC", "Australian Christians"),
+    ("GRN", "The Greens (WA)"),
+    ("ALP", "WA Labor"),
+    ("AJP", "Animal Justice Party"),
+    ("Libertarian", "Libertarian"),
+    ("SPPk", "Stop Pedophiles! Protect kiddies!"),
+    ("LCWA", "Legalise Cannabis Party WA"),
+    ("PHON", "One Nation"),
+    ("IND - MOERMOND", "Independent"),
+    ("IND - SUDHIR", "Independent"),
+]
+CANDIDATE_ENTRY = re.compile(r"^\s*(\d{1,3})\s{2,}([^,]+?),\s*(\S.*?)(?:\s{2,}(\S.*?))?\s*$")
+COUNT_ROW = re.compile(r"^\s+([A-Za-z][A-Za-z' -]*?)\s+(\d[\d,]*(?:\s+\d[\d,]*){16})\s*$")
+TYPES_ROW = re.compile(
+    r"^(\S.*?)?\s+(\d[\d,]*)\s+(\d[\d,]*)\s+(\d[\d,]*)\s+(\d[\d,]*)\s+(\d[\d,]*)\s+(\d[\d,]*)\s+(\d[\d,]*)\s+(\d[\d,]*)\s+[\d.]+%\s*$"
+)
+
+
+@dataclass
+class Group:
+    label: str
+    party: str
+    members: list[int]  # indexes into the candidate list, in ballot order
+    votes: int = 0
+    seats: int = 0
+
+
+@dataclass
+class StateCouncil:
+    candidates: list[Candidate]
+    groups: list[Group]
+    districts: dict[str, list[int]]  # each district's ordinary votes for each group
+    district_informal: dict[str, int]
+    types: dict[str, list[int]]  # the state's absent, postal, and provisional votes for each group
+    type_informal: dict[str, int]
+    totals: list[int]
+    formal: int
+    informal: int
+    enrolled: int
+    elected: list[int]
+    above: int
+    below: int
+
+
+def section(text: str, start: str, end: str) -> list[str]:
+    begin = text.index(start)
+    return text[begin : text.index(end, begin)].splitlines()
+
+
+def council_candidates(text: str) -> list[Candidate]:
+    lines = section(text, "2. Legislative Council candidates\nThe following", "The following is a summary")
+    out: list[Candidate] = []
+    for line in lines:
+        found = CANDIDATE_ENTRY.match(line)
+        if not found or "Candidate (" in line:
+            continue
+        if int(found[1]) != len(out) + 1:
+            raise ValueError(f"Legislative Council candidate {found[1]} follows {len(out)}")
+        given = "" if found[3] == "." else found[3]
+        out.append(Candidate(found[2].strip(), given, (found[4] or "").strip()))
+    return out
+
+
+def council_groups(cands: list[Candidate], labels: list[str]) -> list[Group]:
+    """The groups in ballot order: each run of one party's candidates, with the independents split where the
+    primary count's columns name the head of an independent group."""
+    heads = [i for i, c in enumerate(cands) if i == 0 or party_name(c.party) != party_name(cands[i - 1].party)]
+    for label in labels:
+        if label.startswith("IND - "):
+            hit = [i for i, c in enumerate(cands) if norm(c.surname) == norm(label.removeprefix("IND - "))]
+            if len(hit) != 1:
+                raise ValueError(f"{label} heads {len(hit)} candidates")
+            heads.append(hit[0])
+    heads = sorted(set(heads))
+    out = []
+    for n, head in enumerate(heads):
+        end = heads[n + 1] if n + 1 < len(heads) else len(cands)
+        out.append(Group("", cands[head].party, list(range(head, end))))
+
+    return out
+
+
+def number_row(words: str) -> list[int]:
+    return [integer(w) for w in words.split()]
+
+
+def types_table(text: str) -> dict[str, tuple[int, int]]:
+    """Each district's ordinary and valid votes and its electors from the table of types of votes by district."""
+    lines = section(text, "4. L\n", "5. L\n")
+    out: dict[str, tuple[int, int]] = {}
+    for index, line in enumerate(lines):
+        found = TYPES_ROW.match(line)
+        if not found:
+            continue
+        name = (found[1] or "").strip()
+        nums = [integer(found[k]) for k in range(2, 10)]
+        if not name or name.startswith(("Total", "Percentage")):
+            if found[1] is None:
+                before = next(x.strip() for x in reversed(lines[:index]) if x.strip())
+                after = next((x.strip() for x in lines[index + 1 :] if x.strip()), "")
+                name = f"{before}{after}" if before.endswith("-") else f"{before} {after}"
+            else:
+                continue
+        elif found[1] is not None and found[1].strip().startswith("Total"):
+            continue
+        out[fold(name)] = (nums[1], nums[0])
+    return out
+
+
+def state_council(day: str) -> StateCouncil:
+    link = STATE_COUNCIL[day]
+    text = layout(link)
+    cands = council_candidates(text)
+    # The primary count, from the heading to the percentages beneath the totals.
+    lines = section(text, "9. Legislative Council Primary Count\n", "% of Total")
+    printed = re.search(r"Enrolment Figure: ([\d,]+)", "\n".join(lines))
+    if printed is None:
+        raise ValueError("the Legislative Council primary count prints no enrolment")
+    enrolled = integer(printed[1])
+    header = " ".join(x.strip() for x in lines[:12] if "SAP" in x or "Liber" in x or "IND" in x or "MOER" in x)
+    rows: dict[str, list[int]] = {}
+    for line in lines:
+        found = COUNT_ROW.match(line)
+        if found:
+            name = found[1].strip()
+            if name in rows:
+                raise ValueError(f"{name} is printed twice in the Legislative Council primary count")
+            rows[name] = number_row(found[2])
+    labels = [label for label, _ in GROUPS]
+    if "SAP" not in header or "MOND" not in " ".join(lines[:12]):
+        raise ValueError("the primary count's columns are not those expected")
+    groups = council_groups(cands, labels)
+    if [g.party for g in groups] != [party for _, party in GROUPS]:
+        raise ValueError(f"the candidate list's groups {[g.party for g in groups]} do not match the count's columns")
+    for g, (label, _) in zip(groups, GROUPS, strict=True):
+        g.label = label
+    total = rows.pop("Total")
+    kinds = {k: rows.pop(k) for k in ("Absent Votes", "Postal Votes", "Provisional Votes")}
+    for name, nums in [*rows.items(), *kinds.items(), ("Total", total)]:
+        if sum(nums[:14]) != nums[14] or nums[14] + nums[15] != nums[16]:
+            raise ValueError(f"{name}: the Legislative Council primary count's row does not add up")
+    columns = [sum(nums[k] for nums in [*rows.values(), *kinds.values()]) for k in range(17)]
+    if columns != total:
+        raise ValueError(f"the Legislative Council primary count's rows add up to {columns}, not its total {total}")
+    # The districts against the table of types of votes, and the totals against the comparative summary.
+    types = types_table(text)
+    if set(types) != {fold(name) for name in rows}:
+        raise ValueError(f"the types of votes by district name {sorted(set(types) ^ {fold(n) for n in rows})}")
+    for name, nums in rows.items():
+        if types[fold(name)][0] != nums[14]:
+            raise ValueError(
+                f"{name}: {nums[14]:,} ordinary votes, but the table of types of votes has {types[fold(name)][0]:,}"
+            )
+    if sum(electors for _, electors in types.values()) != enrolled:
+        raise ValueError("the districts' electors do not add up to the printed enrolment")
+    summary = section(text, "Legislative Council - Types of Votes - Comparative Summary", "Types of Votes and Turnout")
+    formal = integer(next(x.split()[-1] for x in summary if x.startswith("Total Formal Votes")))
+    informal = integer(next(x.split()[-1] for x in summary if x.startswith("Informal Votes")))
+    if (formal, informal) != (total[14], total[15]) or total[16] != integer(
+        next(x.split()[-1] for x in summary if x.startswith("Total Votes"))
+    ):
+        raise ValueError("the primary count's totals differ from the comparative summary")
+    split = re.search(r"Whole of State\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)", text[text.index("5. L\n") :])
+    if split is None or integer(split[1]) + integer(split[2]) != formal:
+        raise ValueError("the above and below the line votes do not add up to the formal votes")
+    # The elected members.
+    elected = council_elected(text, cands)
+    for k, g in enumerate(groups):
+        g.votes = total[k]
+        g.seats = sum(1 for i in elected if i in g.members)
+    return StateCouncil(
+        cands,
+        groups,
+        {n: v[:14] for n, v in rows.items()},
+        {n: v[15] for n, v in rows.items()},
+        {n.removesuffix(" Votes"): v[:14] for n, v in kinds.items()},
+        {n.removesuffix(" Votes"): v[15] for n, v in kinds.items()},
+        total[:14],
+        formal,
+        informal,
+        enrolled,
+        elected,
+        integer(split[1]),
+        integer(split[2]),
+    )
+
+
+def council_elected(text: str, cands: list[Candidate]) -> list[int]:
+    """The candidates the report lists as elected, checked against its table of members by party."""
+    lines = section(
+        text,
+        "The following table shows the candidates elected to the Legislative Council",
+        "Western Australian Electoral Commission 2025",
+    )
+    elected: list[int] = []
+    for line in lines[2:]:
+        found = re.match(r"^(\S.*?)\*?\s{2,}(\S.*?)\s*$", line)
+        if not found or found[1].startswith("Member"):
+            continue
+        printed = found[1].rstrip("*").strip()
+        surname, _, given = printed.partition(",")
+        party = party_name(found[2])
+        hits = [i for i, c in enumerate(cands) if norm(c.surname) == norm(surname) and party_name(c.party) == party]
+        if len(hits) > 1:
+            hits = [i for i in hits if norm(given.strip())[:3] in {norm(n)[:3] for n in cands[i].given.split()}]
+        if len(hits) != 1:
+            raise ValueError(f"elected {printed} matches {len(hits)} candidates")
+        elected.append(hits[0])
+    summary = section(text, "Elected Members\n", "Total ")
+    seats = {
+        party_name(m[1]): int(m[4]) for x in summary if (m := re.match(r"^(\S.*?)\s+(\d+)\s+(\d+)\s+(\d+)\s*$", x))
+    }
+    held = Counter(party_name(cands[i].party) for i in elected)
+    if len(elected) != 37 or len(set(elected)) != 37 or dict(held) != seats:
+        raise ValueError(f"{len(elected)} elected members, {dict(held)}, against the report's {seats}")
+    return elected
+
+
+STATE_METHOD = (
+    "First preference votes for each group of candidates, above and below the line together, from section 9 of the "
+    "Western Australian Electoral Commission's Results and Statistics report. The report prints each district's "
+    "ordinary votes, which are stored on one unit per district, and the absent, postal, and provisional votes once "
+    "for the whole state, which are stored on one unit each. It prints no votes for individual candidates, so the "
+    "options are the groups; a group's seats are its candidates the commission declared elected. The rows add up "
+    "to the state's formal and informal votes in the report's comparative summary. The later counts are not stored."
+)
+
+
+def state_council_contest(p: Package, day: str, election_id: str, path: str, units: dict[str, str]) -> None:
+    link = STATE_COUNCIL[day]
+    p.uses(raw.cached(SOURCE, link))
+    state = state_council(day)
+    contest = key("contest", day, "council", "whole-of-state")
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election_id,
+        kind="body_seats",
+        body_id=COUNCIL,
+        district_area_id=WA,
+        magnitude=len(state.elected),
+        round_number=1,
+        electoral_system_id=STATE_SYSTEM,
+        default_result_kind="counted",
+    )
+    p.name(contest, "Whole of State, Legislative Council", "en", "official")
+    p.add("slug", path=f"{path}/council", entity_id=contest, is_current=True)
+    result_set = key("result_set", contest)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election_id,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=WAEC,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=STATE_METHOD, lang="en")
+    p.add(
+        "note",
+        id=key("note", result_set, "atl-btl"),
+        entity_id=result_set,
+        kind="context",
+        body_md=f"Of the {state.formal:,} formal votes, {state.above:,} were cast above the line and {state.below:,} "
+        "below the line.",
+        lang="en",
+    )
+    options: list[str] = []
+    for number, group in enumerate(state.groups, 1):
+        name = party_name(group.party)
+        head = state.candidates[group.members[0]]
+        label = name or f"Independent group of {head.display}"
+        option = key("option", contest, "group", number)
+        options.append(option)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="list",
+            party_id=party_id(name) if name else None,
+            ballot_position=number,
+            ballot_label=label,
+        )
+        if group.seats:
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=group.seats)
+        for position, index in enumerate(group.members, 1):
+            c = state.candidates[index]
+            person = key("person", contest, index + 1)
+            p.add("person", id=person)
+            p.name(person, c.display, "en", "official")
+            candidacy = key("candidacy", contest, index + 1)
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=option,
+                role="list_member",
+                list_position=position,
+                ballot_name=c.ballot,
+                member_of_party_id=party_id(name) if name else None,
+                is_independent=name is None,
+            )
+            if index in state.elected:
+                p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
+
+    def unit(code: str, label: str, area: str, kind: str) -> str:
+        id = key("unit", code)
+        p.add(
+            "reporting_unit",
+            id=id,
+            polity_id=AUSTRALIA,
+            scheme_code="au-wa.polling_place",
+            code=code,
+            area_relation="within",
+            area_id=area,
+            kind=kind,
+        )
+        p.name(id, label, "en", "official")
+        return id
+
+    def row(id: str, votes: list[int], informal: int) -> None:
+        for option, value in zip(options, votes, strict=True):
+            put(p, result_set, id, option, VOTES, value)
+        put(p, result_set, id, None, VALID, sum(votes))
+        put(p, result_set, id, None, INVALID, informal)
+        put(p, result_set, id, None, CAST, sum(votes) + informal)
+
+    for name, votes in sorted(state.districts.items()):
+        slug = changeset.slug(name)
+        district = next(d for d in checked(day) if fold(d.name) == fold(name))
+        row(
+            unit(
+                f"{day}:council:{slug}",
+                f"{district.name}: ordinary votes",
+                district_area(day, district.name),
+                "aggregate",
+            ),
+            votes,
+            state.district_informal[name],
+        )
+        assert district.enrolled is not None
+        put(p, result_set, units[f"{day}:{slug}:roll"], None, REGISTERED, district.enrolled)
+    for name, votes in state.types.items():
+        label = f"{name} votes"
+        row(unit(f"{day}:council:{changeset.slug(name)}", label, WA, "aggregate"), votes, state.type_informal[name])
+    for option, value in zip(options, state.totals, strict=True):
+        p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=value)
+    for measure, value in (
+        (VALID, state.formal),
+        (INVALID, state.informal),
+        (CAST, state.formal + state.informal),
+        (REGISTERED, state.enrolled),
+    ):
+        p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
 
 
 def files() -> list[str]:
