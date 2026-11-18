@@ -189,6 +189,9 @@ def fetch() -> None:
     from ea.sources.au import nswec_lg2008
 
     nswec_lg2008.fetch()
+    from ea.sources.au import nswec_lge
+
+    nswec_lge.fetch()
 
 
 # Parsing ---------------------------------------------------------------------------------------------------------
@@ -2016,7 +2019,7 @@ def bye_groups() -> dict[date, list[Bye]]:
 
 
 def packages() -> list[str]:
-    from ea.sources.au import nswec_lg2008
+    from ea.sources.au import nswec_lg2008, nswec_lge
 
     return [
         f"{SOURCE}/geo",
@@ -2029,6 +2032,7 @@ def packages() -> list[str]:
         *(f"{SOURCE}/lc-{c.day}" for c in COUNCIL.values()),
         *(f"{SOURCE}/by-{day}" for day in bye_groups()),
         *nswec_lg2008.packages(),
+        *nswec_lge.packages(),
     ]
 
 
@@ -2048,6 +2052,9 @@ def parse() -> None:
     from ea.sources.au import nswec_lg2008
 
     nswec_lg2008.parse()
+    from ea.sources.au import nswec_lge
+
+    nswec_lge.parse()
 
 
 def council() -> None:
