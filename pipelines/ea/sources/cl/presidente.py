@@ -143,6 +143,35 @@ ELECTIONS: dict[int, Election] = {
             "counted on election day, before the cancellations it lists."
         ),
     ),
+    1942: Election(
+        date(1942, 2, 1),
+        "special",
+        BROWSER + "1942.pdf",
+        "1937",
+        (
+            _c("rios", "Juan Antonio Ríos Morales"),
+            _c("ibanez", "Carlos Ibáñez del Campo"),
+            Column("scattered", "others", "Dispersos"),
+            Column("blank", "blank", "En blanco"),
+            Column("invalid", "invalid", "Nulos o viciados"),
+            TOTAL,
+        ),
+        "rios",
+        581486,
+        "1 de febrero de 1942",
+        (
+            "Province totals from the Registro Electoral's summary by communes, departments and provinces, as the "
+            "Tribunal Calificador counted the election. The returns also print each department and commune, the "
+            "registered voters and the share who voted by province, which this result set does not hold. Blank "
+            "votes and null (viciados) votes are separate columns. The returns give 80.2 percent of the roll as "
+            "having voted. In Antofagasta the province row prints 56 under the null votes and 87 under the blank "
+            "votes; its departments add up to 87 null and 56 blank, and the national figures only add up with "
+            "those, so they are stored that way, each box on the figure as printed. Concepción's Ibáñez figure is "
+            "marred by a speck on the scan; it is read as 9,042, which its departments add up to and which makes "
+            "the province's total add up. Juan Antonio Ríos won an absolute majority of the valid votes and was "
+            "proclaimed President."
+        ),
+    ),
     1946: Election(
         date(1946, 9, 4),
         "special",
