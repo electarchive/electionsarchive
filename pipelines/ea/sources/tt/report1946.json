@@ -1,0 +1,2185 @@
+{
+ "1946": [
+  {
+   "district": "North Port-of-Spain",
+   "page": 10,
+   "registered": 21326,
+   "ballots": 7442,
+   "valid": 7196,
+   "rejected": 246,
+   "candidates": [
+    [
+     "Butler, T. U. B.",
+     1984
+    ],
+    [
+     "Gomes, Albert",
+     5212
+    ]
+   ]
+  },
+  {
+   "district": "South Port-of-Spain",
+   "page": 10,
+   "registered": 22822,
+   "ballots": 9494,
+   "valid": 9230,
+   "rejected": 264,
+   "candidates": [
+    [
+     "Garcia, Rufus Serapio",
+     92
+    ],
+    [
+     "James, Aubrey",
+     952
+    ],
+    [
+     "Mathura, Chandra Bahadoor",
+     1356
+    ],
+    [
+     "Pereira, John Nunes",
+     1228
+    ],
+    [
+     "Richards, Alfred",
+     1362
+    ],
+    [
+     "Solomon, Patrick Vincent Joseph",
+     4240
+    ]
+   ]
+  },
+  {
+   "district": "San Fernando",
+   "page": 10,
+   "registered": 14121,
+   "ballots": 8230,
+   "valid": 7692,
+   "rejected": 538,
+   "candidates": [
+    [
+     "George, B. Adolphus",
+     67
+    ],
+    [
+     "Joseph, Roy",
+     5841
+    ],
+    [
+     "Mentor, Ralph",
+     1784
+    ]
+   ]
+  },
+  {
+   "district": "St. George",
+   "page": 11,
+   "registered": 65351,
+   "ballots": 24363,
+   "valid": 22246,
+   "rejected": 2117,
+   "candidates": [
+    [
+     "Brunton, Francis Albert Michael",
+     862
+    ],
+    [
+     "Buddhu, Charles Howatson",
+     498
+    ],
+    [
+     "Henry, Vivian Egbert",
+     1116
+    ],
+    [
+     "Julien, Mark Thomas Inskip",
+     1395
+    ],
+    [
+     "Maharaj, Chanka",
+     8056
+    ],
+    [
+     "Sinanan, Mitra Gokhale",
+     5975
+    ],
+    [
+     "Tang, Norman Wilfred",
+     4344
+    ]
+   ]
+  },
+  {
+   "district": "Caroni",
+   "page": 11,
+   "registered": 28640,
+   "ballots": 16616,
+   "valid": 15130,
+   "rejected": 1486,
+   "candidates": [
+    [
+     "Abidh, Clarence Carmichael",
+     7371
+    ],
+    [
+     "Capildeo, Simbhoonath",
+     5692
+    ],
+    [
+     "Teelucksingh, Sarran",
+     2117
+    ]
+   ]
+  },
+  {
+   "district": "Victoria",
+   "page": 11,
+   "registered": 40469,
+   "ballots": 26058,
+   "valid": 24170,
+   "rejected": 1888,
+   "candidates": [
+    [
+     "Fitzpatrick, George Albert",
+     712
+    ],
+    [
+     "Kumar, Ranjit",
+     13328
+    ],
+    [
+     "Lee, Edward Adolphus",
+     2002
+    ],
+    [
+     "Moses, McDonald",
+     4420
+    ],
+    [
+     "Pitt, David Thomas",
+     3708
+    ]
+   ]
+  },
+  {
+   "district": "St. Patrick",
+   "page": 11,
+   "registered": 33411,
+   "ballots": 23251,
+   "valid": 22398,
+   "rejected": 853,
+   "candidates": [
+    [
+     "Kelshall, John Bryan Gilbert",
+     3468
+    ],
+    [
+     "Lutchman, Sirjue",
+     1726
+    ],
+    [
+     "Rojas, John Felix Ferdinand",
+     3401
+    ],
+    [
+     "Roodal, Timothy",
+     13619
+    ],
+    [
+     "Thomas, Amos Nathaniel",
+     184
+    ]
+   ]
+  },
+  {
+   "district": "Eastern Counties",
+   "page": 11,
+   "registered": 21863,
+   "ballots": 13360,
+   "valid": 12706,
+   "rejected": 654,
+   "candidates": [
+    [
+     "Bryan, Victor",
+     5215
+    ],
+    [
+     "Khan, Mohammed A.",
+     126
+    ],
+    [
+     "Moonan, Joseph",
+     4502
+    ],
+    [
+     "Nathai, Babooram M.",
+     2112
+    ],
+    [
+     "Wharton, Edward V.",
+     749
+    ]
+   ]
+  },
+  {
+   "district": "Tobago",
+   "page": 12,
+   "registered": 11509,
+   "ballots": 8467,
+   "valid": 8105,
+   "rejected": 362,
+   "candidates": [
+    [
+     "De Nobriga, George",
+     605
+    ],
+    [
+     "Edwards, Laurence Emanuel",
+     1674
+    ],
+    [
+     "Hamel-Smith, Raymond Percival",
+     515
+    ],
+    [
+     "Harrower, Robert Hamilton",
+     962
+    ],
+    [
+     "James, Alphonso",
+     4318
+    ],
+    [
+     "Samuel, George Frederick",
+     31
+    ]
+   ]
+  }
+ ],
+ "1956": [
+  {
+   "district": "Port-of-Spain North",
+   "page": 26,
+   "ballots": 8766,
+   "rejected": 135,
+   "majority": 1458,
+   "candidates": [
+    [
+     "Ulric Lee",
+     4881
+    ],
+    [
+     "Albert M. Gomes",
+     3423
+    ],
+    [
+     "Raymond Hamel-Smith",
+     327
+    ]
+   ]
+  },
+  {
+   "district": "Port-of-Spain South",
+   "page": 26,
+   "ballots": 9380,
+   "rejected": 132,
+   "majority": 2515,
+   "candidates": [
+    [
+     "Patrick Vincent Joseph Solomon",
+     5848
+    ],
+    [
+     "Norman Tang",
+     3333
+    ],
+    [
+     "Albert Owen Harris",
+     67
+    ]
+   ]
+  },
+  {
+   "district": "Port-of-Spain South-East",
+   "page": 26,
+   "ballots": 8408,
+   "rejected": 124,
+   "majority": 4460,
+   "candidates": [
+    [
+     "Dr. Eric E. Williams",
+     6067
+    ],
+    [
+     "Carlton Elliott Achong",
+     1607
+    ],
+    [
+     "Herman Scott",
+     376
+    ],
+    [
+     "Aubrey Emmanuel James",
+     234
+    ]
+   ]
+  },
+  {
+   "district": "Port-of-Spain North-East",
+   "page": 26,
+   "ballots": 10466,
+   "rejected": 195,
+   "majority": 5980,
+   "candidates": [
+    [
+     "John Shelford Donaldson",
+     7373
+    ],
+    [
+     "James Kelly",
+     1393
+    ],
+    [
+     "Quintin O'Connor",
+     937
+    ],
+    [
+     "Leonard Ramalho Gomes",
+     397
+    ],
+    [
+     "Irvine Durham",
+     171
+    ]
+   ]
+  },
+  {
+   "district": "St. George West",
+   "page": 26,
+   "ballots": 12460,
+   "rejected": 298,
+   "majority": 4770,
+   "candidates": [
+    [
+     "John Harold O'Halloran",
+     6460
+    ],
+    [
+     "Aldwin Gerard Francis",
+     1690
+    ],
+    [
+     "Ashram Sinanan",
+     1596
+    ],
+    [
+     "McVorran de Freitas",
+     1081
+    ],
+    [
+     "Dolly St. Rose",
+     1040
+    ],
+    [
+     "Francis Albert Michael Brunton",
+     295
+    ]
+   ]
+  },
+  {
+   "district": "Laventille",
+   "page": 26,
+   "ballots": 12263,
+   "rejected": 173,
+   "majority": 7748,
+   "candidates": [
+    [
+     "Donald C. Granado",
+     8940
+    ],
+    [
+     "Kathleen Rigsby",
+     1192
+    ],
+    [
+     "Cecil Gittens",
+     923
+    ],
+    [
+     "Cisto Arthur Darmanie",
+     454
+    ],
+    [
+     "Simeon A. Alexander",
+     294
+    ],
+    [
+     "Raymond Quevedo",
+     287
+    ]
+   ]
+  },
+  {
+   "district": "San Juan",
+   "page": 26,
+   "ballots": 13441,
+   "rejected": 240,
+   "majority": 6464,
+   "candidates": [
+    [
+     "Robert Edward Wallace",
+     8390
+    ],
+    [
+     "Hubert Adolphus McNish",
+     1926
+    ],
+    [
+     "Saad Reginald Ghany",
+     1328
+    ],
+    [
+     "Godfrey Richards",
+     1129
+    ],
+    [
+     "Jose Ramon Fortune",
+     428
+    ]
+   ]
+  },
+  {
+   "district": "St. Joseph",
+   "page": 27,
+   "ballots": 9922,
+   "rejected": 144,
+   "majority": 109,
+   "candidates": [
+    [
+     "Kamaluddin Mohammed",
+     4223
+    ],
+    [
+     "Chanka Maharaj",
+     4114
+    ],
+    [
+     "Vivian Raphael Kangalee",
+     873
+    ],
+    [
+     "Rito Da Costa",
+     370
+    ],
+    [
+     "Teddy Edward Davidson Peter",
+     117
+    ],
+    [
+     "Darlington Marshall",
+     81
+    ]
+   ]
+  },
+  {
+   "district": "Tunapuna",
+   "page": 27,
+   "ballots": 15006,
+   "rejected": 594,
+   "majority": 179,
+   "candidates": [
+    [
+     "Learie Nicholas Constantine",
+     6622
+    ],
+    [
+     "Surujpat Mathura",
+     6443
+    ],
+    [
+     "Rattan Kumar Harracksingh",
+     708
+    ],
+    [
+     "Violet Amelia Thorpe",
+     412
+    ],
+    [
+     "Mohammed Ibrahim Khan",
+     287
+    ]
+   ]
+  },
+  {
+   "district": "St. George East",
+   "page": 27,
+   "ballots": 11688,
+   "rejected": 305,
+   "majority": 2149,
+   "candidates": [
+    [
+     "Arnold C. Thomasos",
+     4759
+    ],
+    [
+     "Jagdath Maharaj",
+     2610
+    ],
+    [
+     "John Stanley Brooks",
+     2321
+    ],
+    [
+     "Norman Alcantara",
+     766
+    ],
+    [
+     "John Anthony La Rose",
+     446
+    ],
+    [
+     "Raphael Chinaleong",
+     258
+    ],
+    [
+     "Edward Bomparte",
+     163
+    ],
+    [
+     "George John",
+     60
+    ]
+   ]
+  },
+  {
+   "district": "Caroni North",
+   "page": 27,
+   "ballots": 12928,
+   "rejected": 414,
+   "majority": 4323,
+   "candidates": [
+    [
+     "Bhadase Sagan Maraj",
+     7801
+    ],
+    [
+     "Chunilal Saith",
+     3478
+    ],
+    [
+     "Karpo Ojah Maharaj",
+     638
+    ],
+    [
+     "Indar Persad",
+     299
+    ],
+    [
+     "Pandit Tewari",
+     298
+    ]
+   ]
+  },
+  {
+   "district": "Caroni Central",
+   "page": 27,
+   "ballots": 11994,
+   "rejected": 407,
+   "majority": 2297,
+   "candidates": [
+    [
+     "Mitra Gokhale Sinanan",
+     6076
+    ],
+    [
+     "Fred A. Greene",
+     3779
+    ],
+    [
+     "Ramoutar Dass",
+     848
+    ],
+    [
+     "Ranjit Kumar",
+     807
+    ],
+    [
+     "Ramzan Ali",
+     44
+    ],
+    [
+     "Doon Ragoobir",
+     33
+    ]
+   ]
+  },
+  {
+   "district": "Caroni South",
+   "page": 28,
+   "ballots": 8358,
+   "rejected": 165,
+   "majority": 3484,
+   "candidates": [
+    [
+     "Simbhoonath Capildeo",
+     5169
+    ],
+    [
+     "Wilfred Andrew Rose",
+     1685
+    ],
+    [
+     "Frederick McDonald Campbell-Bryce",
+     1339
+    ]
+   ]
+  },
+  {
+   "district": "San Fernando East",
+   "page": 28,
+   "ballots": 8619,
+   "rejected": 78,
+   "majority": 1348,
+   "candidates": [
+    [
+     "Albert Gerard Montano",
+     3986
+    ],
+    [
+     "Edward Adolphus Lee",
+     2638
+    ],
+    [
+     "Robert Nathaniel Donaldson",
+     627
+    ],
+    [
+     "John Felix Ferdinand Rojas",
+     440
+    ],
+    [
+     "Joseph Eugene Ivan Herrera",
+     319
+    ],
+    [
+     "Richard Rambaransingh",
+     277
+    ],
+    [
+     "Vernon Joseph",
+     228
+    ],
+    [
+     "Pelham Banfield",
+     18
+    ],
+    [
+     "Hugh Barclay Webster",
+     8
+    ]
+   ]
+  },
+  {
+   "district": "San Fernando West",
+   "page": 28,
+   "ballots": 8437,
+   "rejected": 164,
+   "majority": 988,
+   "candidates": [
+    [
+     "Dr. Winston Mahabir",
+     4395
+    ],
+    [
+     "Roy Adolphus Joseph",
+     3407
+    ],
+    [
+     "Allan Annisetto Greene",
+     324
+    ],
+    [
+     "Aubrey Jordan",
+     79
+    ],
+    [
+     "Ruth Kamala Seukeran",
+     68
+    ]
+   ]
+  },
+  {
+   "district": "Naparima",
+   "page": 28,
+   "ballots": 14382,
+   "rejected": 380,
+   "majority": 702,
+   "candidates": [
+    [
+     "Lionel Frank Seukeran",
+     5229
+    ],
+    [
+     "Ramsamooj Gunness",
+     4527
+    ],
+    [
+     "Oli Mohammed",
+     3186
+    ],
+    [
+     "Kelvin Lucky",
+     903
+    ],
+    [
+     "Fitzroy McCollins",
+     157
+    ]
+   ]
+  },
+  {
+   "district": "Pointe-a-Pierre",
+   "page": 28,
+   "ballots": 12599,
+   "rejected": 232,
+   "majority": 4165,
+   "candidates": [
+    [
+     "Ashford Sastri Sinanan",
+     6459
+    ],
+    [
+     "Ibbit Mosaheb",
+     2294
+    ],
+    [
+     "John Lalchansingh",
+     1942
+    ],
+    [
+     "Olric Dougan",
+     1436
+    ],
+    [
+     "John E. Commissiong",
+     171
+    ],
+    [
+     "Gustavus McFee",
+     65
+    ]
+   ]
+  },
+  {
+   "district": "Ortoire/Moruga",
+   "page": 28,
+   "ballots": 12749,
+   "rejected": 356,
+   "majority": 1546,
+   "candidates": [
+    [
+     "Stephen Carpoondeo Maharaj",
+     4549
+    ],
+    [
+     "Edgar Augustin Fitzgerald",
+     3003
+    ],
+    [
+     "George Mahaste Singh",
+     2870
+    ],
+    [
+     "Vernon Wentworth Lewis",
+     839
+    ],
+    [
+     "Alexander Lal Mahabir",
+     677
+    ],
+    [
+     "Ramnarine Seereeram Maharaj",
+     393
+    ],
+    [
+     "Reuben James Moore",
+     62
+    ]
+   ]
+  },
+  {
+   "district": "St. Patrick East",
+   "page": 29,
+   "ballots": 13229,
+   "rejected": 442,
+   "majority": 2525,
+   "candidates": [
+    [
+     "Ajodhasingh",
+     6632
+    ],
+    [
+     "Saran Sampath",
+     4107
+    ],
+    [
+     "Alexander Jamadar",
+     991
+    ],
+    [
+     "Frederick Boodlal",
+     726
+    ],
+    [
+     "Elvyn Noel",
+     331
+    ]
+   ]
+  },
+  {
+   "district": "St. Patrick Central",
+   "page": 29,
+   "ballots": 12036,
+   "rejected": 131,
+   "majority": 1,
+   "candidates": [
+    [
+     "Alexander Chamberlain Alexis",
+     3124
+    ],
+    [
+     "Leo Charles Mitchell",
+     3123
+    ],
+    [
+     "Seusankar Seunarine",
+     2448
+    ],
+    [
+     "Leonard Irvine St. Aubyn Jones",
+     2287
+    ],
+    [
+     "Fabien Sebastien Lesaldo",
+     875
+    ],
+    [
+     "Benjamin Ramsaran",
+     48
+    ]
+   ]
+  },
+  {
+   "district": "St. Patrick West",
+   "page": 29,
+   "ballots": 10986,
+   "rejected": 325,
+   "majority": 1796,
+   "candidates": [
+    [
+     "Tubal Uriah Buz Butler",
+     4151
+    ],
+    [
+     "Manmohansingh",
+     2355
+    ],
+    [
+     "David Ignatius Lynch",
+     2171
+    ],
+    [
+     "John Milton Hackshaw",
+     1984
+    ]
+   ]
+  },
+  {
+   "district": "St. Andrew/St. David",
+   "page": 29,
+   "ballots": 12316,
+   "rejected": 381,
+   "majority": 1176,
+   "candidates": [
+    [
+     "Victor Bryan",
+     3753
+    ],
+    [
+     "Pope Wilberforce McLean",
+     2577
+    ],
+    [
+     "Cyril Lancelot Brown",
+     2313
+    ],
+    [
+     "Leonaldo Miller (Jnr.)",
+     2289
+    ],
+    [
+     "Joseph Thomas Mangatal",
+     1003
+    ]
+   ]
+  },
+  {
+   "district": "Nariva/Mayaro",
+   "page": 29,
+   "ballots": 9411,
+   "rejected": 946,
+   "majority": 626,
+   "candidates": [
+    [
+     "Victor Lionel Campbell",
+     2945
+    ],
+    [
+     "Ramprasad Bhoolai",
+     2319
+    ],
+    [
+     "Babooram Nathai",
+     1796
+    ],
+    [
+     "Kenneth Dougdeen",
+     670
+    ],
+    [
+     "Cecil Henry Nurse",
+     487
+    ],
+    [
+     "Mitchell Norvan Baptiste",
+     124
+    ],
+    [
+     "Mahadeo Maharaj",
+     63
+    ],
+    [
+     "Joseph Moonan",
+     61
+    ]
+   ]
+  },
+  {
+   "district": "Tobago",
+   "page": 29,
+   "ballots": 11630,
+   "rejected": 230,
+   "majority": 245,
+   "candidates": [
+    [
+     "Alphonso Theophilus Philbert James",
+     5774
+    ],
+    [
+     "Arthur Napoleon Raymond Robinson",
+     5529
+    ],
+    [
+     "Lynn de Gale",
+     97
+    ]
+   ]
+  }
+ ],
+ "1961": [
+  {
+   "district": "Port-of-Spain North",
+   "page": 48,
+   "ballots": 10191,
+   "rejected": 2,
+   "majority": 3729,
+   "candidates": [
+    [
+     "Alfredo Bermudez",
+     6959,
+     "P.N.M."
+    ],
+    [
+     "Louis Gerald Rostant",
+     3230,
+     "D.L.P."
+    ]
+   ]
+  },
+  {
+   "district": "Port-of-Spain South",
+   "page": 48,
+   "ballots": 9736,
+   "rejected": 5,
+   "majority": 5887,
+   "candidates": [
+    [
+     "Carlton Reis",
+     1922,
+     "D.L.P."
+    ],
+    [
+     "Eric Williams",
+     7809,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Port-of-Spain East",
+   "page": 48,
+   "ballots": 9886,
+   "rejected": 1,
+   "majority": 7215,
+   "candidates": [
+    [
+     "Norman Bernard Alcantara",
+     1077,
+     "D.L.P."
+    ],
+    [
+     "John Michael Broomes",
+     516,
+     "A.N.C."
+    ],
+    [
+     "Isabel Ursula Teshea",
+     8292,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Port-of-Spain West",
+   "page": 48,
+   "ballots": 9626,
+   "rejected": 1,
+   "majority": 2415,
+   "candidates": [
+    [
+     "Beryl Gomes",
+     334,
+     "A.N.C."
+    ],
+    [
+     "Fred Ayoub Sabga",
+     3438,
+     "D.L.P."
+    ],
+    [
+     "Dr. Patrick V. J. Solomon",
+     5853,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "San Fernando East",
+   "page": 48,
+   "ballots": 12579,
+   "rejected": 2,
+   "majority": 5465,
+   "candidates": [
+    [
+     "Gerald Montano",
+     9021,
+     "P.N.M."
+    ],
+    [
+     "Nizam Franklin Muradali",
+     3556,
+     "D.L.P."
+    ]
+   ]
+  },
+  {
+   "district": "San Fernando West",
+   "page": 48,
+   "ballots": 11251,
+   "rejected": 31,
+   "majority": 1662,
+   "candidates": [
+    [
+     "Alloy Le Quay",
+     4779,
+     "D.L.P."
+    ],
+    [
+     "Saied Mohammed",
+     6441,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Diego Martin",
+   "page": 48,
+   "ballots": 12955,
+   "rejected": 3,
+   "majority": 5866,
+   "candidates": [
+    [
+     "Joseph Edward Lai Fook",
+     3151,
+     "D.L.P."
+    ],
+    [
+     "Johnson Lopez",
+     784,
+     "A.N.C."
+    ],
+    [
+     "John Harold O'Halloran",
+     9017,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Maraval",
+   "page": 48,
+   "ballots": 12280,
+   "rejected": 17,
+   "majority": 4059,
+   "candidates": [
+    [
+     "Cecil William Alexander",
+     8161,
+     "P.N.M."
+    ],
+    [
+     "Mc Voran De Freitas",
+     4102,
+     "D.L.P."
+    ]
+   ]
+  },
+  {
+   "district": "Laventille",
+   "page": 48,
+   "ballots": 11231,
+   "rejected": 12,
+   "majority": 9769,
+   "candidates": [
+    [
+     "Donald C. Granado",
+     10494,
+     "P.N.M."
+    ],
+    [
+     "Pope W. McLean",
+     725,
+     "D.L.P."
+    ]
+   ]
+  },
+  {
+   "district": "San Juan",
+   "page": 49,
+   "ballots": 12882,
+   "rejected": 3,
+   "majority": 7881,
+   "candidates": [
+    [
+     "Mohammed A. Khan",
+     2549,
+     "D.L.P."
+    ],
+    [
+     "Robert E. Wallace",
+     10330,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Barataria",
+   "page": 49,
+   "ballots": 13351,
+   "rejected": 3,
+   "majority": 1678,
+   "candidates": [
+    [
+     "J. A. R. Kelly",
+     5835,
+     "D.L.P."
+    ],
+    [
+     "Kamaluddin Mohammed",
+     7513,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "St. Joseph",
+   "page": 49,
+   "ballots": 12305,
+   "rejected": 5,
+   "majority": 4068,
+   "candidates": [
+    [
+     "Claire Phyllis Achong",
+     4116,
+     "D.L.P."
+    ],
+    [
+     "Matthew Ramcharan",
+     8184,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Tunapuna",
+   "page": 49,
+   "ballots": 11593,
+   "rejected": 2,
+   "majority": 1789,
+   "candidates": [
+    [
+     "Rampersad Bholi",
+     4901,
+     "D.L.P."
+    ],
+    [
+     "Alfred A. Thompson",
+     6690,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "St. Augustine",
+   "page": 49,
+   "ballots": 12306,
+   "rejected": 18,
+   "majority": 3556,
+   "candidates": [
+    [
+     "Rudranauth Capildeo",
+     7927,
+     "D.L.P."
+    ],
+    [
+     "Hugh Ormsby Thomas",
+     4361,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Arima",
+   "page": 49,
+   "ballots": 11040,
+   "rejected": 1,
+   "majority": 2339,
+   "candidates": [
+    [
+     "Ursula M. C. Bleasdell",
+     4320,
+     "D.L.P."
+    ],
+    [
+     "Clytus A. Thomasos",
+     6719,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Chaguanas",
+   "page": 49,
+   "ballots": 11481,
+   "rejected": 1,
+   "majority": 5587,
+   "candidates": [
+    [
+     "Tajmool Hosein",
+     8337,
+     "D.L.P."
+    ],
+    [
+     "Baliram Swaratsingh",
+     3143,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Couva",
+   "page": 49,
+   "ballots": 11936,
+   "rejected": 2,
+   "majority": 4544,
+   "candidates": [
+    [
+     "Simbhonath Capildeo",
+     8239,
+     "D.L.P."
+    ],
+    [
+     "Soondailal B. Ramoutar",
+     3695,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Caroni East",
+   "page": 49,
+   "ballots": 11395,
+   "rejected": 4,
+   "majority": 2143,
+   "candidates": [
+    [
+     "Indar Persad",
+     4624,
+     "P.N.M."
+    ],
+    [
+     "Balgobin Ramdeen",
+     6767,
+     "D.L.P."
+    ]
+   ]
+  },
+  {
+   "district": "Pointe-a-Pierre",
+   "page": 49,
+   "ballots": 11726,
+   "rejected": null,
+   "majority": 1684,
+   "candidates": [
+    [
+     "William H. Agimudi",
+     5021,
+     "P.N.M."
+    ],
+    [
+     "Peter G. Farquhar",
+     6705,
+     "D.L.P."
+    ]
+   ]
+  },
+  {
+   "district": "Naparima",
+   "page": 50,
+   "ballots": 11386,
+   "rejected": 18,
+   "majority": 6262,
+   "candidates": [
+    [
+     "Haniff Mohammed",
+     2553,
+     "P.N.M."
+    ],
+    [
+     "Lionel F. Seukeran",
+     8815,
+     "D.L.P."
+    ]
+   ]
+  },
+  {
+   "district": "Princes Town",
+   "page": 50,
+   "ballots": 12141,
+   "rejected": 4,
+   "majority": 3835,
+   "candidates": [
+    [
+     "Stephen C. Maharaj",
+     7986,
+     "D.L.P."
+    ],
+    [
+     "Lloyd C. Phillips",
+     4151,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Fyzabad",
+   "page": 50,
+   "ballots": 13422,
+   "rejected": null,
+   "majority": 126,
+   "candidates": [
+    [
+     "Muriel Donawa",
+     6498,
+     "P.N.M."
+    ],
+    [
+     "Vernon Jamadar",
+     6624,
+     "D.L.P."
+    ],
+    [
+     "Dennis Nicholas",
+     210,
+     "B.P."
+    ],
+    [
+     "Benjamin Ramsaran",
+     90,
+     "Ind."
+    ]
+   ]
+  },
+  {
+   "district": "La Brea",
+   "page": 50,
+   "ballots": 10362,
+   "rejected": 5,
+   "majority": 6108,
+   "candidates": [
+    [
+     "Alexander C. Alexis",
+     7924,
+     "P.N.M."
+    ],
+    [
+     "Tubal Uriah Bus Butler",
+     617,
+     "B.P."
+    ],
+    [
+     "Leo Mitchell",
+     1816,
+     "D.L.P."
+    ]
+   ]
+  },
+  {
+   "district": "Point Fortin",
+   "page": 50,
+   "ballots": 11393,
+   "rejected": 2,
+   "majority": 2921,
+   "candidates": [
+    [
+     "Robert Nathaniel Donaldson",
+     4098,
+     "D.L.P."
+    ],
+    [
+     "Cuthbert K. Johnson",
+     7019,
+     "P.N.M."
+    ],
+    [
+     "Steadman Roberts",
+     274,
+     "B.P."
+    ]
+   ]
+  },
+  {
+   "district": "Toco/Manzanilla",
+   "page": 50,
+   "ballots": 9083,
+   "rejected": 1,
+   "majority": 3062,
+   "candidates": [
+    [
+     "Lionel M. Robinson",
+     6072,
+     "P.N.M."
+    ],
+    [
+     "Harold L. U. Rousseau",
+     3010,
+     "D.L.P."
+    ]
+   ]
+  },
+  {
+   "district": "Nariva",
+   "page": 50,
+   "ballots": 11409,
+   "rejected": null,
+   "majority": 2445,
+   "candidates": [
+    [
+     "Montgomery A. Forrester",
+     6927,
+     "D.L.P."
+    ],
+    [
+     "S. R. Moonan",
+     4482,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Ortoire/Mayaro",
+   "page": 50,
+   "ballots": 11099,
+   "rejected": null,
+   "majority": 2592,
+   "candidates": [
+    [
+     "Victor Lionel Campbell",
+     6739,
+     "P.N.M."
+    ],
+    [
+     "Cecil Carrabon",
+     4147,
+     "D.L.P."
+    ],
+    [
+     "Babooram Nathai",
+     213,
+     "B.P."
+    ]
+   ]
+  },
+  {
+   "district": "Siparia",
+   "page": 50,
+   "ballots": 11515,
+   "rejected": 2,
+   "majority": 3453,
+   "candidates": [
+    [
+     "Saran Sampath",
+     4030,
+     "P.N.M."
+    ],
+    [
+     "Ashford S. Sinanan",
+     7483,
+     "D.L.P."
+    ]
+   ]
+  },
+  {
+   "district": "Tobago East",
+   "page": 50,
+   "ballots": 4870,
+   "rejected": 1,
+   "majority": 1933,
+   "candidates": [
+    [
+     "Alphonso P. T. James",
+     1468,
+     "D.L.P."
+    ],
+    [
+     "Arthur N. R. Robinson",
+     3401,
+     "P.N.M."
+    ]
+   ]
+  },
+  {
+   "district": "Tobago West",
+   "page": 50,
+   "ballots": 7082,
+   "rejected": 3,
+   "majority": 3395,
+   "candidates": [
+    [
+     "Duncan Esmond Guy",
+     1412,
+     "Ind."
+    ],
+    [
+     "Benjamin L. B. Pitt",
+     4807,
+     "P.N.M."
+    ],
+    [
+     "Walter Henry Smith",
+     860,
+     "D.L.P."
+    ]
+   ]
+  }
+ ],
+ "1966": [
+  {
+   "district": "Port-of-Spain South",
+   "page": 13,
+   "registered": 12801,
+   "ballots": 6656,
+   "rejected": 1,
+   "candidates": [
+    [
+     "Hill, Max Beverly",
+     272
+    ],
+    [
+     "Reis, Carlton",
+     539
+    ],
+    [
+     "Shade, Clifford Albert",
+     366
+    ],
+    [
+     "Williams, Eric Eustace",
+     5478
+    ]
+   ]
+  },
+  {
+   "district": "Port-of-Spain East",
+   "page": 15,
+   "registered": 13638,
+   "ballots": 7707,
+   "rejected": 8,
+   "candidates": [
+    [
+     "Castillo, Fitzroy",
+     131
+    ],
+    [
+     "Henry, Ira",
+     193
+    ],
+    [
+     "Samaroo, Norman",
+     983
+    ],
+    [
+     "Teshea, Isabel Ursula",
+     6392
+    ]
+   ]
+  },
+  {
+   "district": "Port-of-Spain Central",
+   "page": 17,
+   "registered": 12941,
+   "ballots": 7332,
+   "rejected": 3,
+   "candidates": [
+    [
+     "Bermudez, Alfredo",
+     4006
+    ],
+    [
+     "Farquhar, Peter Geoffrey",
+     3004
+    ],
+    [
+     "Lee Kong, Leon Ulric",
+     293
+    ],
+    [
+     "Pierre, Lennox Oscar",
+     26
+    ]
+   ]
+  },
+  {
+   "district": "Port-of-Spain North East",
+   "page": 19,
+   "registered": 13336,
+   "ballots": 7500,
+   "rejected": 3,
+   "candidates": [
+    [
+     "Braithwaite, Cyril Cecil",
+     192
+    ],
+    [
+     "Joseph, Dorothy",
+     752
+    ],
+    [
+     "Prevatt, Francis Casimir",
+     4982
+    ],
+    [
+     "Roach, Lawrence Christopher",
+     1571
+    ]
+   ]
+  },
+  {
+   "district": "Port-of-Spain West",
+   "page": 21,
+   "registered": 12016,
+   "ballots": 6583,
+   "rejected": 3,
+   "candidates": [
+    [
+     "Blackman, Fitzgerald",
+     5143
+    ],
+    [
+     "Deboran, Josiah O.",
+     207
+    ],
+    [
+     "Edghill, Lysa Ianthe",
+     583
+    ],
+    [
+     "Jobity, Desmond",
+     647
+    ]
+   ]
+  },
+  {
+   "district": "San Fernando East",
+   "page": 23,
+   "registered": 13406,
+   "ballots": 8383,
+   "rejected": 4,
+   "candidates": [
+    [
+     "Alexis, Leon Jessel",
+     310
+    ],
+    [
+     "Christian, Norma",
+     1674
+    ],
+    [
+     "Espinet, Cedric",
+     593
+    ],
+    [
+     "Montano, Gerard",
+     5802
+    ]
+   ]
+  },
+  {
+   "district": "San Fernando West",
+   "page": 25,
+   "registered": 12887,
+   "ballots": 7869,
+   "rejected": 3,
+   "candidates": [
+    [
+     "Donaldson, Robert Nathaniel",
+     445
+    ],
+    [
+     "Fergus, Arnold Stokly",
+     469
+    ],
+    [
+     "Mahabir, Errol Edward",
+     4577
+    ],
+    [
+     "Persad, Percy Deo",
+     2375
+    ]
+   ]
+  },
+  {
+   "district": "Diego Martin West",
+   "page": 31,
+   "registered": 14020,
+   "ballots": 7935,
+   "rejected": 3,
+   "candidates": [
+    [
+     "Beausoleil, Reginald Emmanuel Martin",
+     146
+    ],
+    [
+     "Brunton, Francis Albert Michael",
+     178
+    ],
+    [
+     "Douglas, Gordon Hamilton",
+     990
+    ],
+    [
+     "McLean, Pope Wilberforce",
+     1017
+    ],
+    [
+     "O'Halloran, John Harold",
+     5357
+    ],
+    [
+     "Pajotte, Stephen Edison",
+     188
+    ],
+    [
+     "Small, Evans Albert",
+     56
+    ]
+   ]
+  },
+  {
+   "district": "Tunapuna",
+   "page": 33,
+   "registered": 14111,
+   "ballots": 9540,
+   "rejected": 5,
+   "candidates": [
+    [
+     "Chambers, Ashton Fitzwilliam",
+     3901
+    ],
+    [
+     "Doonarine, Cecil Edgar",
+     226
+    ],
+    [
+     "James, Cyril Lionel Robert",
+     274
+    ],
+    [
+     "Thompson, Alfred Anaclitus",
+     5134
+    ]
+   ]
+  },
+  {
+   "district": "St Augustine",
+   "page": 37,
+   "registered": 14206,
+   "ballots": 9422,
+   "rejected": 13,
+   "candidates": [
+    [
+     "Bharath, John McKenzie",
+     5230
+    ],
+    [
+     "Davis, Carlton",
+     204
+    ],
+    [
+     "Gopeesingh, Dalip Samuel",
+     327
+    ],
+    [
+     "Huggins, Eutrice",
+     2705
+    ],
+    [
+     "Maraj, Bhadase Sagan",
+     943
+    ]
+   ]
+  },
+  {
+   "district": "St Ann's",
+   "page": 39,
+   "registered": 13210,
+   "ballots": 7520,
+   "rejected": 3,
+   "candidates": [
+    [
+     "Chambers, George Michael",
+     6686
+    ],
+    [
+     "Douglas, Aldwyn",
+     420
+    ],
+    [
+     "Hill, Martin Wells",
+     344
+    ],
+    [
+     "Joseph, Eugene",
+     67
+    ]
+   ]
+  },
+  {
+   "district": "San Juan East",
+   "page": 41,
+   "registered": 13773,
+   "ballots": 8226,
+   "rejected": 9,
+   "candidates": [
+    [
+     "Ibrahim, Yussuff Hugh",
+     2429
+    ],
+    [
+     "Khan, Mohammed Abrahim",
+     699
+    ],
+    [
+     "Mohammed, Shamshuddin",
+     4176
+    ],
+    [
+     "Wilson, Oswald Joseph",
+     913
+    ]
+   ]
+  },
+  {
+   "district": "San Juan West",
+   "page": 43,
+   "registered": 13360,
+   "ballots": 7144,
+   "rejected": 6,
+   "candidates": [
+    [
+     "Craig, Preston",
+     1270
+    ],
+    [
+     "Lopez, Ronald Giles",
+     699
+    ],
+    [
+     "Thurton, Roderick Crispin",
+     341
+    ],
+    [
+     "Wallace, Robert Edward",
+     4828
+    ]
+   ]
+  },
+  {
+   "district": "Laventille",
+   "page": 45,
+   "registered": 13641,
+   "ballots": 7462,
+   "rejected": 2,
+   "candidates": [
+    [
+     "Atherley, Victor Fitz Patrick",
+     1268
+    ],
+    [
+     "Phipps, Eric Emmanuel",
+     5940
+    ],
+    [
+     "Pratt, Carl",
+     113
+    ],
+    [
+     "Rosemin, Alfred Sylvester",
+     139
+    ]
+   ]
+  },
+  {
+   "district": "Barataria",
+   "page": 47,
+   "registered": 13035,
+   "ballots": 7509,
+   "rejected": 1,
+   "candidates": [
+    [
+     "Crevello, Clyde",
+     219
+    ],
+    [
+     "Downes, Oswald Malcolm",
+     955
+    ],
+    [
+     "Mohammed, Kamaluddin",
+     4266
+    ],
+    [
+     "Mustapha, Siddique",
+     2068
+    ]
+   ]
+  },
+  {
+   "district": "Caroni East",
+   "page": 49,
+   "registered": 12635,
+   "ballots": 8587,
+   "rejected": 3,
+   "candidates": [
+    [
+     "Hanoomansingh, Hansley",
+     5341
+    ],
+    [
+     "Khan, M. A. S. A.",
+     711
+    ],
+    [
+     "Persad, Indar",
+     2315
+    ],
+    [
+     "Ramdeen, Balgobin",
+     217
+    ]
+   ]
+  },
+  {
+   "district": "Couva",
+   "page": 51,
+   "registered": 11699,
+   "ballots": 9195,
+   "rejected": 9,
+   "candidates": [
+    [
+     "Annamunthodo, Walter",
+     362
+    ],
+    [
+     "Capildeo, Simbhoonath",
+     1273
+    ],
+    [
+     "Lalla, Kenneth Ramsanta",
+     4615
+    ],
+    [
+     "Swaratsingh, Baliram",
+     2936
+    ]
+   ]
+  },
+  {
+   "district": "Chaguanas",
+   "page": 53,
+   "registered": 13373,
+   "ballots": 9768,
+   "rejected": 4,
+   "candidates": [
+    [
+     "Capildeo, Rudranath",
+     6803
+    ],
+    [
+     "Gowandan, Krishna",
+     562
+    ],
+    [
+     "Persad, Rajnandan",
+     2260
+    ],
+    [
+     "Ramtahal, Johnson",
+     139
+    ]
+   ]
+  },
+  {
+   "district": "Tabaquite",
+   "page": 55,
+   "registered": 12532,
+   "ballots": 9352,
+   "rejected": 2,
+   "candidates": [
+    [
+     "Mischier, Milan",
+     3405
+    ],
+    [
+     "Phill, Clive Dennis Randolph",
+     841
+    ],
+    [
+     "Shah, Shafayed Mohammed",
+     4898
+    ],
+    [
+     "Thompson, Leo",
+     206
+    ]
+   ]
+  },
+  {
+   "district": "Naparima North",
+   "page": 57,
+   "registered": 13017,
+   "ballots": 9704,
+   "rejected": 0,
+   "candidates": [
+    [
+     "Dube, Joseph Makhan",
+     499
+    ],
+    [
+     "Hosein, Zainool",
+     848
+    ],
+    [
+     "Muradali, Nazim Franklyn",
+     4252
+    ],
+    [
+     "Ramkerry Singh, Lionel",
+     4105
+    ]
+   ]
+  },
+  {
+   "district": "Naparima South",
+   "page": 59,
+   "registered": 11200,
+   "ballots": 9133,
+   "rejected": 0,
+   "candidates": [
+    [
+     "Aziz, Gool",
+     1377
+    ],
+    [
+     "Gunness, Ramsaroop",
+     115
+    ],
+    [
+     "Lalchansingh, John",
+     881
+    ],
+    [
+     "Le Quay, Alloy",
+     6013
+    ],
+    [
+     "Panday, Basdeo",
+     326
+    ],
+    [
+     "Seukeran, Lionel Frank",
+     421
+    ]
+   ]
+  },
+  {
+   "district": "Pointe-a-Pierre",
+   "page": 61,
+   "registered": 12119,
+   "ballots": 9506,
+   "rejected": 7,
+   "candidates": [
+    [
+     "Agimudie, William Herbert",
+     537
+    ],
+    [
+     "Edmonds, Joseph L.",
+     3618
+    ],
+    [
+     "Weekes, George",
+     471
+    ],
+    [
+     "Wight, Lilias",
+     4873
+    ]
+   ]
+  }
+ ]
+}
