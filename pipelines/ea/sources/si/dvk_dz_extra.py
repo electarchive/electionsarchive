@@ -1,4 +1,4 @@
-"""Slovenian National Assembly: the 1992 election, and the national-community seats of 2000, 2004, and 2008, from the
+"""Slovenian National Assembly: the 1992 election, and the national-community seats of 1996-2026, from the
 State Election Commission's archived result sites (https://www.dvk-rs.si/arhivi/dz<year>/).
 
 `si.dvk/dz-1992-12-06` holds the 1992 election. Its archived site prints each list's votes for Slovenia as a whole and
@@ -6,9 +6,11 @@ the registered voters and ballots cast of each of the 8 electoral units, and not
 declared figures of one national contest and the units carry the turnout. The district packages of
 `ea.sources.si.dvk_okraji` hold 1996-2008. The Italian and Hungarian national communities each elect one deputy
 separately; the district packages leave those two seats out, and `si.dvk/dz-<date>-communities` adds them to the same
-election for 2000, 2004, and 2008. The 1996 and 1992 sites do not print them.
+election for every year from 1996. The 1992 site does not print them. 1996-2014 come from the archived result pages
+and 2018-2026 from the data file behind each archived results site.
 """
 
+import json
 import re
 from dataclasses import dataclass, field
 from datetime import date
@@ -43,11 +45,25 @@ from ea.sources.si.dvk_okraji import (
 DAY_1992 = date(1992, 12, 6)
 PAGES_1992 = {"index": "dz1992/index.html", "lists": "dz1992/rezultati.html"}
 COMMUNITIES = {
+    date(1996, 11, 10): "dz1996/rezultati_vo.html",
     date(2000, 10, 15): "dz2000/rez_ns.html",
     date(2004, 10, 3): "dz2004/html/rez_ns.html",
     date(2008, 9, 21): "dz2008/rezultati/izidi_skupnosti.html",
+    date(2011, 12, 4): "dz2011/rezultati/izidi_skupnosti.html",
+    date(2014, 7, 13): "dz2014/rezultati/izidi_skupnosti.html",
+    date(2018, 6, 3): "dz2018/data/data.json",
+    date(2022, 4, 24): "dz2022/data/data.json",
+    date(2026, 3, 22): "dz2026/data/data.json",
 }
-STAGES = {date(2000, 10, 15): "preliminary", date(2004, 10, 3): "official", date(2008, 9, 21): "official"}
+STAGES = {day: "preliminary" if day.year == 2000 else "official" for day in COMMUNITIES}
+REPAIRED = {"dr. L\ufffdszl\ufffd G\ufffdncz": "dr. László Göncz"}
+"""The 2014 page prints the Hungarian deputy's name with replacement characters for its accents. It is the deputy the
+same commission prints as Göncz László on its 2008 and 2011 pages, so the name is restored from those."""
+CITED_BY_ELECTION = {1996, 2026}
+"""Years whose community file is also one the election's own package cites: the district page of 1996 and the data file
+of 2026."""
+POINTS_UNTIL = 2018
+"""Through 2018 the figures printed for a candidate are points of a ranked ballot; later they are plain votes."""
 KINDS = {9: ("Italian", "italijanske", "italijanska"), 10: ("Hungarian", "madžarske", "madžarska")}
 
 
@@ -69,7 +85,7 @@ def slug_communities(day: date) -> str:
 
 def fetch() -> None:
     for page in chain(PAGES_1992.values(), COMMUNITIES.values()):
-        raw.fetch(SOURCE, url(page), suffix=".html")
+        raw.fetch(SOURCE, url(page), suffix="." + page.rsplit(".", 1)[1])
 
 
 def emit() -> None:
@@ -369,15 +385,99 @@ def _new(unit: int) -> Community:
 
 
 def communities(day: date) -> list[Community]:
-    page = text(raw.cached(SOURCE, url(COMMUNITIES[day])).path)
-    found = {2000: _communities_2000, 2004: _communities_2004, 2008: _communities_2008}[day.year](page)
+    path = raw.cached(SOURCE, url(COMMUNITIES[day])).path
+    if day.year >= 2018:
+        return _communities_data(day, json.loads(path.read_text(encoding="utf-8-sig")))
+    page = text(path)
+    found = {
+        1996: _communities_1996,
+        2000: _communities_2000,
+        2004: _communities_2004,
+        2008: _communities_2008,
+        2011: _communities_2008,
+        2014: _communities_2008,
+    }[day.year](page)
     if [community.unit for community in found] != [9, 10]:
         raise LookupError(f"{day}: found communities {[community.unit for community in found]}")
+    plain = clean(re.sub(r"<[^>]+>", " ", page))
     for community in found:
+        community.candidates = [(REPAIRED.get(name, name), points) for name, points in community.candidates]
+        if any("\ufffd" in name for name, _ in community.candidates):
+            raise ValueError(f"{day} {community.name}: a candidate name lost its accents at the source")
+        if not community.candidates:
+            raise LookupError(f"{day} {community.name}: no candidates")
         top = max(community.candidates, key=lambda candidate: candidate[1])
         community.elected = top[0]
         if sum(1 for _, points in community.candidates if points == top[1]) != 1:
             raise ValueError(f"{day} {community.name}: the top points are tied")
+    printed = re.findall(r"izvoljen[a]? (.{1,60}?) \.", plain) or re.findall(r"izvoljen[a]? ([^.]+)\.", plain)
+    printed = [REPAIRED.get(clean(name), clean(name)) for name in printed if not name.startswith("kandidat")]
+    if printed and [_fold(name) for name in printed] != [_fold(community.elected or "") for community in found]:
+        raise ValueError(f"{day}: the printed winners {printed} differ from the top points")
+    return found
+
+
+def _fold(name: str) -> str:
+    return " ".join(sorted(word for word in re.sub(r"[^\w ]", "", name.casefold()).split() if word != "dr"))
+
+
+def _communities_data(day: date, data: dict[str, object]) -> list[Community]:
+    """The communities' registered voters, ballots, and candidates in the results site's data file."""
+    slovenia = data["slovenija"]
+    if not isinstance(slovenia, dict) or not data["nastavitve"].get("is_final"):  # type: ignore[union-attr]
+        raise LookupError(f"{day}: the data file is not final")
+    block = slovenia["prip_manjs"]
+    found: list[Community] = []
+    for unit in block["enote"]:
+        community = _new(unit["st"])
+        community.registered = unit["udel"]["upr"]
+        community.voters = unit["udel"]["gl"]
+        community.cast = unit["rez"]["glas"]
+        community.invalid = unit["rez"]["nev"]
+        community.valid = unit["rez"]["velj"]
+        rows = [row for row in block["kand_rez"] if row["enota"] == unit["st"]]
+        marked = [row["naziv"] for row in rows if row["man"]]
+        if len(marked) != 1:
+            raise LookupError(f"{day} {community.name}: {len(marked)} elected")
+        rows.sort(key=lambda row: -row["gl"])
+        community.candidates = [(clean(row["naziv"]), row["gl"]) for row in rows]
+        community.elected = clean(marked[0])
+        if community.elected != community.candidates[0][0]:
+            raise ValueError(f"{day} {community.name}: the elected is not the top candidate")
+        if day.year > POINTS_UNTIL and sum(points for _, points in community.candidates) != community.valid:
+            raise ValueError(f"{day} {community.name}: candidate votes differ from the valid ballots")
+        found.append(community)
+    found.sort(key=lambda community: community.unit)
+    if [community.unit for community in found] != [9, 10]:
+        raise LookupError(f"{day}: found communities {[community.unit for community in found]}")
+    return found
+
+
+def _communities_1996(page: str) -> list[Community]:
+    plain = clean(re.sub(r"<[^>]+>", " ", page))
+    found: list[Community] = []
+    for unit in (9, 10):
+        head = re.search(rf"Volilna enota {unit} - .*?(?=Volilna enota \d+ - |$)", plain)
+        if head is None:
+            raise LookupError(f"1996 unit {unit} not found")
+        body = head.group(0)
+        community = _new(unit)
+        for name, pattern in {
+            "registered": r"Število volivcev ([\d.]+)",
+            "voters": r"Glasovalo ([\d.]+)",
+            "cast": r"Število oddanih glasovnic ([\d.]+)",
+            "invalid": r"Število neveljavnih glasovnic ([\d.]+)",
+        }.items():
+            match = re.search(pattern, body)
+            if match is None:
+                raise LookupError(f"1996 unit {unit}: no {name}")
+            setattr(community, name, _int(match.group(1)))
+        board = re.search(r"število točk:(.*?)Za poslan", body)
+        if board is None:
+            raise LookupError(f"1996 unit {unit}: no points")
+        for match in re.finditer(r"([^\d(]+?) ([\d.]+)(?: \([\d,]+ ?%\))?(?= |$)", board.group(1)):
+            community.candidates.append((clean(match.group(1)), _int(match.group(2))))
+        found.append(community)
     return found
 
 
@@ -450,29 +550,25 @@ def _communities_2008(page: str) -> list[Community]:
             raise LookupError(f"2008 unit {unit} not found")
         body = chunk.group(0)
         community = _new(unit)
-        roll = re.search(
-            r"vpisanih\s+(\d+) volivcev\. S potrdil\w+ pristojnega organa \w+ glasoval\w* (\d+) voliv", body
-        )
+        roll = re.search(r"torej je imelo pravico voliti ([\d.]+) volivcev", body)
         if roll is None:
-            raise LookupError(f"2008 unit {unit}: no roll")
-        community.registered = int(roll.group(1)) + int(roll.group(2))
+            raise LookupError(f"{unit}: no roll")
+        community.registered = _int(roll.group(1))
         for name, pattern in {
-            "voters": r"Glasovalo je:? (\d+) volivcev",
-            "cast": r"Število oddanih glasovnic: (\d+)",
-            "invalid": r"Število neveljavnih glasovnic: (\d+)",
-            "valid": r"Število veljavnih glasovnic: (\d+)",
+            "voters": r"Glasovalo je:? ([\d.]+) volivcev",
+            "cast": r"Število oddanih glasovnic: ([\d.]+)",
+            "invalid": r"Število neveljavnih glasovnic: ([\d.]+)",
+            "valid": r"Število veljavnih glasovnic: ([\d.]+)",
         }.items():
             match = re.search(pattern, body)
             if match is None:
-                raise LookupError(f"2008 unit {unit}: no {name}")
-            setattr(community, name, int(match.group(1)))
-        board = re.search(r"število točk:(.*?)Za poslanca", body)
+                raise LookupError(f"unit {unit}: no {name}")
+            setattr(community, name, _int(match.group(1)))
+        board = re.search(r"[šŠ]tevilo točk:(.*?)Za poslanca", body)
         if board is None:
-            raise LookupError(f"2008 unit {unit}: no points")
-        for match in re.finditer(r"([^\d(]+?):? ([\d.]+) točk \([\d,]+ ?%\)", board.group(1)):
+            raise LookupError(f"unit {unit}: no points")
+        for match in re.finditer(r"([^\d(]+?):? ([\d.]+) točk(?: \([\d,]+ ?%\))?", board.group(1)):
             community.candidates.append((clean(match.group(1)), _int(match.group(2))))
-        if len(community.candidates) != 5:
-            raise LookupError(f"2008 unit {unit}: found {len(community.candidates)} candidates")
         found.append(community)
     return found
 
@@ -482,22 +578,45 @@ def method_communities(day: date, community: Community) -> str:
         "Published by the State Election Commission (Državna volilna komisija) on its archived results site for the "
         f"{day.year} election. The {KINDS[community.unit][0]} national community elects one deputy of the National "
         f"Assembly in its own electoral unit, the {'ninth' if community.unit == 9 else 'tenth'}, from a special roll "
-        "of its members. Voters rank the candidates, a first place earns the most points, and the candidate with "
-        "the most points is elected, so the points stored here are points, not votes, and they sum to more than the "
-        "valid ballots. "
+        "of its members. "
     )
+    if day.year <= POINTS_UNTIL:
+        text += (
+            "Voters rank the candidates, a first place earns the most points, and the candidate with the most "
+            "points is elected, so the figures stored here are points, not votes, and they sum to more than the "
+            "valid ballots. "
+        )
+    else:
+        text += (
+            "Voters mark one candidate and the candidate with the most votes is elected; the candidates' votes sum "
+            "to the valid ballots. "
+        )
     if day.year == 2000:
         text += (
             "The 2000 site prints the candidates' points only, as the commission's unofficial count, which was never "
             "replaced by the official one, so these are stored as a preliminary tabulation with no ballot figures. "
         )
+    elif day.year == 1996:
+        text += (
+            "The 1996 site prints the roll, the voters, the ballots cast, and the invalid ballots as they stand, and "
+            "no valid-ballot figure; the voters exceed the ballots cast in both units and the site does not explain "
+            "the difference, so each is stored as printed. "
+        )
+    elif day.year >= 2018:
+        text += (
+            "The figures come from the data file behind the archived results site. The registered voters are the "
+            "roll the file prints for the unit, and the voters are all who voted, by the roll and by certificate. "
+        )
     else:
         text += (
             "The registered voters are the special roll plus the voters holding a certificate of the competent "
-            "authority, and the voters are all who voted. The unit has no area of its own, so its reporting unit "
-            "has none. "
+            "authority, and the voters are all who voted. "
         )
-    return text + "The district packages of the same election hold the other 88 seats."
+    return (
+        text
+        + "The unit covers the whole community and has the area of its electoral unit. "
+        + ("The district packages of the same election hold the other 88 seats.")
+    )
 
 
 def election_communities(day: date, found: list[Community]) -> Package:
@@ -509,7 +628,11 @@ def election_communities(day: date, found: list[Community]) -> Package:
         depends=["si.dvk/geo", "si.dvk/registry", f"si.dvk/dz-{day}"],
     )
     p.external.add(SLOVENIA)
-    p.artifact(raw.cached(SOURCE, url(COMMUNITIES[day])), DVK_SOURCE)
+    artifact = raw.cached(SOURCE, url(COMMUNITIES[day]))
+    if day.year in CITED_BY_ELECTION:
+        p.uses(artifact)  # the election package this one depends on already holds this file's source_artifact row
+    else:
+        p.artifact(artifact, DVK_SOURCE)
     stage = STAGES[day]
     for community in found:
         english, native, adjective = KINDS[community.unit]
@@ -563,8 +686,8 @@ def election_communities(day: date, found: list[Community]) -> Package:
             polity_id=SLOVENIA,
             scheme_code="si.ve",
             code=f"{day}:{community.unit}",
-            area_relation="unlocated",
-            area_id=None,
+            area_relation="within",
+            area_id=area("si.ve", str(community.unit)),
             kind="aggregate",
         )
         roman = "IX" if community.unit == 9 else "X"
@@ -618,9 +741,10 @@ def election_communities(day: date, found: list[Community]) -> Package:
             if name == community.elected:
                 p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=1)
         _frame(p, sets, unit_ids, option_ids, measures, values)
-    p.accept(
-        "accounting.votes_valid",
-        "the candidates' stored values are the points of a ranked ballot, not votes, so they sum to more than the "
-        "valid ballots the commission prints; stored as printed",
-    )
+    if day.year <= POINTS_UNTIL:
+        p.accept(
+            "accounting.votes_valid",
+            "the candidates' stored values are the points of a ranked ballot, not votes, so they sum to more than the "
+            "valid ballots the commission prints; stored as printed",
+        )
     return p
