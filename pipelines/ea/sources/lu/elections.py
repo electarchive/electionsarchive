@@ -304,6 +304,7 @@ def get(url: str) -> None:
 
 
 def fetch() -> None:
+    shapes.fetch()
     for name in FILES:
         raw.fetch(SOURCE, url(name), suffix=".xml")
     for link in merged_pages("communal-2017"):
@@ -682,7 +683,7 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         (
-            "Luxembourg's four legislative constituencies, its cantons, and its communes with their shapes since before "
+            "Luxembourg's four legislative constituencies with their shapes since 2006, its cantons, and its communes with their shapes since before "
             "1920 and the mergers between them, with the communes named in the elections site's result files"
         ),
     )
@@ -755,7 +756,11 @@ def _boundaries(p: Package, atlas: shapes.Atlas) -> None:
 
 def _shapes(p: Package, atlas: shapes.Atlas) -> None:
     """The shapes and cantons of the communes in each period, and a note of each merger on the communes it joined."""
-    for scheme, found in (("lu.canton", atlas.cantons), ("lu.commune", atlas.communes)):
+    for scheme, found in (
+        ("lu.circonscription", atlas.circonscriptions),
+        ("lu.canton", atlas.cantons),
+        ("lu.commune", atlas.communes),
+    ):
         for code, commune in found.items():
             id = key("area", scheme, code)
             for version in commune.versions:
@@ -782,6 +787,8 @@ def _shapes(p: Package, atlas: shapes.Atlas) -> None:
                         valid_to=end,
                     )
         for period in shapes.PERIODS:
+            if scheme == "lu.circonscription" and period.vintage < "2006":
+                continue
             p.add(
                 "boundary_set",
                 id=p.id("boundary_set", scheme, period.vintage),
