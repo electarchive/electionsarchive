@@ -88,6 +88,8 @@ def party_code(text: str) -> str:
 
 
 def _word(w: str) -> str:
+    if re.fullmatch(r"\(?(?:[A-Za-z]\.){2,}\)?", w):
+        return w.upper()
     out = "-".join("'".join(q[:1].upper() + q[1:].lower() for q in part.split("'")) for part in w.split("-"))
     return re.sub(r"^(Mc|Mac(?=[a-z]{3,}))([a-z])", lambda m: m.group(1) + m.group(2).upper(), out)
 
