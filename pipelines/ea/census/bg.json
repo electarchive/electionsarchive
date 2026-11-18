@@ -104,6 +104,118 @@
       "publisher": "Главна дирекция на статистиката (Национален статистически институт, Статистическа библиотека)",
       "url": "https://statlib.nsi.bg/asset/default/SG_6_1942-1945_1947_OCR_BW.pdf",
       "kind": "official_body"
+    },
+    "wp_bg_i_ons": {
+      "title": "I обикновено народно събрание",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/I_обикновено_народно_събрание",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 12635601 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_ii_ons": {
+      "title": "II обикновено народно събрание",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/II_обикновено_народно_събрание",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 11435434 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_ii_vns": {
+      "title": "II велико народно събрание",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/II_велико_народно_събрание",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 12370968 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_iii_ons": {
+      "title": "III обикновено народно събрание",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/III_обикновено_народно_събрание",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 12390090 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_iv_ons": {
+      "title": "IV обикновено народно събрание",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/IV_обикновено_народно_събрание",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 12731552 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_iii_vns": {
+      "title": "III велико народно събрание",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/III_велико_народно_събрание",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 12228109 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_v_ons": {
+      "title": "V обикновено народно събрание",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/V_обикновено_народно_събрание",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 11670370 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_vi_ons": {
+      "title": "VI обикновено народно събрание",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/VI_обикновено_народно_събрание",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 12892502 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_iv_vns": {
+      "title": "IV велико народно събрание",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/IV_велико_народно_събрание",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 12932915 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_vii_ons": {
+      "title": "VII обикновено народно събрание",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/VII_обикновено_народно_събрание",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 12232642 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_viii_ons": {
+      "title": "VIII обикновено народно събрание",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/VIII_обикновено_народно_събрание",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 13034571 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_ix_ons": {
+      "title": "IX обикновено народно събрание",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/IX_обикновено_народно_събрание",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 12232654 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_izb1890": {
+      "title": "Парламентарни избори в България (1890)",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/Парламентарни_избори_в_България_(1890)",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 11736284 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
+    },
+    "wp_bg_izb1884": {
+      "title": "Парламентарни избори в България (1884)",
+      "publisher": "Wikipedia (Bulgarian)",
+      "url": "https://bg.wikipedia.org/wiki/Парламентарни_избори_в_България_(1884)",
+      "kind": "community",
+      "note": "Cites the State Gazette decree that fixed the election day and the National Assembly's chronology page for seat counts. Revision 12993738 read 2026-11-18.",
+      "license": "CC BY-SA 4.0"
     }
   },
   "tiers": [
@@ -1489,9 +1601,92 @@
       ],
       "dates": [
         {
-          "date": "1879-04-16",
-          "through": "1898-12-31",
-          "note": "Ordinary and Grand Assembly elections from 1879 to 1898 are known to exist and are not yet listed; the statistical yearbooks' series start in 1899."
+          "date": "1879-09-30",
+          "source": "wp_bg_i_ons",
+          "quote": "Сформира се непосредствено след първите парламентарни избори в Българското княжество проведени на 30 септември и 7 октомври 1879 г.",
+          "note": "I Ordinary National Assembly. Second round 7 October 1879; seat count not settled by the sources read. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1880-01-13",
+          "source": "wp_bg_ii_ons",
+          "quote": "проведени на 13 и 20 януари 1880 г.",
+          "note": "II Ordinary National Assembly. Second round 20 January 1880; seat count not settled by the sources read. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1881-06-14",
+          "source": "wp_bg_ii_vns",
+          "quote": "се провеждат на 14 и 21 юни (27 юни и 4 юли – нов стил) същата година",
+          "note": "II Grand National Assembly, Svishtov. Second round 21 June 1881; 307 deputies attended. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1882-11-21",
+          "seats": 47,
+          "source": "wp_bg_iii_ons",
+          "quote": "се провеждат на 21 ноември",
+          "note": "III Ordinary National Assembly. The law cut the membership to 47; supplementary elections in summer 1883 raised it to 55. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1884-05-27",
+          "seats": 195,
+          "source": "wp_bg_iv_ons",
+          "quote": "Парламентарните избори се провеждат на 27 май и 3 юни същата година",
+          "note": "IV Ordinary National Assembly. Second round 3 June 1884; 195 deputies elected, joined by 91 from Eastern Rumelia in 1886. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1886-05-11",
+          "seats": 91,
+          "source": "wp_bg_izb1884",
+          "quote": "населението на Източна Румелия избира свои 91 народни представители на 11 и 18 май 1886",
+          "note": "Elections in Eastern Rumelia after the Unification for 91 deputies who joined the IV Ordinary National Assembly. Second round 18 May 1886. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1886-09-28",
+          "seats": 493,
+          "source": "wp_bg_iii_vns",
+          "quote": "провеждат парламентарните избори на 28 септември 1886 г.",
+          "note": "III Grand National Assembly. 493 deputies elected; the vote failed in 7 of 85 electoral districts. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1887-10-09",
+          "seats": 285,
+          "source": "wp_bg_v_ons",
+          "quote": "Провеждат се на 9 октомври същата година",
+          "note": "V Ordinary National Assembly. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1890-08-26",
+          "seats": 276,
+          "source": "wp_bg_izb1890",
+          "quote": "се провеждат на 26 август 1890 г.",
+          "note": "VI Ordinary National Assembly, convened 15 October 1890; decree of 14 June 1890. Seat count per the Assembly's chronology: 276. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1893-04-18",
+          "seats": 577,
+          "source": "wp_bg_iv_vns",
+          "quote": "Парламентарните избори се провеждат на 18 април същата година",
+          "note": "IV Grand National Assembly, Tarnovo. Seat count per the Assembly's chronology: 577. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1893-07-18",
+          "seats": 145,
+          "source": "wp_bg_vii_ons",
+          "quote": "Провеждат са на 18 юли (31 юли – нов стил) същата година",
+          "note": "VII Ordinary National Assembly, after the constitutional amendment of May 1893 cut the ratio to one deputy per 20,000. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1894-09-10",
+          "seats": 149,
+          "source": "wp_bg_viii_ons",
+          "quote": "Провеждат са на 10 септември същата година",
+          "note": "VIII Ordinary National Assembly. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
+        },
+        {
+          "date": "1896-11-17",
+          "seats": 159,
+          "source": "wp_bg_ix_ons",
+          "quote": "Провеждат се на 17 ноември същата година",
+          "note": "IX Ordinary National Assembly. Date as printed in the decree and the press of the day (Julian calendar); dates before 1916 are not converted to the Gregorian calendar."
         },
         {
           "date": "1899-04-25",
