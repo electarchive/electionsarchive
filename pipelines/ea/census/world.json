@@ -837,10 +837,11 @@
       "note": "The Archives of Yugoslavia, the national archive of the State Union's successor, on the Constitutional Charter the Federal Assembly proclaimed on 4 February 2003. The end date is the Montenegrin parliament's declaration of independence of 3 June 2006, as the IPU PARLINE archive records it (archive.ipu.org/parline-e/reports/2355_arc.htm and arc/2385_06.htm)."
     },
     "ddr": {
-      "publisher": "Deutscher Bundestag",
-      "title": "The German Democratic Republic (1949-1990)",
-      "url": "https://www.bundestag.de/en/parliament/history/parliamentarism/gdr/gdr-200348",
-      "kind": "official_body"
+      "publisher": "Volkskammer der DDR",
+      "title": "Beschluß der Volkskammer der Deutschen Demokratischen Republik über den Beitritt der Deutschen Demokratischen Republik zum Geltungsbereich des Grundgesetzes der Bundesrepublik Deutschland vom 23. August 1990, GBl. I 1990 S. 1324",
+      "url": "https://www.verfassungen.de/ddr/beitrittsbeschluss90.htm",
+      "kind": "official_body",
+      "note": "The GDR parliament's decision of accession with effect from 3 October 1990, as printed in the Gesetzblatt der DDR and transcribed on verfassungen.de. The republic began when the Provisional Volkskammer constituted itself on 7 October 1949 (Gesetz über die Konstituierung der Provisorischen Volkskammer, GBl. 1949 S. 1, https://www.verfassungen.de/ddr/volkskammergesetz49.htm), and the Bundesarchiv lists its ten Volkskammer elections from 15 October 1950 to 18 March 1990 (https://www.bundesarchiv.de/themen-entdecken/online-entdecken/geschichtsgalerien/wahlen-in-der-ddr/)."
     },
     "ant": {
       "publisher": "Encyclopaedia Britannica",
@@ -3325,9 +3326,9 @@
       "iso": "DDR",
       "name_en": "East Germany",
       "status": "former",
-      "reason": "Volkskammer elections from 1950 to 1990.",
+      "reason": "Founded on 7 October 1949, when the Deutscher Volksrat constituted itself as the Provisional Volkskammer; held Volkskammer elections from 15 October 1950 to 18 March 1990 and acceded to the Federal Republic of Germany with effect from 3 October 1990.",
       "source": "ddr",
-      "locator": "https://www.bundestag.de/en/parliament/history/parliamentarism/gdr/gdr-200348"
+      "locator": "https://www.verfassungen.de/ddr/beitrittsbeschluss90.htm (Die Volkskammer erklärt den Beitritt der Deutschen Demokratischen Republik zum Geltungsbereich des Grundgesetzes der Bundesrepublik Deutschland gemäß Artikel 23 des Grundgesetzes mit Wirkung vom 3. Oktober 1990.)"
     },
     {
       "iso": "ANT",
