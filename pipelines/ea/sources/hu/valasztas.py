@@ -2449,14 +2449,21 @@ class Local:
         name = found.names.get(area_code) or found.historic.get(area_code, ("", area_code))[1]
         return person_text(name) if name.isupper() else name
 
-    def contest(self, kind: str, area_code: str, ward: str | None = None, magnitude: int | None = 1) -> str:
-        """kind: mayor, lord-mayor, council (block vote), ward, county-list, budapest-list."""
+    def contest(
+        self,
+        kind: str,
+        area_code: str,
+        ward: str | None = None,
+        magnitude: int | None = 1,
+        note: str | None = None,
+    ) -> str:
+        """kind: mayor, lord-mayor, council (block vote), ward, county-list, budapest-list, assembly-compensation."""
         tag = f"onk:{self.year}:{kind}:{area_code}" + (f":{ward}" if ward else "")
         if tag in self.d.sets:
             return tag
         name = (
             self.place_name(area_code)
-            if kind not in ("county-list", "county-list-large", "lord-mayor", "budapest-list")
+            if kind not in ("county-list", "county-list-large", "lord-mayor", "budapest-list", "assembly-compensation")
             else ""
         )
         maz = area_code[:2]
@@ -2492,6 +2499,11 @@ class Local:
             title, english = f"{name} kompenzációs lista", f"{name} compensation list"
             office, body, area, system = None, council(area_code), settlement(area_code), LOCAL_COMP
             contest_kind = "list_allocation"
+        elif kind == "assembly-compensation":
+            title = "Fővárosi közgyűlés kompenzációs lista"
+            english = "Budapest Assembly compensation list"
+            office, body, area, system = None, county_assembly("01"), county("01"), LOCAL_COMP
+            contest_kind = "list_allocation"
         else:
             title, english = "Fővárosi közgyűlés", "Budapest Assembly"
             office, body, area, system = None, county_assembly("01"), county("01"), LOCAL_LIST
@@ -2503,7 +2515,7 @@ class Local:
             title,
             f"{self.path}/{changeset.slug(tag.split(':', 2)[2])}",
             magnitude=magnitude,
-            method=method(),
+            method=note or method(),
             english=english,
             office=office,
             body=body,
@@ -2743,6 +2755,7 @@ def local_2019(d: Day) -> None:
         if found:
             local_workbook(d, local, sheets("2019_onkormanyzati", path.split("/")[-1]), found[1], SHEETS_2019)
     winners_2019(d, local)
+    assemblies_2019(d, local)
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -2997,6 +3010,271 @@ def report(year: str, winners: Winners) -> None:
         raise ValueError(f"{year}: {len(winners.missed)} declared winners did not match a candidate")
 
 
+# ---------------------------------------------------------------------------------------------------------------
+# County and Budapest assemblies of the 2014 and 2019 local elections: seats by list and the elected list members
+
+ASSEMBLY_PAGE = re.compile(r"<!-- (https://\S+?)(?: \(([^)]*)\))? -->")
+BUDAPEST_COMPENSATION = (
+    "The Budapest Assembly is the Lord Mayor, the 23 district mayors, and {seats} members from the Budapest "
+    "compensation lists. {detail} The office publishes this contest on its assembly pages, not by polling station."
+)
+
+
+def assembly_pages(name: str, pattern: str) -> Iterator[tuple[str, str]]:
+    """The pages of a combined file of saved pages whose address matches `pattern`, as (county code, HTML)."""
+    content = raw.cached(SOURCE, name).path.read_bytes().decode("utf-8", errors="replace")
+    marks = list(ASSEMBLY_PAGE.finditer(content))
+    for mark, following in zip(marks, [*marks[1:], None], strict=False):
+        found = re.search(pattern, mark[1])
+        if found:
+            yield found[1], content[mark.end() : following.start() if following else None]
+
+
+def list_key(label: str) -> str:
+    return same_name(label) or label
+
+
+ABBREVIATIONS = {
+    "FIDESZ-KDNP": "FIDESZ-MAGYAR POLGÁRI SZÖVETSÉG-KERESZTÉNYDEMOKRATA NÉPPÁRT",
+    "DK": "DEMOKRATIKUS KOALÍCIÓ",
+    "JOBBIK": "JOBBIK MAGYARORSZÁGÉRT MOZGALOM",
+    "MSZP": "MAGYAR SZOCIALISTA PÁRT",
+    "MOMENTUM": "MOMENTUM MOZGALOM",
+    "MI HAZÁNK": "MI HAZÁNK MOZGALOM",
+    "MINDENKI MAGYARORSZÁGA": "MINDENKI MAGYARORSZÁGA MOZGALOM",
+    "PÁRBESZÉD": "PÁRBESZÉD MAGYARORSZÁGÉRT PÁRT",
+}
+
+
+def spelled_out(label: str) -> str:
+    """A list's short name as the ballot spells it: each party's abbreviation replaced by its full name."""
+    words = re.sub(r"\s+", " ", label).strip().upper()
+    for short in sorted(ABBREVIATIONS, key=len, reverse=True):
+        words = re.sub(rf"(?<![\w]){re.escape(short)}(?![\w])", ABBREVIATIONS[short], words)
+    return words
+
+
+class Assembly:
+    """The seats and elected members of one assembly's lists, staged on the options of one list contest."""
+
+    def __init__(self, d: Day, tag: str, create: bool = False) -> None:
+        self.d = d
+        self.tag = tag
+        self.create = create
+        self.contest = d.contest_id(tag)
+        self.found: dict[str, str] = {}
+        self.ballot: dict[str, str] = {}
+        for row in d.p.rows.get("contest_option", []):
+            if row["contest_id"] == self.contest and row["kind"] == "list":
+                self.ballot[cast(str, row["id"])] = cast(str, row["ballot_label"])
+        self.seats: dict[str, int] = {}
+        self.members: Counter[str] = Counter()
+        self.seen: Counter[str] = Counter()
+
+    def lookup(self, label: str) -> str | None:
+        """The option the page's name for a list stands for: the same name, or the short name of a ballot name."""
+        if label in self.found:
+            return self.found[label]
+        wanted = {list_key(label), list_key(spelled_out(label))}
+        free = [o for o in self.ballot if o not in self.found.values()]
+        exact = [o for o in free if list_key(self.ballot[o]) in wanted]
+        # A local list's name may be printed in full on the ballot and shortened on the page, or the other way around.
+        near = [
+            o
+            for o in free
+            if any(
+                len(w) >= 6 and (list_key(self.ballot[o]).startswith(w) or w.startswith(list_key(self.ballot[o])))
+                for w in wanted
+            )
+        ]
+        for found in (exact, near):
+            if len(found) == 1:
+                self.found[label] = found[0]
+                return found[0]
+        return None
+
+    def pair_leftovers(self, labels: Iterable[str]) -> None:
+        """A page name that matches no ballot name, when it is the only one left and only one list that is still free
+        won enough votes (5%) to take a seat, is that list."""
+        left = [label for label in labels if self.lookup(label) is None]
+        free = [o for o in self.ballot if o not in self.found.values()]
+        if len(left) == 1 and len(free) > 1:
+            votes = self.d.summed(self.tag)
+            total = sum(amount for option, amount in votes.items() if option)
+            free = [o for o in free if votes.get(o, 0) >= 0.05 * total]
+        if len(left) == 1 and len(free) == 1:
+            self.found[left[0]] = free[0]
+
+    def option(self, label: str, position: int | None = None) -> str:
+        option = self.lookup(label)
+        if option is None:
+            if not self.create:
+                raise ValueError(f"{self.tag}: the page's list {label!r} matches no list on the ballot")
+            option = self.found[label] = self.d.option(self.tag, label, "list", nominator=label, position=position)
+            self.ballot[option] = label
+        return option
+
+    def win(self, label: str, seats: int, position: int | None = None) -> None:
+        option = self.option(label, position)
+        self.seats[option] = seats
+        if seats:
+            self.d.outcome(self.tag, option, "won", seats)
+
+    def member(self, name: str, label: str, position: int | None = None) -> None:
+        option = self.lookup(label)
+        if option is None:
+            raise ValueError(f"{self.tag}: {name!r} is elected from {label!r}, which is not a list of the contest")
+        person = f"{self.tag}:{list_key(label)}:{position or ''}:{same_name(name)}"
+        self.seen[person] += 1
+        if self.seen[person] > 1:
+            person += f":{self.seen[person]}"
+        candidacy = self.d.candidate(
+            self.tag, option, person, name, role="list_member", position=position, nominator=label
+        )
+        self.d.outcome(self.tag, option, "elected", candidacy=candidacy)
+        self.members[option] += 1
+
+    def check(self) -> None:
+        bad = {o: (n, self.seats.get(o)) for o, n in self.members.items() if self.seats.get(o) != n}
+        if bad:
+            raise ValueError(f"{self.tag}: members and seats disagree: {bad}")
+        unmarked = [o for o, n in self.seats.items() if n and not self.members[o]]
+        if unmarked:
+            raise ValueError(f"{self.tag}: {len(unmarked)} lists have seats and no members")
+
+    def magnitude(self, size: int | None = None) -> None:
+        """Record the assembly's size on the contest: the size the office prints, or the seats it gave out."""
+        total = sum(self.seats.values())
+        if size is not None and size != total:
+            raise ValueError(f"{self.tag}: {size} seats printed, {total} given out")
+        for row in self.d.p.rows["contest"]:
+            if row["id"] == self.contest:
+                row["magnitude"] = total
+
+
+def assemblies_2019(d: Day, local: Local) -> None:
+    d.cite(ASSEMBLIES_2019)
+    for maz, page in assembly_pages(ASSEMBLIES_2019, r"tertag\.jsp\?EA=40&KKOD=0&MAZ=(\d\d)$"):
+        rows = table_cells(page)
+        seats: list[tuple[str, int]] = []
+        members: list[tuple[str, str, str]] = []
+        mode = ""
+        for row in rows:
+            if row[:1] == ["Szervezet"]:
+                mode = "seats"
+            elif row[:1] == ["Képviselő neve"]:
+                mode = "members"
+            elif mode == "seats" and len(row) == 2 and (n := number(row[1])) is not None:
+                seats.append((row[0], n))
+            elif mode == "members" and len(row) == 3:
+                members.append((row[0], row[1], row[2]))
+            elif mode == "members":
+                mode = ""
+        if maz == "01":
+            via = Counter(org for _, org, how in members if how == "fővárosi listáról")
+            tag = local.contest(
+                "assembly-compensation",
+                "01",
+                magnitude=None,
+                note=BUDAPEST_COMPENSATION.format(
+                    seats=sum(via.values()),
+                    detail="The office publishes the seats of each list and the members elected from it, but no votes.",
+                ),
+            )
+            assembly = Assembly(d, tag, create=True)
+            for org, n in via.items():
+                assembly.win(org, n)
+            for name, org, how in members:
+                if how == "fővárosi listáról":
+                    assembly.member(name, org)
+            composition = Counter(org for _, org, _ in members)
+            if composition != Counter(dict(seats)):
+                raise ValueError(f"2019 Budapest: composition {composition} differs from the seats {dict(seats)}")
+        else:
+            tag = f"onk:2019:county-list:{maz}"
+            if tag not in d.sets:
+                raise ValueError(f"2019 {maz}: no county list contest")
+            assembly = Assembly(d, tag)
+            assembly.pair_leftovers(org for org, _ in seats)
+            for org, n in seats:
+                assembly.win(org, n)
+            for name, org, how in members:
+                if how != "megyei közgyűlési listáról":
+                    raise ValueError(f"2019 {maz}: {name!r} got a seat by {how!r}")
+                assembly.member(name, org)
+        assembly.check()
+        assembly.magnitude()
+
+
+def assemblies_2014(d: Day, local: Local) -> None:
+    d.cite(ASSEMBLIES_2014)
+    for maz, page in assembly_pages(ASSEMBLIES_2014, r"/M(\d\d)/mered\.html$"):
+        rows = table_cells(page)
+        size = re.search(r"megválasztható tagjainak száma:\s*(?:<[^>]*>|\s|&nbsp;)*(\d+)", page)
+        seats: list[tuple[str, int]] = []
+        members: list[tuple[str, str, str]] = []
+        fragments: list[tuple[str, int | None, int]] = []
+        votes: list[tuple[str, int | None]] = []
+        mode = ""
+        for row in rows:
+            head = row[0] if row else ""
+            if head in ("Megyei lista neve", "A jelölt neve", "Sorszám", "Kompenzációs lista neve"):
+                mode = head
+            elif mode == "Megyei lista neve" and len(row) == 2 and (n := number(row[1])) is not None:
+                seats.append((head, n))
+            elif mode == "Kompenzációs lista neve" and len(row) == 3 and (n := number(row[2])) is not None:
+                fragments.append((head, number(row[1]), n))
+            elif mode == "A jelölt neve" and len(row) == 3:
+                members.append((row[0], row[1], row[2]))
+            elif mode == "Sorszám" and len(row) == 4 and number(row[0]) is not None:
+                votes.append((row[1], number(row[2])))
+            else:
+                mode = "" if mode in ("A jelölt neve", "Megyei lista neve", "Kompenzációs lista neve") else mode
+        if maz == "01":
+            how = "Kompenzációs lista"
+            tag = local.contest(
+                "assembly-compensation",
+                "01",
+                magnitude=None,
+                note=BUDAPEST_COMPENSATION.format(
+                    seats=sum(n for _, _, n in fragments),
+                    detail="The office publishes each list's fragment votes, the seats it won, and its elected members.",
+                ),
+            )
+            assembly = Assembly(d, tag, create=True)
+            unit = county_unit(d, "01")
+            for position, (label, fragment, n) in enumerate(fragments, 1):
+                assembly.win(label, n, position)
+                d.value(tag, unit, assembly.option(label), 1, fragment)
+            for name, org, mode_ in members:
+                if mode_ == how:
+                    assembly.member(name, org)
+        else:
+            tag = f"onk:2014:county-list:{maz}"
+            if tag not in d.sets:
+                raise ValueError(f"2014 {maz}: no county list contest")
+            assembly = Assembly(d, tag)
+            assembly.pair_leftovers(label for label, _ in seats)
+            for label, n in seats:
+                assembly.win(label, n)
+            for name, org, position in members:
+                assembly.member(name, org, number(position))
+            assembly.magnitude(int(size[1]) if size else None)
+            _declare_list_votes(d, tag, assembly, votes)
+        assembly.check()
+        if maz == "01":
+            assembly.magnitude()
+
+
+def _declare_list_votes(d: Day, tag: str, assembly: Assembly, votes: list[tuple[str, int | None]]) -> None:
+    """The list votes a county's page prints, kept as declared totals beside the sums of its polling stations."""
+    for label, amount in votes:
+        option = assembly.lookup(label)
+        if option is None:
+            raise ValueError(f"{tag}: the page prints votes for {label!r}, which is not a list of the contest")
+        d.declare(tag, option, 1, amount)
+
+
 OTHER.append((date(2019, 10, 13), "2019 local elections", local_2019))
 
 
@@ -3178,6 +3456,7 @@ def local_2014(d: Day) -> None:
                         d.candidate(tag, option, f"{tag}:{position}", label, nominator=nominator)
                 d.value(tag, unit, option, 1, number(item["SZAVAZAT"]))
     winners_2014(d, local)
+    assemblies_2014(d, local)
 
 
 def winners_2014(d: Day, local: Local) -> None:
