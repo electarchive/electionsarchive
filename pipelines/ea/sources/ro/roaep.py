@@ -11,6 +11,8 @@ From 1990 to 2004 the deputies and senators were elected from party lists in eac
 contest is one county of one chamber and its options are the lists. In 2008 they were elected in single-member
 colleges, so a contest is one college of one chamber and its options are the candidates, as the 2012 election that
 `ro.aep` holds is shaped. The presidential election is one contest per round.
+
+The local elections of the same archive, 1996 to 2008, are built by `roaep_local`.
 """
 
 import difflib
@@ -1646,19 +1648,27 @@ DAYS = [
 
 
 def fetch() -> None:
+    from ea.sources.ro import roaep_local
+
     for url in URLS.values():
         raw.fetch(SOURCE, url, suffix=SUFFIX[url[url.rfind(".") :]])
+    roaep_local.fetch()
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in DAYS)]
+    from ea.sources.ro import roaep_local
+
+    return [f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in DAYS), *roaep_local.packages()]
 
 
 def parse() -> None:
+    from ea.sources.ro import roaep_local
+
     for year in YEARS:
         for p in year():
             p.write()
     registry().write()
+    roaep_local.parse()
 
 
 def emit() -> None:
