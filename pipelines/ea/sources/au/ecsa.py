@@ -1142,13 +1142,18 @@ def events() -> dict[str, Callable[[], Event]]:
 
 
 def packages() -> list[str]:
-    return ["au.ecsa/registry", *(f"au.ecsa/{name}" for name in events())]
+    return ["au.ecsa/registry", *(f"au.ecsa/{name}" for name in events()), *council_packages()]
 
 
 def fetch() -> None:
-    for url in (ELECTION_2022, TCP_2022):
+    for url in (ELECTION_2022, TCP_2022, COUNCIL_2022_PLACES):
         raw.fetch(SOURCE, url, suffix=".zip")
-    raw.fetch(SOURCE, JAENSCH, suffix=".pdf")
+    for url in (JAENSCH, COUNCIL_HISTORY):
+        raw.fetch(SOURCE, url, suffix=".pdf")
+    for url in (COUNCIL_2022_GROUPED, COUNCIL_2022_UNGROUPED, COUNCIL_2022_ELECTED):
+        raw.fetch(SOURCE, url, suffix=".csv")
+    for url in (COUNCIL_2014, COUNCIL_2018):
+        raw.fetch(SOURCE, url, suffix=".html")
     index = raw.fetch(SOURCE, INDEX_2018, suffix=".html")
     for page in district_pages(index.path.read_text()):
         for n in ("", "2"):
@@ -1159,6 +1164,8 @@ def parse() -> None:
     registry().write()
     for name in events():
         build(name).write()
+    for name in council_events():
+        build_council(name).write()
 
 
 def emit() -> None:
@@ -1206,7 +1213,8 @@ def registry() -> Package:
     p = Package(
         "au.ecsa/registry",
         SOURCE,
-        "South Australian parties, the House of Assembly, and its electoral system, from the Electoral Commission SA",
+        "South Australian parties, both houses of Parliament, and their electoral systems, from the Electoral "
+        "Commission SA",
     )
     p.external.add(AUSTRALIA)
     p.add(
@@ -1220,10 +1228,20 @@ def registry() -> Package:
         license_url=LICENSE_URL,
         attribution="Electoral Commission SA",
     )
-    for url in sorted({url for name in events() for url in event(name).files}):
+    files = {url for name in events() for url in event(name).files}
+    files |= {url for name in council_events() for url in council_event(name).files}
+    for url in sorted(files):
         p.artifact(raw.cached(SOURCE, url), ECSA)
     p.add("scheme", code="au-sa.district", polity_id=AUSTRALIA, kind="electoral_district", rank=1, noun="district")
     p.add("scheme", code="au-sa.place", polity_id=AUSTRALIA, kind="precinct", rank=2, noun="polling place")
+    p.add(
+        "scheme",
+        code="au-sa.council",
+        polity_id=AUSTRALIA,
+        kind="electoral_district",
+        rank=1,
+        noun="Legislative Council district",
+    )
     p.add("body", id=ASSEMBLY, polity_id=AUSTRALIA, kind="lower_house")
     p.name(ASSEMBLY, "South Australian House of Assembly", "en", "official")
     p.add("electoral_system", id=SYSTEM, polity_id=AUSTRALIA, rules={"formula": "irv"}, rules_version=1)
@@ -1294,11 +1312,16 @@ def registry() -> Package:
         "engine does not recompute the repeated count.",
         lang="en",
     )
+    council(p)
     tags = {c.party for name in events() for d in event(name).districts for c in d.candidates if known_party(c.party)}
+    tags |= {
+        o.party for name in council_events() for c in council_event(name).contests for o in c.options
+        if known_party(o.party)
+    }  # fmt: skip
     for tag in sorted(tags):
         p.add("party", id=party_id(tag), kind="party", polity_id=AUSTRALIA)
-        if tag in PARTIES:
-            p.name(party_id(tag), PARTIES[tag], "en", "official")
+        if tag in PARTIES or tag in COUNCIL_PARTIES:
+            p.name(party_id(tag), PARTIES.get(tag) or COUNCIL_PARTIES[tag], "en", "official")
             p.name(party_id(tag), tag, "en", "abbreviation", False)
         else:
             p.name(party_id(tag), tag, "en", "abbreviation")
@@ -1680,3 +1703,1246 @@ def build(name: str) -> Package:
             "; ".join(lead + ", ".join(found) for found, lead in valid if found),
         )
     return p
+
+
+# The Legislative Council: the history's second volume from 1857 to 2006, and the commission's own results since.
+
+COUNCIL_HISTORY = f"{HOST}/component/edocman/1857-2006-legislative-council-v2-by-dean-jaensch/download?Itemid=0"
+COUNCIL = key("body", "legislative-council")
+COUNCIL_BLOCK = key("electoral_system", "legislative-council", "block")
+COUNCIL_PREFERENTIAL = key("electoral_system", "legislative-council", "preferential")
+COUNCIL_LIST = key("electoral_system", "legislative-council", "list")
+COUNCIL_STV = key("electoral_system", "legislative-council", "stv")
+COUNCIL_FIRST, COUNCIL_LAST = 25, 161  # the first page of the 1857 section and the last page of the 1973 section
+COUNCIL_TITLE = re.compile(
+    r"^(?P<name>THE PROVINCE|MIDLAND|(?:NORTH[- ]EASTERN|MIDLAND|SOUTHERN|NORTHERN|CENTRAL) DISTRICT(?: NO\.? ?\d)?)\s*"
+    r"(?:[–-]\s*(?P<date>\d{1,2} [A-Z][a-z]+ \d{4})\*?)?$",
+    re.IGNORECASE,
+)
+COUNCIL_DISTRICT = re.compile(
+    r"^(?P<name>The Province|North[- ]Eastern|Midland|Southern|Northern|Central(?: No\.? ?\d)?)(?:\s{2,}(?P<rest>.*))?$"
+)
+ANCHOR = re.compile(r"^(Enrolled|Candidates|Uncontested|\d+ BY-ELECTIONS?|BY-ELECTIONS?\b)")
+
+
+def council_split(page: pymupdf.Page) -> float:
+    """Where a page's right column begins: the left edge of the leftmost heading, title, or table header that sits
+    right of the middle, or the page's width where the page has one column."""
+    starts = []
+    for block in page.get_text("dict")["blocks"]:
+        for line in block.get("lines", []):
+            text = "".join(span["text"] for span in line["spans"]).strip()
+            x0 = line["bbox"][0]
+            if x0 > 220 and (ANCHOR.match(text) or COUNCIL_TITLE.match(text)):
+                starts.append(x0)
+    return min(starts) - 4 if starts else page.rect.width
+
+
+@functools.cache
+def council_pages() -> dict[int, list[str]]:
+    """The text of each page of the electorate results to 1973, as its left and right columns."""
+    path = str(raw.cached(SOURCE, COUNCIL_HISTORY).path)
+    document = pymupdf.open(path)
+    out: dict[int, list[str]] = {}
+    for number in range(COUNCIL_FIRST, COUNCIL_LAST + 1):
+        page = document[number - 1]
+        split = council_split(page)
+        halves = []
+        for x, w in ((0.0, split), (split, page.rect.width - split)):
+            if w < 1:
+                halves.append("")
+                continue
+            halves.append(
+                subprocess.run(
+                    [
+                        "pdftotext",
+                        "-layout",
+                        "-f",
+                        str(number),
+                        "-l",
+                        str(number),
+                        "-x",
+                        str(int(x)),
+                        "-y",
+                        "0",
+                        "-W",
+                        str(int(w)),
+                        "-H",
+                        str(int(page.rect.height)),
+                        path,
+                        "-",
+                    ],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                ).stdout
+            )
+        out[number] = halves
+    return out
+
+
+def council_days(heading: str, year: int) -> list[date]:
+    """The polling days of a heading like 'ELECTORATE RESULTS – 9, 16, 23 MAY' or '27 MAY, 3 JUNE'."""
+    found = re.findall(r"(\d{1,2})(?:\s+([A-Z]+))?", heading.split("RESULTS", 1)[1])
+    days: list[date] = []
+    month = 0
+    for day, name in reversed(found):
+        if name:
+            month = MONTHS.index(name.title()) + 1
+        days.append(date(year, month, int(day)))
+    return sorted(days)
+
+
+@dataclass
+class CouncilSection:
+    """A general election's section of the history: its polling days, and its blocks of electorate results."""
+
+    year: int
+    days: list[date] = field(default_factory=list)
+    blocks: list[Block] = field(default_factory=list)
+    notes: dict[tuple[str, date], str] = field(default_factory=dict)
+
+
+def council_members(text: str) -> list[Candidate]:
+    """Members from an uncontested table, where some names print a comma before the initials, as 'MORROW, W'."""
+    return surnames(re.sub(r"([A-Za-z]), ([A-Z]{1,4}\*?)(?=$|\s*[(,])", r"\1 \2", text.strip().rstrip(".")))
+
+
+@functools.cache
+def council_sections() -> dict[int, CouncilSection]:
+    out: dict[int, CouncilSection] = {}
+    section: CouncilSection | None = None
+    on = False
+    title: tuple[str, date | None] | None = None
+    current: Block | None = None
+    mode = "first"
+    entries: list[list[object]] | None = None  # the uncontested table: district, members, and date
+
+    def finish() -> None:
+        nonlocal entries
+        assert section is not None
+        for district, names, when in entries or []:
+            people = council_members(str(names))
+            if not people:
+                raise ValueError(f"{section.year}: no members returned for {district!r}: {names!r}")
+            assert when is None or isinstance(when, date)
+            section.blocks.append(Block(str(district), when, None, [(c, None) for c in people], []))
+        entries = None
+
+    for halves in council_pages().values():
+        for text in halves:
+            for raw_line in text.splitlines():
+                line = raw_line.strip()
+                if not line or re.fullmatch(r"\d{1,3}", line):
+                    continue
+                found = re.fullmatch(r"(?:THE )?(\d{4}) GENERAL ELECTION", line)
+                if found:
+                    if section is None or section.year != int(found[1]):
+                        if section is not None:
+                            finish()
+                        section = out[int(found[1])] = CouncilSection(int(found[1]))
+                        on, title, current = False, None, None
+                    continue
+                if section is None:
+                    continue
+                if "POLLING PLACE RESULTS" in line or "DIVISION RESULTS" in line:
+                    finish()
+                    on, title, current = False, None, None
+                    continue
+                if "ELECTORATE RESULTS" in line or re.fullmatch(r"(?:\d+ )?BY-ELECTIONS?", line):
+                    finish()
+                    on, title, current = True, None, None
+                    if "BY-ELECTION" not in line:
+                        section.days = council_days(line, section.year)
+                    continue
+                if not on:
+                    continue
+                if line == "Uncontested":
+                    finish()
+                    entries, current = [], None
+                    continue
+                if entries is not None:
+                    if line.startswith(("District", "Division")):
+                        continue
+                    district = COUNCIL_DISTRICT.match(line)
+                    dated = re.fullmatch(r"(\d{1,2} [A-Z][a-z]+ \d{4})\*?(?:\s{2,}(.*))?", line)
+                    if district and not COUNCIL_TITLE.match(line):
+                        entries.append([district["name"], district["rest"] or "", None])
+                        continue
+                    if dated and entries:
+                        entries[-1][2] = printed_date(dated[1])
+                        if dated[2]:
+                            entries[-1][1] = f"{entries[-1][1]}, {dated[2]}".strip(", ")
+                        continue
+                    if entries and re.fullmatch(
+                        r"[A-Z][A-Za-z’' -]+,? [A-Z]{1,4}\s?\*?(?:\s?\*?\([A-Za-z&]+\))?", line
+                    ):
+                        entries[-1][1] = f"{entries[-1][1]}, {line}".strip(", ")
+                        continue
+                    if line.startswith("*") and entries:
+                        last = entries[-1]
+                        if isinstance(last[2], date):
+                            section.notes[(str(last[0]), last[2])] = line.lstrip("*")
+                        continue
+                    if re.match(r"[a-z]", line):
+                        continue  # the rest of a footnote
+                    finish()
+                found = COUNCIL_TITLE.match(line)
+                if found:
+                    title = (found["name"], printed_date(found["date"]) if found["date"] else None)
+                    current = None
+                    continue
+                if line.startswith(("Enrolled", "Candidates", "Plumpers")) or re.fullmatch(
+                    r"\((?:[\d ]+|na)\)|na", line
+                ):
+                    continue
+                stats = council_header(COUNCIL_PRINTED_WRONG.get(" ".join(line.split()), line))
+                if stats is None and title is not None and re.fullmatch(r"[\d.,]+(?: +[\d.,]+| +na)+", line):
+                    raise ValueError(f"{section.year}: unreadable header {line!r} under {title[0]!r}")
+                if stats is not None and title is not None:
+                    current = Block(title[0], title[1], stats, [], [])
+                    section.blocks.append(current)
+                    title, mode = None, "first"
+                    continue
+                if current is None:
+                    continue
+                if line.startswith("Result after preferences"):
+                    mode = "after"
+                    continue
+                # A figure of thousands printed with a point, as '3.085' is.
+                line = re.sub(r"(?<=\s)(\d)\.(\d{3})(?=\s)", r"\1 \2", line)
+                fields = re.split(r"\s{2,}", line.replace("#", " ").strip())
+                if fields[0] == "Total" and len(fields) == 2 and number(fields[1]) is not None:
+                    current.total = number(fields[1])
+                    current = None
+                    continue
+                got = pdf_candidate(fields)
+                if got and re.match(r"[A-Za-z’']", got[0].name):
+                    (current.first if mode == "first" else current.after).append(got)
+                    continue
+                current = None
+    if section is not None:
+        finish()
+    return out
+
+
+# Header lines that print a percentage without its decimal point.
+COUNCIL_PRINTED_WRONG = {"9 841 4 163 42.3 4 044 9701 119 2.9": "9 841 4 163 42.3 4 044 97.1 119 2.9"}
+
+
+def council_header(line: str) -> Stats | None:
+    """A header line, or one that prints neither the roll nor the turnout, as 'na 4 312 na 4 217 97.8 95 2.2'."""
+    found = re.fullmatch(r"na\s+([\d ]+?)\s+na\s+([\d ]+?)\s+\d+\.\d\s+([\d ]+?)\s+\d+\.\d", " ".join(line.split()))
+    if found:
+        voted, formal, informal = (int(found[i].replace(" ", "")) for i in (1, 2, 3))
+        return None, voted, formal, informal
+    return early_header(line)
+
+
+def council_elected(candidate: Candidate) -> bool:
+    """Whether the history prints the surname in capitals, where a prefix like 'De' in 'DeGARIS' stays mixed."""
+    words = candidate.name.split()
+    surname = " ".join(words[:-1] if len(words) > 1 else words)
+    letters = re.sub(r"[^A-Za-z]", "", re.sub(r"^(Mc|Mac|De|Le|O’|O')(?=[A-Z]{2})", "", surname))
+    return len(letters) > 1 and letters.isupper()
+
+
+STATE_FIRST, STATE_LAST = 163, 173  # the pages of the State-wide elections from 1975 to 2006
+
+
+@dataclass
+class Group:
+    """A ballot group: its above-the-line or list votes, where it has any, and its candidates with their own votes."""
+
+    letter: str
+    party: str
+    ticket: int | None
+    members: list[tuple[Candidate, int | None]] = field(default_factory=list)
+    ungrouped: bool = False
+
+
+@dataclass
+class StateCount:
+    """A State-wide election of the Legislative Council, as one district."""
+
+    day: date
+    stats: Stats
+    quota: int | None
+    groups: list[Group]
+    system: str
+    files: list[str]
+    note: str | None = None
+
+
+@functools.cache
+def state_pages() -> dict[int, str]:
+    path = str(raw.cached(SOURCE, COUNCIL_HISTORY).path)
+    out = subprocess.run(
+        ["pdftotext", "-layout", "-f", str(STATE_FIRST), "-l", str(STATE_LAST), path, "-"],
+        check=True, capture_output=True, text=True,
+    ).stdout.split("\f")  # fmt: skip
+    return {STATE_FIRST + i: text for i, text in enumerate(out[: STATE_LAST - STATE_FIRST + 1])}
+
+
+def state_head(text: str, year: int) -> tuple[date, Stats, int | None]:
+    heading = re.search(r"ELECTORATE RESULTS\s*–\s*(\d{1,2}) ([A-Z]+)", text)
+    assert heading, year
+    day = date(year, MONTHS.index(heading[2].title()) + 1, int(heading[1]))
+    stats = next((found for line in text.splitlines() if (found := header(line.strip()))), None)
+    if stats is None:
+        raise ValueError(f"{year}: no State-wide header")
+    quota = re.search(r"Quota\s+([\d ]+?)\s*$", text, re.MULTILINE)
+    return day, stats, number(quota[1]) if quota else None
+
+
+def list_groups(number_: int) -> list[Group]:
+    """The party lists of 1975 and 1979: each group's line, '(H)' or 'ALP(A)', with its votes beside it or beside its
+    only candidate, and the candidates listed below it in the same column."""
+    document = pymupdf.open(str(raw.cached(SOURCE, COUNCIL_HISTORY).path))
+    lines: list[Text] = []
+    for block in document[number_ - 1].get_text("dict")["blocks"]:
+        for line in block.get("lines", []):
+            text = "".join(span["text"] for span in line["spans"]).strip()
+            if text:
+                x0, y0, x1, y1 = line["bbox"]
+                lines.append(Text(x0, y0, x1, y1, text))
+    start = next(t.y0 for t in lines if t.text.startswith("Candidates")) + 2
+    end = next(t.y0 for t in lines if t.text.startswith("*The prescribed"))
+    lines = [t for t in lines if start < t.y0 < end]
+    groups: list[tuple[Text, Group]] = []
+    for t in sorted(lines, key=lambda t: (t.x0 > 290, t.y0)):
+        found = re.fullmatch(r"([A-Z]+)? ?\(([A-Z])\)", t.text)
+        column = t.x0 > 290
+        if found:
+            groups.append((t, Group(found[2], found[1] or "", None)))
+            continue
+        if not re.fullmatch(r"[A-Z][A-Za-z’' -]+ [A-Z]{1,4}\*?", t.text):
+            continue
+        owner = [g for head, g in groups if (head.x0 > 290) == column and head.y0 < t.y0]
+        if not owner:
+            raise ValueError(f"page {number_}: candidate {t.text!r} has no group")
+        owner[-1].members.append((label_candidate(t.text, owner[-1].party), None))
+    for head, group in groups:
+        beside = [
+            t for t in lines
+            if (t.x0 > 290) == (head.x0 > 290) and t.x0 > head.x1 and re.fullmatch(r"\d{1,3}(?: \d{3})*", t.text)
+            and (abs(t.y0 - head.y0) < 3 or (not group.ticket and abs(t.y0 - head.y0) < 14 and t.y0 > head.y0))
+        ]  # fmt: skip
+        if not beside:
+            raise ValueError(f"page {number_}: no votes for group {group.letter}")
+        group.ticket = number(min(beside, key=lambda t: (t.y0, t.x0)).text)
+    return sorted((g for _, g in groups), key=lambda g: g.letter)
+
+
+def stv_1982(text: str) -> list[Group]:
+    groups: dict[str, Group] = {}
+    body = text.split("Candidates", 1)[1]
+    for line in body.splitlines():
+        found = re.fullmatch(
+            r"\s*(?P<name>\S.*?)\s{2,}(?:(?P<party>[A-Z]+) )?\((?P<letter>[A-Z])\)\s+(?P<votes>[\d ]+?)\s+[<\d.]+\s*",
+            line,
+        )
+        if not found:
+            continue
+        group = groups.setdefault(found["letter"], Group(found["letter"], found["party"] or "", None))
+        group.members.append((label_candidate(found["name"], found["party"] or ""), number(found["votes"])))
+    return [groups[letter] for letter in sorted(groups)]
+
+
+def numbers(fields: list[str]) -> list[str]:
+    return [f for f in fields if re.fullmatch(r"<?[\d .]+", f)]
+
+
+def stv_tickets(text: str, year: int) -> list[Group]:
+    """The grouped and ungrouped candidates of 1985 to 2006: a group's first line gives its ticket votes and the
+    first candidate's own votes, and each further line a candidate's own votes."""
+    groups: list[Group] = []
+    lettered = year >= 2002
+    ungrouped = False
+    body = text.split("Formal Vote Details", 1)[1]
+    for line in body.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("Ungrouped candidates"):
+            ungrouped = True
+            continue
+        fields = re.split(r"\s{2,}", stripped)
+        if (
+            len(fields) < 2
+            or not re.match(r"[A-Z][A-Za-z’']", fields[0])
+            or fields[0].startswith(("Total", "Candidate", "Grouped"))
+        ):
+            continue
+        name = fields[0].replace(", ", " ")
+        rest = fields[1:]
+        codes = [f.rstrip(".") for f in rest if re.fullmatch(r"[A-Z0-9&]{1,6}\.?", f) and not f[0].isdigit()]
+        values = [int(f.replace(" ", "")) for f in numbers(rest) if re.fullmatch(r"\d[\d ]*", f)]
+        decimals = [i for i, f in enumerate(numbers(rest)) if not re.fullmatch(r"\d[\d ]*", f)]
+        if not values:
+            continue
+        has_ticket = bool(decimals) and decimals[0] == 1
+        if lettered and has_ticket:
+            party, letter = (codes[0], codes[1]) if len(codes) == 2 else ("", codes[0])
+        else:
+            party, letter = (codes[0] if codes else ""), ""
+        if party in ("IND",):
+            party = ""
+        whole = len(numbers(rest)) in (5, 6, 7) and not has_ticket  # an ungrouped candidate without ticket votes
+        candidate = label_candidate(name, party)
+        if has_ticket or whole or ungrouped:
+            ticket = values[0] if has_ticket else None
+            own = values[1] if has_ticket else values[0]
+            groups.append(Group(letter, party, ticket, [(candidate, own)], ungrouped or whole))
+        else:
+            if not groups:
+                raise ValueError(f"{year}: {name!r} has no group")
+            groups[-1].members.append((candidate, values[0]))
+    return groups
+
+
+@functools.cache
+def state_counts() -> dict[int, StateCount]:
+    out: dict[int, StateCount] = {}
+    texts: dict[int, list[tuple[int, str]]] = {}
+    for page, text in state_pages().items():
+        found = re.match(r"\s*(\d{4}) GENERAL ELECTION", text)
+        assert found, page
+        texts.setdefault(int(found[1]), []).append((page, text))
+    for year, parts in texts.items():
+        text = "\n".join(t for _, t in parts)
+        day, stats, quota = state_head(text, year)
+        if year < 1982:
+            groups = [g for page, _ in parts for g in list_groups(page)]
+            system = COUNCIL_LIST
+        elif year == 1982:
+            groups, system = stv_1982(text), COUNCIL_STV
+        else:
+            groups, system = stv_tickets(text, year), COUNCIL_STV
+        out[year] = StateCount(day, stats, quota, groups, system, [COUNCIL_HISTORY])
+    return out
+
+
+# The commission's own Legislative Council results: State-wide first preferences by group for 2014 and 2018, and
+# first preferences by division and polling place for 2022.
+
+COUNCIL_2014 = (
+    f"{HOST}/elections/past-state-election-results?view=article&id=661:2014-legislative-council-state-summary"
+    "&catid=12:elections"
+)
+COUNCIL_2018 = f"{HOST}/html/results/2018/Legislative_Council.html"
+COUNCIL_2022_PLACES = (
+    f"{HOST}/component/edocman/110-2022se-legislative-council-first-preference-votes-by-polling-place-division"
+    "/download?Itemid=0"
+)
+COUNCIL_2022_GROUPED = f"{HOST}/component/edocman/63-2022se-lc-grouped-candidates-1/download?Itemid=0"
+COUNCIL_2022_UNGROUPED = f"{HOST}/component/edocman/63-2022se-lc-ungrouped-candidates-1/download?Itemid=0"
+COUNCIL_2022_ELECTED = f"{HOST}/component/edocman/51-2022se-lc-order-of-election-of-members/download?Itemid=0"
+# The party each group or summary line names, by its printed name in capitals.
+GROUP_PARTIES = {
+    "AUSTRALIAN LABOR PARTY": "ALP",
+    "LIBERAL PARTY": "LIB",
+    "THE GREENS": "GRN",
+    "THE NATIONALS": "NAT",
+    "FAMILY FIRST": "FFP",
+    "FAMILY FIRST PARTY": "FFP",
+    "PAULINE HANSON'S ONE NATION": "ONP",
+    "SABEST": "SAB",
+    "SA-BEST": "SAB",
+    "NICK XENOPHON'S SA-BEST": "SAB",
+    "ANIMAL JUSTICE PARTY": "AJP",
+    "LIBERAL DEMOCRATS": "LDP",
+    "LIBERAL DEMOCRATS LESS GOVERNMENT MORE FREEDOM": "LDP",
+    "AUST FAMILY PARTY": "AFP",
+    "ADVANCE SA": "ADV",
+    "REAL CHANGE SA": "RCSA",
+    "SA PARTY - STOP OVERDEVELOPMENT & CORRUPTION": "SAP",
+    "LEGALISE CANNABIS SOUTH AUSTRALIA PARTY": "LCSA",
+    "STOP POPULATION GROWTH NOW": "SPGN",
+    "DIGNITY PARTY INC": "DPA",
+    "DIGNITY FOR DISABILITY": "D4D",
+    "CHILD PROTECTION PARTY": "CPP",
+    "AUSTRALIAN CONSERVATIVES (SA)": "AC",
+    "DANIG PARTY OF AUSTRALIA (SA DIVISION)": "DIG",
+    "F.R.E.E. AUSTRALIA PARTY": "FREE",
+    "FAIR LAND TAX - TAX PARTY": "FLT",
+    "SOUTH AUSTRALIAN FISHING & LIFESTYLE PARTY": "SAFL",
+    "KATTER'S SOUTH AUSTRALIAN PARTY": "KAP",
+    "MULTICULTURAL PARTY": "MCP",
+    "SHOOTERS AND FISHERS PARTY SA": "SFP",
+}
+# Names for the party codes the council's history and the commission use, beyond those of the House of Assembly.
+COUNCIL_PARTIES = {
+    "ABP": "Aboriginal Political Party",
+    "AC": "Australian Conservatives",
+    "ACLP": "Anti Communist Labor Party",
+    "ACP": "Australian Conservative Party",
+    "ADV": "Advance SA",
+    "AFM": "Australian Family Movement",
+    "AFR": "Australian Federal Republican Party",
+    "AIA": "Australian Independent Alliance",
+    "AP": "Australia Party",
+    "ARF": "Australian Recreation and Fishing Party",
+    "ASCP": "Australian Social Credit Party",
+    "CLIC": "Community Leadership Independent Coalition",
+    "COMB": "Combined Party",
+    "CPP": "Child Protection Party",
+    "CTA": "Call To Australia",
+    "D4D": "Dignity for Disability",
+    "DLP": "Democratic Labor Party",
+    "DPA": "Dignity Party",
+    "DES": "Democratic Socialist Party",
+    "DSE": "Democratic Socialist Electoral League",
+    "FAM": "Family First Party",
+    "FEG": "Free Enterprise Group",
+    "FLT": "Fair Land Tax - Tax Party",
+    "FREE": "F.R.E.E. Australia Party",
+    "GA": "Green Alliance",
+    "GP": "Grey Power",
+    "GRP": "Green Party SA",
+    "HBP": "Happy Birthday Party",
+    "KAP": "Katter's South Australian Party",
+    "LCSA": "Legalise Cannabis South Australia Party",
+    "LIBERT": "Libertarian Party",
+    "LM": "Liberal Movement",
+    "MAR": "Marijuana Party",
+    "MCP": "Multicultural Party",
+    "MLR": "Marijuana Law Reform",
+    "NA": "National Action",
+    "NATCP": "National Country Party",
+    "NATS": "The Nationals",
+    "NCP": "National Centre Party",
+    "NDP": "Nuclear Disarmament Party",
+    "NES": "No Emergency Services Levy Party",
+    "NHH": "No Hoo Haa Party",
+    "NLW": "Natural Law Party",
+    "NND": "No Nuclear Dump in South Australia Party",
+    "NPC": "No Pokies Campaign",
+    "OMA": "Overtaxed Motorists Association",
+    "OMD": "Overtaxed Motorists, Drinkers, Smokers Association",
+    "OPP": "Overtaxed Pokies Party",
+    "OSA": "Overtaxed Smokers Association",
+    "PROG": "Progressive Labor Party",
+    "RCSA": "Real Change SA",
+    "SAF": "SA First",
+    "SAFL": "South Australian Fishing & Lifestyle Party",
+    "SAN": "SA Nuclear Free Future Party",
+    "SAP": "SA Party - Stop Overdevelopment & Corruption",
+    "SC": "Social Credit",
+    "SCL": "Social Credit League",
+    "SFP": "Shooters and Fishers Party SA",
+    "SOCA": "Socialist Alliance",
+    "SP": "Shooters Party",
+    "SPA": "Socialist Party of Australia",
+    "SPGN": "Stop Population Growth Now",
+    "SRA": "Smokers Rights Association",
+    "SRM": "Save the River Murray Party",
+    "SSR": "Stormy Summers Reform Party",
+    "UAP": "United Australia Party",
+    "VIA": "Voters Independent Association",
+    "WP": "Workers Party",
+}
+
+
+@dataclass
+class Option:
+    label: str
+    kind: str  # candidate, legend (votes above the line for a group), or list
+    party: str
+    person: Candidate | None = None
+    members: list[Candidate] = field(default_factory=list)  # a list's candidates in order
+
+
+@dataclass
+class Leaf:
+    name: str
+    votes: list[int | None]
+    formal: int | None = None
+    informal: int | None = None
+    total: int | None = None
+    kind: str = "standard"
+    parent: str = ""  # the division a polling place is in
+
+
+@dataclass
+class CouncilContest:
+    name: str
+    seats: int
+    system: str
+    options: list[Option]
+    declared: Leaf
+    enrolled: int | None = None
+    places: list[Leaf] = field(default_factory=list)
+    winners: list[int] = field(default_factory=list)
+    won: dict[int, int] = field(default_factory=dict)  # seats won by each list
+    unopposed: bool = False
+    after: list[tuple[str, int]] | None = None
+    notes: list[str] = field(default_factory=list)
+    scheme: str = "au-sa.council"
+    code: str = ""
+
+
+@dataclass
+class CouncilEvent:
+    day: date
+    kind: str  # general or by_election
+    files: list[str]
+    contests: list[CouncilContest] = field(default_factory=list)
+    last: date | None = None
+
+
+DISTRICT_NAMES = {
+    "province": "The Province",
+    "central": "Central District",
+    "central1": "Central District No. 1",
+    "central2": "Central District No. 2",
+    "northeastern": "North-Eastern District",
+    "northern": "Northern District",
+    "southern": "Southern District",
+    "midland": "Midland District",
+}
+
+
+def council_district(printed: str) -> str:
+    text = re.sub(r"^the|district|no(?=\d)", "", re.sub(r"[^a-z0-9]", "", printed.lower()))
+    return DISTRICT_NAMES[text]
+
+
+def candidate_options(candidates: list[Candidate]) -> list[Option]:
+    return [Option(c.name, "candidate", c.party, c) for c in candidates]
+
+
+def history_contest(block: Block, day: date) -> CouncilContest:
+    name = council_district(block.title)
+    candidates = [c for c, _ in block.first]
+    winners = [i for i, c in enumerate(candidates) if council_elected(c)]
+    if not winners:
+        raise ValueError(f"{day} {name}: no candidate is elected")
+    system = COUNCIL_BLOCK if day.year < 1930 else COUNCIL_PREFERENTIAL
+    if block.stats is None:
+        declared = Leaf(name, [None] * len(candidates))
+        return CouncilContest(
+            name, len(winners), system, candidate_options(candidates), declared, winners=winners, unopposed=True
+        )
+    enrolled, voted, formal, informal = block.stats
+    declared = Leaf(name, [v for _, v in block.first], formal, informal, voted)
+    contest = CouncilContest(
+        name, len(winners), system, candidate_options(candidates), declared, enrolled=enrolled, winners=winners
+    )
+    if block.after:
+        contest.after = [(c.name, v) for c, v in block.after]
+    return contest
+
+
+def state_contest(count: StateCount) -> CouncilContest:
+    options: list[Option] = []
+    votes: list[int | None] = []
+    winners: list[int] = []
+    won: dict[int, int] = {}
+    for group in count.groups:
+        party = "" if group.party in ("", "IND") else group.party
+        if count.system == COUNCIL_LIST:
+            members = [c for c, _ in group.members]
+            options.append(
+                Option(f"Group {group.letter}" + (f" ({party})" if party else ""), "list", party, None, members)
+            )
+            votes.append(group.ticket)
+            seats = sum(1 for c in members if council_elected(c))
+            if seats:
+                won[len(options) - 1] = seats
+            continue
+        if group.ticket is not None:
+            label = f"Group {group.letter}" if group.letter else f"Group of {group.members[0][0].display}"
+            options.append(Option(f"{label}{f' ({party})' if party else ''} (above the line)", "legend", party))
+            votes.append(group.ticket)
+        for c, v in group.members:
+            if council_elected(c):
+                winners.append(len(options))
+            options.append(Option(c.name, "candidate", c.party, c))
+            votes.append(v)
+    enrolled, voted, formal, informal = count.stats
+    name = "State of South Australia"
+    declared = Leaf(name, votes, formal, informal, voted)
+    seats = len(winners) + sum(won.values())
+    contest = CouncilContest(name, seats, count.system, options, declared, enrolled, winners=winners, won=won)
+    if count.quota:
+        contest.notes.append(f"The quota for election was {count.quota:,} votes.")
+    return contest
+
+
+def history_council_events() -> dict[str, Callable[[], CouncilEvent]]:
+    out: dict[str, Callable[[], CouncilEvent]] = {}
+    for year, section in council_sections().items():
+        first = section.days[0]
+        out[first.isoformat()] = functools.partial(history_general, year)
+        for when in sorted({b.when for b in section.blocks if b.when}):
+            out[f"{when.isoformat()}-by-election"] = functools.partial(history_by_election, year, when)
+    for year, count in state_counts().items():
+        out[count.day.isoformat()] = functools.partial(state_event, year)
+    return out
+
+
+def history_general(year: int) -> CouncilEvent:
+    section = council_sections()[year]
+    first, last = section.days[0], section.days[-1]
+    event = CouncilEvent(first, "general", [COUNCIL_HISTORY], last=last if last != first else None)
+    event.contests = [history_contest(b, first) for b in section.blocks if b.when is None]
+    return event
+
+
+def history_by_election(year: int, when: date) -> CouncilEvent:
+    section = council_sections()[year]
+    event = CouncilEvent(when, "by_election", [COUNCIL_HISTORY])
+    for block in section.blocks:
+        if block.when == when:
+            contest = history_contest(block, when)
+            note = section.notes.get((block.title, when))
+            if note:
+                contest.notes.append(note)
+            event.contests.append(contest)
+    return event
+
+
+def state_event(year: int) -> CouncilEvent:
+    count = state_counts()[year]
+    return CouncilEvent(count.day, "general", count.files, [state_contest(count)])
+
+
+def summary_rows(text: str) -> tuple[list[tuple[str, int]], dict[str, int]]:
+    """The party rows of a State summary page, with their ballot papers, and its totals."""
+    rows: list[tuple[str, int]] = []
+    totals: dict[str, int] = {}
+    text = re.sub(r"<table style=\"width: 100%; height: 1em;\">.*?</table>", "", text, flags=re.DOTALL)  # bar charts
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", text, re.DOTALL):
+        found = [c for c in cells(row) if c]
+        if len(found) < 2:
+            continue
+        value = number(found[-1])
+        if value is None:
+            continue
+        label = re.sub(r"\s+", " ", found[0]).strip()
+        if label.startswith("Total"):
+            totals[label.rstrip(":").strip()] = value
+        elif label not in ("Party",):
+            rows.append((label, value))
+    return rows, totals
+
+
+def summary_event(day: str, url: str) -> CouncilEvent:
+    text = raw.cached(SOURCE, url).path.read_text()
+    rows, totals = summary_rows(text)
+    options = []
+    for label, _ in rows:
+        independent = label.startswith("Independent")
+        party = "" if independent else GROUP_PARTIES[label.upper()]
+        options.append(Option(label, "list", party))
+    electors = re.search(r"Number of Electors:\s*</?[^>]*>?\s*([\d,]+)", text) or re.search(
+        r"Number of Electors:\s*([\d,]+)", re.sub(r"<[^>]+>", " ", text)
+    )
+    name = "State of South Australia"
+    declared = Leaf(
+        name,
+        [v for _, v in rows],
+        totals["Total Formal"],
+        totals["Total Informal"],
+        totals["Total Ballot Papers"],
+    )
+    contest = CouncilContest(
+        name, 11, COUNCIL_STV, options, declared, enrolled=number(electors[1]) if electors else None
+    )
+    contest.notes.append(
+        "The commission's State summary gives the first preference votes of each group and of each ungrouped "
+        "candidate's line, above and below the line together, and not those of each candidate. The members elected "
+        "are not part of the summary, so no outcome is stored."
+    )
+    return CouncilEvent(date.fromisoformat(day), "general", [url], [contest])
+
+
+def csv_text(url: str) -> str:
+    data = raw.cached(SOURCE, url).path.read_bytes()
+    try:
+        return data.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return data.decode("cp1252")
+
+
+def event_council_2022() -> CouncilEvent:
+    grouped = list(csv.reader(io.StringIO(csv_text(COUNCIL_2022_GROUPED))))[2:]
+    ungrouped = list(csv.reader(io.StringIO(csv_text(COUNCIL_2022_UNGROUPED))))[2:]
+    people: dict[tuple[str, str], tuple[str, str]] = {}  # (group letter, 'SURNAME I.') to (given names, surname)
+    order: dict[str, list[tuple[str, str]]] = {}
+    group_names: dict[str, str] = {}
+    for row in [*grouped, *[["", "UG", *r[2:]] for r in ungrouped]]:
+        if len(row) < 5 or not row[3].strip():
+            continue
+        letter = row[1].strip() or "UG"
+        surname, given = row[3].strip(), " ".join(p.strip() for p in row[4:6] if p.strip())
+        short = f"{surname} {given[0]}."
+        people[(letter, short.upper())] = (given, surname)
+        order.setdefault(letter, []).append((given, surname))
+        if row[0].strip():
+            group_names[letter] = row[0].strip()
+    elected_rows = list(csv.reader(io.StringIO(csv_text(COUNCIL_2022_ELECTED))))
+    elected = {
+        re.sub(r"\s+", " ", r[1].lstrip("*").strip()).upper() for r in elected_rows if r and re.fullmatch(r"\d+", r[0])
+    }
+    places: dict[tuple[str, str], dict[tuple[str, str], int]] = {}
+    with zipfile.ZipFile(raw.cached(SOURCE, COUNCIL_2022_PLACES).path) as z:
+        for info in sorted(z.infolist(), key=lambda i: i.filename):
+            if not info.filename.endswith(".csv"):
+                continue
+            for row in list(csv.reader(io.StringIO(z.read(info).decode("utf-8-sig"))))[3:]:
+                if len(row) < 5 or not row[0].strip():
+                    continue
+                division, place, group, label, value = (c.strip() for c in row[:5])
+                letter = group.split(".", 1)[0].strip()
+                places.setdefault((division, place), {})[(letter, label)] = int(value.replace(",", ""))
+    # Options in ballot order: each group's votes above the line, then its candidates; ungrouped candidates last.
+    options: list[Option] = []
+    keys: list[tuple[str, str]] = []
+    winners: list[int] = []
+    for letter in [*sorted((g for g in order if g != "UG"), key=lambda g: (len(g), g)), "UG"]:
+        if letter not in order:
+            continue
+        name = group_names.get(letter, "")
+        independent = letter == "UG" or name.upper().startswith("INDEPENDENT")
+        party = "" if independent else GROUP_PARTIES[name.upper()]
+        if letter != "UG":
+            options.append(Option(f"Group {letter}: {name} (above the line)", "legend", party))
+            keys.append((letter, "GROUP VOTES"))
+        for given, surname in order[letter]:
+            label = f"{surname} {given[0]}."
+            person = Candidate(
+                f"{surname}, {given}", party, display=f"{given} {title(surname) if surname.isupper() else surname}"
+            )
+            if f"{given} {surname}".upper() in elected:
+                winners.append(len(options))
+            options.append(Option(f"{surname}, {given}", "candidate", party, person))
+            keys.append((letter, label.upper()))
+    if len(winners) != 11:
+        raise ValueError(f"2022: matched {len(winners)} of 11 members elected")
+    leaves: dict[str, list[Leaf]] = {}
+    for (division, place), values in places.items():
+        upper = {(g, label.upper()): v for (g, label), v in values.items()}
+        votes: list[int | None] = []
+        for k in keys:
+            if k not in upper:
+                raise ValueError(f"2022 {division} {place}: no votes for {k}")
+            votes.append(upper[k])
+        formal = values[("Z", "Total Formal")]
+        if sum(v or 0 for v in votes) != formal:
+            raise ValueError(f"2022 {division} {place}: options add up to {sum(v or 0 for v in votes)}, not {formal}")
+        declaration = place.startswith("Declaration")
+        leaves.setdefault(division, []).append(
+            Leaf(
+                "Declaration votes" if declaration else place,
+                votes,
+                formal,
+                values.get(("Z", "Total Informal")),
+                values.get(("Z", "Total Votes")),
+                "aggregate" if declaration else "standard",
+                division,
+            )
+        )
+    every = [leaf for division in sorted(leaves) for leaf in leaves[division]]
+    declared = Leaf(
+        "State of South Australia",
+        [sum(leaf.votes[i] or 0 for leaf in every) for i in range(len(options))],
+        sum(leaf.formal or 0 for leaf in every),
+        sum(leaf.informal or 0 for leaf in every),
+        sum(leaf.total or 0 for leaf in every),
+    )
+    contest = CouncilContest("State of South Australia", 11, COUNCIL_STV, options, declared, winners=winners)
+    contest.places = every
+    contest.notes.append(
+        "Places are the polling places of each House of Assembly district, which the commission calls divisions "
+        "for the Legislative Council, and one line of declaration votes for each division."
+    )
+    files = [COUNCIL_2022_PLACES, COUNCIL_2022_GROUPED, COUNCIL_2022_UNGROUPED, COUNCIL_2022_ELECTED]
+    return CouncilEvent(date(2022, 3, 19), "general", files, [contest])
+
+
+@functools.cache
+def council_events() -> dict[str, Callable[[], CouncilEvent]]:
+    out: dict[str, Callable[[], CouncilEvent]] = {
+        **history_council_events(),
+        "2014-03-15": functools.partial(summary_event, "2014-03-15", COUNCIL_2014),
+        "2018-03-17": functools.partial(summary_event, "2018-03-17", COUNCIL_2018),
+        "2022-03-19": event_council_2022,
+    }
+    return dict(sorted(out.items()))
+
+
+@functools.cache
+def council_event(name: str) -> CouncilEvent:
+    return council_events()[name]()
+
+
+COUNCIL_METHOD = {
+    COUNCIL_BLOCK: (
+        "Published in the history of South Australian elections, Legislative Council volume, by district. Each "
+        "elector could vote for as many candidates as there were seats to fill, and the candidates with the most "
+        "votes were elected, so the candidates' votes add up to more than the formal ballot papers where several "
+        "seats were filled. Votes are stored as the history prints them for the district; its tables by polling "
+        "place and by House of Assembly division are not stored here. The history prints the elected candidates' "
+        "surnames in capitals, and the outcomes are stored as it prints them. Informal ballot papers are those that "
+        "do not count, and valid votes are the formal ballot papers."
+    ),
+    COUNCIL_PREFERENTIAL: (
+        "Published in the history of South Australian elections, Legislative Council volume, by district. Electors "
+        "numbered the candidates in order of preference. Each seat was filled by its own count, in which a candidate "
+        "with an absolute majority was elected, and the ballot papers of the candidates already elected passed on by "
+        "their next preference to the count for the next seat. First preference votes are stored for each candidate, "
+        "and the votes the history prints after the distribution of preferences are given in a note. The history "
+        "prints the elected candidates' surnames in capitals, and the outcomes are stored as it prints them."
+    ),
+    COUNCIL_LIST: (
+        "Published in the history of South Australian elections, Legislative Council volume, for the State as one "
+        "district. Electors numbered the party lists, not candidates, and the votes are stored for each list. A list "
+        "with less than half a quota was excluded and its votes passed on by second preference; seats went by full "
+        "quotas and then by the largest remainders. The candidates of each list are stored in their printed order, "
+        "and the history prints the elected candidates' surnames in capitals."
+    ),
+    COUNCIL_STV: (
+        "The State is one district that elects eleven members by the single transferable vote. Votes for a group "
+        "above the line, which adopt the group's order of preferences, are stored on one option for the group, and "
+        "first preferences below the line on each candidate, so the options together hold every formal vote. The "
+        "distribution of preferences is not stored; the outcomes are the members the source shows elected."
+    ),
+}
+
+
+def council_key(name: str) -> str:
+    return f"au.ecsa/council-{name}"
+
+
+def joint(day: date) -> str | None:
+    """The House of Assembly package whose general election fell on the same day, if the archive holds one."""
+    name = day.isoformat()
+    return name if name in events() and event(name).kind == "general" else None
+
+
+def build_council(name: str) -> Package:
+    ev = council_event(name)
+    day = ev.day
+    general = ev.kind == "general"
+    shared = joint(day) if general else None
+    depends = ["au.ecsa/registry", *([f"au.ecsa/{shared}"] if shared else [])]
+    whole = general and day.year >= 1975
+    p = Package(
+        council_key(name),
+        SOURCE,
+        f"The South Australian Legislative Council {'election' if general else 'by-election'} of {day}",
+        depends=depends,
+    )
+    p.external.add(AUSTRALIA)
+    for url in ev.files:
+        p.uses(raw.cached(SOURCE, url))
+    election = key("election", day.isoformat())
+    path = f"au-sa/{day}-state" if shared or whole else f"au-sa/{day}-council"
+    if general and not shared:
+        p.add(
+            "election",
+            id=election,
+            polity_id=AUSTRALIA,
+            kind="general",
+            date_from=day,
+            date_to=ev.last or day,
+            status="held",
+        )
+        p.add("slug", path=path, entity_id=election, is_current=True)
+        label = "state election" if whole else "Legislative Council election"
+        p.name(election, f"{day.year} South Australian {label}", "en", "official")
+    off: list[str] = []
+    cast: list[str] = []
+    for c in ev.contests:
+        slug = changeset.slug(c.name)
+        if not general:
+            election = key("election", "council", day.isoformat(), slug)
+            path = f"au-sa/{day}-council-by-election-{slug}"
+            p.add(
+                "election",
+                id=election,
+                polity_id=AUSTRALIA,
+                kind="by_election",
+                date_from=day,
+                date_to=day,
+                status="held",
+            )
+            p.add("slug", path=path, entity_id=election, is_current=True)
+            p.name(election, f"{day.year} {c.name} Legislative Council by-election", "en", "official")
+        tag = (day.isoformat(), "council", slug)
+        contest = key("contest", *tag)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="body_seats",
+            body_id=COUNCIL,
+            magnitude=c.seats,
+            round_number=1,
+            electoral_system_id=c.system,
+            default_result_kind="tacit" if c.unopposed else "counted",
+        )
+        p.name(contest, f"{c.name}, Legislative Council", "en", "official")
+        p.add("slug", path=f"{path}/{'council' if whole else f'council-{slug}'}", entity_id=contest, is_current=True)
+        result_set = key("result_set", *tag)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="tacit" if c.unopposed else "counted",
+            source_id=ECSA,
+            status="active",
+            is_default=True,
+            completeness=None if c.unopposed else 1.0,
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=COUNCIL_METHOD[c.system],
+            lang="en",
+        )
+        caveats = list(c.notes)
+        if c.unopposed:
+            caveats.append(
+                "There was no poll: "
+                + ("the only candidate" if c.seats == 1 else "as many candidates as members")
+                + " stood, and the history lists the returned members without votes."
+            )
+        if not c.unopposed and any(v is None for v in c.declared.votes):
+            caveats.append("The history does not print the votes of every candidate in this contest.")
+        for index, caveat in enumerate(caveats):
+            p.add(
+                "note",
+                id=key("note", result_set, "caveat", index),
+                entity_id=result_set,
+                kind="caveat",
+                body_md=caveat,
+                lang="en",
+            )
+        options: list[str] = []
+        for position, option in enumerate(c.options, 1):
+            option_id = key("option", *tag, position)
+            options.append(option_id)
+            party = party_id(option.party) if known_party(option.party) else None
+            p.add(
+                "contest_option",
+                id=option_id,
+                contest_id=contest,
+                kind=option.kind,
+                party_id=party,
+                ballot_position=position,
+                ballot_label=option.label,
+            )
+            people = [option.person] if option.person else option.members
+            for rank, person in enumerate(people, 1):
+                assert person is not None
+                person_id = key("person", *tag, position, rank)
+                p.add("person", id=person_id)
+                p.name(person_id, person.display or person_name(person.name), "en", "official")
+                p.add(
+                    "candidacy",
+                    id=key("candidacy", *tag, position, rank),
+                    person_id=person_id,
+                    option_id=option_id,
+                    role="list_member" if option.kind == "list" else "head",
+                    list_position=rank if option.kind == "list" else None,
+                    ballot_name=person.name,
+                    member_of_party_id=party,
+                    is_independent=person.party in ("", "IND"),
+                    is_incumbent=person.incumbent,
+                )
+        if c.unopposed:
+            for index, option_id in enumerate(options):
+                p.add("outcome", result_set_id=result_set, option_id=option_id, kind="elected")
+            continue
+        unit = key("unit", *tag)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=AUSTRALIA,
+            scheme_code="au-sa.council",
+            code=f"{day}:{slug}",
+            area_relation="unlocated",
+            kind="aggregate" if c.places else "standard",
+        )
+        p.name(unit, c.name, "en", "official")
+        if c.places:
+            divisions: dict[str, str] = {}
+            seen: Counter[str] = Counter()
+            for leaf in c.places:
+                if leaf.parent not in divisions:
+                    division = divisions[leaf.parent] = key("unit", *tag, "division", leaf.parent)
+                    p.add(
+                        "reporting_unit",
+                        id=division,
+                        polity_id=AUSTRALIA,
+                        scheme_code="au-sa.district",
+                        code=f"{day}:council:{changeset.slug(leaf.parent)}",
+                        parent_id=unit,
+                        area_relation="unlocated",
+                        kind="aggregate",
+                    )
+                    p.name(division, f"Division of {leaf.parent} (Legislative Council)", "en", "official")
+                code = f"{day}:council:{changeset.slug(leaf.parent)}:{changeset.slug(leaf.name)}"
+                seen[code] += 1
+                code += f"-{seen[code]}" if seen[code] > 1 else ""
+                place = key("unit", code)
+                p.add(
+                    "reporting_unit",
+                    id=place,
+                    polity_id=AUSTRALIA,
+                    scheme_code="au-sa.place",
+                    code=code,
+                    parent_id=divisions[leaf.parent],
+                    area_relation="unlocated",
+                    kind=leaf.kind,
+                )
+                p.name(place, f"{leaf.name} ({leaf.parent}, Legislative Council)", "en", "official")
+                for option_id, value in zip(options, leaf.votes, strict=True):
+                    _put(p, result_set, place, option_id, VOTES, value)
+                _put(p, result_set, place, None, VALID, leaf.formal)
+                _put(p, result_set, place, None, INVALID, leaf.informal)
+                _put(p, result_set, place, None, CAST, leaf.total)
+        else:
+            for option_id, value in zip(options, c.declared.votes, strict=True):
+                _put(p, result_set, unit, option_id, VOTES, value)
+            _put(p, result_set, unit, None, VALID, c.declared.formal)
+            _put(p, result_set, unit, None, INVALID, c.declared.informal)
+            _put(p, result_set, unit, None, CAST, c.declared.total)
+        if c.enrolled is not None:
+            roll = unit
+            if c.places:
+                roll = key("unit", *tag, "roll")
+                p.add(
+                    "reporting_unit",
+                    id=roll,
+                    polity_id=AUSTRALIA,
+                    scheme_code="au-sa.council",
+                    code=f"{day}:{slug}:roll",
+                    parent_id=unit,
+                    area_relation="unlocated",
+                    kind="aggregate",
+                )
+                p.name(roll, f"{c.name}: electoral roll", "en", "official")
+            _put(p, result_set, roll, None, REGISTERED, c.enrolled)
+            p.add("declared", result_set_id=result_set, option_id=None, measure=REGISTERED, value=c.enrolled)
+        total = c.declared
+        for measure, value in ((CAST, total.total), (INVALID, total.informal), (VALID, total.formal)):
+            if value is not None:
+                p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+        for option_id, value in zip(options, total.votes, strict=True):
+            if value is not None:
+                p.add("declared", result_set_id=result_set, option_id=option_id, measure=VOTES, value=value)
+        if None not in (total.formal, total.informal, total.total) and (
+            (total.formal or 0) + (total.informal or 0) != total.total
+        ):
+            cast.append(f"{c.name} ({total.total:,} against {(total.formal or 0) + (total.informal or 0):,})")
+        if c.seats == 1 and total.formal is not None and sum(v or 0 for v in total.votes) != total.formal:
+            off.append(f"{c.name} ({sum(v or 0 for v in total.votes):,} against {total.formal:,})")
+        if c.after:
+            listing = ", ".join(f"{label} {v:,}" for label, v in c.after)
+            p.add(
+                "note",
+                id=key("note", result_set, "final"),
+                entity_id=result_set,
+                kind="context",
+                body_md=f"After the distribution of preferences the history prints these votes: {listing}.",
+                lang="en",
+            )
+        if c.winners or c.won:
+            for index, option_id in enumerate(options):
+                option = c.options[index]
+                if option.kind == "list":
+                    seats = c.won.get(index)
+                    if seats:
+                        p.add("outcome", result_set_id=result_set, option_id=option_id, kind="won", seats=seats)
+                    else:
+                        p.add("outcome", result_set_id=result_set, option_id=option_id, kind="lost")
+                elif option.kind == "candidate":
+                    kind = "elected" if index in c.winners else "lost"
+                    p.add("outcome", result_set_id=result_set, option_id=option_id, kind=kind)
+    if cast:
+        p.accept(
+            "accounting.ballots_sum",
+            "The source prints a number of ballots cast that is not its formal plus its informal ballot papers in "
+            + ", ".join(cast),
+        )
+    if off:
+        p.accept(
+            "accounting.votes_valid",
+            "The source prints candidate votes that do not add up to its own formal votes in " + ", ".join(off),
+        )
+    return p
+
+
+def council_packages() -> list[str]:
+    return [council_key(name) for name in council_events()]
+
+
+def council(p: Package) -> None:
+    """The Legislative Council and the electoral systems that have filled it."""
+    p.add("body", id=COUNCIL, polity_id=AUSTRALIA, kind="upper_house")
+    p.name(COUNCIL, "South Australian Legislative Council", "en", "official")
+    systems = [
+        (
+            COUNCIL_BLOCK,
+            None,
+            date(1929, 12, 31),
+            {"formula": "block"},
+            (
+                "From 1857 to 1929 each elector could vote for as many candidates as there were seats to fill in the "
+                "district, and the candidates with the most votes were elected. In 1857 electors deleted the names of "
+                "the candidates they did not support; from 1861 they marked the candidates they supported. Until 1882 "
+                "the whole Province was one district, and from 1882 there were four, then five, districts."
+            ),
+        ),
+        (
+            COUNCIL_PREFERENTIAL,
+            date(1930, 1, 1),
+            date(1974, 12, 31),
+            {"formula": "irv"},
+            (
+                "From 1930 to 1973 electors numbered the candidates, and each seat in a district was filled by a "
+                "preferential count of its own; the ballot papers of a candidate already elected passed on by their next "
+                "preference to the count for the next seat. The rules stored here are those of one count; the engine "
+                "does not recompute the repeated count."
+            ),
+        ),
+        (
+            COUNCIL_LIST,
+            date(1975, 1, 1),
+            date(1981, 12, 31),
+            {"formula": "droop"},
+            (
+                "In 1975 and 1979 the State was one district of eleven members. Electors numbered party lists, a list "
+                "with less than half a quota was excluded and its votes passed on by second preferences, and seats went "
+                "by full quotas and then by the largest remainders."
+            ),
+        ),
+        (
+            COUNCIL_STV,
+            date(1982, 1, 1),
+            None,
+            {"formula": "stv", "quota": "droop", "surplus": "gregory"},
+            (
+                "Since 1982 the State has been one district that elects eleven members by the single transferable vote "
+                "with a Droop quota. From 1985 electors could vote above the line for a group, adopting its registered "
+                "order of preferences, or number candidates below the line."
+            ),
+        ),
+    ]
+    for system, start, end, rules, body in systems:
+        p.add(
+            "electoral_system",
+            id=system,
+            polity_id=AUSTRALIA,
+            valid_from=start,
+            valid_to=end,
+            rules=rules,
+            rules_version=1,
+        )
+        p.add("note", id=key("note", system), entity_id=system, kind="methodology", body_md=body, lang="en")
