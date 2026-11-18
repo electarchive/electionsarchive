@@ -1,0 +1,11160 @@
+{
+ "2.04.pdf": {
+  "area": "EVERGREEN-PARADISE",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY (APNU)",
+    "abbr": "APNU",
+    "votes": 467,
+    "page": 1,
+    "box": [
+     0.7655,
+     0.2405,
+     0.7976,
+     0.251
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC (PPP/C)",
+    "abbr": "PPP/C",
+    "votes": 988,
+    "page": 1,
+    "box": [
+     0.7647,
+     0.2619,
+     0.7976,
+     0.2719
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 33,
+   "page": 1,
+   "box": [
+    0.7639,
+    0.3348,
+    0.7953,
+    0.3448
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 3
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 6
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": "EVERGREEN-LA RESOURCE",
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "VICKEY HARNARAIN",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": "BETTER HOPE-ANDREWS",
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "NAFEEZA ALI",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": "BETTER SUCCESS",
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "JAVYN DALE PERSAUD",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": "PHILLIPS BOUNTY HALL",
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ROEVIN ANTHONY SHAMLALL",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": "WESTBURY",
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "AUDREY AGATHA GARRAWAY",
+      "abbr": "APNU",
+      "votes": 77,
+      "page": 1,
+      "box": [
+       0.7608,
+       0.8614,
+       0.7929,
+       0.871
+      ]
+     },
+     {
+      "name": "MANOJ DHANIRAM SEREE",
+      "abbr": "PPP/C",
+      "votes": 92,
+      "page": 1,
+      "box": [
+       0.7608,
+       0.8843,
+       0.7922,
+       0.8943
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": "DARTMOUTH (EAST OF PUBLIC ROAD)",
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "KEITH MAURICE BELFIELD",
+      "abbr": "APNU",
+      "votes": 126,
+      "page": 2,
+      "box": [
+       0.7694,
+       0.0786,
+       0.7992,
+       0.089
+      ]
+     },
+     {
+      "name": "RANDY ALVERSTONE GEORGE",
+      "abbr": "PPP/C",
+      "votes": 5,
+      "page": 2,
+      "box": [
+       0.7663,
+       0.1024,
+       0.7976,
+       0.1119
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": "DARTMOUTH (NORTHWEST AND SOUTH)",
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "GWENETH ROSALINA MC FARLANE",
+      "abbr": "APNU",
+      "votes": 247,
+      "page": 2,
+      "box": [
+       0.7647,
+       0.151,
+       0.7969,
+       0.1614
+      ]
+     },
+     {
+      "name": "BETHLYANN GEORGE",
+      "abbr": "PPP/C",
+      "votes": 56,
+      "page": 2,
+      "box": [
+       0.7639,
+       0.1748,
+       0.7976,
+       0.1843
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": "DUNKELD-EXMOUTH",
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "NADIRA BAYCHU",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": "JIB-PARADISE",
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "CHANDARPAUL SHIVNARINE RAMESH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "VICKEY HARNARAIN",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 2,
+    "name": "NAFEEZA ALI",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 3,
+    "name": "JAVYN DALE PERSAUD",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 4,
+    "name": "ROEVIN ANTHONY SHAMLALL",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 5,
+    "name": "MANOJ DHANIRAM SEREE",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 6,
+    "name": "KEITH MAURICE BELFIELD",
+    "abbr": "APNU"
+   },
+   {
+    "number": 7,
+    "name": "GWENETH ROSALINA MC FARLANE",
+    "abbr": "APNU"
+   },
+   {
+    "number": 8,
+    "name": "NADIRA BAYCHU",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 9,
+    "name": "CHANDARPAUL SHIVNARINE RAMESH",
+    "abbr": "PPP/C"
+   }
+  ],
+  "stem": "Evergreen Paradise"
+ },
+ "2.07.pdf": {
+  "area": "ANNANDALE-RIVERSTOWN",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY",
+    "abbr": "APNU",
+    "votes": 254,
+    "page": 1,
+    "box": [
+     0.7743,
+     0.2293,
+     0.8018,
+     0.2367
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC",
+    "abbr": "PPP/C",
+    "votes": 2248,
+    "page": 1,
+    "box": [
+     0.7686,
+     0.2593,
+     0.8064,
+     0.2673
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 44,
+   "page": 1,
+   "box": [
+    0.3597,
+    0.3173,
+    0.3769,
+    0.3247
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 1
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 8
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "GENITA JAWAHIRLALL",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RANJIV AVANISH LALL",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "PARMANAND SINGH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "MANISHA PERSAUD",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "HANSOUTIE RAMKELLAWAN",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SAHEED YASIN",
+      "abbr": "APNU",
+      "votes": 34,
+      "page": 1,
+      "box": [
+       0.7686,
+       0.8767,
+       0.7927,
+       0.8873
+      ]
+     },
+     {
+      "name": "MANOJ SINGH",
+      "abbr": "PPP/C",
+      "votes": 167,
+      "page": 1,
+      "box": [
+       0.7663,
+       0.9067,
+       0.7984,
+       0.9173
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "LEON ANTHONY NEDD",
+      "abbr": "APNU",
+      "votes": 121,
+      "page": 2,
+      "box": [
+       0.7959,
+       0.08,
+       0.8176,
+       0.088
+      ]
+     },
+     {
+      "name": "MELISSA PETERS",
+      "abbr": "PPP/C",
+      "votes": 437,
+      "page": 2,
+      "box": [
+       0.7926,
+       0.11,
+       0.8198,
+       0.118
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KEENO PAUL",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KRISHNA SINGH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "GENITA JAWAHIRLALL",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 2,
+    "name": "RANJIV AVANISH LALL",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 3,
+    "name": "PARMANAND SINGH",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 4,
+    "name": "MANISHA PERSAUD",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 5,
+    "name": "HANSOUTIE RAMKELLAWAN",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 6,
+    "name": "MANOJ SINGH",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 7,
+    "name": "MELISSA PETERS",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 8,
+    "name": "KEENO ORIN PAUL",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 9,
+    "name": "KRISHNA SINGH",
+    "abbr": "PPP/C"
+   }
+  ],
+  "stem": "Annandale Riverstown"
+ },
+ "3.02.pdf": {
+  "area": "LEGUAN",
+  "lists": [
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC (P.P.P/C)",
+    "abbr": "PPP/C",
+    "votes": null
+   }
+  ],
+  "valid": null,
+  "rejected": null,
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 9
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "PERSAUD, DHVENDRA",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SINGH, JAINARINE",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "CHINTAMANI, PHILOMENA",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "MAGAN, BALGOBIN",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAMROOP, DEOMATTIE",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAMBAJUE, MAHENDRANATH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAZAK, MOHAMED SHAZAAD",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SHARMA, KALYAN PERSAUD",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAMNARINE, DHANSHAM",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "PERSAUD, DHVENDRA",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 2,
+    "name": "SINGH, JAINARINE",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 3,
+    "name": "CHINTAMANI, PHILOMENA",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 4,
+    "name": "MAGAN, BALGOBIN",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 5,
+    "name": "RAMROOP, DEOMATTIE",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 6,
+    "name": "RAMBAJUE, MAHENDRANATH",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 7,
+    "name": "RAZAK, MOHAMED SHAZAAD",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 8,
+    "name": "SHARMA, KALYAN PERSAUD",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 9,
+    "name": "RAMNARINE, DHANSHAM",
+    "abbr": "PPP/C"
+   }
+  ],
+  "stem": "Leguan"
+ },
+ "3.03.pdf": {
+  "area": "MORA/PARIKA",
+  "lists": [
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC (PPP/C)",
+    "abbr": "PPP/C",
+    "votes": 1181,
+    "page": 1,
+    "box": [
+     0.7263,
+     0.2446,
+     0.7788,
+     0.2594
+    ]
+   },
+   {
+    "label": "MORA/PARIKA COMMUNITY DEVELOPMENT GROUP (M/PCDG)",
+    "abbr": "M/PCDG",
+    "votes": 232,
+    "page": 1,
+    "box": [
+     0.738,
+     0.264,
+     0.789,
+     0.2799
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 23,
+   "page": 1,
+   "box": [
+    0.7373,
+    0.3335,
+    0.7929,
+    0.3472
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 7
+   },
+   {
+    "abbr": "M/PCDG",
+    "seats": 1
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": "NAAMRYCK-MORA",
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "GHANSHAM PERSAUD",
+      "abbr": "",
+      "votes": 100,
+      "page": 1,
+      "box": [
+       0.7427,
+       0.5935,
+       0.7937,
+       0.606
+      ]
+     },
+     {
+      "name": "ROMIO AGUSTUS FANFAIR",
+      "abbr": "",
+      "votes": 15,
+      "page": 1,
+      "box": [
+       0.742,
+       0.6146,
+       0.7922,
+       0.6288
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": "PARIKA-LOOKOUT (HYDE PARK/LOOKOUT)",
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "HAIMWANTIE DEVI SUKUL",
+      "abbr": "",
+      "votes": 96,
+      "page": 1,
+      "box": [
+       0.7459,
+       0.7035,
+       0.8008,
+       0.7195
+      ]
+     },
+     {
+      "name": "MURTLAND BRYAN LAYNE",
+      "abbr": "",
+      "votes": 73,
+      "page": 1,
+      "box": [
+       0.7482,
+       0.7258,
+       0.789,
+       0.74
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": "PARIKA/OUTFALL TO JOHN DALLY BRIDGE",
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAMGOBIN PRAHALAD",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": "PARIKA-SEADAM TO MAIN ACCESS ROAD",
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "JAINARINE MARAJ",
+      "abbr": "",
+      "votes": 87,
+      "page": 2,
+      "box": [
+       0.778,
+       0.0302,
+       0.8706,
+       0.0462
+      ]
+     },
+     {
+      "name": "FENTON EVERAD NELSON",
+      "abbr": "",
+      "votes": 38,
+      "page": 2,
+      "box": [
+       0.778,
+       0.0576,
+       0.8706,
+       0.0741
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": "PARIKA (MAIN ACCESS ROAD TO FACADE TRENCH)",
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "DONALD NASCIMENTO",
+      "abbr": "",
+      "votes": 278,
+      "page": 2,
+      "box": [
+       0.778,
+       0.2007,
+       0.8706,
+       0.2172
+      ]
+     },
+     {
+      "name": "OLNEY ABIOLA SILAS",
+      "abbr": "",
+      "votes": 37,
+      "page": 2,
+      "box": [
+       0.778,
+       0.2275,
+       0.8706,
+       0.2446
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": "PARIKA (WEST OF FACADE TRENCH)",
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ARITA MC GARREL",
+      "abbr": "",
+      "votes": 86,
+      "page": 2,
+      "box": [
+       0.7984,
+       0.3387,
+       0.891,
+       0.358
+      ]
+     },
+     {
+      "name": "ELANEA ONEEKA LAVANDA CLAY",
+      "abbr": "",
+      "votes": 41,
+      "page": 2,
+      "box": [
+       0.8125,
+       0.37,
+       0.869,
+       0.3837
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": "PARIKA (EAST OF FACADE TRENCH)",
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SAMUEL RAMROOP",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": "PARIKA-PARIKA BACKDAM",
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "JAIKISHAN BALDEO",
+      "abbr": "",
+      "votes": 181,
+      "page": 2,
+      "box": [
+       0.7984,
+       0.6231,
+       0.891,
+       0.6403
+      ]
+     },
+     {
+      "name": "KAPIELDEO RAMPERSAUD",
+      "abbr": "",
+      "votes": 6,
+      "page": 2,
+      "box": [
+       0.7984,
+       0.6488,
+       0.891,
+       0.6682
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "GHANSHAM PERSAUD",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "HAIMWANTIE DEVI SUKUL",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "RAMGOBIN PRAHALAD",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "JAINARINE MARAJ",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "DONALD NASCIMENTO",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "ARITA MC GARREL",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "SAMUEL RAMROOP",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "JAIKISHAN BALDEO",
+    "abbr": null
+   }
+  ],
+  "stem": "Mora Parika"
+ },
+ "3.06.pdf": {
+  "area": "TUSCHEN/UITVLUGT",
+  "lists": [
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY (P.P.P./C)",
+    "abbr": "PPP/C",
+    "votes": 6077,
+    "page": 1,
+    "box": [
+     0.7592,
+     0.2721,
+     0.8031,
+     0.2842
+    ]
+   },
+   {
+    "label": "TUSCHEN UITVLUGT DEVELOPERS (T.U.D.)",
+    "abbr": "TUD",
+    "votes": 752,
+    "page": 1,
+    "box": [
+     0.7647,
+     0.2976,
+     0.7969,
+     0.3097
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 225,
+   "page": 1,
+   "box": [
+    0.7647,
+    0.34,
+    0.7969,
+    0.3521
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 9
+   },
+   {
+    "abbr": "TUD",
+    "seats": 1
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAI, DEORAM",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "PERSAUD, NAVVETA DHANRAJIE",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "JAIRAM, HARDEO",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAI, PARVATI",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "BISSESSAR, YUDHISTHIR",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "JUNOR, SHAMAINE AMANDA",
+      "abbr": "",
+      "votes": 167,
+      "page": 2,
+      "box": [
+       0.7569,
+       0.0842,
+       0.7875,
+       0.0964
+      ]
+     },
+     {
+      "name": "RIMPLE, ROCHELLE DANEIELLE",
+      "abbr": "",
+      "votes": 145,
+      "page": 2,
+      "box": [
+       0.7569,
+       0.1127,
+       0.7867,
+       0.1248
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ALI, RAMZAN",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "NUKHAI, VICKRAM",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "JONAS, DEVALINGAM",
+      "abbr": "",
+      "votes": 717,
+      "page": 2,
+      "box": [
+       0.7522,
+       0.2879,
+       0.7875,
+       0.3018
+      ]
+     },
+     {
+      "name": "SUBRIAN, KRISHNA",
+      "abbr": "",
+      "votes": 106,
+      "page": 2,
+      "box": [
+       0.7561,
+       0.3182,
+       0.7867,
+       0.3309
+      ]
+     }
+    ]
+   },
+   {
+    "number": 10,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "PERSAUD, AMANDA DEORANIE",
+      "abbr": "",
+      "votes": 833,
+      "page": 2,
+      "box": [
+       0.7537,
+       0.38,
+       0.7851,
+       0.3921
+      ]
+     },
+     {
+      "name": "BRANDT, EVROD MC BETH",
+      "abbr": "",
+      "votes": 262,
+      "page": 2,
+      "box": [
+       0.7529,
+       0.4091,
+       0.7851,
+       0.4212
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "RAI, DEORAM",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "PERSAUD, NAVVETA DHANRAJIE",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "JAIRAM, HARDEO",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "RAI, PARVATI",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "BISSESSAR, YUDHISTHIR",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "JUNOR, SHAMAINE AMANDA",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "ALI, RAMZAN",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "NUKHAI, VICKRAM",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "JONAS, DEVALINGAM",
+    "abbr": null
+   },
+   {
+    "number": 10,
+    "name": "PERSAUD, AMANDA DEORANIE",
+    "abbr": null
+   }
+  ],
+  "stem": "Tuschen Uitvlugt"
+ },
+ "3.09.pdf": {
+  "area": "LA GRANGE/NISMES",
+  "lists": [
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC",
+    "abbr": "PPP/C",
+    "votes": 1032,
+    "page": 1,
+    "box": [
+     0.778,
+     0.2343,
+     0.8188,
+     0.2433
+    ]
+   },
+   {
+    "label": "UNITED ACTION GROUP",
+    "abbr": "UAG",
+    "votes": 696,
+    "page": 1,
+    "box": [
+     0.7804,
+     0.2538,
+     0.8133,
+     0.2638
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 45,
+   "page": 1,
+   "box": [
+    0.7812,
+    0.3286,
+    0.8125,
+    0.3381
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 5
+   },
+   {
+    "abbr": "UAG",
+    "seats": 4
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ALVIN PARAG",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "HANSA KUMARI MANGRAU",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "REBEKAH RHODA DASRATH-KRISHNARAN",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "CHANDANIE BHARAT",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "OLABISI OMADARA JOSEPH",
+      "abbr": "UAG",
+      "votes": 49,
+      "page": 2,
+      "box": [
+       0.7773,
+       0.3514,
+       0.8102,
+       0.361
+      ]
+     },
+     {
+      "name": "JASODRA SINGH",
+      "abbr": "PPP/C",
+      "votes": 78,
+      "page": 2,
+      "box": [
+       0.7765,
+       0.3743,
+       0.8094,
+       0.3838
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "TAKIESHA STACYANN KANSINALLY",
+      "abbr": "UAG",
+      "votes": 67,
+      "page": 2,
+      "box": [
+       0.7749,
+       0.4819,
+       0.8078,
+       0.4914
+      ]
+     },
+     {
+      "name": "KISHAN SHIVGOBIN",
+      "abbr": "PPP/C",
+      "votes": 76,
+      "page": 2,
+      "box": [
+       0.7741,
+       0.5057,
+       0.8071,
+       0.5152
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SAMANTHA NATASHA DALY",
+      "abbr": "UAG",
+      "votes": 128,
+      "page": 2,
+      "box": [
+       0.7757,
+       0.6138,
+       0.8055,
+       0.6233
+      ]
+     },
+     {
+      "name": "OLIVIA LUCRETIA DAVID",
+      "abbr": "PPP/C",
+      "votes": 57,
+      "page": 2,
+      "box": [
+       0.7725,
+       0.6371,
+       0.8055,
+       0.6471
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ASHTON LOCKSLEY CRAWFORD",
+      "abbr": "UAG",
+      "votes": 228,
+      "page": 2,
+      "box": [
+       0.7718,
+       0.7576,
+       0.8039,
+       0.7676
+      ]
+     },
+     {
+      "name": "LLEWELYN CYRUS",
+      "abbr": "PPP/C",
+      "votes": 79,
+      "page": 2,
+      "box": [
+       0.771,
+       0.7805,
+       0.8039,
+       0.79
+      ]
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "MARIAI DAVITA RITNEY",
+      "abbr": "PPP/C",
+      "votes": 56,
+      "page": 2,
+      "box": [
+       0.7702,
+       0.8871,
+       0.8031,
+       0.8967
+      ]
+     },
+     {
+      "name": "MICHAEL SCOTLAND",
+      "abbr": "UAG",
+      "votes": 122,
+      "page": 2,
+      "box": [
+       0.7725,
+       0.91,
+       0.8031,
+       0.92
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "ALVIN PARAG",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "HANSA KUMARI MANGRAU",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "REBEKAH RHODA DASRATH-KRISHNARAN",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "CHANDANIE BHARAT",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "JASODRA SINGH",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "KISHAN SHIVGOBIN",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "SAMANTHA NATASHA DALY",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "ASHTON LOCKSLEY CRAWFORD",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "MICHAEL SCOTLAND",
+    "abbr": null
+   }
+  ],
+  "stem": "La Grange Nismes"
+ },
+ "3.12.pdf": {
+  "area": "LA-JALOUSIE/NOUVELLE FLANDERS",
+  "lists": [
+   {
+    "label": "THE PEOPLE'S PROGRESSIVE PARTY/CIVIC",
+    "abbr": "PPP/C",
+    "votes": null
+   }
+  ],
+  "valid": null,
+  "rejected": null,
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 9
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ISHWARDAT TATLALL TATKAN",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KUMAR KRISHNA",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KHAMRAJ",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "NALINI PREMNAUTH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KUDESHANAND BHAIRO",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAJISH KADARNAUTH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SHARAN RAMESHWAR",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "THAKURDEEN YAIDAT",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAJKUMAR ETWARU",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "ISHWARDAT TATLALL TATKAN",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 2,
+    "name": "KUMAR KRISHNA",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 3,
+    "name": "KHAMRAJ",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 4,
+    "name": "NALINI PREMNAUTH",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 5,
+    "name": "KUDESHANAND BHAIRO",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 6,
+    "name": "RAJISH KADARNAUTH",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 7,
+    "name": "SHARAN RAMESHWAR",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 8,
+    "name": "THAKURDEEN YAIDAT",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 9,
+    "name": "RAJKUMAR ETWARU",
+    "abbr": "PPP/C"
+   }
+  ],
+  "stem": "La Jalousie Nouvelle Flanders",
+  "note": "Only the People's Progressive Party/Civic list stood; the declaration prints 000 for its votes, for the rejected ballots, and for each constituency candidate, every one of whom was returned unopposed."
+ },
+ "3.13.pdf": {
+  "area": "THE BEST/KLIEN POUDEROYEN",
+  "lists": [
+   {
+    "label": "UNITED DEMOCRATIC MOVEMENT",
+    "abbr": "UDM",
+    "votes": 888,
+    "page": 1,
+    "box": [
+     0.7929,
+     0.2324,
+     0.8957,
+     0.249
+    ]
+   },
+   {
+    "label": "THE PEOPLE'S PROGRESSIVE PARTY",
+    "abbr": "PPP/C",
+    "votes": 2040,
+    "page": 1,
+    "box": [
+     0.7388,
+     0.2529,
+     0.8957,
+     0.2719
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 92,
+   "page": 1,
+   "box": [
+    0.8039,
+    0.3248,
+    0.8871,
+    0.3424
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "UDM",
+    "seats": 3
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 7
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "",
+      "abbr": "UDM",
+      "votes": 329,
+      "page": 1,
+      "box": [
+       0.7875,
+       0.5771,
+       0.8557,
+       0.589
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "PPP/C",
+      "votes": 357,
+      "page": 1,
+      "box": [
+       0.7749,
+       0.5986,
+       0.8525,
+       0.6157
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DESMOND PERSAUD",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "NAOMI SINGH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "JAIKARRAN JAGNANAN",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "",
+      "abbr": "PPP/C",
+      "votes": 216,
+      "page": 2,
+      "box": [
+       0.7184,
+       0.2829,
+       0.8141,
+       0.2995
+      ]
+     },
+     {
+      "name": "PREM CHAND PERSAUD",
+      "abbr": "",
+      "votes": 114,
+      "page": 2,
+      "box": [
+       0.7467,
+       0.3067,
+       0.8408,
+       0.3233
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ROBERT ROBIN WILLIAMS",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ANURADHA SUKHA",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "",
+      "abbr": "UDM",
+      "votes": 103,
+      "page": 2,
+      "box": [
+       0.7671,
+       0.7667,
+       0.8424,
+       0.7824
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "PPP/C",
+      "votes": 166,
+      "page": 2,
+      "box": [
+       0.7655,
+       0.7881,
+       0.8361,
+       0.8052
+      ]
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "",
+      "abbr": "UDM",
+      "votes": 211,
+      "page": 3,
+      "box": [
+       0.7388,
+       0.1305,
+       0.8573,
+       0.1476
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "PPP/C",
+      "votes": 54,
+      "page": 3,
+      "box": [
+       0.7522,
+       0.1519,
+       0.8706,
+       0.171
+      ]
+     }
+    ]
+   },
+   {
+    "number": 10,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "",
+      "abbr": "UDM",
+      "votes": 145,
+      "page": 3,
+      "box": [
+       0.731,
+       0.3486,
+       0.8212,
+       0.3648
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "PPP/C",
+      "votes": 109,
+      "page": 3,
+      "box": [
+       0.7082,
+       0.3705,
+       0.8118,
+       0.3881
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "DAVINDRA SEUDAT",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "DESMOND PERSAUD",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "NAOMI SINGH",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "JAIKARRAN JAGNANAN",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "UMESH CHANDRA BALRAM",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "ROBERT ROBIN WILLIAMS",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "ANURADHA SUKHA",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "BABITA SINGH",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "LORNA ADONIS",
+    "abbr": null
+   },
+   {
+    "number": 10,
+    "name": "RUDOLPH ARCHER",
+    "abbr": null
+   }
+  ],
+  "stem": "The Best Klein Pouderoyen"
+ },
+ "3.14.pdf": {
+  "area": "MALGRE TOUT/MEER ZORGEN",
+  "lists": [
+   {
+    "label": "MALGRE TOUT MEER ZORGEN DEVELOPMENT GROUP",
+    "abbr": "MMDG",
+    "votes": 1751,
+    "page": 1,
+    "box": [
+     0.7192,
+     0.2842,
+     0.76,
+     0.2958
+    ]
+   },
+   {
+    "label": "MOVEMENT FOR UNITY AND DEMOCRACY",
+    "abbr": "MUD",
+    "votes": 763,
+    "page": 1,
+    "box": [
+     0.7318,
+     0.3018,
+     0.7694,
+     0.3127
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY CIVIC",
+    "abbr": "PPP/C",
+    "votes": 3461,
+    "page": 1,
+    "box": [
+     0.7286,
+     0.3194,
+     0.7741,
+     0.3315
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 52,
+   "page": 1,
+   "box": [
+    0.7373,
+    0.3503,
+    0.7765,
+    0.3618
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "MMDG",
+    "seats": 2
+   },
+   {
+    "abbr": "MUD",
+    "seats": 1
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 5
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "",
+      "abbr": "PPP/C",
+      "votes": 86,
+      "page": 1,
+      "box": [
+       0.738,
+       0.563,
+       0.8078,
+       0.5794
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "MMDG",
+      "votes": 68,
+      "page": 1,
+      "box": [
+       0.7357,
+       0.5861,
+       0.811,
+       0.6018
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "",
+      "abbr": "PPP/C",
+      "votes": 61,
+      "page": 1,
+      "box": [
+       0.7435,
+       0.6352,
+       0.8212,
+       0.6515
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "MUD",
+      "votes": 6,
+      "page": 1,
+      "box": [
+       0.7404,
+       0.6558,
+       0.7867,
+       0.6727
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "MMDG",
+      "votes": 59,
+      "page": 1,
+      "box": [
+       0.738,
+       0.6788,
+       0.7882,
+       0.6945
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "",
+      "abbr": "PPP/C",
+      "votes": 134,
+      "page": 1,
+      "box": [
+       0.7576,
+       0.7327,
+       0.7976,
+       0.7455
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "MMDG",
+      "votes": 110,
+      "page": 1,
+      "box": [
+       0.7616,
+       0.7576,
+       0.8306,
+       0.7733
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "PAUL RAMRATTAN",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "",
+      "abbr": "PPP/C",
+      "votes": 131,
+      "page": 1,
+      "box": [
+       0.8024,
+       0.8655,
+       0.8706,
+       0.8824
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "MMDG",
+      "votes": 21,
+      "page": 1,
+      "box": [
+       0.8016,
+       0.8927,
+       0.8431,
+       0.9085
+      ]
+     },
+     {
+      "name": "L. BHARAT",
+      "abbr": "",
+      "votes": 41,
+      "page": 1,
+      "box": [
+       0.7976,
+       0.9188,
+       0.8392,
+       0.9345
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "",
+      "abbr": "PPP/C",
+      "votes": 190,
+      "page": 2,
+      "box": [
+       0.7145,
+       0.143,
+       0.7576,
+       0.1606
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "MMDG",
+      "votes": 19,
+      "page": 2,
+      "box": [
+       0.7004,
+       0.1667,
+       0.7616,
+       0.1842
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "",
+      "abbr": "PPP/C",
+      "votes": 482,
+      "page": 2,
+      "box": [
+       0.7208,
+       0.2158,
+       0.8008,
+       0.2315
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "MUD",
+      "votes": 195,
+      "page": 2,
+      "box": [
+       0.7224,
+       0.2376,
+       0.7725,
+       0.2564
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "MMDG",
+      "votes": 346,
+      "page": 2,
+      "box": [
+       0.7224,
+       0.2624,
+       0.7992,
+       0.2818
+      ]
+     },
+     {
+      "name": "K. SEENARINE",
+      "abbr": "",
+      "votes": 44,
+      "page": 2,
+      "box": [
+       0.7302,
+       0.2879,
+       0.778,
+       0.3024
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "",
+      "abbr": "PPP/C",
+      "votes": 410,
+      "page": 2,
+      "box": [
+       0.738,
+       0.3388,
+       0.8188,
+       0.3545
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "MUD",
+      "votes": 147,
+      "page": 2,
+      "box": [
+       0.7396,
+       0.3624,
+       0.7827,
+       0.3788
+      ]
+     },
+     {
+      "name": "",
+      "abbr": "MMDG",
+      "votes": 301,
+      "page": 2,
+      "box": [
+       0.7373,
+       0.383,
+       0.8212,
+       0.4048
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "GHANSHYAM SINGH",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "YASMIN DOOBAY",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "ORSON GARNETT",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "PAUL RAMRATTAN",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "RAIDAI BIKHRAM-SHIWRAM",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "ROOKMIN TOTARAM",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "ABDOOL YASSIM",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "MITCHROY GARNETT",
+    "abbr": null
+   }
+  ],
+  "stem": "Malgre Tout Meer Zorgen"
+ },
+ "4.02.pdf": {
+  "area": "LAMAHA-YARROWKABRA",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY",
+    "abbr": "APNU",
+    "votes": 396,
+    "page": 1,
+    "box": [
+     0.6588,
+     0.2376,
+     0.7506,
+     0.2588
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY CIVIC",
+    "abbr": "PPP/C",
+    "votes": 656,
+    "page": 1,
+    "box": [
+     0.6698,
+     0.2576,
+     0.7506,
+     0.2776
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 22,
+   "page": 1,
+   "box": [
+    0.6784,
+    0.3364,
+    0.7592,
+    0.3545
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 2
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 3
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "YONNETH ANNABELLE FORTUNE",
+      "abbr": "",
+      "votes": 149,
+      "page": 1,
+      "box": [
+       0.6886,
+       0.5921,
+       0.771,
+       0.6115
+      ]
+     },
+     {
+      "name": "FLOYD SMITH",
+      "abbr": "",
+      "votes": 222,
+      "page": 1,
+      "box": [
+       0.6918,
+       0.6182,
+       0.7804,
+       0.6388
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "NAZEER ABDOOLLA MUHAMMAD BARNWELL",
+      "abbr": "",
+      "votes": 109,
+      "page": 1,
+      "box": [
+       0.7208,
+       0.7424,
+       0.811,
+       0.7636
+      ]
+     },
+     {
+      "name": "EDRIS RICHLAND BOSTON",
+      "abbr": "",
+      "votes": 97,
+      "page": 1,
+      "box": [
+       0.698,
+       0.7636,
+       0.8212,
+       0.7927
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "MICHELLE ROSE SHARMILA HARDWARDE",
+      "abbr": "",
+      "votes": 103,
+      "page": 2,
+      "box": [
+       0.5961,
+       0.1636,
+       0.6706,
+       0.1794
+      ]
+     },
+     {
+      "name": "EGLISTON LAUREL MC ALOY",
+      "abbr": "",
+      "votes": 131,
+      "page": 2,
+      "box": [
+       0.5788,
+       0.1836,
+       0.6706,
+       0.2012
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "FLOYD SMITH",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "NAZEER ABDOOLLA MUHAMMAD BARNWELL",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "EGLISTON LAUREL MC ALOY",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "SIMON TROY DE FREITAS",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "FINTON RAGONAUTH",
+    "abbr": null
+   }
+  ],
+  "stem": "Lamaha Yarowkabra",
+  "note": "The declaration prints the votes of constituencies 1 to 3 only; it names the councillors elected for constituencies 4 and 5 without their votes or the other candidates."
+ },
+ "4.03.pdf": {
+  "area": "SOESDYKE/HUIST COVERDEN",
+  "lists": [
+   {
+    "label": "APNU",
+    "abbr": "APNU",
+    "votes": 455,
+    "page": 1,
+    "box": [
+     0.76,
+     0.26,
+     0.7937,
+     0.269
+    ]
+   },
+   {
+    "label": "PPP/C",
+    "abbr": "PPP/C",
+    "votes": 1076,
+    "page": 1,
+    "box": [
+     0.7561,
+     0.2805,
+     0.7992,
+     0.2895
+    ]
+   },
+   {
+    "label": "MUD",
+    "abbr": "MUD",
+    "votes": 26,
+    "page": 1,
+    "box": [
+     0.7663,
+     0.3005,
+     0.7882,
+     0.3095
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 21,
+   "page": 1,
+   "box": [
+    0.7663,
+    0.3538,
+    0.7875,
+    0.3629
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 3
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 6
+   },
+   {
+    "abbr": "MUD",
+    "seats": 0
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "QUINTYN WRIGHT",
+      "abbr": "APNU",
+      "votes": 118,
+      "page": 1,
+      "box": [
+       0.7624,
+       0.5967,
+       0.7937,
+       0.6057
+      ]
+     },
+     {
+      "name": "BUPENDRA DEOKIE",
+      "abbr": "PPP/C",
+      "votes": 120,
+      "page": 1,
+      "box": [
+       0.7624,
+       0.6195,
+       0.7937,
+       0.6286
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "BRENDA E. LONCKE",
+      "abbr": "APNU",
+      "votes": 20,
+      "page": 1,
+      "box": [
+       0.7663,
+       0.6919,
+       0.7882,
+       0.701
+      ]
+     },
+     {
+      "name": "ANDAL R. RAGHOO",
+      "abbr": "PPP/C",
+      "votes": 79,
+      "page": 1,
+      "box": [
+       0.7671,
+       0.7148,
+       0.7875,
+       0.7238
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "MISIR MOHABIR",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "CARLA LONCKE",
+      "abbr": "APNU",
+      "votes": 51,
+      "page": 1,
+      "box": [
+       0.7671,
+       0.8729,
+       0.7875,
+       0.8819
+      ]
+     },
+     {
+      "name": "JESSICA ANDREW",
+      "abbr": "PPP/C",
+      "votes": 172,
+      "page": 1,
+      "box": [
+       0.7616,
+       0.8962,
+       0.7929,
+       0.9052
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "LESLIE E. GLASGOW",
+      "abbr": "APNU",
+      "votes": 25,
+      "page": 2,
+      "box": [
+       0.7663,
+       0.0762,
+       0.7882,
+       0.0852
+      ]
+     },
+     {
+      "name": "KALOWTEE PERSAUD",
+      "abbr": "PPP/C",
+      "votes": 158,
+      "page": 2,
+      "box": [
+       0.7624,
+       0.099,
+       0.7937,
+       0.1081
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DINESH SINGH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "PULKHUMARIE BAKSH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SHELDON BENJAMIN",
+      "abbr": "APNU",
+      "votes": 69,
+      "page": 2,
+      "box": [
+       0.7663,
+       0.2929,
+       0.7875,
+       0.3019
+      ]
+     },
+     {
+      "name": "DARLINGTON BLAIR",
+      "abbr": "PPP/C",
+      "votes": 90,
+      "page": 2,
+      "box": [
+       0.7663,
+       0.3162,
+       0.7882,
+       0.3252
+      ]
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "UMA PRASAD-AJODHIA",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "BUPENDRA DEOKIE",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 2,
+    "name": "ANDAL R. RAGHOO",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 3,
+    "name": "MISIR MOHABIR",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 4,
+    "name": "JESSICA ANDREW",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 5,
+    "name": "KALOWTEE PERSAUD",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 6,
+    "name": "DINESH SINGH",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 7,
+    "name": "PULKHUMARIE BAKSH",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 8,
+    "name": "DARLINGTON BLAIR",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 9,
+    "name": "UMA PRASAD-AJODHIA",
+    "abbr": "PPP/C"
+   }
+  ],
+  "stem": "Soesdyke Huist Coverden"
+ },
+ "4.04.pdf": {
+  "area": "CALEDONIA/GOOD-SUCCESS",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY (A.P.N.U)",
+    "abbr": "APNU",
+    "votes": 600,
+    "page": 1,
+    "box": [
+     0.7688,
+     0.2495,
+     0.8016,
+     0.26
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC (P.P.P./C)",
+    "abbr": "PPP/C",
+    "votes": 1199,
+    "page": 1,
+    "box": [
+     0.7648,
+     0.2705,
+     0.807,
+     0.281
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 19,
+   "page": 1,
+   "box": [
+    0.7688,
+    0.3448,
+    0.8008,
+    0.3543
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 3
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 6
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "CATHENA DHANRAJ",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "NICKISHA AUSTIN-JAISINGH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "JOSEPH JOHNSON",
+      "abbr": "APNU",
+      "votes": 154,
+      "page": 1,
+      "box": [
+       0.7703,
+       0.7238,
+       0.8008,
+       0.7338
+      ]
+     },
+     {
+      "name": "GANGADAI A. SINGH",
+      "abbr": "PPP/C",
+      "votes": 84,
+      "page": 1,
+      "box": [
+       0.7742,
+       0.7467,
+       0.7945,
+       0.7567
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "WAHEEDA JAIKARANSUE",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "CAROLINE R. JOHNSON",
+      "abbr": "APNU",
+      "votes": 103,
+      "page": 2,
+      "box": [
+       0.7711,
+       0.09,
+       0.8008,
+       0.1
+      ]
+     },
+     {
+      "name": "JAI KUMARIE PERSAUD",
+      "abbr": "PPP/C",
+      "votes": 165,
+      "page": 2,
+      "box": [
+       0.7711,
+       0.1133,
+       0.8016,
+       0.1233
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "NEELWATTIE SUKHU",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "BIDJAWATIE PAUL",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DWARKA NAUTH",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "NADITA HUSSEIN",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "CATHENA DHANRAJ",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "NICKISHA AUSTIN-JAISINGH",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "JOSEPH JOHNSON",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "WAHEEDA JAIKARANSUE",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "JAI KUMARIE PERSAUD",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "NEELWATTIE SUKHU",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "BIDJAWATIE PAUL",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "DWARKA NAUTH",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "NADITA HUSSEIN",
+    "abbr": null
+   }
+  ],
+  "stem": "Good Success Caledonia"
+ },
+ "4.05.pdf": {
+  "area": "HERSTELLING/LITTLE DIAMOND",
+  "lists": [
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC",
+    "abbr": "PPP/C",
+    "votes": null
+   }
+  ],
+  "valid": null,
+  "rejected": null,
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 9
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ROY RAJMAN",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ZAIFUL KHAN",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "PUNEET PURSHETAM JAIGOPAUL",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KUMAR PARASRAM",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SHANNET ALTHEA SYDNEY",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DELON EARL AMOS",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KEVIN JAMMAL DEY",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SUREANDRA BANSRAJ",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ASIF MOHAMED ISHAK",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "ROY RAJMAN",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "ZAIFUL KHAN",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "PUNEET PURSHETAM JAIGOPAUL",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "KUMAR PARASRAM",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "SHANNET ALTHEA SYDNEY",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "DELON EARL AMOS",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "KEVIN JAMMAL DEY",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "SUREANDRA BANSRAJ",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "ASIF MOHAMED ISHAK",
+    "abbr": null
+   }
+  ],
+  "stem": "Herstelling Little Diamond",
+  "note": "The declaration prints no contest for the lists and for every constituency; the People's Progressive Party/Civic list took all 9 list seats."
+ },
+ "4.08.pdf": {
+  "area": "ECCLES/RAMSBURG",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY (APNU)",
+    "abbr": "APNU",
+    "votes": 862,
+    "page": 1,
+    "box": [
+     0.742,
+     0.2736,
+     0.8093,
+     0.2864
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY CIVIC (PPP/C)",
+    "abbr": "PPP/C",
+    "votes": 1730,
+    "page": 1,
+    "box": [
+     0.7412,
+     0.2958,
+     0.7981,
+     0.3061
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 20,
+   "page": 1,
+   "box": [
+    0.7508,
+    0.3696,
+    0.8045,
+    0.3789
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 3
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 6
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "KHEMRAJ SEWRAM",
+      "abbr": "",
+      "votes": 459,
+      "page": 2,
+      "box": [
+       0.7133,
+       0.1484,
+       0.8011,
+       0.1621
+      ]
+     },
+     {
+      "name": "SIMONE BENNETT",
+      "abbr": "",
+      "votes": 291,
+      "page": 2,
+      "box": [
+       0.7181,
+       0.1714,
+       0.8011,
+       0.1861
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ANAND KALLADEEN",
+      "abbr": "",
+      "votes": 89,
+      "page": 2,
+      "box": [
+       0.7133,
+       0.2453,
+       0.7684,
+       0.2591
+      ]
+     },
+     {
+      "name": "JOEL NILES",
+      "abbr": "",
+      "votes": 172,
+      "page": 2,
+      "box": [
+       0.7133,
+       0.2684,
+       0.8011,
+       0.2831
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "NAZAR MOHAMED",
+      "abbr": "",
+      "votes": 88,
+      "page": 2,
+      "box": [
+       0.7133,
+       0.3418,
+       0.8011,
+       0.356
+      ]
+     },
+     {
+      "name": "WINSTON STOBY",
+      "abbr": "",
+      "votes": 28,
+      "page": 2,
+      "box": [
+       0.7133,
+       0.3658,
+       0.8011,
+       0.3795
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RONALD SARJOO",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "JAIWANTIE GUNDEO",
+      "abbr": "",
+      "votes": 94,
+      "page": 2,
+      "box": [
+       0.7133,
+       0.5583,
+       0.8011,
+       0.5705
+      ]
+     },
+     {
+      "name": "LAURICE BAILEY",
+      "abbr": "",
+      "votes": 73,
+      "page": 2,
+      "box": [
+       0.7133,
+       0.5833,
+       0.8011,
+       0.5965
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "CHAITNARINE PERSAUD",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "KIRT ISAACS",
+      "abbr": "",
+      "votes": 138,
+      "page": 2,
+      "box": [
+       0.742,
+       0.7586,
+       0.7764,
+       0.7693
+      ]
+     },
+     {
+      "name": "JOY BARNWELL",
+      "abbr": "",
+      "votes": 53,
+      "page": 2,
+      "box": [
+       0.7236,
+       0.7835,
+       0.8059,
+       0.7953
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SHANTARAM SEETARAM",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAMESH PERSAUD",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "KHEMRAJ SEWRAM",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "JOEL NILES",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "NAZAR MOHAMED",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "RONALD SARJOO",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "JAIWANTIE GUNDEO",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "CHAITNARINE PERSAUD",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "KIRT ISAACS",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "SHANTARAM SEETARAM",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "RAMESH PERSAUD",
+    "abbr": null
+   }
+  ],
+  "stem": "Eccles Ramsburg"
+ },
+ "4.10.pdf": {
+  "area": "INDUSTRY-PLAISANCE",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY",
+    "abbr": "APNU",
+    "votes": 1746,
+    "page": 1,
+    "box": [
+     0.6331,
+     0.2558,
+     0.7242,
+     0.2712
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY CIVIC",
+    "abbr": "PPP/C",
+    "votes": 1775,
+    "page": 1,
+    "box": [
+     0.6548,
+     0.2752,
+     0.7161,
+     0.2889
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 37,
+   "page": 1,
+   "box": [
+    0.6331,
+    0.3117,
+    0.7258,
+    0.3265
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 4
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 5
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ANN ELIZABETH HAYWOOD",
+      "abbr": "",
+      "votes": 45,
+      "page": 1,
+      "box": [
+       0.6234,
+       0.5356,
+       0.6976,
+       0.5493
+      ]
+     },
+     {
+      "name": "KAPILDEO PARSRAM",
+      "abbr": "",
+      "votes": 392,
+      "page": 1,
+      "box": [
+       0.6234,
+       0.5601,
+       0.6968,
+       0.5732
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "VICKASH BASDEO",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "VANESSA INDIRA SANDRINA BENN",
+      "abbr": "",
+      "votes": 180,
+      "page": 1,
+      "box": [
+       0.6452,
+       0.6821,
+       0.7161,
+       0.6969
+      ]
+     },
+     {
+      "name": "MICHELLE ROXWELL SEMPLE",
+      "abbr": "",
+      "votes": 48,
+      "page": 1,
+      "box": [
+       0.6395,
+       0.7054,
+       0.7161,
+       0.7202
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ANAND",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "CONWAY DOUGLAS",
+      "abbr": "",
+      "votes": 200,
+      "page": 1,
+      "box": [
+       0.6234,
+       0.8405,
+       0.7081,
+       0.8558
+      ]
+     },
+     {
+      "name": "ALLAN SINGH",
+      "abbr": "",
+      "votes": 73,
+      "page": 1,
+      "box": [
+       0.6234,
+       0.8627,
+       0.7161,
+       0.8798
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "RODWELL IVOR NATHANIEL LEWIS",
+      "abbr": "",
+      "votes": 202,
+      "page": 2,
+      "box": [
+       0.6435,
+       0.045,
+       0.7355,
+       0.0621
+      ]
+     },
+     {
+      "name": "GIVANI MEGHBARAN",
+      "abbr": "",
+      "votes": 184,
+      "page": 2,
+      "box": [
+       0.6548,
+       0.0672,
+       0.7355,
+       0.0849
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "CLOYDE BRYAN ABEL",
+      "abbr": "",
+      "votes": 361,
+      "page": 2,
+      "box": [
+       0.6484,
+       0.1316,
+       0.7355,
+       0.1493
+      ]
+     },
+     {
+      "name": "DELVOR BUNBURY",
+      "abbr": "",
+      "votes": 87,
+      "page": 2,
+      "box": [
+       0.6524,
+       0.1573,
+       0.7355,
+       0.1738
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "AVA ALLISON DANIELS",
+      "abbr": "",
+      "votes": 59,
+      "page": 2,
+      "box": [
+       0.6435,
+       0.2222,
+       0.7016,
+       0.2365
+      ]
+     },
+     {
+      "name": "DAWN SHARON CAROL JOHNSON",
+      "abbr": "",
+      "votes": 368,
+      "page": 2,
+      "box": [
+       0.6387,
+       0.2439,
+       0.7258,
+       0.2621
+      ]
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "TESSA KAREN HENRY",
+      "abbr": "",
+      "votes": 466,
+      "page": 2,
+      "box": [
+       0.6556,
+       0.31,
+       0.7185,
+       0.3248
+      ]
+     },
+     {
+      "name": "TASHAH CHARLES PERRY",
+      "abbr": "",
+      "votes": 96,
+      "page": 2,
+      "box": [
+       0.646,
+       0.3311,
+       0.7355,
+       0.3499
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "KAPILDEO PARSRAM",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "VICKASH BASDEO",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "VANESSA BENN",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "ANAND",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "CONWAY DOUGLAS",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "RODWELL LEWIS",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "CLOYDE ABEL",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "DAWN JOHNSON",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "TESSA HENRY",
+    "abbr": null
+   }
+  ],
+  "stem": "Industry Plaisance"
+ },
+ "4.12.pdf": {
+  "area": "BETERVERWAGTING/TRIUMPH",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY (APNU)",
+    "abbr": "APNU",
+    "votes": 1062,
+    "page": 1,
+    "box": [
+     0.7556,
+     0.2621,
+     0.7984,
+     0.2838
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC (PPP/C)",
+    "abbr": "PPP/C",
+    "votes": 824,
+    "page": 1,
+    "box": [
+     0.7589,
+     0.2877,
+     0.7895,
+     0.2974
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 40,
+   "page": 1,
+   "box": [
+    0.7637,
+    0.3219,
+    0.7839,
+    0.3316
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 5
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 4
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "DUNCAN, DWANE ARLINGTON",
+      "abbr": "APNU",
+      "votes": 107,
+      "page": 1,
+      "box": [
+       0.7621,
+       0.5265,
+       0.7911,
+       0.5362
+      ]
+     },
+     {
+      "name": "KING, SHELLON KHERON",
+      "abbr": "",
+      "votes": 28,
+      "page": 1,
+      "box": [
+       0.7653,
+       0.5499,
+       0.7863,
+       0.5595
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "GLASGOW, ASHLEY RODERICK",
+      "abbr": "APNU",
+      "votes": 135,
+      "page": 1,
+      "box": [
+       0.7637,
+       0.5989,
+       0.7919,
+       0.6085
+      ]
+     },
+     {
+      "name": "CUMBERBATCH, NEVILLE WINSTON",
+      "abbr": "",
+      "votes": 11,
+      "page": 1,
+      "box": [
+       0.7702,
+       0.6228,
+       0.7847,
+       0.6325
+      ]
+     },
+     {
+      "name": "DUNCAN, ONIX ANTHONY",
+      "abbr": "",
+      "votes": 96,
+      "page": 1,
+      "box": [
+       0.7669,
+       0.6462,
+       0.7887,
+       0.6558
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "BOLLERS, CAROL JUNITA",
+      "abbr": "APNU",
+      "votes": 149,
+      "page": 1,
+      "box": [
+       0.7653,
+       0.6963,
+       0.7952,
+       0.706
+      ]
+     },
+     {
+      "name": "PERSAUD, RAJENDRA",
+      "abbr": "",
+      "votes": 18,
+      "page": 1,
+      "box": [
+       0.7718,
+       0.7197,
+       0.7903,
+       0.7293
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ANDREWS, WENDY",
+      "abbr": "APNU",
+      "votes": 85,
+      "page": 1,
+      "box": [
+       0.7702,
+       0.7812,
+       0.7895,
+       0.7909
+      ]
+     },
+     {
+      "name": "BHARIO, ANTHONY RICHARD",
+      "abbr": "",
+      "votes": 73,
+      "page": 1,
+      "box": [
+       0.7702,
+       0.8046,
+       0.7887,
+       0.8142
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ABRAMS, TRICIA EVADNEY",
+      "abbr": "",
+      "votes": 153,
+      "page": 1,
+      "box": [
+       0.7677,
+       0.8655,
+       0.7944,
+       0.8752
+      ]
+     },
+     {
+      "name": "SUKHU, NANDANIE DEVI",
+      "abbr": "PPP/C",
+      "votes": 160,
+      "page": 1,
+      "box": [
+       0.7677,
+       0.8895,
+       0.796,
+       0.8991
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "MAXWELL, JUNELL TAMARA",
+      "abbr": "APNU",
+      "votes": 138,
+      "page": 2,
+      "box": [
+       0.7427,
+       0.0758,
+       0.7694,
+       0.0855
+      ]
+     },
+     {
+      "name": "SINGH, RAMESHCHANDRA",
+      "abbr": "",
+      "votes": 100,
+      "page": 2,
+      "box": [
+       0.7427,
+       0.0991,
+       0.7694,
+       0.1088
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "MC RAE, LENNOX MOURTLAND",
+      "abbr": "APNU",
+      "votes": 122,
+      "page": 2,
+      "box": [
+       0.7427,
+       0.1595,
+       0.7685,
+       0.1692
+      ]
+     },
+     {
+      "name": "RAM, SUMINTRA ANISHA",
+      "abbr": "",
+      "votes": 28,
+      "page": 2,
+      "box": [
+       0.7452,
+       0.1829,
+       0.7637,
+       0.1926
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "EVANS, WAYNE WILLIAM",
+      "abbr": "",
+      "votes": 76,
+      "page": 2,
+      "box": [
+       0.7444,
+       0.2433,
+       0.7629,
+       0.253
+      ]
+     },
+     {
+      "name": "CHATARPAUL, KALOWATIE",
+      "abbr": "PPP/C",
+      "votes": 147,
+      "page": 2,
+      "box": [
+       0.7419,
+       0.2667,
+       0.7677,
+       0.2764
+      ]
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "TEKCHAND, LALLOO",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "DUNCAN, DWANE ARLINGTON",
+    "abbr": "APNU"
+   },
+   {
+    "number": 2,
+    "name": "GLASGOW, ASHLEY RODERICK",
+    "abbr": "APNU"
+   },
+   {
+    "number": 3,
+    "name": "BOLLERS, CAROL JUNITA",
+    "abbr": "APNU"
+   },
+   {
+    "number": 4,
+    "name": "ANDREWS, WENDY",
+    "abbr": "APNU"
+   },
+   {
+    "number": 5,
+    "name": "SUKHU, NANDANIE DEVI",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 6,
+    "name": "MAXWELL, JUNELL TAMARA",
+    "abbr": "APNU"
+   },
+   {
+    "number": 7,
+    "name": "MC RAE, LENNOX MOURTLAND",
+    "abbr": "APNU"
+   },
+   {
+    "number": 8,
+    "name": "CHATARPAUL, KALOWATIE",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 9,
+    "name": "TEKCHAND, LALLOO",
+    "abbr": "PPP/C"
+   }
+  ],
+  "stem": "Beterverwagting Triumph"
+ },
+ "4.13.pdf": {
+  "area": "MON REPOS/LA RECONNAISSANCE",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY (APNU)",
+    "abbr": "APNU",
+    "votes": 442,
+    "page": 1,
+    "box": [
+     0.7113,
+     0.2148,
+     0.7419,
+     0.2262
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC (PPP/C)",
+    "abbr": "PPP/C",
+    "votes": 6016,
+    "page": 1,
+    "box": [
+     0.7081,
+     0.2353,
+     0.7476,
+     0.2473
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 52,
+   "page": 1,
+   "box": [
+    0.6984,
+    0.3037,
+    0.7806,
+    0.3276
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 1
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 8
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "VARSHA PERSAUD",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "HARRY DAT TILKU",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "JAGROOP",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "MEENA DEVI SINGH",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KHEMRAJ JAILAL",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "PREMANANDI SUKHDEO",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DEV PERSAUD",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "VERMA DOOLICHANDRA",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "AKIL NURU JERVIS",
+      "abbr": "",
+      "votes": 344,
+      "page": 2,
+      "box": [
+       0.729,
+       0.7197,
+       0.7597,
+       0.7305
+      ]
+     },
+     {
+      "name": "DHARMINDRA PERSAUD",
+      "abbr": "",
+      "votes": 275,
+      "page": 2,
+      "box": [
+       0.7306,
+       0.7436,
+       0.7605,
+       0.7544
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "VARSHA PERSAUD",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "HARRY DAT TILKU",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "JAGROOP",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "MEENA DEVI SINGH",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "KHEMRAJ JAILAL",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "PREMANANDI SUKHDEO",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "DEV PERSAUD",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "VERMA DOOLICHANDRA",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "AKIL NURE JERVIS",
+    "abbr": null
+   }
+  ],
+  "stem": "Mon Repos La Reconnaissance"
+ },
+ "4.14.pdf": {
+  "area": "BUXTON/FOULIS",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY (APNU)",
+    "abbr": "APNU",
+    "votes": 5105,
+    "page": 1,
+    "box": [
+     0.6993,
+     0.2813,
+     0.8002,
+     0.2936
+    ]
+   },
+   {
+    "label": "PEOPLES PROGRESSIVE PARTY/CIVIC (PPP/C)",
+    "abbr": "PPP/C",
+    "votes": 4511,
+    "page": 1,
+    "box": [
+     0.7068,
+     0.3,
+     0.8002,
+     0.3154
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 176,
+   "page": 1,
+   "box": [
+    0.6893,
+    0.3732,
+    0.7903,
+    0.3888
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 5
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 4
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "DAVID JONES",
+      "abbr": "APNU",
+      "votes": 964,
+      "page": 1,
+      "box": [
+       0.6893,
+       0.6188,
+       0.7803,
+       0.6362
+      ]
+     },
+     {
+      "name": "LETTA EUCINE ABINA MURRAY",
+      "abbr": "",
+      "votes": 114,
+      "page": 1,
+      "box": [
+       0.6893,
+       0.6417,
+       0.7803,
+       0.6564
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "DERK SHELTON SIMON",
+      "abbr": "",
+      "votes": 187,
+      "page": 1,
+      "box": [
+       0.6893,
+       0.6886,
+       0.7803,
+       0.7041
+      ]
+     },
+     {
+      "name": "EDGAR HAMILTON SIMON",
+      "abbr": "",
+      "votes": 40,
+      "page": 1,
+      "box": [
+       0.6893,
+       0.7124,
+       0.7803,
+       0.7271
+      ]
+     },
+     {
+      "name": "OSWALD WILLIAMS",
+      "abbr": "APNU",
+      "votes": 598,
+      "page": 1,
+      "box": [
+       0.6918,
+       0.7341,
+       0.7803,
+       0.7491
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "RANDOLPH ALVIN BLAIR",
+      "abbr": "",
+      "votes": 249,
+      "page": 1,
+      "box": [
+       0.6893,
+       0.7829,
+       0.7803,
+       0.7972
+      ]
+     },
+     {
+      "name": "RUPAN PURAN PERSAUD",
+      "abbr": "PPP/C",
+      "votes": 869,
+      "page": 1,
+      "box": [
+       0.7093,
+       0.8041,
+       0.7803,
+       0.8193
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "PAUL COLE",
+      "abbr": "",
+      "votes": 227,
+      "page": 1,
+      "box": [
+       0.6893,
+       0.8907,
+       0.7672,
+       0.9025
+      ]
+     },
+     {
+      "name": "GAVIN DICK",
+      "abbr": "APNU",
+      "votes": 355,
+      "page": 1,
+      "box": [
+       0.6893,
+       0.911,
+       0.7903,
+       0.9245
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "MARCIA DORSETTE",
+      "abbr": "",
+      "votes": 261,
+      "page": 2,
+      "box": [
+       0.6946,
+       0.0843,
+       0.7803,
+       0.0971
+      ]
+     },
+     {
+      "name": "SHAMEER MOHAMED",
+      "abbr": "PPP/C",
+      "votes": 805,
+      "page": 2,
+      "box": [
+       0.6893,
+       0.1041,
+       0.7803,
+       0.1195
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ROGER EVELYN",
+      "abbr": "",
+      "votes": 125,
+      "page": 2,
+      "box": [
+       0.6893,
+       0.1659,
+       0.7803,
+       0.1797
+      ]
+     },
+     {
+      "name": "DAIMEON RONDELLE ANTHONY JAMES",
+      "abbr": "",
+      "votes": 214,
+      "page": 2,
+      "box": [
+       0.7199,
+       0.1876,
+       0.7635,
+       0.2
+      ]
+     },
+     {
+      "name": "PETAL ALLISON TELFORD",
+      "abbr": "APNU",
+      "votes": 640,
+      "page": 2,
+      "box": [
+       0.6893,
+       0.2007,
+       0.7803,
+       0.2151
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SAVERNA ASHANA OUTRAM",
+      "abbr": "PPP/C",
+      "votes": 1021,
+      "page": 2,
+      "box": [
+       0.6893,
+       0.2605,
+       0.7868,
+       0.2743
+      ]
+     },
+     {
+      "name": "PAULETTE OSMIN SHOLL",
+      "abbr": "",
+      "votes": 53,
+      "page": 2,
+      "box": [
+       0.7002,
+       0.2843,
+       0.7797,
+       0.2965
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "JESSICA REHANA JOY BACCHUS",
+      "abbr": "",
+      "votes": 110,
+      "page": 2,
+      "box": [
+       0.6896,
+       0.3429,
+       0.7803,
+       0.3564
+      ]
+     },
+     {
+      "name": "CHERYL EVETH MCPHERSON",
+      "abbr": "APNU",
+      "votes": 701,
+      "page": 2,
+      "box": [
+       0.718,
+       0.3664,
+       0.7532,
+       0.377
+      ]
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "WHITNEY IAYASHA ROGERS",
+      "abbr": "",
+      "votes": 835,
+      "page": 2,
+      "box": [
+       0.6893,
+       0.4245,
+       0.7903,
+       0.4392
+      ]
+     },
+     {
+      "name": "VINETTA SINGH",
+      "abbr": "PPP/C",
+      "votes": 1151,
+      "page": 2,
+      "box": [
+       0.6927,
+       0.4472,
+       0.7663,
+       0.4613
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "DAVID JONES",
+    "abbr": "APNU"
+   },
+   {
+    "number": 2,
+    "name": "OSWALD WILLIAMS",
+    "abbr": "APNU"
+   },
+   {
+    "number": 3,
+    "name": "RUPAN PURAN PERSAUD",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 4,
+    "name": "GAVIN DICK",
+    "abbr": "APNU"
+   },
+   {
+    "number": 5,
+    "name": "SHAMEER MOHAMED",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 6,
+    "name": "PETAL ALLISON TELFORD",
+    "abbr": "APNU"
+   },
+   {
+    "number": 7,
+    "name": "SAVERNA ASHANA OUTRAM",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 8,
+    "name": "CHERYL EVETH MCPHERSON",
+    "abbr": "APNU"
+   },
+   {
+    "number": 9,
+    "name": "VINETTA SINGH",
+    "abbr": "PPP/C"
+   }
+  ],
+  "stem": "Buxton Foulis"
+ },
+ "4.16.pdf": {
+  "area": "HASLINGTON-GROVE",
+  "lists": [
+   {
+    "label": "A Partnership for National Unity - APNU",
+    "abbr": "APNU",
+    "votes": 4485,
+    "page": 1,
+    "box": [
+     0.76,
+     0.2637,
+     0.8086,
+     0.278
+    ]
+   },
+   {
+    "label": "People's Progressive Party - PPP/C",
+    "abbr": "PPP/C",
+    "votes": 1941,
+    "page": 1,
+    "box": [
+     0.7616,
+     0.2838,
+     0.8008,
+     0.2934
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 131,
+   "page": 1,
+   "box": [
+    0.7663,
+    0.3571,
+    0.7945,
+    0.3667
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 6
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 3
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Avnel Angela Adacia Moore",
+      "abbr": "APNU",
+      "votes": 527,
+      "page": 1,
+      "box": [
+       0.7608,
+       0.5983,
+       0.7937,
+       0.6079
+      ]
+     },
+     {
+      "name": "Shammattie Persaud",
+      "abbr": "PPP/C",
+      "votes": 209,
+      "page": 1,
+      "box": [
+       0.7608,
+       0.6213,
+       0.7937,
+       0.6309
+      ]
+     },
+     {
+      "name": "Aaron Blackman",
+      "abbr": "MBC",
+      "votes": 146,
+      "page": 1,
+      "box": [
+       0.7624,
+       0.6443,
+       0.7937,
+       0.6539
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Mario Alanzo Sumner",
+      "abbr": "APNU",
+      "votes": 839,
+      "page": 1,
+      "box": [
+       0.7608,
+       0.7157,
+       0.7937,
+       0.7258
+      ]
+     },
+     {
+      "name": "Juanita Odetta France",
+      "abbr": "PPP/C",
+      "votes": 59,
+      "page": 1,
+      "box": [
+       0.7608,
+       0.7392,
+       0.7937,
+       0.7493
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Joy Ann Morgan-Lewis",
+      "abbr": "APNU",
+      "votes": 472,
+      "page": 1,
+      "box": [
+       0.76,
+       0.8356,
+       0.7929,
+       0.8456
+      ]
+     },
+     {
+      "name": "Tolisha Lanesia Culley",
+      "abbr": "PPP/C",
+      "votes": 67,
+      "page": 1,
+      "box": [
+       0.7592,
+       0.8591,
+       0.7937,
+       0.8691
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "Sharmilla Prashad",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Rodwell Hamilton",
+      "abbr": "APNU",
+      "votes": 1075,
+      "page": 2,
+      "box": [
+       0.7608,
+       0.2197,
+       0.8024,
+       0.2288
+      ]
+     },
+     {
+      "name": "Alex Dane Fraser",
+      "abbr": "PPP/C",
+      "votes": 99,
+      "page": 2,
+      "box": [
+       0.7639,
+       0.2421,
+       0.7969,
+       0.2517
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Alna Nicola Thomas",
+      "abbr": "APNU",
+      "votes": 259,
+      "page": 2,
+      "box": [
+       0.7624,
+       0.3632,
+       0.7953,
+       0.3737
+      ]
+     },
+     {
+      "name": "Clive Anthony Bristol",
+      "abbr": "PPP/C",
+      "votes": 449,
+      "page": 2,
+      "box": [
+       0.7616,
+       0.3866,
+       0.7945,
+       0.3966
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Melissa Alana Adams",
+      "abbr": "APNU",
+      "votes": 439,
+      "page": 2,
+      "box": [
+       0.7592,
+       0.5067,
+       0.7922,
+       0.5167
+      ]
+     },
+     {
+      "name": "Gangaram Kanhaye",
+      "abbr": "PPP/C",
+      "votes": 113,
+      "page": 2,
+      "box": [
+       0.7608,
+       0.53,
+       0.7914,
+       0.5396
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Kamaladeen Balmacoon",
+      "abbr": "APNU",
+      "votes": 574,
+      "page": 2,
+      "box": [
+       0.7576,
+       0.6478,
+       0.7914,
+       0.6573
+      ]
+     },
+     {
+      "name": "Omkar Kameraj",
+      "abbr": "PPP/C",
+      "votes": 245,
+      "page": 2,
+      "box": [
+       0.7576,
+       0.6706,
+       0.7914,
+       0.6806
+      ]
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "Satesh Rajkumar",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "Avnel Angela Adacia Moore",
+    "abbr": "APNU"
+   },
+   {
+    "number": 2,
+    "name": "Mario Alanzo Sumner",
+    "abbr": "APNU"
+   },
+   {
+    "number": 3,
+    "name": "Joyann Morgan-Lewis",
+    "abbr": "APNU"
+   },
+   {
+    "number": 4,
+    "name": "Sharmilla Prashad",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 5,
+    "name": "Rodwell Hamilton",
+    "abbr": "APNU"
+   },
+   {
+    "number": 6,
+    "name": "Clive Anthony Bristol",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 7,
+    "name": "Melissa Alana Adams",
+    "abbr": "APNU"
+   },
+   {
+    "number": 8,
+    "name": "Kamaladeen Balmacoon",
+    "abbr": "APNU"
+   },
+   {
+    "number": 9,
+    "name": "Satesh Rajkumar",
+    "abbr": "PPP/C"
+   }
+  ],
+  "stem": "Haslington Grove"
+ },
+ "5.01.pdf": {
+  "area": "WOODLANDS/FARM",
+  "lists": [
+   {
+    "label": "THE PEOPLE'S PROGRESSIVE PARTY/CIVIC (PPP/C)",
+    "abbr": "PPP/C",
+    "votes": 1273,
+    "page": 1,
+    "box": [
+     0.7694,
+     0.239,
+     0.8102,
+     0.2495
+    ]
+   },
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY (APNU)",
+    "abbr": "APNU",
+    "votes": 724,
+    "page": 1,
+    "box": [
+     0.7725,
+     0.2595,
+     0.8055,
+     0.269
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 29,
+   "page": 1,
+   "box": [
+    0.778,
+    0.3129,
+    0.7992,
+    0.3229
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 6
+   },
+   {
+    "abbr": "APNU",
+    "seats": 3
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KIRITPAL, SADARSHANAND",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DINDIALL, GOWKARRAN MARAJ",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SEEJATAN, HAMCHAND",
+      "abbr": "",
+      "votes": 197,
+      "page": 1,
+      "box": [
+       0.7725,
+       0.6829,
+       0.8031,
+       0.6924
+      ]
+     },
+     {
+      "name": "HENRY, WAINRIGHT AUGUSTUS",
+      "abbr": "",
+      "votes": 15,
+      "page": 1,
+      "box": [
+       0.778,
+       0.7052,
+       0.7961,
+       0.7148
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SOMWARU, DEVENAND",
+      "abbr": "",
+      "votes": 158,
+      "page": 1,
+      "box": [
+       0.7718,
+       0.7671,
+       0.8016,
+       0.7776
+      ]
+     },
+     {
+      "name": "POMPEY, PRINCE ALBERT",
+      "abbr": "",
+      "votes": 32,
+      "page": 1,
+      "box": [
+       0.7741,
+       0.791,
+       0.7961,
+       0.8005
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "BALKARAN, KRISENDAT",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "FRASER, TREVOR MARTIN",
+      "abbr": "",
+      "votes": 90,
+      "page": 2,
+      "box": [
+       0.7804,
+       0.0757,
+       0.8031,
+       0.0857
+      ]
+     },
+     {
+      "name": "CHICHESTER, TREVON ANDRE",
+      "abbr": "",
+      "votes": 112,
+      "page": 2,
+      "box": [
+       0.778,
+       0.0995,
+       0.8086,
+       0.1095
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "MUIR, DONNA LETECIA",
+      "abbr": "",
+      "votes": 113,
+      "page": 2,
+      "box": [
+       0.778,
+       0.161,
+       0.8078,
+       0.1714
+      ]
+     },
+     {
+      "name": "HALLEY, RHONDA ALEXIS",
+      "abbr": "",
+      "votes": 209,
+      "page": 2,
+      "box": [
+       0.7749,
+       0.1833,
+       0.8086,
+       0.1929
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "GLASGOW, SANDRA NATASHA",
+      "abbr": "",
+      "votes": 28,
+      "page": 2,
+      "box": [
+       0.7812,
+       0.2443,
+       0.8031,
+       0.2548
+      ]
+     },
+     {
+      "name": "HALLEY, MARY CAROLYN",
+      "abbr": "",
+      "votes": 79,
+      "page": 2,
+      "box": [
+       0.782,
+       0.2681,
+       0.8031,
+       0.2781
+      ]
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SEALEY, CINDY NATASHA",
+      "abbr": "",
+      "votes": 32,
+      "page": 2,
+      "box": [
+       0.7812,
+       0.3276,
+       0.8031,
+       0.3386
+      ]
+     },
+     {
+      "name": "CAMERON, PAULA PAMELA",
+      "abbr": "",
+      "votes": 254,
+      "page": 2,
+      "box": [
+       0.7757,
+       0.3519,
+       0.8086,
+       0.3624
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "KIRITPAL, SADARSHANAND",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "DINDIALL, GOWKARRAN MARAJ",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "SEEJATAN, HAMCHAND",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "SOMWARU, DEVENAND",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "BALKARAN, KRISENDAT",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "CHICHESTER, TREVON ANDRE",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "HALLEY, RHONDA ALEXIS",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "HALLEY, MARY CAROLYN",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "CAMERON, PAULA PAMELA",
+    "abbr": null
+   }
+  ],
+  "stem": "Woodlands Farm"
+ },
+ "5.02.pdf": {
+  "area": "HAMLET/CHANCE",
+  "lists": [
+   {
+    "label": "A Partnership for National Unity (APNU)",
+    "abbr": "APNU",
+    "votes": 415,
+    "page": 1,
+    "box": [
+     0.7718,
+     0.2386,
+     0.8047,
+     0.2486
+    ]
+   },
+   {
+    "label": "People's Progressive Party Civic (PPP/C)",
+    "abbr": "PPP/C",
+    "votes": 53,
+    "page": 1,
+    "box": [
+     0.778,
+     0.2595,
+     0.7984,
+     0.2695
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 5,
+   "page": 1,
+   "box": [
+    0.7819,
+    0.3334,
+    0.7915,
+    0.3431
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 3
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 0
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Gleavia Asanti Bourne",
+      "abbr": "APNU",
+      "votes": 272,
+      "page": 1,
+      "box": [
+       0.7663,
+       0.579,
+       0.7992,
+       0.589
+      ]
+     },
+     {
+      "name": "Hotty Joycelyn Charles",
+      "abbr": "PPP/C",
+      "votes": 14,
+      "page": 1,
+      "box": [
+       0.7741,
+       0.6029,
+       0.7937,
+       0.6124
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Monica Ollana Sealey",
+      "abbr": "APNU",
+      "votes": 39,
+      "page": 1,
+      "box": [
+       0.771,
+       0.6976,
+       0.7929,
+       0.7076
+      ]
+     },
+     {
+      "name": "Mion Natasha Richmond",
+      "abbr": "PPP/C",
+      "votes": 14,
+      "page": 1,
+      "box": [
+       0.7733,
+       0.721,
+       0.7922,
+       0.731
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Wonnell Roslyn Rockcliffe",
+      "abbr": "APNU",
+      "votes": 91,
+      "page": 1,
+      "box": [
+       0.7694,
+       0.8167,
+       0.7882,
+       0.8262
+      ]
+     },
+     {
+      "name": "Sampson Franklin Gibbons",
+      "abbr": "PPP/C",
+      "votes": 27,
+      "page": 1,
+      "box": [
+       0.7694,
+       0.84,
+       0.7914,
+       0.8486
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "Gleavia Asanti Bourne",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "Monica Ollana Sealey",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "Wonnell Roslyn Rockcliffe",
+    "abbr": null
+   }
+  ],
+  "stem": "Hamlet Chance"
+ },
+ "5.03.pdf": {
+  "area": "MAHAICONY-ABARY",
+  "lists": [
+   {
+    "label": "A Partnership For National Unity (APNU)",
+    "abbr": "APNU",
+    "votes": 729,
+    "page": 2,
+    "box": [
+     0.7678,
+     0.2595,
+     0.8,
+     0.2695
+    ]
+   },
+   {
+    "label": "The People Progressive Party Civic (PPP/C)",
+    "abbr": "PPP/C",
+    "votes": 1441,
+    "page": 2,
+    "box": [
+     0.7631,
+     0.2876,
+     0.8024,
+     0.2976
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": null,
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 3
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 6
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Charles Alexander Gibbons",
+      "abbr": "",
+      "votes": 21,
+      "page": 2,
+      "box": [
+       0.7639,
+       0.5643,
+       0.7945,
+       0.5743
+      ]
+     },
+     {
+      "name": "Indardeo Persaud",
+      "abbr": "",
+      "votes": 91,
+      "page": 2,
+      "box": [
+       0.7639,
+       0.5938,
+       0.7937,
+       0.6038
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Ottis Godfrey James",
+      "abbr": "",
+      "votes": 27,
+      "page": 2,
+      "box": [
+       0.7631,
+       0.6614,
+       0.7953,
+       0.6719
+      ]
+     },
+     {
+      "name": "Bibi Anesa Ali",
+      "abbr": "",
+      "votes": 181,
+      "page": 2,
+      "box": [
+       0.7647,
+       0.6905,
+       0.7937,
+       0.7005
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "Alim Bacchus",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Lambert Octavius Nunes",
+      "abbr": "",
+      "votes": 144,
+      "page": 2,
+      "box": [
+       0.7639,
+       0.8262,
+       0.7945,
+       0.8357
+      ]
+     },
+     {
+      "name": "Vishunudatt Singh",
+      "abbr": "",
+      "votes": 134,
+      "page": 2,
+      "box": [
+       0.7639,
+       0.8552,
+       0.7945,
+       0.8652
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "Chaitram Ramroop",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "Mark Anttany Pestano",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "John Lyndon Forbes",
+      "abbr": "",
+      "votes": 24,
+      "page": 3,
+      "box": [
+       0.7788,
+       0.2352,
+       0.8118,
+       0.2452
+      ]
+     },
+     {
+      "name": "Leon Randy Wordsworth",
+      "abbr": "",
+      "votes": 175,
+      "page": 3,
+      "box": [
+       0.7804,
+       0.2652,
+       0.811,
+       0.2748
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Hatty Loreli Downer-Nurse",
+      "abbr": "",
+      "votes": 285,
+      "page": 3,
+      "box": [
+       0.7773,
+       0.3448,
+       0.8094,
+       0.3548
+      ]
+     },
+     {
+      "name": "Patrick Elroy Mc Inroy",
+      "abbr": "",
+      "votes": 43,
+      "page": 3,
+      "box": [
+       0.7765,
+       0.3743,
+       0.8086,
+       0.3843
+      ]
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Junior Edmund Henry",
+      "abbr": "",
+      "votes": 172,
+      "page": 3,
+      "box": [
+       0.7773,
+       0.4405,
+       0.8071,
+       0.451
+      ]
+     },
+     {
+      "name": "Ishaani Bessasar",
+      "abbr": "",
+      "votes": 85,
+      "page": 3,
+      "box": [
+       0.7741,
+       0.47,
+       0.8063,
+       0.4805
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "Indardeo Persaud",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "Bibi Anesa Ali",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "Alim Bacchus",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "Lambert Octavius Nunes",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "Chaitram Ramroop",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "Mark Anttany Pestano",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "Leon Randy Wordsworth",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "Hatty Loreli Downer-Nurse",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "Junior Edmund Henry",
+    "abbr": null
+   }
+  ],
+  "stem": "Mahaicony Abary",
+  "note": "The declaration prints 2,170, the sum of the two lists' votes, on the line for rejected ballot papers; the number of rejected ballots is not given."
+ },
+ "5.06.pdf": {
+  "area": "UNION-NAARSTIGHEID N.D.C.",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY (A.P.N.U)",
+    "abbr": "APNU",
+    "votes": 2031,
+    "page": 1,
+    "box": [
+     0.7467,
+     0.2729,
+     0.7882,
+     0.2824
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY CIVIC (P.P.P/C)",
+    "abbr": "PPP/C",
+    "votes": 1531,
+    "page": 1,
+    "box": [
+     0.7482,
+     0.2929,
+     0.7875,
+     0.3024
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 51,
+   "page": 1,
+   "box": [
+    0.469,
+    0.3248,
+    0.4996,
+    0.3343
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 5
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 4
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ALMARREA VERGINA EVERSELY",
+      "abbr": "APNU",
+      "votes": 310,
+      "page": 1,
+      "box": [
+       0.7498,
+       0.5276,
+       0.7827,
+       0.5371
+      ]
+     },
+     {
+      "name": "ROSALINE CECILIA CARMICHAEL",
+      "abbr": "PPP/C",
+      "votes": 72,
+      "page": 1,
+      "box": [
+       0.7498,
+       0.551,
+       0.782,
+       0.5605
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "YVETTE ALEXANDER PRICE",
+      "abbr": "APNU",
+      "votes": 392,
+      "page": 1,
+      "box": [
+       0.749,
+       0.5986,
+       0.7812,
+       0.6081
+      ]
+     },
+     {
+      "name": "COLLIN GILBERT MILLER",
+      "abbr": "PPP/C",
+      "votes": 52,
+      "page": 1,
+      "box": [
+       0.749,
+       0.6214,
+       0.7812,
+       0.631
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SEONAID LISA MARIE RICHMOND",
+      "abbr": "APNU",
+      "votes": 338,
+      "page": 1,
+      "box": [
+       0.7482,
+       0.6695,
+       0.7812,
+       0.679
+      ]
+     },
+     {
+      "name": "DERIC DAVID DUTCHIN",
+      "abbr": "PPP/C",
+      "votes": 77,
+      "page": 1,
+      "box": [
+       0.7482,
+       0.6929,
+       0.7812,
+       0.7024
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DEVENA KEMRAJ SUNDAR",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KISHUN RAJIV",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "CAROLINE CLEOPATRA WILLIAMSON",
+      "abbr": "APNU",
+      "votes": 246,
+      "page": 1,
+      "box": [
+       0.7482,
+       0.8729,
+       0.7812,
+       0.8824
+      ]
+     },
+     {
+      "name": "BERNARD VENO GARRETT",
+      "abbr": "PPP/C",
+      "votes": 166,
+      "page": 1,
+      "box": [
+       0.7506,
+       0.8957,
+       0.7812,
+       0.9052
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "KAYLA AMARA CAMICHAEL",
+      "abbr": "APNU",
+      "votes": 231,
+      "page": 2,
+      "box": [
+       0.7569,
+       0.1143,
+       0.7875,
+       0.1243
+      ]
+     },
+     {
+      "name": "DASON DARYEL LANGEVINE",
+      "abbr": "PPP/C",
+      "votes": 24,
+      "page": 2,
+      "box": [
+       0.7569,
+       0.1376,
+       0.789,
+       0.1471
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "TIFFENY ALLICA MCFARLANE-MENTORE",
+      "abbr": "APNU",
+      "votes": 264,
+      "page": 2,
+      "box": [
+       0.7553,
+       0.1976,
+       0.7882,
+       0.2071
+      ]
+     },
+     {
+      "name": "RODLYN ABIOLA MCALMONT-ADOLPH",
+      "abbr": "PPP/C",
+      "votes": 11,
+      "page": 2,
+      "box": [
+       0.7553,
+       0.2205,
+       0.7851,
+       0.2295
+      ]
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "BHANMATIE MCPHERSON",
+      "abbr": "PPP/C",
+      "votes": 15,
+      "page": 2,
+      "box": [
+       0.7537,
+       0.2805,
+       0.7859,
+       0.2905
+      ]
+     },
+     {
+      "name": "LESLYN EDWARDS-CHARLES",
+      "abbr": "IND",
+      "votes": 220,
+      "page": 2,
+      "box": [
+       0.7537,
+       0.3038,
+       0.7867,
+       0.3133
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "ALMARREA EVERSELY",
+    "abbr": "APNU"
+   },
+   {
+    "number": 2,
+    "name": "YVETTE ALEXANDER PRICE",
+    "abbr": "APNU"
+   },
+   {
+    "number": 3,
+    "name": "SEONAID LISA MARIE RICHMOND",
+    "abbr": "APNU"
+   },
+   {
+    "number": 4,
+    "name": "DEVENA KEMRAJ SUNDAR",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 5,
+    "name": "RAJIV KISHUN",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 6,
+    "name": "CAROLINE CLEOPATRA WILLIAMSON",
+    "abbr": "APNU"
+   },
+   {
+    "number": 7,
+    "name": "KAYLA AMARA CAMICHAEL",
+    "abbr": "APNU"
+   },
+   {
+    "number": 8,
+    "name": "TIFFENY ALLICA MCFARLANE-MENTORE",
+    "abbr": "APNU"
+   },
+   {
+    "number": 9,
+    "name": "LESLYN EDWARDS-CHARLES",
+    "abbr": "IND"
+   }
+  ],
+  "stem": "Union Naarstigheid"
+ },
+ "5.07.pdf": {
+  "area": "BATH/WOODLEY PARK",
+  "lists": [
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC (P.P.P/C)",
+    "abbr": "PPP/C",
+    "votes": null
+   }
+  ],
+  "valid": null,
+  "rejected": null,
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 9
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DEVON RAJPAUL",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SHEREZE RAHAMAN-RAMOO",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SUDESH PERSAUD",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DILCHAN SANMOGAN",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KHEMRAJIE ANANTRAM",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DHANPAUL MOHAN",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DUNITA ROOPNARINE",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DINESH ROOPCHAND GOSSAI",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DHANMATTIE BALGOBIN",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "DEVON RAJPAUL",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "SHEREZE RAHAMAN-RAMOO",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "SUDESH PERSAUD",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "DILCHAN SANMOGAN",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "KHEMRAJIE ANANTRAM",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "DHANPAUL MOHAN",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "DUNITA ROOPNARINE",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "DINESH ROOPCHAND GOSSAI",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "DHANMATTIE BALGOBIN",
+    "abbr": null
+   }
+  ],
+  "stem": "Bath Woodley Park"
+ },
+ "5.08.pdf": {
+  "area": "WOODLANDS/BEL-AIR",
+  "lists": [
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC",
+    "abbr": "PPP/C",
+    "votes": 403,
+    "page": 1,
+    "box": [
+     0.7671,
+     0.2648,
+     0.8,
+     0.2743
+    ]
+   },
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY",
+    "abbr": "APNU",
+    "votes": 300,
+    "page": 1,
+    "box": [
+     0.7686,
+     0.2843,
+     0.8008,
+     0.2943
+    ]
+   }
+  ],
+  "valid": {
+   "value": 703,
+   "page": 1,
+   "box": [
+    0.7686,
+    0.3048,
+    0.8,
+    0.3148
+   ]
+  },
+  "rejected": {
+   "value": 7,
+   "page": 1,
+   "box": [
+    0.7694,
+    0.3595,
+    0.8016,
+    0.369
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 2
+   },
+   {
+    "abbr": "APNU",
+    "seats": 2
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": "WOODLANDS, FRIENDS & RETREAT",
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SHARON NICOLA GAJADHAR",
+      "abbr": "PPP/C",
+      "votes": 88,
+      "page": 1,
+      "box": [
+       0.7694,
+       0.6067,
+       0.8016,
+       0.6162
+      ]
+     },
+     {
+      "name": "MICHAEL BETHUNE",
+      "abbr": "APNU",
+      "votes": 49,
+      "page": 1,
+      "box": [
+       0.7694,
+       0.63,
+       0.8016,
+       0.64
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": "EXPECTATION",
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SIMONICA LONDON",
+      "abbr": "APNU",
+      "votes": 125,
+      "page": 1,
+      "box": [
+       0.7718,
+       0.7262,
+       0.8016,
+       0.7357
+      ]
+     },
+     {
+      "name": "JOYCELYN BRAITHWAITE",
+      "abbr": "PPP/C",
+      "votes": 87,
+      "page": 1,
+      "box": [
+       0.7694,
+       0.75,
+       0.8024,
+       0.7595
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": "INVERNESS",
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "HERROL PLUCK",
+      "abbr": "APNU",
+      "votes": 127,
+      "page": 1,
+      "box": [
+       0.7725,
+       0.8448,
+       0.8024,
+       0.8548
+      ]
+     },
+     {
+      "name": "ANNASTACY REDOY",
+      "abbr": "PPP/C",
+      "votes": 62,
+      "page": 1,
+      "box": [
+       0.7694,
+       0.8686,
+       0.8016,
+       0.8786
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": "WILLEMSTAAD/BEL-AIR",
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SAFRAZ SATTAR",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "SHARON GAJADHAR",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 2,
+    "name": "SIMONICA LONDON",
+    "abbr": "APNU"
+   },
+   {
+    "number": 3,
+    "name": "HERROL PLUCK",
+    "abbr": "APNU"
+   },
+   {
+    "number": 4,
+    "name": "SAFFRAZ SATTAR",
+    "abbr": "PPP/C"
+   }
+  ],
+  "stem": "Woodlands Bel Air"
+ },
+ "5.09.pdf": {
+  "area": "ZEELUST-ROSIGNOL",
+  "lists": [
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY CIVIC - PPP/C",
+    "abbr": "PPP/C",
+    "votes": 2269,
+    "page": 1,
+    "box": [
+     0.6588,
+     0.2976,
+     0.7545,
+     0.3145
+    ]
+   },
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY - APNU",
+    "abbr": "APNU",
+    "votes": 553,
+    "page": 1,
+    "box": [
+     0.6784,
+     0.3279,
+     0.7804,
+     0.3424
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 39,
+   "page": 1,
+   "box": [
+    0.7137,
+    0.3606,
+    0.7498,
+    0.3733
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 7
+   },
+   {
+    "abbr": "APNU",
+    "seats": 2
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "VIRGIL A. M. WATTS",
+      "abbr": "PPP/C",
+      "votes": 209,
+      "page": 1,
+      "box": [
+       0.6894,
+       0.6376,
+       0.771,
+       0.6527
+      ]
+     },
+     {
+      "name": "SHURLON D. E. PETERS",
+      "abbr": "APNU",
+      "votes": 274,
+      "page": 1,
+      "box": [
+       0.6886,
+       0.6661,
+       0.7655,
+       0.6818
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "RAVINA GANNIE",
+      "abbr": "PPP/C",
+      "votes": 218,
+      "page": 2,
+      "box": [
+       0.6173,
+       0.1545,
+       0.6573,
+       0.1679
+      ]
+     },
+     {
+      "name": "GLADWYN C. JOHNSON",
+      "abbr": "APNU",
+      "votes": 52,
+      "page": 2,
+      "box": [
+       0.5898,
+       0.1818,
+       0.6612,
+       0.197
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "FELIX A. DAVIS",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SAVITREE RANGASAMMY",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "LATCHMIDAYAL BISSOONDAYAL",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "KEVON JAWAHIR",
+      "abbr": "PPP/C",
+      "votes": 192,
+      "page": 2,
+      "box": [
+       0.6196,
+       0.5127,
+       0.6635,
+       0.5297
+      ]
+     },
+     {
+      "name": "CHRISTOPHER P. WORDSWORTH",
+      "abbr": "APNU",
+      "votes": 27,
+      "page": 2,
+      "box": [
+       0.6376,
+       0.5424,
+       0.7106,
+       0.557
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "BISRAM EVANS",
+      "abbr": "PPP/C",
+      "votes": 333,
+      "page": 2,
+      "box": [
+       0.6267,
+       0.5964,
+       0.6737,
+       0.6097
+      ]
+     },
+     {
+      "name": "JOAN V. JOHNSON",
+      "abbr": "APNU",
+      "votes": 16,
+      "page": 2,
+      "box": [
+       0.6369,
+       0.6224,
+       0.6792,
+       0.6388
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "BIBI W. HAMID",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SHAMEERA EVANS",
+      "abbr": "PPP/C",
+      "votes": 221,
+      "page": 3,
+      "box": [
+       0.6078,
+       0.1558,
+       0.7208,
+       0.1685
+      ]
+     },
+     {
+      "name": "DAWN L. CHAPMAN",
+      "abbr": "APNU",
+      "votes": 62,
+      "page": 3,
+      "box": [
+       0.5788,
+       0.18,
+       0.6596,
+       0.1976
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "SHURLON D. E. PETERS",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "RAVINA GANNIE",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "FELIX A. DAVIS",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "SAVITREE RANGASAMMY",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "LATCHMIDAYAL BISSOONDAYAL",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "KEVON J. JAWAHIR",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "BISRAM EVANS",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "BIBI W. HAMID",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "SHAMEERA EVANS",
+    "abbr": null
+   }
+  ],
+  "stem": "Zeelust Rosignol"
+ },
+ "6.01.pdf": {
+  "area": "PLEGT ANKER/KORTBERAADT NDC",
+  "lists": [
+   {
+    "label": "A Partnership for National Unity (APNU)",
+    "abbr": "APNU",
+    "votes": 140,
+    "page": 1,
+    "box": [
+     0.778,
+     0.2586,
+     0.8086,
+     0.2686
+    ]
+   },
+   {
+    "label": "People Progressive Party Civic (PPP/C)",
+    "abbr": "PPP/C",
+    "votes": 161,
+    "page": 1,
+    "box": [
+     0.7788,
+     0.2795,
+     0.8063,
+     0.29
+    ]
+   }
+  ],
+  "valid": {
+   "value": 301,
+   "page": 1,
+   "box": [
+    0.7765,
+    0.3205,
+    0.8063,
+    0.3305
+   ]
+  },
+  "rejected": {
+   "value": 7,
+   "page": 1,
+   "box": [
+    0.7875,
+    0.3529,
+    0.7992,
+    0.3633
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 2
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 2
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SHENELA HENRY",
+      "abbr": "APNU",
+      "votes": 23,
+      "page": 1,
+      "box": [
+       0.7859,
+       0.6014,
+       0.8071,
+       0.6124
+      ]
+     },
+     {
+      "name": "RAMNARINE INDERDEO",
+      "abbr": "PPP/C",
+      "votes": 54,
+      "page": 1,
+      "box": [
+       0.7867,
+       0.6257,
+       0.8078,
+       0.6357
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "BERNADETTE DOUGLAS",
+      "abbr": "APNU",
+      "votes": 44,
+      "page": 1,
+      "box": [
+       0.7859,
+       0.6738,
+       0.8086,
+       0.6838
+      ]
+     },
+     {
+      "name": "JUNIOR FRASER",
+      "abbr": "PPP/C",
+      "votes": 37,
+      "page": 1,
+      "box": [
+       0.7875,
+       0.6971,
+       0.8086,
+       0.7076
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "TROYDON KESNEY",
+      "abbr": "APNU",
+      "votes": 47,
+      "page": 1,
+      "box": [
+       0.7875,
+       0.7695,
+       0.8102,
+       0.7795
+      ]
+     },
+     {
+      "name": "ANASTASIA RAMSAY",
+      "abbr": "PPP/C",
+      "votes": 25,
+      "page": 1,
+      "box": [
+       0.7882,
+       0.7929,
+       0.8094,
+       0.8033
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "DEODACLAN RAMDAT",
+      "abbr": "APNU",
+      "votes": 32,
+      "page": 1,
+      "box": [
+       0.789,
+       0.8552,
+       0.811,
+       0.8648
+      ]
+     },
+     {
+      "name": "ODESH TAMBARIN",
+      "abbr": "PPP/C",
+      "votes": 32,
+      "page": 1,
+      "box": [
+       0.7898,
+       0.8767,
+       0.811,
+       0.8867
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "Inderdeo, Ramnarine",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "Douglas, Bernadette",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "Kesney, Troydon",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "Tambarin, Odesh",
+    "abbr": null
+   }
+  ],
+  "stem": "Plegt Anker Kortberaadt",
+  "note": "In constituency 4 the two candidates tied at 32 votes each; the declaration marks Odesh Tambarin the winner by drawing of lots."
+ },
+ "6.02.pdf": {
+  "area": "WYBURG/CARACAS",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY",
+    "abbr": "APNU",
+    "votes": 246,
+    "page": 1,
+    "box": [
+     0.7905,
+     0.7639,
+     0.8019,
+     0.7984
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC",
+    "abbr": "PPP/C",
+    "votes": 390,
+    "page": 1,
+    "box": [
+     0.7705,
+     0.7639,
+     0.7819,
+     0.7984
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 16,
+   "page": 1,
+   "box": [
+    0.7376,
+    0.778,
+    0.7486,
+    0.7992
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 1
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 2
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SYBIL BOBB",
+      "abbr": "APNU",
+      "votes": 69,
+      "page": 1,
+      "box": [
+       0.5243,
+       0.771,
+       0.5352,
+       0.7945
+      ]
+     },
+     {
+      "name": "PARBATIE YOUARDHAN",
+      "abbr": "PPP/C",
+      "votes": 169,
+      "page": 1,
+      "box": [
+       0.5019,
+       0.7678,
+       0.5133,
+       0.8
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "JACQUELINE BENJAMIN",
+      "abbr": "APNU",
+      "votes": 43,
+      "page": 1,
+      "box": [
+       0.4543,
+       0.771,
+       0.4657,
+       0.7937
+      ]
+     },
+     {
+      "name": "PERCY PHILLIPS",
+      "abbr": "PPP/C",
+      "votes": 184,
+      "page": 1,
+      "box": [
+       0.4314,
+       0.7678,
+       0.4429,
+       0.8008
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "GEORGE HINKSON",
+      "abbr": "APNU",
+      "votes": 130,
+      "page": 1,
+      "box": [
+       0.3829,
+       0.7678,
+       0.3943,
+       0.8008
+      ]
+     },
+     {
+      "name": "DIAN LEITCH-HINDS",
+      "abbr": "PPP/C",
+      "votes": 38,
+      "page": 1,
+      "box": [
+       0.3595,
+       0.7749,
+       0.371,
+       0.7976
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "PARBATIE YOUARDHAN",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 2,
+    "name": "PERCY PHILLIPS",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 3,
+    "name": "GEORGE HINKSON",
+    "abbr": "APNU"
+   }
+  ],
+  "stem": "Wyburg Caracas"
+ },
+ "6.04.pdf": {
+  "area": "MUNICIPALITY OF NEW AMSTERDAM",
+  "lists": [
+   {
+    "label": "A Partnership for National Unity",
+    "abbr": "APNU",
+    "votes": 3074,
+    "page": 1,
+    "box": [
+     0.7584,
+     0.2629,
+     0.8031,
+     0.2729
+    ]
+   },
+   {
+    "label": "People's Progressive Party/ Civic",
+    "abbr": "PPP/C",
+    "votes": 2336,
+    "page": 1,
+    "box": [
+     0.7584,
+     0.2919,
+     0.8024,
+     0.3019
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 85,
+   "page": 1,
+   "box": [
+    0.7655,
+    0.3405,
+    0.7812,
+    0.3476
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 4
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 3
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "QUACY ADRIAN ISAACS",
+      "abbr": "",
+      "votes": 431,
+      "page": 1,
+      "box": [
+       0.76,
+       0.5624,
+       0.7906,
+       0.5719
+      ]
+     },
+     {
+      "name": "JAMES WILLIAM RODWELL KING",
+      "abbr": "",
+      "votes": 209,
+      "page": 1,
+      "box": [
+       0.76,
+       0.5914,
+       0.7929,
+       0.6014
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ALLISEA ONEICA SILAND",
+      "abbr": "",
+      "votes": 511,
+      "page": 1,
+      "box": [
+       0.7584,
+       0.6581,
+       0.7906,
+       0.669
+      ]
+     },
+     {
+      "name": "JOEL JOHN DANIEL AMSTERDAM",
+      "abbr": "",
+      "votes": 628,
+      "page": 1,
+      "box": [
+       0.7592,
+       0.6881,
+       0.7914,
+       0.6981
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "KIRK KARL FRASER",
+      "abbr": "",
+      "votes": 567,
+      "page": 1,
+      "box": [
+       0.7592,
+       0.7438,
+       0.7914,
+       0.7533
+      ]
+     },
+     {
+      "name": "QWESI ORLANDO JOESPH",
+      "abbr": "",
+      "votes": 199,
+      "page": 1,
+      "box": [
+       0.7608,
+       0.7719,
+       0.7914,
+       0.7814
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "NELSON OCIENAN EGARD BLAKE",
+      "abbr": "",
+      "votes": 398,
+      "page": 1,
+      "box": [
+       0.7576,
+       0.8533,
+       0.7898,
+       0.8624
+      ]
+     },
+     {
+      "name": "MARK FRANCE",
+      "abbr": "",
+      "votes": 4,
+      "page": 1,
+      "box": [
+       0.7631,
+       0.881,
+       0.7843,
+       0.891
+      ]
+     },
+     {
+      "name": "ESAN OSQUIT VANDERSTOOP",
+      "abbr": "",
+      "votes": 207,
+      "page": 1,
+      "box": [
+       0.7569,
+       0.91,
+       0.7898,
+       0.92
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "WAINWRIGHT WILTON GORDON MC INTOSH",
+      "abbr": "",
+      "votes": 351,
+      "page": 2,
+      "box": [
+       0.7678,
+       0.1252,
+       0.7984,
+       0.1357
+      ]
+     },
+     {
+      "name": "KENROY HENRY",
+      "abbr": "",
+      "votes": 68,
+      "page": 2,
+      "box": [
+       0.7733,
+       0.1548,
+       0.7937,
+       0.1648
+      ]
+     },
+     {
+      "name": "JUANITA ALISA TRACY SUZANNE BURROWES",
+      "abbr": "",
+      "votes": 175,
+      "page": 2,
+      "box": [
+       0.7686,
+       0.1838,
+       0.7984,
+       0.1933
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "KIM PATRICIA STEPHEN",
+      "abbr": "",
+      "votes": 208,
+      "page": 2,
+      "box": [
+       0.7655,
+       0.2386,
+       0.7984,
+       0.2481
+      ]
+     },
+     {
+      "name": "NICOLA OHNICA LUTHER",
+      "abbr": "",
+      "votes": 262,
+      "page": 2,
+      "box": [
+       0.7647,
+       0.2667,
+       0.7976,
+       0.2762
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "TAMEDA NATASHA AUGUST",
+      "abbr": "",
+      "votes": 514,
+      "page": 2,
+      "box": [
+       0.7647,
+       0.3219,
+       0.7969,
+       0.3314
+      ]
+     },
+     {
+      "name": "ROOPCHAND RAMJAGAN SINGH",
+      "abbr": "",
+      "votes": 610,
+      "page": 2,
+      "box": [
+       0.7639,
+       0.3505,
+       0.7969,
+       0.3605
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "QUACY ADRIAN ISAACS",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "JOEL JOHN DANIEL AMSTERDAM",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "KIRK KARL FRASER",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "OCIEANA OTHNIEL BLAKE",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "WAINWRIGHT WILTON GORDON MC INTOSH",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "NICOLA OHNICA LUTHER",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "ROOPCHAND RAMJAGAN SINGH",
+    "abbr": null
+   }
+  ],
+  "stem": "New Amsterdam"
+ },
+ "6.06.pdf": {
+  "area": "GIBRALTAR/ FYRISH",
+  "lists": [
+   {
+    "label": "PEOPLE PROGRESSIVE PARTY /CVIC (PPP/C)",
+    "abbr": "PPP/C",
+    "votes": 780,
+    "page": 1,
+    "box": [
+     0.7089,
+     0.2786,
+     0.7379,
+     0.29
+    ]
+   },
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY (APNU)",
+    "abbr": "APNU",
+    "votes": 630,
+    "page": 1,
+    "box": [
+     0.7089,
+     0.3066,
+     0.7387,
+     0.3179
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 35,
+   "page": 1,
+   "box": [
+    0.7089,
+    0.3527,
+    0.7315,
+    0.3613
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 5
+   },
+   {
+    "abbr": "APNU",
+    "seats": 4
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "RAYWATTIE PRETTIPAUL",
+      "abbr": "",
+      "votes": 25,
+      "page": 1,
+      "box": [
+       0.7048,
+       0.5829,
+       0.7339,
+       0.5932
+      ]
+     },
+     {
+      "name": "SHANTAL CHRISTINA COLLINS",
+      "abbr": "",
+      "votes": 100,
+      "page": 1,
+      "box": [
+       0.7073,
+       0.6097,
+       0.7347,
+       0.6205
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "TAIKNARINE PERSAUD",
+      "abbr": "",
+      "votes": 107,
+      "page": 1,
+      "box": [
+       0.7073,
+       0.6735,
+       0.7339,
+       0.6843
+      ]
+     },
+     {
+      "name": "SHAUNDELLE PATRICIA SIMPSON",
+      "abbr": "",
+      "votes": 120,
+      "page": 1,
+      "box": [
+       0.7073,
+       0.7009,
+       0.7339,
+       0.7117
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "DORETTE ALLISON CRANDON",
+      "abbr": "",
+      "votes": 23,
+      "page": 1,
+      "box": [
+       0.704,
+       0.7647,
+       0.7323,
+       0.7755
+      ]
+     },
+     {
+      "name": "PAMELA CRANDON",
+      "abbr": "",
+      "votes": 62,
+      "page": 1,
+      "box": [
+       0.704,
+       0.792,
+       0.7323,
+       0.8028
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "FELICIA ALICIA FORTUNE",
+      "abbr": "",
+      "votes": 30,
+      "page": 1,
+      "box": [
+       0.7032,
+       0.8553,
+       0.7323,
+       0.8661
+      ]
+     },
+     {
+      "name": "ERWIN ELTON CRANDON",
+      "abbr": "",
+      "votes": 207,
+      "page": 1,
+      "box": [
+       0.7024,
+       0.8826,
+       0.7323,
+       0.8934
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "DAVINDRANAUTH SEWNAUTH",
+      "abbr": "",
+      "votes": 44,
+      "page": 2,
+      "box": [
+       0.7194,
+       0.1259,
+       0.7484,
+       0.1368
+      ]
+     },
+     {
+      "name": "GERMANE MARTINET HENRY",
+      "abbr": "",
+      "votes": 39,
+      "page": 2,
+      "box": [
+       0.7202,
+       0.1521,
+       0.7492,
+       0.163
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "HARRIS CHINSAMY IVAN",
+      "abbr": "",
+      "votes": 237,
+      "page": 2,
+      "box": [
+       0.7218,
+       0.2137,
+       0.75,
+       0.2245
+      ]
+     },
+     {
+      "name": "OMAR ANTHONY DAVID",
+      "abbr": "",
+      "votes": 10,
+      "page": 2,
+      "box": [
+       0.721,
+       0.241,
+       0.75,
+       0.2519
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "BIBI SHAZENA HUSSAIN",
+      "abbr": "",
+      "votes": 82,
+      "page": 2,
+      "box": [
+       0.721,
+       0.3048,
+       0.7508,
+       0.3157
+      ]
+     },
+     {
+      "name": "PARMANAND BALGOBIN",
+      "abbr": "",
+      "votes": 8,
+      "page": 2,
+      "box": [
+       0.7218,
+       0.3322,
+       0.7508,
+       0.343
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "FAIZAL MOHAMED",
+      "abbr": "",
+      "votes": 43,
+      "page": 2,
+      "box": [
+       0.7226,
+       0.3954,
+       0.7516,
+       0.4063
+      ]
+     },
+     {
+      "name": "NANDY CARLETTA AMANDIA WILSON",
+      "abbr": "",
+      "votes": 89,
+      "page": 2,
+      "box": [
+       0.7234,
+       0.4228,
+       0.7532,
+       0.4336
+      ]
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "MOHAMED RAFIQUE RAHAMAN GAFUR",
+      "abbr": "",
+      "votes": 170,
+      "page": 2,
+      "box": [
+       0.7274,
+       0.486,
+       0.7548,
+       0.4969
+      ]
+     },
+     {
+      "name": "EZRA EMANUEL PAUL",
+      "abbr": "",
+      "votes": 7,
+      "page": 2,
+      "box": [
+       0.725,
+       0.514,
+       0.7548,
+       0.5248
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "COLLINS, SHANTAL CHRISTINA",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "SIMPSON, SHAUDELLE PATRICIA",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "CRANDON, PAMELA",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "CRANDON, ERWIN ELTON",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "SEWNAUTH, DAVINDRANAUTH",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "IVAN, HARRIS CHINSAMY",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "HUSSAIN BIBI SHAZENA",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "WILSON, NANDY CARLETA AMANDIA",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "GAFUR, MOHAMED RAFIQUE RAHAMAN GAFUR",
+    "abbr": null
+   }
+  ],
+  "stem": "Gibraltar Fyrish"
+ },
+ "6.07.pdf": {
+  "area": "ORDNANCE FORTLANDS/ NO.38",
+  "lists": [
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/ CIVIC",
+    "abbr": "PPP/C",
+    "votes": null
+   }
+  ],
+  "valid": null,
+  "rejected": null,
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 8
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ROY JAFARALLY",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "BALCHAND ANANTRAM",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "YASHODA SUKHOO",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "YOUDHISTHIR PERSAUD",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KESHRI JAILALL",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "HAIMWATTIE CLIFFORD",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAMSUNDAR PHAGWAH",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "EDMOND BENNY",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "ROY JAFARALLY",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "BALCHAND ANANTRAM",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "YASHODA SUKHOO",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "YOUDHISTHIR PERSAUD",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "KESHRI JAILALL",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "HAIMWATTIE CLIFFORD",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "RAMSUNDAR PHAGWAH",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "EDMOND BENNY",
+    "abbr": null
+   }
+  ],
+  "stem": "Ordnance Fortlands"
+ },
+ "6.08.pdf": {
+  "area": "CANEFIELD/ ENTERPRISE",
+  "lists": [
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/ CIVIC",
+    "abbr": "PPP/C",
+    "votes": null
+   }
+  ],
+  "valid": null,
+  "rejected": null,
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 8
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "AMEER ALLY DIARAM",
+      "abbr": "PPP/C",
+      "votes": 198,
+      "page": 1,
+      "box": [
+       0.7315,
+       0.4849,
+       0.7573,
+       0.4946
+      ]
+     },
+     {
+      "name": "KRISHANDAI GARIB",
+      "abbr": "CP",
+      "votes": 18,
+      "page": 1,
+      "box": [
+       0.729,
+       0.5083,
+       0.7573,
+       0.5179
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "TARAMATTIE DURPALI",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ALICA DOWRIDGE",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SUNILDAT HAIMCHANDRAJI",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "GERON HITNARINE",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DHANRAJ SHIVKUMAR",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "BIBI HAZRA RAMHIT",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "LILAWATIE HARDYAL",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "AMEER ALLY DIARAM",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 2,
+    "name": "TARAMATTIE DURPALI",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 3,
+    "name": "ALICA DOWRIDGE",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 4,
+    "name": "SUNILDAT HAIMCHANDRAJI",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 5,
+    "name": "GERON HITNARINE",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 6,
+    "name": "DHANRAJ SHIVKUMAR",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 7,
+    "name": "BIBI HAZRA RAMHIT",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 8,
+    "name": "LILAWATIE HARDYAL",
+    "abbr": "PPP/C"
+   }
+  ],
+  "stem": "Canefield Enterprise"
+ },
+ "6.11.pdf": {
+  "area": "PORT MOURANT/JOHNS",
+  "lists": [
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY/CIVIC",
+    "abbr": "PPP/C",
+    "votes": null
+   }
+  ],
+  "valid": null,
+  "rejected": null,
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 9
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "PERDITA TAMESAR",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "PERDITA TAMESAR",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "RAZIA SANICHARRA",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "UMAWATTIE RAMNAUTH",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "TEKHA PERSAUD POORAN",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "ROHINI SINGH",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "VIMEN ARMOGAN",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "MAHESH KUMAR DOOLARA",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "KAVITA SINGH",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "CHITREKA GOBIN",
+    "abbr": null
+   }
+  ],
+  "stem": "Port Mourant Johns"
+ },
+ "6.12.pdf": {
+  "area": "BLOOMFIELD/WHIM",
+  "lists": [
+   {
+    "label": "PPP/C",
+    "abbr": "PPP/C",
+    "votes": null
+   }
+  ],
+  "valid": null,
+  "rejected": null,
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 7
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "IVAN BAIJNATH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "JAGDAT RAMSINGH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAJMATEE PUNNI",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SEELOCHNEE JAIRAM",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "CHANDRASHEIKAR GRIFFTH",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "RAVINDRA LAWRENCE",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "SURSATEE ISHMAEL",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "IVAN BAIJNATH",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 2,
+    "name": "JAGDAT RAMSINGH",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 3,
+    "name": "RAJMATEE PUNNI",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 4,
+    "name": "SEELOCHNEE JAIRAM",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 5,
+    "name": "CHANDRASHEIKAR GRIFFITH",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 6,
+    "name": "RAVINDRA LAWRENCE",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 7,
+    "name": "SURSATEE ISHMAEL",
+    "abbr": "PPP/C"
+   }
+  ],
+  "stem": "Bloomfield Whim"
+ },
+ "6.13.pdf": {
+  "area": "Lancaster/Hogstye",
+  "lists": [
+   {
+    "label": "A Partnership for National Unity (A.P.N.U)",
+    "abbr": "APNU",
+    "votes": 1221,
+    "page": 1,
+    "box": [
+     0.7137,
+     0.2427,
+     0.7589,
+     0.2598
+    ]
+   },
+   {
+    "label": "People's Progressive Party / Civic (P.P.P/C)",
+    "abbr": "PPP/C",
+    "votes": 506,
+    "page": 1,
+    "box": [
+     0.7258,
+     0.2684,
+     0.7565,
+     0.2803
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 44,
+   "page": 1,
+   "box": [
+    0.7137,
+    0.298,
+    0.7758,
+    0.3208
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 5
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 2
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Ertha Loretta Thom",
+      "abbr": "APNU",
+      "votes": 103,
+      "page": 1,
+      "box": [
+       0.725,
+       0.5111,
+       0.7524,
+       0.5225
+      ]
+     },
+     {
+      "name": "Samuel Permaul",
+      "abbr": "PPP/C",
+      "votes": 94,
+      "page": 1,
+      "box": [
+       0.7266,
+       0.5345,
+       0.7484,
+       0.5459
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Lucy Park",
+      "abbr": "APNU",
+      "votes": 253,
+      "page": 1,
+      "box": [
+       0.7218,
+       0.584,
+       0.7524,
+       0.596
+      ]
+     },
+     {
+      "name": "Rawlwin Alvin Leitch",
+      "abbr": "PPP/C",
+      "votes": 53,
+      "page": 1,
+      "box": [
+       0.7274,
+       0.608,
+       0.7468,
+       0.6194
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Juneann Marlyn Morgan",
+      "abbr": "APNU",
+      "votes": 253,
+      "page": 1,
+      "box": [
+       0.7218,
+       0.6507,
+       0.7766,
+       0.6701
+      ]
+     },
+     {
+      "name": "Paul Adrian Tyndall",
+      "abbr": "PPP/C",
+      "votes": 39,
+      "page": 1,
+      "box": [
+       0.7274,
+       0.6758,
+       0.7766,
+       0.694
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Akeem Anthony Greene",
+      "abbr": "APNU",
+      "votes": 241,
+      "page": 1,
+      "box": [
+       0.7226,
+       0.7276,
+       0.7766,
+       0.7459
+      ]
+     },
+     {
+      "name": "Ava Reanna Smith",
+      "abbr": "PPP/C",
+      "votes": 57,
+      "page": 1,
+      "box": [
+       0.7137,
+       0.7584,
+       0.7484,
+       0.7778
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Glendon Anthony Park",
+      "abbr": "APNU",
+      "votes": 167,
+      "page": 1,
+      "box": [
+       0.7258,
+       0.8028,
+       0.7766,
+       0.8217
+      ]
+     },
+     {
+      "name": "Forbes Elroy Ollington Moore",
+      "abbr": "PPP/C",
+      "votes": 103,
+      "page": 1,
+      "box": [
+       0.7137,
+       0.8336,
+       0.7532,
+       0.8524
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Sheron Vanessa Evelaly Smith",
+      "abbr": "APNU",
+      "votes": 163,
+      "page": 1,
+      "box": [
+       0.7137,
+       0.8855,
+       0.7532,
+       0.9048
+      ]
+     },
+     {
+      "name": "Krishna",
+      "abbr": "PPP/C",
+      "votes": 111,
+      "page": 1,
+      "box": [
+       0.7137,
+       0.91,
+       0.7565,
+       0.9305
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Kim Rodrine Rambarose",
+      "abbr": "APNU",
+      "votes": 41,
+      "page": 2,
+      "box": [
+       0.7306,
+       0.0889,
+       0.7484,
+       0.0997
+      ]
+     },
+     {
+      "name": "Kennard Atto Park",
+      "abbr": "PPP/C",
+      "votes": 35,
+      "page": 2,
+      "box": [
+       0.7306,
+       0.1123,
+       0.75,
+       0.1236
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "Ertha Loretta Thom",
+    "abbr": "APNU"
+   },
+   {
+    "number": 2,
+    "name": "Lucy Park",
+    "abbr": "APNU"
+   },
+   {
+    "number": 3,
+    "name": "Juneann Marlyn Morgan",
+    "abbr": "APNU"
+   },
+   {
+    "number": 4,
+    "name": "Akeem Anthony Greene",
+    "abbr": "APNU"
+   },
+   {
+    "number": 5,
+    "name": "Glendon Anthony Park",
+    "abbr": "APNU"
+   },
+   {
+    "number": 6,
+    "name": "Sheron Vanessa Evelaly Smith",
+    "abbr": "APNU"
+   },
+   {
+    "number": 7,
+    "name": "Kim Rodrine Rambarose",
+    "abbr": "APNU"
+   }
+  ],
+  "stem": "Lancaster Hogstye"
+ },
+ "6.16.pdf": {
+  "area": "Macedonia/Joppa",
+  "lists": [
+   {
+    "label": "A Partnership for National Unity",
+    "abbr": "APNU",
+    "votes": 294,
+    "page": 1,
+    "box": [
+     0.7231,
+     0.2527,
+     0.7498,
+     0.2618
+    ]
+   },
+   {
+    "label": "People's Progressive Party/Civic",
+    "abbr": "PPP/C",
+    "votes": 463,
+    "page": 1,
+    "box": [
+     0.7231,
+     0.2715,
+     0.749,
+     0.2812
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 28,
+   "page": 1,
+   "box": [
+    0.7271,
+    0.3042,
+    0.7443,
+    0.3139
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 2
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 4
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "Moses, Ashley Marcia",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Busgith, William",
+      "abbr": "",
+      "votes": 88,
+      "page": 1,
+      "box": [
+       0.6612,
+       0.6194,
+       0.6753,
+       0.6273
+      ]
+     },
+     {
+      "name": "Rose, Stacey Latoya",
+      "abbr": "",
+      "votes": 80,
+      "page": 1,
+      "box": [
+       0.6612,
+       0.6467,
+       0.6753,
+       0.6552
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Haynes, Lennox Syphus",
+      "abbr": "",
+      "votes": 83,
+      "page": 1,
+      "box": [
+       0.6604,
+       0.7455,
+       0.6737,
+       0.7533
+      ]
+     },
+     {
+      "name": "Gray-Mayers, Odessa Eletha",
+      "abbr": "",
+      "votes": 61,
+      "page": 1,
+      "box": [
+       0.6596,
+       0.7636,
+       0.6729,
+       0.7721
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Drepaul, Senei Ocienia",
+      "abbr": "",
+      "votes": 53,
+      "page": 1,
+      "box": [
+       0.6596,
+       0.8503,
+       0.6737,
+       0.8588
+      ]
+     },
+     {
+      "name": "Gooding-France, Vera Voranica",
+      "abbr": "",
+      "votes": 89,
+      "page": 1,
+      "box": [
+       0.6596,
+       0.877,
+       0.6745,
+       0.8855
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "Goobardhan, Ramotar",
+      "abbr": "",
+      "votes": 87,
+      "page": 2,
+      "box": [
+       0.6667,
+       0.0933,
+       0.6808,
+       0.1024
+      ]
+     },
+     {
+      "name": "Ifill, Donna Patricia",
+      "abbr": "",
+      "votes": 16,
+      "page": 2,
+      "box": [
+       0.6675,
+       0.1218,
+       0.6808,
+       0.1297
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "Misir, Pornandan",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "Moses, Ashley Marcia",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "Busgith, William",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "Haynes, Lennox Syphus",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "Gooding-France, Vera Voranica",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "Goobardan, Ramotar",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "Misir, Pornandan",
+    "abbr": null
+   }
+  ],
+  "stem": "Macedonia Joppa"
+ },
+ "6.18.pdf": {
+  "area": "GOOD HOPE/NO. 51",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY (A.P.N.U)",
+    "abbr": "APNU",
+    "votes": 220,
+    "page": 1,
+    "box": [
+     0.7686,
+     0.2404,
+     0.8016,
+     0.25
+    ]
+   },
+   {
+    "label": "PEOPLE PROGRESSIVE PARTY / CIVIC (P.P.P/C)",
+    "abbr": "PPP/C",
+    "votes": 589,
+    "page": 1,
+    "box": [
+     0.7694,
+     0.261,
+     0.8024,
+     0.271
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 25,
+   "page": 1,
+   "box": [
+    0.7702,
+    0.3155,
+    0.8024,
+    0.325
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 2
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 5
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "PERMANAND JAIPERSAUD",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "KERPAUL DAMMAR",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "NAGASAR PERSAUD SOOKRAM",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "MEANCHAND KAMPTA",
+      "abbr": "PPP/C",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SHARRON ALLISON DAVIS",
+      "abbr": "APNU",
+      "votes": 68,
+      "page": 1,
+      "box": [
+       0.7843,
+       0.8533,
+       0.818,
+       0.8638
+      ]
+     },
+     {
+      "name": "SWARSATIE DEVI SHARIF",
+      "abbr": "PPP/C",
+      "votes": 54,
+      "page": 1,
+      "box": [
+       0.7843,
+       0.8776,
+       0.8188,
+       0.8881
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SATKUMAR DEONAT",
+      "abbr": "PPP/C",
+      "votes": 41,
+      "page": 2,
+      "box": [
+       0.7671,
+       0.0614,
+       0.7976,
+       0.0714
+      ]
+     },
+     {
+      "name": "MARCIA ANNETTA LOWENFIELD",
+      "abbr": "APNU",
+      "votes": 55,
+      "page": 2,
+      "box": [
+       0.7671,
+       0.0841,
+       0.8,
+       0.094
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "JULIET ROSEMARY JACOBS",
+      "abbr": "PPP/C",
+      "votes": 43,
+      "page": 2,
+      "box": [
+       0.7678,
+       0.1437,
+       0.8,
+       0.1536
+      ]
+     },
+     {
+      "name": "RENWICK ANTHONY WILLIAMS",
+      "abbr": "APNU",
+      "votes": 95,
+      "page": 2,
+      "box": [
+       0.7678,
+       0.1668,
+       0.8,
+       0.1763
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "PERMANAND JAIPERSAUD",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 2,
+    "name": "KERPAUL DAMMAR",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 3,
+    "name": "NAGASAR PERSAUD SOOKRAM",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 4,
+    "name": "MEANCHAND KAMPTA",
+    "abbr": "PPP/C"
+   },
+   {
+    "number": 5,
+    "name": "SHARRON ALLISON DAVIS",
+    "abbr": "APNU"
+   },
+   {
+    "number": 6,
+    "name": "MARCIA ANNETTA LOWENFIELD",
+    "abbr": "APNU"
+   },
+   {
+    "number": 7,
+    "name": "RENWICK ANTHONY WILLIAMS",
+    "abbr": "APNU"
+   }
+  ],
+  "stem": "Good Hope No. 51"
+ },
+ "6.20.pdf": {
+  "area": "NO. 64 - NO 74 NEIGHBOURHOOD DEMOCRATIC COUNCIL",
+  "lists": [
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY",
+    "abbr": "PPP/C",
+    "votes": null
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 0,
+   "page": 1,
+   "box": [
+    0.7616,
+    0.3215,
+    0.7914,
+    0.3301
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 5
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "MOTEE LALL RAMSUNDAR SANKAT",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "JAILALL TAHAL",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "PAMELA THERESA FRANCIS",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "DEON OSAFA DAVID",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "JASON GRAVESANDE",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "MOTEE LALL RAMSUNDAR SANKAT",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "JAILALL TAHAL",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "PAMELA THERESA FRANCIS",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "DEON OSAFA DAVID",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "JASON GRAVESANDE",
+    "abbr": null
+   }
+  ],
+  "stem": "No 64 No 74"
+ },
+ "6.22.pdf": {
+  "area": "MUNICIPALITY OF CORRIVERTON",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY",
+    "abbr": "APNU",
+    "votes": 508,
+    "page": 1,
+    "box": [
+     0.7616,
+     0.2461,
+     0.789,
+     0.2558
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY / CIVIC",
+    "abbr": "PPP/C",
+    "votes": 2314,
+    "page": 1,
+    "box": [
+     0.7561,
+     0.2655,
+     0.7929,
+     0.2752
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 72,
+   "page": 1,
+   "box": [
+    0.76,
+    0.3352,
+    0.7875,
+    0.3448
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 1
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 7
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "BURNETT, GARY",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "MORIAH, PATRICK ANTHONY",
+      "abbr": "",
+      "votes": 82,
+      "page": 1,
+      "box": [
+       0.7584,
+       0.6309,
+       0.7859,
+       0.6406
+      ]
+     },
+     {
+      "name": "ARJOON, INDERJIT PERSAUD",
+      "abbr": "",
+      "votes": 336,
+      "page": 1,
+      "box": [
+       0.7584,
+       0.6527,
+       0.7867,
+       0.6624
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "BURNETT, STEVE ANTHONY",
+      "abbr": "",
+      "votes": 130,
+      "page": 1,
+      "box": [
+       0.7616,
+       0.6982,
+       0.7875,
+       0.7079
+      ]
+     },
+     {
+      "name": "JAGERNAUTH, SHIVANIE",
+      "abbr": "",
+      "votes": 229,
+      "page": 1,
+      "box": [
+       0.7592,
+       0.72,
+       0.7875,
+       0.7303
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "SUGRIM, ANIL",
+      "abbr": "",
+      "votes": 88,
+      "page": 1,
+      "box": [
+       0.76,
+       0.7667,
+       0.7875,
+       0.7764
+      ]
+     },
+     {
+      "name": "RAMSAROOP, LAXHMI DEVI",
+      "abbr": "",
+      "votes": 342,
+      "page": 1,
+      "box": [
+       0.76,
+       0.7885,
+       0.7882,
+       0.7982
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "CLARKE, LEONARD DENNIS LESLIE",
+      "abbr": "",
+      "votes": 53,
+      "page": 1,
+      "box": [
+       0.7608,
+       0.8467,
+       0.7875,
+       0.857
+      ]
+     },
+     {
+      "name": "AMIN, IMRAN",
+      "abbr": "",
+      "votes": 141,
+      "page": 1,
+      "box": [
+       0.7624,
+       0.8691,
+       0.7859,
+       0.8794
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "LYKEN, WITHNEY ASHELY",
+      "abbr": "",
+      "votes": 20,
+      "page": 2,
+      "box": [
+       0.7333,
+       0.083,
+       0.76,
+       0.0927
+      ]
+     },
+     {
+      "name": "RICKNAUTH, SHAKUNTALA",
+      "abbr": "",
+      "votes": 257,
+      "page": 2,
+      "box": [
+       0.7333,
+       0.1042,
+       0.7592,
+       0.1139
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ARNACHALAM, VIDYAWATTEE DEVI",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "JOHN, ROBERT PERCIVAL",
+      "abbr": "",
+      "votes": 6,
+      "page": 2,
+      "box": [
+       0.7341,
+       0.2345,
+       0.7608,
+       0.2442
+      ]
+     },
+     {
+      "name": "ALLY, SAIF",
+      "abbr": "",
+      "votes": 286,
+      "page": 2,
+      "box": [
+       0.7341,
+       0.2558,
+       0.7608,
+       0.2648
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "BURNETT, GARY",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "ARJOON, INDERJIT PERSAUD",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "JAGERNAUTH, SHIVANIE",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "RAMSAROOP, LAXHMI DEVI",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "AMIN, IMRAN",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "RICKNAUTH, SHAKUNTALA",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "ARNACHALAM, VIDYAWATTEE DEVI",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "ALLY, SAIF",
+    "abbr": null
+   }
+  ],
+  "stem": "Corriverton"
+ },
+ "7.01.pdf": {
+  "area": "MUNICIPALITY OF BARTICA",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY",
+    "abbr": "APNU",
+    "votes": 1601,
+    "page": 1,
+    "box": [
+     0.7655,
+     0.2452,
+     0.8039,
+     0.2557
+    ]
+   },
+   {
+    "label": "PEOPLES PROGRESSIVE PARTY/CIVIC",
+    "abbr": "PPP/C",
+    "votes": 1784,
+    "page": 1,
+    "box": [
+     0.7647,
+     0.2662,
+     0.8071,
+     0.2767
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 38,
+   "page": 1,
+   "box": [
+    0.7663,
+    0.2995,
+    0.8,
+    0.3095
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 4
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 5
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ARITA PEGGY EMBLETON",
+      "abbr": "",
+      "votes": 145,
+      "page": 1,
+      "box": [
+       0.7647,
+       0.5029,
+       0.7945,
+       0.5129
+      ]
+     },
+     {
+      "name": "NIRANJAN PERSAUD RUPNARIN",
+      "abbr": "",
+      "votes": 177,
+      "page": 1,
+      "box": [
+       0.7639,
+       0.5257,
+       0.7945,
+       0.5352
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "MALISA ANN WILSON",
+      "abbr": "",
+      "votes": 116,
+      "page": 1,
+      "box": [
+       0.7631,
+       0.5738,
+       0.7937,
+       0.5838
+      ]
+     },
+     {
+      "name": "MARTIN ANTHONY MURRAY",
+      "abbr": "",
+      "votes": 219,
+      "page": 1,
+      "box": [
+       0.76,
+       0.5967,
+       0.7937,
+       0.6067
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ESTIVA KALILLA MALINI LAKE",
+      "abbr": "",
+      "votes": 256,
+      "page": 1,
+      "box": [
+       0.7592,
+       0.6448,
+       0.7929,
+       0.6552
+      ]
+     },
+     {
+      "name": "EDWARD ANTHONY PERSAUD",
+      "abbr": "",
+      "votes": 23,
+      "page": 1,
+      "box": [
+       0.7584,
+       0.6681,
+       0.7914,
+       0.6786
+      ]
+     },
+     {
+      "name": "ERWIN ALEXANDER WARD",
+      "abbr": "",
+      "votes": 195,
+      "page": 1,
+      "box": [
+       0.7616,
+       0.6919,
+       0.7914,
+       0.7019
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "LLOYD ANTHONY GARRAWAY",
+      "abbr": "",
+      "votes": 144,
+      "page": 2,
+      "box": [
+       0.7749,
+       0.0857,
+       0.8063,
+       0.0967
+      ]
+     },
+     {
+      "name": "DEVINA PERSAUD",
+      "abbr": "",
+      "votes": 95,
+      "page": 2,
+      "box": [
+       0.771,
+       0.11,
+       0.8039,
+       0.12
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "CLINTON KANE BOBB",
+      "abbr": "",
+      "votes": 160,
+      "page": 2,
+      "box": [
+       0.7718,
+       0.1705,
+       0.8031,
+       0.181
+      ]
+     },
+     {
+      "name": "SHARIZA MANGREE PERSAUD",
+      "abbr": "",
+      "votes": 123,
+      "page": 2,
+      "box": [
+       0.7702,
+       0.1929,
+       0.8008,
+       0.2043
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "CARMEL WARREN WILLIAMS",
+      "abbr": "",
+      "votes": 183,
+      "page": 2,
+      "box": [
+       0.7678,
+       0.2543,
+       0.7984,
+       0.2648
+      ]
+     },
+     {
+      "name": "DANIEL WILLIAMS",
+      "abbr": "",
+      "votes": 152,
+      "page": 2,
+      "box": [
+       0.7671,
+       0.2771,
+       0.7976,
+       0.2871
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "KOBY QUAMINA JOHN",
+      "abbr": "",
+      "votes": 251,
+      "page": 2,
+      "box": [
+       0.7624,
+       0.3386,
+       0.7929,
+       0.3486
+      ]
+     },
+     {
+      "name": "GAIL ANN PERSAUD",
+      "abbr": "",
+      "votes": 284,
+      "page": 2,
+      "box": [
+       0.7616,
+       0.3605,
+       0.7953,
+       0.371
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "LUVINA LAVERN JONES",
+      "abbr": "",
+      "votes": 282,
+      "page": 2,
+      "box": [
+       0.76,
+       0.4214,
+       0.7937,
+       0.4319
+      ]
+     },
+     {
+      "name": "ANTHONY THOMAS ALGREE",
+      "abbr": "",
+      "votes": 274,
+      "page": 2,
+      "box": [
+       0.76,
+       0.4452,
+       0.7937,
+       0.4552
+      ]
+     }
+    ]
+   },
+   {
+    "number": 9,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "DANE MC INTYRE",
+      "abbr": "",
+      "votes": 61,
+      "page": 2,
+      "box": [
+       0.7584,
+       0.5052,
+       0.789,
+       0.5157
+      ]
+     },
+     {
+      "name": "SHELLAN CELINA JOHN DREPAUL",
+      "abbr": "",
+      "votes": 215,
+      "page": 2,
+      "box": [
+       0.7576,
+       0.5286,
+       0.7906,
+       0.539
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "NIRANJAN PERSAUD RUPNARIN",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "MARTIN ANTHONY MURRAY",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "ESTIVA KALILLA MALINI LAKE",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "LLOYD ANTHONY GARRAWAY",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "CLINTON KANE BOBB",
+    "abbr": null
+   },
+   {
+    "number": 6,
+    "name": "CARMEL WARREN WILLIAMS",
+    "abbr": null
+   },
+   {
+    "number": 7,
+    "name": "GAIL ANN PERSAUD",
+    "abbr": null
+   },
+   {
+    "number": 8,
+    "name": "LUVINA LAVERN JONES",
+    "abbr": null
+   },
+   {
+    "number": 9,
+    "name": "SHELLAN CELINA JOHN DREPAUL",
+    "abbr": null
+   }
+  ],
+  "stem": "Bartica"
+ },
+ "8.01.pdf": {
+  "area": "MUNICIPALITY OF MAHDIA",
+  "lists": [
+   {
+    "label": "A Partnership for National Unity",
+    "abbr": "APNU",
+    "votes": 327,
+    "page": 1,
+    "box": [
+     0.7097,
+     0.1425,
+     0.7661,
+     0.1567
+    ]
+   },
+   {
+    "label": "People's Progressive Party",
+    "abbr": "PPP/C",
+    "votes": 330,
+    "page": 1,
+    "box": [
+     0.7081,
+     0.1647,
+     0.7742,
+     0.1858
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 11,
+   "page": 1,
+   "box": [
+    0.7105,
+    0.2023,
+    0.7605,
+    0.2217
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 2
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 2
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "LEITCH, KRISTINE",
+      "abbr": "",
+      "votes": 112,
+      "page": 1,
+      "box": [
+       0.7113,
+       0.3875,
+       0.7911,
+       0.404
+      ]
+     },
+     {
+      "name": "SINGH, RAJKUMAR",
+      "abbr": "",
+      "votes": 86,
+      "page": 1,
+      "box": [
+       0.7024,
+       0.412,
+       0.7661,
+       0.4285
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ADAMS, DAVID",
+      "abbr": "",
+      "votes": 91,
+      "page": 1,
+      "box": [
+       0.7113,
+       0.4587,
+       0.7605,
+       0.4809
+      ]
+     },
+     {
+      "name": "ROMASCINDO-HUSSAIN, ESLYN GAIL",
+      "abbr": "",
+      "votes": 92,
+      "page": 1,
+      "box": [
+       0.7137,
+       0.486,
+       0.7677,
+       0.5037
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "MENDONCA-BURROWES, JUEWAYNE",
+      "abbr": "",
+      "votes": 100,
+      "page": 1,
+      "box": [
+       0.7121,
+       0.5402,
+       0.7613,
+       0.5573
+      ]
+     },
+     {
+      "name": "JOHN, AKITA",
+      "abbr": "",
+      "votes": 78,
+      "page": 1,
+      "box": [
+       0.6968,
+       0.5641,
+       0.7508,
+       0.5818
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "WILLIAMS, MALENIE",
+      "abbr": "",
+      "votes": 15,
+      "page": 1,
+      "box": [
+       0.6831,
+       0.6182,
+       0.7806,
+       0.6336
+      ]
+     },
+     {
+      "name": "THORNHILL-BENN, CAMILLE",
+      "abbr": "",
+      "votes": 75,
+      "page": 1,
+      "box": [
+       0.6871,
+       0.6416,
+       0.7347,
+       0.6558
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "LEITCH, KRISTINE NIKKI",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "ROMASCINDO-HUSSAIN, ESLYN GAIL",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "MENDONCA-BURROWES, JUEWAYNE",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "THORNHILL-BENN, CAMILLE",
+    "abbr": null
+   }
+  ],
+  "stem": "Mahdia"
+ },
+ "9.01.pdf": {
+  "area": "MUNICIPALITY OF LETHEM",
+  "lists": [
+   {
+    "label": "People's Progressive Party/Civic",
+    "abbr": "PPP/C",
+    "votes": null
+   }
+  ],
+  "valid": null,
+  "rejected": null,
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 5
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "Fitzgerald Brenton Singh",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "Indira Marisa Singh",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "John Theophillus Macedo",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "Andreza Do Nascimento",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "Jason Anthony Wilson",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "Fitzgerald Brenton Singh",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "Indira Marisa Singh",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "John Theophillus Macedo",
+    "abbr": null
+   },
+   {
+    "number": 4,
+    "name": "Andreza Do Nascimento",
+    "abbr": null
+   },
+   {
+    "number": 5,
+    "name": "Jason Anthony Wilson",
+    "abbr": null
+   }
+  ],
+  "stem": "Lethem"
+ },
+ "9.02.pdf": {
+  "area": "ARANAPUTA/UPPER BURRO BURRO",
+  "lists": [
+   {
+    "label": "People's Progressive Party/Civic",
+    "abbr": "PPP/C",
+    "votes": null
+   }
+  ],
+  "valid": null,
+  "rejected": null,
+  "seats": [
+   {
+    "abbr": "PPP/C",
+    "seats": 3
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "FIGUEIREDO GLORIA",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "FRANCIS RAYNOLDSON",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "unopposed",
+    "candidates": [
+     {
+      "name": "ABRAHAM ORVAN RUDOLPH",
+      "abbr": "",
+      "votes": null
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "FIGUEIREDO GLORIA",
+    "abbr": null
+   },
+   {
+    "number": 2,
+    "name": "FRANCIS RAYNOLDSON",
+    "abbr": null
+   },
+   {
+    "number": 3,
+    "name": "ABRAHAM ORVAN RUDOLPH",
+    "abbr": null
+   }
+  ],
+  "stem": "Aranaputa Upper Burro Burro"
+ },
+ "10.01.pdf": {
+  "area": "MUNICIPALITY OF LINDEN",
+  "lists": [
+   {
+    "label": "A PARTNERSHIP FOR NATIONAL UNITY - APNU",
+    "abbr": "APNU",
+    "votes": 8002,
+    "page": 1,
+    "box": [
+     0.6863,
+     0.1982,
+     0.7184,
+     0.2067
+    ]
+   },
+   {
+    "label": "PEOPLE'S PROGRESSIVE PARTY - PPP/C",
+    "abbr": "PPP/C",
+    "votes": 2464,
+    "page": 1,
+    "box": [
+     0.6863,
+     0.2139,
+     0.7192,
+     0.2218
+    ]
+   }
+  ],
+  "valid": null,
+  "rejected": {
+   "value": 157,
+   "page": 1,
+   "box": [
+    0.6957,
+    0.2715,
+    0.7184,
+    0.2794
+   ]
+  },
+  "seats": [
+   {
+    "abbr": "APNU",
+    "seats": 6
+   },
+   {
+    "abbr": "PPP/C",
+    "seats": 2
+   }
+  ],
+  "constituencies": [
+   {
+    "number": 1,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "KUICE SHARMA SOLOMON",
+      "abbr": "APNU",
+      "votes": 1980,
+      "page": 1,
+      "box": [
+       0.6996,
+       0.4709,
+       0.7341,
+       0.4794
+      ]
+     },
+     {
+      "name": "KENISHA TIMIKA DEY-VENTURE",
+      "abbr": "PPP/C",
+      "votes": 624,
+      "page": 1,
+      "box": [
+       0.7035,
+       0.4903,
+       0.731,
+       0.4988
+      ]
+     },
+     {
+      "name": "AVIS GODFREY ISAACS",
+      "abbr": "TNM",
+      "votes": 35,
+      "page": 1,
+      "box": [
+       0.7051,
+       0.5103,
+       0.7318,
+       0.5188
+      ]
+     }
+    ]
+   },
+   {
+    "number": 2,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "VANESSA NICOLA KISSOON",
+      "abbr": "APNU",
+      "votes": 462,
+      "page": 1,
+      "box": [
+       0.7067,
+       0.5521,
+       0.7349,
+       0.5612
+      ]
+     },
+     {
+      "name": "NIKITA ROBERTS",
+      "abbr": "PPP/C",
+      "votes": 384,
+      "page": 1,
+      "box": [
+       0.709,
+       0.5727,
+       0.7365,
+       0.5818
+      ]
+     }
+    ]
+   },
+   {
+    "number": 3,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "MARISA TIPHANY YULEX ROBERTSON",
+      "abbr": "APNU",
+      "votes": 301,
+      "page": 1,
+      "box": [
+       0.7114,
+       0.6158,
+       0.7373,
+       0.6255
+      ]
+     },
+     {
+      "name": "SHARMELLA LATIFFA SOLOMON",
+      "abbr": "PPP/C",
+      "votes": 97,
+      "page": 1,
+      "box": [
+       0.7129,
+       0.6376,
+       0.7404,
+       0.6467
+      ]
+     }
+    ]
+   },
+   {
+    "number": 4,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ALICIA ODESSA BENTICK",
+      "abbr": "APNU",
+      "votes": 338,
+      "page": 1,
+      "box": [
+       0.7145,
+       0.6794,
+       0.742,
+       0.6885
+      ]
+     },
+     {
+      "name": "MELINDA YELITA FREDERICKS",
+      "abbr": "PPP/C",
+      "votes": 221,
+      "page": 1,
+      "box": [
+       0.7145,
+       0.6952,
+       0.7412,
+       0.7042
+      ]
+     }
+    ]
+   },
+   {
+    "number": 5,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "KWESI TAYOE DRAILE PARKES",
+      "abbr": "APNU",
+      "votes": 1040,
+      "page": 1,
+      "box": [
+       0.7145,
+       0.7473,
+       0.7506,
+       0.757
+      ]
+     },
+     {
+      "name": "SHERRY CASSANDRA FYFFE JAMES",
+      "abbr": "PPP/C",
+      "votes": 370,
+      "page": 1,
+      "box": [
+       0.7184,
+       0.7624,
+       0.7467,
+       0.7721
+      ]
+     }
+    ]
+   },
+   {
+    "number": 6,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "RUSHELLE MONIKA STEWART",
+      "abbr": "APNU",
+      "votes": 1070,
+      "page": 2,
+      "box": [
+       0.6612,
+       0.1109,
+       0.6894,
+       0.1206
+      ]
+     },
+     {
+      "name": "EROLD FITZ ALRICK ROETHOF",
+      "abbr": "PPP/C",
+      "votes": 230,
+      "page": 2,
+      "box": [
+       0.6635,
+       0.1242,
+       0.6855,
+       0.1333
+      ]
+     }
+    ]
+   },
+   {
+    "number": 7,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "LEESSA RUNAE THORNE",
+      "abbr": "APNU",
+      "votes": 1399,
+      "page": 2,
+      "box": [
+       0.662,
+       0.1582,
+       0.6902,
+       0.1673
+      ]
+     },
+     {
+      "name": "KEITH NORMAN FERRIER",
+      "abbr": "PPP/C",
+      "votes": 194,
+      "page": 2,
+      "box": [
+       0.6659,
+       0.1715,
+       0.6863,
+       0.18
+      ]
+     }
+    ]
+   },
+   {
+    "number": 8,
+    "label": null,
+    "status": "counted",
+    "candidates": [
+     {
+      "name": "ONITA PAULINE HARRY",
+      "abbr": "APNU",
+      "votes": 1347,
+      "page": 2,
+      "box": [
+       0.662,
+       0.2048,
+       0.691,
+       0.2139
+      ]
+     },
+     {
+      "name": "SHURDON RAWLE MURRAY",
+      "abbr": "PPP/C",
+      "votes": 345,
+      "page": 2,
+      "box": [
+       0.6643,
+       0.2188,
+       0.6863,
+       0.2267
+      ]
+     }
+    ]
+   }
+  ],
+  "elected": [
+   {
+    "number": 1,
+    "name": "KUICE SHARMA SOLOMON",
+    "abbr": "APNU"
+   },
+   {
+    "number": 2,
+    "name": "VANESSA NICOLA KISSOON",
+    "abbr": "APNU"
+   },
+   {
+    "number": 3,
+    "name": "MARISA TIPHANY YULEX ROBERTSON",
+    "abbr": "APNU"
+   },
+   {
+    "number": 4,
+    "name": "ALICIA ODESSA BENTICK",
+    "abbr": "APNU"
+   },
+   {
+    "number": 5,
+    "name": "KWESI TAYOE DRAILE PARKES",
+    "abbr": "APNU"
+   },
+   {
+    "number": 6,
+    "name": "RUSHELLE MONIKA STEWART",
+    "abbr": "APNU"
+   },
+   {
+    "number": 7,
+    "name": "LEESSA RUNAE THORNE",
+    "abbr": "APNU"
+   },
+   {
+    "number": 8,
+    "name": "ONITA PAULINE HARRY",
+    "abbr": "APNU"
+   }
+  ],
+  "stem": "Linden"
+ }
+}

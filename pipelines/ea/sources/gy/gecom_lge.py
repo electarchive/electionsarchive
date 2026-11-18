@@ -3,9 +3,11 @@ one document per local authority area: list votes, rejected ballots, seats, and 
 
 The 2016 declarations are scans whose figures are typed or handwritten, and many 2018 declarations have no usable
 text layer, so both years are read from the page images. For 2016 two independent readings were reconciled figure by
-figure; for 2018 each reading was checked against the numbers the text layer prints, where it has one. The readings,
-each figure with its page and box, are kept in `gecom_lge_forms/{year}.json`, and the parse checks each declaration's
-arithmetic again. The 2023 declarations are parsed from their text layer."""
+figure; for 2018 each reading was checked against the numbers the text layer prints, where it has one. The 2023
+declarations are parsed from their text layer where they have one; the 2023 declarations that are scans only, many of
+them handwritten, are read from the page images, with each typed figure placed by OCR on the page and each handwritten
+one boxed by eye and tightened to its ink. The readings, each figure with its page and box, are kept in
+`gecom_lge_forms/{year}.json`, and the parse checks each declaration's arithmetic again."""
 
 import difflib
 import json
@@ -394,7 +396,8 @@ def problems(form: Form) -> tuple[list[str], list[int]]:
 COUNTRY = str(uuid5(package.NAMESPACE, "polity\x1fGY"))
 VOTES, REGISTERED, CAST, VALID, INVALID = 1, 2, 3, 4, 5
 DAYS = {"2016": date(2016, 3, 18), "2018": date(2018, 11, 12), "2023": date(2023, 6, 12)}
-TRANSCRIBED = {"2016", "2018"}
+TRANSCRIBED = {"2016", "2018", "2023"}
+PARTLY = {"2023"}  # days whose declarations with a text layer are parsed from it, and only the scans transcribed
 MUNICIPALITIES = {
     "mabaruma",
     "anna-regina",
@@ -507,6 +510,8 @@ NAMES = {
     "seafield-tempie": "Seafield Tempie",
     "the-best-klein-pouderoyen": "The Best Klein Pouderoyen",
     "no-52-no-74": "No. 52 No. 74",
+    "no-52-no-63": "No. 52 No. 63",
+    "no-64-no-74": "No. 64 No. 74",
     "good-hope-no-51": "Good Hope No. 51",
 }
 BLOCS = {"APNU", "APNU+AFC"}
@@ -563,6 +568,7 @@ class Area(NamedTuple):
     boxes: dict[tuple[object, ...], Box]  # where each transcribed figure is printed
     caveats: list[str]  # published with the list contest
     uncontested: bool = False  # a single list took the list seats without a poll
+    read: bool = False  # the figures were read from the page images
 
 
 def text_of(url: str) -> str:
@@ -607,7 +613,7 @@ def parsed(day: str) -> list[Area]:
     out: list[Area] = []
     for name, url in files(day):
         text = text_of(url)
-        if len(text) < 600 or name[:-4] not in AREAS_2023:
+        if len(text) < 600 or name[:-4] not in AREAS_2023 or name in scanned(day):
             continue  # a scan with no text layer, or a file whose area is not known
         stem = AREAS_2023[name[:-4]]
         form = parse_form(text)
@@ -637,15 +643,24 @@ def place(entry: dict[str, object]) -> Box | None:
     return None
 
 
+@cache
+def scanned(day: str) -> dict[str, dict[str, object]]:
+    """The transcription of each declaration of a day that was read from its page images."""
+    if day not in TRANSCRIBED:
+        return {}
+    return json.loads((FORMS / f"{day}.json").read_text())
+
+
 def transcribed(day: str) -> list[Area]:
     """Every declaration of a day whose page images were transcribed, checked again here."""
     urls = dict(files(day))
-    forms: dict[str, dict[str, object]] = json.loads((FORMS / f"{day}.json").read_text())
-    if set(forms) != set(urls):
+    forms = scanned(day)
+    if set(forms) - set(urls) or (day not in PARTLY and set(forms) != set(urls)):
         raise ValueError(f"{day}: transcriptions {sorted(set(forms) ^ set(urls))} do not match the published files")
     out: list[Area] = []
     for name, t in forms.items():
-        stem = name.rsplit("/", 1)[1][:-4]
+        # A file named by number names its area in the transcription.
+        stem = str(t["stem"]) if t.get("stem") else name.rsplit("/", 1)[1][:-4]
         boxes: dict[tuple[object, ...], Box] = {}
         lists: list[tuple[str, int]] = []
         listed = t.get("lists")
@@ -764,6 +779,7 @@ def transcribed(day: str) -> list[Area]:
                 boxes,
                 caveats,
                 uncontested,
+                True,
             )
         )
     return out
@@ -771,7 +787,7 @@ def transcribed(day: str) -> list[Area]:
 
 @cache
 def areas(day: str) -> list[Area]:
-    out = transcribed(day) if day in TRANSCRIBED else parsed(day)
+    out = (parsed(day) if day in PARTLY else []) + (transcribed(day) if day in TRANSCRIBED else [])
     slugs = [a.slug for a in out]
     if len(set(slugs)) != len(slugs):
         raise ValueError(f"{day}: two declarations for one area")
@@ -979,8 +995,8 @@ def build(day: str) -> Package:
     p.add("election", id=election, polity_id=COUNTRY, kind="local", date_from=first, date_to=first, status="held")
     p.add("slug", path=f"gy/{day}-local", entity_id=election, is_current=True)
     p.name(election, f"{first.year} Guyanese local government elections", "en", "official")
-    method = METHOD + (READ if day in TRANSCRIBED else "")
     for area in chosen:
+        method = METHOD + (READ if area.read else "")
         f = area.form
         title = council_name(area.slug, area.name)
         locator = {"url": area.url}
