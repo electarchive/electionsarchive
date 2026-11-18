@@ -29,24 +29,24 @@
   },
   "majlis_law": {
    "title": "قانون انتخابات مجلس شورای اسلامی (مصوب ۱۳۷۸/۰۹/۰۷، با اصلاحات بعدی)",
-   "publisher": "مرکز پژوهش‌های مجلس شورای اسلامی (Islamic Parliament Research Center)",
-   "url": "https://rc.majlis.ir/fa/law",
+   "publisher": "پژوهشکده شورای نگهبان (Guardian Council Research Institute), consolidated text; the Islamic Parliament Research Center is the original publisher",
+   "url": "https://www.shora-gc.ir/fa/news/5730/",
    "kind": "official_body",
-   "note": "Islamic Consultative Assembly Election Law of 28 November 1999, as amended. Art. 2: 290 members. Art. 3: supervision by the Guardian Council. Its annex lists the constituencies and their seats. The Research Center's law database did not answer from the session that wrote this census (connection reset on 2026-11-16); the law is cited by title and article, to be quoted from rc.majlis.ir when the host answers."
+   "note": "Islamic Consultative Assembly Election Law of 28 November 1999, consolidated by the Guardian Council's site as amended through 22 July 2023 (1402/05/01). Art. 2: «عده نمایندگان مجلس ۲۹۰ نفر می‌باشد و افزایش تعداد آن بر اساس اصل شصت و چهارم (۶۴) قانون اساسی خواهد بود.» Its note: five of the members belong to the religious minorities: «زرتشتیان و کلیمیان هرکدام یک نماینده، مسیحیان آشوری و کلدانی مجموعاً یک نماینده و مسیحیان ارمنی جنوب و شمال هرکدام یک نماینده.» Art. 3: «نظارت بر انتخابات مجلس به عهده شورای نگهبان می‌باشد. این نظارت استصوابی و عام و در تمام مراحل در کلیه امور مربوط به انتخابات جاری است.» Art. 4: mid-term elections are held together with the next nationwide election of art. 6 of the Constitution; art. 4 note 1: when the Majlis falls below four fifths of its members, the Ministry of Interior must hold a mid-term election within four months. The consolidated text carries no annex of constituencies and seats; those are the Ministry's tables cited as moi_majlis_2012, moi_majlis_2016_districts, and moi_majlis_2024_districts. The Research Center's own copy (rc.majlis.ir) was not retrievable."
   },
   "president_law": {
    "title": "قانون انتخابات ریاست جمهوری اسلامی ایران (مصوب ۱۳۶۴/۰۴/۰۵، با اصلاحات بعدی)",
-   "publisher": "مرکز پژوهش‌های مجلس شورای اسلامی (Islamic Parliament Research Center)",
-   "url": "https://rc.majlis.ir/fa/law",
+   "publisher": "پژوهشکده شورای نگهبان (Guardian Council Research Institute), consolidated text; the Islamic Parliament Research Center is the original publisher",
+   "url": "https://www.shora-gc.ir/fa/news/5730/",
    "kind": "official_body",
-   "note": "Presidential Election Law of 26 June 1985, as amended. Art. 1: four-year term from the Leader's endorsement. Art. 8: supervision by the Guardian Council. The Research Center's law database did not answer from the session that wrote this census (connection reset on 2026-11-16); the law is cited by title and article, to be quoted from rc.majlis.ir when the host answers."
+   "note": "Presidential Election Law of 26 June 1985 (1364/04/05), as amended, in the consolidated text the Guardian Council's site carries on the same page as the Majlis law. Art. 1: «دورۀ ریاست‌جمهوری اسلامی ایران چهار سال است و از تاریخ تنفیذ اعتبارنامه وسیلۀ مقام رهبری آغاز می‌گردد.» Art. 8: «نظارت بر انتخابات ریاست‌جمهوری به‌عهدۀ شورای نگهبان می‌باشد. این نظارت عام و در تمام مراحل و در کلیۀ امور مربوطبه انتخابات جاری است.» Art. 14: the second round is held on the Friday of the following week. The Research Center's own copy (rc.majlis.ir) was not retrievable."
   },
   "councils_law": {
    "title": "قانون تشکیلات، وظایف و انتخابات شوراهای اسلامی کشور و انتخاب شهرداران و دهیاران (مصوب ۱۳۷۵/۰۳/۰۱، با اصلاحات بعدی)",
    "publisher": "مرکز پژوهش‌های مجلس شورای اسلامی (Islamic Parliament Research Center)",
    "url": "https://rc.majlis.ir/fa/law",
    "kind": "official_body",
-   "note": "Law on the organization, duties, and elections of the Islamic councils and the election of mayors (and, since the 1403 amendment, village administrators), of 22 May 1996, as amended. Village and city councils are elected directly; district, county, and province councils and the Supreme Council of the Provinces are formed from members of the councils below them; city councils choose the mayor. The 1396 amendment set a four-year term. The Research Center's law database did not answer from the session that wrote this census (connection reset on 2026-11-16); the law is cited by title and article, to be quoted from rc.majlis.ir when the host answers."
+   "note": "Law on the organization, duties, and elections of the Islamic councils and the election of mayors (and, since the 1403 amendment, village administrators), of 22 May 1996, as amended. Village and city councils are elected directly; district, county, and province councils and the Supreme Council of the Provinces are formed from members of the councils below them; city councils choose the mayor. The 1396 amendment set a four-year term. The Research Center's law database did not answer from the session that wrote this census (connection reset on 2026-11-16); the law is cited by title and article, to be quoted from rc.majlis.ir when the host answers. Not yet quoted: the Research Center's copy (rc.majlis.ir) and its 1396 and 1403 amendments were still unreachable on 2026-11-17."
   },
   "referendum_law": {
    "title": "قانون همه‌پرسی در جمهوری اسلامی ایران (مصوب ۱۳۶۸/۰۴/۰۴)",
@@ -67,7 +67,7 @@
    "publisher": "وزارت کشور جمهوری اسلامی ایران (Ministry of Interior)",
    "url": "https://www.moi.ir/",
    "kind": "official_body",
-   "note": "The Ministry's Election Headquarters runs every public election and announces the results: national totals, and votes by candidate per constituency and per county. The host reset every connection from the session that wrote this census on 2026-11-16; elect.moi.ir answered the proxy with 502."
+   "note": "The Ministry's Election Headquarters runs every public election and announces the results: national totals, and votes by candidate per constituency and per county. The host reset every connection from the session that wrote this census on 2026-11-16; elect.moi.ir answered the proxy with 502. The Election Headquarters' news list, as archived on 2025-05-24, carries the headlines «زمان برگزاری انتخابات شوراها به سال ۱۴۰۵ موکول می‌شود» (1403-12-22) and «زینی وند: انتخابات دوره هفتم شوراها، ۱۱ اردیبهشت ۱۴۰۵ برگزار می‌شود» (1404-02-09), that is, the seventh council elections for 1 May 2026."
   },
   "sci2016": {
    "title": "سرشماری عمومی نفوس و مسکن ۱۳۹۵: نتایج تفصیلی کل کشور (2016 National Population and Housing Census, detailed results)",
@@ -110,6 +110,13 @@
    "url": "https://irandataportal.syr.edu/parliamentary-elections/",
    "kind": "academic",
    "note": "Each election's page gives the date, the eligible and actual voters, the number of constituencies (\"Number of Precincts\"), and the seats (\"Number of Candidates Needed\"), citing the Ministry of Interior (www.moi.ir). The constituency count includes the religious-minority constituencies."
+  },
+  "guardian_council_2026": {
+   "title": "انتخابات میان دوره ای مجلس و خبرگان رهبری با توجه به تعویق انتخابات شوراها به تعویق افتاد (news item of 18 April 2026)",
+   "publisher": "پایگاه اطلاع‌رسانی شورای نگهبان (Guardian Council)",
+   "url": "https://www.shora-gc.ir/fa/news/11544/",
+   "kind": "official_body",
+   "note": "The Guardian Council's spokesman, Hadi Tahan Nazif, on 29 Farvardin 1405 (18 April 2026): «با توجه به تعویق انتخابات شورای شهر و روستا که یک انتخابات سراسری است عملاً انتخابات میان دوره‌ای مجلس شورای اسلامی و انتخابات میان دوره‌ای مجلس خبرگان رهبری هم به این ترتیب به تعویق می‌افتد». It gives no new date for the council elections."
   }
  },
  "tiers": [
@@ -484,7 +491,7 @@
    "source": "majlis_law",
    "locator": "https://rc.majlis.ir/fa/law (Majlis Election Law, chapter on mid-term elections)",
    "valid_from": "1979-12-03",
-   "note": "Seats left vacant by death, resignation, or annulment are filled at mid-term elections, which since the 2000s have been held on the polling day of the next nationwide election. Not yet dated or counted.",
+   "note": "Seats left vacant by death, resignation, or annulment are filled at mid-term elections, which since the 2000s have been held on the polling day of the next nationwide election. Not yet dated or counted. The mid-term Majlis elections wait on the postponed 2026 council elections (guardian_council_2026).",
    "match": [
     {
      "election_kinds": [
@@ -1022,7 +1029,7 @@
    "first_held": "1999-02-26",
    "earliest_record": "1999-02-26",
    "contests_per_unit": 1,
-   "note": "Every city elects a council of 5 to 21 members (Tehran 21) by plurality block vote, on the same day nationwide. Six rounds so far; the fourth was postponed from 2010 to 2013 to coincide with the presidential vote, and terms have been four years since. City councils then elect the mayor (class shahrdar).",
+   "note": "Every city elects a council of 5 to 21 members (Tehran 21) by plurality block vote, on the same day nationwide. Six rounds so far; the fourth was postponed from 2010 to 2013 to coincide with the presidential vote, and terms have been four years since. City councils then elect the mayor (class shahrdar). The seventh round was set by the Ministry of Interior for 11 Ordibehesht 1405 (1 May 2026) and on 18 April 2026 the Guardian Council spokesman said it was postponed, with the mid-term Majlis and Experts elections that wait on it; none of the sources held here gives a new date, so no 2026 date is listed.",
    "match": [
     {
      "election_kinds": [
@@ -1104,7 +1111,7 @@
    "locator": "https://rc.majlis.ir/fa/law (Councils Law: village councils of 3 or 5 members by population)",
    "valid_from": "1996-05-22",
    "first_held": "1999-02-26",
-   "note": "Each inhabited village above the law's population floor elects a council of three or five members (the 1403 amendment set three members and two alternates for villages of up to 1,500 people) on the city-council polling day. The village councils choose the village administrator (dehyar). Village counts are not in the 2016 country-divisions table quoted here.",
+   "note": "Each inhabited village above the law's population floor elects a council of three or five members (the 1403 amendment set three members and two alternates for villages of up to 1,500 people) on the city-council polling day. The village councils choose the village administrator (dehyar). Village counts are not in the 2016 country-divisions table quoted here. The seventh round was set by the Ministry of Interior for 11 Ordibehesht 1405 (1 May 2026) and on 18 April 2026 the Guardian Council spokesman said it was postponed, with the mid-term Majlis and Experts elections that wait on it; none of the sources held here gives a new date, so no 2026 date is listed.",
    "match": [
     {
      "election_kinds": [
