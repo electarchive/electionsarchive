@@ -1,0 +1,1885 @@
+{
+  "polity": "CSK",
+  "name": "Czechoslovakia",
+  "sources": {
+    "z11_1918": {
+      "title": "Zákon č. 11/1918 Sb., o zřízení samostatného státu československého",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1918/11",
+      "kind": "official_body",
+      "note": "Act of the National Committee of 28 October 1918, publicly proclaimed and in force that day: 'Samostatný stát československý vstoupil v život.'"
+    },
+    "uz542_1992": {
+      "title": "Zákon č. 542/1992 Sb., o zániku České a Slovenské Federativní Republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1992/542",
+      "kind": "official_body",
+      "note": "Constitutional act of 25 November 1992: the federation ceased to exist at the end of 31 December 1992, and its powers passed to the Czech Republic and the Slovak Republic on 1 January 1993 (arts. 1, 2); arts. 4 made the deputies elected in 1992 to the Federal Assembly and the national councils the legislatures of the successor states."
+    },
+    "z123_1920": {
+      "title": "Zákon č. 123/1920 Sb., kterým vydává se řád volení do poslanecké sněmovny.",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1920/123",
+      "kind": "official_body",
+      "note": "Election law of the Chamber of Deputies, 29 February 1920: 23 electoral regions (volební kraje) electing 300 deputies by list PR (art. I); the first election excluded regions 22 (Těšín) and 23 (Subcarpathian Rus), Hlučín, Vitorazsko, Valtice, and the Spiš and Orava plebiscite areas, whose deputies were to be elected later (art. II)."
+    },
+    "z124_1920": {
+      "title": "Zákon č. 124/1920 Sb., o složení a pravomoci senátu.",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1920/124",
+      "kind": "official_body",
+      "note": "The Senate: 150 elected members (§ 1), elected under the Chamber's election law (§ 2) by voters aged 26 and over (§ 3), for eight years (§ 5)."
+    },
+    "ns1920": {
+      "title": "Volby do Národního shromáždění 1920 až 1935",
+      "publisher": "Český statistický úřad",
+      "url": "https://csu.gov.cz/produkty/volby-do-narodniho-shromazdeni-1920-az-1935-n-2hwwxuf57q",
+      "kind": "official_body",
+      "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office"
+    },
+    "d47_1945": {
+      "title": "Ústavní dekret č. 47/1945 Sb., o Prozatímním Národním shromáždění",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1945/47",
+      "kind": "official_body",
+      "note": "Presidential constitutional decree of 25 August 1945: a single chamber of 300 members to sit until a Constituent National Assembly elected by universal, equal, direct, and secret ballot under PR; its members were chosen indirectly under a government order."
+    },
+    "uz65_1946": {
+      "title": "Ústavní zákon č. 65/1946 Sb., o ústavodárném Národním shromáždění",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1946/65",
+      "kind": "official_body",
+      "note": "Constitutional act of 11 April 1946 on the Constituent National Assembly of 300 members."
+    },
+    "z67_1946": {
+      "title": "Zákon č. 67/1946 Sb., o volbě ústavodárného Národního shromáždění",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1946/67",
+      "kind": "official_body",
+      "note": "Election law of the Constituent National Assembly: 28 electoral regions (§ 1), list PR with seats apportioned among the Czech land, the Moravian-Silesian land, and Slovakia (§ 2)."
+    },
+    "uz74_1948": {
+      "title": "Ústavní zákon č. 74/1948 Sb., jímž se na přechodnou dobu do účinnosti nové ústavy upravuje volba a pravomoc Národního shromáždění a činnost Ústavodárného Národního shromáždění",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1948/74",
+      "kind": "official_body",
+      "note": "Constitutional act of 16 April 1948: a National Assembly of one chamber of 300 members with a six-year term (art. 1), elected by PR (art. 2)."
+    },
+    "z75_1948": {
+      "title": "Zákon č. 75/1948 Sb., o volbách do Národního shromáždění",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1948/75",
+      "kind": "official_body",
+      "note": "Election law of 1948: electoral regions grouped into two electoral areas, regions 1 to 19 (Czech lands) and 20 to 28 (Slovakia) (§ 1), 300 deputies (§ 2); the minister of the interior called the election in the Official Gazette (§ 22)."
+    },
+    "u150_1948": {
+      "title": "Ústavní zákon č. 150/1948 Sb., Ústava Československé republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1948/150",
+      "kind": "official_body",
+      "note": "Constitution of 9 May 1948: a National Assembly of one chamber of 300 members elected for six years; the President elected by it for seven years."
+    },
+    "z14_1954": {
+      "title": "Zákon č. 14/1954 Sb., o volbách do národních výborů",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1954/14",
+      "kind": "official_body",
+      "note": "First election law of the regional, district, and local national committees, members elected in single-member constituencies."
+    },
+    "z27_1954": {
+      "title": "Zákon č. 27/1954 Sb., o volbách do Národního shromáždění",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1954/27",
+      "kind": "official_body",
+      "note": "Election law of 26 May 1954: one deputy in each single-member constituency (§ 3), one constituency for every 35,000 inhabitants (§ 4)."
+    },
+    "uz35_1960": {
+      "title": "Ústavní zákon č. 35/1960 Sb., o změně ústavního zákona o volbách do Národního shromáždění a o volbách do Slovenské národní rady a ústavního zákona o národních výborech",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1960/35",
+      "kind": "official_body",
+      "note": "Fixed 300 constituencies for the National Assembly (art. I § 1); the Slovak National Council used the Slovak ones."
+    },
+    "z39_1960": {
+      "title": "Zákon č. 39/1960 Sb., o volbách do národních výborů",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1960/39",
+      "kind": "official_body"
+    },
+    "u100_1960": {
+      "title": "Ústavní zákon č. 100/1960 Sb., Ústava Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1960/100",
+      "kind": "official_body",
+      "note": "Art. 39: the National Assembly of 300 deputies elected for four years; art. 43: it elects the President; art. 63: by three-fifths of all deputies, for five years."
+    },
+    "u37_1964": {
+      "title": "Usnesení č. 37/1964 Sb., o vyhlášení dne voleb do Národního shromáždění, do Slovenské národní rady, do národních výborů a voleb soudců okresních soudů",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1964/37",
+      "kind": "official_body",
+      "note": "Resolution of the Presidium of the National Assembly calling the National Assembly, Slovak National Council, and national committee elections, and the elections of district court judges, for Sunday 14 June 1964."
+    },
+    "uzfed": {
+      "title": "Ústavní zákon č. 143/1968 Sb., o československé federaci",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1968/143",
+      "kind": "official_body"
+    },
+    "z44_1971": {
+      "title": "Zákon č. 44/1971 Sb., o volbách do Federálního shromáždění",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1971/44",
+      "kind": "official_body",
+      "note": "Election law of 6 July 1971: 200 constituencies for the House of the People and 150 for the House of the Nations, 75 in each republic (§ 11); one deputy per constituency (§ 10)."
+    },
+    "uz43_1971": {
+      "title": "Ústavní zákon č. 43/1971 Sb., kterým se mění čl. 86 Ústavy a čl. 30 a 103 ústavního zákona o československé federaci",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1971/43",
+      "kind": "official_body",
+      "note": "Lengthened the term of the House of the People, the national councils, and the national committees from four to five years from the general elections of November 1971."
+    },
+    "u92_1971": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 92/1971 Sb., o vyhlášení voleb do Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1971/92",
+      "kind": "official_body"
+    },
+    "u94_1971": {
+      "title": "Usnesení Předsednictva České národní rady č. 94/1971 Sb., o vyhlášení voleb do České národní rady a všeobecných voleb do národních výborů v České socialistické republice",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1971/94",
+      "kind": "official_body"
+    },
+    "u72_1976": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 72/1976 Sb., o vyhlášení voleb do Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1976/72",
+      "kind": "official_body"
+    },
+    "u32_1981": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 32/1981 Sb., o vyhlášení voleb do Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1981/32",
+      "kind": "official_body"
+    },
+    "u10_1986": {
+      "title": "Usnesení PŘEDSEDNICTVA FEDERÁLNÍHO SHROMÁŽDĚNÍ, Československé socialistické republiky č. 10/1986 Sb., o vyhlášení voleb do Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1986/10",
+      "kind": "official_body"
+    },
+    "uz14_1990": {
+      "title": "Ústavní zákon č. 14/1990 Sb., o odvolávání poslanců zastupitelských sborů a volbě nových poslanců národních výborů",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1990/14",
+      "kind": "official_body",
+      "note": "Constitutional act of 23 January 1990: parties recalled deputies of the Federal Assembly, the national councils, and the national committees, and the vacant seats were filled by co-option on the proposal of Civic Forum and Public Against Violence."
+    },
+    "uz45_1990": {
+      "title": "Ústavní zákon č. 45/1990 Sb., o zkrácení volebního období zákonodárných sborů",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1990/45",
+      "kind": "official_body",
+      "note": "Ended the term of the bodies elected in 1986 at the 1990 election and set the term of the Federal Assembly elected in 1990 at 24 months."
+    },
+    "zfs1990": {
+      "title": "Zákon č. 47/1990 Sb., o volbách do Federálního shromáždění",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1990/47",
+      "kind": "official_body"
+    },
+    "uz327_1991": {
+      "title": "Ústavní zákon č. 327/1991 Sb., o referendu",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1991/327",
+      "kind": "official_body",
+      "note": "Constitutional act of 18 July 1991: a referendum on the form of the federation, called by the President in both republics, and the only way for a republic to leave it (art. 1); none was called before the federation was dissolved by constitutional act."
+    },
+    "volby": {
+      "title": "Volby.cz: výsledky voleb a referend",
+      "publisher": "Český statistický úřad",
+      "url": "https://www.volby.cz/",
+      "kind": "official_body",
+      "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office"
+    },
+    "z36_1964": {
+      "title": "Zákon č. 36/1964 Sb., o organizaci soudů a o volbách soudců",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1964/36",
+      "kind": "official_body"
+    },
+    "u14_1972": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 14/1972 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 55 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1972/14",
+      "kind": "official_body"
+    },
+    "u39_1972": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 39/1972 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 111 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1972/39",
+      "kind": "official_body"
+    },
+    "u68_1972": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 68/1972 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 119 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1972/68",
+      "kind": "official_body"
+    },
+    "u78_1972": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 78/1972 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 135 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1972/78",
+      "kind": "official_body"
+    },
+    "u18_1973": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 18/1973 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 11 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1973/18",
+      "kind": "official_body"
+    },
+    "u19_1973": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 19/1973 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 198 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1973/19",
+      "kind": "official_body"
+    },
+    "u75_1973": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 75/1973 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 76 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1973/75",
+      "kind": "official_body"
+    },
+    "u164_1973": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 164/1973 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 66 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1973/164",
+      "kind": "official_body"
+    },
+    "u1_1974": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 1/1974 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 57 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1974/1",
+      "kind": "official_body"
+    },
+    "u105_1974": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 105/1974 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 131 a č. 149 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky a ve volebním obvodu č. 36 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1974/105",
+      "kind": "official_body"
+    },
+    "u24_1975": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 24/1975 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 135 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1975/24",
+      "kind": "official_body"
+    },
+    "u37_1975": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 37/1975 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 121 pro volby do Sněmovny národů a ve volebním obvodu č. 41 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1975/37",
+      "kind": "official_body"
+    },
+    "u58_1975": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 58/1975 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 13 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1975/58",
+      "kind": "official_body"
+    },
+    "u101_1975": {
+      "title": "Usnesení Předsednictva Federálního shromáždění č. 101/1975 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 87 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1975/101",
+      "kind": "official_body"
+    },
+    "u7_1977": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 7/1977 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 27 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1977/7",
+      "kind": "official_body"
+    },
+    "u93_1977": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 93/1977 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 94 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1977/93",
+      "kind": "official_body"
+    },
+    "u94_1977": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 94/1977 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 39 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1977/94",
+      "kind": "official_body"
+    },
+    "u15_1979": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 15/1979 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 42 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1979/15",
+      "kind": "official_body"
+    },
+    "u82_1979": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 82/1979 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 50 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1979/82",
+      "kind": "official_body"
+    },
+    "u23_1980": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 23/1980 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 165 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1980/23",
+      "kind": "official_body"
+    },
+    "u44_1980": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 44/1980 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 63 pro volby do Sněmovny národů Federálního shromáždění ČSSR",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1980/44",
+      "kind": "official_body"
+    },
+    "u127_1980": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 127/1980 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 3 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1980/127",
+      "kind": "official_body"
+    },
+    "u100_1981": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 100/1981 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 3 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1981/100",
+      "kind": "official_body"
+    },
+    "u114_1981": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 114/1981 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 101 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1981/114",
+      "kind": "official_body"
+    },
+    "u12_1982": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 12/1982 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 77 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1982/12",
+      "kind": "official_body"
+    },
+    "u109_1982": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 109/1982 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 109 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1982/109",
+      "kind": "official_body"
+    },
+    "u10_1983": {
+      "title": "Usnesení Předsednictva Federálního shromáždění č. 10/1983 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 1 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1983/10",
+      "kind": "official_body"
+    },
+    "u60_1983": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 60/1983 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 65 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1983/60",
+      "kind": "official_body"
+    },
+    "u79_1983": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 79/1983 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 66 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1983/79",
+      "kind": "official_body"
+    },
+    "u151_1983": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 151/1983 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 122 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1983/151",
+      "kind": "official_body"
+    },
+    "u12_1984": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 12/1984 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 110 pro volby do Sněmovny národů Federálního shromáždění ČSSR",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1984/12",
+      "kind": "official_body"
+    },
+    "u137_1984": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 137/1984 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 63 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1984/137",
+      "kind": "official_body"
+    },
+    "u12_1985": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 12/1985 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 159 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1985/12",
+      "kind": "official_body"
+    },
+    "u78_1987": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 78/1987 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 105 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1987/78",
+      "kind": "official_body"
+    },
+    "u25_1988": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 25/1988 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 48 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1988/25",
+      "kind": "official_body"
+    },
+    "u11_1989": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 11/1989 Sb., o vyhlášení doplňovacích voleb ve volebním obvodu č. 66 pro volby do Sněmovny lidu a ve volebních obvodech č. 15, 24, 53, 62, 66, 68, 92 a 118 pro volby do Sněmovny národů Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1989/11",
+      "kind": "official_body"
+    },
+    "u49_1989": {
+      "title": "Usnesení Předsednictva Federálního shromáždění Československé socialistické republiky č. 49/1989 Sb., o vyhlášení doplňovací volby ve volebním obvodu č. 133 pro volby do Sněmovny lidu Federálního shromáždění Československé socialistické republiky",
+      "publisher": "Sbírka zákonů České republiky (e-Sbírka)",
+      "url": "https://e-sbirka.gov.cz/sb/1989/49",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Československo",
+      "name_en": "Czechoslovakia",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "valid_from": "1918-10-28",
+      "valid_to": "1993-01-01",
+      "source": "z11_1918"
+    },
+    {
+      "key": "zeme",
+      "name": "Země (Čechy, Morava a Slezsko, Slovensko, Podkarpatská Rus)",
+      "name_en": "Lands (Bohemia, Moravia-Silesia, Slovakia, Subcarpathian Rus)",
+      "parent": "national",
+      "polity_kind": "region",
+      "valid_from": "1928-12-01",
+      "valid_to": "1949-01-01",
+      "source": "ns1920"
+    },
+    {
+      "key": "republika",
+      "name": "Česká a Slovenská (socialistická) republika",
+      "name_en": "Czech and Slovak republics of the federation",
+      "parent": "national",
+      "polity_kind": "federal_unit",
+      "valid_from": "1969-01-01",
+      "valid_to": "1993-01-01",
+      "source": "uzfed"
+    },
+    {
+      "key": "kraj",
+      "name": "Kraje",
+      "name_en": "Regions (kraje)",
+      "parent": "national",
+      "polity_kind": "region",
+      "valid_from": "1949-01-01",
+      "valid_to": "1990-11-24",
+      "source": "z14_1954"
+    },
+    {
+      "key": "okres",
+      "name": "Okresy",
+      "name_en": "Districts (okresy)",
+      "parent": "national",
+      "polity_kind": "county",
+      "valid_from": "1918-10-28",
+      "valid_to": "1993-01-01",
+      "source": "z14_1954"
+    },
+    {
+      "key": "obec",
+      "name": "Obce",
+      "name_en": "Municipalities (obce)",
+      "parent": "okres",
+      "polity_kind": "municipality",
+      "valid_from": "1918-10-28",
+      "valid_to": "1993-01-01",
+      "source": "z14_1954"
+    }
+  ],
+  "classes": [
+    {
+      "key": "rns_1918",
+      "tier": "national",
+      "name": "Revoluční národní shromáždění 1918–1920",
+      "name_en": "Revolutionary National Assembly, 1918–1920",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {},
+      "source": "z11_1918",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The provisional legislature was formed from the National Committee, its seats shared among the Czech and Slovak parties by agreement in proportion to the 1911 Imperial Council vote; nobody voted for it.",
+      "valid_from": "1918-11-14",
+      "valid_to": "1920-04-18",
+      "note": "Sat from 14 November 1918 until the first parliamentary election; it adopted the 1920 Constitutional Charter and the election laws, and chose the first President."
+    },
+    {
+      "key": "poslanecka_snemovna",
+      "tier": "national",
+      "name": "Volby do poslanecké sněmovny Národního shromáždění",
+      "name_en": "Chamber of Deputies of the National Assembly",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "ČSÚ republishes totals by electoral region and land; results by district or municipality are only in the printed State Statistical Office volumes.",
+      "source": "z123_1920",
+      "valid_from": "1920-02-29",
+      "valid_to": "1939-03-15",
+      "first_held": "1920-04-18",
+      "earliest_record": "1920-04-18",
+      "est_votes": 29000000,
+      "effort": 3,
+      "note": "300 deputies elected by list PR in 23 electoral regions with second and third scrutinies at the national level (Act 123/1920). The 1920 election left out the Těšín region (22), whose territory was split with Poland in July 1920, and Subcarpathian Rus (23), which elected its 9 deputies on 16 March 1924; from 1925 elections were held in 22 regions. The chamber elected in 1935 sat until the occupation of March 1939.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "CSK",
+          "valid_from": "1918-10-28",
+          "valid_to": "1939-03-15"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 6,
+          "term_years": 6,
+          "called": true,
+          "administered_by": "Ústřední volební komise při ministerstvu vnitra",
+          "source": "z123_1920",
+          "valid_from": "1920-02-29",
+          "valid_to": "1939-03-15"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ČSÚ publikace Volby do Národního shromáždění 1920 až 1935",
+          "url": "https://csu.gov.cz/produkty/volby-do-narodniho-shromazdeni-1920-az-1935-n-2hwwxuf57q",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "first_date": "1920-04-18",
+          "last_date": "1935-05-19",
+          "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+          "source": "ns1920",
+          "evidence": "PDF and XLS tables of votes and seats by party, by electoral region and land, and by region and party, for the Chamber and the Senate in 1920, 1925, 1929, and 1935; republished in 2006 from the State Statistical Office returns."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1920-04-18",
+          "election_kind": "general",
+          "contests": 21,
+          "seats": 300,
+          "source": "ns1920",
+          "quote": "Poznámka: V roce 1920 se nekonaly volby na území Podkarpatské Rusi, dodatečně byly uskutečněny v roce 1924.",
+          "note": "21 regions voted; the 9 seats of Užhorod (Subcarpathian Rus) and the 9 of Těšín were not filled by this election (ČSÚ table 1.7)."
+        },
+        {
+          "date": "1924-03-16",
+          "election_kind": "special",
+          "contests": 1,
+          "seats": 9,
+          "source": "ns1920",
+          "quote": "V roce 1920 se nekonaly volby na území Podkarpatské Rusi, dodatečně byly uskutečněny v roce 1924.",
+          "note": "Supplementary election of the 9 deputies of the Užhorod region (Subcarpathian Rus) for the rest of the first term."
+        },
+        {
+          "date": "1925-11-15",
+          "election_kind": "general",
+          "contests": 22,
+          "seats": 300,
+          "source": "ns1920",
+          "quote": "Tab. 1. 10 Získané hlasy a mandáty podle volebních krajů a zemí, Volby v r. 1925: 22 volebních krajů, Celkem 300 mandátů"
+        },
+        {
+          "date": "1929-10-27",
+          "election_kind": "general",
+          "contests": 22,
+          "seats": 300,
+          "source": "ns1920",
+          "quote": "Tab. 1. 13 Získané hlasy a mandáty podle volebních krajů a zemí, Volby v r. 1929: Celkem 8 183 462 zapsaných voličů, 300 mandátů"
+        },
+        {
+          "date": "1935-05-19",
+          "election_kind": "general",
+          "contests": 22,
+          "seats": 300,
+          "source": "ns1920",
+          "quote": "Tab. 1. 16 Získané hlasy a mandáty podle volebních krajů a zemí, Volby v r. 1935: Celkem 8 927 572 zapsaných voličů, 300 mandátů"
+        }
+      ]
+    },
+    {
+      "key": "senat",
+      "tier": "national",
+      "name": "Volby do senátu Národního shromáždění",
+      "name_en": "Senate of the National Assembly",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "ČSÚ republishes totals by Senate electoral region and land only.",
+      "source": "z124_1920",
+      "valid_from": "1920-02-29",
+      "valid_to": "1939-03-15",
+      "first_held": "1920-04-25",
+      "earliest_record": "1920-04-25",
+      "est_votes": 25000000,
+      "effort": 3,
+      "note": "150 senators elected for eight years by voters aged 26 and over, by list PR in 13 Senate electoral regions (12 from 1925, after the Těšín region was dropped). In 1920 the Senate was elected a week after the Chamber; from 1925 both were elected on the same day.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "CSK",
+          "valid_from": "1918-10-28",
+          "valid_to": "1939-03-15"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 8,
+          "term_years": 8,
+          "called": true,
+          "administered_by": "Ústřední volební komise při ministerstvu vnitra",
+          "source": "z124_1920",
+          "valid_from": "1920-02-29",
+          "valid_to": "1939-03-15"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ČSÚ publikace Volby do Národního shromáždění 1920 až 1935",
+          "url": "https://csu.gov.cz/produkty/volby-do-narodniho-shromazdeni-1920-az-1935-n-2hwwxuf57q",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "first_date": "1920-04-18",
+          "last_date": "1935-05-19",
+          "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+          "source": "ns1920",
+          "evidence": "PDF and XLS tables of votes and seats by party, by electoral region and land, and by region and party, for the Chamber and the Senate in 1920, 1925, 1929, and 1935; republished in 2006 from the State Statistical Office returns."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1920-04-25",
+          "election_kind": "general",
+          "contests": 11,
+          "seats": 150,
+          "source": "ns1920",
+          "quote": "volby do Senátu byly prováděny ve 12 volebních krajích ČSR (v roce 1920 navíc volební kraj Těšín)",
+          "note": "11 regions voted; the 4 seats of Užhorod and the 4 of Těšín were not filled (ČSÚ table 2.7)."
+        },
+        {
+          "date": "1925-11-15",
+          "election_kind": "general",
+          "contests": 12,
+          "seats": 150,
+          "source": "ns1920",
+          "quote": "Tab. 2. 10 Získané hlasy a mandáty podle území, Volby v r.1925: Celkem 150 mandátů"
+        },
+        {
+          "date": "1929-10-27",
+          "election_kind": "general",
+          "contests": 12,
+          "seats": 150,
+          "source": "ns1920",
+          "quote": "Tab. 2. 13 Získané hlasy a mandáty podle území, Volby v r.1929: Celkem 150 mandátů"
+        },
+        {
+          "date": "1935-05-19",
+          "election_kind": "general",
+          "contests": 12,
+          "seats": 150,
+          "source": "ns1920",
+          "quote": "Tab. 2. 16 Získané hlasy a mandáty podle území, Volby v r.1935: Celkem 150 mandátů"
+        }
+      ]
+    },
+    {
+      "key": "prozatimni_ns",
+      "tier": "national",
+      "name": "Prozatímní Národní shromáždění 1945–1946",
+      "name_en": "Provisional National Assembly, 1945–1946",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {},
+      "source": "d47_1945",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Its 300 members were chosen by assemblies of delegates of the national committees in October 1945 from National Front lists agreed among the parties, not by voters.",
+      "valid_from": "1945-08-27",
+      "valid_to": "1946-06-18"
+    },
+    {
+      "key": "uns_1946",
+      "tier": "national",
+      "name": "Volby do Ústavodárného Národního shromáždění 1946",
+      "name_en": "Constituent National Assembly, 1946",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "Results by region and district were printed by the State Statistical Office in 1946; no official digital edition was reachable.",
+      "source": "uz65_1946",
+      "valid_from": "1946-04-18",
+      "valid_to": "1948-06-18",
+      "first_held": "1946-05-26",
+      "est_votes": 7100000,
+      "effort": 4,
+      "note": "The only competitive election of the period: 300 deputies by list PR among the National Front parties in 28 electoral regions, with seats first apportioned among the Czech land, the Moravian-Silesian land, and Slovakia. Voting was compulsory and blank ballots were allowed.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "constituent_assembly"
+          ],
+          "iso_pattern": "CSK",
+          "valid_from": "1945-01-01",
+          "valid_to": "1948-05-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "ČSÚ: Volby do zákonodárných orgánů Československa a České republiky (2008)",
+          "url": "https://www.czso.cz/documents/10180/20536128/422008k01.pdf",
+          "format": "pdf",
+          "access": "none",
+          "checked_at": "2026-11-18",
+          "first_date": "1946-05-26",
+          "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+          "evidence": "The 2008 ČSÚ historical volume gave the 1946 results for the Czech lands; its chapter files on czso.cz return 404 since the move to csu.gov.cz."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1946-05-26",
+          "election_kind": "general",
+          "contests": 28,
+          "seats": 300,
+          "source": "z67_1946",
+          "quote": "Pro volby do ústavodárného Národního shromáždění se tvoří celkem 28 volebních krajů."
+        }
+      ]
+    },
+    {
+      "key": "ns_1948",
+      "tier": "national",
+      "name": "Volby do Národního shromáždění 1948–1964",
+      "name_en": "National Assembly, 1948–1964 (single list)",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "uz74_1948",
+      "disposition": "blocked",
+      "disposition_reason": "Single-list elections of the National Front; only national totals were printed at the time, and no official digital edition of the returns by constituency was found on csu.gov.cz, volby.cz, or volby.statistics.sk.",
+      "valid_from": "1948-04-24",
+      "valid_to": "1969-01-01",
+      "first_held": "1948-05-30",
+      "est_votes": 38000000,
+      "effort": 5,
+      "note": "1948: 300 deputies on National Front lists in 28 electoral regions (Act 75/1948). From 1954 one deputy per single-member constituency, one for each 35,000 inhabitants (Act 27/1954); 300 constituencies from 1960 (Constitutional Act 35/1960 and the 1960 Constitution). Slovak National Council and national committee elections were held on the same days in 1954 (national committees on 16 May), 1960, and 1964.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "CSK",
+          "valid_from": "1948-05-01",
+          "valid_to": "1969-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 6,
+          "term_years": 6,
+          "called": false,
+          "administered_by": "Ústřední volební komise",
+          "source": "u150_1948",
+          "locator": "https://e-sbirka.gov.cz/sb/1948/150 (čl. V: Nejvyšším orgánem moci zákonodárné je Národní shromáždění o jedné sněmovně. Má tři sta členů (poslanců), volených na dobu šesti let.)",
+          "valid_from": "1948-04-24",
+          "valid_to": "1960-07-11"
+        },
+        {
+          "period_years": 4,
+          "term_years": 4,
+          "called": false,
+          "administered_by": "Ústřední volební komise",
+          "source": "u100_1960",
+          "locator": "https://e-sbirka.gov.cz/sb/1960/100 (art. 39)",
+          "valid_from": "1960-07-11",
+          "valid_to": "1969-01-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1948-05-30",
+          "election_kind": "general",
+          "contests": 28,
+          "seats": 300,
+          "source": "z75_1948",
+          "quote": "Volební kraje jsou sdruženy ve dvě volební oblasti, z nichž jednu tvoří volební kraje prvý až devatenáctý, druhou volební kraje dvacátý až dvacátý osmý.",
+          "note": "Called by the minister of the interior in the Official Gazette, not in the Collection of Laws."
+        },
+        {
+          "date": "1954-11-28",
+          "election_kind": "general",
+          "source": "z27_1954",
+          "quote": "Pro volby do Národního shromáždění se vytvoří tolik volebních obvodů, aby na každých 35.000 obyvatel připadl jeden volební obvod.",
+          "note": "First election in single-member constituencies; the number of constituencies followed population."
+        },
+        {
+          "date": "1960-06-12",
+          "election_kind": "general",
+          "contests": 300,
+          "seats": 300,
+          "source": "uz35_1960",
+          "quote": "Pro volby do Národního shromáždění se vytvoří 300 volebních obvodů."
+        },
+        {
+          "date": "1964-06-14",
+          "election_kind": "general",
+          "contests": 300,
+          "seats": 300,
+          "source": "u37_1964",
+          "quote": "volby do Národního shromáždění, do Slovenské národní rady a do národních výborů na neděli dne 14. června 1964"
+        }
+      ]
+    },
+    {
+      "key": "fs_sl",
+      "tier": "national",
+      "name": "Volby do Sněmovny lidu Federálního shromáždění",
+      "name_en": "Federal Assembly: House of the People",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "cz.obec"
+        ]
+      },
+      "finest_note": "For 1990 and 1992 volby.cz gives the Czech part by municipality; the Slovak part survives online only as the federal totals in the gazette and press. The single-list elections of 1971 to 1986 have no published constituency returns.",
+      "source": "uzfed",
+      "locator": "https://e-sbirka.gov.cz/sb/1968/143 (art. 30)",
+      "valid_from": "1969-01-01",
+      "valid_to": "1993-01-01",
+      "first_held": "1971-11-26",
+      "earliest_record": "1990-06-08",
+      "est_votes": 60000000,
+      "effort": 3,
+      "note": "200 deputies elected across the federation (Constitutional Act 143/1968, art. 30): in single-member constituencies on single lists from 1971 to 1986 (Act 44/1971), then 150 deputies by list PR with a 5% threshold in 12 electoral regions, 8 Czech and 4 Slovak, in 1990 and 1992 (Act 47/1990), each republic's share set by population. Its members of January 1969 were delegated by the old National Assembly, and its 1990 vacancies were filled by co-option (see fs_kooptace). The 1990 term was cut to two years (Constitutional Act 45/1990).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "lower_house"
+          ],
+          "iso_pattern": "CSK",
+          "valid_from": "1969-01-01",
+          "valid_to": "1993-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Ústřední volební komise",
+          "source": "uz43_1971",
+          "valid_from": "1971-11-28",
+          "valid_to": "1990-03-01"
+        },
+        {
+          "period_years": 2,
+          "term_years": 2,
+          "called": false,
+          "administered_by": "Ústřední volební komise",
+          "source": "uz45_1990",
+          "valid_from": "1990-03-01",
+          "valid_to": "1993-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Volby.cz výsledky (ČSÚ)",
+          "url": "https://www.volby.cz/pls/sl1990/u0",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "first_date": "1990-06-08",
+          "last_date": "1992-06-05",
+          "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+          "source": "volby",
+          "evidence": "HTML results of the House of the People for the Czech Republic only, in 1990 and 1992, by electoral region, district, and municipality; the Slovak part is not on volby.cz or volby.statistics.sk, which has only the Slovak National Council."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1971-11-26",
+          "election_kind": "general",
+          "contests": 200,
+          "seats": 200,
+          "source": "u92_1971",
+          "quote": "volby do Federálního shromáždění na pátek dne 26. listopadu a sobotu dne 27. listopadu 1971",
+          "note": "Two-day election; single National Front candidates in single-member constituencies."
+        },
+        {
+          "date": "1976-10-22",
+          "election_kind": "general",
+          "contests": 200,
+          "seats": 200,
+          "source": "u72_1976",
+          "quote": "volby do Federálního shromáždění Československé socialistické republiky na pátek dne 22. října a sobotu dne 23. října 1976",
+          "note": "Two-day election; single National Front candidates in single-member constituencies."
+        },
+        {
+          "date": "1981-06-05",
+          "election_kind": "general",
+          "contests": 200,
+          "seats": 200,
+          "source": "u32_1981",
+          "quote": "volby do Federálního shromáždění na pátek dne 5. června a sobotu dne 6. června 1981",
+          "note": "Two-day election; single National Front candidates in single-member constituencies."
+        },
+        {
+          "date": "1986-05-23",
+          "election_kind": "general",
+          "contests": 200,
+          "seats": 200,
+          "source": "u10_1986",
+          "quote": "volby do Federálního shromáždění Československé socialistické republiky na pátek 23. května a sobotu 24. května 1986",
+          "note": "Two-day election; single National Front candidates in single-member constituencies."
+        },
+        {
+          "date": "1990-06-08",
+          "election_kind": "general",
+          "contests": 12,
+          "seats": 150,
+          "source": "zfs1990",
+          "quote": "Volby do Federálního shromáždění se konají na základě obecného, rovného a přímého volebního práva tajným hlasováním podle zásady poměrného zastoupení ve volebních krajích.",
+          "note": "8 Czech and 4 Slovak electoral regions; 101 seats in the Czech Republic and 49 in Slovakia."
+        },
+        {
+          "date": "1992-06-05",
+          "election_kind": "general",
+          "contests": 12,
+          "seats": 150,
+          "source": "volby",
+          "quote": "Volby do Sněmovny lidu Federálního shromáždění konané ve dnech 5. - 6.6.1992 na území České republiky",
+          "note": "8 Czech and 4 Slovak electoral regions; 99 seats in the Czech Republic and 51 in Slovakia."
+        }
+      ]
+    },
+    {
+      "key": "fs_sn",
+      "tier": "national",
+      "name": "Volby do Sněmovny národů Federálního shromáždění",
+      "name_en": "Federal Assembly: House of the Nations",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest",
+        "fine": [
+          "cz.obec"
+        ]
+      },
+      "finest_note": "As for the House of the People: volby.cz has the Czech half of 1990 and 1992 by municipality; the Slovak half and the single-list elections have no official digital returns.",
+      "source": "uzfed",
+      "locator": "https://e-sbirka.gov.cz/sb/1968/143 (art. 31)",
+      "valid_from": "1969-01-01",
+      "valid_to": "1993-01-01",
+      "first_held": "1971-11-26",
+      "earliest_record": "1990-06-08",
+      "est_votes": 60000000,
+      "effort": 3,
+      "note": "150 deputies, 75 elected in each republic (Constitutional Act 143/1968, art. 31): in single-member constituencies from 1971 to 1986 (Act 44/1971), then by list PR in the 8 Czech and 4 Slovak electoral regions in 1990 and 1992 (Act 47/1990).",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "CSK",
+          "valid_from": "1969-01-01",
+          "valid_to": "1993-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "administered_by": "Ústřední volební komise",
+          "source": "uz43_1971",
+          "valid_from": "1971-11-28",
+          "valid_to": "1990-03-01"
+        },
+        {
+          "period_years": 2,
+          "term_years": 2,
+          "called": false,
+          "administered_by": "Ústřední volební komise",
+          "source": "uz45_1990",
+          "valid_from": "1990-03-01",
+          "valid_to": "1993-01-01"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Volby.cz výsledky (ČSÚ)",
+          "url": "https://www.volby.cz/pls/sn1990/u0",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "first_date": "1990-06-08",
+          "last_date": "1992-06-05",
+          "license": "ČSÚ terms of use: reuse with attribution to the Czech Statistical Office",
+          "source": "volby",
+          "evidence": "HTML results of the House of the Nations for the Czech Republic only, in 1990 and 1992, by electoral region, district, and municipality; the Slovak part is not on volby.cz or volby.statistics.sk, which has only the Slovak National Council."
+        }
+      ],
+      "dates": [
+        {
+          "date": "1971-11-26",
+          "election_kind": "general",
+          "contests": 150,
+          "seats": 150,
+          "source": "u92_1971",
+          "quote": "volby do Federálního shromáždění na pátek dne 26. listopadu a sobotu dne 27. listopadu 1971",
+          "note": "Two-day election; single National Front candidates in single-member constituencies."
+        },
+        {
+          "date": "1976-10-22",
+          "election_kind": "general",
+          "contests": 150,
+          "seats": 150,
+          "source": "u72_1976",
+          "quote": "volby do Federálního shromáždění Československé socialistické republiky na pátek dne 22. října a sobotu dne 23. října 1976",
+          "note": "Two-day election; single National Front candidates in single-member constituencies."
+        },
+        {
+          "date": "1981-06-05",
+          "election_kind": "general",
+          "contests": 150,
+          "seats": 150,
+          "source": "u32_1981",
+          "quote": "volby do Federálního shromáždění na pátek dne 5. června a sobotu dne 6. června 1981",
+          "note": "Two-day election; single National Front candidates in single-member constituencies."
+        },
+        {
+          "date": "1986-05-23",
+          "election_kind": "general",
+          "contests": 150,
+          "seats": 150,
+          "source": "u10_1986",
+          "quote": "volby do Federálního shromáždění Československé socialistické republiky na pátek 23. května a sobotu 24. května 1986",
+          "note": "Two-day election; single National Front candidates in single-member constituencies."
+        },
+        {
+          "date": "1990-06-08",
+          "election_kind": "general",
+          "contests": 12,
+          "seats": 150,
+          "source": "zfs1990",
+          "quote": "Volby do Federálního shromáždění se konají na základě obecného, rovného a přímého volebního práva tajným hlasováním podle zásady poměrného zastoupení ve volebních krajích.",
+          "note": "75 seats in the 8 Czech regions and 75 in the 4 Slovak regions."
+        },
+        {
+          "date": "1992-06-05",
+          "election_kind": "general",
+          "contests": 12,
+          "seats": 150,
+          "source": "volby",
+          "quote": "Volby do Sněmovny národů Federálního shromáždění konané ve dnech 5. - 6.6.1992 na území České republiky",
+          "note": "75 seats in the 8 Czech regions and 75 in the 4 Slovak regions."
+        }
+      ]
+    },
+    {
+      "key": "doplnovaci",
+      "tier": "national",
+      "name": "Doplňovací volby do Národního shromáždění a Federálního shromáždění",
+      "name_en": "National Assembly and Federal Assembly by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "z44_1971",
+      "valid_from": "1954-06-02",
+      "valid_to": "1990-03-01",
+      "first_held": "1972-05-27",
+      "est_votes": 2000000,
+      "effort": 5,
+      "note": "From 1954 a seat left vacant in a single-member constituency was filled by a by-election called by the presidium of the legislature; the Federal Assembly's presidium called them for the House of the People and the House of the Nations from 1972 to 1989, each published in the Collection of Laws. Dates here are those of the published calls the archive read; results were not published by constituency.",
+      "disposition": "blocked",
+      "disposition_reason": "Only the calls survive in the Collection of Laws; no official record of the returns by constituency was found online.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house",
+            "upper_house"
+          ],
+          "iso_pattern": "CSK",
+          "valid_from": "1954-06-02",
+          "valid_to": "1990-03-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1972-05-27",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u14_1972",
+          "quote": "doplňovací volby ve volebním obvodu č. 55 pro volby do Sněmovny lidu Federálního shromáždění na sobotu dne 27. května 1972"
+        },
+        {
+          "date": "1972-09-16",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u39_1972",
+          "quote": "doplňovací volby ve volebním obvodu č. 111 pro volby do Sněmovny lidu Federálního shromáždění na sobotu dne 16. září 1972"
+        },
+        {
+          "date": "1972-11-18",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u68_1972",
+          "quote": "doplňovací volby ve volebním obvodu č. 119 pro volby do Sněmovny lidu Federálního shromáždění na sobotu dne 18. listopadu 1972"
+        },
+        {
+          "date": "1972-12-16",
+          "election_kind": "by_election",
+          "contests": 2,
+          "seats": 2,
+          "source": "u78_1972",
+          "quote": "doplňovací volby ve volebním obvodu č. 135 pro volby do Sněmovny národů Federálního shromáždění na sobotu dne 16. prosince 1972",
+          "note": "Also called by č. 79/1972 Sb.."
+        },
+        {
+          "date": "1973-05-25",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u18_1973",
+          "quote": "doplňovací volby ve volebním obvodu č. 11 pro volby do Sněmovny lidu Federálního shromáždění na pátek dne 25. května a sobotu dne 26. května 1973"
+        },
+        {
+          "date": "1973-05-26",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u19_1973",
+          "quote": "doplňovací volby ve volebním obvodu č. 198 pro volby do Sněmovny lidu Federálního shromáždění na sobotu dne 26. května 1973"
+        },
+        {
+          "date": "1973-09-08",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u75_1973",
+          "quote": "doplňovací volby ve volebním obvodu č. 76 pro volby do Sněmovny lidu Federálního shromáždění na sobotu dne 8. září 1973"
+        },
+        {
+          "date": "1974-02-23",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u164_1973",
+          "quote": "doplňovací volby ve volebním obvodu č. 66 pro volby do Sněmovny národů Federálního shromáždění na sobotu dne 23. února 1974"
+        },
+        {
+          "date": "1974-03-30",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u1_1974",
+          "quote": "doplňovací volby ve volebním obvodu č. 57 pro volby do Sněmovny národů Federálního shromáždění na sobotu dne 30. března 1974"
+        },
+        {
+          "date": "1974-12-07",
+          "election_kind": "by_election",
+          "contests": 3,
+          "seats": 3,
+          "source": "u105_1974",
+          "quote": "doplňovací volby ve volebním obvodu č. 131 a č. 149 pro volby do Sněmovny lidu a ve volebním obvodu č. 36 pro volby do Sněmovny národů na sobotu dne 7. prosince 1974"
+        },
+        {
+          "date": "1975-05-17",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u24_1975",
+          "quote": "doplňovací volby ve volebním obvodu č. 135 pro volby do Sněmovny národů Federálního shromáždění na sobotu dne 17. května 1975"
+        },
+        {
+          "date": "1975-06-14",
+          "election_kind": "by_election",
+          "contests": 2,
+          "seats": 2,
+          "source": "u37_1975",
+          "quote": "doplňovací volby ve volebním obvodu č. 121 pro volby do Sněmovny národů a ve volebním obvodu č. 41 pro volby do Sněmovny lidu Federálního shromáždění na sobotu dne 14. června 1975"
+        },
+        {
+          "date": "1975-08-30",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u58_1975",
+          "quote": "doplňovací volby ve volebním obvodu č. 13 pro volby do Sněmovny lidu na sobotu dne 30. srpna 1975"
+        },
+        {
+          "date": "1975-11-22",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u101_1975",
+          "quote": "doplňovací volby ve volebním obvodu č. 87 pro volby do Sněmovny národů Federálního shromáždění na sobotu dne 22. listopadu 1975"
+        },
+        {
+          "date": "1977-04-15",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u7_1977",
+          "quote": "doplňovací volby ve volebním obvodu č. 27 pro volby do Sněmovny lidu Federálního shromáždění na pátek dne 15. dubna 1977"
+        },
+        {
+          "date": "1978-02-04",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u93_1977",
+          "quote": "doplňovací volby ve volebním obvodu č. 94 pro volby do Sněmovny národů Federálního shromáždění na sobotu dne 4. února 1978"
+        },
+        {
+          "date": "1978-02-18",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u94_1977",
+          "quote": "doplňovací volby ve volebním obvodu č. 39 pro volby do Sněmovny lidu Federálního shromáždění na sobotu dne 18. února 1978"
+        },
+        {
+          "date": "1979-04-07",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u15_1979",
+          "quote": "doplňovací volby ve volebním obvodu č. 42 pro volby do Sněmovny národů Federálního shromáždění na sobotu dne 7. dubna 1979"
+        },
+        {
+          "date": "1979-09-29",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u82_1979",
+          "quote": "doplňovací volby ve volebním obvodu č. 50 pro volby do Sněmovny národů Federálního shromáždění na sobotu dne 29. září 1979"
+        },
+        {
+          "date": "1980-03-29",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u23_1980",
+          "quote": "doplňovací volby ve volebním obvodu č. 165 pro volby do Sněmovny lidu Federálního shromáždění na sobotu dne 29. března a na neděli 30. března 1980"
+        },
+        {
+          "date": "1980-05-16",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u44_1980",
+          "quote": "doplňovací volby ve volebním obvodu č. 63 pro volby do Sněmovny národů Federálního shromáždění na pátek dne 16. května a sobotu dne 17. května 1980"
+        },
+        {
+          "date": "1980-10-17",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u127_1980",
+          "quote": "doplňovací volby ve volebním obvodu č. 3 pro volby do Sněmovny lidu Federálního shromáždění na pátek dne 17. října 1980"
+        },
+        {
+          "date": "1981-12-09",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u100_1981",
+          "quote": "na středu dne 9. prosince 1981"
+        },
+        {
+          "date": "1982-01-23",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u114_1981",
+          "quote": "na sobotu dne 23. ledna 1982"
+        },
+        {
+          "date": "1982-02-26",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u12_1982",
+          "quote": "na pátek dne 26. února a sobotu dne 27. února 1982"
+        },
+        {
+          "date": "1982-10-16",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u109_1982",
+          "quote": "doplňovací volbu ve volebním obvodu č. 109 pro volby do Sněmovny národů Federálního shromáždění (severní část okresu Čadca, ohraničená obcemi Čierne, Čadca, Zákopčie a Dlhá nad Kysucou) a stanoví den jejího konání na sobotu 16. října 1982"
+        },
+        {
+          "date": "1983-03-15",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u10_1983",
+          "quote": "doplňovací volbu ve volebním obvodu č. 1 pro volby do Sněmovny lidu Federálního shromáždění (městský obvod Praha 1) a stanoví den jejího konání na úterý 15. března 1983"
+        },
+        {
+          "date": "1983-06-10",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u60_1983",
+          "quote": "na pátek dne 10. června 1983"
+        },
+        {
+          "date": "1983-09-02",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u79_1983",
+          "quote": "doplňovací volbu ve volebním obvodu č. 66 pro volby do Sněmovny lidu Federálního shromáždění (východní část okresu Teplice ohraničená obcemi Žalany, Bžany, Kladruby, Teplice, Krupka) a stanoví den jejího konání na pátek dne 2. září 1983"
+        },
+        {
+          "date": "1984-02-10",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u151_1983",
+          "quote": "doplňovací volbu ve volebním obvodu č. 122 pro volby do Sněmovny lidu Federálního shromáždění (obce Orlová, Bohumín, Petřvald, Rychvald, Dolní Lutyně, Dětmarovice a Petrovice u Karviné) a stanoví den jejího konání na pátek dne 10. února 1984"
+        },
+        {
+          "date": "1984-03-03",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u12_1984",
+          "quote": "na sobotu dne 3. března 1984"
+        },
+        {
+          "date": "1985-02-22",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u137_1984",
+          "quote": "doplňovací volbu ve volebním obvodu č. 63 pro volby do Sněmovny lidu (okres Louny) a stanoví den jejího konání na pátek dne 22. února 1985"
+        },
+        {
+          "date": "1985-03-22",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u12_1985",
+          "quote": "na pátek 22. března 1985 a sobotu 23. března 1985"
+        },
+        {
+          "date": "1987-10-31",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u78_1987",
+          "quote": "na sobotu dne 31. října 1987"
+        },
+        {
+          "date": "1988-03-25",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u25_1988",
+          "quote": "na pátek 25. března 1988"
+        },
+        {
+          "date": "1989-04-20",
+          "election_kind": "by_election",
+          "contests": 9,
+          "seats": 9,
+          "source": "u11_1989",
+          "quote": "na čtvrtek 20. dubna 1989"
+        },
+        {
+          "date": "1989-06-16",
+          "election_kind": "by_election",
+          "contests": 1,
+          "seats": 1,
+          "source": "u49_1989",
+          "quote": "na pátek dne 16. června 1989"
+        }
+      ]
+    },
+    {
+      "key": "fs_kooptace",
+      "tier": "national",
+      "name": "Delegování (1969) a kooptace (1990) poslanců Federálního shromáždění",
+      "locator": "https://e-sbirka.gov.cz/sb/1990/14 (art. I); https://e-sbirka.gov.cz/sb/1968/143 (art. 147)",
+      "name_en": "Federal Assembly members delegated in 1969 and co-opted in 1990",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {},
+      "source": "uz14_1990",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Seats filled without a vote of the electorate: in January 1969 the House of the People was formed from the National Assembly and the House of the Nations was elected by the Czech and Slovak National Councils from their members (Constitutional Act 143/1968, art. 147); in January and February 1990 recalled deputies were replaced by co-option (Constitutional Act 14/1990).",
+      "valid_from": "1969-01-01",
+      "valid_to": "1990-06-08"
+    },
+    {
+      "key": "prezident",
+      "tier": "national",
+      "name": "Volba prezidenta republiky",
+      "name_en": "President (elected by the legislature)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "u100_1960",
+      "locator": "https://e-sbirka.gov.cz/sb/1960/100 (arts. 43, 63)",
+      "valid_from": "1918-11-14",
+      "valid_to": "1993-01-01",
+      "first_held": "1918-11-14",
+      "est_votes": 0,
+      "effort": 2,
+      "note": "The President was always elected by the legislature: the National Assembly in joint session of both chambers for seven years under the 1920 Charter, the National Assembly for seven years under the 1948 Constitution and for five years under the 1960 Constitution, and the Federal Assembly from 1969 (Constitutional Act 143/1968). In July 1992 the Federal Assembly failed in several ballots to elect a successor to Havel, who resigned on 20 July 1992; the office stayed vacant until the federation ended.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect",
+            "general"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "CSK"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1918-11-14",
+          "election_kind": "indirect",
+          "note": "Tomáš Garrigue Masaryk, by acclamation of the Revolutionary National Assembly."
+        },
+        {
+          "date": "1920-05-27",
+          "election_kind": "indirect",
+          "note": "Masaryk re-elected by the National Assembly (both chambers) under the 1920 Constitutional Charter."
+        },
+        {
+          "date": "1927-05-27",
+          "election_kind": "indirect",
+          "note": "Masaryk."
+        },
+        {
+          "date": "1934-05-24",
+          "election_kind": "indirect",
+          "note": "Masaryk."
+        },
+        {
+          "date": "1935-12-18",
+          "election_kind": "indirect",
+          "note": "Edvard Beneš, after Masaryk resigned."
+        },
+        {
+          "date": "1938-11-30",
+          "election_kind": "indirect",
+          "note": "Emil Hácha, after Beneš resigned following Munich."
+        },
+        {
+          "date": "1946-06-19",
+          "election_kind": "indirect",
+          "note": "Beneš, by the Constituent National Assembly."
+        },
+        {
+          "date": "1948-06-14",
+          "election_kind": "indirect",
+          "note": "Klement Gottwald, after Beneš resigned."
+        },
+        {
+          "date": "1953-03-21",
+          "election_kind": "indirect",
+          "note": "Antonín Zápotocký, after Gottwald's death."
+        },
+        {
+          "date": "1957-11-19",
+          "election_kind": "indirect",
+          "note": "Antonín Novotný, after Zápotocký's death."
+        },
+        {
+          "date": "1964-11-12",
+          "election_kind": "indirect",
+          "note": "Novotný re-elected under the 1960 Constitution."
+        },
+        {
+          "date": "1968-03-30",
+          "election_kind": "indirect",
+          "note": "Ludvík Svoboda, after Novotný resigned."
+        },
+        {
+          "date": "1973-03-22",
+          "election_kind": "indirect",
+          "note": "Svoboda re-elected by the Federal Assembly."
+        },
+        {
+          "date": "1975-05-29",
+          "election_kind": "indirect",
+          "note": "Gustáv Husák, after the Constitution was amended to replace the incapacitated Svoboda."
+        },
+        {
+          "date": "1980-05-22",
+          "election_kind": "indirect",
+          "note": "Husák."
+        },
+        {
+          "date": "1985-05-22",
+          "election_kind": "indirect",
+          "note": "Husák."
+        },
+        {
+          "date": "1989-12-29",
+          "election_kind": "indirect",
+          "note": "Václav Havel, after Husák resigned."
+        },
+        {
+          "date": "1990-07-05",
+          "election_kind": "indirect",
+          "note": "Havel, by the Federal Assembly elected in June 1990, for two years."
+        }
+      ]
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Referendum o státoprávním uspořádání",
+      "name_en": "Referendum on the form of the federation",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "uz327_1991",
+      "valid_from": "1991-08-16",
+      "valid_to": "1993-01-01",
+      "est_votes": 0,
+      "effort": 1,
+      "note": "Constitutional Act 327/1991 allowed a federation-wide or single-republic referendum on the form of the state, called by the President on the proposal of the Federal Assembly or a national council; none was called before the Federal Assembly dissolved the federation by Constitutional Act 542/1992. No other referendum was provided for between 1918 and 1991.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "CSK"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "zemska_zastupitelstva",
+      "tier": "zeme",
+      "name": "Volby do zemských zastupitelstev",
+      "name_en": "Land assemblies (Bohemia, Moravia-Silesia, Slovakia, Subcarpathian Rus)",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ns1920",
+      "disposition": "blocked",
+      "disposition_reason": "The returns were printed by the State Statistical Office in 1929 and 1936; no official digital edition was found on csu.gov.cz or volby.statistics.sk.",
+      "valid_from": "1928-07-01",
+      "valid_to": "1939-03-15",
+      "first_held": "1928-12-02",
+      "est_votes": 15000000,
+      "effort": 5,
+      "note": "The land administration of 1928 (Act 125/1927) gave each of the four lands an assembly, two-thirds elected by list PR and one-third appointed by the government, elected on 2 December 1928 with the district assemblies and on 26 May 1935, a week after the parliamentary election. The four lands were the groupings ČSÚ uses for the parliamentary returns.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "valid_from": "1928-07-01",
+          "valid_to": "1939-03-15"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1928-12-02",
+          "election_kind": "local",
+          "note": "Bohemia, Moravia-Silesia, Slovakia, and Subcarpathian Rus."
+        },
+        {
+          "date": "1935-05-26",
+          "election_kind": "local",
+          "note": "Bohemia, Moravia-Silesia, Slovakia, and Subcarpathian Rus."
+        }
+      ]
+    },
+    {
+      "key": "autonomni_snemy",
+      "tier": "zeme",
+      "name": "Volby do Sněmu Slovenské krajiny (1938) a Sněmu Podkarpatské Rusi (1939)",
+      "name_en": "Diets of the autonomous Slovak Land (1938) and Carpathian Ukraine (1939)",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "ns1920",
+      "disposition": "blocked",
+      "disposition_reason": "Single-list elections of the Second Republic; no official digital publication of the returns was found.",
+      "valid_from": "1938-11-22",
+      "valid_to": "1939-03-15",
+      "first_held": "1938-12-18",
+      "est_votes": 1700000,
+      "effort": 5,
+      "note": "The constitutional acts on the autonomy of Slovakia (299/1938) and Subcarpathian Rus (328/1938) of 22 November 1938 created land diets: the Slovak diet of 63 deputies was elected on a single list on 18 December 1938, and the diet of Carpatho-Ukraine on 12 February 1939. The Slovak diet later sat as the parliament of the Slovak State, which the Slovak census covers.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "polity_kinds": [
+            "region"
+          ],
+          "valid_from": "1938-11-22",
+          "valid_to": "1939-03-15"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1938-12-18",
+          "election_kind": "general",
+          "note": "Diet of the Slovak Land, 63 deputies."
+        },
+        {
+          "date": "1939-02-12",
+          "election_kind": "general",
+          "note": "Diet of Carpatho-Ukraine (Subcarpathian Rus)."
+        }
+      ]
+    },
+    {
+      "key": "narodni_rady",
+      "tier": "republika",
+      "name": "Volby do České národní rady a Slovenské národní rady",
+      "name_en": "Czech and Slovak National Councils",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {},
+      "source": "uz542_1992",
+      "locator": "https://e-sbirka.gov.cz/sb/1992/542 (čl. 4)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elections of the republics' own legislatures, held with the federal elections; the census of Czechia (class cnr) and of Slovakia (classes snr and snr_1948) count them, since those councils became the successor states' parliaments.",
+      "valid_from": "1948-05-30",
+      "valid_to": "1993-01-01"
+    },
+    {
+      "key": "okresni_zastupitelstva",
+      "tier": "okres",
+      "name": "Volby do okresních zastupitelstev 1928 a 1935",
+      "name_en": "District assemblies, 1928 and 1935",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "ns1920",
+      "disposition": "blocked",
+      "disposition_reason": "Printed returns only; no official digital edition was found.",
+      "valid_from": "1928-07-01",
+      "valid_to": "1939-03-15",
+      "first_held": "1928-12-02",
+      "est_votes": 15000000,
+      "effort": 5,
+      "note": "Two-thirds of each district assembly were elected by list PR with the land assemblies, one-third appointed (Act 125/1927).",
+      "dates": [
+        {
+          "date": "1928-12-02",
+          "election_kind": "local"
+        },
+        {
+          "date": "1935-05-26",
+          "election_kind": "local"
+        }
+      ]
+    },
+    {
+      "key": "obecni_zastupitelstva",
+      "tier": "obec",
+      "name": "Volby do obecních zastupitelstev 1919–1938",
+      "name_en": "Municipal councils of the First Republic",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "ns1920",
+      "disposition": "blocked",
+      "disposition_reason": "Municipal returns were kept by the municipalities and printed only in part by the State Statistical Office; no official digital edition was found.",
+      "valid_from": "1919-01-31",
+      "valid_to": "1939-03-15",
+      "first_held": "1919-06-15",
+      "est_votes": 40000000,
+      "effort": 5,
+      "note": "Councils elected by list PR under the municipal election law of 31 January 1919 (Act 75/1919), first in Bohemia, Moravia, and Silesia on 15 June 1919; Slovakia and Subcarpathian Rus voted later, and municipalities held further elections at the end of each term (1923, 1927, 1931, and 1938 in most of the country) and after dissolutions.",
+      "dates": [
+        {
+          "date": "1919-06-15",
+          "election_kind": "local",
+          "note": "Bohemia, Moravia, and Silesia."
+        },
+        {
+          "date": "1920-01-01",
+          "precision": "year",
+          "through": "1938-12-31",
+          "election_kind": "local",
+          "note": "Staggered later rounds, not yet listed by date."
+        }
+      ]
+    },
+    {
+      "key": "narodni_vybory",
+      "tier": "kraj",
+      "name": "Volby do národních výborů 1954–1986",
+      "name_en": "National committees (regional, district, and local), 1954–1986",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "z14_1954",
+      "disposition": "blocked",
+      "disposition_reason": "Single-list elections; only national totals were printed, and no official digital edition of the returns was found.",
+      "valid_from": "1954-03-09",
+      "valid_to": "1990-11-24",
+      "first_held": "1954-05-16",
+      "est_votes": 70000000,
+      "effort": 5,
+      "note": "Regional, district, town, and local national committees were elected together in single-member constituencies on National Front lists: under federal laws (14/1954, 39/1960, 34/1964) and from 1971 under laws of the Czech and Slovak National Councils (54/1971, 56/1971). Vacancies went to by-elections called by the presidia. The councils elected in November 1990 under the republics' municipal laws belong to the Czech and Slovak censuses.",
+      "match": [
+        {
+          "election_kinds": [
+            "local"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "valid_from": "1954-01-01",
+          "valid_to": "1990-11-01"
+        }
+      ],
+      "dates": [
+        {
+          "date": "1954-05-16",
+          "election_kind": "local",
+          "source": "z14_1954",
+          "note": "First elections of the regional, district, and local national committees."
+        },
+        {
+          "date": "1957-05-19",
+          "election_kind": "local"
+        },
+        {
+          "date": "1960-06-12",
+          "election_kind": "local",
+          "source": "z39_1960"
+        },
+        {
+          "date": "1964-06-14",
+          "election_kind": "local",
+          "source": "u37_1964",
+          "quote": "volby do Národního shromáždění, do Slovenské národní rady a do národních výborů na neděli dne 14. června 1964"
+        },
+        {
+          "date": "1971-11-26",
+          "election_kind": "local",
+          "source": "u94_1971",
+          "note": "Called by the presidia of the Czech and Slovak National Councils for 26 and 27 November 1971, with the federal elections."
+        },
+        {
+          "date": "1976-10-22",
+          "election_kind": "local",
+          "note": "With the federal elections."
+        },
+        {
+          "date": "1981-06-05",
+          "election_kind": "local",
+          "note": "With the federal elections."
+        },
+        {
+          "date": "1986-05-23",
+          "election_kind": "local",
+          "note": "With the federal elections."
+        }
+      ]
+    },
+    {
+      "key": "soudci",
+      "tier": "okres",
+      "name": "Volby soudců okresních soudů",
+      "name_en": "District court judges elected by voters",
+      "category": "judicial",
+      "goal": "local",
+      "measure": {},
+      "source": "z36_1964",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Judicial elections on single lists, held with the 1964 general elections; the archive covers legislative, executive, and direct-democracy contests.",
+      "valid_from": "1964-02-28",
+      "valid_to": "1969-01-01"
+    }
+  ]
+}
