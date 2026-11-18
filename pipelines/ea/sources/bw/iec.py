@@ -1,4 +1,5 @@
 import functools
+import re
 import subprocess
 from datetime import date
 from typing import NamedTuple
@@ -56,6 +57,18 @@ GENERAL = {
         {"BCP": 3, "BDP": 37, "UDC": 17},
     ),
 }
+# The 2019 report prints only the National Assembly results by constituency in its first annexure; the councils'
+# ward results from its second annexure are built by bw.iec_council, on the same polling day.
+ASSEMBLY_2019 = General(
+    date(2019, 10, 23),
+    f"{BASE}/Botswana_2019_General_Elections_REPORT(1).pdf",
+    ("Annexure 1", "Annexure 2", "", ""),
+    {},
+    # The report's text: 38 seats for the BDP, 15 for the UDC, 3 for the BPF, and 1 for the AP, of the 57.
+    {"BDP": 38, "UDC": 15, "BPF": 3, "AP": 1},
+)
+COUNCIL_ELECTION_2019 = str(uuid5(package.NAMESPACE, "bw.iec_council\x1felection\x1f2019-10-23"))
+COUNCIL_PACKAGE_2019 = "bw.iec_council/2019-10-23"
 # Each by-election report prints its results, one block per polling district.
 BY = {
     date(2021, 12, 18): Report(f"{BASE}/11_by_election__REPORT.pdf", "2021 local government by-elections"),
@@ -108,6 +121,7 @@ PARTIES = {
     "AP": "Alliance for Progressives",
     "BMD": "Botswana Movement for Democracy",
     "BNF": "Botswana National Front",
+    "RAP": "Real Alternative Party",
     "BPF": "Botswana Patriotic Front",
     "BPP": "Botswana Peoples Party",
     "BTTO": "Botswana Tlhoko Tiro Organisation",
@@ -151,7 +165,7 @@ def _artifact(url: str) -> raw.Artifact:
 
 
 def fetch() -> None:
-    for spec in [*GENERAL.values(), *BY.values()]:
+    for spec in [*GENERAL.values(), ASSEMBLY_2019, *BY.values()]:
         raw.fetch(SOURCE, spec.url, suffix=".pdf")
 
 
@@ -167,6 +181,74 @@ def pages(url: str, name: str) -> list[str]:
 
 def lines(year: int) -> list[str]:
     return pages(GENERAL[year].url, str(year))
+
+
+ASSEMBLY_HEADER = re.compile(r"^\s*(\d{1,2})\s+(\S.*?)\s{2,}(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(-?\d+)\s+(\d+)%\s*$")
+# A page break once leaves a stray letter after a constituency's code, so the name and figures print on the next line.
+ASSEMBLY_STRAY = re.compile(r"^\s*(\d{1,2})\s+[A-Z]\s*$")
+ASSEMBLY_NAMED = re.compile(r"^\s+(\S.*?)\s{2,}(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(-?\d+)\s+(\d+)%\s*$")
+ASSEMBLY_CANDIDATE = re.compile(r"^\s+(\S.*?)\s{2,}(\S.*?)\s{2,}([MF])\s+([A-Z]{2,5})\s+(\d+)\s*$")
+
+
+CORRECTIONS_2019 = {"35": 52}
+NOTES_2019: dict[str, str] = {}
+
+
+class Constituency(NamedTuple):
+    unit: Unit
+    margin: int
+    turnout: int
+
+
+@functools.cache
+def assembly_2019() -> list[Constituency]:
+    """The 2019 constituencies, with candidates, from the report's first annexure."""
+    rows = pages(ASSEMBLY_2019.url, "2019")
+    start = next(i for i, row in enumerate(rows) if row.strip() == "Annexure 1" and "Parliamentary" in rows[i + 1])
+    end = next(i for i in range(start + 1, len(rows)) if rows[i].strip() == "Annexure 2")
+    found: list[Constituency] = []
+    stray = ""
+    for row in rows[start:end]:
+        match = ASSEMBLY_HEADER.match(row)
+        if match:
+            code, name, *figures = match.groups()
+        else:
+            match = ASSEMBLY_STRAY.match(row)
+            if match:
+                stray = match[1]
+                continue
+            match = ASSEMBLY_NAMED.match(row) if stray else None
+            if not match:
+                candidate = ASSEMBLY_CANDIDATE.match(row)
+                if candidate and found:
+                    first, last, _, code, votes = candidate.groups()
+                    found[-1].unit.candidates.append((f"{first.strip()} {last.strip()}".title(), code, int(votes)))
+                continue
+            code, (name, *figures) = stray, match.groups()
+            stray = ""
+        registered, valid, rejected, cast, margin, turnout = (int(n) for n in figures)
+        unit = Unit(code, name.strip(), "", registered, rejected, cast, margin)
+        unit.valid = valid
+        found.append(Constituency(unit, margin, turnout))
+    if [int(c.unit.code) for c in found] != list(range(1, 58)):
+        raise ValueError(f"the 2019 annexure does not print constituencies 1 to 57 in order: {len(found)}")
+    for each in found:
+        unit = each.unit
+        ranked = sorted((v or 0 for _, _, v in unit.candidates), reverse=True)
+        if unit.code in CORRECTIONS_2019:
+            note = (
+                f"The annexure prints {unit.rejected:,} rejected votes, which cannot be right beside its {unit.valid:,} "
+                f"valid and {unit.cast:,} total votes, so it is stored as {CORRECTIONS_2019[unit.code]:,}, the figure "
+                "that makes the three add up and that brings the constituencies' rejected votes to the 6,185 the "
+                "report's rejected ballots trend gives for 2019."
+            )
+            NOTES_2019[unit.code] = note
+            unit.rejected = CORRECTIONS_2019[unit.code]
+        if sum(ranked) != unit.valid or unit.valid + unit.rejected != unit.cast:
+            raise ValueError(f"2019 {unit.name}: the printed totals do not add up")
+        if ranked[0] - ranked[1] != each.margin:
+            raise ValueError(f"2019 {unit.name}: the printed margin is not the leaders' difference")
+    return found
 
 
 @functools.cache
@@ -253,7 +335,7 @@ def _settle(unit: Unit) -> None:
 
 
 def packages() -> list[str]:
-    days = sorted([*(GENERAL[y].day for y in GENERAL), *BY])
+    days = sorted([*(GENERAL[y].day for y in GENERAL), ASSEMBLY_2019.day, *BY])
     return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in days)]
 
 
@@ -262,6 +344,7 @@ def parse() -> None:
     registry().write()
     for year in GENERAL:
         general(year).write()
+    assembly(2019).write()
     for day in BY:
         byelection(day).write()
 
@@ -295,6 +378,8 @@ def constituencies() -> dict[str, str]:
     for year in GENERAL:
         for unit in books(year)[0]:
             found[changeset.slug(unit.name)] = unit.name.title()
+    for each in assembly_2019():
+        found.setdefault(changeset.slug(each.unit.name), each.unit.name.title())
     return dict(sorted(found.items()))
 
 
@@ -318,7 +403,7 @@ def geo() -> Package:
     )
     p.external |= {BOTSWANA, COUNTRY}
     _source(p)
-    for spec in [*GENERAL.values(), *BY.values()]:
+    for spec in [*GENERAL.values(), ASSEMBLY_2019, *BY.values()]:
         p.artifact(_artifact(spec.url), IEC_SOURCE)
     for code, rank, kind, noun in (
         ("bw.council", 1, "administrative", "local council"),
@@ -353,6 +438,8 @@ def used_parties() -> list[str]:
         for units in books(year):
             for unit in units:
                 found |= {code for _, code, _ in unit.candidates if code != "IND"}
+    for each in assembly_2019():
+        found |= {code for _, code, _ in each.unit.candidates if code != "IND"}
     for day in BY:
         for unit in by(day):
             found |= {code for _, code, _ in unit.candidates if code != "IND"}
@@ -420,6 +507,7 @@ def _contest(
     district: str,
     body: str,
     unit_id: str,
+    extra: str = "",
 ) -> None:
     walkover = unit.cast == -1
     contest = key("contest", tag)
@@ -451,6 +539,8 @@ def _contest(
         completeness=1.0,
     )
     method = METHOD.format(unit="constituency" if "parliament" in tag else "polling district")
+    if extra:
+        method += f" {extra}"
     p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
     ranked = sorted((v or 0 for _, _, v in unit.candidates), reverse=True)
     for index, (candidate, code, votes) in enumerate(unit.candidates, start=1):
@@ -575,6 +665,88 @@ def general(year: int) -> Package:
             unit_id=unit_id,
         )
     return p
+
+
+def assembly(year: int) -> Package:
+    """The 2019 National Assembly election by constituency, on the polling day of the councils' ward elections."""
+    day = ASSEMBLY_2019.day
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        f"The {day:%-d %B %Y} general election of Botswana: the National Assembly by constituency",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", COUNCIL_PACKAGE_2019],
+    )
+    p.external |= {BOTSWANA, COUNTRY}
+    p.uses(_artifact(ASSEMBLY_2019.url))
+    constituencies_ = assembly_2019()
+    _declared_2019([each.unit for each in constituencies_])
+    election = key("election", day)
+    path = f"bw/{day}"
+    # The councils' ward elections were held the same day, and their own package holds that election.
+    p.add(
+        "election",
+        id=election,
+        polity_id=BOTSWANA,
+        parent_id=COUNCIL_ELECTION_2019,
+        kind="general",
+        date_from=day,
+        date_to=day,
+        status="held",
+    )
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    p.name(election, f"{year} Botswana general election", "en", "official")
+    p.add(
+        "note",
+        id=key("note", election),
+        entity_id=election,
+        kind="methodology",
+        body_md="The National Assembly election by constituency. The local council ward elections of the same polling "
+        "day are a separate election, linked as its parent.",
+        lang="en",
+    )
+    for each in constituencies_:
+        unit = each.unit
+        code = changeset.slug(unit.name)
+        unit_id = key("unit", f"{day}:constituency:{code}")
+        p.add(
+            "reporting_unit",
+            id=unit_id,
+            polity_id=BOTSWANA,
+            scheme_code="bw.constituency",
+            code=f"{day}:{code}",
+            area_relation="equals",
+            area_id=area("bw.constituency", code),
+            kind="standard",
+        )
+        _contest(
+            p,
+            election,
+            f"{day}:parliament:{code}",
+            unit,
+            path=f"{path}/parliament/{code}",
+            name=f"{year} National Assembly election, {unit.name.title()}",
+            district=area("bw.constituency", code),
+            body=ASSEMBLY,
+            unit_id=unit_id,
+            extra=NOTES_2019.get(unit.code, ""),
+        )
+    return p
+
+
+def _declared_2019(parliament: list[Unit]) -> None:
+    """Check the constituencies against the report's text on the seats won and its national voter figures."""
+    seats: dict[str, int] = {}
+    for unit in parliament:
+        leader = max(unit.candidates, key=lambda candidate: candidate[2] or 0)
+        seats[leader[1]] = seats.get(leader[1], 0) + 1
+    # Annexure 5 prints 925,478 registered voters, and annexure 6 prints 778,343 voted and 6,185 rejected ballots.
+    totals = (
+        sum(unit.registered for unit in parliament),
+        sum(unit.cast for unit in parliament),
+        sum(unit.rejected for unit in parliament),
+    )
+    if seats != ASSEMBLY_2019.seats or totals != (925478, 778343, 6185):
+        raise ValueError(f"2019 constituencies do not match the report's seats and national totals: {seats} {totals}")
 
 
 def byelection(day: date) -> Package:
