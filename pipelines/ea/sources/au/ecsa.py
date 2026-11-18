@@ -14,6 +14,8 @@ from dataclasses import dataclass, field
 from datetime import date
 from uuid import uuid5
 
+import pymupdf
+
 from ea import changeset, package, raw
 from ea.package import Package
 
@@ -39,6 +41,28 @@ PARTIES = {
     "LDP": "Liberal Democratic Party",
     "DEM": "Australian Democrats",
     "DIG": "Danig",
+    "ANL": "Australian National League",
+    "COMM": "Communist Party",
+    "CP": "Country Party",
+    "F&PCP": "Farmers and Producers Country Party",
+    "F&S": "Farmers and Settlers Party",
+    "FPPU": "Farmers and Producers Political Union",
+    "FTA": "Free Trade Association",
+    "LANG": "Lang Labor Party",
+    "LCL": "Liberal and Country League",
+    "LDU": "Liberal and Democratic Union",
+    "LU": "Liberal Union",
+    "NDL": "National Defence League",
+    "NLP": "National Labor Party",
+    "PCP": "Progressive Country Party",
+    "PEOP": "Peoples Party",
+    "PPEOP": "Peninsula Peoples Party",
+    "PPLAB": "Premiers Plan Labor Party",
+    "PROT": "Protestant Labor Party",
+    "SOC": "Socialist Party",
+    "SOCLAB": "Socialist Labor Party",
+    "ST": "Single Tax",
+    "ULP": "United Labor Party",
 }
 
 
@@ -50,6 +74,9 @@ ECSA = key("source", "ecsa")
 HISTORY = key("source", "history")
 ASSEMBLY = key("body", "house-of-assembly")
 SYSTEM = key("electoral_system", "house-of-assembly", "irv")
+FPTP = key("electoral_system", "house-of-assembly", "fptp")
+BLOCK = key("electoral_system", "house-of-assembly", "block")
+CONTINGENT = key("electoral_system", "house-of-assembly", "contingent")
 
 
 def party_id(tag: str) -> str:
@@ -94,6 +121,11 @@ class District:
     declared: Place
     finalists: list[int] | None = None
     note: str | None = None
+    seats: int = 1
+    winners: list[int] | None = None  # the candidates the history prints in capitals, where it does
+    unopposed: bool = False
+    system: str | None = None  # the key of the electoral system, where it is not the default
+    after: list[tuple[str, int]] | None = None  # votes after preferences in a district that elects several members
 
 
 @dataclass
@@ -330,23 +362,36 @@ def event_2018() -> Event:
     return event
 
 
-# 1938 to 2006: the history of South Australian elections, by district.
+# 1857 to 2006: the history of South Australian elections, by district.
 
 JAENSCH = f"{HOST}/component/edocman/1857-2006-house-of-assembly-v1-by-dean-jaensch/download?Itemid=0"
-FIRST_PAGE, LAST_PAGE = 257, 363  # the first page of the 1938 section and the last page before the appendices
+FIRST_PAGE, LAST_PAGE = 25, 363  # the first page of the 1857 section and the last page before the appendices
+PLURALITY_END = 1933  # the last general election of the sections that print polling places or contingency results
 MONTHS = [
     "January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
     "November", "December",
 ]  # fmt: skip
-# Each general election's polling day, as the section's introduction states it.
+# Each general election's first polling day, as the section's introduction states it.
 GENERAL = {
+    1857: "03-09", 1860: "03-13", 1862: "11-10", 1865: "03-01", 1868: "04-06", 1870: "03-28", 1871: "12-14",
+    1875: "02-10", 1878: "04-02", 1881: "04-08", 1884: "04-08", 1887: "03-19", 1890: "04-09", 1893: "04-15",
+    1896: "04-25", 1899: "04-29", 1902: "05-03", 1905: "05-27", 1906: "11-03", 1910: "04-02", 1912: "02-10",
+    1915: "03-27", 1918: "04-06", 1921: "04-09", 1924: "04-05", 1927: "03-26", 1930: "04-05", 1933: "04-08",
     1938: "03-19", 1941: "03-29", 1944: "04-29", 1947: "03-08", 1950: "03-04", 1953: "03-07", 1956: "03-03",
     1959: "03-07", 1962: "03-03", 1965: "03-06", 1968: "03-02", 1970: "05-30", 1973: "03-10", 1975: "07-12",
     1977: "09-17", 1979: "09-15", 1982: "11-06", 1985: "12-07", 1989: "11-25", 1993: "12-11", 1997: "10-11",
     2002: "02-09", 2006: "03-18",
 }  # fmt: skip
+# The last polling day of the general elections whose districts did not all vote on one day.
+LAST = {
+    1860: "04-03", 1862: "11-24", 1865: "03-13", 1868: "05-04", 1870: "04-05", 1871: "12-27", 1875: "03-01",
+    1878: "04-30", 1881: "04-27", 1884: "04-23", 1887: "04-21", 1890: "04-23", 1893: "05-06", 1896: "05-02",
+    1899: "05-06", 1906: "11-10", 1921: "04-16",
+}  # fmt: skip
 DECIMAL = re.compile(r"\d+\.\d")
-TITLE = re.compile(r"^(?P<name>[A-Z][A-Za-z' .-]+?)(?: [–-] (?P<day>\d{1,2}) (?P<month>[A-Z][a-z]+) (?P<year>\d{4}))?$")
+TITLE = re.compile(
+    r"^(?P<name>[A-Z][A-Za-z' .&-]+?)(?: [–-] (?P<day>\d{1,2}) (?P<month>[A-Z][a-z]+) (?P<year>\d{4}))?$"
+)
 
 
 @functools.cache
@@ -406,11 +451,15 @@ def pdf_candidate(fields: list[str]) -> tuple[Candidate, int] | None:
     if not rest or len(rest) > 2:
         return None
     party = rest[1] if len(rest) == 2 else ""
-    if party and not re.fullmatch(r"[A-Za-z][A-Za-z0-9]{1,6}", party):
+    if party and not re.fullmatch(r"[A-Za-z][A-Za-z0-9&]{1,6}", party):
         if not re.fullmatch(r"\S{2,7}", party) or re.search(r"\w{3}", party):
             return None
         party = "?"  # a party code that the document prints as garbled symbols
-    label = rest[0]
+    return label_candidate(rest[0], party), votes
+
+
+def label_candidate(label: str, party: str) -> Candidate:
+    """A candidate from a printed label like 'McINTOSH M*', where the asterisk marks a sitting member."""
     incumbent = label.endswith("*")
     label = label.rstrip("*").strip()
     words = label.split()
@@ -419,17 +468,26 @@ def pdf_candidate(fields: list[str]) -> tuple[Candidate, int] | None:
         w.title() if w.isupper() else re.sub(r"^(Mc|Mac)([A-Z]{2,})", lambda m: m[1] + m[2].capitalize(), w)
         for w in surname.split()
     )
-    return Candidate(label, party, incumbent, f"{initials} {shown}".strip()), votes
+    return Candidate(label, party, incumbent, f"{initials} {shown}".strip())
+
+
+def elected(candidate: Candidate) -> bool:
+    """Whether the history prints the surname in capitals, as it does for each elected candidate."""
+    words = candidate.name.split()
+    surname = " ".join(words[:-1] if len(words) > 1 else words)
+    letters = re.sub(r"[^A-Za-z]", "", re.sub(r"^(Mc|Mac)(?=[A-Z])", "", surname))
+    return len(letters) > 1 and letters.isupper()
 
 
 @dataclass
 class Block:
     title: str
     when: date | None
-    stats: tuple[int, int, int, int]
-    first: list[tuple[Candidate, int]]
+    stats: Stats | None
+    first: list[tuple[Candidate, int | None]]
     after: list[tuple[Candidate, int]]
     note: str | None = None
+    total: int | None = None  # the total of the candidates' votes where the history prints one
 
 
 def blocks(text: str) -> list[Block]:
@@ -483,7 +541,212 @@ def blocks(text: str) -> list[Block]:
     return out
 
 
+Stats = tuple[int | None, int | None, int | None, int | None]
+MISSING = re.compile(r"na", re.IGNORECASE)
+PRINTED_DATE = re.compile(r"\d{1,2} [A-Z][a-z]+ \d{4}")
+
+
+# A header line that prints the turnout percentage without its decimal point.
+PRINTED_WRONG = {
+    "3 238 2 126 6539 2 096 98.6 30 1.4": "3 238 2 126 65.7 2 096 98.6 30 1.4",
+    "29 335 20 859 71.1 20 568 98 6 291 1.4": "29 335 20 859 71.1 20 568 98.6 291 1.4",
+}
+
+
+def early_header(line: str) -> Stats | None:
+    """Enrolled, voted, formal, and informal from a header line of the colonial layout, where figures can be 'na'."""
+    text = " ".join(line.split())
+    text = re.sub(r" 100 0(?: 0(?:\.0)?)?$", " 100.0 0 0.0", PRINTED_WRONG.get(text, text))  # a poll with no informal
+    tokens = text.split()
+    if len(tokens) < 3 or not all(re.fullmatch(r"[\d.,]+|na|Na", t) for t in tokens) or not tokens[0].isdigit():
+        return None
+    full = header(line)
+    if full:
+        return full
+    marks = [i for i, t in enumerate(tokens) if DECIMAL.fullmatch(t) or MISSING.fullmatch(t)]
+    if not marks:
+        return None
+    head = tokens[: marks[0]]
+
+    def grouped(part: list[str]) -> bool:  # some figures are printed without the space for thousands
+        return whole(part) or (len(part) == 1 and part[0].isdigit())
+
+    if (
+        len(marks) == 2
+        and all(DECIMAL.fullmatch(tokens[m]) for m in marks)
+        and grouped(tokens[marks[0] + 1 : marks[1]])
+    ):
+        # A header without its roll: voted, formal, the formal share, informal, and the informal share.
+        informal = group(tokens[marks[0] + 1 : marks[1]])
+        for cut in range(1, len(head)):
+            if grouped(head[:cut]) and grouped(head[cut:]) and group(head[:cut]) == group(head[cut:]) + informal:
+                return None, group(head[:cut]), group(head[cut:]), informal
+    fit = [
+        (group(head[:cut]), group(head[cut:]))
+        for cut in range(1, len(head))
+        if grouped(head[:cut]) and grouped(head[cut:]) and group(head[cut:]) <= group(head[:cut])
+    ]
+    if DECIMAL.fullmatch(tokens[marks[0]]) and len(fit) != 1:
+        fit = [f for f in fit if abs(100 * f[1] / f[0] - float(tokens[marks[0]])) < 0.6]
+    enrolled: int | None
+    voted: int | None
+    if len(fit) == 1:
+        enrolled, voted = fit[0]
+    elif not fit and grouped(head):
+        enrolled, voted = group(head), None
+    else:
+        return None
+    segments = [tokens[a + 1 : b] for a, b in zip(marks, [*marks[1:], len(tokens)], strict=True)]
+    formal = group(segments[0]) if len(marks) >= 2 and segments[0] and grouped(segments[0]) else None
+    informal = group(segments[1]) if len(marks) >= 3 and segments[1] and grouped(segments[1]) else None
+    if len(marks) >= 2 and not any(MISSING.fullmatch(t) for t in tokens) and (formal is None or informal is None):
+        return None
+    return enrolled, voted, formal, informal
+
+
+def surnames(names: str) -> list[Candidate]:
+    """Candidates from a list like 'BUTTERFIELD T* (ALP), HARVEY W (ALP)'."""
+    out = []
+    for part in re.split(r",\s*", re.sub(r"\(([^()]*)\)\*", r"*(\1)", names)):
+        found = re.fullmatch(r"(?P<label>.*?)(?:\s*\((?P<party>[^()]*)\))?", part.strip())
+        if found and found["label"]:
+            out.append(label_candidate(found["label"], (found["party"] or "").strip()))
+    return out
+
+
+def printed_date(text: str) -> date:
+    day, month, year = text.split()
+    return date(int(year), MONTHS.index(month) + 1, int(day))
+
+
+def early_blocks(pages: list[list[str]]) -> list[Block]:
+    """Every block of the electorate results of a general election's section from 1857 to 1933, in page order.
+
+    The section's polling place tables follow its electorate results. Where their heading falls in a page's left
+    column, the right column can still end the electorate results above its own part of the tables, so it is read
+    leniently: a line that is not part of a block ends the block."""
+    out: list[Block] = []
+    title = ""
+    current: Block | None = None
+    mode = "first"
+    entries: list[list[str]] | None = None  # the uncontested table: district, names, date, and a shared party
+    party = ""
+
+    def finish() -> None:
+        nonlocal entries
+        for district, names, day, shared in entries or []:
+            people = [c if c.party else Candidate(c.name, shared, c.incumbent, c.display) for c in surnames(names)]
+            if not people:
+                raise ValueError(f"no members returned for {district!r}: {names!r}")
+            out.append(Block(district, printed_date(day) if day else None, None, [(c, None) for c in people], []))
+        entries = None
+
+    def step(raw_line: str, line: str, lenient: bool) -> None:
+        nonlocal title, current, mode, entries, party
+        if re.fullmatch(r"\d{1,3}|\d{4} GENERAL ELECTION|ELECTORATE RESULTS", line) or line.startswith(
+            ("Enrolled Voted", "Candidates ")
+        ):
+            return
+        if line == "Uncontested":
+            finish()
+            entries, current, party = [], None, ""
+            return
+        if entries is not None:
+            if line.startswith(("District", "Division")):
+                everyone = re.search(r"all (\w+)$", line)
+                party = everyone[1] if everyone else ""
+                return
+            fields = re.split(r"\s{2,}", line.rstrip("."))
+            if PRINTED_DATE.fullmatch(line) and entries:
+                entries[-1][2] = line
+            elif raw_line.startswith(" " * 6) and entries and len(fields) == 1:
+                entries[-1][1] += ("" if entries[-1][1].endswith(",") else ",") + " " + fields[0]
+            elif len(fields) >= 2:
+                day = fields[-1] if len(fields) == 3 and PRINTED_DATE.fullmatch(fields[-1]) else ""
+                entries.append([fields[0], fields[1], day, party])
+            elif lenient:
+                finish()
+            else:
+                raise ValueError(f"unreadable uncontested line {line!r}")
+            return
+        if re.match(r"\d+ BY-ELECTION", line) or line.startswith("BY-ELECTION"):
+            current = None
+            return
+        stats = early_header(line)
+        if stats is None and not lenient and re.fullmatch(r"[\d.,]+(?: +[\d.,]+| +na){3,}", line):
+            raise ValueError(f"unreadable district header {line!r}")
+        found = TITLE.match(title)
+        if stats is not None and (found or not lenient):
+            if not found:
+                raise ValueError(f"no district title before {line!r}: {title!r}")
+            when = (
+                date(int(found["year"]), MONTHS.index(found["month"]) + 1, int(found["day"])) if found["day"] else None
+            )
+            current = Block(found["name"].strip(), when, stats, [], [])
+            out.append(current)
+            mode = "first"
+            return
+        if line.startswith("Result after preferences"):
+            mode = "after"
+            return
+        if current is not None:
+            fields = re.split(r"\s{2,}", line.replace("#", " ").strip())
+            if len(fields) >= 3 and fields[-1] == "0" and re.fullmatch(r"\d[\d ]*", fields[-2]):
+                fields = fields[:-1]  # a candidate with no votes has no percentage
+            if fields[0] == "Total" and len(fields) == 2 and number(fields[1]) is not None:
+                current.total = number(fields[1])
+                return
+            unknown = fields[-1].lower() == "na" and len(fields) > 1
+            if (
+                not unknown
+                and current.stats is not None
+                and current.when is not None
+                and re.fullmatch(r"[A-Za-z'’ -]+ [A-Z]{1,4}\*?", fields[0])
+                and (len(fields) == 1 or (len(fields) == 2 and re.fullmatch(r"[A-Za-z&]{2,6}`?", fields[1])))
+            ):
+                # A by-election whose votes the history does not print.
+                found = pdf_candidate([fields[0], *(f.rstrip("`") for f in fields[1:]), "0"])
+                if found:
+                    current.first.append((found[0], None))
+                    return
+            got = pdf_candidate([*fields[:-1], "0"] if unknown else fields)
+            if got and re.match(r"[A-Za-z]", got[0].name):
+                if mode == "first":
+                    current.first.append((got[0], None) if unknown else got)
+                else:
+                    current.after.append(got)
+                return
+        if re.fullmatch(r"[A-Z][A-Za-z' .&-]+?(?: [–-] \d{1,2} [A-Z][a-z]+ \d{4})?", line):
+            title = line
+            current = None
+        elif current is not None and not re.fullmatch(r"\(([\d ,]+|na)\)|Plumpers.*|#.*|[a-z].*|.*;.*", line):
+            if not lenient:
+                raise ValueError(f"unread line in {current.title!r}: {line!r}")
+            current = None
+
+    for halves in pages:
+        heading = False
+        for side, text in enumerate(halves):
+            lenient = side == 1 and any("POLLING PLACE RESULTS" in line for line in halves[0].splitlines())
+            for raw_line in text.splitlines():
+                line = raw_line.strip()
+                if not line:
+                    if entries is not None:
+                        finish()
+                elif "POLLING PLACE RESULTS" in line:
+                    finish()
+                    heading = True
+                    break
+                else:
+                    step(raw_line, line, lenient)
+        if heading:
+            break
+    finish()
+    return out
+
+
 def district_of(block: Block) -> District:
+    assert block.stats is not None
     candidates = [c for c, _ in block.first]
     district = District(
         block.title,
@@ -514,20 +777,313 @@ def district_of(block: Block) -> District:
     return district
 
 
+PRINTED_SPELLING = {"Gumeracka": "Gumeracha"}
+# Elected candidates whom the history prints in lower case, with the reason that each was elected.
+ELECTED = {
+    (1921, "Adelaide"): ["Edwards AA"],  # 6,503 votes against 2,352 for the next candidate, in a three-member district
+}
+
+
+def system_for(day: date, seats: int) -> str:
+    """The key of the electoral system that counted a poll before 1938."""
+    if day >= date.fromisoformat(f"1930-{GENERAL[1930]}"):
+        return CONTINGENT
+    return FPTP if seats == 1 else BLOCK
+
+
+def early_district(block: Block, year: int, day: date) -> District:
+    """A district from the history's sections for 1857 to 1933, where the elected candidates' surnames are in capitals."""
+    names = [c.name for c, _ in block.first]
+    extra = ELECTED.get((year, block.title), [])
+    winners = [i for i, (c, _) in enumerate(block.first) if elected(c) or c.name in extra]
+    if len(extra) != sum(1 for c, _ in block.first if c.name in extra and not elected(c)):
+        raise ValueError(f"{block.title}: elected {extra} are not all candidates in {names}")
+    if not winners:
+        raise ValueError(f"{block.title}: no candidate is elected in {names}")
+    title = PRINTED_SPELLING.get(block.title, block.title)
+    if block.stats is None:
+        candidates = [c for c, _ in block.first]
+        declared = Place(title, [None] * len(candidates), None, None, None)
+        district = District(title, candidates, None, [], declared, unopposed=True)
+    else:
+        district = district_of(block)
+        district.name = title
+        district.declared.name = title
+        if len(winners) > 1:
+            if district.finalists:
+                district.after = [
+                    (district.candidates[i].name, v or 0)
+                    for i, v in zip(district.finalists, district.declared.runoff or [], strict=True)
+                ]
+            district.finalists = district.declared.runoff = None
+    if block.stats is not None:
+        found = polling_tables().get(year, {}).get((block.title, block.when))
+        if found is None:
+            found = next(
+                (t for (name, when), t in polling_tables().get(year, {}).items()
+                 if when == block.when and letters(name) == letters(block.title)),
+                None,
+            )  # fmt: skip
+        if found:
+            with_places(district, found)
+    district.seats = len(winners)
+    district.winners = winners
+    district.system = system_for(day, district.seats)
+    return district
+
+
+LAST_POLLING_PAGE = 237  # the last page of the polling place tables, which end with the 1918 section
+PARTY_LINE = re.compile(r"[A-Z&]{2,6}")
+
+
+@dataclass
+class Table:
+    """A district's polling place table: the candidate names above its columns, and a row for each polling place."""
+
+    columns: list[str]
+    rows: list[tuple[str, list[int | None]]] = field(default_factory=list)
+
+
+@dataclass
+class Text:
+    """A line of a page, with where it sits and whether it runs upward, as the column headings of the tables do."""
+
+    x0: float
+    y0: float
+    x1: float
+    y1: float
+    text: str
+    upward: bool = False
+    italic: bool = False
+
+
+def letters(text: str) -> str:
+    return re.sub(r"[^a-z]", "", text.lower())
+
+
+def page_texts(page: pymupdf.Page) -> tuple[list[Text], list[Text]]:
+    """A page's lines and its words, the words without those inside a rotated line."""
+    lines: list[Text] = []
+    for block in page.get_text("dict")["blocks"]:
+        for line in block.get("lines", []):
+            text = "".join(span["text"] for span in line["spans"]).strip()
+            if text:
+                x0, y0, x1, y1 = line["bbox"]
+                italic = all(span["flags"] & 2 for span in line["spans"])
+                lines.append(Text(x0, y0, x1, y1, text, abs(line["dir"][1]) > 0.5, italic))
+    turned = [t for t in lines if t.upward]
+    words = [
+        Text(w[0], w[1], w[2], w[3], w[4])
+        for w in page.get_text("words")
+        if not any(t.x0 <= (w[0] + w[2]) / 2 <= t.x1 and t.y0 <= (w[1] + w[3]) / 2 <= t.y1 for t in turned)
+    ]
+    return lines, words
+
+
+def read_row(words: list[Text], edges: list[float]) -> list[int | None] | None:
+    """A row's numbers by column, where a column's numbers end at the right of its heading and a number of thousands
+    prints as two words, such as '2 006'. A blank cell is None, and None is returned where the words are not numbers."""
+    if not words or not all(re.fullmatch(r"\d+|-|na|Na", w.text) for w in words):
+        return None
+
+    @functools.cache
+    def best(i: int, k: int) -> tuple[float, tuple[tuple[str, int], ...]] | None:
+        if i == len(words):
+            return 0.0, ()
+        options: list[tuple[float, tuple[tuple[str, int], ...]]] = []
+        for j in range(k, len(edges)):
+            skipped = 100 * (j - k)
+            rest = best(i + 1, j + 1)
+            if rest:
+                miss = (words[i].x1 - (edges[j] + 3)) ** 2 + skipped
+                options.append((rest[0] + miss, ((words[i].text, j), *rest[1])))
+            if (
+                i + 1 < len(words)
+                and re.fullmatch(r"[1-9]\d{0,2}", words[i].text)
+                and re.fullmatch(r"\d{3}", words[i + 1].text)
+                and words[i + 1].x0 - words[i].x1 < 6
+                and (rest := best(i + 2, j + 1))
+            ):
+                # A first part that stands where a column's numbers end is more likely a number of its own.
+                lone = 100 if any(abs(words[i].x1 - (edge + 3)) < 4 for edge in edges) else 0
+                miss = (words[i + 1].x1 - (edges[j] + 3)) ** 2 + skipped + lone
+                options.append((rest[0] + miss, ((words[i].text + words[i + 1].text, j), *rest[1])))
+        return min(options, key=lambda o: o[0]) if options else None
+
+    found = best(0, 0)
+    if found is None:
+        return None
+    cells: list[int | None] = [None] * len(edges)
+    for text, j in found[1]:
+        cells[j] = None if text in ("-", "na", "Na") else int(text)
+    return cells
+
+
+def page_tables(page: pymupdf.Page) -> list[tuple[str | None, Table]]:
+    """The tables on a page in the order the document draws them, with the title above each, which a continued table
+    lacks."""
+    lines, words = page_texts(page)
+    labels = [t for t in lines if t.text == "Polling Place" and not t.upward]
+    found: list[tuple[str | None, Table]] = []
+    for label in labels:
+        middle = (label.y0 + label.y1) / 2
+        beside = [t.x0 for t in labels if t.x0 > label.x0 + 30 and abs((t.y0 + t.y1) / 2 - middle) < 130]
+        reach = min(beside, default=700) - 5
+        headings = sorted(
+            (t for t in lines if t.upward and label.x1 < t.x0 < reach and abs((t.y0 + t.y1) / 2 - middle) < 75),
+            key=lambda t: t.x0,
+        )
+        if not headings:
+            continue
+        top = min(t.y0 for t in headings)
+        left = label.x0 - 10
+        titles = [
+            t
+            for t in lines
+            if t.italic and not t.upward and abs(t.x0 - label.x0) < 15 and label.y0 - 130 < t.y1 < top
+            and not any(abs(o.x0 - label.x0) < 20 and t.y1 < o.y0 < label.y0 for o in labels)
+        ]  # fmt: skip
+        title = max(titles, key=lambda t: t.y1).text if titles else None
+        groups: list[list[Text]] = []
+        for t in headings:
+            if groups and PARTY_LINE.fullmatch(t.text) and t.x0 - groups[-1][-1].x0 < 16:
+                groups[-1].append(t)
+            else:
+                groups.append([t])
+        edges = [max(t.x1 for t in g) for g in groups]
+        start = max(t.y1 for t in headings)
+        end = min(
+            [t.y0 for t in lines if t.italic and not t.upward and abs(t.x0 - label.x0) < 15 and t.y0 > start] + [800]
+        )
+        rows: dict[int, list[Text]] = {}
+        for w in sorted(words, key=lambda w: (w.y0, w.x0)):
+            if left <= w.x0 and w.x1 <= max(edges) + 12 and start - 1 <= w.y0 < end - 1:
+                same = next((y for y in rows if abs(y - w.y0) < 3), None)
+                rows.setdefault(round(w.y0) if same is None else same, []).append(w)
+        table = Table([g[0].text for g in groups])
+        first = min(t.x0 for t in headings)
+        for y in sorted(rows):
+            row = sorted(rows[y], key=lambda w: w.x0)
+            split = sum(1 for w in row if w.x1 < first - 6)
+            if (
+                0 < split < len(row)
+                and re.fullmatch(r"[1-9]\d{0,2}", row[split - 1].text)
+                and re.fullmatch(r"\d{3}", row[split].text)
+                and row[split].x0 - row[split - 1].x1 < 6
+            ):
+                split -= 1  # the first part of a number of thousands, printed left of the column's heading
+            name = " ".join(w.text for w in row[:split])
+            cells = read_row(row[split:], edges)
+            if name and cells is not None:
+                table.rows.append((name, cells))
+        found.append((title, table))
+    return found
+
+
+@functools.cache
+def polling_tables() -> dict[int, dict[tuple[str, date | None], list[Table]]]:
+    """Every polling place table of each general election's section, by district and by-election date."""
+    document = pymupdf.open(str(raw.cached(SOURCE, JAENSCH).path))
+    out: dict[int, dict[tuple[str, date | None], list[Table]]] = {}
+    year = 0
+    key: tuple[str, date | None] | None = None
+    for number, halves in pdf_pages().items():
+        if number > LAST_POLLING_PAGE:
+            break
+        found = re.match(r"\s*THE (\d{4}) GENERAL ELECTION", halves[0])
+        if found:
+            year, key = int(found[1]), None
+            out[year] = {}
+            continue
+        for title, table in page_tables(document[number - 1]):
+            if title is not None:
+                match = TITLE.match(re.sub(r"([–-])(\d)", r"\1 \2", re.sub(r"\s*\((?i:continued)\)$", "", title)))
+                if not match:
+                    raise ValueError(f"page {number}: polling place table for {title!r}")
+                when = (
+                    date(int(match["year"]), MONTHS.index(match["month"]) + 1, int(match["day"]))
+                    if match["day"]
+                    else None
+                )
+                key = (match["name"].strip(), when)
+            if key is None:
+                raise ValueError(f"page {number}: a polling place table with no district")
+            out[year].setdefault(key, []).append(table)
+    return out
+
+
+def align(columns: list[str], candidates: list[Candidate]) -> list[int] | None:
+    """The candidate above each column, from the names the table prints, or None where a name is not a candidate's."""
+    found: list[int] = []
+    for column in columns:
+        scores = [
+            (difflib.SequenceMatcher(None, letters(column), letters(c.name)).ratio(), index)
+            for index, c in enumerate(candidates)
+            if index not in found
+        ]
+        best = max(scores, default=(0.0, -1))
+        if best[0] < 0.8:
+            return None
+        found.append(best[1])
+    return found
+
+
+def with_places(district: District, tables: list[Table]) -> None:
+    """Add the polling places of a district's tables, where the tables print the district's candidates and no others.
+
+    A district's candidates can be split over several tables that list the same places, and a table can continue on
+    another page, so a place is one row of the first table that names it."""
+    places: dict[tuple[str, int], Place] = {}
+    for table in tables:
+        found = align(table.columns, district.candidates)
+        if found is None or not table.rows:
+            return
+        seen: Counter[str] = Counter()
+        for name, cells in table.rows:
+            label = name.rstrip("*").strip()
+            if label in ("Total", "Totals"):
+                continue
+            seen[label] += 1
+            kind = "aggregate" if label in ("Absent", "Absent Voters", "Absent votes", "Declaration") else "standard"
+            place = places.setdefault((label, seen[label]), Place(label, [None] * len(district.candidates), kind=kind))
+            for column, index in enumerate(found):
+                place.votes[index] = cells[column]
+    covered = {index for table in tables for index in align(table.columns, district.candidates) or []}
+    sums = [sum(p.votes[i] or 0 for p in places.values()) for i in range(len(district.candidates))]
+    totals = [v or 0 for v in district.declared.votes]
+    # Tables that leave out a candidate, or whose columns add up to more than the district's votes, or to well less
+    # than them, are not read as places: the district keeps its total alone.
+    if (
+        covered != set(range(len(district.candidates)))
+        or any(got > want * 1.02 + 3 for got, want in zip(sums, totals, strict=True))
+        or sum(sums) < 0.6 * sum(totals)
+    ):
+        return
+    district.places = list(places.values())
+
+
 @functools.cache
 def sections() -> dict[int, list[Block]]:
     """Every block of results in each general election's section of the history, in page order."""
     out: dict[int, list[Block]] = {}
+    texts: dict[int, list[list[str]]] = {}
     year = 0
     for halves in pdf_pages().values():
         found = re.match(r"\s*THE (\d{4}) GENERAL ELECTION", halves[0])
         if found:
             year = int(found[1])
             out[year] = []
+            if year <= PLURALITY_END:
+                texts[year] = []
             continue
         if year:
-            for half in halves:
-                out[year].extend(blocks(half))
+            if year <= PLURALITY_END:
+                texts[year].append(halves)
+            else:
+                for half in halves:
+                    out[year].extend(blocks(half))
+    for year, parts in texts.items():
+        out[year] = early_blocks(parts)
     return out
 
 
@@ -550,16 +1106,22 @@ def appendix() -> dict[int, tuple[int | None, ...]]:
     return out
 
 
+def history_district(year: int, day: date, block: Block) -> District:
+    return early_district(block, year, day) if year <= PLURALITY_END else district_of(block)
+
+
 def history_event(year: int) -> Event:
     day = date.fromisoformat(f"{year}-{GENERAL[year]}")
     event = Event(day.isoformat(), "general", [JAENSCH])
-    event.districts = [district_of(b) for b in sections()[year] if b.when is None]
+    if year in LAST:
+        event.last = date.fromisoformat(f"{year}-{LAST[year]}")
+    event.districts = [history_district(year, day, b) for b in sections()[year] if b.when is None]
     return event
 
 
 def history_by_elections(year: int, when: date) -> Event:
     event = Event(when.isoformat(), "by_election", [JAENSCH])
-    event.districts = [district_of(b) for b in sections()[year] if b.when == when]
+    event.districts = [history_district(year, when, b) for b in sections()[year] if b.when == when]
     return event
 
 
@@ -618,6 +1180,28 @@ METHOD = (
 )
 
 
+METHOD_PLURALITY = (
+    "Published in the history of South Australian elections by district. Each elector marked the candidates they "
+    "supported, up to the number of members the district elected, and the candidates with the most votes were "
+    "elected. First votes are stored for each candidate as the history prints them. Votes cast away from a polling "
+    "place are not separated. The history prints the elected candidates' surnames in capitals, and the outcomes are "
+    "stored as it prints them. Informal ballot papers are those that do not count, and valid votes are the formal "
+    "ballot papers."
+)
+METHOD_CONTINGENT = (
+    "Published in the history of South Australian elections by district. Each elector numbered candidates in order "
+    "of preference. A candidate with an absolute majority of the formal votes was elected; if none had one, the "
+    "candidate with the fewest first preference votes was excluded and the ballot papers passed on by the next "
+    "preference, until one did. A district that elected several members repeated the count, returning the elected "
+    "candidates' first preference votes by their second preferences, for each further seat. First preference "
+    "votes are stored for each candidate, and the votes the history prints after the distribution of preferences "
+    "are given in a note on each district's result set, because the archive stores a count only at the first "
+    "preference stage. The history prints the elected candidates' surnames in capitals, and the outcomes are "
+    "stored as it prints them. Informal ballot papers are those that do not count, and valid votes are the formal "
+    "ballot papers."
+)
+
+
 def registry() -> Package:
     p = Package(
         "au.ecsa/registry",
@@ -651,6 +1235,63 @@ def registry() -> Package:
         body_md="Each of the 47 districts elects one member by full preferential voting: voters number every box, "
         "and the candidate with the fewest votes is excluded and their ballots passed on until one candidate holds "
         "a majority.",
+        lang="en",
+    )
+    p.add(
+        "electoral_system",
+        id=FPTP,
+        polity_id=AUSTRALIA,
+        valid_to=date(1929, 12, 31),
+        rules={"formula": "fptp"},
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", FPTP),
+        entity_id=FPTP,
+        kind="methodology",
+        body_md="From 1857 to 1929 a district that elected one member returned the candidate with the most votes. "
+        "Electors marked the candidates they supported, except in 1857, when they deleted the names of the "
+        "candidates they did not support.",
+        lang="en",
+    )
+    p.add(
+        "electoral_system",
+        id=BLOCK,
+        polity_id=AUSTRALIA,
+        valid_to=date(1929, 12, 31),
+        rules={"formula": "block"},
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", BLOCK),
+        entity_id=BLOCK,
+        kind="methodology",
+        body_md="From 1857 to 1929 a district that elected several members gave each elector as many votes as there "
+        "were members, and the candidates with the most votes were elected. An elector could use fewer votes, "
+        "and so could vote for one candidate alone, which the history calls plumping.",
+        lang="en",
+    )
+    p.add(
+        "electoral_system",
+        id=CONTINGENT,
+        polity_id=AUSTRALIA,
+        valid_from=date(1930, 1, 1),
+        valid_to=date(1937, 12, 31),
+        rules={"formula": "irv"},
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", CONTINGENT),
+        entity_id=CONTINGENT,
+        kind="methodology",
+        body_md="Contingency voting, used for the elections of 1930 and 1933: electors numbered the candidates, and "
+        "in a district that elected one member the count was the instant runoff. In a district of several members "
+        "the count was repeated for each seat, and the votes of the candidates already elected returned to the "
+        "count by their second preferences. The rules stored here are those of the single-member count; the "
+        "engine does not recompute the repeated count.",
         lang="en",
     )
     tags = {c.party for name in events() for d in event(name).districts for c in d.candidates if known_party(c.party)}
@@ -712,6 +1353,10 @@ def build(name: str) -> Package:
         p.name(election, f"{first.year} South Australian state election", "en", "official")
     off: list[str] = []
     cast: list[str] = []
+    turnout: list[str] = []
+    unprinted: list[str] = []
+    apart: list[str] = []
+    itemized: list[str] = []
     slugs: set[str] = set()
     for d in ev.districts:
         name = title(d.name) if d.name.isupper() else d.name
@@ -740,10 +1385,10 @@ def build(name: str) -> Package:
             election_id=election,
             kind="body_seats",
             body_id=ASSEMBLY,
-            magnitude=1,
+            magnitude=d.seats,
             round_number=1,
-            electoral_system_id=SYSTEM,
-            default_result_kind="counted",
+            electoral_system_id=d.system or SYSTEM,
+            default_result_kind="tacit" if d.unopposed else "counted",
         )
         p.name(contest, f"{name}, House of Assembly", "en", "official")
         p.add("slug", path=f"{path}/{slug}", entity_id=contest, is_current=True)
@@ -754,13 +1399,49 @@ def build(name: str) -> Package:
             election_id=election,
             contest_id=contest,
             stage="official",
-            kind="counted",
+            kind="tacit" if d.unopposed else "counted",
             source_id=ECSA,
             status="active",
             is_default=True,
-            completeness=1.0,
+            completeness=None if d.unopposed else 1.0,
         )
-        p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md={FPTP: METHOD_PLURALITY, BLOCK: METHOD_PLURALITY, CONTINGENT: METHOD_CONTINGENT}.get(
+                d.system or SYSTEM, METHOD
+            ),
+            lang="en",
+        )
+        caveats: list[str] = []
+        if d.unopposed:
+            caveats.append(
+                "There was no poll: "
+                + ("the only candidate" if d.seats == 1 else "as many candidates as members")
+                + " stood, and the history lists the returned members without votes."
+            )
+        elif d.seats > 1 and d.system == BLOCK:
+            caveats.append(
+                f"The district elected {d.seats} members and each elector could vote for up to {d.seats} candidates, "
+                "so the candidates' votes add up to more than the formal ballot papers."
+            )
+        if (
+            d.winners is not None
+            and not d.unopposed
+            and any(c.name and v is None for c, v in zip(d.candidates, d.declared.votes, strict=True))
+        ):
+            caveats.append("The history does not print the candidates' votes in this contest.")
+        for index, caveat in enumerate(caveats):
+            p.add(
+                "note",
+                id=key("note", result_set, "district", index),
+                entity_id=result_set,
+                kind="caveat",
+                body_md=caveat,
+                lang="en",
+            )
         if d.note:
             p.add(
                 "note",
@@ -809,6 +1490,11 @@ def build(name: str) -> Package:
                 is_independent=c.party in ("", "IND"),
                 is_incumbent=c.incumbent,
             )
+        if d.unopposed:
+            for index, option in enumerate(options):
+                kind = "elected" if index in (d.winners or []) else "lost"
+                p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
+            continue
         district_unit = key("unit", day, slug)
         p.add(
             "reporting_unit",
@@ -848,6 +1534,46 @@ def build(name: str) -> Package:
             _put(p, result_set, unit, None, INVALID, place.informal)
             _put(p, result_set, unit, None, CAST, place.total)
 
+        if d.places and all(pl.formal is None and pl.informal is None and pl.total is None for pl in d.places):
+            # The polling place tables itemize candidates' votes only, so the district's ballot papers sit on a unit
+            # of their own.
+            ballots = key("unit", day, slug, "ballots")
+            p.add(
+                "reporting_unit",
+                id=ballots,
+                polity_id=AUSTRALIA,
+                scheme_code="au-sa.district",
+                code=f"{day}:{slug}:ballots",
+                parent_id=district_unit,
+                area_relation="unlocated",
+                kind="aggregate",
+            )
+            p.name(ballots, f"District of {name}: ballot papers", "en", "official")
+            _put(p, result_set, ballots, None, VALID, d.declared.formal)
+            _put(p, result_set, ballots, None, INVALID, d.declared.informal)
+            _put(p, result_set, ballots, None, CAST, d.declared.total)
+            if d.seats == 1 and d.declared.formal is not None:
+                itemized.append(f"{name} ({d.declared.formal:,} formal votes)")
+        if d.places:
+            sums = [sum(pl.votes[i] or 0 for pl in d.places) for i in range(len(options))]
+            differ = [i for i, v in enumerate(d.declared.votes) if v is not None and sums[i] != v]
+            if differ:
+                apart.append(f"{name} ({len(differ)} of {len(options)} candidates)")
+                p.add(
+                    "note",
+                    id=key("note", result_set, "places"),
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md="The history's polling place table adds up to a different number of votes than its "
+                    f"district total for {len(differ)} of the {len(options)} candidates"
+                    + (
+                        ", because it leaves some votes out"
+                        if all(sums[i] < (d.declared.votes[i] or 0) for i in differ)
+                        else ""
+                    )
+                    + ". Both are stored as printed.",
+                    lang="en",
+                )
         if d.enrolled is not None:
             if d.places:
                 roll = key("unit", day, slug, "roll")
@@ -871,7 +1597,11 @@ def build(name: str) -> Package:
             (total.formal or 0) + (total.informal or 0) != total.total
         ):
             cast.append(f"{name} ({total.total:,} against {(total.formal or 0) + (total.informal or 0):,})")
-        if total.formal is not None and sum(v or 0 for v in total.votes) != total.formal:
+        if d.enrolled is not None and total.total is not None and total.total > d.enrolled:
+            turnout.append(f"{name} ({total.total:,} against {d.enrolled:,} enrolled)")
+        if d.seats == 1 and total.formal is not None and all(v is None for v in total.votes):
+            unprinted.append(f"{name} ({total.formal:,} formal votes)")
+        elif d.seats == 1 and total.formal is not None and sum(v or 0 for v in total.votes) != total.formal:
             off.append(f"{name} ({sum(v or 0 for v in total.votes):,} against {total.formal:,})")
         for measure, value in ((CAST, total.total), (INVALID, total.informal), (VALID, total.formal)):
             if value is not None:
@@ -891,11 +1621,24 @@ def build(name: str) -> Package:
                 body_md=f"After the distribution of preferences the {len(held)} remaining candidates held {listing} votes.",
                 lang="en",
             )
-            win = max(zip(ranked, total.runoff, strict=True), key=lambda pair: pair[1] or 0)[0]
+            win = {max(zip(ranked, total.runoff, strict=True), key=lambda pair: pair[1] or 0)[0]}
         else:
-            win = max(range(len(options)), key=lambda i: total.votes[i] or 0)
+            win = {max(range(len(options)), key=lambda i: total.votes[i] or 0)}
+        if d.after:
+            listing = ", ".join(f"{label} {v:,}" for label, v in d.after)
+            p.add(
+                "note",
+                id=key("note", result_set, "final"),
+                entity_id=result_set,
+                kind="context",
+                body_md=f"After the distribution of preferences the history prints these votes for the {len(d.after)} "
+                f"candidates it shows: {listing}.",
+                lang="en",
+            )
+        if d.winners is not None:
+            win = set(d.winners)
         for index, option in enumerate(options):
-            if index == win:
+            if index in win:
                 kind = "elected"
             elif ranked and index in ranked:
                 kind = "lost"
@@ -908,9 +1651,32 @@ def build(name: str) -> Package:
             "The source prints a number of ballots cast that is not its formal plus its informal ballot papers in "
             + ", ".join(cast),
         )
-    if off:
+    if turnout:
+        p.accept(
+            "accounting.turnout",
+            "The source prints a number of ballots cast that is more than its electors enrolled in "
+            + ", ".join(turnout),
+        )
+    if apart:
+        p.accept(
+            "accounting.declared",
+            "The source's polling place tables add up to different votes than its district totals in "
+            + ", ".join(apart),
+        )
+    valid = [
+        (
+            itemized,
+            (
+                "The source prints a district's ballot papers apart from its polling place tables, which itemize "
+                "candidates' votes only, so the unit that holds the ballot papers holds no candidate votes in "
+            ),
+        ),
+        (unprinted, "The source prints no candidate votes, only formal votes, for "),
+        (off, "The source prints candidate votes that do not add up to its own formal votes in "),
+    ]
+    if any(found for found, _ in valid):
         p.accept(
             "accounting.votes_valid",
-            "The source prints candidate votes that do not add up to its own formal votes in " + ", ".join(off),
+            "; ".join(lead + ", ".join(found) for found, lead in valid if found),
         )
     return p
