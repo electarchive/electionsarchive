@@ -1,0 +1,749 @@
+{
+  "polity": "GE-SO",
+  "name": "Republic of South Ossetia",
+  "sources": {
+    "cik-history": {
+      "title": "Историческая справка: этапы становления Центральной избирательной комиссии",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://cikruo.ru/istoricheskaya-spravka/",
+      "kind": "official_body",
+      "note": "The Commission's own history: the Central Election Commission formed after the Supreme Council's election regulations of 16 October 1990, the 9 December 1990 Supreme Council election, the Central Referendum Commission that ran the 17 March 1991 Soviet referendum and the 19 January 1992 independence referendum, the 2001 constitutional referendum, the 2001, 2006, 2011, and 2012 presidential elections, and the referendums held with the 2006 and 2011 presidential elections."
+    },
+    "cik-results": {
+      "title": "Результаты голосования",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://cikruo.ru/rezultaty-golosovaniya/",
+      "kind": "official_body"
+    },
+    "cik-precincts": {
+      "title": "Избирательные участки на территории Республики Южная Осетия, образованные для голосования по выборам Президента РЮО, назначенных на 10 апреля 2022 года",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://cikruo.ru/izbiratelnye-uchastki/",
+      "kind": "official_body"
+    },
+    "kz-garantii": {
+      "title": "Конституционный закон «Об основных гарантиях избирательных прав и права на участие в референдуме граждан Республики Южная Осетия» (в редакции от 16 июня 2026 года)",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://cikruo.ru/wp-content/uploads/2026/07/KZ-Ob-osnovn.-garantiyah-2026-g.doc",
+      "kind": "official_body",
+      "note": "Adopted by Parliament on 27 December 2018, amended 21 March 2024, 21 May 2026, and 16 June 2026. Art. 8: terms of the President, state bodies, and local self-government of at most five years; art. 9: elections are mandatory and held on time."
+    },
+    "const": {
+      "title": "Конституция Республики Южная Осетия (принята всенародным голосованием 8 апреля 2001 года, с изменениями)",
+      "publisher": "Парламент Республики Южная Осетия",
+      "url": "https://parliamentrso.org/node/3567",
+      "kind": "official_body",
+      "note": "Arts. 48 (President elected for five years, at most two consecutive terms), 57 (Parliament of 34 members for five years, 17 by single-member districts and 17 by party list in one national district), 88-91 (local state bodies and local self-government); the closing provisions end the Constitution of 2 November 1993."
+    },
+    "kz-parlament": {
+      "title": "Конституционный закон «О выборах депутатов Парламента Республики Южная Осетия» (принят 30 марта 2018 года, с изменениями от 28 февраля 2019 года и 21 марта 2024 года)",
+      "publisher": "Парламент Республики Южная Осетия",
+      "url": "https://parliamentrso.org/node/4500",
+      "kind": "official_body",
+      "note": "Art. 3: 34 members, 17 in single-member districts and 17 by national party list; art. 5: elections called by the President; art. 12: single-member districts drawn for five years within administrative units."
+    },
+    "parl-history": {
+      "title": "История Парламентаризма РЮО",
+      "publisher": "Парламент Республики Южная Осетия",
+      "url": "https://parliamentrso.org/node/7",
+      "kind": "official_body"
+    },
+    "parl-vi": {
+      "title": "Депутатский корпус VI-го созыва",
+      "publisher": "Парламент Республики Южная Осетия",
+      "url": "https://parliamentrso.org/node/2",
+      "kind": "official_body"
+    },
+    "parl-vii": {
+      "title": "Депутатский корпус VII-го созыва",
+      "publisher": "Парламент Республики Южная Осетия",
+      "url": "https://parliamentrso.org/node/4552",
+      "kind": "official_body"
+    },
+    "parl-pres2022": {
+      "title": "Постановление Парламента РЮО «О назначении выборов Президента Республики Южная Осетия» от 21 января 2022 года",
+      "publisher": "Парламент Республики Южная Осетия",
+      "url": "https://parliamentrso.org/node/3569",
+      "kind": "official_body"
+    },
+    "pres-1990": {
+      "title": "Анатолий Бибилов: «20 сентября 1990 года наш народ сделал единственно правильный выбор»",
+      "publisher": "Администрация Президента Республики Южная Осетия",
+      "url": "https://presidentruo.org/anatolij-bibilov-20-sentyabrya-1990-goda-nash-narod-sdelal-edinstvenno-pravilnyj-vybor/",
+      "kind": "official_body"
+    },
+    "pres-25": {
+      "title": "Выступление на торжественном заседании, посвященном 25-летию парламентаризма Республики Южная Осетия",
+      "publisher": "Администрация Президента Республики Южная Осетия",
+      "url": "https://presidentruo.org/vystuplenie-na-torzhestvennom-zasedanii-posvyashhennom-25-letiyu-parlamentarizma-respubliki-yuzhnaya-osetiya/",
+      "kind": "official_body"
+    },
+    "pres-state": {
+      "title": "Государственное устройство",
+      "publisher": "Администрация Президента Республики Южная Осетия",
+      "url": "https://presidentruo.org/gosudarstvennoe-ustrojstvo/",
+      "kind": "official_body"
+    },
+    "pres-referendum": {
+      "title": "Леонид Тибилов: «Народ Южной Осетии стоит на этапе принятия серьезнейшего политического решения»",
+      "publisher": "Администрация Президента Республики Южная Осетия",
+      "url": "https://presidentruo.org/leonid-tibilov-narod-yuzhnoj-osetii-stoit-na-etape-prinyatiya-sereznejshego-politicheskogo-resheniya/",
+      "kind": "official_body"
+    },
+    "pres-tibilov": {
+      "title": "Леонид Тибилов: «Осетинский народ должен быть объединен»",
+      "publisher": "Администрация Президента Республики Южная Осетия",
+      "url": "https://presidentruo.org/leonid-tibilov-osetinskij-narod-dolzhen-byt-obedinen/",
+      "kind": "official_body"
+    },
+    "pres-appoint": {
+      "title": "Анатолий Бибилов назначил Алана Хугаева заместителем Главы Администрации Дзауского района – Главой Администрации города Квайса",
+      "publisher": "Администрация Президента Республики Южная Осетия",
+      "url": "https://presidentruo.org/anatolij-bibilov-naznachil-alana-xugaeva-zamestitelem-glavy-administracii-dzauskogo-rajona-glavoj-administracii-goroda-kvajsa/",
+      "kind": "official_body"
+    },
+    "ukaz-2014": {
+      "title": "Указ «О назначении выборов депутатов Парламента Республики Южная Осетия» от 20 марта 2014 года",
+      "publisher": "Администрация Президента Республики Южная Осетия",
+      "url": "https://presidentruo.org/ukaz-o-o-naznachenii-vyborov-deputatov-parlamenta-respubliki-yuzhnaya-osetiya/",
+      "kind": "official_body"
+    },
+    "ukaz-2019": {
+      "title": "Указ «О назначении выборов депутатов Парламента Республики Южная Осетия нового созыва» от 25 марта 2019 года",
+      "publisher": "Администрация Президента Республики Южная Осетия",
+      "url": "https://presidentruo.org/ukaz-o-naznachenii-vyborov-deputatov-parlamenta-respubliki-yuzhnaya-osetiya-novogo-sozyva/",
+      "kind": "official_body"
+    },
+    "ukaz-2024": {
+      "title": "Указ «О назначении выборов депутатов Парламента Республики Южная Осетия нового созыва» от 25 марта 2024 года № 97",
+      "publisher": "Администрация Президента Республики Южная Осетия",
+      "url": "https://presidentruo.org/ukaz-o-naznachenii-vyborov-deputatov-parlamenta-respubliki-yuzhnaya-osetiya-novogo-sozyva-2/",
+      "kind": "official_body"
+    },
+    "cik-2017-pres": {
+      "title": "Постановление № 18/2 от 12 апреля 2017 года «О результатах голосования по выборам Президента Республики Южная Осетия»",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://oldcikruo.ru/2017/04/12/postanovlenie-v-182-ot-5-aprelya-2017-goda-o-rezulytatah-golosovaniya-po-vboram-prezidenta-respubliki-yuzhnaya-osetiya/",
+      "kind": "official_body"
+    },
+    "cik-2017-ref": {
+      "title": "Постановление № 18/1 от 12 апреля 2017 года «О результатах голосования по референдуму Республики Южная Осетия»",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://cikruo.ru/2017/04/12/postanovlenie-18-1-g-ot-12-aprelya-2017-goda/",
+      "kind": "official_body"
+    },
+    "cik-2019": {
+      "title": "Постановление № 45/1 от 12 июня 2019 года «О результатах голосования по выборам депутатов Парламента Республики Южная Осетия седьмого созыва»",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://oldcikruo.ru/2019/06/12/tsentralynaya-izbiratelynaya-komissiya-respubliki-yuzhnaya-osetiya-postanovlenie-v-451/",
+      "kind": "official_body"
+    },
+    "cik-2022-r1": {
+      "title": "Постановление ЦИК РЮО от 14 апреля 2022 года № 39/1 «О результатах выборов Президента Республики Южная Осетия 10 апреля 2022 года»",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://cikruo.ru/2022/04/14/postanovlenie-cik-rjuo-ot-14-aprelya-2022-goda-39-1/",
+      "kind": "official_body"
+    },
+    "cik-2022-r2": {
+      "title": "Постановление ЦИК РЮО от 12 мая 2022 года № 46/1 «Об итогах повторного голосования по выборам Президента Республики Южная Осетия 8 мая 2022 года и о результатах выборов Президента Республики Южная Осетия»",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://cikruo.ru/2022/05/14/postanovlenie-centralnoj-izbiratelnoj-komissii-respubliki-juzhnaya-osetiya-ot-12-maya-2022-goda-2022-g-46-1-ob-itogah-povtornogo-golosovaniya-po-vyboram-prezidenta-respubliki-juzhnaya-osetiya-8-maya/",
+      "kind": "official_body"
+    },
+    "cik-2024": {
+      "title": "Постановление ЦИК РЮО № 85/1 от 13 июня 2024 года и протоколы о результатах выборов депутатов Парламента Республики Южная Осетия восьмого созыва",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://cikruo.ru/2024/06/13/centralnaya-izbiratelnaya-komissiya-respubliki-juzhnaya-osetiya-publikuet-rezultaty-vyborov-o-rezultatah-vyborov-deputatov-parlamenta-respubliki-juzhnaya-osetiya-vosmogo-sozyva-po-vsem-odnomandatnym-i/",
+      "kind": "official_body"
+    },
+    "cik-2024-itogi": {
+      "title": "Итоги голосования по единому республиканскому избирательному округу и одномандатным избирательным округам",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://cikruo.ru/2024/06/10/itogi-golosovaniya-po-edinomu-respublikanskomu-izbiratelnomu-okrugu-i-odnomandatnym-izbiratelnym-okrugam/",
+      "kind": "official_body"
+    },
+    "cik-2026": {
+      "title": "Постановление ЦИК РЮО от 19 сентября 2026 г. № 104/1 «О результатах досрочных выборов Президента Республики Южная Осетия, назначенных на 18 сентября 2026 года»",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://cikruo.ru/wp-content/uploads/2026/09/Postanovlenie-CIK-ot-19.09.2026-104.1.docx",
+      "kind": "official_body"
+    },
+    "cik-2026-page": {
+      "title": "Результаты голосования на досрочных выборах Президента РЮО",
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "url": "https://cikruo.ru/2026/09/19/rezultaty-golosovaniya-na-dosrochnyh-vyborah-v-prezidenty-rjuo/",
+      "kind": "official_body"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Республика Южная Осетия",
+      "name_en": "Republic of South Ossetia (Republic of South Ossetia – State of Alania from 2017)",
+      "parent": null,
+      "polity_kind": "de_facto_state",
+      "valid_from": "1990-09-20",
+      "source": "pres-1990"
+    },
+    {
+      "key": "rajon",
+      "name": "Город Цхинвал и районы",
+      "name_en": "City of Tskhinval and districts",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "ge-so.rajon",
+      "elects": false,
+      "source": "cik-precincts",
+      "counts": [
+        {
+          "date": "2022-04-10",
+          "value": 5,
+          "source": "cik-precincts",
+          "locator": "https://cikruo.ru/izbiratelnye-uchastki/ (precincts listed under Город Цхинвал, Дзауский район, Знаурский район, Ленингорский район, Цхинвальский район)"
+        }
+      ]
+    },
+    {
+      "key": "okrug",
+      "name": "Одномандатные избирательные округа",
+      "name_en": "Single-member parliamentary districts",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "ge-so.okrug",
+      "elects": false,
+      "valid_from": "2019-06-09",
+      "source": "kz-parlament",
+      "counts": [
+        {
+          "date": "2019-06-09",
+          "value": 17,
+          "source": "cik-2019",
+          "locator": "https://oldcikruo.ru/2019/06/12/tsentralynaya-izbiratelynaya-komissiya-respubliki-yuzhnaya-osetiya-postanovlenie-v-451/ (protocols for districts No. 1 to 17)"
+        },
+        {
+          "date": "2024-06-09",
+          "value": 17,
+          "source": "cik-2024-itogi",
+          "locator": "https://cikruo.ru/2024/06/10/itogi-golosovaniya-po-edinomu-respublikanskomu-izbiratelnomu-okrugu-i-odnomandatnym-izbiratelnym-okrugam/ (winners in districts No. 1 to 17)"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "parliament",
+      "tier": "national",
+      "name": "Выборы депутатов Парламента Республики Южная Осетия (1990: Верховный Совет; 1994: Государственный Ныхас)",
+      "name_en": "Parliament (Supreme Council, 1990; State Nykhas, 1994)",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "1990-12-09",
+      "earliest_record": "2019-06-09",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "ge-so.okrug"
+        ],
+        "fine": [
+          "ge-so.okrug",
+          "ge-so.uchastok"
+        ]
+      },
+      "finest_note": "Single-member district protocols and the national list protocol from 2019; the Commission's sites hold no results before 2017.",
+      "source": "kz-parlament",
+      "locator": "https://parliamentrso.org/node/4500 (arts. 3, 5, 12)",
+      "note": "The Supreme Council of 64 members was elected on 9 December 1990 and again in March 1994, when it was called the State Nykhas; it took the name Parliament after the first presidential election of 1996. The 2001 Constitution (art. 57) sets 34 members for five years. In 2009 and 2014 all 34 seats went to national party lists under the law of 19 November 2008 (the 7% threshold in 2009); since the law of 30 March 2018, 17 members are elected in single-member districts and 17 from national party lists. The President calls the election (law of 2018, art. 5).",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "GE-SO"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": true,
+          "administered_by": "Центральная избирательная комиссия Республики Южная Осетия",
+          "source": "const",
+          "locator": "https://parliamentrso.org/node/3567 (art. 57: five-year term; art. 50: the President calls parliamentary elections)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия Республики Южная Осетия (архив сайта 2016-2022)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "role": "administers",
+          "url": "https://oldcikruo.ru/category/v2019/",
+          "format": "html",
+          "first_date": "2019-06-09",
+          "last_date": "2019-06-09",
+          "finest": "ge-so.okrug",
+          "source": "cik-2019",
+          "evidence": "Commission decision 45/1 of 12 June 2019 with protocol No. 1 for each of the 17 single-member districts and protocol No. 2 for the national list, with per-district columns"
+        },
+        {
+          "platform": "Центральная избирательная комиссия Республики Южная Осетия",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "role": "administers",
+          "url": "https://cikruo.ru/category/vybory-deputatov-parlamenta-rjuo-2024/",
+          "format": "html",
+          "first_date": "2024-06-09",
+          "last_date": "2024-06-09",
+          "finest": "ge-so.okrug",
+          "source": "cik-2024",
+          "evidence": "Commission decision 85/1 of 13 June 2024 with the national list protocol and the single-member district results"
+        }
+      ],
+      "est_votes": 25000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1990-12-09",
+          "election_kind": "general",
+          "seats": 64,
+          "source": "parl-history",
+          "quote": "Первый состав законодателей (64 депутата) – в то время Верховный Совет Республики Южная Осетия – сформированный после всенародного голосования 9 декабря 1990 года",
+          "note": "First Supreme Council of the South Ossetian Soviet Republic, run by the Central Election Commission formed under the regulations of 16 October 1990."
+        },
+        {
+          "date": "1994-03-27",
+          "election_kind": "general",
+          "source": "pres-25",
+          "quote": "27 марта 1994 года в нашей стране состоялись выборы в Государственный Ныхас Южной Осетии, как тогда назывался высший орган законодательной власти республики.",
+          "note": "Second Supreme Council, then called the State Nykhas; Parliament's own history gives March 1994."
+        },
+        {
+          "date": "1999-05-12",
+          "election_kind": "general",
+          "source": "parl-history",
+          "quote": "Третьи по счету парламентские выборы состоялись 12 мая 1999 года.",
+          "note": "Third convocation. Parliament and the President both give 12 May 1999, a Wednesday; no Commission record of the polling day is online."
+        },
+        {
+          "date": "2004-05-23",
+          "election_kind": "general",
+          "seats": 34,
+          "source": "parl-history",
+          "quote": "23 мая 2004 года состоялись выборы в Парламент четвертого созыва.",
+          "note": "Fourth convocation, the first under the 2001 Constitution (34 members). The number of single-member districts used is not stated in a source reached here."
+        },
+        {
+          "date": "2009-05-31",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 34,
+          "source": "pres-25",
+          "quote": "По итогам голосования, состоявшегося 31 мая 2009 года, большинство в Парламенте РЮО сохранила партия «Единство»",
+          "note": "Fifth convocation. Parliament's history says the seats were shared among the three parties over the 7% threshold, so all 34 went to national lists."
+        },
+        {
+          "date": "2014-06-08",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 34,
+          "source": "ukaz-2014",
+          "quote": "Назначить выборы депутатов Парламента Республики Южная Осетия нового созыва на 8 июня 2014 года.",
+          "note": "Sixth convocation, called under the law of 19 November 2008; Parliament's roster of the sixth convocation lists all 34 members by party."
+        },
+        {
+          "date": "2019-06-09",
+          "election_kind": "general",
+          "contests": 18,
+          "seats": 34,
+          "source": "ukaz-2019",
+          "quote": "Назначить выборы депутатов Парламента Республики Южная Осетия нового созыва на 9 июня 2019 года.",
+          "note": "Seventh convocation, the first under the law of 30 March 2018: 17 single-member districts and one national list contest for 17 seats (Commission decision 45/1)."
+        },
+        {
+          "date": "2024-06-09",
+          "election_kind": "general",
+          "contests": 18,
+          "seats": 34,
+          "source": "cik-2024",
+          "quote": "Выборы депутатов Парламента Республики Южная Осетия восьмого созыва 9 июня 2024 года",
+          "note": "Eighth convocation: 17 single-member districts and the national list, for which 17 district commissions reported."
+        }
+      ]
+    },
+    {
+      "key": "president",
+      "tier": "national",
+      "name": "Выборы Президента Республики Южная Осетия",
+      "name_en": "President",
+      "category": "executive",
+      "goal": "national",
+      "first_held": "1996-11-10",
+      "earliest_record": "2017-04-09",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "ge-so.rajon"
+        ],
+        "fine": [
+          "ge-so.uchastok"
+        ]
+      },
+      "finest_note": "Territorial commission tables by district for 2017; national protocols for 2022 and 2026; the Commission's sites hold no results before 2017.",
+      "source": "const",
+      "locator": "https://parliamentrso.org/node/3567 (art. 48)",
+      "note": "Elected for five years, at most two consecutive terms (Constitution art. 48); Parliament calls the election. A candidate needs more than half the votes cast; failing that, the top two meet in a repeat vote no later than 15 days after the result (Constitutional law on presidential elections art. 50, as the Commission quotes it on its results page). The 2011 election was annulled and rerun in 2012; the 2026 election was early.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "runoff",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "GE-SO"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "runoff": "majority",
+          "runoff_rule": "Top two in a repeat vote within 15 days of the first-round result",
+          "administered_by": "Центральная избирательная комиссия Республики Южная Осетия",
+          "source": "const",
+          "locator": "https://parliamentrso.org/node/3567 (art. 48: five-year term; Parliament calls the election)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия Республики Южная Осетия (архив сайта 2016-2022)",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "role": "administers",
+          "url": "https://oldcikruo.ru/category/v2017/",
+          "format": "html",
+          "first_date": "2017-04-09",
+          "last_date": "2017-04-09",
+          "finest": "ge-so.rajon",
+          "source": "cik-2017-pres",
+          "evidence": "Commission decision 18/2 of 12 April 2017 and territorial commission tables for each district"
+        },
+        {
+          "platform": "Центральная избирательная комиссия Республики Южная Осетия",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "role": "administers",
+          "url": "https://cikruo.ru/rezultaty-golosovaniya/",
+          "format": "html, pdf (scanned protocols), docx",
+          "first_date": "2022-04-10",
+          "last_date": "2026-09-18",
+          "source": "cik-results",
+          "evidence": "Decisions 39/1 and 46/1 of 2022 with scanned protocols, and decision 104/1 of 19 September 2026 with the scanned national protocol"
+        }
+      ],
+      "est_votes": 30000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "1996-11-10",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "parl-history",
+          "quote": "10 ноября 1996 года в результате всенародных выборов был избран первый Президент Республики Южная Осетия. Им стал Людвиг Чибиров, который набрал 55% голосов."
+        },
+        {
+          "date": "2001-11-18",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cik-history",
+          "quote": "Еще один сложный момент в деятельности Центризбиркома был связан с президентскими выборами 2001 года",
+          "note": "The sources reached here confirm the year only; the polling day is not yet confirmed in an official record."
+        },
+        {
+          "date": "2001-12-06",
+          "election_kind": "runoff",
+          "note": "Repeat vote between the top two; the day is not yet confirmed in an official record."
+        },
+        {
+          "date": "2006-11-12",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cik-history",
+          "quote": "2006 и 2011 годы были непростыми в истории юго-осетинского Центризбиркома, поскольку в эти периоды одновременно с выборами Президента проводились и референдумы",
+          "note": "Held with the independence referendum. The sources reached here confirm the year only."
+        },
+        {
+          "date": "2011-11-13",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "pres-tibilov",
+          "quote": "Это следствие выборов ноября-декабря 2011 года, когда около 30 наших сограждан баллотировались на пост Президента республики.",
+          "note": "Held with the referendum on Russian as a state language; 17 candidates stood (Commission history). The sources reached here confirm the month only."
+        },
+        {
+          "date": "2011-11-27",
+          "election_kind": "runoff",
+          "note": "Repeat vote between the top two; its result was annulled and a new election called for 2012. The day is not yet confirmed in an official record."
+        },
+        {
+          "date": "2012-03-25",
+          "election_kind": "special",
+          "contests": 1,
+          "seats": 1,
+          "source": "cik-history",
+          "quote": "на следующих выборах Президента (2012 г.) из 22 претендентов к выборному старту «дошли» всего четверо.",
+          "note": "Rerun of the annulled 2011 election, with four candidates. The sources reached here confirm the year only."
+        },
+        {
+          "date": "2012-04-08",
+          "election_kind": "runoff",
+          "contests": 1,
+          "seats": 1,
+          "source": "pres-tibilov",
+          "quote": "Год назад, 9 апреля 2012 года, Леонид Тибилов был избран Президентом Республики Южная Осетия (РЮО).",
+          "note": "Repeat vote of the 2012 election; the President's site gives 9 April, the day after polling, as the day Tibilov was elected."
+        },
+        {
+          "date": "2017-04-09",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cik-2017-pres",
+          "quote": "Утвердить протокол Центральной избирательной комиссии Республики Южная Осетия от 12 апреля 2017 года по итогам голосования по выборам Президента Республики Южная Осетия 9 апреля 2017 года.",
+          "note": "Held with the referendum on the name State of Alania; won in the first round."
+        },
+        {
+          "date": "2022-04-10",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "cik-2022-r1",
+          "quote": "Признать выборы Президента Республики Южная Осетия 10 апреля 2022 года состоявшимися."
+        },
+        {
+          "date": "2022-05-08",
+          "election_kind": "runoff",
+          "contests": 1,
+          "seats": 1,
+          "source": "cik-2022-r2",
+          "quote": "Признать повторное голосование по выборам Президента Республики Южная Осетия 8 мая 2022 года состоявшимся.",
+          "note": "First set for 28 April 2022 (decision 39/1), held on 8 May."
+        },
+        {
+          "date": "2026-09-18",
+          "election_kind": "special",
+          "contests": 1,
+          "seats": 1,
+          "source": "cik-2026",
+          "quote": "О результатах досрочных выборов Президента Республики Южная Осетия, назначенных на 18 сентября 2026 года",
+          "note": "Early election; won in the first round with 84.95% of those voting."
+        }
+      ]
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Референдум Республики Южная Осетия",
+      "name_en": "Referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "1992-01-19",
+      "earliest_record": "2017-04-09",
+      "measure": {
+        "unit": "question",
+        "grain": [
+          "ge-so.rajon"
+        ],
+        "fine": [
+          "ge-so.uchastok"
+        ]
+      },
+      "finest_note": "National result for 2017 only; the Commission's sites hold no earlier referendum results.",
+      "source": "kz-garantii",
+      "note": "Called by the President under constitutional law (Constitution art. 50); changes to chapters I, II, and IX of the Constitution need a referendum (art. 92). A referendum on joining Russia, proposed in 2016 for July 2016, was put off past the 2017 presidential election, and one set by initiative in 2022 was not held.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "GE-SO"
+        }
+      ],
+      "cadence": [
+        {
+          "called": true,
+          "administered_by": "Центральная избирательная комиссия Республики Южная Осетия (1991-1992: Центральная комиссия по референдуму)",
+          "source": "cik-history"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Центральная избирательная комиссия Республики Южная Осетия",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "role": "administers",
+          "url": "https://cikruo.ru/2017/04/12/postanovlenie-18-1-g-ot-12-aprelya-2017-goda/",
+          "format": "html",
+          "first_date": "2017-04-09",
+          "last_date": "2017-04-09",
+          "source": "cik-2017-ref",
+          "evidence": "Commission decision 18/1 of 12 April 2017 on the referendum result"
+        }
+      ],
+      "est_votes": 30000,
+      "effort": 1,
+      "dates": [
+        {
+          "date": "1992-01-19",
+          "election_kind": "referendum",
+          "contests": 2,
+          "source": "pres-referendum",
+          "quote": "Так, 19 января 1992 года на всенародное голосование были вынесены два вопроса: «Согласны ли вы, чтобы Республика Южная Осетия была независимой?», а также «Согласны ли вы с решением Верховного Совета РЮО от 1 сентября 1991 года о воссоединении с Россией?».",
+          "note": "Independence and union with Russia, run by the Central Referendum Commission."
+        },
+        {
+          "date": "2001-04-08",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "pres-state",
+          "quote": "Конституция Республики Южная Осетия принята на всенародном референдуме 8 апреля 2001 года.",
+          "note": "Constitution."
+        },
+        {
+          "date": "2006-11-12",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "cik-history",
+          "quote": "в первом случае референдум вновь определял отношение населения к вопросу о независимости Республики Южная Осетия",
+          "note": "Independence, held with the presidential election. The sources reached here confirm the year only."
+        },
+        {
+          "date": "2011-11-13",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "cik-history",
+          "quote": "второй касался придания статуса государственного русскому языку",
+          "note": "Russian as a state language, held with the first round of the presidential election. The sources reached here confirm the year only."
+        },
+        {
+          "date": "2017-04-09",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "cik-2017-ref",
+          "quote": "Утвердить протокол Центральной избирательной комиссии Республики Южная Осетия от 12 апреля 2017 года по итогам голосования на референдуме Республики Южная Осетия 9 апреля 2017 года.",
+          "note": "Amendment of art. 1 of the Constitution adding the name State of Alania, held with the presidential election."
+        }
+      ]
+    },
+    {
+      "key": "local",
+      "tier": "rajon",
+      "name": "Выборы органов местного самоуправления",
+      "name_en": "Local self-government",
+      "category": "council",
+      "goal": "local",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "ge-so.rajon"
+        ]
+      },
+      "source": "const",
+      "locator": "https://parliamentrso.org/node/3567 (arts. 88-91)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Constitution provides for local self-government (arts. 88-91) and the law on electoral guarantees covers local elections, but the Commission lists no local election since 1990: the city of Tskhinval and the districts are run by heads of administration whom the President appoints by decree.",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "by_election"
+          ],
+          "iso_pattern": "GE-SO",
+          "polity_kinds": [
+            "municipality",
+            "region"
+          ]
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "ussr_referendum",
+      "tier": "national",
+      "name": "Всесоюзный референдум о сохранении СССР 17 марта 1991 года",
+      "name_en": "Soviet referendum on preserving the USSR, 17 March 1991",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "cik-history",
+      "disposition": "out_of_scope",
+      "disposition_reason": "An all-Union referendum that the Republic's Central Referendum Commission ran on its territory; it belongs to the census of the USSR, and no official South Ossetian result is published.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "russian_federal",
+      "tier": "national",
+      "name": "Выборы Президента и депутатов Государственной думы Российской Федерации на территории Республики",
+      "name_en": "Russian federal elections held on the Republic's territory",
+      "category": "non_territorial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "cik-history",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Russian presidential and State Duma elections are held for Russian citizens on the Republic's territory; the Commission gives only technical help, and the results belong to Russia's census.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "judicial",
+      "tier": "national",
+      "name": "Судьи",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "const",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Supreme Court judges are appointed by Parliament on the President's nomination, and Constitutional Court judges by the President and Parliament (Constitution arts. 50 and 61); no judicial office is elected.",
+      "match": []
+    },
+    {
+      "key": "nominating",
+      "tier": "national",
+      "name": "Выдвижение кандидатов политическими партиями",
+      "name_en": "Party candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "kz-parlament",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties nominate their list and district candidates at their own congresses and file them with the Commission; the Commission runs no primaries and publishes no party selections.",
+      "match": []
+    }
+  ]
+}

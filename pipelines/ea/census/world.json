@@ -770,10 +770,16 @@
       "kind": "official_body"
     },
     "ge-so": {
-      "publisher": "Caucasian Knot",
-      "title": "CEC: Tibilov was elected President of South Ossetia",
-      "url": "https://amp.eng.kavkaz-uzel.eu/articles/20670",
-      "kind": "compendium"
+      "publisher": "Администрация Президента Республики Южная Осетия",
+      "title": "Анатолий Бибилов: «20 сентября 1990 года наш народ сделал единственно правильный выбор»",
+      "url": "https://presidentruo.org/anatolij-bibilov-20-sentyabrya-1990-goda-nash-narod-sdelal-edinstvenno-pravilnyj-vybor/",
+      "kind": "official_body"
+    },
+    "ge-so-cik": {
+      "publisher": "Центральная избирательная комиссия Республики Южная Осетия",
+      "title": "Постановление ЦИК РЮО № 85/1 от 13 июня 2024 года и протоколы о результатах выборов депутатов Парламента Республики Южная Осетия восьмого созыва",
+      "url": "https://cikruo.ru/2024/06/13/centralnaya-izbiratelnaya-komissiya-respubliki-juzhnaya-osetiya-publikuet-rezultaty-vyborov-o-rezultatah-vyborov-deputatov-parlamenta-respubliki-juzhnaya-osetiya-vosmogo-sozyva-po-vsem-odnomandatnym-i/",
+      "kind": "official_body"
     },
     "md-sn": {
       "publisher": "Supreme Council of the Pridnestrovian Moldavian Republic",
@@ -3221,9 +3227,15 @@
       "name_en": "South Ossetia",
       "status": "de_facto",
       "recognized_within": "GE",
-      "reason": "Parliament and presidential elections, including 2012, 2014, and 2017.",
+      "reason": "Proclaimed on 20 September 1990, when the South Ossetian regional soviet made the autonomous oblast a republic; its Central Election Commission has run Supreme Council and Parliament elections since 9 December 1990, referendums since 1992, and presidential elections since 1996.",
       "source": "ge-so",
-      "locator": "https://amp.eng.kavkaz-uzel.eu/articles/20670"
+      "locator": "https://presidentruo.org/anatolij-bibilov-20-sentyabrya-1990-goda-nash-narod-sdelal-edinstvenno-pravilnyj-vybor/ (20 сентября 1990 года, сессия Совета народных депутатов Южной Осетии приняла Постановление о преобразовании Юго-Осетинской автономной области в Республику Южная Осетия)",
+      "electorate": {
+        "value": 34333,
+        "date": "2024-06-09",
+        "source": "ge-so-cik",
+        "locator": "https://cikruo.ru/2024/06/13/centralnaya-izbiratelnaya-komissiya-respubliki-juzhnaya-osetiya-publikuet-rezultaty-vyborov-o-rezultatah-vyborov-deputatov-parlamenta-respubliki-juzhnaya-osetiya-vosmogo-sozyva-po-vsem-odnomandatnym-i/ (Протокол № 2: Суммарное число избирателей, внесенных в списки избирателей на избирательных участках на момент окончания голосования 34333)"
+      }
     },
     {
       "iso": "MD-SN",
