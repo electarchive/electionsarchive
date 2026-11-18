@@ -124,9 +124,15 @@ def fetch() -> None:
 
 
 def packages() -> list[str]:
-    from ea.sources.ro import aep_2012, aep_local2016
+    from ea.sources.ro import aep_2012, aep_2019, aep_local2016
 
-    return ["ro.aep/registry", *(f"ro.aep/{day}" for day in DAYS), *aep_local2016.PACKAGES, *aep_2012.PACKAGES]
+    return [
+        "ro.aep/registry",
+        *(f"ro.aep/{day}" for day in DAYS),
+        *aep_local2016.PACKAGES,
+        *aep_2012.PACKAGES,
+        *aep_2019.PACKAGES,
+    ]
 
 
 def parse() -> None:
@@ -137,6 +143,9 @@ def parse() -> None:
         build(day).write()
     aep_local2016.parse()
     aep_2012.parse()
+    from ea.sources.ro import aep_2019
+
+    aep_2019.parse()
 
 
 def emit() -> None:
