@@ -148,10 +148,28 @@ NATIONAL = ["2014-10-26", "2019-10-27", "2024-10-27"]
 RUNOFF = ["2014-11-30", "2019-11-24", "2024-11-24"]
 PRIMARY = ["2014-06-01", "2019-06-30", "2024-06-30"]
 LOCAL = ["2015-05-10", "2020-09-27", "2025-05-11"]
+# The referendum against 135 articles of Law 19.889 (2022-03-27), whose circuit file is on the open-data catalog, and the
+# 2019-08-04 act in which voters adhered to a referendum against Law 19.684, whose results the Corte's own site
+# publishes as a zip holding a workbook per circuit and a PDF per department.
+REFERENDUM_DAY = "2022-03-27"
+ADHESION_DAY = "2019-08-04"
+REFERENDUM = {
+    "dataset": "corte-electoral-referendum2022",
+    "circuits": "55b88af7-9364-4735-aad9-b5db5f49d828/resource/0e15bff1-67ae-48af-9e03-4880395ac59e/download/"
+    "referndum-contra-135-artculos-de-la-ley-19.889.csv",
+}
+ADHESION = {
+    "page": f"{GUB}comunicacion/publicaciones/acto-adhesion-interposicion-del-recurso-referendum-contra-ley-n-19684",
+    "zip": f"{GUB}download/node/field_documento/503",
+    "circuits": "adhesion_final_cto.xlsx",
+    "departments": "areporteresultadosadhesion2019.pdf",
+}
 DAYS = sorted(FILES)
 XDAYS = sorted(XLSX)
-ALL = sorted([*DAYS, *XDAYS])
+OTHER = [ADHESION_DAY, REFERENDUM_DAY]
+ALL = sorted([*DAYS, *XDAYS, *OTHER])
 KIND_PATH = {**dict.fromkeys(NATIONAL, "general"), **dict.fromkeys(RUNOFF, "runoff")}
+KIND_PATH |= {ADHESION_DAY: "adhesion", REFERENDUM_DAY: "referendum"}
 KIND_PATH |= {**dict.fromkeys(PRIMARY, "primary"), **dict.fromkeys(LOCAL, "local")}
 
 # The two tickets in each second round: the totals column, the ticket's label, and the party that nominated it.
@@ -269,6 +287,15 @@ def documents(day: str) -> dict[str, str]:
     return found
 
 
+def cited(day: str) -> list[str]:
+    """Every raw file an election's package cites."""
+    if day == REFERENDUM_DAY:
+        return [f"{CATALOG}{REFERENDUM['dataset']}", url(REFERENDUM["circuits"])]
+    if day == ADHESION_DAY:
+        return [ADHESION["page"], ADHESION["zip"]]
+    return xlsx_links(day) if day in XLSX else list(documents(day).values())
+
+
 def packages() -> list[str]:
     return ["uy.corte/geo", "uy.corte/registry", *(f"uy.corte/{day}" for day in ALL)]
 
@@ -282,6 +309,10 @@ def fetch() -> None:
         raw.fetch(SOURCE, link, suffix=PLEBISCITE_SUFFIX[day])
     for day in XDAYS:
         fetch_xlsx(day)
+    raw.fetch(SOURCE, f"{CATALOG}{REFERENDUM['dataset']}", suffix=".html")
+    raw.fetch(SOURCE, url(REFERENDUM["circuits"]), suffix=".csv")
+    raw.fetch(SOURCE, ADHESION["page"], suffix=".html")
+    raw.fetch(SOURCE, ADHESION["zip"], suffix=".zip")
 
 
 def parse() -> None:
@@ -657,8 +688,11 @@ class Builder:
         self.day = day
         self.p = Package(f"uy.corte/{day}", SOURCE, summary, depends=["uy.corte/geo", "uy.corte/registry"])
         self.p.external.add(URUGUAY)
-        for link in xlsx_links(day) if day in XLSX else documents(day).values():
-            self.p.uses(raw.cached(SOURCE, link))
+        for link in cited(day):
+            if day in OTHER:
+                self.p.artifact(raw.cached(SOURCE, link), UY_SOURCE)
+            else:
+                self.p.uses(raw.cached(SOURCE, link))
         if day in PLEBISCITE_FILES:
             self.p.uses(raw.cached(SOURCE, PLEBISCITE_FILES[day]))
         self.path = f"uy/{day}-{KIND_PATH[day]}"
@@ -1014,6 +1048,10 @@ def election(day: str) -> Package:
         p = primary_xlsx(day)
     elif day in PRIMARY:
         p = primary(day)
+    elif day == REFERENDUM_DAY:
+        return referendum()
+    elif day == ADHESION_DAY:
+        return adhesion()
     else:
         p = local(day)
     if day in XLSX and day in LOCAL:
@@ -1253,6 +1291,148 @@ def runoff(day: str) -> Package:
         b.values(result_set, found.select("UNIT", OPTION=pl.lit(option), MEASURE=pl.lit(1), VALUE="VALUE"))
         b.p.add("outcome", result_set_id=result_set, option_id=option, kind="elected" if lema == elected else "lost")
     b.accounting_values(result_set)
+    return b.p
+
+
+def referendum_circuits() -> pl.DataFrame:
+    """The 2022 referendum's circuit file, in the shape of the totals files (DEPARTAMENTO, CRV, TOTAL columns)."""
+    frame = circuit(table(url(REFERENDUM["circuits"])))
+    return frame.select(
+        "DEPARTAMENTO",
+        "CRV",
+        TOTALHABILITADOS="TOTALHABILITADOS",
+        TOTALVOTOSEMITIDOS="TOTALVOTOSEMITIDOS",
+        TOTALVOTOSOBSERVADOS="TOTALVOTOSOBSERVADOS",
+        TOTALANULADOS="TOTALANULADOS",
+        TOTALENBLANCO="TOTALENBLANCO",
+        SI="TOTALSI",
+        NO="TOTALNO",
+    )
+
+
+def referendum() -> Package:
+    b = Builder(
+        REFERENDUM_DAY,
+        "The 2022 referendum against 135 articles of Law 19.889 by circuit from the Corte Electoral",
+        referendum_circuits(),
+    )
+    b.election(
+        "referendum",
+        "2022 Uruguayan referendum against 135 articles of Law 19.889",
+        "Referéndum contra 135 artículos de la Ley 19.889 (2022)",
+    )
+    b.add_units(b.totals)
+    contest, result_set = b.contest(
+        "luc",
+        "ballot_question",
+        "2022 referendum against 135 articles of Law 19.889 (Ley de Urgencia)",
+        "ley-19889",
+        es="Referéndum contra 135 artículos de la Ley 19.889 (Ley de Urgente Consideración)",
+    )
+    b.p.add("ballot_question", contest_id=contest, type="optional_referendum")
+    unit = b.unit_frame()
+    for position, (column, label, name) in enumerate((("SI", "Sí", "yes"), ("NO", "No", "no")), 1):
+        option = b.option(contest, "answer", label, name, position=position)
+        found = b.totals.select("DEPARTAMENTO", "CRV", VALUE=pl.col(column).cast(pl.Int64)).join(
+            unit, on=["DEPARTAMENTO", "CRV"], how="left"
+        )
+        b.values(result_set, found.select("UNIT", OPTION=pl.lit(option), MEASURE=pl.lit(1), VALUE="VALUE"))
+    b.accounting_values(result_set)
+    b.p.add(
+        "note",
+        id=key("note", result_set, "counts"),
+        entity_id=result_set,
+        kind="caveat",
+        body_md="Sí is the vote to repeal the 135 articles and No the vote to keep them. The circuit file counts the "
+        "Sí and No ballots of voters who voted in their own circuit; the observed ballots, cast by voters registered "
+        "elsewhere, are counted in the circuit's ballots cast and are not split between Sí and No. Valid votes are "
+        "not published per circuit, so none are stored. The Corte publishes no declared national totals or outcome "
+        "apart from the circuit file.",
+        lang="en",
+    )
+    b.p.accept(
+        "accounting.turnout",
+        "In 88 circuits the ballots cast exceed the circuit's roll; in each the excess is within the observed ballots "
+        "(voters registered in another circuit), which the Corte counts in the circuit's ballots; stored as published",
+    )
+    return b.p
+
+
+def adhesion_circuits() -> pl.DataFrame:
+    """The 2019 adhesion act's circuit workbook: DEPARTAMENTO, CRV, and the ballots of each circuit."""
+    with zipfile.ZipFile(raw.cached(SOURCE, ADHESION["zip"]).path) as archive:
+        data = archive.read(ADHESION["circuits"])
+    book = fastexcel.read_excel(data)
+    frame = book.load_sheet_by_idx(0, header_row=0, dtypes="string").to_polars()
+    frame = frame.with_columns(pl.col(pl.String).str.strip_chars()).filter(pl.col("Circuito").is_not_null())
+    return frame.select(
+        DEPARTAMENTO=pl.col("Departamento").map_elements(department, return_dtype=pl.String),
+        CRV=pl.col("Circuito").cast(pl.Int64).cast(pl.String),
+        TOTALVOTOSOBSERVADOS=pl.col("Observados").cast(pl.Int64),
+        TOTALENBLANCO=pl.col("Blancos").cast(pl.Int64),
+        TOTALANULADOS=pl.col("Anulados").cast(pl.Int64),
+        ADHESIONES=pl.col("Adhesiones").cast(pl.Int64),
+    )
+
+
+def adhesion_declared() -> tuple[dict[str, int], int]:
+    """The national totals row of the Corte's department PDF, and the voters on the roll it states."""
+    with zipfile.ZipFile(raw.cached(SOURCE, ADHESION["zip"]).path) as archive:
+        data = archive.read(ADHESION["departments"])
+    text = subprocess.run(
+        ["pdftotext", "-layout", "-", "-"], input=data, capture_output=True, check=True
+    ).stdout.decode()
+    row = re.search(r"^\s*TOTAL((?:\s+\d+){5})\s*$", text, re.MULTILINE)
+    roll = re.search(r"Total de habilitados:\s*(\d+)", text)
+    if row is None or roll is None:
+        raise ValueError("the adhesion PDF has no totals row")
+    adhesions, blank, annulled, observed, _ = (int(n) for n in row.group(1).split())
+    return {"adhesions": adhesions, "blank": blank, "annulled": annulled, "observed": observed}, int(roll.group(1))
+
+
+def adhesion() -> Package:
+    b = Builder(
+        ADHESION_DAY,
+        "The 2019 act of adhesion to the referendum against Law 19.684 by circuit from the Corte Electoral",
+        adhesion_circuits(),
+    )
+    b.election(
+        "special",
+        "2019 act of adhesion to a referendum against Law 19.684",
+        "Acto de adhesión a la interposición del recurso de referéndum contra la Ley 19.684 (2019)",
+    )
+    b.add_units(b.totals)
+    contest, result_set = b.contest(
+        "adhesion",
+        "ballot_question",
+        "2019 adhesion to a referendum against Law 19.684 (comprehensive law for trans people)",
+        "ley-19684",
+        es="Adhesión a la interposición del recurso de referéndum contra la Ley 19.684",
+    )
+    b.p.add("ballot_question", contest_id=contest, type="referendum")
+    option = b.option(contest, "answer", "Adhesión", "adhesion", position=1)
+    found = b.totals.select("DEPARTAMENTO", "CRV", VALUE="ADHESIONES").join(
+        b.unit_frame(), on=["DEPARTAMENTO", "CRV"], how="left"
+    )
+    b.values(result_set, found.select("UNIT", OPTION=pl.lit(option), MEASURE=pl.lit(1), VALUE="VALUE"))
+    b.accounting_values(result_set)
+    totals_, roll = adhesion_declared()
+    b.p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=totals_["adhesions"])
+    for measure, name in ((6, "blank"), (5, "annulled"), (15, "observed")):
+        b.p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=totals_[name])
+    b.p.add(
+        "note",
+        id=key("note", result_set, "counts"),
+        entity_id=result_set,
+        kind="caveat",
+        body_md=f"Voters who adhered to the request for a referendum against the law signed a roll at the circuit; "
+        f"the adhesions, blank and annulled ballots, and observed ballots (voters registered elsewhere) of each "
+        f"circuit are stored as the Corte publishes them. The Corte states {roll:,} voters on the roll nationally "
+        f"and {totals_['adhesions'] / roll:.2%} reached, against the 25% needed; the roll per circuit is not "
+        f"published, and the workbook's own per-circuit total of voters is inconsistent in a few circuits, so it "
+        f"is not stored.",
+        lang="en",
+    )
     return b.p
 
 
