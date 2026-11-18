@@ -19,6 +19,12 @@ Every deputy was elected in a single-member constituency (circumscripție electo
 results by region or county only, so each election is stored as one contest for all the Assembly's seats, by region or
 county. The 1948 election (several lists, provisional county results split across two issues) and the 1952 election
 (no issue in the library) are not covered.
+
+The referendum of 23 November 1986 on cutting Romania's armaments, troops, and military spending by 5 percent is read
+the same way, from the communiqué of the Central Commission for the Referendum that Scînteia printed on 25 November
+1986. Its two tables give, by county, the citizens who took part and their yes and no votes, and the young people aged
+14 to 18 who were consulted alongside and their answers; they are stored as two questions of one referendum. The
+communiqué gives the registered voters and the young people listed nationally only.
 """
 
 import json
@@ -59,6 +65,7 @@ def key(kind: str, *parts: object) -> str:
 
 ASSEMBLY = key("body", "marea-adunare-nationala")
 SYSTEM = key("electoral_system", "single-member-majority")
+REFERENDUM_SYSTEM = key("electoral_system", "referendum")
 GEOBOUNDARIES = key("source", "geoboundaries-adm1")
 
 
@@ -379,23 +386,85 @@ def check(e: Election) -> None:
         code_of(e.plan, row.printed)
 
 
+@dataclass(frozen=True)
+class Referendum:
+    day: date
+    path: str
+    paper: str
+    issue: str
+    printed: date
+    page: int
+    plan: str
+    registered: int  # the citizens on the voting lists, which the communiqué gives nationally only
+    youth_registered: int  # the young people aged 14 to 18 on the consultation lists, nationally only
+
+
+REFERENDUM = Referendum(
+    date(1986, 11, 23),
+    "scanteia/1986/11/scanteia_1986_11_13767.pdf",
+    "Scînteia",
+    "13767",
+    date(1986, 11, 25),
+    1,
+    "1981",
+    16_073_845,
+    1_577_357,
+)
+REFERENDUM_FIELDS = ("cast", "yes", "no", "youth_cast", "youth_yes", "youth_no")
+
+
+@cache
+def referendum_table(day: date) -> tuple[list[Row], Row]:
+    rows: list[Row] = []
+    for line in (TABLES / f"{day}.tsv").read_text().splitlines():
+        if not line.strip() or line.startswith("#"):
+            continue
+        name, *cells = line.split("\t")
+        if len(cells) != len(REFERENDUM_FIELDS):
+            raise ValueError(f"{day}: {name} has {len(cells)} cells")
+        values: dict[str, int | None] = {
+            f: 0 if c == "-" else int(c) for f, c in zip(REFERENDUM_FIELDS, cells, strict=True)
+        }
+        rows.append(Row(name, values))
+    return rows[:-1], rows[-1]
+
+
+def check_referendum(r: Referendum) -> None:
+    rows, total = referendum_table(r.day)
+    for row in rows:
+        v = row.values
+        for prefix in ("", "youth_"):
+            if v[f"{prefix}cast"] != (v[f"{prefix}yes"] or 0) + (v[f"{prefix}no"] or 0):
+                raise ValueError(f"{r.day} {row.printed}: {prefix}participants are not yes + no")
+        code_of(r.plan, row.printed)
+    for f in REFERENDUM_FIELDS:
+        summed = sum(row.values[f] or 0 for row in rows)
+        if summed != total.values[f]:
+            raise ValueError(f"{r.day} {f}: rows add up to {summed}, the total row prints {total.values[f]}")
+    if (total.values["cast"] or 0) > r.registered or (total.values["youth_cast"] or 0) > r.youth_registered:
+        raise ValueError(f"{r.day}: more participants than registered")
+
+
 def packages() -> list[str]:
-    return [GEO, REGISTRY, *(f"{SOURCE}/{e.day}" for e in ELECTIONS)]
+    return [GEO, REGISTRY, *(f"{SOURCE}/{e.day}" for e in ELECTIONS), f"{SOURCE}/{REFERENDUM.day}"]
 
 
 def fetch() -> None:
     for e in ELECTIONS:
         raw.fetch(SOURCE, LIBRARY + e.path, suffix=".pdf")
+    raw.fetch(SOURCE, LIBRARY + REFERENDUM.path, suffix=".pdf")
     raw.fetch(SOURCE, BOUNDARIES, suffix=".geojson")
 
 
 def parse() -> None:
     for e in ELECTIONS:
         check(e)
+    check_referendum(REFERENDUM)
     geo().write()
     registry().write()
     for e in ELECTIONS:
         build(e).write()
+    build_referendum(REFERENDUM).write()
 
 
 def emit() -> None:
@@ -444,6 +513,9 @@ def geo() -> Package:
         for row in table(e.day)[0]:
             code = code_of(e.plan, row.printed)
             used.setdefault(area_key(e.plan, code), (e.plan, code))
+    for row in referendum_table(REFERENDUM.day)[0]:
+        code = code_of(REFERENDUM.plan, row.printed)
+        used.setdefault(area_key(REFERENDUM.plan, code), (REFERENDUM.plan, code))
     for ak, (plan, code) in sorted(used.items()):
         scheme, valid_from, valid_to = PLANS[plan]
         area = area_id(plan, code)
@@ -497,12 +569,21 @@ SYSTEM_NOTE = (
 )
 
 
+REFERENDUM_SYSTEM_NOTE = (
+    "Law no. 20 of 23 October 1986 and Decree no. 360/1986 of the Council of State called a referendum on 23 November "
+    "1986 on the 5 percent cut in armaments, troops, and military spending. Citizens with the right to vote answered "
+    "yes or no; county commissions and the commission of the municipality of Bucharest drew up the records, which the "
+    "Central Commission for the Referendum verified and summed up in a communiqué. Young people aged 14 to 18, who "
+    "could not vote, were consulted alongside on lists of their own, and the communiqué reports their answers apart."
+)
+
+
 def registry() -> Package:
     p = Package(
         REGISTRY,
         SOURCE,
         "Romania's Great National Assembly, its electoral system, and the Fronts whose candidates stood from 1957 to "
-        "1985",
+        "1985, and the rules of the referendum of 1986",
     )
     p.external.add(ROMANIA)
     p.add("body", id=ASSEMBLY, polity_id=ROMANIA, kind="unicameral")
@@ -518,6 +599,23 @@ def registry() -> Package:
         rules_version=1,
     )
     p.add("note", id=key("note", SYSTEM), entity_id=SYSTEM, kind="methodology", body_md=SYSTEM_NOTE, lang="en")
+    p.add(
+        "electoral_system",
+        id=REFERENDUM_SYSTEM,
+        polity_id=ROMANIA,
+        valid_from=date(1986, 10, 23),
+        valid_to=date(1989, 12, 22),
+        rules={"formula": "referendum"},
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", REFERENDUM_SYSTEM),
+        entity_id=REFERENDUM_SYSTEM,
+        kind="methodology",
+        body_md=REFERENDUM_SYSTEM_NOTE,
+        lang="en",
+    )
     for front in FRONTS.values():
         party = key("party", front.code)
         p.add("party", id=party, kind="bloc", polity_id=ROMANIA)
@@ -738,4 +836,226 @@ def build(e: Election) -> Package:
             "against, and annulled add up to 1,211,323; the counties so add up to 13,577,145 votes cast against the "
             "communiqué's 13,577,143",
         )
+    return p
+
+
+REFERENDUM_QUESTIONS = {
+    "": (
+        "Reduction of armaments, troops, and military spending by 5 percent",
+        (
+            "Reducerea, de către Republica Socialistă România, cu 5 la sută, a armamentelor, efectivelor și "
+            "cheltuielilor militare"
+        ),
+        "military-spending-cut",
+    ),
+    "youth_": (
+        (
+            "Reduction of armaments, troops, and military spending by 5 percent: consultation of young people aged 14 "
+            "to 18"
+        ),
+        (
+            "Consultarea tinerilor în vîrstă de 14-18 ani cu privire la reducerea armamentelor, efectivelor și "
+            "cheltuielilor militare"
+        ),
+        "youth-consultation",
+    ),
+}
+
+
+def build_referendum(r: Referendum) -> Package:
+    rows, total = referendum_table(r.day)
+    p = Package(
+        f"{SOURCE}/{r.day}",
+        SOURCE,
+        f"The referendum of {r.day:%-d %B %Y} on cutting military spending, by county, digitized from the Central "
+        f"Commission for the Referendum's communiqué as {r.paper} printed it",
+        depends=[GEO, REGISTRY],
+    )
+    p.external.add(ROMANIA)
+    url = LIBRARY + r.path
+    source = key("source", r.day)
+    p.add(
+        "source",
+        id=source,
+        kind="official_body",
+        publisher=f"Comisia Centrală pentru Referendum (communiqué printed in {r.paper})",
+        title=(
+            f"Comunicatul Comisiei Centrale pentru Referendum cu privire la rezultatul referendumului de la "
+            f"{r.day:%d.%m.%Y} ({r.paper} nr. {r.issue}, {r.printed:%d.%m.%Y}, p. {r.page})"
+        ),
+        url=url,
+        license="No license stated: an official communiqué of a state body, excluded from copyright by Romanian law",
+        attribution=f"{r.paper}; Biblioteca Județeană „Ovid Densusianu” Hunedoara-Deva",
+        notes=(
+            "The communiqué was published in the Buletinul Oficial and reprinted in full in the daily press; this is "
+            "the newspaper's reprint, as the county library of Hunedoara serves its scan."
+        ),
+    )
+    stored = raw.cached(SOURCE, url)
+    artifact = p.artifact(stored, source)
+    width, height = sizes(stored.path)[r.page]
+    page = key("page", r.day, r.page)
+    p.add(
+        "source_page",
+        id=page,
+        artifact_id=artifact,
+        page_number=r.page,
+        image_key=f"pages/{SOURCE}/{stored.sha256}-{r.page}.png",
+        width=round(width * 100 / 72),
+        height=round(height * 100 / 72),
+    )
+
+    election = key("election", r.day)
+    p.add(
+        "election",
+        id=election,
+        polity_id=ROMANIA,
+        kind="referendum",
+        date_from=r.day,
+        date_to=r.day,
+        date_precision="day",
+        status="held",
+    )
+    p.name(election, f"{r.day.year} Romanian military spending referendum", "en", "official")
+    p.name(election, f"Referendumul din {r.day:%d.%m.%Y}", "ro", "native", False)
+    base = f"ro/{r.day}-referendum"
+    p.add("slug", path=base, entity_id=election, is_current=True)
+
+    boxes = json.loads((TABLES / f"{r.day}.boxes.json").read_text())
+    if [b["unit"] for b in boxes] != [row.printed for row in rows]:
+        raise ValueError(f"{r.day}: the boxes do not follow the table's rows")
+    units: dict[str, str] = {}
+    for row in rows:
+        code = code_of(r.plan, row.printed)
+        unit = key("unit", r.day, code)
+        units[row.printed] = unit
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=ROMANIA,
+            scheme_code=PLANS[r.plan][0],
+            code=code,
+            area_relation="equals",
+            area_id=area_id(r.plan, code),
+            kind="standard",
+            valid_from=r.day,
+            valid_from_precision="day",
+            valid_to=r.day,
+            valid_to_precision="day",
+        )
+        p.name(unit, area_name(r.plan, code), "ro", "official")
+
+    for number, (prefix, (english, romanian, path)) in enumerate(REFERENDUM_QUESTIONS.items(), start=1):
+        contest = key("contest", r.day, number)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="ballot_question",
+            electoral_system_id=REFERENDUM_SYSTEM,
+            round_number=1,
+            default_result_kind="counted",
+        )
+        p.add("ballot_question", contest_id=contest, type="referendum")
+        p.name(contest, english, "en", "official")
+        p.name(contest, romanian, "ro", "native", False)
+        p.add("slug", path=f"{base}/{path}", entity_id=contest, is_current=True)
+        yes, no = key("option", r.day, number, "yes"), key("option", r.day, number, "no")
+        for option, position, label in ((yes, 1, "DA"), (no, 2, "NU")):
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="answer",
+                ballot_position=position,
+                ballot_label=label,
+            )
+            p.name(option, "Yes" if option == yes else "No", "en", "official")
+        result_set = key("result_set", r.day, number)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=source,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        who = "young people aged 14 to 18 consulted" if prefix else "citizens who took part"
+        method = (
+            f"The Central Commission for the Referendum's communiqué on the referendum of {r.day:%-d %B %Y}, as "
+            f"{r.paper} no. {r.issue} of {r.printed:%-d %B %Y} printed it on page {r.page}. The table prints, for "
+            f"each county and the municipality of Bucharest, the {who} and their yes and no answers; its percentages "
+            "are not stored. Every no answer is printed as a dash and stored as zero, and the participants are stored "
+            "as the ballots cast. The communiqué prints no invalid ballots. Every figure was read from the page image "
+            "and keeps its page and box. "
+        )
+        if prefix:
+            method += (
+                f"The communiqué gives {r.youth_registered:,} young people on the consultation lists nationally, and "
+                "none by county. Young people could not vote; the consultation ran alongside the referendum on "
+                "separate lists and had no legal effect."
+            )
+        else:
+            method += (
+                f"The communiqué gives {r.registered:,} citizens on the voting lists nationally, and none by county. "
+                "The municipality of Bucharest includes the Ilfov agricultural sector."
+            )
+        p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
+        p.add("outcome", result_set_id=result_set, option_id=yes, kind="won")
+        p.add("outcome", result_set_id=result_set, option_id=no, kind="lost")
+
+        measures = {f"{prefix}cast": (None, CAST), f"{prefix}yes": (yes, VOTES), f"{prefix}no": (no, VOTES)}
+        values: list[tuple[str, str | None, int, int]] = []
+        locators: list[tuple[str, str | None, int, str, float, float, float, float]] = []
+        for row, located in zip(rows, boxes, strict=True):
+            unit = units[row.printed]
+            for field, (option, measure) in measures.items():
+                value = row.values[field]
+                if value is None:
+                    continue
+                values.append((unit, option, measure, value))
+                x0, y0, x1, y1 = located["boxes"][field]
+                locators.append((unit, option, measure, page, x0, y0, x1, y1))
+        p.frame(
+            "result_value",
+            pl.DataFrame(values, schema=["unit_id", "option_id", "measure", "value"], orient="row").with_columns(
+                result_set_id=pl.lit(result_set),
+                channel=pl.lit(0, pl.Int16),
+                count_round=pl.lit(0, pl.Int16),
+                flags=pl.lit(DIGITIZED, pl.Int16),
+                measure=pl.col("measure").cast(pl.Int16),
+            ),
+        )
+        p.frame(
+            "value_locator",
+            pl.DataFrame(
+                locators,
+                schema=["unit_id", "option_id", "measure", "page_id", "x0", "y0", "x1", "y1"],
+                orient="row",
+            ).with_columns(
+                result_set_id=pl.lit(result_set),
+                channel=pl.lit(0, pl.Int16),
+                count_round=pl.lit(0, pl.Int16),
+                source_id=pl.lit(None, pl.String),
+                measure=pl.col("measure").cast(pl.Int16),
+            ),
+        )
+        p.add(
+            "declared",
+            result_set_id=result_set,
+            option_id=None,
+            measure=REGISTERED,
+            value=r.youth_registered if prefix else r.registered,
+        )
+        for field, (option, measure) in measures.items():
+            p.add("declared", result_set_id=result_set, option_id=option, measure=measure, value=total.values[field])
+    p.accept(
+        "accounting.declared",
+        f"the communiqué gives the {r.registered:,} citizens on the voting lists and the {r.youth_registered:,} young "
+        "people on the consultation lists nationally only, and its county tables print no registered figures to sum",
+    )
     return p
