@@ -1,0 +1,714 @@
+{
+  "polity": "SO-SL",
+  "name": "Republic of Somaliland",
+  "sources": {
+    "parl-history": {
+      "title": "Our History",
+      "publisher": "Golaha Wakiilada Jamhuuriyadda Somaliland",
+      "url": "https://somalilandparliament.net/history",
+      "kind": "official_body",
+      "note": "Dates the reassertion of Somaliland's independence of 26 June 1960 to the Burao conference of 18 May 1991, when the first Speaker took office, and lists the House's Speakers since."
+    },
+    "dastuur": {
+      "title": "Dastuurka Jamhuuriyadda Somaliland",
+      "publisher": "Golaha Wakiilada Jamhuuriyadda Somaliland",
+      "url": "https://somalilandparliament.net/storage/uploads/settings/1772431097Constitution.pdf",
+      "kind": "official_body",
+      "note": "Constitution approved at the referendum of 31 May 2001, with the Supreme Court's declaration of the result of 13 June 2001. Arts. 40 (82 Representatives by direct election), 42 (five-year term), 58 and 60 (82 Elders, six-year term, chosen as a law provides), 83 (President and Vice-President elected jointly by direct vote on one ticket), 88 (five-year term, two terms), 109-111 (regions, districts, and their councils), 130 (transitional rules)."
+    },
+    "parl-ref2001": {
+      "title": "The national Constitution Referendum of Republic of somaliland",
+      "publisher": "Golaha Wakiilada Jamhuuriyadda Somaliland",
+      "url": "https://somalilandparliament.net/elections-detail/eyJpdiI6IkwzQUJXR3k3NG5MaEtKMnlXa1hCYUE9PSIsInZhbHVlIjoiQ2NIZDgraGxyamE4dWxkVkRKcVRDZz09IiwibWFjIjoiNjc5OWQyNmRmYTNlNTIzOTVkNTRlMjBmMWM1MmEzM2NkMzM0NWQyYzUyM2Q3NmU4MmVlZDcwMjE4MDk4N2I2OSIsInRhZyI6IiJ9",
+      "kind": "official_body"
+    },
+    "parl-pres2010": {
+      "title": "presidential Election of 2010",
+      "publisher": "Golaha Wakiilada Jamhuuriyadda Somaliland",
+      "url": "https://somalilandparliament.net/elections-detail/eyJpdiI6InROb3RhY1lyRWlyVlYvc0FCVFA3d1E9PSIsInZhbHVlIjoibTdHV3dnNER1TExaN3RtM2lhRTUrQT09IiwibWFjIjoiNTA4MDQ2MjgzMzdkNjI0MDBiNWRmNTExNjFmZDRjODJmMjgwOWY0YzhhZDRiYzI2Y2YwMzVjY2E4MmI0YmE0NSIsInRhZyI6IiJ9",
+      "kind": "official_body"
+    },
+    "parl-pres2024": {
+      "title": "Presidential Election, 2024-11-13",
+      "publisher": "Golaha Wakiilada Jamhuuriyadda Somaliland",
+      "url": "https://somalilandparliament.net/elections-detail/eyJpdiI6Ik5xOWU1bUlYMzlDUGMzSWhlaXdGS3c9PSIsInZhbHVlIjoiUDhwWUdudENaNFFJQVhHODNQRHpQUT09IiwibWFjIjoiZGE0MjU5MTlkMDA0N2ZkMmI3NDE2YTViNGMyMDNiYjg4Mzk4OTBiNWJhOTViODFkNjZjYTM1NWMxMjc0MjZmNiIsInRhZyI6IiJ9",
+      "kind": "official_body"
+    },
+    "parl-mps": {
+      "title": "Current Members of the House of Representatives",
+      "publisher": "Golaha Wakiilada Jamhuuriyadda Somaliland",
+      "url": "https://somalilandparliament.net/Parliament/member/current",
+      "kind": "official_body",
+      "note": "Lists the sitting Representatives with their region and their 2021-2026 term."
+    },
+    "nec-site": {
+      "title": "Somaliland National Electoral Commission",
+      "publisher": "Guddida Doorashooyinka Qaranka Jamhuuriyadda Somaliland",
+      "url": "https://www.slnec.com/",
+      "kind": "official_body",
+      "note": "The Commission's own site; it served a bot-verification page to automated requests on 18 November 2026."
+    },
+    "nec2010": {
+      "title": "Natiijada Doorashada Madaxtooyada 26 June 2010",
+      "publisher": "Guddida Doorashooyinka Qaranka Jamhuuriyadda Somaliland",
+      "url": "http://www.somalilandlaw.com/NEC_2010_Final_Results.pdf",
+      "kind": "official_body",
+      "note": "The Commission's declaration of 5 July 2010, by district (21), region (6), and nationally; copy kept by Somalilandlaw.com."
+    },
+    "nec2012": {
+      "title": "Doorashooyinka Golaha Deegaanka ee Dawladaha Hoose 2012: natiijada heer gobol",
+      "publisher": "Guddida Doorashooyinka Qaranka Jamhuuriyadda Somaliland",
+      "url": "http://www.somalilandlaw.com/NECResults_by_region-party.pdf",
+      "kind": "official_body",
+      "note": "The Commission's final 2012 local council results by region and party or association; copy kept by Somalilandlaw.com from the Commission's site."
+    },
+    "nec2017": {
+      "title": "Doorashada Madaxtooyada November 13, 2017: Natiijada Codadka heer Goob-doorasho, Degmo iyo Gobol",
+      "publisher": "Guddida Doorashooyinka Qaranka Jamhuuriyadda Somaliland",
+      "url": "http://www.somalilandlaw.com/2017_PresElect_Final-PollingStation-Results.pdf",
+      "kind": "official_body",
+      "note": "The Commission's final results for each of the 1,642 polling stations, with district (21) and region (6) totals; copy kept by Somalilandlaw.com."
+    },
+    "law2001": {
+      "title": "Presidential and Local Elections Law (Law No. 20/2001) and its amendments",
+      "publisher": "Somalilandlaw.com",
+      "url": "http://www.somalilandlaw.com/presidential___local_elections.html",
+      "kind": "compendium",
+      "note": "Texts of Law No. 20/2001, which governed the presidential and district council elections from 2002 to 2017, with its six amendment schedules (2009-2017)."
+    },
+    "law2005": {
+      "title": "House of Representatives Election Law (Law No. 20-2/2005)",
+      "publisher": "Somalilandlaw.com",
+      "url": "http://www.somalilandlaw.com/representatives__election_law.htm",
+      "kind": "compendium",
+      "note": "Text of the 2005 law, art. 12 allocating the 82 seats by region (Hargeisa 20, Togdheer 15, Awdal 13, Sanaag 12, Sool 12, Sahil 10) with largest-remainder list PR in each region, and the history of its passage."
+    },
+    "law2020": {
+      "title": "The General Law for National Elections and Voters' Registration, Law Lr. 91/2020 (unofficial translation)",
+      "publisher": "Somalilandlaw.com",
+      "url": "http://www.somalilandlaw.com/General_Law_National_Elections___Voter_Registration_No_91-2020_Unofficial-translation.pdf",
+      "kind": "compendium",
+      "note": "Consolidated election law of 2020 for the President, the House of Representatives, the district councils, and voter registration. Arts. 10 (five-year terms for all three), 77 (seats by region, as in 2005), 78 (vacancies filled from reserve list candidates), 79-80 (district councils by open-list PR, council sizes by the Regions and Districts Law)."
+    },
+    "sll-elections": {
+      "title": "Somaliland Electoral Laws",
+      "publisher": "Somalilandlaw.com",
+      "url": "http://www.somalilandlaw.com/electoral_laws.html",
+      "kind": "compendium",
+      "note": "Running record of Somaliland's election laws and polls: the 28 November 2012 local elections, the 2017 presidential results, and the combined House and local council elections of 31 May 2021."
+    },
+    "sll-elders": {
+      "title": "House of Elders S/election Law",
+      "publisher": "Somalilandlaw.com",
+      "url": "http://www.somalilandlaw.com/_elders__selection_law.html",
+      "kind": "compendium",
+      "note": "How the House of Elders was chosen by the community conferences of Borama (1993) and Hargeisa (February 1997), the extensions of its term since, and the 2006 bill for direct elections, which the Elders rejected."
+    },
+    "sll-parties": {
+      "title": "Political Parties and Associations Law (Xeerka Ururada iyo Xisbiyada)",
+      "publisher": "Somalilandlaw.com",
+      "url": "http://www.somalilandlaw.com/xeerka_xisbiyadda.htm",
+      "kind": "compendium",
+      "note": "How the nation-wide local council vote of 2002 and of 2012 decided which three associations became the national parties, with the Registration and Approval Committee's announcement of 26 December 2012."
+    },
+    "eu2002": {
+      "title": "Report on the Somaliland Local Elections held on 15 December 2002",
+      "publisher": "Delegation of the European Commission in the Republic of Kenya",
+      "url": "http://www.somalilandlaw.com/EU_Report_on_Somaliland_Local_Elections_2002.pdf",
+      "kind": "official_body"
+    },
+    "nordem2003": {
+      "title": "Somaliland: Presidential Election 2003 (NORDEM Report 08/2003)",
+      "publisher": "Norwegian Centre for Human Rights, NORDEM",
+      "url": "http://www.somalilandlaw.com/NORDEM_Report_on_the_2003Pres_Elections.pdf",
+      "kind": "academic"
+    },
+    "iri2005": {
+      "title": "Somaliland September 29, 2005 Parliamentary Election Assessment Report",
+      "publisher": "International Republican Institute",
+      "url": "http://www.somalilandlaw.com/IRI_Parlelection_2005.pdf",
+      "kind": "academic"
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Jamhuuriyadda Somaliland",
+      "name_en": "Republic of Somaliland",
+      "parent": null,
+      "polity_kind": "de_facto_state",
+      "source": "parl-history"
+    },
+    {
+      "key": "gobol",
+      "name": "Gobollada",
+      "name_en": "Regions (House of Representatives constituencies)",
+      "parent": "national",
+      "polity_kind": "region",
+      "scheme": "so-sl.gobol",
+      "elects": false,
+      "source": "dastuur",
+      "counts": [
+        {
+          "date": "2010-06-26",
+          "value": 6,
+          "source": "nec2010",
+          "locator": "http://www.somalilandlaw.com/NEC_2010_Final_Results.pdf (Natiijada Heer Gobol: Sanaag, Sool, Togdheer, Saaxil, Maroodi-Jeex, Awdal)"
+        },
+        {
+          "date": "2017-11-13",
+          "value": 6,
+          "source": "nec2017",
+          "locator": "http://www.somalilandlaw.com/2017_PresElect_Final-PollingStation-Results.pdf (Tiradat Gobolka totals: Awdal, Marodi-jeex, Saaxil, Togdheer, Sool, Sanaag)"
+        }
+      ]
+    },
+    {
+      "key": "degmo",
+      "name": "Degmooyinka (dawladaha hoose)",
+      "name_en": "Districts (local governments)",
+      "parent": "gobol",
+      "polity_kind": "municipality",
+      "scheme": "so-sl.degmo",
+      "source": "dastuur",
+      "counts": [
+        {
+          "date": "2002-12-15",
+          "value": 23,
+          "source": "eu2002",
+          "locator": "http://www.somalilandlaw.com/EU_Report_on_Somaliland_Local_Elections_2002.pdf (section 1.5: councillors for the 23 districts, in five categories)"
+        },
+        {
+          "date": "2010-06-26",
+          "value": 21,
+          "source": "nec2010",
+          "locator": "http://www.somalilandlaw.com/NEC_2010_Final_Results.pdf (Natiijada Heer Degmo: 21 districts)"
+        },
+        {
+          "date": "2017-11-13",
+          "value": 21,
+          "source": "nec2017",
+          "locator": "http://www.somalilandlaw.com/2017_PresElect_Final-PollingStation-Results.pdf (21 districts across six regions)"
+        }
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "key": "madaxweyne",
+      "tier": "national",
+      "name": "Doorashada Madaxweynaha iyo Madaxweyne-ku-xigeenka",
+      "name_en": "President and Vice-President",
+      "category": "executive",
+      "goal": "national",
+      "first_held": "2003-04-14",
+      "earliest_record": "2010-06-26",
+      "measure": {
+        "unit": "contest",
+        "grain": [
+          "so-sl.degmo"
+        ],
+        "fine": [
+          "so-sl.goob"
+        ]
+      },
+      "finest_note": "Votes by district and region in the Commission's 2010 declaration; by polling station (1,642) in 2017.",
+      "source": "dastuur",
+      "locator": "https://somalilandparliament.net/storage/uploads/settings/1772431097Constitution.pdf (Qodobka 83aad: direct, secret election of the President and Vice-President on one ticket; Qodobka 88aad: five-year term, two terms at most)",
+      "note": "The ticket with the most valid votes wins; there is no runoff. Before the 2001 Constitution, Presidents were chosen by the community conferences of Burao (1991), Borama (1993), and Hargeisa (1997) (see the class shir_beeleed). Vice-President Dahir Riyale Kahin succeeded on President Egal's death in May 2002 without an election. Polls fell due in 2008 and 2022 but were held in 2010 and 2024 after the House of Elders extended the incumbents' terms.",
+      "match": [
+        {
+          "election_kinds": [
+            "general",
+            "special"
+          ],
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "SO-SL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Guddida Doorashooyinka Qaranka",
+          "source": "law2020",
+          "locator": "http://www.somalilandlaw.com/General_Law_National_Elections___Voter_Registration_No_91-2020_Unofficial-translation.pdf (art. 10(1): five-year term)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Guddida Doorashooyinka Qaranka",
+          "url": "https://www.slnec.com/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "2010-06-26",
+          "last_date": "2024-11-13",
+          "source": "nec-site",
+          "role": "administers",
+          "evidence": "The Commission's site served a bot-verification page to automated requests"
+        },
+        {
+          "platform": "Somalilandlaw.com, Somaliland Electoral Laws",
+          "url": "http://www.somalilandlaw.com/electoral_laws.html",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "2010-06-26",
+          "last_date": "2017-11-13",
+          "finest": "so-sl.goob",
+          "source": "sll-elections",
+          "role": "publishes",
+          "evidence": "Copies of the Commission's 2010 declaration by district and its 2017 polling-station results"
+        }
+      ],
+      "est_votes": 600000,
+      "effort": 3,
+      "dates": [
+        {
+          "date": "2003-04-14",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "nordem2003",
+          "quote": "Presidential election scheduled for 14 April 2003",
+          "note": "First direct presidential election; Dahir Riyale Kahin (UDUB) won by 80 votes in the preliminary count."
+        },
+        {
+          "date": "2010-06-26",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "nec2010",
+          "quote": "Natiijada Doorashada Madaxtooyada 26 June 2010",
+          "note": "Ahmed Mohamed Mohamoud Silanyo (Kulmiye) 266,906 votes, Dahir Riyale Kahin (UDUB) 178,881, Faisal Ali Warabe (UCID) 92,459, of 538,246 valid votes in 21 districts."
+        },
+        {
+          "date": "2017-11-13",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "nec2017",
+          "quote": "Doorashada Madaxtooyada November 13, 2017",
+          "note": "Muse Bihi Abdi (Kulmiye) won; results for 1,642 polling stations in 21 districts."
+        },
+        {
+          "date": "2024-11-13",
+          "election_kind": "general",
+          "contests": 1,
+          "seats": 1,
+          "source": "parl-pres2024",
+          "quote": "Abdirahman Mohamed Abdillahi, popularly known as Cirro, representing the Waddani party, was elected as President",
+          "note": "Held with the vote on political associations (class ururada)."
+        }
+      ]
+    },
+    {
+      "key": "golaha_wakiilada",
+      "tier": "national",
+      "name": "Doorashada Golaha Wakiilada",
+      "name_en": "House of Representatives",
+      "category": "legislature",
+      "goal": "national",
+      "first_held": "2005-09-29",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "so-sl.gobol"
+        ],
+        "fine": [
+          "so-sl.degmo"
+        ]
+      },
+      "finest_note": "Party and candidate votes by region.",
+      "source": "dastuur",
+      "locator": "https://somalilandparliament.net/storage/uploads/settings/1772431097Constitution.pdf (Qodobka 40aad: 82 members by direct, secret election; Qodobka 42aad: five-year term)",
+      "note": "The 82 members are elected in six regional constituencies (Hargeisa or Marodijeh 20, Togdheer 15, Awdal 13, Sanaag 12, Sool 12, Sahil 10) by list PR with largest remainders, the seats going to each party's candidates in order of their personal votes (Law 20-2/2005 art. 12; Law 91/2020 art. 77). A vacancy goes to the next reserve candidate on the party's list, so there are no by-elections (Law 91/2020 art. 78). From 1993 to 2005 the House was chosen by the clan conferences; the House elected in 2005 sat, by repeated extensions, until 2021.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral",
+            "lower_house"
+          ],
+          "iso_pattern": "SO-SL"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Guddida Doorashooyinka Qaranka",
+          "source": "law2020",
+          "locator": "http://www.somalilandlaw.com/General_Law_National_Elections___Voter_Registration_No_91-2020_Unofficial-translation.pdf (art. 10(2): five-year term; art. 77: seats by region)"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Guddida Doorashooyinka Qaranka",
+          "url": "https://www.slnec.com/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "2005-09-29",
+          "last_date": "2021-05-31",
+          "source": "nec-site",
+          "role": "administers",
+          "evidence": "The Commission's site served a bot-verification page to automated requests"
+        }
+      ],
+      "est_votes": 700000,
+      "effort": 3,
+      "dates": [
+        {
+          "date": "2005-09-29",
+          "election_kind": "general",
+          "contests": 6,
+          "seats": 82,
+          "source": "iri2005",
+          "quote": "Somaliland September 29, 2005 Parliamentary Election",
+          "note": "First direct election of the House, in six regional constituencies under Law 20-2/2005 art. 12."
+        },
+        {
+          "date": "2021-05-31",
+          "election_kind": "general",
+          "contests": 6,
+          "seats": 82,
+          "source": "sll-elections",
+          "quote": "The first combined House of Representatives and Local Councils Elections shall be held throughout the country on 31 May 2021",
+          "note": "Held with the district council elections; the members elected sit for 2021-2026 by region (Parliament, current members)."
+        }
+      ]
+    },
+    {
+      "key": "golaha_deegaanka",
+      "tier": "degmo",
+      "name": "Doorashada Golayaasha Deegaanka (dawladaha hoose)",
+      "name_en": "District councils",
+      "category": "council",
+      "goal": "local",
+      "first_held": "2002-12-15",
+      "earliest_record": "2012-11-28",
+      "measure": {
+        "unit": "contest",
+        "schemes": [
+          "so-sl.degmo"
+        ]
+      },
+      "finest_note": "Party and association votes by region in the Commission's 2012 summary; district results are not online.",
+      "source": "law2020",
+      "locator": "http://www.somalilandlaw.com/General_Law_National_Elections___Voter_Registration_No_91-2020_Unofficial-translation.pdf (art. 10(3): five-year term; arts. 79-80: open-list PR by district, council sizes by the Regions and Districts Law)",
+      "note": "Each district elects its council by party or association lists; the council then elects the mayor and deputy mayor. In 2002 the 23 districts were graded, with 25 councillors in Hargeisa and 21, 17, 13, or 9 elsewhere by grade. The nation-wide council votes of 2002 and 2012 also decided which three associations became the national parties (Political Parties and Associations Law art. 6).",
+      "match": [
+        {
+          "election_kinds": [
+            "local",
+            "general",
+            "special"
+          ],
+          "body_kinds": [
+            "council"
+          ],
+          "polity_kinds": [
+            "municipality"
+          ],
+          "iso_pattern": "SO-SL*"
+        }
+      ],
+      "cadence": [
+        {
+          "period_years": 5,
+          "term_years": 5,
+          "called": false,
+          "partisan": true,
+          "administered_by": "Guddida Doorashooyinka Qaranka",
+          "source": "law2020",
+          "locator": "http://www.somalilandlaw.com/General_Law_National_Elections___Voter_Registration_No_91-2020_Unofficial-translation.pdf (art. 10(3))"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Guddida Doorashooyinka Qaranka",
+          "url": "https://www.slnec.com/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "2012-11-28",
+          "last_date": "2021-05-31",
+          "source": "nec-site",
+          "role": "administers",
+          "evidence": "The Commission's site served a bot-verification page to automated requests"
+        },
+        {
+          "platform": "Somalilandlaw.com, Political Parties and Associations Law",
+          "url": "http://www.somalilandlaw.com/xeerka_xisbiyadda.htm",
+          "format": "pdf",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "2012-11-28",
+          "last_date": "2012-11-28",
+          "finest": "so-sl.gobol",
+          "source": "sll-parties",
+          "role": "publishes",
+          "evidence": "Copy of the Commission's 2012 results by region and party or association"
+        }
+      ],
+      "est_votes": 800000,
+      "effort": 4,
+      "dates": [
+        {
+          "date": "2002-12-15",
+          "election_kind": "local",
+          "contests": 20,
+          "source": "eu2002",
+          "quote": "Report on the Somaliland Local Elections held on 15 December 2002",
+          "note": "Planned in 23 districts; the Commission cancelled the vote in two Sool districts and in Buuhoodle, so 20 districts voted. UDUB, Kulmiye, and UCID became the three national parties."
+        },
+        {
+          "date": "2012-11-28",
+          "election_kind": "local",
+          "source": "nec2012",
+          "quote": "Doorashooyinka Golaha Deegaanka Ee Dawladaha Hoose 2012",
+          "note": "Seven parties and associations; 810,858 valid votes. Kulmiye, Waddani, and UCID became the national parties for ten years (Registration and Approval Committee, 26 December 2012)."
+        },
+        {
+          "date": "2021-05-31",
+          "election_kind": "local",
+          "source": "sll-elections",
+          "quote": "The first combined House of Representatives and Local Councils Elections shall be held throughout the country on 31 May 2021",
+          "note": "Held with the House of Representatives election."
+        }
+      ]
+    },
+    {
+      "key": "afti",
+      "tier": "national",
+      "name": "Aftida Dastuurka",
+      "name_en": "Constitutional referendum",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "first_held": "2001-05-31",
+      "earliest_record": "2001-05-31",
+      "measure": {
+        "unit": "contest"
+      },
+      "finest_note": "National totals only.",
+      "source": "dastuur",
+      "locator": "https://somalilandparliament.net/storage/uploads/settings/1772431097Constitution.pdf (Supreme Court declaration of 13 June 2001 on the referendum of 31 May 2001; Qodobka 125aad: the referendum law and its organizing committee)",
+      "note": "The only referendum: the Constitution, which also affirmed the 1991 reassertion of independence, approved by 1,148,940 votes to 34,302. A referendum committee, not the later National Electoral Commission, ran it.",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "iso_pattern": "SO-SL"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Golaha Wakiilada, Elections",
+          "url": "https://somalilandparliament.net/elections-detail/eyJpdiI6IkwzQUJXR3k3NG5MaEtKMnlXa1hCYUE9PSIsInZhbHVlIjoiQ2NIZDgraGxyamE4dWxkVkRKcVRDZz09IiwibWFjIjoiNjc5OWQyNmRmYTNlNTIzOTVkNTRlMjBmMWM1MmEzM2NkMzM0NWQyYzUyM2Q3NmU4MmVlZDcwMjE4MDk4N2I2OSIsInRhZyI6IiJ9",
+          "format": "html",
+          "access": "open",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "2001-05-31",
+          "last_date": "2001-05-31",
+          "source": "parl-ref2001",
+          "role": "publishes",
+          "evidence": "Total, valid, invalid, yes, and no votes of the 2001 referendum"
+        }
+      ],
+      "est_votes": 1187833,
+      "effort": 1,
+      "dates": [
+        {
+          "date": "2001-05-31",
+          "election_kind": "referendum",
+          "contests": 1,
+          "source": "parl-ref2001",
+          "quote": "Date: 31 May 2001 ... \"Yes\" votes: 1,148,940 (97%) \"No\" votes: 34,302 (3%)",
+          "note": "Constitution of the Republic of Somaliland; 1,187,833 votes, 1,183,242 valid."
+        }
+      ]
+    },
+    {
+      "key": "ururada",
+      "tier": "national",
+      "name": "Doorashada Ururada Siyaasadda",
+      "name_en": "Contest of political associations for national party status",
+      "category": "special_purpose",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "sll-parties",
+      "note": "The Constitution allows three national parties (art. 9). Registered political associations and the sitting parties contest a nation-wide vote every ten years, and the three with the most support across the regions become the national parties. In 2002 and 2012 that vote was the district council election itself, counted in golaha_deegaanka; in 2024 it was a separate ballot held with the presidential election.",
+      "match": [
+        {
+          "name_pattern": "(Urur|[Aa]ssociation)",
+          "iso_pattern": "SO-SL"
+        }
+      ],
+      "access": [
+        {
+          "platform": "Guddida Doorashooyinka Qaranka",
+          "url": "https://www.slnec.com/",
+          "format": "html, pdf",
+          "access": "blocked",
+          "checked_at": "2026-11-18",
+          "license": "none stated",
+          "first_date": "2024-11-13",
+          "last_date": "2024-11-13",
+          "source": "nec-site",
+          "role": "administers",
+          "evidence": "The Commission's site served a bot-verification page to automated requests"
+        }
+      ],
+      "est_votes": 600000,
+      "effort": 2,
+      "dates": [
+        {
+          "date": "2024-11-13",
+          "election_kind": "general",
+          "note": "Held with the presidential election; the Commission's results were not reachable from here."
+        }
+      ]
+    },
+    {
+      "key": "golaha_guurtida",
+      "tier": "national",
+      "name": "Golaha Guurtida",
+      "name_en": "House of Elders (Guurti)",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "sll-elders",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The 82 Elders were chosen by their communities at the Borama (1993) and Hargeisa (February 1997) conferences, vacancies are filled by the clans, and the House has extended its own term since 2003; the Constitution leaves the method to a law (art. 58), and the only bill for direct elections was rejected by the Elders on 23 September 2006. No public vote has been held.",
+      "match": [
+        {
+          "body_kinds": [
+            "upper_house"
+          ],
+          "iso_pattern": "SO-SL"
+        }
+      ]
+    },
+    {
+      "key": "shir_beeleed",
+      "tier": "national",
+      "name": "Shirarka beelaha (1991-1997)",
+      "name_en": "Community conferences that chose the President and Parliament, 1991-1997",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "sll-elders",
+      "valid_to": "2001-06-13",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Burao conference of May 1991, the Borama conference of 1993, and the Hargeisa conference of 1996-1997 chose the President and the members of both Houses by delegates of the clans, not by any public vote, and published no returns.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "iso_pattern": "SO-SL",
+          "valid_to": "2001-06-13"
+        }
+      ]
+    },
+    {
+      "key": "duqa",
+      "tier": "degmo",
+      "name": "Doorashada Duqa Magaalada",
+      "name_en": "Mayors",
+      "category": "indirect",
+      "goal": "local",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "eu2002",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Mayors are elected by the district councillors from among themselves, not by the voters.",
+      "match": [
+        {
+          "office_kinds": [
+            "mayor",
+            "deputy_mayor"
+          ],
+          "iso_pattern": "SO-SL*"
+        }
+      ]
+    },
+    {
+      "key": "golaha_gobolka",
+      "tier": "gobol",
+      "name": "Golayaasha Gobollada",
+      "name_en": "Regional councils",
+      "category": "council",
+      "goal": "subnational",
+      "measure": {
+        "unit": "polity"
+      },
+      "source": "dastuur",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Constitution provides for regional councils (art. 111), but the election laws of 2001 and 2020 elect only district councils, and no regional council has been elected.",
+      "match": []
+    },
+    {
+      "key": "garsoorka",
+      "tier": "national",
+      "name": "Garsoorka",
+      "name_en": "Judges",
+      "category": "judicial",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "dastuur",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The President appoints the Chief Justice and the Supreme Court judges after consulting the Judicial Commission, and the two Houses confirm the Chief Justice (Constitution art. 105); no judicial office is elected.",
+      "match": []
+    },
+    {
+      "key": "xisbiyada_musharax",
+      "tier": "national",
+      "name": "Xulashada musharaxiinta xisbiyada",
+      "name_en": "Party candidate selection",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "law2020",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Parties choose their presidential tickets and their candidate lists under their own rules and hand them to the Commission; the state runs and publishes no primaries.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary",
+            "caucus"
+          ],
+          "iso_pattern": "SO-SL"
+        }
+      ]
+    }
+  ]
+}

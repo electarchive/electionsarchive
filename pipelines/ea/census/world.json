@@ -758,9 +758,9 @@
       "kind": "official_body"
     },
     "so-sl": {
-      "publisher": "Parliament of the Republic of Somaliland",
-      "title": "Somaliland election results",
-      "url": "https://somalilandparliament.net/?p=688",
+      "publisher": "Golaha Wakiilada Jamhuuriyadda Somaliland",
+      "title": "Our History",
+      "url": "https://somalilandparliament.net/history",
       "kind": "official_body"
     },
     "ge-ab": {
@@ -3203,9 +3203,9 @@
       "name_en": "Somaliland",
       "status": "de_facto",
       "recognized_within": "SO",
-      "reason": "House of Representatives, presidential, and local council elections since 2002.",
+      "reason": "Reasserted the independence of 26 June 1960 at the Burao conference of 18 May 1991; it held a constitutional referendum in 2001, and its National Electoral Commission has run district council (2002, 2012, 2021), presidential (2003, 2010, 2017, 2024), and House of Representatives (2005, 2021) elections since.",
       "source": "so-sl",
-      "locator": "https://somalilandparliament.net/?p=688"
+      "locator": "https://somalilandparliament.net/history (Ibrahim Megag Samatar, first Speaker after the reassertion of independence on 18 May 1991 at Burco)"
     },
     {
       "iso": "GE-AB",
