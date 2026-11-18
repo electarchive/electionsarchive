@@ -1,5 +1,8 @@
-"""Uzbekistan's presidential elections of 2000, 2007, 2015, 2016, 2021, and 2023, nationally, from the Central
-Election Commission's website.
+"""Uzbekistan's presidential elections of 2000, 2007, 2015, 2016, 2021, and 2023 and its national referendums of 2002
+and 2023, nationally, from the Central Election Commission's website.
+
+The referendums are `REFERENDUMS`: the 2002 page and decision No. 1245 print the yes and no votes of each question, the
+registered voters, and the voters who took part, and `prove_referendum` checks each against its printed phrase.
 
 The Commission publishes each result as a page of prose on saylov.uz, so the archive holds national totals only: the
 votes of each candidate, the registered voters, and the voters who took part, as the page words them. Two pages need
@@ -200,8 +203,101 @@ DISAGREE = {
 ROUNDING = Decimal("0.06")
 
 
+@dataclass(frozen=True)
+class Question:
+    en: str
+    ru: str  # the question as the page words it
+    yes: tuple[str, int]  # the page's words, then the number
+    no: tuple[str, int]
+    yes_share: str
+    no_share: str
+
+
+@dataclass(frozen=True)
+class Referendum:
+    day: date
+    url: str
+    page: bool  # a page of the referendums section (Russian text) rather than a decision (Uzbek text)
+    registered: tuple[str, int]
+    cast: tuple[str, int]
+    invalid: tuple[str, int] | None
+    turnout: str  # the printed turnout
+    questions: tuple[Question, ...]
+    title: str
+    phrases: tuple[str, ...] = ()
+
+
+URL_1245 = (
+    f"{DECISIONS.replace('/ru/', '/oz/')}/1245-2023-yil-30-aprelda-o-tkazilgan-o-zbekiston-respublikasi-"
+    "referendumining-yakunlari-to-g-risida"
+)
+REFERENDUMS = (
+    Referendum(
+        date(2002, 1, 27),
+        f"{PAGES}/10",
+        True,
+        ("13 миллионов 266 602", 13_266_602),
+        ("12 113 770", 12_113_770),
+        None,
+        "91,58",
+        (
+            Question(
+                "Do you agree to be elected by a bicameral parliament of the Republic of Uzbekistan?",
+                "Согласны ли Вы быть избранными двухпалатным парламентом Республики Узбекистан?",
+                ("11 миллионов 344 тысячи 242", 11_344_242),
+                ("768 828", 768_828),
+                "93,65",
+                "6,35",
+            ),
+            Question(
+                "Do you agree to change the constitutional term of the President of the Republic of Uzbekistan "
+                "from five to seven years?",
+                "Согласны ли вы на изменение конституционного срока Президента Республики Узбекистан с пяти до "
+                "семи лет?",
+                ("11 миллионов 117 тысяч 841", 11_117_841),
+                ("995 229", 995_229),
+                "91,78",
+                "8,22",
+            ),
+        ),
+        "Results of the referendum of 27 January 2002, as the Commission's website states them",
+    ),
+    Referendum(
+        date(2023, 4, 30),
+        URL_1245,
+        False,
+        ("19 722 809", 19_722_809),
+        ("16 667 097", 16_667_097),
+        ("73 672", 73_672),
+        "84,51",
+        (
+            Question(
+                "Do you adopt the Constitutional Law of the Republic of Uzbekistan \u201cOn the Constitution of the "
+                "Republic of Uzbekistan\u201d?",
+                "Siz “O‘zbekiston Respublikasi Konstitutsiyasi to‘g‘risida”gi O‘zbekiston Respublikasi "
+                "Konstitutsiyaviy Qonunini qabul qilasizmi?",
+                ("15 034 608", 15_034_608),
+                ("1 558 817", 1_558_817),
+                "90,21",
+                "9,35",
+            ),
+        ),
+        "Decision No. 1245 of 1 May 2023 of the Central Election Commission on the results of the referendum of "
+        "30 April 2023",
+    ),
+)
+REFERENDUM_SYSTEM = key("electoral_system", "referendum")
+ANSWER = 1  # the options' position of yes; no is 2
+WON, LOST = "won", "lost"
+
+
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/president-{e.year}" for e in ELECTIONS)]
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/president-{e.year}" for e in ELECTIONS),
+        *(f"{SOURCE}/referendum-{r.day.year}" for r in REFERENDUMS),
+    ]
 
 
 def urls(e: Election) -> list[str]:
@@ -212,6 +308,8 @@ def fetch() -> None:
     for e in ELECTIONS:
         for url in urls(e):
             raw.fetch(SOURCE, url, suffix=".pdf" if url.endswith(".pdf") else ".html")
+    for r in REFERENDUMS:
+        raw.fetch(SOURCE, r.url, suffix=".html")
 
 
 def parse() -> None:
@@ -219,6 +317,8 @@ def parse() -> None:
     registry().write()
     for e in ELECTIONS:
         build(e).write()
+    for r in REFERENDUMS:
+        referendum(r).write()
 
 
 def emit() -> None:
@@ -334,6 +434,36 @@ def registry() -> Package:
                 attribution="Central Election Commission of the Republic of Uzbekistan, saylov.uz",
             )
             p.artifact(raw.cached(SOURCE, e.decision[0]), did)
+    for r in REFERENDUMS:
+        sid = source_id("referendum", r.day.year)
+        p.add(
+            "source",
+            id=sid,
+            kind="official_body",
+            publisher="Центральная избирательная комиссия Республики Узбекистан (Central Election Commission of "
+            "the Republic of Uzbekistan)",
+            title=r.title,
+            url=r.url,
+            license="Official publication; the site asks that its materials be cited when used",
+            attribution="Central Election Commission of the Republic of Uzbekistan, saylov.uz",
+        )
+        p.artifact(raw.cached(SOURCE, r.url), sid)
+    p.add(
+        "electoral_system",
+        id=REFERENDUM_SYSTEM,
+        polity_id=UZBEKISTAN,
+        rules={"formula": "referendum"},
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", REFERENDUM_SYSTEM),
+        entity_id=REFERENDUM_SYSTEM,
+        kind="methodology",
+        body_md="A question put to a national referendum is carried when more than half of the voters who took "
+        "part vote for it, provided more than half of the registered voters took part.",
+        lang="en",
+    )
     p.add("office", id=PRESIDENCY, polity_id=UZBEKISTAN, kind="head_of_state")
     p.name(PRESIDENCY, "President of the Republic of Uzbekistan", "en", "official")
     p.name(PRESIDENCY, "Президент Республики Узбекистан", "ru", "official", False)
@@ -562,4 +692,202 @@ def build(e: Election) -> Package:
         put(option, VOTES, c.votes, c.flags)
         if not c.flags:
             p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=c.votes)
+    return p
+
+
+def referendum_text(r: Referendum) -> str:
+    return text(r.url)
+
+
+def prove_referendum(r: Referendum) -> None:
+    """Every figure must stand in the page that prints it, and the shares must agree with the votes."""
+    page = referendum_text(r)
+    words = [r.registered[0], r.cast[0], *(r.invalid[:1] if r.invalid else ())]
+    for q in r.questions:
+        words += [q.yes[0], q.no[0], q.yes_share, q.no_share]
+    for phrase in (*words, r.turnout, *r.phrases):
+        if phrase not in page:
+            raise ValueError(f"{r.day}: {phrase!r} is not on the page")
+    for q in r.questions:
+        # the 2023 decision takes its shares of the voters who took part, the 2002 page of the yes and no votes
+        valid = r.cast[1] if r.invalid else q.yes[1] + q.no[1]
+        for votes, share in ((q.yes[1], q.yes_share), (q.no[1], q.no_share)):
+            if abs(percent(votes, valid) - Decimal(share.replace(",", "."))) > ROUNDING:
+                raise ValueError(f"{r.day}: {votes} votes are not {share} percent of {valid}")
+
+
+def referendum_caveats(r: Referendum) -> list[str]:
+    cast = r.cast[1]
+    if r.day.year == 2002:
+        valid = r.questions[0].yes[1] + r.questions[0].no[1]
+        return [
+            (
+                f"The page prints 12,113,770 voters who took part, while the yes and no votes of each question add up "
+                f"to {valid:,}, {cast - valid:,} fewer; the printed shares of each question fit {valid:,}. The page "
+                "prints no invalid ballots, so the difference may be ballots that were not valid on a question. It "
+                "prints a turnout of 91.58 percent, while 12,113,770 of 13,266,602 registered voters is 91.31 "
+                "percent. Every figure is stored as printed, and the turnout is not stored."
+            ),
+            (
+                "The same voters answered both questions, so the registered voters and the voters who took part "
+                "are stored on each question."
+            ),
+        ]
+    return [
+        (
+            "Decision No. 1245 declares the referendum valid because more than half of the registered voters took "
+            "part (84.51 percent), and the question adopted by 90.21 percent of the voters who took part. The yes "
+            "votes, no votes, and 73,672 invalid ballots add up to the voters who took part."
+        )
+    ]
+
+
+def referendum(r: Referendum) -> Package:
+    prove_referendum(r)
+    day = r.day.isoformat()
+    year = r.day.year
+    p = Package(
+        f"{SOURCE}/referendum-{year}",
+        SOURCE,
+        f"The {r.day.day} {r.day:%B} {year} national referendum of Uzbekistan, national totals, from the Central "
+        "Election Commission",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {UZBEKISTAN, COUNTRY}
+    p.uses(raw.cached(SOURCE, r.url))
+    source = source_id("referendum", year)
+    election = key("election", day, "referendum")
+    p.add(
+        "election",
+        id=election,
+        polity_id=UZBEKISTAN,
+        kind="referendum",
+        date_from=r.day,
+        date_to=r.day,
+        status="held",
+    )
+    p.add("slug", path=f"uz/{day}-referendum", entity_id=election, is_current=True)
+    p.name(election, f"{year} Uzbekistani referendum", "en", "official")
+    p.name(election, f"Референдум Республики Узбекистан {year} года", "ru", "native", False)
+    unit = key("unit", day, "referendum", "nation")
+    p.add(
+        "reporting_unit",
+        id=unit,
+        polity_id=UZBEKISTAN,
+        scheme_code=SCHEME,
+        code=f"{day}:referendum:uz",
+        area_relation="equals",
+        area_id=COUNTRY,
+        kind="aggregate",
+    )
+    p.name(unit, "Республика Узбекистан", "ru", "official")
+    p.name(unit, "Uzbekistan", "en", "official", False)
+    p.add(
+        "reporting_unit_area",
+        unit_id=unit,
+        area_id=COUNTRY,
+        method="official_list",
+        approximate=False,
+        partial=False,
+    )
+    many = len(r.questions) > 1
+    for number, q in enumerate(r.questions, 1):
+        label = f"{year} Uzbekistani referendum, question {number}" if many else f"{year} Uzbekistani referendum"
+        label_ru = f"Референдум {year} года, вопрос {number}" if many else f"Референдум {year} года"
+        contest = key("contest", day, "referendum", number)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="ballot_question",
+            electoral_system_id=REFERENDUM_SYSTEM,
+            round_number=1,
+            default_result_kind="counted",
+        )
+        p.add("ballot_question", contest_id=contest, type="referendum")
+        p.name(contest, f"{label}: {q.en}", "en", "official")
+        p.name(contest, label_ru, "ru", "native", False)
+        p.add(
+            "slug",
+            path=f"uz/{day}-referendum/question-{number}" if many else f"uz/{day}-referendum/question",
+            entity_id=contest,
+            is_current=True,
+        )
+        p.add(
+            "note",
+            id=key("note", contest, "question"),
+            entity_id=contest,
+            kind="context",
+            body_md=q.ru,
+            lang="ru" if r.page else "uz",
+        )
+        result_set = key("result_set", day, "referendum", number)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=source,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add(
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md="National totals as the Central Election Commission's "
+            + ("page" if r.page else "decision")
+            + " words them: it prints no figures below the country. Each figure was read from the text and "
+            "checked against the phrase that prints it, and the printed shares against the votes.",
+            lang="en",
+        )
+        for index, caveat in enumerate(referendum_caveats(r)):
+            p.add(
+                "note",
+                id=key("note", result_set, index),
+                entity_id=result_set,
+                kind="caveat",
+                body_md=caveat,
+                lang="en",
+            )
+        rows: list[tuple[str | None, int, int]] = [(None, REGISTERED, r.registered[1]), (None, CAST, r.cast[1])]
+        if r.invalid:
+            rows.append((None, INVALID, r.invalid[1]))
+        yes_no = {}
+        for position, (answer, en, ru, votes) in enumerate(
+            (("yes", "Yes", "За", q.yes[1]), ("no", "No", "Против", q.no[1])), 1
+        ):
+            option = key("option", day, "referendum", number, answer)
+            yes_no[answer] = option
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="answer",
+                ballot_position=position,
+                ballot_label=en,
+            )
+            p.name(option, en, "en", "official")
+            p.name(option, ru, "ru", "native", False)
+            rows.append((option, VOTES, votes))
+        for option, measure, value in rows:
+            p.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=option,
+                channel=0,
+                measure=measure,
+                count_round=0,
+                flags=0,
+                value=value,
+            )
+            p.add("declared", result_set_id=result_set, option_id=option, measure=measure, value=value)
+        yes_won = q.yes[1] > q.no[1]
+        p.add("outcome", result_set_id=result_set, option_id=yes_no["yes"], kind=WON if yes_won else LOST)
+        p.add("outcome", result_set_id=result_set, option_id=yes_no["no"], kind=LOST if yes_won else WON)
     return p
