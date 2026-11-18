@@ -1,12 +1,18 @@
 import csv
 import functools
 import io
+import json
 import re
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
 from html.parser import HTMLParser
+from typing import Any
 from uuid import uuid5
+
+import shapely
+import shapely.geometry
+import shapely.ops
 
 from ea import changeset, package, raw
 from ea.package import Package
@@ -17,6 +23,16 @@ BASE = "https://wahlen.tirol.gv.at"
 AUSTRIA = str(uuid5(package.NAMESPACE, "polity\x1fAT"))
 LAND_POLITY = landtag.polity("AT-7")
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fAUT"))
+GEOBOUNDARIES = "at.tirol.geoboundaries"
+OUTLINES = (
+    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/AUT/ADM3/"
+    "geoBoundaries-AUT-ADM3_simplified.geojson"
+)
+# The 2017 outlines run from the first election to the merger of Matrei am Brenner, Mühlbachl, and Pfons on
+# 1 January 2022 (code 70370, first on the 2022 ballot).
+MERGED = ("70327", "70330", "70341")
+MERGER = "70370"
+MERGER_DATE = date(2022, 1, 1)
 
 
 @dataclass(frozen=True)
@@ -61,6 +77,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 SOURCE_ID = key("source", SOURCE)
+GEO_SOURCE = key("source", "geoboundaries")
 LANDTAG = key("body", "landtag")
 LAND = key("area", "at-7.land", "7")
 MEASURES = ((2, "registered"), (3, "cast"), (4, "valid"), (5, "invalid"))
@@ -71,6 +88,7 @@ def packages() -> list[str]:
 
 
 def fetch() -> None:
+    raw.fetch(GEOBOUNDARIES, OUTLINES, suffix=".geojson")
     for edition in EDITIONS:
         raw.fetch(SOURCE, edition.csv, suffix=".csv")
         raw.fetch(SOURCE, edition.page, suffix=".html")
@@ -335,7 +353,86 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=key("area", "at-7.bezirk", parent[code]))
         for index, text in enumerate(found):
             p.name(id, text, "de", "official", index == 0)
+    outlines(p, names, parent)
     return p
+
+
+def is_place(code: str) -> bool:
+    """Whether a code is a municipality and not a postal-ballot unit (postal units end in 99 or a letter)."""
+    return code.isdigit() and not code.endswith("99")
+
+
+def outlines(p: Package, names: dict[str, list[str]], parent: dict[str, str]) -> None:
+    """Attach the 2017 geoBoundaries outlines, matched by name inside Tyrol, then dissolve districts and the state."""
+    first_day = min(table(e)[0] for e in EDITIONS)
+    p.add(
+        "source",
+        id=GEO_SOURCE,
+        kind="academic",
+        publisher="geoBoundaries (Federal Office of Metrology and Survey, Austria)",
+        title="geoBoundaries gbOpen Austria ADM3, 2017",
+        url="https://www.geoboundaries.org/",
+        license="CC BY-SA 2.0",
+        license_url="https://creativecommons.org/licenses/by-sa/2.0/",
+        attribution="geoBoundaries (William & Mary geoLab), Federal Office of Metrology and Survey, Austria",
+    )
+    p.artifact(raw.cached(GEOBOUNDARIES, OUTLINES), GEO_SOURCE)
+    for since, until in ((first_day, MERGER_DATE), (MERGER_DATE, None)):
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", "at-7.gemeinde", since.year),
+            scheme_code="at-7.gemeinde",
+            vintage="2017" if until else "2017, with Matrei am Brenner merged",
+            valid_from=since,
+            valid_to=until,
+            as_of=date(2017, 1, 1),
+        )
+    by_name: dict[str, list[Any]] = {}
+    for feature in json.loads(raw.cached(GEOBOUNDARIES, OUTLINES).path.read_text("utf-8"))["features"]:
+        shape = shapely.geometry.shape(feature["geometry"])
+        centre = shape.representative_point()
+        if 10.0 < centre.x < 13.0 and 46.6 < centre.y < 47.8:
+            by_name.setdefault(feature["properties"]["shapeName"], []).append(shape)
+    shapes: dict[str, Any] = {}
+    for code, found in sorted(names.items()):
+        if not is_place(code) or code == MERGER:
+            continue
+        matched = [shape for text in found for shape in by_name.get(text, [])]
+        if len(matched) != 1:
+            raise ValueError(f"{code} {found}: {len(matched)} outlines in the geoBoundaries file")
+        shapes[code] = matched[0]
+    merged = shapely.ops.unary_union([shapes[code] for code in MERGED])
+    rows: list[tuple[str, Any, date | None, date | None]] = []
+    for code, shape in shapes.items():
+        rows.append((key("area", "at-7.gemeinde", code), shape, first_day, MERGER_DATE if code in MERGED else None))
+    rows.append((key("area", "at-7.gemeinde", MERGER), merged, MERGER_DATE, None))
+    for window, live in ((first_day, MERGER_DATE), (MERGER_DATE, None)):
+        groups: dict[str, list[Any]] = {}
+        for code, shape in shapes.items():
+            if live is None and code in MERGED:
+                continue
+            groups.setdefault(parent[code], []).append(shape)
+        if live is None:
+            groups.setdefault(parent[MERGER], []).append(merged)
+        dissolved = {code: shapely.ops.unary_union(group) for code, group in groups.items()}
+        for code, shape in dissolved.items():
+            rows.append((key("area", "at-7.bezirk", code), shape, window, live))
+        rows.append((LAND, shapely.ops.unary_union(list(dissolved.values())), window, live))
+    for area, shape, since, until in rows:
+        if shape.geom_type == "Polygon":
+            shape = shapely.geometry.MultiPolygon([shape])
+        p.add(
+            "area_geometry",
+            area_id=area,
+            valid_from=since,
+            valid_to=until,
+            geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+            label_point=shapely.to_wkb(
+                shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+            ),
+            quality="academic",
+            source_id=GEO_SOURCE,
+        )
 
 
 def registry() -> Package:
