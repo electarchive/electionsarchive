@@ -100,15 +100,17 @@ ASSEMBLY_METHOD = (
     "First preference votes per voting venue, as the NSW Electoral Commission publishes them in its final votes "
     "spreadsheet for each election. Ordinary votes are reported per election-day voting centre and per early voting "
     "centre; absent, postal, iVote, provisional, enrolment, and declared-institution votes are reported once per "
-    "district and are stored as one unit each. The count of preferences after the first is not stored here, and no "
-    "elected member is recorded."
+    "district and are stored as one unit each. The member elected is recorded as the commission's distribution of "
+    "preferences page for the district declares it; a candidate excluded during the count is recorded as eliminated, "
+    "and each other candidate as lost. The count of preferences after the first is not stored here."
 )
 ASSEMBLY_METHOD_2011 = (
     "First preference votes per polling place in one district, as the NSW Electoral Commission's results pages for "
     "the 2011 election print them after the final count. Votes counted outside a polling place (postal and iVote, "
     "declared institution, absent, provisional and silent, enrolment, and pre-poll votes) are reported once per "
-    "district and are stored as one unit each. The count of preferences after the first is not stored here, and no "
-    "elected member is recorded."
+    "district and are stored as one unit each. The member elected is the one the district summary page declares "
+    "elected; of the other candidates, the one who stood in the final two-candidate count is recorded as lost and "
+    "the rest as eliminated. The count of preferences after the first is not stored here."
 )
 COUNCIL_METHOD = (
     "First preference votes per voting venue for the councillor election of one council, as the NSW Electoral "
@@ -162,7 +164,9 @@ BYE_METHOD = (
     "First preference votes per voting venue in one by-election for the Legislative Assembly, as the NSW Electoral "
     "Commission's first preference report prints them. Votes counted outside a voting venue (absent, postal, iVote, "
     "provisional, enrolment, and declared-institution votes) are reported once per district and are stored as one "
-    "unit each. The distribution of preferences and the member elected are not stored here."
+    "unit each. The member elected is recorded as the commission's distribution of preferences page declares it; a "
+    "candidate excluded during the count is recorded as eliminated, and each other candidate as lost. The count of "
+    "preferences after the first is not stored here."
 )
 
 
@@ -175,6 +179,7 @@ def fetch() -> None:
             fetch_2011()
         else:
             raw.fetch(SOURCE, state_url(year), suffix=".xlsx")
+    fetch_dop()
     for config in COUNCIL.values():
         if config.workbook is not None:
             raw.fetch(SOURCE, config.workbook, suffix=".xlsx")
@@ -237,6 +242,8 @@ class District2011(NamedTuple):
     totals: dict[str, int]
     formal: int
     informal: int
+    elected: str
+    final: list[str]
 
 
 def district_pages_2011() -> list[tuple[str, str, str]]:
@@ -254,7 +261,15 @@ def district_pages_2011() -> list[tuple[str, str, str]]:
 CDN_SCRIPT = re.compile(rb"<script>\(function\(\)\{function c\(\)\{.*?__CF\$cv\$params.*?</script>", re.DOTALL)
 
 
-def fetch_page_2011(client: httpx.Client, url: str) -> None:
+# The host also scrambles each email-protection link with a fresh key on every request.
+EMAIL_LINK = re.compile(rb'href="/cdn-cgi/l/email-protection#[0-9a-f]+"')
+
+
+# It likewise injects font rules whose order varies from one request to the next.
+CDN_FONTS = re.compile(rb'<style type="text/css">@font-face[^<]*?/cf-fonts/[^<]*</style>')
+
+
+def fetch_page(client: httpx.Client, url: str) -> None:
     if url in raw.keys(SOURCE):
         return
     for attempt in range(4):
@@ -266,7 +281,9 @@ def fetch_page_2011(client: httpx.Client, url: str) -> None:
             if attempt == 3:
                 raise
             sleep(2**attempt)
-    content = CDN_SCRIPT.sub(b"", response.content)
+    content = EMAIL_LINK.sub(
+        b'href="/cdn-cgi/l/email-protection"', CDN_FONTS.sub(b"", CDN_SCRIPT.sub(b"", response.content))
+    )
     if b"__CF$cv$params" in content:
         raise ValueError(f"{url}: the CDN script was not removed")
     raw.store(
@@ -283,15 +300,83 @@ def fetch_2011() -> None:
     from concurrent.futures import ThreadPoolExecutor
 
     with httpx.Client(headers={"User-Agent": raw.USER_AGENT}, follow_redirects=True, timeout=120) as client:
-        fetch_page_2011(client, state_url(2011))
+        fetch_page(client, state_url(2011))
         urls = [u for _, a, b in district_pages_2011() for u in (a, b)]
         with ThreadPoolExecutor(8) as pool:
-            list(pool.map(lambda u: fetch_page_2011(client, u), urls))
+            list(pool.map(lambda u: fetch_page(client, u), urls))
+
+
+# 2015-2023: the commission's distribution of preferences pages -------------------------------------------------
+
+DOP_INDEX = {
+    2015: f"{PAST}/SGE2015/la-home.htm",
+    2019: f"{PAST}/SG1901/LA/results",
+    2023: f"{PAST}/SG2301/LA/results",
+}
+DOP_LINK = {
+    2015: re.compile(r'href="/la/([a-z0-9-]+)/dop/dop/index\.htm"'),
+    2019: re.compile(r'href="/SG1901/LA/([a-z0-9-]+)/dop/dop"'),
+    2023: re.compile(r'href="/SG2301/LA/([a-z0-9-]+)/dop/dop"'),
+}
+
+
+def dop_slugs(year: int) -> list[str]:
+    text = raw.cached(SOURCE, DOP_INDEX[year]).path.read_text(encoding="utf-8", errors="replace")
+    pattern = DOP_LINK[year]
+    if year == 2015:
+        text = text.replace('href="/SGE2015/', 'href="/')
+    slugs = sorted(set(pattern.findall(text)))
+    if not slugs:
+        raise ValueError(f"{DOP_INDEX[year]}: no distribution of preferences links")
+    return slugs
+
+
+def dop_url(year: int, slug: str) -> str:
+    if year == 2015:
+        return f"{PAST}/SGE2015/la/{slug}/dop/dop/index.htm"
+    return f"{PAST}/{'SG1901' if year == 2019 else 'SG2301'}/LA/{slug}/dop/dop"
+
+
+def dop_pages(year: int) -> list[str]:
+    if year not in DOP_INDEX:
+        return []
+    return [DOP_INDEX[year], *(dop_url(year, slug) for slug in dop_slugs(year))]
+
+
+def fetch_dop() -> None:
+    from concurrent.futures import ThreadPoolExecutor
+
+    with httpx.Client(headers={"User-Agent": raw.USER_AGENT}, follow_redirects=True, timeout=120) as client:
+        for index in DOP_INDEX.values():
+            fetch_page(client, index)
+        urls = [u for year in DOP_INDEX for u in dop_pages(year)[1:]]
+        with ThreadPoolExecutor(8) as pool:
+            list(pool.map(lambda u: fetch_page(client, u), urls))
+
+
+def dop_outcomes(year: int, slug: str) -> dict[str, str]:
+    """Each candidate's printed ballot name on a district's count page, with elected, eliminated, or lost."""
+    page = raw.cached(SOURCE, dop_url(year, slug)).path.read_text(encoding="utf-8", errors="replace")
+    out: dict[str, str] = {}
+    for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", page, flags=re.DOTALL | re.IGNORECASE):
+        cells = re.findall(r"<td[^>]*>(.*?)</td>", tr, flags=re.DOTALL | re.IGNORECASE)
+        if not cells or "<br" not in cells[0].lower():
+            continue
+        name = html.unescape(re.split(r"<br\s*/?>", cells[0], flags=re.IGNORECASE)[0]).strip()
+        texts = [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", c))).strip() for c in cells[1:]]
+        elected = any(t.startswith("ELECTED") for t in texts)
+        excluded = any(t == "EXCLUDED" for t in texts)
+        if elected and excluded:
+            raise ValueError(f"{dop_url(year, slug)}: {name} is both elected and excluded")
+        out[name] = "elected" if elected else "eliminated" if excluded else "lost"
+    if sum(v == "elected" for v in out.values()) != 1:
+        raise ValueError(f"{dop_url(year, slug)}: expected one elected candidate in {out}")
+    return out
 
 
 def state_pages(year: int) -> list[str]:
     if year != 2011:
-        return [state_url(year)]
+        return [state_url(year), *dop_pages(year)]
     return [state_url(2011), *(u for _, a, b in district_pages_2011() for u in (a, b))]
 
 
@@ -324,6 +409,26 @@ def district_2011(slug: str, summary: str, venues: str) -> District2011:
         m.group(2): html.unescape(m.group(1))
         for m in re.finditer(r'<a class="partyname" title="([^"]*)">([^<]+)</a>', page)
     }
+    summary_rows = table_rows(summary)
+    start = next(i for i, r in enumerate(summary_rows) if r[0] == "Candidate" and r[1:3] == ["Party", "Votes"])
+    declared = re.search(r'<span class="candidatename">([^<]+)</span></b>(?:&nbsp;|\s)*was declared elected on', page)
+    if declared is None:
+        raise ValueError(f"{summary}: no declaration of the member elected")
+    final: list[str] = []
+    winner = ""
+    for r in summary_rows[start + 1 :]:
+        if len(r) < 3 or r[0] == "Candidate" or not re.fullmatch(r"[\d,]+", r[2]):
+            break
+        full, party_code = r[0].rstrip("+").strip(), r[1].rstrip("+").strip()
+        surname = full.split(" ")[0]
+        hits = [i for i, x in enumerate(labels) if x.split(" ")[0] == surname and parties[i] == party_code]
+        if len(hits) != 1:
+            raise ValueError(f"{summary}: cannot match two-candidate row {r[:2]} to {labels}")
+        final.append(labels[hits[0]])
+        if full == html.unescape(declared.group(1)).strip():
+            winner = labels[hits[0]]
+    if len(final) != 2 or not winner:
+        raise ValueError(f"{summary}: the declared member {declared.group(1)!r} is not in {final}")
     out: list[Row] = []
     totals: dict[str, int] = {}
     formal = informal = 0
@@ -344,7 +449,7 @@ def district_2011(slug: str, summary: str, venues: str) -> District2011:
         for cand, party, votes in zip(labels, parties, nums[: len(labels)], strict=True):
             out.append(Row(name, subtype, label, cand, party, names.get(party, ""), votes))
         out.append(Row(name, subtype, label, "Informal", "", "", nums[len(labels) + 1]))
-    return District2011(name, _votes(enrolled.group(1)), out, totals, formal, informal)
+    return District2011(name, _votes(enrolled.group(1)), out, totals, formal, informal, winner, final)
 
 
 _D2011: list[District2011] = []
@@ -751,6 +856,22 @@ def state_election(year: int) -> Package:
                 is_independent=parties_of[candidate] in NO_PARTY,
             )
             del order
+        if year == 2011:
+            d11 = next(x for x in districts_2011() if x.name == name)
+            statuses = {
+                c: "elected" if c == d11.elected else "lost" if c in d11.final else "eliminated" for c in options
+            }
+        else:
+            slug = {changeset.slug(x): x for x in dop_slugs(year)}.get(changeset.slug(name))
+            if slug is None:
+                raise ValueError(f"{year}: no distribution of preferences page for {name}")
+            statuses = dop_outcomes(year, slug)
+            if set(statuses) != set(options):
+                raise ValueError(
+                    f"{year} {name}: count page candidates {sorted(statuses)} differ from {sorted(options)}"
+                )
+        for candidate, kind in statuses.items():
+            p.add("outcome", result_set_id=result_set, option_id=options[candidate], kind=kind)
         units: dict[tuple[str, str], str] = {}
         valid: Counter[str] = Counter()
         bad: Counter[str] = Counter()
@@ -1638,6 +1759,77 @@ def byes() -> list[Bye]:
     return sorted(found.values(), key=lambda b: (b.day, b.district))
 
 
+BYE_DOP_LEAVES = {
+    "dop.html",
+    "dop.htm",
+    "dop_report.html",
+    "dopreport.html",
+    "distributionofpreferencesreport.html",
+}
+
+
+def _flat(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", text.lower())
+
+
+def bye_dop_pages() -> dict[tuple[str, str], tuple[str, str]]:
+    """The distribution of preferences page for each by-election district: (store, page url)."""
+    found: dict[tuple[str, str], tuple[str, str]] = {}
+    for store in (BYE_RESULTS, BYE_PAST):
+        for url in _pages(store):
+            code = re.search(r"/(sb\d{4})/", url, re.IGNORECASE)
+            parts = url.split("/")
+            if code and parts[-1].lower() in BYE_DOP_LEAVES:
+                district = parts[-3] if "Parliamentary" in url else parts[-2]
+                found.setdefault((code.group(1).upper(), _flat(district)), (store, url))
+    return found
+
+
+def bye_dop(b: Bye) -> tuple[str, str]:
+    try:
+        return bye_dop_pages()[(b.code, _flat(b.district))]
+    except KeyError:
+        raise ValueError(f"{b.code} {b.district}: no distribution of preferences page") from None
+
+
+def bye_outcomes(b: Bye) -> dict[str, str]:
+    """Each candidate's ballot name (as in b.candidates) with elected, eliminated, or lost."""
+    store, url = bye_dop(b)
+    page = re.sub(r"<br\s*/?>", "\u00a6", _pages(store)[url], flags=re.IGNORECASE)
+    rows = _cells(page)
+    excluded: set[str] = set()
+    for r in rows:
+        for cell in r:
+            if cell.endswith("Excluded Candidate"):
+                name = cell[: -len("Excluded Candidate")].strip("\u00a6 ")
+                excluded |= {name.upper(), re.sub(r"\s*\([^)]*\)$", "", name).upper()}
+    start = next((i for i, r in enumerate(rows) if r and r[0] == "Candidates"), None)
+    if start is None:
+        raise ValueError(f"{url}: no candidate table")
+    status: dict[str, str] = {}
+    for r in rows[start + 1 :]:
+        if not r or r[0].startswith("Total"):
+            break
+        printed = r[0].split("\u00a6")[0].strip()
+        elected = any(c.upper().startswith("ELECTED") for c in r[1:])
+        out = any(c == "EXCLUDED" for c in r[1:]) or (
+            printed.upper() in excluded or re.sub(r"\s*\([^)]*\)$", "", printed).upper() in excluded
+        )
+        if elected and out:
+            raise ValueError(f"{url}: {printed} is both elected and excluded")
+        status[printed.upper()] = "elected" if elected else "eliminated" if out else "lost"
+    result: dict[str, str] = {}
+    for name, _, _ in b.candidates:
+        key_ = name.upper()
+        hits = [k for k in status if k == key_ or k.startswith(key_ + " ")]
+        if len(hits) != 1:
+            raise ValueError(f"{url}: candidate {name!r} matches {hits} on the count page")
+        result[name] = status[hits[0]]
+    if len(set(result.values())) < 1 or sum(v == "elected" for v in result.values()) != 1 or len(result) != len(status):
+        raise ValueError(f"{url}: count page candidates {sorted(status)} do not match {sorted(result)}")
+    return result
+
+
 def bye_party(name: str, acronym: str) -> tuple[str, str]:
     """The party key and display name for a by-election candidate's printed party."""
     if name and name not in NO_PARTY:
@@ -1674,7 +1866,7 @@ def bye_election(day: date, items: list[Bye]) -> Package:
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external |= {AUSTRALIA}
-    for store in sorted({b.store for b in items}):
+    for store in sorted({b.store for b in items} | {bye_dop(b)[0] for b in items}):
         p.uses(raw.cached(SOURCE, store))
     election_id = key("election", "by", day)
     path = f"au/nsw/{day}-by-election"
@@ -1760,6 +1952,13 @@ def bye_election(day: date, items: list[Bye]) -> Package:
                 ballot_name=cand,
                 member_of_party_id=pid or None,
                 is_independent=not pid,
+            )
+        for cand, kind in bye_outcomes(b).items():
+            p.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=options[b.candidates.index(next(c for c in b.candidates if c[0] == cand))],
+                kind=kind,
             )
         for i, (_, _, votes) in enumerate(b.summary):
             p.add("declared", result_set_id=result_set, option_id=options[i], measure=1, value=votes)
