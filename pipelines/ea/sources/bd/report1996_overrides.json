@@ -1,0 +1,743 @@
+{
+ "14": {
+  "votes": [
+   35030,
+   731,
+   572,
+   8702,
+   34439,
+   1810,
+   37546,
+   446,
+   577
+  ],
+  "registered": 163954,
+  "valid": 119853,
+  "invalid": 1869,
+  "cast": 121722,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "23": {
+  "votes": [
+   24541,
+   310,
+   87387,
+   50839,
+   326,
+   242,
+   3305,
+   1263,
+   1020,
+   337
+  ],
+  "registered": 228834,
+  "valid": 169570,
+  "invalid": 2002,
+  "cast": 171572,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "36": {
+  "votes": [
+   499,
+   4456,
+   92543,
+   35889,
+   13007
+  ],
+  "registered": 203239,
+  "valid": 146394,
+  "invalid": 1628,
+  "cast": 148022,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "86": {
+  "votes": [
+   48393,
+   844,
+   120,
+   4774,
+   333,
+   58405,
+   186,
+   86752,
+   3352
+  ],
+  "registered": 231141,
+  "valid": 203159,
+  "invalid": 1686,
+  "cast": 204845,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "113": {
+  "votes": [
+   2043,
+   5332,
+   331,
+   329,
+   126,
+   52369,
+   10328,
+   294,
+   63951
+  ],
+  "registered": 217923,
+  "valid": 135103,
+  "invalid": 1676,
+  "cast": 136779,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "114": {
+  "votes": [
+   45937,
+   145,
+   204,
+   208,
+   1680,
+   393,
+   45913,
+   4180,
+   247
+  ],
+  "registered": 142428,
+  "valid": 98907,
+  "invalid": 1041,
+  "cast": 99948,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "115": {
+  "votes": [
+   50639,
+   180,
+   3977,
+   31281,
+   380,
+   5754,
+   190,
+   243,
+   3257,
+   212
+  ],
+  "registered": 156079,
+  "valid": 96113,
+  "invalid": 1213,
+  "cast": 97326,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "121": {
+  "votes": [
+   1619,
+   52418,
+   374,
+   50125,
+   79,
+   111,
+   5395,
+   6054
+  ],
+  "registered": 150429,
+  "valid": 116175,
+  "invalid": 1148,
+  "cast": 117323,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "141": {
+  "votes": [
+   13574,
+   46722,
+   29341,
+   21303,
+   8157,
+   13054,
+   324
+  ],
+  "registered": 193161,
+  "valid": 132475,
+  "invalid": 1811,
+  "cast": 134286,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "143": {
+  "votes": [
+   44666,
+   248,
+   28692,
+   80056,
+   278,
+   2132,
+   4725,
+   241
+  ],
+  "registered": 251963,
+  "valid": 161038,
+  "invalid": 1814,
+  "cast": 162852,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "147": {
+  "votes": [
+   45659,
+   63574,
+   4314,
+   41456
+  ],
+  "registered": 211061,
+  "valid": 155003,
+  "invalid": 2134,
+  "cast": 157137,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "156": {
+  "votes": [
+   5438,
+   113,
+   18190,
+   34029,
+   154,
+   391,
+   211,
+   32908
+  ],
+  "registered": 158548,
+  "valid": 91434,
+  "invalid": 1039,
+  "cast": 92473,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "175": {
+  "registered": 163845,
+  "valid": 130832,
+  "invalid": 1323,
+  "cast": 132155,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes. The page's rows could not be told apart by machine, so each candidate's name, party, and votes were read by eye.",
+  "candidates": [
+   [
+    "Alhaj Mou. Hafiz Nur Mohammad",
+    "Bangladesh Khelafat Andolon",
+    814
+   ],
+   [
+    "Golam Sarwar Milon",
+    "Jatiya Party",
+    26823
+   ],
+   [
+    "Md. Ali Jilkot Ahmed",
+    "Bangladesh Awami League",
+    38796
+   ],
+   [
+    "Md. Habibur Rahman",
+    "Jatiya Janata Party (Sheikh Asad)",
+    343
+   ],
+   [
+    "Md. Kismot Ali",
+    "Bangladesher Communist Party",
+    448
+   ],
+   [
+    "Md. Sahidur Rahman Ankhi",
+    "Jaker Party",
+    798
+   ],
+   [
+    "Md. Zakirul Islam Khan",
+    "Jamat-E-Islami Bangladesh",
+    994
+   ],
+   [
+    "Shamsul Islam Khan",
+    "Bangladesh Nationalist Party",
+    61816
+   ]
+  ]
+ },
+ "179": {
+  "parties": {
+   "2": "Independent"
+  },
+  "reason": "The second candidate's party cell is illegible in the scan; the symbol, Television, is not a party's, so the candidate is independent."
+ },
+ "189": {
+  "votes": [
+   105,
+   11114,
+   27,
+   4973,
+   74214,
+   125,
+   626,
+   63631,
+   45,
+   150,
+   37,
+   31,
+   53,
+   552,
+   394,
+   133,
+   796,
+   59,
+   30
+  ],
+  "registered": 239123,
+  "valid": 157095,
+  "invalid": 987,
+  "cast": 158082,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "190": {
+  "votes": [
+   128766,
+   8946,
+   112,
+   105,
+   51,
+   1370,
+   66,
+   2292,
+   102307,
+   45,
+   43,
+   129,
+   24958,
+   682,
+   32,
+   71,
+   469,
+   31,
+   32
+  ],
+  "registered": 405660,
+  "valid": 270507,
+  "invalid": 2351,
+  "cast": 272858,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "191": {
+  "votes": [
+   71243,
+   67,
+   47343,
+   33361,
+   4450,
+   421,
+   595,
+   1357,
+   366
+  ],
+  "registered": 212570,
+  "valid": 159203,
+  "invalid": 1716,
+  "cast": 160919,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "192": {
+  "votes": [
+   4624,
+   5454,
+   2991,
+   45164,
+   296,
+   2384,
+   514,
+   1753,
+   76427
+  ],
+  "registered": 168722,
+  "valid": 139607,
+  "invalid": 1415,
+  "cast": 141022,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "193": {
+  "votes": [
+   417,
+   95121,
+   498,
+   81854,
+   4498,
+   808,
+   53696,
+   563
+  ],
+  "registered": 295992,
+  "valid": 237455,
+  "invalid": 2001,
+  "cast": 239456,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "194": {
+  "votes": [
+   378,
+   692,
+   71528,
+   291,
+   5543,
+   230,
+   94732,
+   82,
+   1175,
+   62,
+   538,
+   91,
+   1343,
+   71,
+   79168,
+   263
+  ],
+  "registered": 337945,
+  "valid": 256187,
+  "invalid": 1690,
+  "cast": 257877,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "196": {
+  "votes": [
+   3486,
+   546,
+   56504,
+   49627,
+   133,
+   5838,
+   90,
+   175,
+   1178,
+   132,
+   40
+  ],
+  "registered": 149261,
+  "valid": 117749,
+  "invalid": 1082,
+  "cast": 118831,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "197": {
+  "votes": [
+   122,
+   45353,
+   4616,
+   27461,
+   2134,
+   225,
+   54,
+   125,
+   189,
+   58342,
+   7968
+  ],
+  "registered": 197334,
+  "valid": 146589,
+  "invalid": 1328,
+  "cast": 147917,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "198": {
+  "votes": [
+   2658,
+   23747,
+   45243,
+   3529,
+   28,
+   23605,
+   1165,
+   213,
+   4227,
+   138,
+   1177,
+   71
+  ],
+  "registered": 129782,
+  "valid": 105801,
+  "invalid": 857,
+  "cast": 106658,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "199": {
+  "votes": [
+   382,
+   48906,
+   26441,
+   1597,
+   1382,
+   904,
+   21688
+  ],
+  "registered": 121194,
+  "valid": 101300,
+  "invalid": 956,
+  "cast": 102256,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "200": {
+  "votes": [
+   3390,
+   131,
+   535,
+   6454,
+   1840,
+   78723,
+   77620,
+   545
+  ],
+  "registered": 204232,
+  "valid": 169238,
+  "invalid": 2338,
+  "cast": 171576,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "201": {
+  "votes": [
+   193,
+   61862,
+   398,
+   454,
+   3142,
+   21759,
+   256,
+   3675,
+   75672,
+   787
+  ],
+  "registered": 219827,
+  "valid": 168198,
+  "invalid": 2085,
+  "cast": 170283,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "222": {
+  "votes": [
+   82543,
+   550,
+   1650,
+   793,
+   500,
+   77339,
+   6005,
+   3052
+  ],
+  "registered": 221631,
+  "valid": 172432,
+  "invalid": 1897,
+  "cast": 174329,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "232": {
+  "votes": [
+   455,
+   10425,
+   13325,
+   29483,
+   15054,
+   364,
+   4860,
+   212,
+   14356,
+   237,
+   28120
+  ],
+  "registered": 187303,
+  "valid": 116891,
+  "invalid": 2194,
+  "cast": 119085,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "266": {
+  "votes": [
+   300,
+   65086,
+   385,
+   1758,
+   265,
+   15897,
+   8480,
+   289,
+   24138,
+   265,
+   133,
+   156
+  ],
+  "registered": 157248,
+  "valid": 117152,
+  "invalid": 1573,
+  "cast": 118725,
+  "reason": "Read by eye from the 300 dpi page image. The Awami League candidate's votes are partly illegible (\"24?38\"); 24138 is the printed valid votes less the other candidates' votes, and gives the printed 20.60%. Registered voters are partly illegible (\"157?48\"); 157248 gives the printed turnout of 75.50%."
+ },
+ "267": {
+  "registered": 212446,
+  "valid": 153359,
+  "invalid": 2374,
+  "cast": 155733,
+  "reason": "Read by eye from the 300 dpi page image. The Railway Engine candidate's votes are partly illegible; 107 is the printed valid votes less the other candidates' votes, and gives the printed 0.07%. The page's rows could not be told apart by machine, so each candidate's name, party, and votes were read by eye.",
+  "candidates": [
+   [
+    "A.F.M. Azizul Bari",
+    "Independent",
+    40
+   ],
+   [
+    "A.K.M. Fakhrul Islam Chowdhury",
+    "Independent",
+    78
+   ],
+   [
+    "Alamgir Kabir Chowdhury",
+    "Independent",
+    224
+   ],
+   [
+    "Amanat Ullah Aman",
+    "Independent",
+    116
+   ],
+   [
+    "Ferdaus Ahmed Qoreshi",
+    "Bangladesh Nationalist Party",
+    62647
+   ],
+   [
+    "Jahid Hossain (Khasru)",
+    "Independent",
+    107
+   ],
+   [
+    "Joinal Abedin",
+    "Bangladesher Samajtantrik Dal (Khalekuzzaman)",
+    341
+   ],
+   [
+    "Joinal Abedin Hajari",
+    "Bangladesh Awami League",
+    68566
+   ],
+   [
+    "Lt.Col (Rtd) Jafar Imam BB",
+    "Jatiya Party",
+    1507
+   ],
+   [
+    "M. Shajahan Saju",
+    "Independent",
+    176
+   ],
+   [
+    "Moulana A.T.M Kaikobad",
+    "Bangladesh Islami Front",
+    375
+   ],
+   [
+    "Moulana Nurul Karim Balal",
+    "Islami Oikya Jote",
+    462
+   ],
+   [
+    "Nur Mohammad Khan",
+    "Jaker Party",
+    333
+   ],
+   [
+    "Professor Joinal Abedin",
+    "Jatiya Samajtantrik Dal (Rab)",
+    5770
+   ],
+   [
+    "Professor Mohammad Liakat Ali Bhuiyan",
+    "Jamat-E-Islami Bangladesh",
+    11933
+   ],
+   [
+    "Shah Alam Majumder",
+    "Independent",
+    348
+   ],
+   [
+    "Shuk Dev Nath",
+    "Independent",
+    87
+   ],
+   [
+    "Zia Uddin",
+    "Freedom Party",
+    249
+   ]
+  ]
+ },
+ "270": {
+  "names": {
+   "5": "Md. Siddique Ullah (Jayagi)"
+  },
+  "reason": "The fifth candidate's name cell reads blank by OCR; read by eye from the page image."
+ },
+ "271": {
+  "votes": [
+   255,
+   25570,
+   16458,
+   5895,
+   165,
+   335,
+   1539,
+   6038,
+   66
+  ],
+  "registered": 89848,
+  "valid": 56321,
+  "invalid": 699,
+  "cast": 57020,
+  "reason": "The sixth candidate's name cell reads blank by OCR; read by eye from the page image.",
+  "names": {
+   "6": "Md. Mir Omar Faruk"
+  }
+ },
+ "272": {
+  "votes": [
+   113,
+   172,
+   233,
+   53413,
+   264,
+   6823,
+   61632,
+   368,
+   10972,
+   29,
+   305
+  ],
+  "registered": 213043,
+  "valid": 134324,
+  "invalid": 1688,
+  "cast": 136012,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "279": {
+  "votes": [
+   2382,
+   66336,
+   511,
+   62043,
+   199,
+   6102,
+   129
+  ],
+  "registered": 175343,
+  "valid": 137702,
+  "invalid": 1120,
+  "cast": 138822,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ },
+ "284": {
+  "votes": [
+   35993,
+   1519,
+   50059,
+   1504,
+   122,
+   6400
+  ],
+  "registered": 143372,
+  "valid": 95597,
+  "invalid": 1043,
+  "cast": 96640,
+  "reason": "Read by eye from the 300 dpi page image; the scan's rules and faint print defeated OCR here. The candidates' votes add to the printed valid votes."
+ }
+}
