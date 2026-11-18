@@ -47,6 +47,7 @@ OFFICES = {
     ),
 }
 SYSTEM = key("electoral_system", "assembly_vote")
+UNIT = key("unit", "national")
 
 
 @dataclass(frozen=True)
@@ -266,13 +267,23 @@ def registry() -> Package:
         SOURCE,
         "Viet Nam's State offices that the National Assembly elects, and the electoral system of those votes",
     )
-    p.external.add(VIETNAM)
+    p.external |= {VIETNAM, COUNTRY}
     p.add("scheme", code=SCHEME, polity_id=VIETNAM, kind="administrative", rank=1, noun="nation", code_system=None)
     for slug, (kind, en, vi) in OFFICES.items():
         office = key("office", slug)
         p.add("office", id=office, polity_id=VIETNAM, kind=kind)
         p.name(office, en, "en", "official")
         p.name(office, vi, "vi", "official", False)
+    p.add(
+        "reporting_unit",
+        id=UNIT,
+        polity_id=VIETNAM,
+        scheme_code=SCHEME,
+        code="VN",
+        area_relation="equals",
+        area_id=COUNTRY,
+        kind="aggregate",
+    )
     p.add("electoral_system", id=SYSTEM, polity_id=VIETNAM, rules={"formula": "fptp"}, rules_version=1)
     p.add(
         "note",
@@ -293,7 +304,7 @@ def election(d: Day) -> Package:
         f"{d.title}, {day:%-d %B %Y}, from the Assembly's press releases",
         depends=[f"{SOURCE}/registry"],
     )
-    p.external |= {VIETNAM, COUNTRY}
+    p.external.add(VIETNAM)
     _sources(p)
     for url in urls(d):
         p.artifact(raw.cached(SOURCE, url), GOVERNMENT if "vanban." in url else PORTAL)
@@ -303,17 +314,7 @@ def election(d: Day) -> Package:
     p.add("slug", path=path, entity_id=eid, is_current=True)
     p.name(eid, f"{day:%-d %B %Y} National Assembly vote: {d.title}", "en", "official")
     p.name(eid, d.title_vi, "vi", "native", False)
-    unit = key("unit", day)
-    p.add(
-        "reporting_unit",
-        id=unit,
-        polity_id=VIETNAM,
-        scheme_code=SCHEME,
-        code="VN",
-        area_relation="equals",
-        area_id=COUNTRY,
-        kind="aggregate",
-    )
+    unit = UNIT
     rows: list[tuple[str, str | None, int, int]] = []
     for v in d.votes:
         office = key("office", v.office)
