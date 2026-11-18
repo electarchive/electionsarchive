@@ -32,12 +32,12 @@ PRESIDENCY = servel.PRESIDENCY
 DPI = 150
 
 # Measures
-VOTES, CAST, INVALID, BLANK = 1, 3, 5, 6
+VOTES, REGISTERED, CAST, INVALID, BLANK = 1, 2, 3, 5, 6
 
 
 class Column(NamedTuple):
     key: str  # the column's key in presidente.tsv
-    kind: str  # candidate, others, invalid, blank, cast
+    kind: str  # candidate, others, invalid, blank, cast, registered
     label: str  # the printed heading, or the candidate's printed name
 
 
@@ -53,6 +53,11 @@ class Election(NamedTuple):
     caveat: str
     advanced: tuple[str, ...] = ()  # with no majority, the two candidates the Congreso Pleno chose between
     misprints: tuple[str, ...] = ()  # provinces whose printed figures do not add up, and columns that differ nationally
+    areas: tuple[
+        tuple[str, str], ...
+    ] = ()  # provinces whose area belongs to another division in this election, by that division
+    absent: tuple[str, ...] = ()  # provinces of the division that did not yet exist, being part of another one
+    misprinted: str = ""  # why the printed figures disagree, when the returns' misprint is not a candidate's figure
 
 
 def _c(key: str, name: str) -> Column:
@@ -142,6 +147,46 @@ ELECTIONS: dict[int, Election] = {
             "Magallanes were not called to vote. The national roll is the number of registrations the Registry "
             "counted on election day, before the cancellations it lists."
         ),
+    ),
+    1938: Election(
+        date(1938, 10, 25),
+        "general",
+        BROWSER + "1938.pdf",
+        "1937",
+        (
+            Column("registered", "registered", "Inscritos hábiles"),
+            _c("aguirre", "Pedro Aguirre Cerda"),
+            _c("ross", "Gustavo Ross Santa María"),
+            _c("ibanez", "Carlos Ibáñez del Campo"),
+            Column("scattered", "others", "Dispersos, a diversos nombres"),
+            Column("blank", "blank", "En blanco"),
+            Column("invalid", "invalid", "Votos anulados no escrutados por el Tribunal Calificador"),
+            TOTAL,
+        ),
+        "aguirre",
+        None,
+        "25 de octubre de 1938",
+        (
+            "Province totals from the Registro Electoral's general result by communes, departments and provinces, as "
+            "the Tribunal Calificador counted the election in its session of 12 December 1938. The returns also print "
+            "each department and commune, which this result set does not hold. Registered voters (inscritos hábiles) "
+            "are printed by province and stored as such. Blank votes and the null votes the Tribunal did not count "
+            "are separate columns. Osorno was still a department of Valdivia, so Valdivia's figures cover the "
+            "province as it stood before Osorno was made a province in 1940. Carlos Ibáñez withdrew before the vote; "
+            "the returns still credit him with 112 votes. In Arauco the 18 votes of the province row sit under the "
+            "null votes, where its departments print them; read so, every column adds up to the national figures. "
+            "Chiloé's printed total of voters, 5,770, is ten fewer than its own figures and its departments add up "
+            "to (5,780); the national total of 443,888 includes the 5,780. Chiloé's figure is stored as printed. "
+            "Pedro Aguirre Cerda won an absolute majority of the valid votes and was proclaimed President."
+        ),
+        misprints=("Chiloé", "total"),
+        misprinted=(
+            "The returns print Chiloé's total of voters as 5,770, ten fewer than its own figures and its departments "
+            "add up to, while the printed national total counts 5,780; both are stored as printed, as the result "
+            "set's caveat says."
+        ),
+        areas=(("Valdivia", "1938"),),
+        absent=("Osorno",),
     ),
     1942: Election(
         date(1942, 2, 1),
@@ -357,11 +402,13 @@ PROVINCES: dict[str, tuple[str, ...]] = {
         "Aysén",
         "Magallanes",
     ),
+    "1938": ("Valdivia",),
 }
 DIVISIONS = {
     "1925": "provincial division of 1925 to 1927",
     "1928": "provincial division of 1928 to 1936",
     "1937": "provincial division of 1937 to 1974",
+    "1938": "provincial division of 1937 to 1940, with Osorno",
 }
 SYSTEM_RULES = {"formula": "contingent", "majority": 0.5, "chooser": "legislature", "among": 2}
 SYSTEM_NOTE = (
@@ -390,6 +437,15 @@ def slug(text: str) -> str:
 
 def area(period: str, province: str) -> str:
     return key("area", SCHEME, f"{period}:{slug(province)}")
+
+
+def units(election: Election) -> list[tuple[str, str]]:
+    """The provinces an election's returns list, in printed order, each with the division its area belongs to."""
+    return [
+        (dict(election.areas).get(name, election.period), name)
+        for name in PROVINCES[election.period]
+        if name not in election.absent
+    ]
 
 
 def packages() -> list[str]:
@@ -445,12 +501,12 @@ def parse() -> None:
         rows = frame.filter(pl.col("year") == year)
         provinces = rows.filter(pl.col("province") != "TOTAL")
         names = provinces["province"].unique(maintain_order=True).to_list()
-        if sorted(names) != sorted(PROVINCES[election.period]):
+        if sorted(names) != sorted(name for _, name in units(election)):
             raise ValueError(f"{year}: provinces {names} differ from the {election.period} division")
         keys = {c.key for c in election.columns}
         if {c for c in rows["column"] if not sexed(c)} != keys:
             raise ValueError(f"{year}: columns {sorted(set(rows['column']))}, expected {sorted(keys)}")
-        parts = [c.key for c in election.columns if c.kind != "cast"]
+        parts = [c.key for c in election.columns if c.kind not in ("cast", "registered")]
         for name in names:
             row = dict(provinces.filter(pl.col("province") == name).select("column", "value").iter_rows())
             if name not in election.misprints and sum(row.get(k, 0) for k in parts) != row["total"]:
@@ -603,7 +659,8 @@ def build(year: int) -> Package:
     if election.misprints:
         p.accept(
             "accounting.declared",
-            "The returns' printed national figure for a candidate differs from the sum of their printed province "
+            election.misprinted
+            or "The returns' printed national figure for a candidate differs from the sum of their printed province "
             "figures; both are stored as printed, as the result set's caveat says.",
         )
 
@@ -637,7 +694,9 @@ def build(year: int) -> Package:
                     is_independent=None,
                 )
         else:
-            measures[column.key] = {"invalid": INVALID, "blank": BLANK, "cast": CAST}[column.kind]
+            measures[column.key] = {"invalid": INVALID, "blank": BLANK, "cast": CAST, "registered": REGISTERED}[
+                column.kind
+            ]
     if election.advanced:
         for column in election.advanced:
             p.add("outcome", result_set_id=result_set, option_id=options[column], kind="advanced")
@@ -659,16 +718,16 @@ def build(year: int) -> Package:
 
     facts: list[tuple[str, str | None, int, int]] = []
     boxes: list[tuple[str, str | None, int, str, float, float, float, float]] = []
-    for name in PROVINCES[election.period]:
-        unit = key("unit", election.period, slug(name))
+    for period, name in units(election):
+        unit = key("unit", period, slug(name))
         p.add(
             "reporting_unit",
             id=unit,
             polity_id=CHILE,
             scheme_code=SCHEME,
-            code=f"{election.period}:{slug(name)}",
+            code=f"{period}:{slug(name)}",
             area_relation="equals",
-            area_id=area(election.period, name),
+            area_id=area(period, name),
             kind="standard",
         )
         for column, value, page, x0, y0, x1, y1 in (
