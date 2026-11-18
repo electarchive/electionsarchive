@@ -303,6 +303,34 @@
       "url": "https://legalinfo.mn/mn/detail/16106891842531",
       "kind": "official_body",
       "note": "Sets the first-round presidential vote for 9 June 2021."
+    },
+    "a2016_call": {
+      "title": "Монгол Улсын Их Хурлын болон аймаг, нийслэлийн иргэдийн Төлөөлөгчдийн Хурлын ээлжит сонгуулийн санал авах өдрийг тогтоох тухай (Улсын Их Хурлын 2016 оны 09 дүгээр тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/11628",
+      "kind": "official_body",
+      "note": "Sets the voting day for the regular State Great Khural and aimag and capital khural elections of 29 June 2016 (the day as amended by resolution 39 of 5 May 2016), with voting abroad on 17 to 19 June."
+    },
+    "a2016_districts": {
+      "title": "Монгол Улсын Их Хурлын сонгуулийн тойрог байгуулах, тойргийн мандатын тоо, дугаар, нутаг дэвсгэр, төвийг тогтоох тухай (Улсын Их Хурлын 2016 оны 41 дүгээр тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/11903",
+      "kind": "official_body",
+      "note": "Forms 76 constituencies for the 2016 State Great Khural election."
+    },
+    "a2016_soum": {
+      "title": "Сум, дүүргийн иргэдийн Төлөөлөгчдийн Хурлын ээлжит сонгуулийг товлон зарлах, санал авах өдрийг тогтоох тухай (Улсын Их Хурлын 2016 оны 06 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/12046",
+      "kind": "official_body",
+      "note": "Sets the regular soum and district khural vote for 19 October 2016."
+    },
+    "a2024_districts": {
+      "title": "Монгол Улсын Их Хурлын 2024 оны ээлжит сонгуулийн тойрог байгуулах, тойргийн мандатын тоо, дугаар, нутаг дэвсгэр, төвийг тогтоох тухай (Улсын Их Хурлын 2023 оны 112 дугаар тогтоол)",
+      "publisher": "Хууль зүйн үндэсний хүрээлэн (legalinfo.mn, Эрх зүйн мэдээллийн нэгдсэн систем)",
+      "url": "https://legalinfo.mn/mn/detail/16960708774791",
+      "kind": "official_body",
+      "note": "Forms 13 constituencies (7 for the aimags, 6 for the capital) for the 2024 State Great Khural election."
     }
   },
   "tiers": [
@@ -656,12 +684,12 @@
           "note": "26 constituencies for 48 seats and one national party list for 28 seats."
         },
         {
-          "date": "2016-01-01",
-          "precision": "year",
-          "source": "nso_seats",
-          "quote": "Улсын Их Хурлын гишүүд, 2016: Дүн 76 (МАН 65, АН 9)",
+          "date": "2016-06-29",
+          "contests": 76,
           "seats": 76,
-          "note": "Held in June 2016 under the 2015 Election Law in 76 single-member constituencies."
+          "source": "a2016_call",
+          "quote": "МОНГОЛ УЛСЫН ИХ ХУРЛЫН БОЛОН АЙМАГ, НИЙСЛЭЛИЙН ИРГЭДИЙН ТӨЛӨӨЛӨГЧДИЙН ХУРЛЫН ЭЭЛЖИТ СОНГУУЛИЙН САНАЛ АВАХ ӨДРИЙГ 2016 ОНЫ 06 ДУГААР САРЫН 29-НИЙ ӨДӨР БАЙХААР ТОГТООСУГАЙ; resolution 41 of 2016: \"МОНГОЛ УЛСЫН ИХ ХУРЛЫН СОНГУУЛИЙН 76 ТОЙРОГ БАЙГУУЛСУГАЙ\"",
+          "note": "In 76 single-member constituencies under the 2015 Election Law; the constituency count is from resolution 41 of 12 May 2016 (legalinfo.mn/mn/detail/11903)."
         },
         {
           "date": "2020-01-01",
@@ -678,7 +706,7 @@
           "quote": "Улсын Их Хурлын гишүүд, 2024: Дүн 126 (МАН 68, АН 42)",
           "contests": 14,
           "seats": 126,
-          "note": "Held on 28 June 2024: 13 multi-member constituencies for 78 seats and one national list for 48 seats, as the Commission's workbooks give them."
+          "note": "Held on 28 June 2024: 13 multi-member constituencies for 78 seats and one national list for 48 seats, as the Commission's workbooks give them. Resolution 112 of 21 December 2023 formed the 13 constituencies (legalinfo.mn/mn/detail/16960708774791); the voting day awaits the calling resolution."
         }
       ]
     },
@@ -896,12 +924,11 @@
           "note": "Held in October 2012; NSO turnout table: 979.8 thousand voted, 52.9%."
         },
         {
-          "date": "2016-01-01",
-          "precision": "year",
-          "source": "nso_turnout",
-          "quote": "Иргэдийн төлөөлөгчдийн хурал, 2016: санал өгсөн 1161.1 мянган хүн, оролцоо 60.4%",
+          "date": "2016-06-29",
+          "source": "a2016_call",
+          "quote": "МОНГОЛ УЛСЫН ИХ ХУРЛЫН БОЛОН АЙМАГ, НИЙСЛЭЛИЙН ИРГЭДИЙН ТӨЛӨӨЛӨГЧДИЙН ХУРЛЫН ЭЭЛЖИТ СОНГУУЛИЙН САНАЛ АВАХ ӨДРИЙГ 2016 ОНЫ 06 ДУГААР САРЫН 29-НИЙ ӨДӨР БАЙХААР ТОГТООСУГАЙ",
           "seats": 809,
-          "note": "Held under the 2015 Election Law; the voting days await the calling resolution."
+          "note": "Aimag and capital khurals voted with the State Great Khural; NSO turnout table: 1161.1 thousand voted, 60.4%."
         },
         {
           "date": "2020-10-15",
@@ -1041,11 +1068,10 @@
           "note": "Held in October 2012; NSO turnout table: 979.8 thousand voted, 52.9%."
         },
         {
-          "date": "2016-01-01",
-          "precision": "year",
-          "source": "nso_turnout",
-          "quote": "Иргэдийн төлөөлөгчдийн хурал, 2016: санал өгсөн 1161.1 мянган хүн, оролцоо 60.4%",
-          "note": "Held under the 2015 Election Law; the voting days await the calling resolution."
+          "date": "2016-10-19",
+          "source": "a2016_soum",
+          "quote": "СУМ, ДҮҮРГИЙН ИРГЭДИЙН ТӨЛӨӨЛӨГЧДИЙН ХУРЛЫН ЭЭЛЖИТ СОНГУУЛИЙН САНАЛ АВАХ ӨДРИЙГ 2016 ОНЫ 10 ДУГААР САРЫН 19-НИЙ ӨДӨР БАЙХААР ТОГТООСУГАЙ",
+          "note": "Soum and district khurals voted separately from the aimag and capital khurals; NSO turnout table: 1161.1 thousand voted, 60.4%."
         },
         {
           "date": "2020-10-15",
