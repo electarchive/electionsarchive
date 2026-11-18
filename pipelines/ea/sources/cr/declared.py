@@ -204,11 +204,15 @@ def ticket(resolution: Resolution) -> tuple[list[Elected], str | None]:
         role, place = ROLES[" ".join(match.group(2).split())]
         found.append(Elected(" ".join(match.group(1).split()), role, place))
     if not found:
+        if resolution.round == 2:
+            raise ValueError(f"{resolution.number}: a second-round declaratoria names no elected ticket")
         return [], None
     if sorted(e.place for e in found) != [0, 1, 2]:
         raise ValueError(f"{resolution.number}: found {found}")
     winner = re.search(r"el\s+partido\s+(?:político\s+)?que\s+obtuvo\s+la\s+mayoría.*?fue\s+([^.,]+?)\s*[.,]", text)
-    return found, fold(winner.group(1)) if winner else None
+    if winner is None:
+        raise ValueError(f"{resolution.number}: names a ticket but not the party that won")
+    return found, fold(winner.group(1))
 
 
 def advancing(resolution: Resolution) -> list[str]:
