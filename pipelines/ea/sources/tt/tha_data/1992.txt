@@ -1,0 +1,41 @@
+# 1992-12-07 | Appendix VI (candidate votes and electorate), Appendix I summary
+D|Canaan/Bon Accord|2758|5|26
+C|Dolores Y. Edwards|N.A.R.|1044
+C|Terry Williams|P.N.M.|579
+D|Buccoo/Lambeau|2884|16|26
+C|William Mc Kenzie|P.N.M.|816
+C|Carlton Phillips|N.A.R.|770
+D|Bethel/Patience Hill|2625|19|26
+C|Henry James|N.A.R.|1082
+C|Haynes J. Cowie-Clarke|P.N.M.|380
+D|Black Rock/Whim|2587|10|27
+C|Beverley Ramsey-Moore|N.A.R.|840
+C|Rodill Clarke|P.N.M.|588
+D|Plymouth/Golden Lane|2681|3|27
+C|Claude Benoit|N.A.R.|924
+C|Lytton Stewart|P.N.M.|574
+D|Moriah/Parlatuvier|2602|14|27
+C|Hochoy Charles|N.A.R.|979
+C|Erica V. Sampson|P.N.M.|532
+D|L'Anse Fourmi/Speyside|2224|12|28
+C|Kenneth Murray|N.A.R.|712
+C|Greville G. Nicholson|P.N.M.|588
+D|Roxborough/Delaford|2241|15|28
+C|Pearl A. Melville-Pollard|N.A.R.|620
+C|Steve Duncan|IND.|413
+C|Marlene Phillips|P.N.M.|309
+D|Belle Garden/Goodwood|2711|10|28
+C|Jefferson G. Davidson|N.A.R.|762
+C|Johnson Richards|P.N.M.|467
+C|Hollister H. Broomes|IND.|287
+D|Providence/Calder Hall|2712|9|29
+C|Robert N. Hislop|N.A.R.|879
+C|Garrel Peters|P.N.M.|576
+D|Bacolet/Mount St. George|2766|10|29
+C|Eutrice Thornhill|N.A.R.|973
+C|Rayle Titus|P.N.M.|595
+C|Garth Stewart|IND.|39
+C|Aldwyn C. Orr|IND.|18
+D|Scarborough/Signal Hill|2712|17|29
+C|Lennox Denoon|N.A.R.|816
+C|Trevor Craig|P.N.M.|558

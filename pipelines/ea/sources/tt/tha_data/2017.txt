@@ -1,0 +1,52 @@
+# 2017-01-23 | Appendix VII (candidate votes), Appendix III (electorate); rejected ballots from the final results sheet
+D|Bacolet/Mt. St. George|3683|12|42
+C|Joel Duport Albert Jack|P.N.M.|1157
+C|Nikkisha Martin|P.D.P.|425
+C|Orwin Dillon|T.F.|191
+D|Belle Garden East/Roxborough/Delaford|3741|3|42
+C|Watson Solomon Duke|P.D.P.|1261
+C|Gary Alston Melville|P.N.M.|949
+C|Anthony Price|T.F.|34
+C|Kossmie Blackman Hercules|M.F.T.|14
+D|Bethel/Mt. Irvine|4370|4|42
+C|Shomari Ajani Hector|P.N.M.|1184
+C|Christyln Moore|T.F.|674
+C|Alicia Denise Roberts-Patterson|P.D.P.|283
+D|Black Rock/Whim/Spring Garden|4490|8|42
+C|Kelvin Charles|P.N.M.|1246
+C|Avanelle Katrina Baird|P.D.P.|430
+C|Beverly Ramsey-Moore|T.F.|428
+C|La Sana Stacy Groome|M.F.T.|17
+D|Buccoo/Mt. Pleasant|4363|9|42
+C|Ancil Dennis|P.N.M.|1291
+C|Sean Nedd|P.D.P.|319
+C|Maria Macfarlane-Williams|T.F.|266
+D|Canaan/Bon Accord|4000|5|43
+C|Clarence Jacob|P.N.M.|1188
+C|Nyron Leung|P.D.P.|547
+C|Kelton Thomas|T.F.|197
+D|Goodwood/Belle Garden West|4142|8|43
+C|Hayden Spencer|P.N.M.|953
+C|Faith B.Yisrael|P.D.P.|948
+C|Steve Jack|T.F.|332
+D|Lambeau/Signal Hill|4343|11|43
+C|Raoul Jomo Pitt|P.N.M.|1185
+C|Wane Clarke|P.D.P.|424
+C|Barry Nelson|T.F.|372
+D|Parlatuvier/L'Anse Fourmi/Speyside|3650|4|43
+C|Farley Chavez Augustine|P.D.P.|1095
+C|Marissa Aysha Williams|P.N.M.|926
+C|Sparkle Taylor|T.F.|111
+D|Plymouth/Golden Lane|3857|10|43
+C|Marisha Althea Osmond|P.N.M.|1012
+C|Curtis Anthony Douglas|P.D.P.|493
+C|Niall George|T.F.|434
+D|Providence/Mason Hall/Moriah|4265|3|44
+C|Sheldon Cunningham|P.N.M.|1089
+C|Melanie Roberts|P.D.P.|800
+C|Winston John|T.F.|129
+C|Eudine Jobdavis|M.F.T.|28
+D|Scarborough/Calder Hall|4076|8|44
+C|Marslyn Erica Melville-Jack|P.N.M.|1130
+C|Kerry Lynch|P.D.P.|512
+C|Cecil Patrick Phillips|T.F.|184

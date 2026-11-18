@@ -1,0 +1,58 @@
+# 2026-01-12 | Appendix VIII results of the poll by district; electorate from Appendix III
+D|BELLE GARDEN/GLAMORGAN|3245|11|0
+C|Faith Sabrina Kisha Brebnor|T.P.P.|1102
+C|Carl Mc Ewen|P.N.M.|483
+C|Jehlaun Kade Carter|I.D.A.|13
+D|BETHEL/NEW GRANGE|3966|11|0
+C|Darren Hestor Henry|T.P.P.|1179
+C|Sterlan Stevern Sheslon Timothy|P.N.M.|780
+C|Terrence Levinston David|I.D.A.|31
+D|BETHESDA/LES COTEAUX|3614|5|0
+C|Zorisha Amena Hackett|T.P.P.|1143
+C|Akeel Khalshon Xavier Guy|P.N.M.|876
+C|Cecil James Noel|I.D.A.|16
+D|BON ACCORD/CROWN POINT|3196|2|0
+C|Niketa Raymond Percy|T.P.P.|953
+C|Dominique Errol Kerr|P.N.M.|693
+C|Philbert Errol Williams|I.D.A.|18
+D|BUCCOO/MT. PLEASANT|3806|11|0
+C|Keigon Kayleb Edbert Denoon|T.P.P.|1079
+C|Ancil Keston Dennis|P.N.M|834
+C|Stacy Cindy Herbert|I.D.A.|9
+C|Nickocy Darias Darrelle Phillips|U.T.P.|8
+D|DARREL SPRING/WHIM|3305|3|0
+C|Ricky Michael Joefield|T.P.P.|838
+C|Kelvon Morris|P.N.M.|826
+C|Elon Mhendi Berkeley|I.D.A.|14
+D|LAMBEAU/LOWLANDS|3504|2|0
+C|Wane Maconie Clarke|T.P.P.|862
+C|Kervin Horsford|P.N.M.|671
+D|MASON HALL NORTH/MORIAH|3869|5|0
+C|Ian Anthony Pollard|T.P.P.|1235
+C|Kwesi Des Vignes|P.N.M.|748
+C|Shelly Ann Lewis-Ottley|I.D.A.|11
+D|MASON HALL SOUTH/BAGATELLE|3539|2|0
+C|Nathisha M Charles-Pantin|T.P.P.|1108
+C|Dexter Miller|P.N.M.|592
+C|Eliyyahu Raphael Ben Yisrael|I.D.A|17
+D|MT. ST. GEORGE/GOODWOOD|3691|5|0
+C|Megan Cecily Morrison|T.P.P.|1103
+C|Camisha Deonese Bacchus|P.N.M.|700
+D|PARLATUVIER/L'ANSE FOURMI/SPEYSIDE|3838|8|0
+C|Farley Chavez Augustine|T.P.P.|1606
+C|Maxslon Natoy Roberts|P.N.M.|418
+C|Linda Coleen Daniel|I.D.A.|21
+D|PLYMOUTH/BLACK ROCK|3653|13|0
+C|Kern Deberio Michael Alexis|T.P.P.|963
+C|Karyn Solange Shinnade Forbes|P.N.M.|870
+D|ROXBOROUGH/ARGYLE|3195|15|0
+C|Orlando Kerr|T.P.P.|1251
+C|Shonae John|P.N.M.|477
+D|SCARBOROUGH/MT. GRACE|3181|6|0
+C|Trevor Williamson James|T.P.P.|854
+C|Petal Casandra Benoit|P.N.M.|702
+C|Denise Tsoiafatt-Angus|I.D.A.|14
+D|SIGNAL HILL/PATIENCE HILL|3637|4|0
+C|Nigel Dave Taitt|T.P.P.|963
+C|Brian Jimmy Harris|P.N.M.|789
+C|Mauricia Douglas|I.D.A.|16

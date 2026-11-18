@@ -1,0 +1,60 @@
+# 2001-01-29 | Appendix VI (candidate votes), Appendix I summary (electorate)
+D|Canaan/Bon Accord|3369|11|24
+C|Lennox Smith|P.N.M.|1008
+C|Clyde Hernan Adams|N.A.R.|729
+C|Curtis Cecil Douglas|U.N.C.|150
+C|Tristan Chapman-Smith|P.E.P.|75
+D|Buccoo/Lambeau|3471|6|24
+C|William Mc Kenzie|P.N.M.|1260
+C|Angelita Dillon-Gbekor|N.A.R.|393
+C|Dos Santos Carrington|P.E.P.|158
+C|Junior Barrington Thomas|U.N.C.|149
+D|Bethel/Patience Hill|3379|15|24
+C|Miriam Caesar-Moore|N.A.R.|939
+C|William Benjamin|P.N.M.|741
+C|Deborah Moore-Miggins|P.E.P.|409
+D|Black Rock/Whim|3174|18|24
+C|Michael M. Brizan|P.N.M.|877
+C|Melva Joefield|N.A.R.|715
+C|Beverley Ramsey-Moore|P.E.P.|250
+C|Desmond Phillips|U.N.C.|92
+D|Plymouth/Golden Lane|3140|17|25
+C|Hochoy Alexander Charles|N.A.R.|1057
+C|Marisha Osmond|P.N.M.|852
+C|Certica Williams-Orr|P.E.P.|98
+C|Joanna Grant|U.N.C.|62
+D|Moriah/Parlatuvier|2887|9|25
+C|Ashworth Michael Jack|N.A.R.|920
+C|Clifton Winchester|P.N.M.|704
+C|Winston John|U.N.C.|124
+C|Lyris Walker|P.E.P.|23
+D|L'Anse Fourmi/Speyside|2730|16|25
+C|Aldington Spencer|P.N.M.|778
+C|Carlyle C. Dick|N.A.R.|637
+C|Sherwin Rupert Lewis|U.N.C.|202
+C|Philomen Spencer|P.E.P.|45
+D|Roxborough/Delaford|2747|17|25
+C|Cecil Wendell Caruth|N.A.R.|671
+C|Allan Powder|P.N.M.|517
+C|Anthony Price|U.N.C.|295
+C|Casimir Reid|P.E.P.|158
+D|Belle Garden/Goodwood|3250|19|26
+C|Hughford Mc Kenna|P.N.M.|731
+C|Max Albert James|N.A.R.|648
+C|Jeanette Z. Williams-John|U.N.C.|337
+C|Boxil Bailey|P.E.P.|204
+D|Providence/Calder Hall|3442|12|26
+C|Anthony Arnold|P.N.M.|996
+C|George Stanley Beard|N.A.R.|858
+C|Terrence Fraser|U.N.C.|82
+C|Umilta Ingrid Roberts-Henry|P.E.P.|39
+D|Bacolet/Mount St. George|2839|6|26
+C|Cynthia Alfred|P.N.M.|882
+C|Eutrice Thornhill|N.A.R.|587
+C|Carl Hector|U.N.C.|156
+C|Edric Alfred|P.E.P.|60
+D|Scarborough/Signal Hill|3188|4|26
+C|Orville London|P.N.M.|1154
+C|Kenneth Sardinha|N.A.R.|483
+C|Wilfred Fletcher|U.N.C.|108
+C|Emond Garnet Parker|P.E.P.|56

@@ -1,0 +1,38 @@
+# 2009-01-19 | Appendix VI (candidate votes), Appendix II (electorate)
+D|Bethel/Mt. Irvine|3591|5|35
+C|Whitney Heinrich Alfred|P.N.M.|1083
+C|Terance Learie Baynes|T.O.P.|873
+D|Buccoo/Mount Pleasant|3555|8|35
+C|Albert Davidson Pilgrim|P.N.M.|1140
+C|Donna Parks-Greene|T.O.P.|613
+D|Canaan/Bon Accord|3407|7|35
+C|Rolly Quaccoo|T.O.P.|874
+C|Frank Agoustine Roberts|P.N.M.|869
+D|Black Rock/Whim/Spring Garden|3939|12|35
+C|Claudia Duke|P.N.M.|1159
+C|Yvette Caruth|T.O.P.|886
+D|Plymouth/Golden Lane|3407|10|36
+C|Godwin Emanuel Adams|P.N.M.|1054
+C|Trevor Brian Armstrong|T.O.P.|933
+D|Providence/Mason Hall/Moriah|3732|13|36
+C|Ashworth Michael Jack|T.O.P.|1317
+C|Nathisha M. Charles-Pantin|P.N.M.|889
+D|Belle Garden/Goodwood|3665|5|36
+C|Steve Jack|T.O.P.|1244
+C|Wendell Sherwin Berkley|P.N.M.|1014
+D|Parlatuvier/L'Anse Fourmi/Speyside|3353|10|36
+C|Tracy Petulia Davidson-Celestine|P.N.M.|1151
+C|Fitzherbert Taylor|T.O.P.|1093
+D|Roxborough/Delaford|3388|8|37
+C|Hilton Sandy|P.N.M.|1105
+C|Lenn Toppin|T.O.P.|1031
+D|Bacolet/Mount St. George|3293|31|37
+C|Orville Clyde Jordan|T.O.P.|1049
+C|Carl Calvin Alleyne|P.N.M.|786
+C|Andre Adrian Phillips|IND.|48
+D|Lambeau/Signal Hill|3733|3|37
+C|Oswald Williams|P.N.M.|1032
+C|Harrisford Mc Millan|T.O.P.|817
+D|Scarborough/Calder Hall|3560|6|37
+C|Orville Delano London|P.N.M.|1029
+C|Anthony Roosvelt Arnold|T.O.P.|827

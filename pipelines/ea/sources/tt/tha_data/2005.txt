@@ -1,0 +1,43 @@
+# 2005-01-17 | Appendix VI (candidate votes), summary page (electorate)
+D|Bethel/Mt. Irvine|3207|7|23
+C|Whitney Alfred|P.N.M.|1010
+C|Harrisford Mc Millan|D.A.C.|830
+D|Buccoo/Mount Pleasant|3136|5|23
+C|Albert Pilgrim|P.N.M.|1100
+C|Terrence Holmes|D.A.C.|456
+D|Canaan/Bon Accord|3031|2|23
+C|Frank Roberts|P.N.M.|824
+C|George Archer|D.A.C.|592
+C|Rolly Quaccoo|IND.|89
+D|Black Rock/Whim/Spring Garden|3523|3|23
+C|Claudia Groome-Duke|P.N.M.|1146
+C|George Graham|D.A.C.|684
+D|Plymouth/Golden Lane|3156|12|24
+C|Godwin Adams|P.N.M.|1070
+C|Hochoy A. Charles|D.A.C.|874
+D|Providence/Mason Hall/Moriah|3360|5|24
+C|Ashworth M. Jack|D.A.C.|931
+C|Rennison Quashie|P.N.M.|885
+C|Christo G. Gift|N.A.R.|58
+D|Belle Garden/Goodwood|3333|6|24
+C|Wendell Berkley|P.N.M.|1018
+C|Tracy N. Tobias|D.A.C.|718
+C|Jason E. Nancis|N.A.R.|65
+D|Parlatuvier/L'Anse Fourmi/Speyside|3133|19|24
+C|Aldington Spencer|P.N.M.|1031
+C|Anthony K. Christmas|D.A.C.|726
+D|Roxborough/Delaford|3119|12|25
+C|Hilton Sandy|P.N.M.|1039
+C|Cecil W. Caruth|D.A.C.|715
+D|Bacolet/Mount St. George|3050|12|25
+C|Cynthia L. Alfred|P.N.M.|845
+C|Orville C. Jordan|D.A.C.|842
+D|Lambeau/Signal Hill|3348|6|25
+C|Oswald Williams|P.N.M.|1130
+C|Barry Nelson|D.A.C.|537
+C|Jonathan Stone|IND.|46
+C|Junior Barrington Thomas|IND.|5
+D|Scarborough/Calder Hall|3212|4|25
+C|Orville D. London|P.N.M.|1039
+C|Judy M. Bobb|D.A.C.|548
+C|Anthony R. Arnold|IND.|67
