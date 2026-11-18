@@ -198,6 +198,9 @@ def fetch() -> None:
         _try(csv_url(LISTS_YEAR, name), ".csv")
     _try(REFERENDUMS_PAGE, ".html")
     _try(REFERENDUMS_SHEET, ".xlsx")
+    from ea.sources.nz import ecby
+
+    ecby.fetch()
 
 
 def split_saved() -> None:
@@ -815,7 +818,9 @@ def has_referendums() -> bool:
 def packages() -> list[str]:
     held = [f"nz.ec/{REFERENDUM_DAY}"] if has(REFERENDUM_URL) else []
     more = [*([LISTS_KEY] if has_lists() else []), *([REFERENDUMS_KEY] if has_referendums() else [])]
-    return ["nz.ec/registry", *held, *(package_key(day) for day in days()), *more]
+    from ea.sources.nz import ecby
+
+    return ["nz.ec/registry", *held, *(package_key(day) for day in days()), *more, *ecby.packages()]
 
 
 def parse() -> None:
@@ -829,6 +834,9 @@ def parse() -> None:
         lists().write()
     if has_referendums():
         referendums().write()
+    from ea.sources.nz import ecby
+
+    ecby.parse()
 
 
 def emit() -> None:
