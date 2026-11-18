@@ -9,6 +9,11 @@ add up the way the volume says they do, and records every disagreement the volum
 
 The volumes of 1925-1945 print each list's votes with each candidate's preference votes and the votes cast for the
 list without a preference; from 1949 on they print votes by party only, by commune, with the seats each party won.
+
+The Senate volumes of 1949-1973 also print each grouping's votes by commune (by civil circumscription in 1949, by
+department in 1957), and from 1957 on each candidate's votes there too. Those tables were read the same way into
+`registro_communes/{year}-senators.json`, one row per printed unit with every printed subtotal; they publish a finer
+result set that supersedes the grouping's total, and the grouping totals already read become its declared figures.
 """
 
 import json
@@ -32,10 +37,11 @@ from ea.package import NAMESPACE, Package
 SOURCE = "cl.registro"
 CHILE = str(uuid5(NAMESPACE, "polity\x1fCL"))
 RETURNS = Path(__file__).with_name("registro_returns")
+COMMUNES = Path(__file__).with_name("registro_communes")
 PAGE = "https://www.servel.cl/archivo-historicoybiblioteca/"
 SHARE = "https://servelcl-my.sharepoint.com/:b:/g/personal/archivo-historicoii_servel_cl/"
 DPI = 150
-VOTES, REGISTERED, CAST, VALID, INVALID, BLANK, PREFERENCE, LEGEND = 1, 2, 3, 4, 5, 6, 7, 9
+VOTES, REGISTERED, CAST, VALID, INVALID, BLANK, PREFERENCE, LEGEND, OBJECTED = 1, 2, 3, 4, 5, 6, 7, 9, 15
 DIGITIZED = 8
 
 # The link Servel's archive page gives for each volume, as the archive's browser session saved it.
@@ -85,6 +91,43 @@ DAYS = {
     1973: date(1973, 3, 4),
 }
 
+# Volumes whose tables by department print the count before the Tribunal Calificador rectified it at the grouping
+# level: they publish a set of their own at the official stage, beside the rectified total, which stays the default.
+UNRECTIFIED = {
+    "1957-senators": (
+        "Read by eye from the volume's typewritten table of the grouping's votes by department, one value per "
+        "department (Santiago by district), each with its page and a box on the scan. The table prints each "
+        "department's count before the Tribunal Calificador's rectification, which the volume applies only to the "
+        "grouping's total; this set therefore holds the departments as counted, and the grouping's rectified "
+        "total stays the contest's default. Seats and members elected belong to that rectified count."
+    ),
+}
+
+# What a reader must know about a grouping's table by commune, by volume and grouping.
+# Values that differ from the glyph on the page are listed here, each with the sums that settle it.
+FINE_NOTES: dict[tuple[str, int], str] = {
+    ("1949-senators", 8): "Mulchén's Radical Doctrinario cell shows only 72, its first digit lost; 172 is stored, "
+    "which closes Mulchén's row, the department total (printed with a damaged first digit, read as 210) and the "
+    "printed Bío-Bío total of 1,144.",
+    ("1953-senators", 3): "The scan cuts off most digits of the Socialista Popular column in the Quillota "
+    "department; each commune's figure is its printed valid votes less its other lists, which agrees with every "
+    "visible leading digit, with the men's and women's columns, and with the printed province (7,334) and "
+    "circunscripción (9,751) totals.",
+    ("1953-senators", 9): "Riachuelo's Conservador Tradicionalista total reads 27; 37 is stored, as its men's and "
+    "women's columns (32 + 5), the department total and the row's valid votes require.",
+    ("1965-senators", 4): "Cartagena prints 225 votes for Rosende; 255 is stored, as its men's and women's columns "
+    "(131 + 124), the list total and the San Antonio department total require. Santo Domingo's total cast has an "
+    "illegible last digit; 1,698 is the sum of its column.",
+    ("1965-senators", 8): "Cunco's figure for Loyola is an illegible mark; 6 is its men's and women's columns and "
+    "what its list total requires.",
+    ("1969-senators", 3): "Viña del Mar prints 1,117 blank votes; 942 is stored, its men's and women's columns "
+    "(486 + 456), which alone closes its total cast (55,612) and the Valparaíso department's blank votes.",
+    ("1973-senators", 10): "Three cells are stored as their men's and women's columns where the total column "
+    "disagrees: Cisnes, Carlos Morales Abarzúa 2 (printed 1); Coyhaique, the Confederación's list 5,244 (printed "
+    "5,241, its candidates also add to 5,244); and Coyhaique's total cast 8,654 (printed 5,654), which the "
+    "Coyhaique department total requires.",
+}
+
 # Findings the volumes' own figures cause, by election day.
 ACCEPTED: dict[date, dict[str, str]] = {
     date(1932, 10, 30): {
@@ -114,6 +157,41 @@ ACCEPTED: dict[date, dict[str, str]] = {
         "accounting.ballots_sum": "Senate, Atacama and Coquimbo: the Tribunal Calificador's table prints the "
         "Socialist list as 15,809 while the Registro's own pages print 15,709 and a total cast of 116,664, so valid "
         "plus null and blank ballots is 100 more than the ballots cast.",
+    },
+}
+
+# Findings the volumes' tables by commune cause, by election day; each joins the day's reason for the same code.
+FINE_ACCEPTED: dict[date, dict[str, str]] = {
+    date(1957, 3, 3): {
+        "accounting.votes_valid": "Senate, Curepto department (6.ª agrupación): the table's list-total row prints "
+        "Lista N° 4 as 227 while its candidate row and the Talca province total give 277, so the lists add to 1,883 "
+        "against the printed 1,933 valid votes; kept as printed.",
+    },
+    date(1961, 3, 5): {
+        "accounting.declared": "Senate, 7.ª circunscripción, Lista G: the commune of Rafael (Tomé) prints 95, so "
+        "the communes add to 27,641, while Rafael's own row total (648) and the Tomé department total (2,095) imply "
+        "93 and the grouping total prints 27,639; kept as printed.",
+    },
+    date(1965, 3, 7): {
+        "accounting.declared": "Senate: the declared figures are the Tribunal Calificador's grouping totals, and the "
+        "Registro's tables by commune differ from them by their own printed figures. 2.ª agrupación: the tables print "
+        "the Socialist list as 15,709 and Alejandro Chelén Rojas as 7,721 against the Tribunal's 15,809 and 7,821, and "
+        "the Combarbalá communes add to one null more and one blank fewer than every printed total above them. 4.ª: "
+        "the four district totals printed with the communes add to 234,465 votes for José Musalem Saffie against "
+        "234,460. 6.ª: the commune of Hualañé prints the Christian Democrats' list as 495 and 1,711 votes cast where "
+        "its candidates and the Mataquito department total give 695 and 1,911, so the communes fall 200 short. 8.ª: "
+        "the three province totals printed with the communes add to 359 votes for Gonzalo Quinteros Tricot (his list "
+        "7,702) and 165,500 cast against the Tribunal's 357, 7,700 and 165,496. All kept as printed.",
+    },
+    date(1969, 3, 2): {
+        "accounting.declared": "Senate, 10.ª agrupación: the commune of Lago Verde prints 2 blank votes, so its "
+        "figures add to 77 against its printed total of 75, and the Aysén department (85), province (237) and "
+        "grouping (1,259) blank totals all imply 0; kept as printed, so the communes add to 1,261 blank votes.",
+    },
+    date(1973, 3, 4): {
+        "accounting.declared": "Senate, 2.ª agrupación: the commune of Huasco prints 2,182 votes cast while its own "
+        "figures add to 2,162, and the Freirina department (4,220), Atacama province and grouping totals (190,529) "
+        "all imply 2,162; kept as printed, so the communes add to 190,549.",
     },
 }
 
@@ -333,6 +411,99 @@ def days() -> dict[date, list[Volume]]:
     return dict(sorted(found.items()))
 
 
+# ---- transcriptions by commune -----------------------------------------------------------------------------------
+
+
+class Fine(NamedTuple):
+    """One unit a volume's table by commune prints, with the figures on its row (or column)."""
+
+    id: str
+    code: str
+    label: str
+    level: str
+    names: tuple[str | None, ...]
+    values: dict[str, int]
+    pages: dict[str, int]
+    boxes: dict[str, tuple[float, float, float, float]]
+
+
+# The figures of a table by commune, by label, as the measure and the part of the option they fill.
+ACCOUNT_LABELS = {
+    "nulos": INVALID,
+    "nulos y blancos": INVALID,
+    "blancos": BLANK,
+    "objetados": OBJECTED,
+    "validos": VALID,
+    "total": CAST,
+}
+FINE_LEVELS = ("unit", "subtotal", "commune", "district", "department", "province", "grouping", "national")
+
+
+@cache
+def fine(volume: str) -> dict[int, list[Fine]]:
+    """Each grouping's printed rows by commune, every level, in the volume's order. A row printed across two facing
+    pages, its lists on one and the rest on the other, is read as two halves and joined here."""
+    path = COMMUNES / f"{volume}.json"
+    if not path.exists():
+        return {}
+    data = json.loads(path.read_text())
+    layouts = {page["page"]: page for page in data["pages"]}
+    found: dict[int, list[Fine]] = {}
+    halves: dict[tuple[object, ...], Fine] = {}
+    codes: Counter[str] = Counter()
+    for row in data["units"]:
+        if row["level"] not in FINE_LEVELS:
+            raise ValueError(f"{volume}: unknown level {row['level']!r}")
+        if row["level"] == "national" or row.get("grouping") is None:
+            continue
+        number = int(row["grouping"])
+        page = int(row["page"])
+        layout = layouts[page]
+        lo, hi = (float(v) for v in row["span"])
+        boxes = {}
+        for label in row["values"]:
+            a, b = (float(v) for v in layout["axis"][label])
+            boxes[label] = (a, lo, b, hi) if layout["layout"] == "rows" else (lo, a, hi, b)
+        names = (row.get("province"), row.get("department"), row.get("district"), row.get("commune"), row["name"])
+        ident = (number, row["level"], *(fold(n) if n else "" for n in names))
+        half = halves.get(ident)
+        if (
+            half is not None
+            and abs(page - next(iter(half.pages.values()))) == 1
+            and not set(half.values) & set(row["values"])
+        ):
+            half.values.update(row["values"])
+            half.pages.update(dict.fromkeys(row["values"], page))
+            half.boxes.update(boxes)
+            del halves[ident]
+            continue
+        code = ":".join([volume[:4], str(number), *(fold(n).lower().replace(" ", "_") for n in names if n)])
+        if row["level"] == "unit":
+            codes[code] += 1
+            if codes[code] > 1:
+                code = f"{code}:{codes[code]}"
+        label = " ".join(row["name"].split())
+        if row.get("commune") and fold(row["commune"]) != fold(row["name"]):
+            label = f"{label} ({' '.join(row['commune'].split())})"
+        unit = Fine(
+            key("unit", "fine", code),
+            code,
+            label,
+            row["level"],
+            names,
+            dict(row["values"]),
+            dict.fromkeys(row["values"], page),
+            boxes,
+        )
+        halves[ident] = unit
+        found.setdefault(number, []).append(unit)
+    return found
+
+
+def leaves(volume: Volume, grouping: Grouping) -> list[Fine]:
+    return [unit for unit in fine(volume.name).get(grouping.number, []) if unit.level == "unit"]
+
+
 # ---- areas -------------------------------------------------------------------------------------------------------
 
 
@@ -341,6 +512,7 @@ def scheme(chamber: str) -> str:
 
 
 UNIT_SCHEME = "cl.registro_agrupacion_votes"
+FINE_SCHEME = "cl.registro_comuna_votes"
 
 
 def composition(chamber: str, grouping: Grouping) -> str:
@@ -485,6 +657,25 @@ def registry() -> Package:
             area_id=area_id(chamber, grouping),
             kind="standard",
         )
+    if any(fine(volume.name) for volume in volumes()):
+        p.add(
+            "scheme", code=FINE_SCHEME, polity_id=CHILE, kind="precinct", rank=3, noun="commune count", code_system=None
+        )
+    for volume in volumes():
+        for grouping in volume.groupings:
+            for unit in leaves(volume, grouping):
+                p.add(
+                    "reporting_unit",
+                    id=unit.id,
+                    polity_id=CHILE,
+                    scheme_code=FINE_SCHEME,
+                    code=unit.code,
+                    parent_id=unit_id(volume.chamber, grouping),
+                    area_relation="within",
+                    area_id=area_id(volume.chamber, grouping),
+                    kind="standard",
+                )
+                p.name(unit.id, unit.label, "es", "official")
     for chamber, (kind, es, en, _) in CHAMBERS.items():
         id = BODIES[chamber]
         p.add("body", id=id, polity_id=CHILE, kind=kind)
@@ -511,7 +702,10 @@ def build(day: date) -> Package:
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external.add(CHILE)
-    for code, reason in ACCEPTED.get(day, {}).items():
+    reasons = dict(ACCEPTED.get(day, {}))
+    for code, reason in FINE_ACCEPTED.get(day, {}).items():
+        reasons[code] = f"{reasons[code]} Also: {reason}" if code in reasons else reason
+    for code, reason in reasons.items():
         p.accept(code, reason)
     election = p.id("election", day)
     p.add(
@@ -663,7 +857,7 @@ def _grouping(
         kind="tacit" if tacit(grouping) else "counted",
         source_id=SOURCE_ID,
         status="active",
-        is_default=True,
+        is_default=not leaves(volume, grouping),
         completeness=None if tacit(grouping) else 1.0,
     )
     note = METHOD
@@ -694,6 +888,9 @@ def _grouping(
 
     for measure, value in grouping.accounting.items():
         put(None, measure, value, grouping.page, grouping.box)
+    options: dict[str, str] = {}
+    choices: dict[tuple[str, str], str] = {}
+    outcomes: list[dict[str, object]] = []
     seen: Counter[str] = Counter()
     for position, slate in enumerate(grouping.slates, start=1):
         tag = fold(slate.label) or str(position)
@@ -701,6 +898,7 @@ def _grouping(
         if seen[tag] > 1:
             tag = f"{tag} {seen[tag]}"
         option = p.id("option", volume.day, *ident, tag)
+        options[slate.label] = option
         name = party_of(slate)
         member = party_id(name) if name is not None else None
         p.add(
@@ -720,7 +918,7 @@ def _grouping(
             put(option, LEGEND, slate.unassigned, slate.page, slate.box)
         won = slate.seats if slate.seats is not None else sum(c.elected for c in slate.candidates)
         if won:
-            p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=won)
+            outcomes.append({"option_id": option, "kind": "won", "seats": won})
         names: Counter[str] = Counter()
         for order, candidate in enumerate(slate.candidates, start=1):
             folded = fold(candidate.name)
@@ -754,9 +952,160 @@ def _grouping(
                     ballot_position=order,
                     ballot_label=candidate.name,
                 )
+                choices[(slate.label, candidate.name)] = choice
                 put(choice, PREFERENCE, candidate.votes, candidate.page or slate.page, candidate.box)
             if candidate.elected:
-                p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
+                outcomes.append({"option_id": option, "candidacy_id": candidacy, "kind": "elected"})
+    finer = p.id("result_set", volume.day, *ident, "commune") if leaves(volume, grouping) else None
+    holders = (result_set,) if volume.name in UNRECTIFIED else (result_set, finer)
+    for outcome in outcomes:
+        for target in holders:
+            if target is not None:
+                p.add("outcome", result_set_id=target, **outcome)
+    if finer is not None:
+        _fine(p, volume, grouping, election, contest, result_set, finer, options, choices, values, locators, pages)
+
+
+FINE_METHOD = (
+    "Read by eye from the same volume's table of the grouping's votes by commune, one value per printed unit (the "
+    "commune, or the civil circumscription or department where that is what the volume prints), each with its page "
+    "and a box on the scan. Where the table prints men's, women's and total columns, the total is stored. The "
+    "grouping's own totals, as the volume prints them, are the declared figures the units are checked against; the "
+    "seats and members elected are those of the grouping's count."
+)
+
+
+def label_measure(label: str) -> tuple[str | None, str | None, int]:
+    """The list, the candidate, and the measure a printed label of a table by commune stands for."""
+    if label in ACCOUNT_LABELS:
+        return None, None, ACCOUNT_LABELS[label]
+    if " / " not in label:
+        return label, None, VOTES
+    head, name = label.split(" / ", 1)
+    return (head, None, LEGEND) if name == "(lista)" else (head, name, PREFERENCE)
+
+
+def disagreements(volume: Volume, grouping: Grouping) -> list[str]:
+    """Where the units' sum differs from the grouping's figure the volume prints."""
+    declared = dict(declared_figures(grouping))
+    summed: Counter[tuple[str | None, str | None, int]] = Counter()
+    for unit in leaves(volume, grouping):
+        for label, value in unit.values.items():
+            summed[label_measure(label)] += value
+    out = []
+    for (head, name, measure), value in sorted(summed.items(), key=str):
+        if measure == INVALID and (None, None, BLANK) in summed and (None, None, BLANK) not in declared:
+            continue
+        want = declared.get((head, name, measure))
+        if want is not None and want != value:
+            what = (
+                name
+                or head
+                or {INVALID: "null", BLANK: "blank", OBJECTED: "objected", VALID: "valid", CAST: "cast"}[measure]
+            )
+            if measure == LEGEND:
+                what += " (votes without a preference)"
+            out.append(f"{what}: units add to {value:,}, grouping total {want:,}")
+    return out
+
+
+def declared_figures(grouping: Grouping) -> list[tuple[tuple[str | None, str | None, int], int]]:
+    found: list[tuple[tuple[str | None, str | None, int], int]] = [
+        ((None, None, measure), value) for measure, value in grouping.accounting.items()
+    ]
+    for slate in grouping.slates:
+        if slate.votes is not None:
+            found.append(((slate.label, None, VOTES), slate.votes))
+        if slate.unassigned is not None:
+            found.append(((slate.label, None, LEGEND), slate.unassigned))
+        for candidate in slate.candidates:
+            if candidate.votes is not None:
+                found.append(((slate.label, candidate.name, PREFERENCE), candidate.votes))
+    return found
+
+
+def _fine(
+    p: Package,
+    volume: Volume,
+    grouping: Grouping,
+    election: str,
+    contest: str,
+    coarse: str,
+    result_set: str,
+    options: dict[str, str],
+    choices: dict[tuple[str, str], str],
+    values: list[dict[str, object]],
+    locators: list[dict[str, object]],
+    pages: set[tuple[str, int]],
+) -> None:
+    units = leaves(volume, grouping)
+    before = volume.name in UNRECTIFIED
+    if before:
+        valid = sum(unit.values.get("validos", 0) for unit in units)
+        whole = grouping.accounting.get(VALID)
+        completeness = round(valid / whole, 4) if whole else None
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage="official" if before else "certified",
+        kind="counted",
+        source_id=SOURCE_ID,
+        status="active",
+        is_default=not before,
+        supersedes_id=None if before else coarse,
+        completeness=completeness if before else 1.0,
+    )
+    note = UNRECTIFIED[volume.name] if before else FINE_METHOD
+    if FINE_NOTES.get((volume.name, grouping.number)):
+        note += f"\n\nOn this grouping's pages: {FINE_NOTES[(volume.name, grouping.number)]}"
+    off = disagreements(volume, grouping)
+    if off:
+        note += "\n\nWhere the units do not add to the grouping's printed totals: " + "; ".join(off) + "."
+    p.add("note", id=p.id("note", result_set), entity_id=result_set, kind="methodology", body_md=note, lang="en")
+    present = {label_measure(label) for unit in units for label in unit.values}
+    split = (None, None, BLANK) in present and BLANK not in grouping.accounting
+    for (head, name, measure), value in [] if before else declared_figures(grouping):
+        if (head, name, measure) not in present or (split and measure == INVALID):
+            continue
+        option = None if head is None else options[head] if name is None else choices[(head, name)]
+        p.add("declared", result_set_id=result_set, option_id=option, measure=measure, value=value)
+    width_height = sizes(volume.name)
+    for unit in units:
+        for label, value in unit.values.items():
+            head, name, measure = label_measure(label)
+            if head is not None and head not in options:
+                raise ValueError(f"{volume.name} {grouping.number} {unit.label}: no list {head!r}")
+            if name is not None and (head, name) not in choices:
+                raise ValueError(f"{volume.name} {grouping.number} {unit.label}: no candidate {name!r} on {head!r}")
+            option = None if head is None else options[head] if name is None else choices[(head, name)]
+            values.append(
+                {
+                    "result_set_id": result_set,
+                    "unit_id": unit.id,
+                    "option_id": option,
+                    "measure": measure,
+                    "value": value,
+                }
+            )
+            page = unit.pages[label]
+            width, height = width_height[page]
+            box = unit.boxes[label]
+            pages.add((volume.name, page))
+            locators.append(
+                {
+                    "result_set_id": result_set,
+                    "unit_id": unit.id,
+                    "option_id": option,
+                    "measure": measure,
+                    "page_id": key("page", volume.name, page),
+                    "x0": round(box[0] * width, 1),
+                    "y0": round(box[1] * height, 1),
+                    "x1": round(box[2] * width, 1),
+                    "y1": round(box[3] * height, 1),
+                }
+            )
 
 
 # ---- checks and entry points -------------------------------------------------------------------------------------
@@ -781,6 +1130,14 @@ def reconcile() -> list[str]:
             f"{volume.name}: {len(volume.groupings)} groupings, {sum(len(g.slates) for g in volume.groupings)} lists; "
             + ("all sums close" if not off else "; ".join(off))
         )
+        for grouping in volume.groupings:
+            units = leaves(volume, grouping)
+            if units:
+                fine_off = disagreements(volume, grouping)
+                report.append(
+                    f"{volume.name} {grouping.number}: {len(units)} units by commune; "
+                    + ("all add to the grouping totals" if not fine_off else "; ".join(fine_off))
+                )
     return report
 
 
