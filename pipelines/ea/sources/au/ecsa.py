@@ -126,6 +126,7 @@ class District:
     unopposed: bool = False
     system: str | None = None  # the key of the electoral system, where it is not the default
     after: list[tuple[str, int]] | None = None  # votes after preferences in a district that elects several members
+    misprinted: int = 0  # polling places whose formal votes the source misprints and the archive leaves out
 
 
 @dataclass
@@ -135,6 +136,7 @@ class Event:
     files: list[str]  # raw urls this election cites
     districts: list[District] = field(default_factory=list)
     last: date | None = None  # the last polling day of an election whose districts did not all vote on one day
+    dated: list[str] = field(default_factory=list)  # raw urls of the pages that give the polling day
 
 
 def title(name: str) -> str:
@@ -1137,7 +1139,12 @@ def history_events() -> dict[str, functools.partial[Event]]:
 @functools.cache
 def events() -> dict[str, Callable[[], Event]]:
     """Every election the pipeline builds, by package name, oldest first."""
-    out: dict[str, Callable[[], Event]] = {**history_events(), "2018-03-17": event_2018, "2022-03-19": event_2022}
+    out: dict[str, Callable[[], Event]] = {
+        **history_events(),
+        **article_events(),
+        "2018-03-17": event_2018,
+        "2022-03-19": event_2022,
+    }
     return dict(sorted(out.items()))
 
 
@@ -1154,6 +1161,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".csv")
     for url in (COUNCIL_2014, COUNCIL_2018):
         raw.fetch(SOURCE, url, suffix=".html")
+    fetch_articles()
     index = raw.fetch(SOURCE, INDEX_2018, suffix=".html")
     for page in district_pages(index.path.read_text()):
         for n in ("", "2"):
@@ -1232,6 +1240,21 @@ def registry() -> Package:
     files |= {url for name in council_events() for url in council_event(name).files}
     for url in sorted(files):
         p.artifact(raw.cached(SOURCE, url), ECSA)
+    p.add(
+        "source",
+        id=WIKIPEDIA,
+        kind="community",
+        publisher="Wikipedia",
+        title="Wikipedia articles on South Australian elections",
+        url="https://en.wikipedia.org/",
+        license="CC BY-SA 4.0",
+        license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+        attribution="Wikipedia contributors",
+        notes="Read from each article's wikitext, pinned to the revision current at retrieval. Used only for the "
+        "polling days of the elections whose results pages do not state them.",
+    )
+    for url in sorted({url for name in events() for url in event(name).dated}):
+        p.artifact(raw.cached(SOURCE, url), WIKIPEDIA)
     p.add("scheme", code="au-sa.district", polity_id=AUSTRALIA, kind="electoral_district", rank=1, noun="district")
     p.add("scheme", code="au-sa.place", polity_id=AUSTRALIA, kind="precinct", rank=2, noun="polling place")
     p.add(
@@ -1358,7 +1381,7 @@ def build(name: str) -> Package:
         depends=["au.ecsa/registry"],
     )
     p.external.add(AUSTRALIA)
-    for url in ev.files:
+    for url in [*ev.files, *ev.dated]:
         p.uses(raw.cached(SOURCE, url))
     election = key("election", day)
     path = f"au-sa/{day}-{'state' if general else 'by-election'}"
@@ -1379,6 +1402,7 @@ def build(name: str) -> Package:
     turnout: list[str] = []
     unprinted: list[str] = []
     apart: list[str] = []
+    dropped: list[str] = []
     itemized: list[str] = []
     slugs: set[str] = set()
     for d in ev.districts:
@@ -1577,6 +1601,8 @@ def build(name: str) -> Package:
             _put(p, result_set, ballots, None, CAST, d.declared.total)
             if d.seats == 1 and d.declared.formal is not None:
                 itemized.append(f"{name} ({d.declared.formal:,} formal votes)")
+        if d.misprinted:
+            dropped.append(f"{name} ({d.misprinted} polling places)")
         if d.places:
             sums = [sum(pl.votes[i] or 0 for pl in d.places) for i in range(len(options))]
             differ = [i for i, v in enumerate(d.declared.votes) if v is not None and sums[i] != v]
@@ -1680,12 +1706,20 @@ def build(name: str) -> Package:
             "The source prints a number of ballots cast that is more than its electors enrolled in "
             + ", ".join(turnout),
         )
+    reasons = []
     if apart:
-        p.accept(
-            "accounting.declared",
+        reasons.append(
             "The source's polling place tables add up to different votes than its district totals in "
-            + ", ".join(apart),
+            + ", ".join(apart)
         )
+    if dropped:
+        reasons.append(
+            "The source's polling place table prints the informal count in its formal column, so the archive leaves "
+            "those formal votes out and the places add up to fewer formal votes than the district total in "
+            + ", ".join(dropped)
+        )
+    if reasons:
+        p.accept("accounting.declared", "; ".join(reasons))
     valid = [
         (
             itemized,
@@ -2946,3 +2980,388 @@ def council(p: Package) -> None:
             rules_version=1,
         )
         p.add("note", id=key("note", system), entity_id=system, kind="methodology", body_md=body, lang="en")
+
+
+# 2010 and 2014 and the by-elections from 2009 to 2015: the commission's results articles, one for each district's
+# results and one for its polling places.
+
+ARTICLE = f"{PAGE}?view=article&id="
+WIKIPEDIA = key("source", "wikipedia")
+SECTIONS = {
+    "2010 State Election Results": ("2010-03-20", "general", ["2010_South_Australian_state_election"]),
+    "2014 State Election Results": ("2014-03-15", "general", ["2014_South_Australian_state_election"]),
+    "2015 By-election Results": ("2015-01-31", "by_election", ["2015_Davenport_state_by-election"]),
+    "2014 By-election Results": ("2014-12-06", "by_election", ["2014_Fisher_state_by-election"]),
+    "2012 By-election Results": (
+        "2012-02-11",
+        "by_election",
+        ["2012_Port_Adelaide_state_by-election", "2012_Ramsay_state_by-election"],
+    ),
+    "2009 By-election Results": ("2009-01-17", "by_election", ["2009_Frome_state_by-election"]),
+}
+PAGE_KIND = re.compile(
+    r"District of ([A-Za-z' -]+?) - (Results|Electoral Results|Polling place Results|Polling Booth Results)"
+)
+
+
+def wiki_url(title: str) -> str:
+    return f"https://en.wikipedia.org/w/index.php?title={title}&action=raw"
+
+
+def article_url(article: str | int) -> str:
+    return f"{ARTICLE}{article}"
+
+
+def article_body(text: str) -> str:
+    found = re.search(r'<div itemprop="articleBody".*?<footer', text, re.DOTALL)
+    return found[0] if found else text
+
+
+def lines(cell: str) -> list[str]:
+    cell = re.sub(r'<div class="progress">.*?</div>\s*</div>', "", cell, flags=re.DOTALL)
+    parts = (
+        " ".join(html.unescape(re.sub(r"<[^>]+>", " ", p)).replace("\xa0", " ").split())
+        for p in re.split(r"<br\s*/?>", cell)
+    )
+    return [part for part in parts if part]
+
+
+def grid(body: str) -> list[list[list[list[str]]]]:
+    """Each table's rows, each row's cells, and each cell's lines."""
+    return [
+        [
+            [lines(c) for c in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", row, re.DOTALL)]
+            for row in re.findall(r"<tr[^>]*>(.*?)</tr>", table, re.DOTALL)
+        ]
+        for table in re.findall(r"<table[^>]*>(.*?)</table>", body, re.DOTALL)
+    ]
+
+
+def flat(cell: list[str]) -> str:
+    return " ".join(cell)
+
+
+def apostrophe(text: str) -> str:
+    return text.replace("`", "'")
+
+
+def classify(text: str, district: str) -> str | None:
+    """Whether an article holds a district's results ('main') or its polling places ('places'), or neither, as when
+    the commission's link points to a page of another district or election."""
+    body = article_body(text)
+    found = PAGE_KIND.search(re.sub(r"<[^>]+>", "", body))
+    if found:
+        if found[1].lower() != district.lower():
+            return None
+        return "places" if "Polling" in found[2] else "main"
+    if "Declaration Ballot Papers" in body:
+        return "places"
+    return "main" if "Total Formal" in body else None
+
+
+def describe(text: str) -> tuple[str, str, str] | None:
+    """The section title, district, and kind ('main' or 'places') an article holds, from its own headings."""
+    body = article_body(text)
+    plain = re.sub(r"<[^>]+>", " ", body)
+    head = re.search(r"<h1[^>]*>(.*?)</h1>", body, re.DOTALL)
+    title = " ".join(lines(head[1])) if head else ""
+    if not re.search(r"\b20\d\d\b", title):
+        head = re.search(r"<title>(.*?)</title>", text, re.DOTALL)
+        title = " ".join(lines(head[1])).rpartition("Electoral Commission - ")[2] if head else ""
+    shown = PAGE_KIND.search(plain)
+    year = re.search(r"\b(20\d\d)\b", title)
+    if not year:
+        return None
+    sections = [k for k in SECTIONS if k.startswith(year[1])]
+    if len(sections) > 1:
+        sections = [k for k in sections if ("By-election" in k) == ("by-election" in title.lower())]
+    if len(sections) != 1:
+        return None
+    section = sections[0]
+    if shown:
+        return section, shown[1], "places" if "Polling" in shown[2] else "main"
+    named = re.search(r"- ([A-Za-z' -]+)$", title)
+    if named and ("Total Formal" in body or "Declaration Ballot Papers" in body):
+        return section, named[1].strip(), "places" if "Declaration Ballot Papers" in body else "main"
+    return None
+
+
+@functools.cache
+def article_index() -> dict[str, dict[str, dict[str, str]]]:
+    """Section title, then district, then 'main' and 'places' to the article url, from the headings of the articles
+    themselves, because the commission's index links some districts to the articles of another district or
+    election and leaves some articles unlinked. Two articles of one district and kind must hold the same tables."""
+    found: dict[tuple[str, str, str], list[str]] = {}
+    for number_ in range(656, 862):
+        url = article_url(number_)
+        try:
+            text = raw.cached(SOURCE, url).path.read_text()
+        except LookupError:
+            continue
+        info = describe(text)
+        if info:
+            found.setdefault(info, []).append(url)
+    out: dict[str, dict[str, dict[str, str]]] = {}
+    for (section, district, kind), urls in found.items():
+        if len(urls) > 1:
+            grids = {repr(grid(article_body(raw.cached(SOURCE, u).path.read_text()))) for u in urls}
+            if len(grids) > 1:
+                raise ValueError(f"{section} {district} {kind}: {len(urls)} articles with different tables")
+        out.setdefault(section, {}).setdefault(district, {})[kind] = urls[0]
+    return out
+
+
+def fetch_articles() -> None:
+    raw.fetch(SOURCE, article_url(655), suffix=".html")
+    ids = range(656, 862)
+    raw.fetch_many(SOURCE, [article_url(i) for i in ids], suffix=".html", workers=6)
+    for _, _, titles in SECTIONS.values():
+        for title in titles:
+            raw.fetch(SOURCE, wiki_url(title), suffix=".wiki")
+
+
+def modern_names(cell: list[str]) -> Candidate:
+    """A heading cell of surname, given names, and party, on separate lines."""
+    if len(cell) == 1:
+        return Candidate(apostrophe(cell[0]), "")
+    return Candidate(apostrophe(" ".join(cell[:-1])), cell[-1])
+
+
+def votes_of(cells: list[list[str]]) -> list[int | None]:
+    return [number(flat(c)) for c in cells]
+
+
+def modern_district(name: str, main: str | None, places: str | None) -> District:
+    """The layout of the 2014 articles and the by-elections after it."""
+    first: list[list[list[str]]] = []
+    runoff_rows: list[list[list[str]]] = []
+    enrolled = None
+    candidates: list[Candidate] = []
+    declared: Place | None = None
+    if main:
+        body = article_body(main)
+        found = re.search(r"Electors Enrolled\s+([\d,]+)", re.sub(r"<[^>]+>", " ", body))
+        enrolled = number(found[1]) if found else None
+        mt = grid(body)
+        first = [r for r in mt[0] if len(r) == 5 or (r and flat(r[0]).startswith("Total"))]
+        runoff_rows = [r for r in mt[1] if len(r) == 5 and number(flat(r[4])) is not None][:2] if len(mt) > 1 else []
+        candidates = [
+            Candidate(apostrophe(" ".join(r[0])), flat(r[1]))
+            for r in first
+            if len(r) == 5 and number(flat(r[4])) is not None
+        ]
+        formal, informal, total = (
+            next((number(flat(r[-1])) for r in first if flat(r[0]).startswith(label)), None)
+            for label in ("Total Formal", "Total Informal", "Total Ballot")
+        )
+        declared = Place(
+            "District Total",
+            [number(flat(r[4])) for r in first if len(r) == 5 and number(flat(r[4])) is not None],
+            formal,
+            informal,
+            total,
+        )
+    leaves: list[Place] = []
+    pair: list[list[str]] | None = None
+    runoff_places: dict[str, list[int | None]] = {}
+    if places:
+        pt = grid(article_body(places))
+        head = pt[0][0]
+        stop = next(i for i, c in enumerate(head) if flat(c).startswith("Frml"))
+        listed = [modern_names(c) for c in head[1:stop]]
+        if candidates and [c.name for c in candidates] != [c.name for c in listed]:
+            raise ValueError(f"{name}: the polling place table lists other candidates than the results")
+        candidates = candidates or listed
+        width = len(candidates)
+        for row in pt[0][1:]:
+            label = flat(row[0]) if row else ""
+            if len(row) < width + 5 or not label or label.startswith(("District Total %", "Polling Place Totals")):
+                continue
+            place = Place(
+                label,
+                votes_of(row[1 : 1 + width]),
+                number(flat(row[1 + width])),
+                number(flat(row[2 + width])),
+                number(flat(row[4 + width])),
+            )
+            if label == "District Total":
+                if declared is None:
+                    declared = place
+                continue
+            if label.startswith("Declaration"):
+                place.name = "Declaration Votes"
+                place.kind = "aggregate"
+            leaves.append(place)
+        if len(pt) > 1:
+            pair = pt[1][0][1:]
+            for row in pt[1][2:]:
+                if len(row) == 5:
+                    runoff_places[flat(row[0]).rstrip(":")] = [number(flat(row[1])), number(flat(row[3]))]
+    assert declared is not None
+    district = District(name, candidates, enrolled, leaves, declared)
+    names = [c.name for c in candidates]
+    if runoff_rows:
+        finalists = [apostrophe(" ".join(r[0])) for r in runoff_rows]
+        counts = [number(flat(r[4])) for r in runoff_rows]
+    elif pair:
+        finalists = [apostrophe(" ".join(c[:-1])) for c in pair]
+        counts = runoff_places.get("District Total", [None, None])
+    else:
+        finalists, counts = [], []
+    if finalists:
+        district.finalists = [names.index(f) for f in finalists]
+        declared.runoff = counts
+        if places and pair and not runoff_rows:
+            district.note = (
+                "The commission's results page for this district is not published, so its figures come from "
+                "the polling place page."
+            )
+    for place in leaves:
+        if place.name in runoff_places and finalists:
+            place.runoff = runoff_places[place.name]
+        elif place.name == "Declaration Votes" and "Declaration Ballot Papers" in runoff_places and finalists:
+            place.runoff = runoff_places["Declaration Ballot Papers"]
+    return district
+
+
+def legacy_candidate(cell: list[str]) -> Candidate:
+    """A heading cell of 'SURNAME, Given' and the party code on the next line."""
+    return Candidate(cell[0], cell[1] if len(cell) > 1 else "")
+
+
+def legacy_numbers(row: list[list[str]]) -> list[int | None]:
+    return [number(flat(c)) for c in row[1:] if flat(c)]
+
+
+def legacy_district(name: str, main: str | None, places: str | None) -> District:
+    """The layout of the 2009 to 2012 articles."""
+    enrolled = None
+    candidates: list[Candidate] = []
+    declared: Place | None = None
+    final: list[tuple[str, int | None]] = []
+    updated = None
+    provisional = False
+    if main:
+        body = article_body(main)
+        plain = re.sub(r"<[^>]+>", " ", body)
+        found = re.search(r"Electors Enrolled\s+([\d,]+)", plain)
+        enrolled = number(found[1]) if found else None
+        updated = re.search(r"Last updated on (\d{1,2} [A-Z][a-z]+ \d{4})", plain, re.IGNORECASE)
+        provisional = "provisional and subject to recheck" in plain
+        mt = [t for t in grid(body) if t and flat(t[0][0]) == "Candidate"]
+        rows = [r for r in mt[0] if len(r) == 5 and number(flat(r[2])) is not None]
+        candidates = [
+            Candidate(r[0][0], flat(r[1]) if flat(r[1]) not in ("", "-") else "") for r in rows if flat(r[1]) != "-"
+        ]
+        stats = {flat(r[0]): number(flat(r[2])) for r in rows if flat(r[1]) == "-"}
+        declared = Place(
+            "District Total",
+            [number(flat(r[2])) for r in rows if flat(r[1]) != "-"],
+            stats.get("Total Formal"),
+            stats.get("Informal"),
+            stats.get("Total Ballot Papers"),
+        )
+        if len(mt) > 1:
+            last = [r for r in mt[-1] if len(r) == 5 and number(flat(r[2])) is not None]
+            final = [(r[0][0], number(flat(r[2]))) for r in last]
+    leaves: list[Place] = []
+    misprinted = 0
+    if places:
+        pt = grid(article_body(places))
+        head = pt[0]
+        listed = [legacy_candidate(c) for c in head[0] if c]
+        width = len(listed)
+        if candidates and [c.name for c in candidates] != [c.name for c in listed]:
+            raise ValueError(f"{name}: the polling place table lists other candidates than the results")
+        candidates = candidates or listed
+        for row in head[2:]:
+            label = flat(row[0]) if row else ""
+            nums = legacy_numbers(row)
+            if not label or label.startswith(("%age", "Polling Place Totals")):
+                continue
+            if len(nums) == 2 * width + 5:
+                values = nums[0 : 2 * width : 2]
+                tail = [nums[2 * width], nums[2 * width + 2], nums[2 * width + 4]]
+            elif len(nums) == width + 3:
+                values, tail = nums[:width], nums[width:]
+            else:
+                raise ValueError(f"{name}: unreadable row {label}: {nums}")
+            place = Place(label, values, tail[0], tail[1], tail[2])
+            if (
+                label not in ("District Total", "Declaration Ballot Papers")
+                and tail[0] == tail[1]
+                and None not in (*values, tail[2])
+                and sum(v or 0 for v in values) + (tail[1] or 0) == tail[2]
+                and sum(v or 0 for v in values) != tail[0]
+            ):
+                place.formal = None  # the table prints the informal count in its formal column
+                misprinted += 1
+            if label == "District Total":
+                if declared is None:
+                    declared = place
+                continue
+            if label.startswith("Declaration"):
+                place.name = "Declaration Votes"
+                place.kind = "aggregate"
+            leaves.append(place)
+    assert declared is not None
+    district = District(name, candidates, enrolled, leaves, declared)
+    names = [c.name for c in candidates]
+    notes: list[str] = []
+    if final:
+        district.finalists = [names.index(n) for n, _ in final]
+        declared.runoff = [v for _, v in final]
+    if not main:
+        notes.append(
+            "The commission's results page for this district is not published, so its figures come from the "
+            "polling place page" + ", and the commission's final two candidate preferred count is not published."
+        )
+    elif updated and provisional:
+        notes.append(
+            f"The commission's results page was last updated on {updated[1]} and still describes its figures as "
+            "provisional and subject to recheck until verification was complete."
+        )
+    district.misprinted = misprinted
+    if misprinted:
+        notes.append(
+            f"The commission's polling place table prints the informal count in its formal column for {misprinted} "
+            "of this district's polling places, so their formal votes are left out."
+        )
+    district.note = " ".join(notes) or None
+    return district
+
+
+@functools.cache
+def article_events() -> dict[str, Callable[[], Event]]:
+    """The elections of the commission's index of past results, by package name."""
+    index = article_index()
+    out: dict[str, Callable[[], Event]] = {}
+    for section, (day, kind, _) in SECTIONS.items():
+        name = day if kind == "general" else f"{day}-by-election"
+        out[name] = functools.partial(article_event, section)
+    return out if index else {}
+
+
+def article_event(section: str) -> Event:
+    day, kind, titles = SECTIONS[section]
+    found = article_index()[section]
+    ev = Event(day, kind, [article_url(655)], dated=[wiki_url(t) for t in titles])
+    for pagename, urls in sorted(found.items()):
+        main = raw.cached(SOURCE, urls["main"]).path.read_text() if "main" in urls else None
+        places = raw.cached(SOURCE, urls["places"]).path.read_text() if "places" in urls else None
+        ev.files += [urls[k] for k in ("main", "places") if k in urls]
+        legacy = section.startswith(("2010", "2012", "2009"))
+        district = (legacy_district if legacy else modern_district)(pagename, main, places)
+        if places is None:
+            gap = (
+                "The commission publishes no polling place results for this district, so only its district total "
+                "is stored."
+            )
+            district.note = f"{district.note} {gap}" if district.note else gap
+        ev.districts.append(district)
+    for title in titles:
+        text = raw.cached(SOURCE, wiki_url(title)).path.read_text()
+        when = date.fromisoformat(day)
+        if f"{when.day} {MONTHS[when.month - 1]} {when.year}" not in text:
+            raise ValueError(f"{title} does not give the polling day {day}")
+    return ev
