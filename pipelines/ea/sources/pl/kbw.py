@@ -5,6 +5,7 @@ come by polling district for 2014, 2019, and 2024, and by commune (gmina) for 20
 authority publishes for those two.
 """
 
+import csv
 import io
 import re
 import zipfile
@@ -451,6 +452,7 @@ EP_FILES: dict[date, list[str]] = {
         "2014/parlament_eu/pe2014kand.xls",
         "2014/parlament_eu/pe2014-gl-lis-obw.zip",
         "2014/parlament_eu/pe2014-gl-lis-okr.zip",
+        "2014/parlament_eu/pe2014-kand-obw.zip",
     ],
     date(2019, 5, 26): [
         "2019/parlament_eu/kandydaci_csv.zip",
@@ -861,6 +863,75 @@ def _kand(
     return lists.sort("group", "nr"), candidates, declared
 
 
+def _candidate_votes_2014(units: pl.DataFrame, candidates: pl.DataFrame) -> pl.DataFrame:
+    """Candidate votes by polling district from the per-commission CSV files of the 2014 election.
+
+    Each file has a preamble, a row that names every list above its columns, and a header row that repeats the list's
+    vote column and then names the list's candidates in order, ending in a "Razem" column. The files count candidates
+    from 1 without gaps, while the candidate file keeps each candidate's ballot position, so a candidate is matched to
+    it by constituency, list number, and name.
+    """
+    path = "2014/parlament_eu/pe2014-kand-obw.zip"
+    positions: dict[tuple[int, int, tuple[str, ...]], int] = {}
+    for row in candidates.iter_rows(named=True):
+        tag = (row["group"], row["nr"], tuple(sorted(row["name"].casefold().split())))
+        if tag in positions:
+            raise ValueError(f"{tag}: two candidates share a name on one list")
+        positions[tag] = row["pos"]
+    groups = dict(units.select("code", "group").iter_rows())
+    rows: list[dict[str, object]] = []
+    seen: set[str] = set()
+    for name in sorted(zipfile.ZipFile(cached(path).path).namelist()):
+        table = list(csv.reader(io.StringIO(member(path, name).decode("cp1250")), delimiter=";"))
+        head = next(i for i, row in enumerate(table) if row and row[0] == "Lp.")
+        header = table[head]
+        data = [row for row in table[head + 1 :] if row and row[0].strip()]
+        codes = [f"{re.sub(r'\D', '', row[1])}:{int(row[5])}" for row in data]
+        if seen & set(codes) or len(set(codes)) != len(codes):
+            raise ValueError(f"{name}: polling districts repeat")
+        seen |= set(codes)
+        if unknown := [code for code in codes if code not in groups]:
+            raise ValueError(f"{name}: polling districts {unknown[:3]} are not in the results file")
+        found_groups = {groups[code] for code in codes}
+        if len(found_groups) != 1:
+            raise ValueError(f"{name}: spans constituencies {sorted(found_groups)}")
+        (group,) = found_groups
+        layout: list[tuple[int, int, int]] = []
+        for start, cell in enumerate(table[head - 1]):
+            found = re.search(r"Lista nr (\d+)", cell)
+            if found is None:
+                continue
+            number = int(found.group(1))
+            last = 0
+            for column in range(start + 1, header.index("Razem", start)):
+                label = tuple(sorted(clean(header[column].removeprefix("=").strip('"')).casefold().split()))
+                position = positions.get((group, number, label))
+                if position is None:
+                    if {row[column].strip() for row in data} - {"Skreślony", ""}:
+                        raise ValueError(f"{name}: {header[column]!r} is not a candidate of list {number}")
+                    continue
+                if position <= last:
+                    raise ValueError(f"{name}: {header[column]!r} is out of order on list {number}")
+                last = position
+                layout.append((column, number, position))
+        for code, row in zip(codes, data, strict=True):
+            for column, number, position in layout:
+                value = row[column].strip() if column < len(row) else ""
+                rows.append(
+                    {
+                        "code": code,
+                        "nr": number,
+                        "pos": position,
+                        "value": None if value in {"", "Skreślony"} else int(value),
+                    }
+                )
+    if missing := set(groups) - seen:
+        raise ValueError(f"{len(missing)} polling districts have no candidate votes, such as {sorted(missing)[:3]}")
+    return pl.DataFrame(
+        rows, schema={"code": pl.String, "nr": pl.Int64, "pos": pl.Int64, "value": pl.Int64}
+    ).drop_nulls("value")
+
+
 def _load_2014() -> Ep:
     day = date(2014, 5, 25)
     data = sheet(member("2014/parlament_eu/pe2014-gl-lis-obw.zip", "pe2014-gl-lis-obw.xls"))
@@ -904,7 +975,8 @@ def _load_2014() -> Ep:
         "Głosy ważne",
         count("Karty nieważne") + count("Głosy nieważne"),
     )
-    return Ep(day, "obwod", units, votes, lists, candidates, declared, accounting)
+    preferences = _candidate_votes_2014(units, candidates)
+    return Ep(day, "obwod", units, votes, lists, candidates, declared, accounting, preferences)
 
 
 def _load_commune(
