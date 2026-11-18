@@ -37,7 +37,7 @@
    "publisher": "Electoral Commission of Malta",
    "url": "https://electoral.gov.mt/ElectionResults/Index",
    "kind": "official_body",
-   "note": "Refuses scripted requests; results pages are saved from a browser."
+   "note": "Results pages are saved from a browser. The local council pages list rounds from 1999; each page gives the polling date, the localities and their seats."
   },
   "ep_2004": {
    "title": "National results Malta 2004-2009 (constitutive session)",
@@ -607,12 +607,151 @@
      "date": "1993-11-01",
      "election_kind": "general",
      "precision": "month",
-     "note": "First elections, in every locality. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+     "note": "First elections, in every locality. Month only: the Electoral Commission's local council results list begins in 1999, and neither it nor the Local Government Act gives the 1993 polling day."
     },
     {
-     "date": "1994-01-01",
-     "through": "2013-12-31",
-     "note": "Rolling elections in groups of councils, not enumerated here. Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+     "date": "1999-03-13",
+     "election_kind": "local",
+     "contests": 21,
+     "seats": 127,
+     "source": "ec_results",
+     "quote": "Election Summary 1999 Date 13/03/1999",
+     "note": "21 localities voted for 127 council seats. 2 further localities were listed with the Commission's note \"No Election was held in this locality\" and so are not counted."
+    },
+    {
+     "date": "1999-05-22",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 5,
+     "source": "ec_results",
+     "quote": "Election Summary 1999 Date 22/05/1999",
+     "note": "Single-locality round: one council voted for 5 seats."
+    },
+    {
+     "date": "1999-11-13",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 7,
+     "source": "ec_results",
+     "quote": "Election Summary 1999 Date 13/11/1999",
+     "note": "Single-locality round: one council voted for 7 seats."
+    },
+    {
+     "date": "2000-03-12",
+     "election_kind": "local",
+     "contests": 23,
+     "seats": 157,
+     "source": "ec_results",
+     "quote": "Election Summary 2000 Date 12/03/2000",
+     "note": "23 localities voted for 157 council seats."
+    },
+    {
+     "date": "2001-03-10",
+     "election_kind": "local",
+     "contests": 21,
+     "seats": 135,
+     "source": "ec_results",
+     "quote": "Election Summary 2001 Date 10/03/2001",
+     "note": "21 localities voted for 135 council seats. 1 further locality was listed with the Commission's note \"No Election was held in this locality\" and so are not counted."
+    },
+    {
+     "date": "2002-03-09",
+     "election_kind": "local",
+     "contests": 22,
+     "seats": 134,
+     "source": "ec_results",
+     "quote": "Election Summary 2002 Date 09/03/2002",
+     "note": "22 localities voted for 134 council seats. 1 further locality was listed with the Commission's note \"No Election was held in this locality\" and so are not counted."
+    },
+    {
+     "date": "2003-03-08",
+     "election_kind": "local",
+     "contests": 23,
+     "seats": 159,
+     "source": "ec_results",
+     "quote": "Election Summary 2003 Date 08/03/2003",
+     "note": "23 localities voted for 159 council seats."
+    },
+    {
+     "date": "2004-06-12",
+     "election_kind": "local",
+     "contests": 22,
+     "seats": 140,
+     "source": "ec_results",
+     "quote": "Election Summary 2004 Date 12/06/2004",
+     "note": "22 localities voted for 140 council seats."
+    },
+    {
+     "date": "2005-03-12",
+     "election_kind": "local",
+     "contests": 21,
+     "seats": 123,
+     "source": "ec_results",
+     "quote": "Election Summary 2005 Date 12/03/2005",
+     "note": "21 localities voted for 123 council seats. 2 further localities were listed with the Commission's note \"No Election was held in this locality\" and so are not counted."
+    },
+    {
+     "date": "2006-03-11",
+     "election_kind": "local",
+     "contests": 23,
+     "seats": 159,
+     "source": "ec_results",
+     "quote": "Election Summary 2006 Date 11/03/2006",
+     "note": "23 localities voted for 159 council seats."
+    },
+    {
+     "date": "2007-03-10",
+     "election_kind": "local",
+     "contests": 22,
+     "seats": 140,
+     "source": "ec_results",
+     "quote": "Election Summary 2007 Date 10/03/2007",
+     "note": "22 localities voted for 140 council seats."
+    },
+    {
+     "date": "2008-03-08",
+     "election_kind": "local",
+     "contests": 23,
+     "seats": 143,
+     "source": "ec_results",
+     "quote": "Election Summary 2008 Date 08/03/2008",
+     "note": "23 localities voted for 143 council seats."
+    },
+    {
+     "date": "2008-05-24",
+     "election_kind": "local",
+     "contests": 1,
+     "seats": 5,
+     "source": "ec_results",
+     "quote": "Election Summary 2008 Date 24/05/2008",
+     "note": "Single-locality round: one council voted for 5 seats."
+    },
+    {
+     "date": "2009-06-06",
+     "election_kind": "local",
+     "contests": 23,
+     "seats": 161,
+     "source": "ec_results",
+     "quote": "Election Summary 2009 Date 06/06/2009",
+     "note": "23 localities voted for 161 council seats."
+    },
+    {
+     "date": "2012-03-10",
+     "election_kind": "local",
+     "contests": 35,
+     "seats": 239,
+     "source": "ec_results",
+     "quote": "Election Summary 2012 Date 10/03/2012",
+     "note": "35 localities voted for 239 council seats."
+    },
+    {
+     "date": "2013-03-09",
+     "election_kind": "local",
+     "contests": 33,
+     "seats": 227,
+     "source": "ec_results",
+     "quote": "Election Summary 2013 Date 09/03/2013",
+     "note": "33 localities voted for 227 council seats. 1 further locality was listed with the Commission's note \"No Election was held in this locality\" and so are not counted."
     },
     {
      "date": "2015-04-11",
@@ -630,7 +769,11 @@
     {
      "date": "2024-06-08",
      "election_kind": "local",
-     "note": "All councils, with the European Parliament election (art. 8(6)). Date not quoted from an official source: the Electoral Commission's results index, which lists it, refused this census's requests."
+     "contests": 68,
+     "seats": 476,
+     "source": "ec_results",
+     "quote": "Election Summary 2024 Date 08/06/2024",
+     "note": "All 68 councils, with the European Parliament election (art. 8(6))."
     }
    ]
   },
