@@ -12,6 +12,8 @@ every figure on its page.
 The volumes and the tables used:
 
 - Riksdagsmannavalen åren 1909–1911, table 7: 1911.
+- Riksdagsmannavalen år 1914, table 2: spring 1914 (the 1911 rows printed above it are not stored).
+- Riksdagsmannavalen åren 1915–1917, table 4: 1917 and autumn 1914 (its county subtotals are not stored).
 - Riksdagsmannavalen åren 1918–1920, table 6: 1920.
 - Riksdagsmannavalen år 1921, table 5: 1921, each constituency's rural districts and towns apart.
 - Riksdagsmannavalen åren 1925–1928, table 3: 1928 and 1924.
@@ -90,6 +92,34 @@ VOLUMES = {
             {159: "H LS S O total invalid seats*"},
         ),
         Volume(
+            "1914-var",
+            "1914",
+            "Riksdagsmannavalen år 1914 (efter riksdagsupplösningen våren 1914)",
+            "tab. 2",
+            {
+                141: "H L S O total invalid seats*",
+                143: "H L S O total invalid seats*",
+                145: "H L S O total invalid seats*",
+                147: "H L S O total invalid seats*",
+            },
+        ),
+        Volume(
+            "1915-1917",
+            "1915-1916-1917",
+            "Riksdagsmannavalen åren 1915–1917",
+            "tab. 4",
+            {
+                160: "H JR B L",
+                161: "S VS O total invalid seats*",
+                162: "H JR B L",
+                163: "S VS O total invalid seats*",
+                164: "H JR B L",
+                165: "S VS O total invalid seats*",
+                166: "H JR B L",
+                167: "S VS O total invalid seats*",
+            },
+        ),
+        Volume(
             "1918-1920",
             "1918-1919-1920",
             "Riksdagsmannavalen åren 1918–1920",
@@ -164,6 +194,19 @@ class Election:
     end: date
     note: str = ""
     precision: str = "day"
+    season: str = ""  # "var" (spring) or "host" (autumn) in a year of two elections
+
+    @property
+    def tag(self) -> str:
+        """The election's key: its year, with the season where a year had two elections."""
+        return f"{self.year}-{self.season}" if self.season else str(self.year)
+
+    @property
+    def label(self) -> tuple[str, str]:
+        """The year as the English and Swedish names give it."""
+        english = {"var": "spring ", "host": "autumn "}.get(self.season, "")
+        swedish = {"var": "våren ", "host": "hösten "}.get(self.season, "")
+        return f"{english}{self.year}", f"{swedish}{self.year}"
 
     @property
     def day(self) -> date:
@@ -178,6 +221,35 @@ ELECTIONS = [
         date(1911, 9, 30),
         "The first Second Chamber election under proportional representation. The constituencies voted on different "
         "days in September: most on Sunday 3, 10, 17, or 24 September, and the town constituencies on weekdays.",
+        "month",
+    ),
+    Election(
+        1914,
+        "1914-var",
+        date(1914, 3, 27),
+        date(1914, 4, 7),
+        "An extra election after the King dissolved the Riksdag on 3 March 1914 over the defence question. Most "
+        "constituencies voted on Sunday 5 April and Blekinge län on 29 March; the two Stockholm city constituencies "
+        "voted first, on Friday 27 March, and Örebro län's two constituencies last, on Tuesday 7 April.",
+        season="var",
+    ),
+    Election(
+        1914,
+        "1915-1917",
+        date(1914, 9, 1),
+        date(1914, 9, 30),
+        "The autumn election of 1914. Most constituencies voted on Sunday 6 or 13 September (some towns on the "
+        "Saturday before), Gotlands län on Saturday 5 September, and the town constituencies on weekdays.",
+        "month",
+        "host",
+    ),
+    Election(
+        1917,
+        "1915-1917",
+        date(1917, 9, 1),
+        date(1917, 9, 30),
+        "Most constituencies voted on Sunday 2, 9, or 16 September (some towns on the Saturday or Tuesday before), "
+        "Gotlands län on Saturday 1 September, and the town constituencies on weekdays.",
         "month",
     ),
     Election(
@@ -240,7 +312,7 @@ ELECTIONS = [
     Election(1960, "1959-1960", date(1960, 9, 18), date(1960, 9, 18)),
     Election(1968, "1965-1968", date(1968, 9, 15), date(1968, 9, 15)),
 ]
-BY_YEAR = {e.year: e for e in ELECTIONS}
+BY_TAG = {e.tag: e for e in ELECTIONS}
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -461,6 +533,10 @@ PARTIES = {
 
 # The party behind each column, where it differs from the column's own name.
 COLUMN_PARTY: dict[tuple[int, str], str] = {
+    (1914, "B"): "C",
+    (1914, "L"): "LS",
+    (1917, "B"): "C",
+    (1917, "L"): "LS",
     (1920, "B"): "C",
     (1921, "B"): "C",
     (1921, "L"): "LS",
@@ -497,6 +573,8 @@ LABELS: dict[str, str] = {
 }
 YEAR_LABELS: dict[tuple[int, str], str] = {
     (1911, "H"): "Moderata",
+    (1914, "H"): "Moderata",
+    (1917, "H"): "Moderata",
     (1924, "K"): "Kommunister (Kilbomsriktningen)",
     (1932, "FP"): "Liberala och frisinnade",
     (1932, "SP"): "Kilbomskommunister",
@@ -635,7 +713,7 @@ def packages() -> list[str]:
 
 
 def election_key(e: Election) -> str:
-    return f"{SOURCE}/andra-kammaren-{e.year}"
+    return f"{SOURCE}/andra-kammaren-{e.tag}"
 
 
 def parse() -> None:
@@ -822,12 +900,13 @@ def election(e: Election) -> Package:
     p = Package(
         election_key(e),
         SOURCE,
-        f"The Second Chamber election of {e.year} by constituency, digitized from Statistics Sweden's {volume.title}",
+        f"The Second Chamber election of {e.label[0]} by constituency, digitized from Statistics Sweden's "
+        f"{volume.title}",
         depends=[REGISTRY, GEO, f"{SOURCE}/geo", f"{val.SOURCE}/geo"],
     )
     p.external |= {SWEDEN, COUNTRY, val.COUNTY, val.CONSTITUENCY}
     p.uses(raw.cached(SOURCE, volume.url))
-    election_id = scb.key("election", "andra-kammaren", e.year)
+    election_id = scb.key("election", "andra-kammaren", e.tag)
     p.add(
         "election",
         id=election_id,
@@ -838,8 +917,14 @@ def election(e: Election) -> Package:
         date_precision=e.precision,
         status="held",
     )
-    p.name(election_id, f"{e.year} Swedish Second Chamber election", "en", "official")
-    p.name(election_id, f"Andrakammarvalet {e.year}", "sv", "native", False)
+    english, swedish = e.label
+    p.name(
+        election_id,
+        f"Swedish Second Chamber election of {english}" if e.season else f"{e.year} Swedish Second Chamber election",
+        "en",
+        "official",
+    )
+    p.name(election_id, f"Andrakammarvalet {swedish}", "sv", "native", False)
     slug = f"se/{e.day}-andra-kammaren"
     p.add("slug", path=slug, entity_id=election_id, is_current=True)
     if e.note:
@@ -860,7 +945,7 @@ def election(e: Election) -> Package:
         groups.setdefault(base(key), []).append((key, row))
     for krets_key, members in groups.items():
         krets = KRETSAR[krets_key]
-        contest = scb.key("contest", "andra-kammaren", e.year, krets_key)
+        contest = scb.key("contest", "andra-kammaren", e.tag, krets_key)
         p.add(
             "contest",
             id=contest,
@@ -875,7 +960,7 @@ def election(e: Election) -> Package:
         )
         p.name(contest, krets.name, "sv", "official")
         p.add("slug", path=f"{slug}/{krets_key}", entity_id=contest, is_current=True)
-        result_set = scb.key("result_set", "andra-kammaren", e.year, krets_key)
+        result_set = scb.key("result_set", "andra-kammaren", e.tag, krets_key)
         p.add(
             "result_set",
             id=result_set,
@@ -897,7 +982,7 @@ def election(e: Election) -> Package:
             won = sum(row.get(f"seats:{column}") or 0 for _, row in members)
             if not votes and not won:
                 continue
-            option = options[column] = scb.key("option", "andra-kammaren", e.year, krets_key, column)
+            option = options[column] = scb.key("option", "andra-kammaren", e.tag, krets_key, column)
             label = YEAR_LABELS.get((e.year, column), LABELS[column])
             if e.year >= 1957 and column == "C":
                 label = "Centerpartiet"
@@ -914,7 +999,7 @@ def election(e: Election) -> Package:
                 p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=won)
         for key, row in members:
             part = key.partition("/")[2]
-            unit = scb.key("unit", "andra-kammaren", e.year, key)
+            unit = scb.key("unit", "andra-kammaren", e.tag, key)
             p.add(
                 "reporting_unit",
                 id=unit,
@@ -931,6 +1016,7 @@ def election(e: Election) -> Package:
                 flags = 0
                 if column is not None:
                     flags = DIGITIZED
+                if column is not None and (e.volume, e.year, key, column) in boxes:
                     page, x0, y0, x1, y1 = boxes[(e.volume, e.year, key, column)]
                     b.pages.add(page)
                     b.boxes.append((result_set, unit, option, measure, page_id(volume, page), x0, y0, x1, y1))
@@ -1097,11 +1183,19 @@ def _numbers(line: list[Word]) -> list[tuple[int, tuple[int, int, int, int]]]:
     return out
 
 
-def _increasing(points: list[tuple[int, float]]) -> list[tuple[int, float]]:
-    """The longest run of (row, y) points whose y rises with the row."""
+def _increasing(points: list[tuple[int, float]], tall: float) -> list[tuple[int, float]]:
+    """The longest run of (row, y) points whose y rises with the row at a plausible pace: at least half a line and at
+    most eight lines per row, with six lines to spare for the subtotals and headings between them."""
     best: list[list[tuple[int, float]]] = []
     for point in sorted(points):
-        chains = [chain for chain in best if chain[-1][0] < point[0] and chain[-1][1] < point[1]]
+        chains = [
+            chain
+            for chain in best
+            if chain[-1][0] < point[0]
+            and 0.5 * tall * (point[0] - chain[-1][0])
+            <= point[1] - chain[-1][1]
+            <= 8 * tall * (point[0] - chain[-1][0]) + 6 * tall
+        ]
         best.append([*max(chains, key=len, default=[]), point])
     return max(best, key=len, default=[])
 
@@ -1118,7 +1212,109 @@ def _interpolate(anchors: list[tuple[int, float]], index: int) -> float:
     return y0 if i0 == i1 else y0 + (index - i0) * (y1 - y0) / (i1 - i0)
 
 
+@dataclass
+class Scan:
+    """One table page as the OCR read it, and the rows of the table it anchors."""
+
+    page: int
+    columns: list[str]
+    lines: list[list[Word]]
+    spelled: list[list[tuple[int, tuple[int, int, int, int]]]]
+    middles: list[float]
+    pitch: float
+    exact: dict[tuple[int, str], tuple[int, int, int, int]]
+    anchors: list[tuple[int, float]]
+    profile: list[float]  # the share of dark pixels in each pixel row, for aligning facing pages
+
+
+def _scan(
+    pdf: Path, page: int, here: list[str], found: list[tuple[int, str, Row]], folder: Path
+) -> tuple[Scan, int, int]:
+    import statistics
+
+    import numpy as np
+    from PIL import Image
+
+    words, width, height = _words(pdf, page, folder)
+    dark = np.asarray(Image.open(folder / f"{page}.png").convert("L")) < 128
+    profile = [float(v) for v in dark.mean(axis=1)]
+    lines = _lines(words)
+    spelled = [_numbers(line) for line in lines]
+    middles = [statistics.median((w[2] + w[4]) / 2 for w in line) for line in lines]
+    heights = [statistics.median(w[4] - w[2] for w in line) for line in lines]
+    # Anchors: a figure of 100 or more that one line of the page spells, and only one row of the table holds, places
+    # its row on that line; the longest run of anchors that descend the page with the rows is kept.
+    counts: dict[int, int] = {}
+    for _, _, row in found:
+        for column in here:
+            if (value := row.get(column)) is not None:
+                counts[value] = counts.get(value, 0) + 1
+    tall = statistics.median(heights) if heights else 30.0
+    points: list[tuple[int, float]] = []
+    exact: dict[tuple[int, str], tuple[int, int, int, int]] = {}
+    for index, (_, _, row) in enumerate(found):
+        for column in here:
+            value = row.get(column)
+            if value is None or value < 100 or counts[value] > 1:
+                continue
+            where = [
+                (li, box)
+                for li, numbers in enumerate(spelled)
+                for n, box in numbers
+                if n == value and box[3] - box[1] < 1.6 * tall
+            ]
+            if len({li for li, _ in where}) == 1:
+                li, box = where[0]
+                points.append((index, middles[li]))
+                exact[(index, column)] = box
+    anchors = _increasing(points, tall)
+    rows = {a[0] for a in anchors}
+    exact = {k: v for k, v in exact.items() if k[0] in rows}
+    pitch = statistics.median(heights) / 2 + 2 if heights else 10.0
+    return Scan(page, here, lines, spelled, middles, pitch, exact, anchors, profile), width, height
+
+
+def _offset(mine: list[float], theirs: list[float], reach: int = 200) -> float:
+    """How far down this page sits from the facing page: the shift that best correlates their rows of ink."""
+    import numpy as np
+
+    a, b = np.asarray(mine), np.asarray(theirs)
+    n = min(len(a), len(b)) - 2 * reach
+    if n <= 0:
+        return 0.0
+    middle = a[reach : reach + n] - a[reach : reach + n].mean()
+    scores = []
+    for shift in range(-reach, reach + 1):
+        window = b[reach - shift : reach - shift + n]
+        scores.append(float(np.dot(middle, window - window.mean())))
+    return float(int(np.argmax(scores)) - reach)
+
+
+def _near(read: int, value: int) -> bool:
+    """Whether the OCR's reading differs from a figure in one digit, or two in a figure of five or more."""
+    a, b = str(read), str(value)
+    if len(a) != len(b):
+        return False
+    return sum(x != y for x, y in zip(a, b, strict=True)) <= (2 if len(b) >= 5 else 1)
+
+
+def _line(scan: Scan, y: float) -> int:
+    return min(range(len(scan.lines)), key=lambda li: abs(scan.middles[li] - y))
+
+
+def _fit(scan: Scan, anchors: list[tuple[int, float]], index: int, row: Row) -> int:
+    """How many of a row's figures the line where a page would print it spells."""
+    if not anchors or not scan.lines:
+        return -1
+    li = _line(scan, _interpolate(anchors, index))
+    spelled = {n for n, _ in scan.spelled[li]}
+    return sum(
+        1 for column in scan.columns if (value := row.get(column)) is not None and value >= 10 and value in spelled
+    )
+
+
 def locate() -> None:
+    import itertools
     import statistics
     import tempfile
 
@@ -1130,73 +1326,167 @@ def locate() -> None:
         cols = columns(volume.key)
         boxes: dict[tuple[int, str], tuple[int, float, float, float, float]] = {}
         read: set[tuple[int, str]] = set()
-        placed = 0
-        wanted = 0
+        near: set[tuple[int, str]] = set()
+        scans: list[Scan] = []
         with tempfile.TemporaryDirectory() as folder:
             for page in volume.pages:
-                words, width, height = _words(pdf, page, Path(folder))
-                here = volume.page_columns(page)
+                scan, width, height = _scan(pdf, page, volume.page_columns(page), found, Path(folder))
+                scans.append(scan)
                 sizes.append([volume.key, page, round(width / 3), round(height / 3)])
-                lines = _lines(words)
-                spelled = [_numbers(line) for line in lines]
-                middles = [statistics.median((w[2] + w[4]) / 2 for w in line) for line in lines]
-                heights = [statistics.median(w[4] - w[2] for w in line) for line in lines]
-                # Anchors: a figure of 100 or more that one line of the page spells, and only one row of the table
-                # holds, places its row on that line.
-                counts: dict[int, int] = {}
-                for _, _, row in found:
-                    for column in here:
-                        if (value := row.get(column)) is not None:
-                            counts[value] = counts.get(value, 0) + 1
-                points: list[tuple[int, float]] = []
-                hits: dict[str, list[tuple[int, int, int, int]]] = {}
-                exact: dict[tuple[int, str], tuple[int, int, int, int]] = {}
-                for index, (_, _, row) in enumerate(found):
-                    for column in here:
-                        value = row.get(column)
-                        if value is None or value < 100 or counts[value] > 1:
-                            continue
-                        where = [(li, box) for li, numbers in enumerate(spelled) for n, box in numbers if n == value]
-                        if len({li for li, _ in where}) == 1:
-                            li, box = where[0]
-                            points.append((index, middles[li]))
-                            exact[(index, column)] = box
-                anchors = _increasing(points)
-                kept = set(anchors)
-                for (index, column), box in exact.items():
-                    if any(a[0] == index for a in kept):
-                        hits.setdefault(column, []).append(box)
-                        boxes[(index, column)] = (page, box[0] / 3, box[1] / 3, box[2] / 3, box[3] / 3)
-                        read.add((index, column))
-                if not anchors:
-                    continue
-                pitch = statistics.median(heights) / 2 + 2
-                band = {index: _interpolate(anchors, index) for index in range(len(found))}
-                nearest = {
-                    index: min(range(len(lines)), key=lambda li, y=y: abs(middles[li] - y)) for index, y in band.items()
-                }
-                # Smaller figures, read on the line their row's band falls on.
-                for index, li in nearest.items():
-                    if abs(middles[li] - band[index]) > pitch:
+        # A spread is a left page and the right page facing it, which print the same rows at the same heights; their
+        # anchors are pooled. Each row belongs to the spread that anchors it most; a row no spread anchors goes with
+        # the rows around it, to the spread whose line at its height spells more of it.
+        spreads: list[list[Scan]] = []
+        for scan in scans:
+            last = spreads[-1] if spreads else None
+            if (
+                last is not None
+                and len(last) == 1
+                and scan.page == last[0].page + 1
+                and scan.columns != last[0].columns
+                and any(not c.startswith("seats") for c in scan.columns)
+            ):
+                last.append(scan)
+            else:
+                spreads.append([scan])
+        pooled: dict[int, list[tuple[int, float]]] = {}
+        for spread in spreads:
+            for scan in spread:
+                # The facing page's anchors, shifted by the offset that best lines up the two pages' rows of ink;
+                # pages scanned apart sit at different heights.
+                points = dict(scan.anchors)
+                for other in spread:
+                    if other is scan:
                         continue
-                    for column in here:
-                        value = found[index][2].get(column)
-                        if value is None or (index, column) in boxes or column.startswith("seats"):
+                    offset = _offset(scan.profile, other.profile)
+                    for index, y in other.anchors:
+                        points.setdefault(index, y + offset)
+                pooled[scan.page] = _increasing(sorted(points.items()), 2 * scan.pitch - 4)
+        layouts: dict[str, list[list[Scan]]] = {}
+        for spread in spreads:
+            layouts.setdefault(" | ".join(" ".join(s.columns) for s in spread), []).append(spread)
+        owner: dict[tuple[str, int], int] = {}  # (layout, row) -> position of the spread in the layout
+        for layout, members in layouts.items():
+            tally: dict[int, dict[int, int]] = {}
+            for position, spread in enumerate(members):
+                for index, _ in pooled[spread[0].page]:
+                    tally.setdefault(index, {})[position] = tally.get(index, {}).get(position, 0) + 1
+            mine = {index: max(t, key=lambda k: t[k]) for index, t in tally.items()}
+            known = sorted(mine)
+            for index in range(len(found)):
+                if index in mine or not known:
+                    continue
+                before = max((k for k in known if k < index), default=None)
+                after = min((k for k in known if k > index), default=None)
+                candidates = sorted({mine[k] for k in (before, after) if k is not None})
+                mine[index] = max(
+                    candidates,
+                    key=lambda position: sum(
+                        _fit(scan, pooled[scan.page], index, found[index][2]) for scan in members[position]
+                    ),
+                )
+            for index, position in mine.items():
+                owner[(layout, index)] = position
+        sibling: dict[str, list[tuple[int, int, int, int]]] = {}  # each column's hits on every page, by layout
+        work: list[tuple[Scan, list[int], list[tuple[int, float]]]] = []
+        for layout, members in layouts.items():
+            for position, spread in enumerate(members):
+                mine = sorted(index for (lay, index), p in owner.items() if lay == layout and p == position)
+                for scan in spread:
+                    anchors = [a for a in pooled[scan.page] if a[0] in mine]
+                    if mine and anchors:
+                        work.append((scan, mine, anchors))
+        hits: dict[int, dict[str, list[tuple[int, int, int, int]]]] = {}
+        bands: dict[int, dict[int, float]] = {}
+        for scan, mine, anchors in work:
+            found_here = hits.setdefault(scan.page, {})
+            for (index, column), box in scan.exact.items():
+                if index in mine:
+                    found_here.setdefault(column, []).append(box)
+                    boxes[(index, column)] = (scan.page, box[0] / 3, box[1] / 3, box[2] / 3, box[3] / 3)
+                    read.add((index, column))
+            # A row beyond the page's first or last anchor is placed on it only within one and a half rows of it.
+            ordered = sorted(anchors)
+            steps = [(b[1] - a[1]) / (b[0] - a[0]) for a, b in itertools.pairwise(ordered) if b[0] > a[0]]
+            step = statistics.median(steps) if steps else 4 * scan.pitch
+            top, bottom = ordered[0][1] - 1.5 * step, ordered[-1][1] + 1.5 * step
+            band = bands[scan.page] = {
+                index: y for index in mine if top <= (y := _interpolate(anchors, index)) <= bottom
+            }
+            # Smaller figures, read on the line their row's band falls on.
+            for index, y in band.items():
+                li = _line(scan, y)
+                if abs(scan.middles[li] - y) > scan.pitch:
+                    continue
+                for column in scan.columns:
+                    value = found[index][2].get(column)
+                    if value is None or value < 10 or (index, column) in boxes or column.startswith("seats"):
+                        continue
+                    spans = [box for n, box in scan.spelled[li] if n == value]
+                    if len(spans) == 1:
+                        box = spans[0]
+                        found_here.setdefault(column, []).append(box)
+                        boxes[(index, column)] = (scan.page, box[0] / 3, box[1] / 3, box[2] / 3, box[3] / 3)
+                        read.add((index, column))
+            for column, bs in found_here.items():
+                sibling.setdefault(" ".join(scan.columns) + "\x1f" + column, []).extend(bs)
+        # The rest take their row's band and their column's median edges: on this page, else on the pages of the
+        # same layout, else between the columns beside it.
+        for scan, _, _ in work:
+            edges = {
+                column: (statistics.median(b[0] for b in bs), statistics.median(b[2] for b in bs))
+                for column, bs in hits[scan.page].items()
+                if len(bs) >= 2
+            }
+            order = [c for c in scan.columns if not c.startswith("seats")]
+            for column in order:
+                others = sibling.get(" ".join(scan.columns) + "\x1f" + column, [])
+                if column not in edges and len(others) >= 2:
+                    edges[column] = (statistics.median(b[0] for b in others), statistics.median(b[2] for b in others))
+            for position, column in enumerate(order):
+                if column in edges:
+                    continue
+                left = next((edges[c][1] for c in reversed(order[:position]) if c in edges), None)
+                right = next((edges[c][0] for c in order[position + 1 :] if c in edges), None)
+                if left is not None and right is not None and right > left:
+                    gap = (right - left) / 4
+                    edges[column] = (left + gap, right - gap)
+            band = bands[scan.page]
+            # A figure the OCR misread by a digit or two, in its column and near its row's band.
+            for index, y in band.items():
+                for column, (x0, x1) in edges.items():
+                    value = found[index][2].get(column)
+                    if value is None or value < 10 or (index, column) in boxes:
+                        continue
+                    best: tuple[float, tuple[int, int, int, int]] | None = None
+                    for li, numbers in enumerate(scan.spelled):
+                        distance = abs(scan.middles[li] - y)
+                        if distance > 3 * scan.pitch:
                             continue
-                        spans = [box for n, box in spelled[li] if n == value]
-                        if value >= 10 and len(spans) == 1:
-                            box = spans[0]
-                            hits.setdefault(column, []).append(box)
-                            boxes[(index, column)] = (page, box[0] / 3, box[1] / 3, box[2] / 3, box[3] / 3)
-                            read.add((index, column))
-                edges = {
-                    column: (statistics.median(b[0] for b in bs), statistics.median(b[2] for b in bs))
-                    for column, bs in hits.items()
-                }
-                for index, y in band.items():
-                    for column, (x0, x1) in edges.items():
-                        if found[index][2].get(column) is not None and (index, column) not in boxes:
-                            boxes[(index, column)] = (page, x0 / 3, (y - pitch) / 3, x1 / 3, (y + pitch) / 3)
+                        for n, box in numbers:
+                            inside = x0 - 20 <= (box[0] + box[2]) / 2 <= x1 + 20
+                            if inside and _near(n, value) and (best is None or distance < best[0]):
+                                best = (distance, box)
+                    if best is not None:
+                        box = best[1]
+                        boxes[(index, column)] = (scan.page, box[0] / 3, box[1] / 3, box[2] / 3, box[3] / 3)
+                        near.add((index, column))
+            # Each row's band again, from the figures now placed on it; then the rest of its figures.
+            placed_rows: dict[int, list[float]] = {}
+            for (index, column), box in boxes.items():
+                if box[0] == scan.page and index in band and ((index, column) in read or (index, column) in near):
+                    placed_rows.setdefault(index, []).append((box[2] + box[4]) / 2 * 3)
+            # A row's other figures take its band, where the OCR confirmed at least one figure of the row on this
+            # page, and their column's edges; a row with none is not boxed, rather than boxed by a guess.
+            for index in band:
+                if index not in placed_rows:
+                    continue
+                y = statistics.median(placed_rows[index])
+                for column, (x0, x1) in edges.items():
+                    if found[index][2].get(column) is not None and (index, column) not in boxes:
+                        top, bottom = (y - scan.pitch) / 3, (y + scan.pitch) / 3
+                        boxes[(index, column)] = (scan.page, x0 / 3, top, x1 / 3, bottom)
+        placed = wanted = 0
         for index, (year, krets, row) in enumerate(found):
             for column in cols:
                 if row[column] is None or column.startswith("seats"):
@@ -1205,7 +1495,10 @@ def locate() -> None:
                 if (index, column) in boxes:
                     placed += 1
                     out.append([volume.key, year, krets, column, *boxes[(index, column)]])
-        print(f"{volume.key}: {wanted} figures, {placed} placed, {len(read)} read by the OCR as transcribed")
+        print(
+            f"{volume.key}: {wanted} figures, {placed} boxed, {len(read)} read by the OCR as transcribed, "
+            f"{len(near)} within a digit or two"
+        )
     with (FOLDER / "locators.tsv").open("w", encoding="utf-8") as f:
         f.write("volume\tyear\tkrets\tcolumn\tpage\tx0\ty0\tx1\ty1\n")
         for r in out:
