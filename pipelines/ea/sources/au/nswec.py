@@ -186,6 +186,9 @@ def fetch() -> None:
         for url in (config.groups, config.summary, config.elected, config.report):
             if url is not None:
                 raw.fetch(SOURCE, url, suffix=".html")
+    from ea.sources.au import nswec_lg2008
+
+    nswec_lg2008.fetch()
 
 
 # Parsing ---------------------------------------------------------------------------------------------------------
@@ -2013,6 +2016,8 @@ def bye_groups() -> dict[date, list[Bye]]:
 
 
 def packages() -> list[str]:
+    from ea.sources.au import nswec_lg2008
+
     return [
         f"{SOURCE}/geo",
         f"{SOURCE}/registry",
@@ -2023,6 +2028,7 @@ def packages() -> list[str]:
         f"{SOURCE}/lc-registry",
         *(f"{SOURCE}/lc-{c.day}" for c in COUNCIL.values()),
         *(f"{SOURCE}/by-{day}" for day in bye_groups()),
+        *nswec_lg2008.packages(),
     ]
 
 
@@ -2039,6 +2045,9 @@ def parse() -> None:
     for day, items in bye_groups().items():
         bye_election(day, items).write()
     council()
+    from ea.sources.au import nswec_lg2008
+
+    nswec_lg2008.parse()
 
 
 def council() -> None:
