@@ -173,6 +173,7 @@ class HaElection(NamedTuple):
     day: date
     workbooks: dict[str, tuple[str, str | None]]  # division -> (workbook url, sheet name)
     pages: dict[str, str]  # division -> page with the final distribution of preferences
+    extra: tuple[str, ...] = ()  # other files the election cites
 
 
 def _ha_2018() -> HaElection:
@@ -211,7 +212,22 @@ def _ha_2014() -> HaElection:
     )
 
 
+BLUE_BOOK = f"{ROOT}/info/Publications/ElectionReports/2007-2010ParlReport/2007-2010BlueBook.pdf"
+SUMMARY_2010 = f"{HA}/Previous_Elections/HoA2010ElectionSummary.html"
+
+
+def _ha_2010() -> HaElection:
+    names = {"bass": "Bass", "braddon": "Braddon", "clark": "Denison", "franklin": "Franklin", "lyons": "Lyons"}
+    return HaElection(
+        date(2010, 3, 20),
+        {code: (BLUE_BOOK, name) for code, name in names.items()},
+        {code: f"{BLUE_BOOK}#{code}" for code in names},
+        (SUMMARY_2010,),
+    )
+
+
 HA_ELECTIONS = [
+    _ha_2010(),
     _ha_2014(),
     _ha_2018(),
     _ha(
@@ -233,7 +249,8 @@ HA_ELECTIONS = [
 
 
 def ha_files(election: HaElection) -> list[str]:
-    return list(dict.fromkeys([*(url for url, _ in election.workbooks.values()), *election.pages.values()]))
+    urls = [*(url for url, _ in election.workbooks.values()), *election.pages.values(), *election.extra]
+    return list(dict.fromkeys(url.partition("#")[0] for url in urls))
 
 
 class Place(NamedTuple):
@@ -275,6 +292,8 @@ def place_kind(name: str) -> str:
 
 @functools.cache
 def sheet(url: str, name: str | None) -> Sheet:
+    if url == BLUE_BOOK:
+        return grid(url, name, bluebook_grid(url, name or ""))
     if url.endswith(".pdf"):
         return grid(url, name, pdf_grid(url))
     frames = pl.read_excel(
@@ -349,6 +368,113 @@ def pdf_grid(url: str) -> list[list[str]]:
         for row, extra in zip(merged, other, strict=True):
             row += extra[1:]
     return merged
+
+
+def bluebook_grid(url: str, division: str) -> list[list[str]]:
+    """The 2007 to 2010 report prints each division's polling places across, up to eight to a page, with the names
+    set in several short lines over each column of right-aligned figures. Lay the pages out as one grid like the
+    later workbooks."""
+    pages: list[list[list[str]]] = []
+    for page in pymupdf.open(raw.cached(SOURCE, url).path):
+        head = page.get_text()[:400]
+        if "First preference votes recorded" not in head or f"Division of {division}".casefold() not in head.casefold():
+            continue
+        lines: list[tuple[float, float, float, str, str | None]] = []  # x1, y0, y1, label, figure
+        for block in page.get_text("dict")["blocks"]:
+            for line in block.get("lines", []):
+                pieces = [
+                    clean(piece).replace("\u2019", "'")
+                    for piece in "".join(s["text"] for s in line["spans"]).split("\t")
+                ]
+                pieces = [piece for piece in pieces if piece]
+                if not pieces:
+                    continue
+                figure = pieces[-1] if is_figure(pieces[-1]) else None
+                label = " ".join(pieces[: len(pieces) - (figure is not None)])
+                lines.append((line["bbox"][2], line["bbox"][1], line["bbox"][3], label, figure))
+        top = next((y0 for _, y0, _, label, _ in lines if label == "Candidates"), None)
+        if top is None:
+            raise ValueError(f"{url}: a page of {division} has no Candidates row")
+        lines = [line for line in lines if line[1] < 780]  # the page number sits below the table
+        body = [(y0, [ballot_name(label)]) for _, y0, _, label, figure in lines if y0 > top and label]
+        edges: list[float] = []
+        for x1, y0, _, _, figure in lines:
+            if figure is not None and y0 > top and not any(abs(x1 - edge) < 12 for edge in edges):
+                edges.append(x1)
+        edges.sort()
+        cells = [[""] * len(edges) for _ in body]
+        for x1, y0, _, _, figure in lines:
+            if figure is None or y0 <= top:
+                continue
+            index = min(range(len(body)), key=lambda i: abs(body[i][0] - y0))
+            if abs(body[index][0] - y0) > 3:
+                raise ValueError(f"{url}: figure {figure} has no row label")
+            cells[index][min(range(len(edges)), key=lambda i: abs(edges[i] - x1))] = figure
+        names: list[list[tuple[float, float, str]]] = [[] for _ in edges]
+        for x0, y0, x1, y1, word, *_ in page.get_text("words"):
+            if 150 < y0 and y1 < top:
+                column = min(range(len(edges)), key=lambda i: abs(edges[i] - 13 - (x0 + x1) / 2))
+                if abs(edges[column] - 13 - (x0 + x1) / 2) > 24:
+                    raise ValueError(f"{url}: heading word {word} lies between columns")
+                names[column].append((round(y0 / 4), x0, word))
+        header = ["Candidates", *(clean(" ".join(w for *_, w in sorted(column))) for column in names)]
+        if not all(header):
+            raise ValueError(f"{url}: a column of {division} has no name: {header}")
+        pages.append([header, *([label, *row] for (_, [label]), row in zip(body, cells, strict=True))])
+    if not pages:
+        raise ValueError(f"{url}: no pages for {division}")
+    merged = pages[0]
+    for other in pages[1:]:
+        if [row[0] for row in other] != [row[0] for row in merged]:
+            raise ValueError(f"{url}: the pages of {division} do not list the same rows")
+        for row, extra in zip(merged, other, strict=True):
+            row += extra[1:]
+    return merged
+
+
+def bluebook_page(url: str, ballots: list[str]) -> Page:
+    """The report's scrutiny sheets close each division's first count with `SURNAME elected n`; the voting summary
+    gives each division's enrolment and formal votes."""
+    base, _, code = url.partition("#")
+    order = list(DIVISIONS)
+    pdf = pymupdf.open(raw.cached(SOURCE, base).path)
+    sheets = [clean(page.get_text()) for page in pdf if page.get_text().lstrip().startswith("Count 1")]
+    if len(sheets) != len(order):
+        raise ValueError(f"{base}: {len(sheets)} scrutiny sheets for {len(order)} divisions")
+    body = sheets[order.index(code)].replace("\u2019", "'")
+    elected: dict[str, int] = {}
+    for surname, order_ in re.findall(r"([A-Za-z'\-]+) elected (\d+)", body):
+        found = [b for b in ballots if b.partition(",")[0].casefold() == surname.casefold()]
+        if len(found) != 1:
+            raise ValueError(f"{base} {code}: {surname} elected matches {found}")
+        elected[found[0]] = int(order_)
+    summary = [
+        clean(item)
+        for page in pdf
+        if "Voting Summary" in page.get_text() and "Electors on the roll" in page.get_text()
+        for item in re.split(r"[\t\n]", page.get_text())
+        if clean(item)
+    ]
+
+    def row(label: str) -> list[int]:
+        start = summary.index(label)
+        figures = [number(item) for item in summary[start + 1 : start + 7]]
+        if None in figures:
+            raise ValueError(f"{base}: the voting summary row {label} reads {summary[start + 1 : start + 7]}")
+        return [figure or 0 for figure in figures]
+
+    position = order.index(code)
+    return Page(
+        elected, row("Formal Votes")[position], row("Electors on the roll")[position], row("Informal Votes")[position]
+    )
+
+
+def summary_elected(url: str) -> dict[str, list[str]]:
+    """The summary page lists each division's five members, one per row: a surname, then the party."""
+    rows = [[cell for cell in r if cell] for r in table_rows(text(url)) if r and re.fullmatch(r"[1-5]", r[0])]
+    if len(rows) != 5 or any(len(r) != 6 for r in rows):
+        raise ValueError(f"{url}: expected five rows of members for five divisions, read {rows}")
+    return {code: [r[column] for r in rows] for column, code in enumerate(DIVISIONS, 1)}
 
 
 def grid(url: str, name: str | None, rows: list[list[str]]) -> Sheet:
@@ -437,6 +563,8 @@ def ha_event_sheet(url: str, ballots: list[str]) -> Page:
 
 
 def ha_page(url: str, ballots: list[str] | None = None) -> Page:
+    if url.startswith(BLUE_BOOK):
+        return bluebook_page(url, ballots or [])
     if url.endswith(".pdf"):
         return ha_event_sheet(url, ballots or [])
     html = text(url)
@@ -543,7 +671,7 @@ def ha_election(election: HaElection) -> Package:
         data = sheet(url, name)
         page = ha_page(election.pages[code], [c.ballot for c in data.candidates])
         division = area("au.tas_division", code)
-        label = DIVISIONS[code]
+        label = "Denison" if code == "clark" and day < date(2018, 3, 3) else DIVISIONS[code]
         seats = len(page.elected)
         contest = key("contest", "ha", day, code)
         p.add(
@@ -593,6 +721,15 @@ def ha_election(election: HaElection) -> Package:
                 option_id=option,
                 kind="elected" if candidate.ballot in page.elected else "lost",
             )
+        if election.extra and election.extra[0] == SUMMARY_2010:
+            members = summary_elected(SUMMARY_2010)[code]
+            for ballot in page.elected:
+                if not any(m.casefold().startswith(ballot.partition(",")[0].casefold() + " ") for m in members):
+                    raise ValueError(f"{day} {code}: {ballot} is not among the summary's members {members}")
+            if len(members) != len(page.elected):
+                raise ValueError(
+                    f"{day} {code}: the summary lists {len(members)} members, the sheet {len(page.elected)}"
+                )
         missing = set(page.elected) - set(options)
         if missing:
             raise ValueError(f"{day} {code}: elected {sorted(missing)} are not on the ballot")
