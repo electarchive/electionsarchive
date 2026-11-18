@@ -14,6 +14,7 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.za import lge
 
 SOURCE = "za.iec"
 HOST = "https://results.elections.org.za/home"
@@ -62,7 +63,8 @@ MUNICIPAL = {
     "2021": Municipal(1091, date(2021, 11, 1)),
     "2026": Municipal(1887, date(2026, 11, 4)),
 }
-VINTAGES = sorted(item.day for item in MUNICIPAL.values())
+EARLY = {"2000": date(2000, 12, 5), "2006": date(2006, 3, 1)}
+VINTAGES = sorted([item.day for item in MUNICIPAL.values()] + list(EARLY.values()))
 NATIONAL = {
     "2014": National(
         date(2014, 5, 7),
@@ -175,6 +177,8 @@ def fetch() -> None:
         for province in FILES:
             raw.fetch(SOURCE, municipal_url(election.event, province), suffix=".csv")
         raw.fetch(SOURCE, municipal_totals_url(election.event), suffix=".xls")
+    for year in EARLY:
+        lge.fetch(int(year))
 
 
 def key(kind: str, *parts: object) -> str:
@@ -366,6 +370,7 @@ def packages() -> list[str]:
         "za.iec/registry",
         *(f"za.iec/{item.day}" for item in NATIONAL.values()),
         *(f"za.iec/{item.day}" for item in MUNICIPAL.values()),
+        *(f"za.iec/{day}" for day in EARLY.values()),
     ]
 
 
@@ -376,6 +381,8 @@ def parse() -> None:
         national(year).write()
     for year in MUNICIPAL:
         municipal(year).write()
+    for year in EARLY:
+        early(year).write()
 
 
 def emit() -> None:
@@ -424,7 +431,7 @@ def geo() -> Package:
         "za.iec/geo",
         SOURCE,
         "South Africa's provinces, and the districts, municipalities, and wards of each municipal demarcation from "
-        "2011, as the IEC's results name them",
+        "2000, as the IEC's results name them",
     )
     p.external.add(SOUTH_AFRICA)
     for code, rank, kind, noun in (
@@ -472,7 +479,35 @@ def geo() -> Package:
             valid_from=since,
             valid_to=until,
         )
+    for year, since in EARLY.items():
+        _early_geo(p, int(year), since)
     return p
+
+
+def _early_geo(p: Package, year: int, since: date) -> None:
+    """The municipalities, districts, district management areas, and wards of 2000 or 2006, as the portal lists them."""
+    until = _until(since)
+    places, wards = lge.structure(year)
+    for place in places:
+        scheme = "za.district" if place.kind == "district" else "za.municipality"
+        id = area(scheme, since, place.code)
+        p.add("area", id=id, scheme_code=scheme)
+        p.add("area_code", area_id=id, code=place.code, valid_from=since, valid_to=until)
+        p.name(id, f"{place.name} District" if place.kind == "district" else place.name, "en", "official")
+        parent = area("za.district", since, place.parent) if place.parent else area("za.province", place.province)
+        p.add("area_parent", area_id=id, parent_id=parent, valid_from=since, valid_to=until)
+    for ward, municipality in sorted(wards.items()):
+        id = area("za.ward", since, ward)
+        p.add("area", id=id, scheme_code="za.ward")
+        p.add("area_code", area_id=id, code=ward, valid_from=since, valid_to=until)
+        p.name(id, f"Ward {ward}", "en", "official")
+        p.add(
+            "area_parent",
+            area_id=id,
+            parent_id=area("za.municipality", since, municipality),
+            valid_from=since,
+            valid_to=until,
+        )
 
 
 def _abbreviations() -> dict[str, str]:
@@ -496,6 +531,10 @@ def _party_names() -> dict[str, str]:
     for year in MUNICIPAL:
         for text in municipal_table(year)["PartyName"].unique().drop_nulls():
             names.setdefault(party_key(text), clean(text))
+    for year in EARLY:
+        votes = lge.table(int(year)).votes
+        for text in votes["party"].unique().drop_nulls():
+            names.setdefault(party_key(text), clean(text))
     names.pop(INDEPENDENT, None)
     for text in _independents():
         names.pop(party_key(text), None)
@@ -518,7 +557,7 @@ def registry() -> Package:
         "za.iec/registry",
         SOURCE,
         "South Africa's National Assembly, provincial legislatures, electoral systems, and the parties on the IEC's "
-        "results from 2011",
+        "results from 2000",
         depends=["za.iec/geo"],
     )
     p.external.add(SOUTH_AFRICA)
@@ -993,3 +1032,221 @@ def municipal(year: str) -> Package:
         option = _option(p, options, contest, row["PartyName"], known, ward=ballot == "Ward")
         _value(p, result_set, unit, option, 1, int(row["TotalValidVotes"]))
     return p
+
+
+EARLY_METHOD = (
+    "Counted by the Electoral Commission of South Africa (IEC) per voting district, as published in the IEC's "
+    "detailed results reports on its results portal, one file for each ward and ballot. Registered voters are the "
+    "voters' roll of the voting district, and spoilt ballots are the ballots the IEC reports as spoilt. The "
+    "proportional and district ballots print their spoilt ballots only for a whole ward, so they are stored only "
+    "for a voting district that is its ward's only one; the registered voters of every voting district come from "
+    "the ward ballot's report. Valid votes are the sum of the parties' votes."
+)
+EARLY_WARD_CAVEAT = (
+    "The IEC prints the candidate's name and party for each line. Independent candidates are separate lines, "
+    "and each is its own option."
+)
+EARLY_DISTRICT_METHOD = (
+    "Forty percent of the district council's seats are elected on this ballot, cast in the district's local "
+    "municipalities and in its district management areas, which vote only on the district ballot."
+)
+
+
+def _early_units(data: lge.Early) -> tuple[dict[str, int], dict[tuple[str, str], tuple[int | None, int | None]]]:
+    """Registered voters by voting district from the ward ballot, and the figures printed for each voting district
+    of a file that prints them."""
+    registered: dict[str, int] = {}
+    for row in data.stats.filter(pl.col("ballot") == "Ward").iter_rows(named=True):
+        if row["registered"] is not None:
+            registered[row["vd"]] = row["registered"]
+    printed: dict[tuple[str, str], tuple[int | None, int | None]] = {}
+    for row in data.stats.iter_rows(named=True):
+        printed[(row["ballot"], row["vd"])] = (row["registered"], row["spoilt"])
+        if row["ballot"] != "Ward" and row["registered"] is not None:
+            registered.setdefault(row["vd"], row["registered"])
+    return registered, printed
+
+
+def early(year: str) -> Package:
+    day = EARLY[year]
+    data = lge.table(int(year))
+    places, _ = lge.structure(int(year))
+    codes = lge.codes(int(year))
+    by_code = {place.code: place for place in places}
+    p = Package(
+        f"za.iec/{day}",
+        SOURCE,
+        f"South Africa's {year} municipal elections, every ward, council, and district council ballot, by voting "
+        "district from the IEC",
+        depends=["za.iec/geo", "za.iec/registry"],
+    )
+    p.external.add(SOUTH_AFRICA)
+    stored: set[str] = set()
+    for link in lge.cited(int(year)):
+        artifact = raw.cached(SOURCE, link)
+        if artifact.storage_key not in stored:  # reports with identical contents share one file
+            stored.add(artifact.storage_key)
+            p.artifact(artifact, SOURCE_ID)
+        else:
+            p.uses(artifact)
+    election = key("election", day)
+    path = f"za/{day}-local"
+    _election(p, election, "local", day, path, f"{year} South African municipal elections")
+    known = _registered_parties()
+    registered, printed = _early_units(data)
+    seen: set[str] = set()
+    options: dict[tuple[str, str], str] = {}
+    sets: dict[str, str] = {}
+    values: dict[tuple[str, str, str | None, int], int] = {}
+    pairs: dict[tuple[str, str], tuple[str, str]] = {}
+
+    def put(result_set: str, unit: str, option: str | None, measure: int, value: int) -> None:
+        index = (result_set, unit, option, measure)
+        if values.get(index, value) != value:
+            raise ValueError(f"{year}: {index} is printed as {values[index]} and as {value}")
+        values[index] = value
+
+    for row in data.votes.sort("ballot", "municipality", "ward", "vd", "party", "candidate").iter_rows(named=True):
+        ballot = row["ballot"]
+        code = codes[row["municipality"]]
+        place = by_code[code]
+        ward = row["ward"]
+        if ballot == "Ward":
+            scope = f"ward:{ward}"
+            if scope not in sets:
+                number = int(ward[-3:])
+                sets[scope] = _contest(
+                    p,
+                    key("contest", day, "ward", ward),
+                    election,
+                    "body_seats",
+                    f"{place.name} Ward {number}",
+                    f"{path}/{code.lower().replace(' ', '-')}-ward-{number}",
+                    body=None,
+                    district_area=area("za.ward", day, ward),
+                    magnitude=1,
+                    system=SYSTEM_WARD,
+                    method=EARLY_METHOD + " " + EARLY_WARD_CAVEAT,
+                )
+        elif ballot == "PR":
+            scope = f"council:{code}"
+            if scope not in sets:
+                sets[scope] = _contest(
+                    p,
+                    key("contest", day, "council", code),
+                    election,
+                    "list_allocation",
+                    f"{place.name} council, proportional ballot",
+                    f"{path}/{code.lower().replace(' ', '-')}-{changeset.slug(place.name)}",
+                    body=None,
+                    district_area=area("za.municipality", day, code),
+                    magnitude=None,
+                    system=SYSTEM_COUNCIL,
+                    method=EARLY_METHOD,
+                )
+        else:
+            scope = f"district:{code}"
+            if scope not in sets:
+                sets[scope] = _contest(
+                    p,
+                    key("contest", day, "district", code),
+                    election,
+                    "list_allocation",
+                    f"{place.name} district council, district ballot",
+                    f"{path}/{code.lower()}-district-council",
+                    body=None,
+                    district_area=area("za.district", day, code),
+                    magnitude=None,
+                    system=SYSTEM_DISTRICT,
+                    method=EARLY_METHOD + " " + EARLY_DISTRICT_METHOD,
+                )
+        result_set = sets[scope]
+        contest = key("contest", day, *scope.split(":"))
+        home = (
+            area("za.ward", day, ward)
+            if ward
+            else area("za.municipality", day, codes[row["council"] or row["municipality"]])
+        )
+        unit = _unit(p, day, row["vd"], home, seen)
+        label = row["party"]
+        if ballot == "Ward":
+            name_key = party_key(label)
+            candidate = clean(row["candidate"])
+            option_key = (contest, f"{name_key}|{candidate}")
+            if option_key not in options:
+                options[option_key] = key("option", contest, name_key, candidate)
+                party_id = None if name_key == INDEPENDENT else party(label)
+                if party_id is not None and party_id not in known:
+                    raise ValueError(f"{label} is not in the registry")
+                p.add(
+                    "contest_option",
+                    id=options[option_key],
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=party_id,
+                    ballot_position=None,
+                    ballot_label=candidate,
+                )
+            option = options[option_key]
+        else:
+            option = _option(p, options, contest, label, known)
+        put(result_set, unit, option, 1, row["votes"])
+        pairs[(result_set, unit)] = (ballot, row["vd"])
+    for (result_set, unit), (ballot, vd) in pairs.items():
+        voters, spoilt = printed.get((ballot, vd), (None, None))
+        voters = voters if voters is not None else registered.get(vd)
+        if voters is not None:
+            put(result_set, unit, None, 2, voters)
+        if spoilt is not None:
+            put(result_set, unit, None, 5, spoilt)
+    for (result_set, unit, option, measure), value in values.items():
+        _value(p, result_set, unit, option, measure, value)
+    _early_reconcile(p, year, data)
+    return p
+
+
+def _early_reconcile(p: Package, year: str, data: lge.Early) -> None:
+    """Compare the voting-district files with what the IEC prints for the whole ward and for the municipality."""
+    day = EARLY[year]
+    valid = data.stats.filter(pl.col("ballot") == "Ward").drop_nulls("valid")
+    summed = (
+        data.votes.filter(pl.col("ballot") == "Ward")
+        .group_by("ward", "vd")
+        .agg(pl.col("votes").sum().alias("summed"))
+        .join(valid.select("ward", "vd", "valid"), on=["ward", "vd"], how="left")
+    )
+    off = summed.filter(pl.col("valid").is_not_null() & (pl.col("valid") != pl.col("summed")))
+    if off.height:
+        p.accept(
+            "accounting.votes_valid",
+            f"in {off.height} voting districts the IEC's ward ballot file prints a valid-vote total that differs from "
+            "the sum of the candidates' votes; both are stored as printed",
+        )
+    known = list(lge.structure(int(year))[1])
+    wards = (
+        data.votes.filter((pl.col("ballot") == "PR") & pl.col("ward").is_not_null())
+        .group_by("ward", "party")
+        .agg(pl.col("votes").sum())
+    )
+    printed = data.municipal.filter(pl.col("ward").is_in(known) & pl.col("party").is_not_null())
+    joined = wards.join(
+        printed.select("ward", "party", pl.col("votes").alias("printed")), on=["ward", "party"], how="full"
+    )
+    gaps = joined.filter(pl.col("votes").fill_null(0) != pl.col("printed").fill_null(0))
+    print(
+        f"{year}: {off.height} ward-ballot voting districts off their printed valid total; {gaps.height} ward-party gaps"
+    )
+    if gaps.height:
+        total = gaps.select((pl.col("votes").fill_null(0) - pl.col("printed").fill_null(0)).abs().sum()).item()
+        p.add(
+            "note",
+            id=key("note", day, "reconcile"),
+            entity_id=key("election", day),
+            kind="caveat",
+            body_md=(
+                f"The IEC's municipality-wide proportional report and its per-ward voting-district reports differ in "
+                f"{gaps.height} ward and party totals, by {total:,} votes in all. Both are published by the IEC; the "
+                "voting-district reports are stored."
+            ),
+            lang="en",
+        )
