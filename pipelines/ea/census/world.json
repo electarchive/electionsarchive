@@ -893,10 +893,10 @@
       "kind": "compendium"
     },
     "xah": {
-      "publisher": "Czoernig election datasets",
-      "title": "Parliamentary elections: Reichsrat 1911",
-      "url": "https://www.czoernig.com/datasets-1/parliamentary-elections:-reichsrat-1911",
-      "kind": "compendium"
+      "publisher": "Parlamentsdirektion (Republik Österreich)",
+      "title": "Erster Weltkrieg und Ende der Monarchie",
+      "url": "https://www.parlament.gv.at/verstehen/historisches/1848-1918/erster-weltkrieg-ende-monarchie/index.html",
+      "kind": "official_body"
     },
     "xwi": {
       "publisher": "Encyclopedia.com",
@@ -3399,9 +3399,9 @@
       "iso": "XAH",
       "name_en": "Austria-Hungary",
       "status": "former",
-      "reason": "Reichsrat and Hungarian Diet elections from 1873 to 1911.",
+      "reason": "The Dual Monarchy from the Compromise with Hungary, completed by Francis Joseph's coronation as King of Hungary on 8 June 1867 (National Archives of Hungary), until the Reichsrat's last sitting and the proclamation of the Republic of German-Austria on 12 November 1918 (Austrian Parliament). Its only common body, the Delegations, was chosen by the two parliaments; popular elections were held by each half: the Reichsrat's House of Deputies, directly elected from 1873 to 1911, and the crown-land diets in Cisleithania, and the Hungarian Diet (1869 to 1910) and the Sabor of Croatia-Slavonia in the lands of the Hungarian Crown, with the Bosnian Diet elected in 1910.",
       "source": "xah",
-      "locator": "https://www.czoernig.com/datasets-1/parliamentary-elections:-reichsrat-1911"
+      "locator": "https://www.parlament.gv.at/verstehen/historisches/1848-1918/erster-weltkrieg-ende-monarchie/index.html (Austrian Parliament: the Reichsrat's last sitting and the Republic proclaimed on 12 November 1918); https://mnl.gov.hu/mnl/ol/hirek/ferenc_jozsef_koronazasa (National Archives of Hungary: coronation on 8 June 1867)"
     },
     {
       "iso": "XWI",
