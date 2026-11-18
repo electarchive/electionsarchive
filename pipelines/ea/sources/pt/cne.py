@@ -17,7 +17,7 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.pt import mai
+from ea.sources.pt import cne_ac1975, mai
 
 SOURCE = "pt.cne"
 HOST = "https://www.cne.pt/sites/default/files/dl"
@@ -28,6 +28,8 @@ FILES: dict[str, str] = {
         f"ar{y}": f"eleicoes/{y}_ar/docs_geral/{y}_ar_quadro_resultados.zip"
         for y in (1976, 1979, 1980, 1983, 1985, 1987, 1991, 1995)
     },
+    "ac1975": "resultados_ac_1975.pdf",
+    "ac1975parties": "partidos_ac1975.pdf",
     "pe1987": "resultados_pe_1987.pdf",
     "pe1989": "resultados_pe_1989.pdf",
     "pe1994": "resultados_pe_1994.pdf",
@@ -413,7 +415,11 @@ REGION_CIRCLES = {
 }
 
 
-def circle_area(name: str) -> tuple[str, str]:
+# Circles of 1975 outside the districts: Macau, Mozambique, and the emigrants, none of which has a shape here.
+ABROAD_1975 = {"macau", "mocambique", "emigracao"}
+
+
+def circle_area(name: str) -> tuple[str | None, str]:
     """The pt.mai area a circle of the Assembly lies in or equals, and how."""
     folded = mai.fold(name)
     if folded in DISTRICTS:
@@ -421,6 +427,8 @@ def circle_area(name: str) -> tuple[str, str]:
     if folded in REGION_CIRCLES:
         same = folded in ("acores", "madeira")
         return mai.district_area(REGION_CIRCLES[folded]), "equals" if same else "within"
+    if folded in ABROAD_1975:
+        return None, "unlocated"
     if folded == "europa":
         return mai.circle_area("europa"), "equals"
     if folded == "fora da europa":
@@ -439,7 +447,13 @@ NAMES = {
     "CDS/PP": "Partido Popular",
     "CDS-PP": "Partido do Centro Democrático Social - Partido Popular",
     "CDU": "Coligação Democrática Unitária",
+    "ADIM": "Associação para a Defesa dos Interesses de Macau",
+    "CDM": "Centro Democrático de Macau",
+    "FEC": "Frente Eleitoral de Comunistas (Marxistas-Leninistas)",
     "FER": "Frente da Esquerda Revolucionária",
+    "FSP": "Frente Socialista Popular",
+    "LCI": "Liga Comunista Internacionalista",
+    "MES": "Movimento de Esquerda Socialista",
     "MDP": "Movimento Democrático Português",
     "MDP/CDE": "Movimento Democrático Português / Comissão Democrática Eleitoral",
     "MPT": "Movimento O Partido da Terra",
@@ -459,9 +473,11 @@ NAMES = {
     "PS": "Partido Socialista",
     "PSD": "Partido Social-Democrata",
     "PSN": "Partido de Solidariedade Nacional",
+    "PUP": "Partido de Unidade Popular",
     "PSR": "Partido Socialista Revolucionário",
     "UDP": "União Democrática Popular",
 }
+CONSTITUENT = key("body", "assembleia-constituinte")
 SYSTEM_LIST, SYSTEM_PRESIDENT, SYSTEM_REFERENDUM = mai.SYSTEM_LIST, mai.SYSTEM_PRESIDENT, mai.SYSTEM_REFERENDUM
 
 
@@ -486,6 +502,8 @@ def list_labels() -> dict[str, str | None]:
     for _, _, vote in EUROPEAN.values():
         for label, _, _ in vote.lines:
             out.setdefault(label, None)
+    for label in cne_ac1975.AC1975_ORDER:
+        out.setdefault(label, None)
     return out
 
 
@@ -579,6 +597,9 @@ def registry() -> Package:
     )
     for name in FILES:
         p.artifact(artifact(name), CNE_SOURCE)
+    p.add("body", id=CONSTITUENT, polity_id=PORTUGAL, kind="constituent_assembly")
+    p.name(CONSTITUENT, "Constituent Assembly", "en", "official")
+    p.name(CONSTITUENT, "Assembleia Constituinte", "pt", "native", False)
     for label, long in sorted(list_labels().items()):
         id = party(label)
         p.add("party", id=id, kind="bloc" if label in BLOCS else "party", polity_id=PORTUGAL)
@@ -603,12 +624,14 @@ def registry() -> Package:
 # name, day, path tail, election kind, family
 ELECTIONS: list[tuple[str, date, str, str, str]] = [
     *((n, d, "general", "general", "ar") for n, d in LEGISLATIVE.items()),
+    ("ac1975", date(1975, 4, 25), "constituent", "general", "ac"),
     *((n, v[0], "presidential", "runoff" if n == "pr1986b" else "general", "pr") for n, v in PRESIDENTIAL.items()),
     *((n, v[0], "european", "general", "pe") for n, v in EUROPEAN.items()),
     ("rn1998a", date(1998, 6, 28), "referendum", "referendum", "rn"),
     ("rn1998b", date(1998, 11, 8), "referendum", "referendum", "rn"),
 ]
 TITLES = {
+    "ac": ("{year} Portuguese Constituent Assembly election", "Eleição para a Assembleia Constituinte de {year}"),
     "ar": ("{year} Portuguese legislative election", "Eleições legislativas de {year}"),
     "pr": ("{year} Portuguese presidential election", "Eleição presidencial de {year}"),
     "pe": ("{year} European Parliament election in Portugal", "Eleições europeias de {year}"),
@@ -618,6 +641,7 @@ METHOD = (
     "{unit} Blank and invalid (nulos) ballots are printed apart from the votes for each option; valid votes are not "
     "stored. The figures are stored as printed."
 )
+NULL_ONLY = "The 1975 map prints one figure for null ballots (votos nulos); it is stored here as invalid ballots."
 JOINED = "The 1976 map prints blank and invalid ballots as one figure; it is stored here as invalid ballots."
 
 
@@ -799,6 +823,51 @@ def legislative(b: Builder, name: str) -> None:
             )
 
 
+def constituent(b: Builder, name: str) -> None:
+    p = b.p
+    order = cne_ac1975.AC1975_ORDER
+    registered, cast, null, votes = cne_ac1975.AC1975_TOTAL
+    rows = cne_ac1975.AC1975
+    if (sum(r[1] for r in rows), sum(r[2] for r in rows), sum(r[3] for r in rows)) != (registered, cast, null) or [
+        sum(r[4][i][0] for r in rows) for i in range(len(order))
+    ] != list(votes):
+        raise ValueError("the 1975 circles do not add to the national totals the map prints")
+    for circle, registered, cast, null, figures in cne_ac1975.AC1975:
+        area, relation = circle_area(circle)
+        lines = [Line(label, votes, seats) for label, (votes, seats) in zip(order, figures, strict=True) if votes]
+        count = Count(registered, cast, None, null, sum(line.seats or 0 for line in lines), lines)
+        unit = b.unit(mai.fold(circle).replace(" ", "-"), circle, area, relation)
+        labels = [line.label for line in lines]
+        fields: dict[str, object] = {"body_id": CONSTITUENT, "electoral_system_id": SYSTEM_LIST}
+        if area:
+            fields["district_area_id"] = area
+        contest, result_set, options = b.contest(
+            mai.fold(circle), "list_allocation", circle, circle, circle, count, unit, labels, count.seats, **fields
+        )
+        for position, label in enumerate(labels, 1):
+            p.add(
+                "contest_option",
+                id=options[label],
+                contest_id=contest,
+                kind="list",
+                party_id=party(label),
+                ballot_position=position,
+                ballot_label=label,
+            )
+        b.figures(result_set, unit, count, options)
+        for line in lines:
+            if line.seats:
+                p.add("outcome", result_set_id=result_set, option_id=options[line.label], kind="won", seats=line.seats)
+        p.add(
+            "note",
+            id=key("note", result_set, "null"),
+            entity_id=result_set,
+            kind="caveat",
+            body_md=NULL_ONLY,
+            lang="en",
+        )
+
+
 def presidential(b: Builder, name: str) -> None:
     p = b.p
     vote = PRESIDENTIAL[name][2]
@@ -977,6 +1046,8 @@ def election(entry: tuple[str, date, str, str, str]) -> Package:
     p.external.add(PORTUGAL)
     p.external.add(COUNTRY)
     p.uses(artifact(name))
+    if name == "ac1975":
+        p.uses(artifact("ac1975parties"))
     if name == "ar1983":
         p.accept(
             "outcomes.seats_magnitude",
@@ -1003,7 +1074,7 @@ def election(entry: tuple[str, date, str, str, str]) -> Package:
     p.name(b.election_id, english, "en", "official")
     p.name(b.election_id, portuguese, "pt", "native", False)
     p.add("slug", path=b.path, entity_id=b.election_id, is_current=True)
-    {"ar": legislative, "pr": presidential, "pe": european, "rn": referendum}[family](b, name)
+    {"ac": constituent, "ar": legislative, "pr": presidential, "pe": european, "rn": referendum}[family](b, name)
     mai._values(p, b.built)
     return p
 
