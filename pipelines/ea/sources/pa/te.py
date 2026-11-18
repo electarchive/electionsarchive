@@ -1,6 +1,7 @@
 """Panama's Tribunal Electoral: general election results by circuit, district, and corregimiento."""
 
 import functools
+import itertools
 import json
 import re
 import subprocess
@@ -16,11 +17,13 @@ import xlrd
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.pa import winners as win
 from ea.store import DATA
 
 SOURCE = "pa.te"
 SITE = "https://www.tribunal-electoral.gob.pa"
 BROWSER = "browser://20261116-222948-d9df9f/"
+BROWSER_DECLARED = "browser://20261118-025251-af3923/"
 INBOX = DATA / "inbox" / "pa.te"
 
 # Measures
@@ -35,7 +38,9 @@ def url(name: str) -> str:
     browser."""
     if name.startswith("https://"):
         return name
-    return DOWNLOAD + name[3:] if name.startswith("dl:") else BROWSER + name
+    if name.startswith("dl:"):
+        return DOWNLOAD + name[3:]
+    return BROWSER_DECLARED + name[2:] if name.startswith("b:") else BROWSER + name
 
 
 def fetch() -> None:
@@ -505,6 +510,10 @@ class Election:
     mayor: list[Unit] = field(default_factory=list)
     rep: list[Unit] = field(default_factory=list)
     council: list[Unit] = field(default_factory=list)
+    declared: dict[str, list[win.Place]] = field(default_factory=dict)  # the winners each proclamation table lists
+    seats: dict[str, int] = field(default_factory=dict)  # the seats each party won, as the Tribunal's table prints them
+    president_winner: tuple[win.Winner, win.Winner | None] | None = None
+    matched: dict[str, dict[str, tuple[Unit, win.Place]]] | None = None
     printed: dict[str, Row] = field(default_factory=dict)  # the national Total row each table prints
     issues: list[str] = field(default_factory=list)
     notes: dict[str, str] = field(default_factory=dict)
@@ -613,6 +622,14 @@ def load_2024() -> Election:
     party_table(next(iter(grids(e.files[3]).values())), "mayor", e, 2, "mayor")
     party_table(next(iter(grids(e.files[4]).values())), "rep", e, 3, "rep")
     party_table(next(iter(grids(e.files[5]).values())), "council", e, 2, "council")
+    names = ["Cuadro-06-Diputado-Proclamados", "Cuadro-10-Alcaldes-Proclamados", "Cuadro-13-Representantes-Proclamados",
+             "Cuadro-07-Diputado-Curules"]  # fmt: skip
+    e.files += [f"b:{n}.xlsx" for n in names]
+    sheets = [next(iter(grids(name).values())) for name in e.files[-4:]]
+    e.declared["deputy"] = win.xlsx_deputies(sheets[0])
+    e.declared["mayor"] = win.xlsx_mayors(sheets[1])
+    e.declared["rep"] = win.xlsx_representatives(sheets[2], lambda label, indent: is_top(Row(label, indent, [])))
+    e.seats = win.xlsx_party_seats(sheets[3])
     return e
 
 
@@ -673,6 +690,7 @@ PRESIDENCY = key("office", "president")
 MAYORALTY = key("office", "mayor")
 REPRESENTATIVE = key("office", "representative")
 SYSTEM_PLURALITY = key("electoral_system", "plurality")
+SYSTEM_QUOTA = key("electoral_system", "quota")
 
 PARTIES: dict[str, tuple[str, str]] = {
     "prd": ("PRD", "Partido Revolucionario Democrático"),
@@ -708,7 +726,7 @@ INDEPENDENTS = ("libre postulacion", "celeste", "verde", "chocolate", "azul oscu
 
 
 def independent(label: str) -> bool:
-    return norm(label).startswith(INDEPENDENTS)
+    return norm(label).startswith(INDEPENDENTS) or norm(label).startswith("libre post")
 
 
 def party_code(label: str) -> str:
@@ -985,6 +1003,21 @@ def registry() -> Package:
         body_md="The candidate with the most votes is elected president, mayor, or representative of a corregimiento.",
         lang="en",
     )
+    p.add("electoral_system", id=SYSTEM_QUOTA, polity_id=PANAMA, valid_from=None, valid_to=None,
+          rules={"formula": "hare", "lists": {"order": "open", "vacancy": "substitute"}}, rules_version=1)  # fmt: skip
+    p.add(
+        "note",
+        id=key("note", SYSTEM_QUOTA),
+        entity_id=SYSTEM_QUOTA,
+        kind="methodology",
+        body_md="Seats of a plurinominal circuit are filled in the three steps the Tribunal's tables name. Candidates "
+        "who reach the quota, the circuit's valid votes divided by its seats, are elected by quota. Candidates who "
+        "reach half the quota are elected next, and the seats left go to the remaining candidates by residual "
+        "votes. Seats belong to candidates, and a party's seats are those of its candidates. The rules recorded "
+        "here name the quota family and open lists; they do not model the half-quota step. A circuit with one seat "
+        "elects its most-voted candidate.",
+        lang="en",
+    )
     seen: set[str] = set()
     for e in elections().values():
         labels = {
@@ -1065,8 +1098,192 @@ def compare(e: Election) -> list[str]:
     return lines
 
 
+# Declared winners ------------------------------------------------------------------------------------------------
+
+PRINTED = {
+    "prd": "PRD", "pdc": "PDC", "arnulfista": "ARN", "mol": "MOLIRENA", "ren": "RENCIV", "renciv": "RENCIV",
+    "mor": "MORENA", "pla": "PLA", "lib": "LIB", "cd": "CD", "camdem": "CD", "pan": "PAN", "popular": "PP",
+    "ppopular": "PP", "ppanamenista": "PAN", "palianza": "ALIANZA", "sol": "SOL", "libnal": "LIBNAL", "pln": "LIBNAL",
+    "solidaridad": "SOL", "rencivilista": "RENCIV", "rencivil": "RENCIV", "pdcc": "PDC", "mpe": "MPE", "ppamenista": "PAN",
+}  # fmt: skip
+
+
+def compact(label: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", norm(label))
+
+
+def printed_code(label: str) -> str:
+    return PRINTED.get(compact(label), party_code(label))
+
+
+def options_of(printed: str, votes: dict[str, int]) -> list[str]:
+    """The labels among a unit's columns that a proclamation table's party names."""
+    if independent(printed):
+        return [label for label in votes if independent(label)]
+    code = printed_code(printed)
+    return [label for label in votes if not independent(label) and party_code(label) == code]
+
+
+def column_of(winner: win.Winner, votes: dict[str, int], counted: bool) -> tuple[str | None, tuple[str, ...]]:
+    """The column of a unit's results that a winner's party stands for, and the columns whose votes add up to the
+    votes the table prints for the winner, when some do.
+
+    A mayor or representative of an alliance is printed under one party with the votes of every allied column added
+    in, so `counted` asks for the columns that add up to those votes. A party column the table names is the winner's
+    option, or, among a party's several columns (free nominations), the one with the most votes.
+    """
+    named: list[str] = []
+    for group in (part.strip() for part in winner.party.split(",") if part.strip()):
+        named += options_of(group, votes)
+    if not named:
+        return None, ()
+    if counted and winner.votes is not None:
+        for size in range(1, 5):
+            hits = [
+                combo
+                for combo in itertools.combinations(votes, size)
+                if sum(votes[label] for label in combo) == winner.votes and any(label in named for label in combo)
+            ]
+            if hits:
+                inside = [label for label in hits[0] if label in named]
+                return max(inside, key=lambda label: votes[label]), hits[0]
+    return max(named, key=lambda label: votes[label]), ()
+
+
+def ticket_of(e: Election, head: win.Winner) -> Ticket:
+    """The presidential ticket a proclaimed president ran on: the one whose parties and head the Tribunal names."""
+    codes = {printed_code(group.strip()) for group in head.party.split(",")}
+    found = [
+        t
+        for t in e.tickets
+        if {printed_code(party) for party in t.parties} == codes and norm(t.name) == norm(head.name)
+    ]
+    if len(found) != 1:
+        raise ValueError(f"{e.year}: {head.name} for {head.party} matches {len(found)} tickets")
+    return found[0]
+
+
+def summed_known(w: win.Winner, votes: dict[str, int]) -> bool:
+    """Whether the votes the table prints for a winner are those of the unit's columns, or the table gives none."""
+    return w.votes is None or bool(column_of(w, votes, True)[1])
+
+
+def and_list(labels: Sequence[str]) -> str:
+    return ", ".join(labels[:-1]) + (", and " if len(labels) > 2 else " and ") + labels[-1]
+
+
+def proclamation(office: str, w: win.Winner, column: str, summed: tuple[str, ...], votes: dict[str, int]) -> str:
+    """What the Tribunal's table says about one proclaimed winner, as a note for the candidacy."""
+    if w.votes is None:
+        return f"Proclaimed by the Tribunal, postulated by {w.party}. The Tribunal's list prints no votes."
+    if office == "deputy":
+        how = f"; the table gives the type of proclamation as \u201c{w.how}\u201d" if w.how else ""
+        return f"Proclaimed with {w.votes:,} votes{how}."
+    text = f"Proclaimed with {w.votes:,} votes."
+    if len(summed) > 1:
+        text += f" That figure equals the votes recorded for {and_list(summed)} together."
+    elif not summed:
+        text += " That figure is not the votes of any combination of the party columns recorded for this unit."
+    return text
+
+
+# Corregimientos the proclamation table spells differently from the results table, by the code each gives them.
+WINNER_ALIASES = {
+    "bocas del toro:isla de bastimentos": "bocas del toro:isla bastimento",
+    "almirante:nance del risco": "almirante:nance de risco",
+    "almirante:valle de agua arriba": "almirante:valle de aguas arriba",
+    "almirante:valle del risco": "almirante:valle de risco",
+    "aguadulce:el hato de san juan de dios": "aguadulce:hato de san juan de dios",
+    "nata:villarreal": "nata:villareal",
+    "colon:sabanita": "colon:sabanitas",
+    "baru:rodolfo aguilar delgado": "baru:rodolfo aguilar",
+    "san felix:las lajas (cab)": "san felix:la lajas (cab)",
+    "chepigana:pina": "chepigana:puerto pina",
+    "pinogana:el real de santa maria (cab)": "pinogana:el real de santa. maria (cab)",
+    "santa fe@darien:rio iglesias": "santa fe@darien:rio iglesia",
+    "pese:sabana grande": "pese:sabanagrande",
+    "las tablas:las lajas": "las tablas:la laja",
+    "macaracas:bajos de guera": "macaracas:bajo de guera",
+    "mariato:llano de catival": "mariato:llano de cativa",
+    "mariato:tebario": "mariato:tebario (mariato)",
+    "nurun:buenos aires (cab)": "nurun:buenos aires",
+    "jirondai:gwaribiara": "jirondai:guariviara",
+    "san san drui:san san drui": "san san druri:san san druri",
+    "kuna de madugandi:kuna de madugandi": "comarca kuna de madungandi:comarca kuna de madungandi",
+    "kuna de wardandi:kuna de wardandi": "comarca kuna de wargandi:comarca kuna de wargandi",
+}
+
+
+def place_code(office: str, place: win.Place) -> str:
+    """The code of the area a proclamation row belongs to, in the form `area_of` gives its unit."""
+    scheme = {"deputy": "circuito", "mayor": "distrito", "rep": "corregimiento"}[office]
+    path = place.path if office != "deputy" else ("", place.path[0])
+    if office == "rep" and not path[1]:
+        # A comarca's corregimientos listed with no district: each one is its own district.
+        path = (path[0], path[2], path[2])
+    found = area_of(Unit(scheme, path, Row("", 0, [])))
+    assert found is not None
+    return WINNER_ALIASES.get(found[1], found[1])
+
+
+def match_declared(e: Election) -> dict[str, dict[str, tuple[Unit, win.Place]]]:
+    """Pair each proclamation row with the unit and contest its table is about, and note what does not pair."""
+    if e.matched is not None:
+        return e.matched
+    out = e.matched = {}
+    for office, places in e.declared.items():
+        units = {found[1]: u for u in getattr(e, office) if (found := area_of(u))}
+        paired = out[office] = {}
+        for place in places:
+            code = place_code(office, place)
+            if code not in units:
+                e.issues.append(f"{office} winners: {place.path} pairs with no unit")
+            elif code in paired:
+                e.issues.append(f"{office} winners: {place.path} appears twice")
+            else:
+                paired[code] = (units[code], place)
+                if office == "deputy" and place.seats != len(place.winners):
+                    e.issues.append(
+                        f"deputy winners: circuit {code} has {len(place.winners)} winners, {place.seats} seats"
+                    )
+    return out
+
+
+def declared_seats(e: Election) -> list[str]:
+    """Check the deputies each party won against the seats by party the Tribunal prints."""
+    if not e.seats:
+        return []
+    won: dict[str, int] = {}
+    for _, place in match_declared(e).get("deputy", {}).values():
+        for w in place.winners:
+            code = "LP" if independent(w.party) else printed_code(w.party)
+            won[code] = won.get(code, 0) + 1
+    printed: dict[str, int] = {}
+    for name, seats in e.seats.items():
+        code = "LP" if independent(name) else SEAT_NAMES.get(compact(name), printed_code(name))
+        printed[code] = printed.get(code, 0) + seats
+    return [
+        f"{e.year} deputies: {code} won {won.get(code, 0)} seats in the proclamations, {printed.get(code, 0)} in the "
+        "table of seats by party"
+        for code in sorted(set(won) | set(printed))
+        if won.get(code, 0) != printed.get(code, 0)
+    ]
+
+
+# Parties as the tables of seats by party name them, where they are not the names of the results columns.
+SEAT_NAMES = {
+    "liberalautentico": "PLA", "unliondemocraticaindependiente": "UDI", "uniondemocraticaindependiente": "UDI",
+    "renovacioncivilista": "RENCIV", "misiondeunidadnacional": "MUN", "laborista": "PALA", "liberalrepublicano": "LIBRE",
+    "democratacristiano": "PDC", "panamenistadoctrinario": "PPD", "movimientopapaegoro": "MPE", "papaegoro": "MPE",
+    "liberalnacional": "LIBNAL", "cambiodemocratico": "CD", "nacionalistapopular": "PNP", "arnulfista": "ARN",
+    "movimientootrocamino": "MOCA",
+}  # fmt: skip
+
+
 def parse() -> None:
     for e in elections().values():
+        match_declared(e)
+        e.issues += declared_seats(e)
         if e.issues:
             raise ValueError(f"{e.year}: {e.issues}")
         for line in compare(e):
@@ -1204,6 +1421,70 @@ def election(e: Election) -> Package:
                   ballot_label=text(label))  # fmt: skip
         return oid
 
+    declared = match_declared(e)
+    if e.year == 2024:
+        p.add("note", id=key("note", id, "proclaimed"), entity_id=id, kind="caveat", lang="en",
+              body_md="The Tribunal's tables of proclaimed deputies, mayors, and representatives are a preliminary "
+              "report that does not include challenges.")  # fmt: skip
+    if e.year == 2014:
+        p.add("note", id=key("note", id, "proclaimed"), entity_id=id, kind="caveat", lang="en",
+              body_md="The Tribunal's list of mayors proclaimed and in force names the mayor of "
+              f"{len(declared['mayor'])} of {len(e.mayor)} districts. No winner is recorded for the others.")  # fmt: skip
+
+    def declare(
+        office: str, cid: str, rid: str, parts: Sequence[object], options: dict[str, str], u: Unit, place: win.Place
+    ) -> None:
+        """Record who the Tribunal proclaimed in a contest: each winner's candidacy and outcome, then the options
+        that lost."""
+        deputy = office == "deputy"
+        votes = u.row.votes
+        elected: list[tuple[str, win.Winner]] = []
+        partners: set[str] = set()
+        for position, w in enumerate(place.winners, 1):
+            column, summed = column_of(w, votes, not deputy)
+            if column is None:
+                if not independent(w.party):
+                    raise ValueError(f"{e.year} {office} {parts}: no column for {w.party}")
+                column = "Libre Postulación"
+                options[column] = option(cid, column, len(options) + 1, "")
+                p.add("note", id=key("note", rid, "column"), entity_id=rid, kind="caveat", lang="en",
+                      body_md="The results table has no column for the free-nomination winner, so the winner's "
+                      "option has no votes recorded here.")  # fmt: skip
+            oid = options[column]
+            name = pretty(w.name)
+            tag = (e.day, office, *parts, position, norm(w.name))
+            person, candidacy = key("person", *tag), key("candidacy", *tag)
+            p.add("person", id=person)
+            p.name(person, name, "es", "official")
+            p.add("candidacy", id=candidacy, person_id=person, option_id=oid, role="list_member" if deputy else "head",
+                  ballot_name=name, is_independent=independent(w.party))  # fmt: skip
+            p.add("outcome", result_set_id=rid, option_id=oid, candidacy_id=candidacy, kind="elected")
+            p.add("note", id=key("note", candidacy), entity_id=candidacy, kind="context", lang="en",
+                  body_md=proclamation(office, w, column, summed, votes))  # fmt: skip
+            elected.append((oid, w))
+            partners |= set(summed)
+            if not deputy and w.votes is None:
+                partners |= {label for group in w.party.split(",") for label in options_of(group.strip(), votes)}
+        if place.note:
+            p.add("note", id=key("note", rid, "seats"), entity_id=rid, kind="caveat", lang="en", body_md=place.note)
+        free = any(independent(w.party) for w in place.winners)
+        won: dict[str, int] = {}
+        for oid, _ in elected:
+            won[oid] = won.get(oid, 0) + 1
+        for label, oid in options.items():
+            if deputy:
+                if oid in won:
+                    p.add("outcome", result_set_id=rid, option_id=oid, kind="won", seats=won[oid])
+                elif not (free and independent(label)):
+                    p.add("outcome", result_set_id=rid, option_id=oid, kind="lost", seats=0)
+            elif (
+                oid not in won
+                and label not in partners
+                and not (free and independent(label))
+                and all(summed_known(w, votes) for _, w in elected)
+            ):
+                p.add("outcome", result_set_id=rid, option_id=oid, kind="lost")
+
     # The presidency: one contest, with a unit for every electoral circuit.
     cid, rid = contest("president", [], "", COUNTRY, kind="office", office_id=PRESIDENCY, magnitude=1,
                        electoral_system_id=SYSTEM_PLURALITY)  # fmt: skip
@@ -1245,12 +1526,18 @@ def election(e: Election) -> Package:
             p.add("declared", result_set_id=rid, option_id=None, measure=measure, value=value)
     for label, value in votes.votes.items():
         p.add("declared", result_set_id=rid, option_id=options[label], measure=VOTES, value=value)
+    if e.president_winner:
+        head = e.president_winner[0]
+        won = ticket_of(e, head)
+        for t in e.tickets:
+            p.add("outcome", result_set_id=rid, option_id=options[t.label], kind="elected" if t is won else "lost")
 
     # Every other contest has one unit: its own circuit, district, or corregimiento.
     for office in ("deputy", "mayor", "rep", "council"):
         for u in getattr(e, office):
             found = area_of(u)
             assert found is not None
+            fields: dict[str, object]
             if office == "deputy":
                 label, parts = f"circuit {u.path[1]}", [u.path[1]]
                 fields = {"kind": "body_seats", "body_id": BODY_ASSEMBLY}
@@ -1274,9 +1561,15 @@ def election(e: Election) -> Package:
             else:
                 label, parts = district_label(u), [found[1]]
                 fields = {"kind": "body_seats", "body_id": BODY_COUNCIL}
+            pair = declared.get(office, {}).get(found[1])
+            if office == "deputy" and pair:
+                fields["magnitude"] = pair[1].seats
+                fields["electoral_system_id"] = SYSTEM_QUOTA if pair[1].kind == "Plurinominal" else SYSTEM_PLURALITY
             cid, rid = contest(office, parts, label, area(*found), **fields)
             options = {name: option(cid, name, position, "") for position, name in enumerate(u.row.votes, 1)}
             values(rid, unit(u), u.row, options)
+            if pair:
+                declare(office, cid, rid, parts, options, u, pair[1])
     if over:
         p.accept(
             "accounting.turnout",
@@ -1347,6 +1640,11 @@ def load_1994() -> Election:
     pdf_party_table(e.files[5], [*P94, "Libre Postulación"], e, 2, "council")
     e.issues = [i for i in e.issues if i != "DARIEN: districts do not add up to the province"]
     e.notes["rep"] = "the table counts the Emberá comarca inside Darién province's printed total"
+    e.files += ["b:Cuadro_05_-_Legislador_electo.pdf", "b:Cuadro_10_-_Alcalde_electo.pdf",
+                "b:Cuadro_06_-_Legislador_x_tipo_de_proclamacion.pdf"]  # fmt: skip
+    e.declared["deputy"] = win.pdf_deputies(pdf_lines(e.files[-3]))
+    e.declared["mayor"] = win.pdf_mayors(pdf_lines(e.files[-2]))
+    e.seats = win.pdf_party_seats(pdf_lines(e.files[-1]))
     return e
 
 
@@ -1361,6 +1659,11 @@ def load_1999() -> Election:
     pdf_party_table(e.files[3], full, e, 2, "mayor")
     pdf_party_table(e.files[4], full, e, 3, "rep", reg=4)
     pdf_party_table(e.files[5], P99, e, 2, "council")
+    e.files += ["b:Cuadro_10_-_Legislador_Electo.pdf", "b:Cuadro_13_-_Alcalde_Electo.pdf",
+                "b:Cuadro_09_-_Legislador_distribucion_x_partido_proclamacion.pdf"]  # fmt: skip
+    e.declared["deputy"] = win.pdf_deputies(pdf_lines(e.files[-3]))
+    e.declared["mayor"] = win.pdf_mayors(pdf_lines(e.files[-2]))
+    e.seats = win.pdf_party_seats(pdf_lines(e.files[-1]))
     return e
 
 
@@ -1371,4 +1674,11 @@ def load_2014() -> Election:
     president_table(2014, pdf_grid(e.files[0], stop="DE MAYO DE 2009"), C1, pdf_grid(e.files[1]), e)
     pdf_party_table(e.files[2], P14, e, "c", "deputy")
     pdf_party_table(e.files[3], P14, e, 2, "mayor")
+    e.files += [
+        "b:1-presidente-en-firme.pdf",
+        "b:4-alcaldes-en-firme.pdf",
+        "b:ACTA_DE_JUNTA_NACIONAL_DE_ESCRUTINIO1.pdf",
+    ]
+    e.president_winner = win.pdf_president(pdf_lines(e.files[-3]))
+    e.declared["mayor"] = win.pdf_list(pdf_lines(e.files[-2]), "district")
     return e
