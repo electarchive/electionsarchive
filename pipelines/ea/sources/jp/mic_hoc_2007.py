@@ -177,11 +177,15 @@ def build() -> Package:
         p.external |= {unit, area}
         return unit, area
 
+    minted: dict[tuple[str, str], str] = {}
+
     def entity(pair: tuple[str, str], table: str, text: str) -> str:
+        if pair in minted:
+            return minted[pair]
         if pair in known:
             p.external.add(known[pair])
             return known[pair]
-        id = known[pair] = keyed(*pair)
+        id = minted[pair] = keyed(*pair)
         if table == "party":
             p.add("party", id=id, kind="party", polity_id=JAPAN)
         else:
