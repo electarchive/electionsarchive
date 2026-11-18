@@ -1,0 +1,46 @@
+{
+  "2010": {
+    "cells": {
+      "160:2414:1": {
+        "value": 212,
+        "note": "Peters, read from the page; the scan reads 232."
+      },
+      "160:2415:1": {
+        "value": 97,
+        "note": "Peters, read from the page; the scan reads 7."
+      },
+      "154:1810-42:0": {
+        "value": 354,
+        "note": "Read from the page."
+      },
+      "154:1810-42:1": {
+        "value": 128,
+        "note": "Read from the page."
+      },
+      "125:4576:5": {
+        "value": 579,
+        "note": "Electorate, read from the page; the scan reads 5779."
+      },
+      "125:4580-01:5": {
+        "value": 717,
+        "note": "Electorate, read from the page; the scan reads 7."
+      },
+      "63:2985:4": {
+        "value": 518,
+        "note": "Electorate, read from the page; the scan reads 18."
+      },
+      "107:0031:3": {
+        "value": 0,
+        "note": "Rejected ballots, read from the page; the scan reads 8."
+      },
+      "107:0031:4": {
+        "value": 311,
+        "note": "Ballots cast, read from the page; the scan reads 319."
+      }
+    },
+    "codes": {
+      "154:1855": "1835",
+      "154:1810-42": "1810-02"
+    }
+  }
+}

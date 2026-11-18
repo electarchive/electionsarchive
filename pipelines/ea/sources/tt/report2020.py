@@ -378,6 +378,9 @@ def draft(reading: dict[str, object], fixes: dict[str, int]) -> Draft:
         {},
     )
     extra = cast(dict[str, list[str]], reading.get("glyphs", {}))
+    # The 2002 to 2010 reports are scanned upright, with station rows set closer together and no notes between them.
+    upright = bool(reading.get("upright"))
+    merged = 20 if upright else MERGED
     for b, band in enumerate(cast(list[dict[str, object]], reading["bands"])):
         if band["kind"] == "total":
             label = cast(str, band["label"]).upper()
@@ -395,7 +398,7 @@ def draft(reading: dict[str, object], fixes: dict[str, int]) -> Draft:
             code = cast(str, row["code"])
             low, high = cast(list[float], row["range"])
             centre = cast(float, row["centre"])
-            if previous is not None and centre - previous < MERGED:
+            if previous is not None and centre - previous < merged:
                 # A number printed just below a station's is a note: "merged with" that station.
                 station, special, venue, boxes = page.labels[-1]
                 page.labels[-1] = (station, special, f"{venue} (merged with {code.lstrip('*')})", boxes)
@@ -417,7 +420,7 @@ def draft(reading: dict[str, object], fixes: dict[str, int]) -> Draft:
                     box = (*box, max(b[2] for _, b in near), max(b[3] for _, b in near))
                 else:
                     box = (xs[column + 2] + 4, centre - 15, xs[column + 3] - 4, centre + 15)
-                boxes.append(_unturn(box, height))
+                boxes.append(box if upright else _unturn(box, height))
             page.grid.append(options)
             page.labels.append((code.lstrip("*"), code.startswith("*"), cast(str, row["venue"]), boxes))
     return page
@@ -430,11 +433,15 @@ class Settled:
     problems: list[str]
 
 
-def settle(pages: list[Draft]) -> Settled:
+def settle(pages: list[Draft], addends: int | None = None) -> Settled:
     """Picks each cell's reading so every row's votes add up to its valid votes and every column carries the
-    running totals printed at the foot and head of each page and in the district's total row."""
+    running totals printed at the foot and head of each page and in the district's total row.
+
+    The first `addends` columns add up to the next one; by default, the candidates' columns add up to the valid votes
+    three columns from the end.
+    """
     width = len(pages[0].grid[0])
-    candidates = width - 3
+    candidates = width - 3 if addends is None else addends
     chosen = [[[options[0] for options in row] for row in page.grid] for page in pages]
     problems: list[str] = []
 
