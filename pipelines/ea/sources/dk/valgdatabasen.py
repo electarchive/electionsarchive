@@ -1,4 +1,5 @@
-"""Folketing, European Parliament, and referendum results by polling district (afstemningsområde), 1979 to 2005.
+"""Folketing, European Parliament, and referendum results by polling district (afstemningsområde), 1979 to 2005,
+and the municipal and regional councils by polling district, 2009 to 2021.
 
 Statistics Denmark's election database (valgdatabasen, served at valgdatabase.dst.dk) holds every polling district's
 count for the national elections it covers. Each election is one extract of five semicolon-separated files: the
@@ -10,22 +11,30 @@ The Folketing and European Parliament elections and the 1998 and 2000 referendum
 of Statistics Denmark and the Ministry of the Interior at nomination-district grain. Those sets stay the default and
 keep the outcomes; this source adds the finer polling-district count to the same contests as a second official set,
 with its completeness against the volume's valid votes. The 1986, 1992, and 1993 referendums are new elections.
+
+The municipal and regional elections are read from the database's data service, which returns the same extract as
+JSON for an election id. Their councils are held by Statistics Denmark's Statbank tables at council grain (`dk.dst`),
+which builds the polling-district sets from these extracts as each council's default count, superseding its own
+per-council set.
 """
 
 import csv
 import io
 import json
 import zipfile
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime
 from functools import cache
 from pathlib import Path
+from urllib.parse import quote
 from uuid import uuid5
 
 import polars as pl
 
 from ea import package, raw
 from ea.package import Package
+from ea.raw import Artifact
 from ea.sources.dk import dst_folketing, dst_hist, ep_hist
 from ea.store import DATA
 
@@ -153,8 +162,9 @@ def packages() -> list[str]:
 
 
 def fetch() -> None:
-    """Load the extracts saved from valgdatabase.dst.dk (data/inbox/dk.valgdatabasen/) into the raw cache, and fetch
+    """Fetch the municipal and regional extracts from the database's data service, load the extracts saved from valgdatabase.dst.dk (data/inbox/dk.valgdatabasen/) into the raw cache, and fetch
     the printed referendum volumes the new referendums' completeness is measured against."""
+    fetch_local()
     for day in PRINTED_VALID:
         raw.fetch(dst_hist.SOURCE, dst_hist.FILES[str(day.year)], suffix=".pdf")
     index = json.loads((INBOX / "index.json").read_text())
@@ -319,7 +329,7 @@ def registry() -> Package:
         id=SOURCE_ID,
         kind="official_body",
         publisher="Danmarks Statistik",
-        title="Valgdatabasen: national elections by polling district",
+        title="Valgdatabasen: elections by polling district",
         url=SITE,
         license="Statistics Denmark data may be reused with attribution to Statistics Denmark as the source",
         attribution="Danmarks Statistik",
@@ -452,3 +462,168 @@ def new_referendum(p: Package, vote: Vote) -> tuple[str, str, dict[str, str]]:
         options[letter] = key("option", vote.day, ANSWERS[letter])
         p.add("contest_option", id=options[letter], contest_id=contest, kind="answer", ballot_label=text)
     return election, contest, options
+
+
+# Municipal and regional elections ------------------------------------------------------------------------------------
+
+# The database's own ids for the municipal (KV) and regional (RV) elections, from its data service.
+LOCAL = {
+    date(2009, 11, 17): (70, 75),
+    date(2013, 11, 19): (71, 76),
+    date(2017, 11, 21): (277, 278),
+    date(2021, 11, 16): (285, 286),
+}
+API = "https://valgdbtestapi.dst.dk/api/v1/HentData"
+LOCAL_ACCOUNTING = {"BE": REGISTERED, "TO": CAST, "UB": BLANK, "UA": INVALID, "GY": VALID}
+# The councils of the five regions (2007 to 2023) and the municipalities each takes in, by municipality number.
+REGION_MUNICIPALITIES = {
+    "084": (
+        101,
+        147,
+        151,
+        153,
+        155,
+        157,
+        159,
+        161,
+        163,
+        165,
+        167,
+        169,
+        173,
+        175,
+        183,
+        185,
+        187,
+        190,
+        201,
+        210,
+        217,
+        219,
+        223,
+        230,
+        240,
+        250,
+        260,
+        270,
+        400,
+        411,
+    ),
+    "085": (253, 259, 265, 269, 306, 316, 320, 326, 329, 330, 336, 340, 350, 360, 370, 376, 390),
+    "083": (
+        410,
+        420,
+        430,
+        440,
+        450,
+        461,
+        479,
+        480,
+        482,
+        492,
+        510,
+        530,
+        540,
+        550,
+        561,
+        563,
+        573,
+        575,
+        580,
+        607,
+        621,
+        630,
+    ),
+    "082": (615, 657, 661, 665, 671, 706, 707, 710, 727, 730, 740, 741, 746, 751, 756, 760, 766, 779, 791),
+    "081": (773, 787, 810, 813, 820, 825, 840, 846, 849, 851, 860),
+}
+REGION_OF = {f"{number}": region for region, numbers in REGION_MUNICIPALITIES.items() for number in numbers}
+LOCAL_METHOD = (
+    "Counted per polling district (afstemningsområde) and read from Statistics Denmark's election database "
+    "(valgdatabasen) through its data service, one extract per election cut on the election's own polling districts, "
+    "so every count is the district's own. Registered voters are the voters entitled to vote, ballots cast are the "
+    "ballots given in, and blank and other invalid ballots are kept apart; valid votes are the valid ballots. The "
+    "database gives each list its ballot letter; the letters of the national parties are kept as their lists, and "
+    "the letters of local lists are summed into the lists without a reserved letter, as in the per-council count "
+    "this set supersedes. Seats are those of the per-council count."
+)
+
+
+def local_url(valg: int, parties: list[str]) -> str:
+    """The data service's address for one election's polling districts and the given list codes."""
+    codes = quote(";".join(parties), safe=";")
+    return f"{API}?valg={valg}&maxdiv=1&kortenavne=false&pers=false&mandater=false&geoniveau=0&partier={codes}"
+
+
+def local_codes(valg: int) -> list[str]:
+    """Every list and accounting code of the election, read from a small probe extract."""
+    probe = json.loads(raw.cached(SOURCE, local_url(valg, ["BE"])).path.read_text())
+    return [str(row["partiKode"]) for row in probe["partier"]]
+
+
+def fetch_local() -> None:
+    for kv, rv in LOCAL.values():
+        for valg in (kv, rv):
+            raw.fetch(SOURCE, local_url(valg, ["BE"]), suffix=".json")
+            raw.fetch(SOURCE, local_url(valg, local_codes(valg)), suffix=".json")
+
+
+@dataclass
+class LocalDistrict:
+    code: str  # Valgsted Id: the municipality number and the district's number in it
+    name: str
+    municipality: str  # the municipality number
+    municipality_name: str
+    accounting: dict[int, int]
+    votes: dict[str, int]  # the list letter to its votes
+
+
+def local_artifact(valg: int) -> Artifact:
+    return raw.cached(SOURCE, local_url(valg, local_codes(valg)))
+
+
+@cache
+def local_districts(valg: int, day: date, kind: str) -> list[LocalDistrict]:
+    """One municipal (KV) or regional (RV) election's polling districts in the extract's order."""
+    data = json.loads(local_artifact(valg).path.read_text())
+    (election,) = data["valg"]
+    if election["kategori"] != kind or election["valgdag"][:10] != day.isoformat():
+        raise ValueError(f"election {valg} is {election['kategori']} {election['valgdag']}, not {kind} {day}")
+    for row in data["udregning"]:
+        if row["divergens"] != 0 or row["multi"] != 1 or row["refValgId"] != valg:
+            raise ValueError(f"{kind} {day}: district {row['valgstedId']} is not mapped to itself")
+    places = {str(row["valgstedId"]): row for row in data["geografi"]}
+    names = {str(row["partinavn"]): str(row["partiKode"]) for row in data["partier"]}
+    prefix = f"{kind}{day.year} - "
+    cells: dict[str, dict[str, int]] = defaultdict(dict)
+    for column in data["valgData"]:
+        label = str(column["navn"]).strip('"').removeprefix(prefix)
+        code = names[label]
+        for cell in column["list"]:
+            group, value = str(cell["gruppe"]), cell["vaerdi"]
+            if str(cell["valgstedId"]) != group:
+                raise ValueError(f"{kind} {day}: group {group} is not a single polling district")
+            if value in (None, "", "-"):
+                continue
+            cells[group][code] = int(value)
+    found: list[LocalDistrict] = []
+    for group, row in cells.items():
+        accounting = {measure: row[code] for code, measure in LOCAL_ACCOUNTING.items() if code in row}
+        # some districts print no registered voters (a dash); every ballot count is there
+        if set(accounting) | {REGISTERED} != set(LOCAL_ACCOUNTING.values()):
+            raise ValueError(f"{kind} {day}: district {group} lacks some of the ballot columns")
+        if accounting[VALID] + accounting[INVALID] + accounting[BLANK] != accounting[CAST]:
+            raise ValueError(f"{kind} {day}: district {group} ballots do not add up")
+        votes = {code: value for code, value in row.items() if code not in LOCAL_ACCOUNTING}
+        place = places[group]
+        found.append(
+            LocalDistrict(
+                group,
+                str(place["valgstedNavn"]).strip(),
+                str(place["kommuneNr"]),
+                str(place["kommuneNavn"]).strip(),
+                accounting,
+                votes,
+            )
+        )
+    return found

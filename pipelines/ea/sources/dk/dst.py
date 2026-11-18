@@ -13,6 +13,7 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.dk import valgdatabasen
 
 SOURCE = "dk.dst"
 API = "https://api.statbank.dk/v1"
@@ -103,6 +104,7 @@ def _retry(label: str, call: Callable[[], object]) -> None:
 
 
 def fetch() -> None:
+    valgdatabasen.fetch_local()
     for table in tables():
         _retry(table, lambda table=table: raw.fetch(SOURCE, info_url(table), suffix=".json"))
         _retry(table, lambda table=table: raw.fetch(SOURCE, data_url(), suffix=".csv", body=body(table)))
@@ -280,6 +282,9 @@ class Contest:
         self.tables: list[str] = []
         self.notes: list[str] = []
         self.body_names: tuple[str, str] = ("", "")
+        self.districts: list[Unit] = []  # the polling districts from the election database, when it holds them
+        self.extract: int | None = None  # the election database's id of the election the districts come from
+        self.district_notes: list[str] = []
 
 
 class Election:
@@ -504,7 +509,8 @@ def kommune_results(election: Election, year: int, names: dict[str, str]) -> Non
         if row["Tid"] == str(year):
             cells[row["OMRÅDE"]][row["VALRES"]] = int(row["value"])
     for area in sorted(cells):
-        if aggregate(area, names.get(area, "")):
+        # 400 is Bornholm's own municipality from 2003 on, not the sum of the island's municipalities
+        if area != "400" and aggregate(area, names.get(area, "")):
             continue
         name = names[area].strip()
         contest = council(election, "kommune", area, name, year)
@@ -583,6 +589,79 @@ def detail_councils(
         for unit in contest.units:
             for option in contest.options:
                 unit.values.setdefault((option, VOTES), 0)
+
+
+# The most votes by which a council's polling districts may differ from its own count, in any figure, before the
+# districts are taken as incomplete and the council keeps its per-council set; councils above 20,000 valid votes
+# allow one in a thousand.
+DISTRICT_TOLERANCE = 20
+SHORT_COUNCILS: list[str] = []
+
+
+def gaps_of(contest: Contest, units: list[Unit]) -> dict[tuple[str | None, int], int]:
+    """How far the districts' sums fall from the council's own count, for each figure the council holds."""
+    (held,) = contest.units
+    sums: dict[tuple[str | None, int], int] = defaultdict(int)
+    for unit in units:
+        for (option, measure), value in unit.values.items():
+            sums[(option, measure)] += value
+        for measure, value in unit.accounting.items():
+            sums[(None, measure)] += value
+    figures = [*held.values.items(), *(((None, m), v) for m, v in held.accounting.items())]
+    return {k: sums.get(k, 0) - v for k, v in figures if sums.get(k, 0) != v}
+
+
+def letters(contest: Contest) -> dict[str, str]:
+    """The ballot letter of each national party's list in a municipal contest, to the list's option code."""
+    return {o.ballot: code for code, o in contest.options.items() if o.kind == "list" and o.ballot}
+
+
+def attach_districts(municipal: Election, regional: Election, day: date) -> None:
+    """Give each municipal and regional council the election database's polling districts, when they add up to
+    the council's own count."""
+    national: dict[str, str] = {}
+    for contest in municipal.contests:
+        for letter, code in letters(contest).items():
+            if national.setdefault(letter, code) != code:
+                raise ValueError(f"{municipal.slug}: letter {letter} stands for {national[letter]} and {code}")
+    kv, rv = valgdatabasen.LOCAL[day]
+    for election, valg, kind in ((municipal, kv, "KV"), (regional, rv, "RV")):
+        groups: dict[str, list[valgdatabasen.LocalDistrict]] = defaultdict(list)
+        for district in valgdatabasen.local_districts(valg, day, kind):
+            council = district.municipality if kind == "KV" else valgdatabasen.REGION_OF[district.municipality]
+            groups[f"{'kommune' if kind == 'KV' else 'region'}-{int(council):03d}"].append(district)
+        for contest in election.contests:
+            found = groups.pop(contest.code, [])
+            if not found:
+                raise ValueError(f"{election.slug} {contest.code}: the election database holds no polling districts")
+            own = letters(contest) if kind == "KV" else {k: v for k, v in national.items() if v in contest.options}
+            units: list[Unit] = []
+            for district in found:
+                unit = Unit(district.code, f"{district.name} ({district.municipality_name})", "dk.afstemningsomraade")
+                unit.accounting = dict(district.accounting)
+                for letter, count in district.votes.items():
+                    option = own.get(letter) or others_option(contest, "others")
+                    unit.values[(option, VOTES)] = unit.values.get((option, VOTES), 0) + count
+                for option in contest.options:
+                    unit.values.setdefault((option, VOTES), 0)
+                units.append(unit)
+            gaps = gaps_of(contest, units)
+            (held,) = contest.units
+            tolerance = max(DISTRICT_TOLERANCE, held.accounting.get(VALID, 0) // 1000)
+            if any(abs(gap) > tolerance for gap in gaps.values()):
+                SHORT_COUNCILS.append(f"{election.slug} {contest.code}")
+                continue
+            contest.districts = units
+            contest.extract = valg
+            if gaps:
+                valid = sum(u.accounting.get(VALID, 0) for u in units)
+                contest.district_notes.append(
+                    f"The polling districts of the election database add up to {valid:,} valid votes, and differ "
+                    f"from the per-council count this set supersedes by at most {max(map(abs, gaps.values())):,} "
+                    "votes in any figure; the per-council figures are kept as this set's declared totals."
+                )
+        if groups:
+            raise ValueError(f"{election.slug}: polling districts outside every council: {sorted(groups)}")
 
 
 REFERENDA = {
@@ -676,6 +755,8 @@ def elections() -> list[Election]:
             else:
                 aggregate_councils(regional, year, "region", "AKVA3")
             found.append(regional)
+            if day in valgdatabasen.LOCAL:
+                attach_districts(municipal, regional, day)
         else:
             county = Election(
                 f"av{year}",
@@ -796,15 +877,28 @@ def registry() -> Package:
 
 def build(day: date) -> Package:
     found = [e for e in elections() if e.day == day]
+    finer = day in valgdatabasen.LOCAL
     p = Package(
         f"dk.dst/{day}",
         SOURCE,
         f"The Danish elections of {day} at the finest unit Statistics Denmark publishes",
-        depends=["dk.dst/registry"],
+        depends=["dk.dst/registry", *([valgdatabasen.REGISTRY] if finer else [])],
     )
     p.external.add(DENMARK)
+    if finer:
+        p.external.add(valgdatabasen.SCHEME)
+        for valg in valgdatabasen.LOCAL[day]:
+            p.artifact(valgdatabasen.local_artifact(valg), valgdatabasen.SOURCE_ID)
     for election in found:
         write_election(p, election)
+    gapped = [f"{e.slug} {c.code}" for e in found for c in e.contests if c.districts and c.district_notes]
+    if gapped:
+        p.accept(
+            "accounting.declared",
+            "The election database's polling districts differ from Statistics Denmark's per-council count by a few "
+            f"votes (at most one in a thousand) in {', '.join(gapped)}; both are the authority's own figures, and "
+            "the per-council figures are kept as the declared totals.",
+        )
     return p
 
 
@@ -852,8 +946,8 @@ def write_contest(p: Package, election: Election, election_id: str, c: Contest) 
         stage="official",
         kind="counted",
         source_id=DST_SOURCE,
-        status="active",
-        is_default=True,
+        status="superseded" if c.districts else "active",
+        is_default=not c.districts,
         completeness=1.0,
     )
     detailed = any(u.scheme == "dk.afstemningsomraade" for u in c.units)
@@ -924,6 +1018,73 @@ def write_contest(p: Package, election: Election, election_id: str, c: Contest) 
             measure=measure,
             value=value,
         )
+    for option, count in c.seats.items():
+        p.add("outcome", result_set_id=result_set, option_id=ids[option], kind="won", seats=count)
+    if c.districts:
+        write_districts(p, election, election_id, contest, c, result_set, ids)
+
+
+def write_districts(
+    p: Package, election: Election, election_id: str, contest: str, c: Contest, superseded: str, ids: dict[str, str]
+) -> None:
+    """The election database's polling-district count, superseding the per-council set as the contest's default.
+
+    The per-council figures the superseded set holds are declared on the new set, so the districts are checked
+    against them; the seats are carried over from the per-council count."""
+    result_set = key("result_set", election.slug, c.code, "districts")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election_id,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=valgdatabasen.SOURCE_ID,
+        status="active",
+        is_default=True,
+        supersedes_id=superseded,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        lang="en",
+        body_md=valgdatabasen.LOCAL_METHOD,
+    )
+    for text in c.district_notes:
+        p.add("note", id=key("note", result_set, text), entity_id=result_set, kind="caveat", body_md=text, lang="en")
+    url = valgdatabasen.local_artifact(c.extract).url if c.extract is not None else ""
+    p.add(
+        "citation",
+        id=key("citation", result_set),
+        entity_id=result_set,
+        source_id=valgdatabasen.SOURCE_ID,
+        locator=json.dumps({"url": url, "site": valgdatabasen.SITE}),
+    )
+    for unit in c.districts:
+        unit_id = key("unit", election.slug, c.code, "district", unit.code)
+        p.add(
+            "reporting_unit",
+            id=unit_id,
+            polity_id=DENMARK,
+            scheme_code=unit.scheme,
+            code=f"{election.slug}:{unit.code}",
+            area_relation="unlocated",
+            area_id=None,
+            kind="standard",
+        )
+        p.name(unit_id, unit.name, "da", "official")
+        for measure, value in sorted(unit.accounting.items()):
+            put(p, result_set, unit_id, None, measure, value)
+        for (option, measure), value in unit.values.items():
+            put(p, result_set, unit_id, ids[option], measure, value)
+    (held,) = c.units
+    for measure, value in sorted(held.accounting.items()):
+        p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+    for (option, measure), value in held.values.items():
+        p.add("declared", result_set_id=result_set, option_id=ids[option], measure=measure, value=value)
     for option, count in c.seats.items():
         p.add("outcome", result_set_id=result_set, option_id=ids[option], kind="won", seats=count)
 
