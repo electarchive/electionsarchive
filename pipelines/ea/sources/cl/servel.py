@@ -1009,6 +1009,21 @@ def key(kind: str, *parts: object) -> str:
 
 
 CHILE = "01016eed-79a5-5393-a8a1-e2f5adb6103c"
+# Contests of 1989-2010 whose candidate totals differ from the ones the historical results site prints on its own
+# district and national pages. `cl.historial` publishes its commune counts, which equal that site's printed totals,
+# as the default result set of each, superseding this one, which stays as the non-default set.
+SUPERSEDED = frozenset(
+    {
+        (date(1989, 12, 14), "deputies", "45"),
+        (date(1989, 12, 14), "senators", "4"),
+        (date(1989, 12, 14), "senators", "9"),
+        (date(1989, 12, 14), "senators", "12"),
+        (date(1989, 12, 14), "senators", "17"),
+        (date(1993, 12, 11), "president", ""),
+        (date(1997, 12, 11), "deputies", "33"),
+        (date(1999, 12, 12), "president", ""),
+    }
+)
 SERVEL = key("source", SOURCE)
 PRESIDENCY = key("office", "president")
 CHAMBER = key("body", "chamber")
@@ -1621,10 +1636,21 @@ def build(election: Election) -> Package:
             kind="counted",
             source_id=SERVEL,
             status="active",
-            is_default=True,
+            is_default=(day, kind, code) not in SUPERSEDED,
             completeness=1.0,
         )
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
+        if (day, kind, code) in SUPERSEDED:
+            p.add(
+                "note",
+                id=key("note", result_set, "superseded"),
+                entity_id=result_set,
+                kind="caveat",
+                body_md="Some candidates' totals here differ slightly from the totals the Ministry of the Interior's "
+                "historical results site prints for this contest; its commune counts, which add up to those printed "
+                "totals, are the default result set.",
+                lang="en",
+            )
         if pact is None and kind in ("mayor_primary", "governor_primary"):
             p.add(
                 "note",

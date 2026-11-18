@@ -11,8 +11,9 @@ from uuid import uuid5
 
 import polars as pl
 
-from ea import changeset, package, raw
+from ea import package, raw
 from ea.package import Package
+from ea.sources.cl import servel
 
 SOURCE = "cl.historial"
 SITE = "https://historial.servel.cl/SitioHistorico"
@@ -395,51 +396,30 @@ def contests(election: Election, part: Part) -> list[Contest]:
 
 
 # ---- packages --------------------------------------------------------------------------------------------------
+#
+# Servel's workbooks (`cl.servel`) hold every election of 1989-2010 by circunscripcion electoral, and they are finer
+# than this site's commune pages, so they carry the elections, contests, options, offices, bodies, and parties. The
+# two sources agree except in a few contests, where this site's commune pages add up to the candidate totals its own
+# district and national pages print and the workbooks do not. For each of those contests (`servel.SUPERSEDED`) this
+# pipeline publishes its commune counts as the default result set, superseding the workbook's, on Servel's contest.
 
-AREA_SCHEMES = (
-    ("cl.historial_comuna", 3, "administrative", "commune"),
-    ("cl.historial_distrito", 2, "electoral_district", "electoral district (1989–2013)"),
-    ("cl.historial_circunscripcion", 2, "electoral_district", "senatorial constituency (1989–2013)"),
-)
+AREA_SCHEMES = (("cl.historial_comuna", 3, "administrative", "commune"),)
 UNIT_SCHEME = "cl.historial_comuna_votes"
 
 
 def geo() -> Package:
-    p = Package(
-        f"{SOURCE}/geo", SOURCE, "Chile's communes, electoral districts, and senatorial constituencies, 1989-2010"
-    )
+    p = Package(f"{SOURCE}/geo", SOURCE, "Chile's communes as the historical results site lists them, 1989-2010")
     p.external.add(CHILE)
     for code, rank, kind, noun in AREA_SCHEMES:
         p.add("scheme", code=code, polity_id=CHILE, kind=kind, rank=rank, noun=noun, code_system=None)
-
-    def place(scheme: str, code: str, label: str) -> None:
-        id = key("area", scheme, code)
-        p.add("area", id=id, scheme_code=scheme)
-        p.add("area_code", area_id=id, code=code)
-        p.name(id, label, "es", "official")
-
     for url in listings():
         p.uses(raw.cached(SOURCE, url))
     for code, name in communes().items():
-        place("cl.historial_comuna", code, name)
-    for number in range(1, 61):
-        place("cl.historial_distrito", str(number), f"Distrito {number} (1989–2013)")
-    for number in range(1, 20):
-        place("cl.historial_circunscripcion", str(number), f"Circunscripción Senatorial {number} (1989–2013)")
+        id = key("area", "cl.historial_comuna", code)
+        p.add("area", id=id, scheme_code="cl.historial_comuna")
+        p.add("area_code", area_id=id, code=code)
+        p.name(id, name, "es", "official")
     return p
-
-
-def parties() -> dict[str, str]:
-    found: dict[str, str] = {}
-    for election in ELECTIONS:
-        for part in election.parts:
-            for code in communes():
-                page = load(comuna_url(part, code))
-                for candidate in page.candidates if page else []:
-                    sigla = " ".join(candidate.party.split())
-                    if sigla and not INDEPENDENT.match(fold(sigla)):
-                        found.setdefault(fold(sigla), sigla)
-    return dict(sorted(found.items()))
 
 
 METHOD = (
@@ -448,13 +428,18 @@ METHOD = (
     "district or constituency page gives the post each candidate won. The site publishes no figures for null or "
     "blank ballots or for the electoral roll at this level."
 )
+SUPERSEDES = (
+    "The commune counts add up to the candidate totals that the site's own page for the {where} prints. Some "
+    "candidates' totals in Servel's workbooks by circunscripcion electoral differ from those, so this set supersedes "
+    "the workbooks' set for this contest."
+)
 
 
 def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "Servel's historical results site as a source, with the reporting units, offices, bodies, and parties it names",
+        "Servel's historical results site as a source, with its commune reporting units",
         depends=[f"{SOURCE}/geo"],
     )
     p.external.add(CHILE)
@@ -471,11 +456,10 @@ def registry() -> Package:
         attribution="Servicio Electoral de Chile (Servel)",
     )
     p.add("scheme", code=UNIT_SCHEME, polity_id=CHILE, kind="precinct", rank=4, noun="commune count", code_system=None)
-    for code, name in communes().items():
-        unit = key("unit", code)
+    for code in communes():
         p.add(
             "reporting_unit",
-            id=unit,
+            id=key("unit", code),
             polity_id=CHILE,
             scheme_code=UNIT_SCHEME,
             code=code,
@@ -483,160 +467,174 @@ def registry() -> Package:
             area_id=key("area", "cl.historial_comuna", code),
             kind="standard",
         )
-        mayor = key("office", "mayor", code)
-        p.add("office", id=mayor, polity_id=CHILE, kind="mayor")
-        p.name(mayor, f"Alcalde de {name}", "es", "official")
-        council = key("body", "council", code)
-        p.add("body", id=council, polity_id=CHILE, kind="council")
-        p.name(council, f"Concejo Municipal de {name}", "es", "official")
-    p.add("office", id=PRESIDENCY, polity_id=CHILE, kind="head_of_state")
-    p.name(PRESIDENCY, "Presidente de la República de Chile", "es", "official")
-    p.name(PRESIDENCY, "President of Chile", "en", "official", False)
-    for id, kind, es, en in (
-        (CHAMBER, "lower_house", "Cámara de Diputados", "Chamber of Deputies"),
-        (SENATE, "upper_house", "Senado", "Senate"),
-    ):
-        p.add("body", id=id, polity_id=CHILE, kind=kind)
-        p.name(id, es, "es", "official")
-        p.name(id, en, "en", "official", False)
-    for folded, sigla in parties().items():
-        id = party(folded)
-        p.add("party", id=id, kind="party", polity_id=CHILE)
-        p.add("external_id", entity_id=id, scheme="cl.historial.party", value=folded)
-        p.name(id, sigla, "es", "official")
     return p
+
+
+def _workbook(day: date, table: str) -> pl.DataFrame:
+    return pl.read_parquet(package.folder(f"{servel.SOURCE}/{day}") / "build" / f"{table}.parquet")
+
+
+def _words(name: str) -> set[str]:
+    return set(fold(name).split())
+
+
+def _match(servel_options: list[tuple[str, str]], name: str) -> str | None:
+    """The workbook's option for a candidate the site names, by the words the two names share (the workbooks print a
+    name shorter or in another form)."""
+    found = [
+        option for option, label in servel_options if _words(label) <= _words(name) or _words(name) <= _words(label)
+    ]
+    return found[0] if len(found) == 1 else None
+
+
+def totals(contest: Contest) -> dict[str, int]:
+    found: dict[str, int] = defaultdict(int)
+    for page in contest.units.values():
+        for candidate in page.candidates:
+            found[fold(candidate.name)] += candidate.votes
+    return dict(found)
+
+
+def differing(election: Election) -> set[tuple[date, str, str]]:
+    """The contests whose commune counts add up to the site's own printed totals and differ from the workbooks'."""
+    options = _workbook(election.day, "contest_option").select("id", "contest_id", "ballot_label")
+    sets = _workbook(election.day, "result_set").select(pl.col("id").alias("result_set_id"), "contest_id")
+    votes = (
+        _workbook(election.day, "result_value")
+        .filter(pl.col("measure") == 1)
+        .group_by("result_set_id", "option_id")
+        .agg(pl.col("value").sum())
+        .join(sets, on="result_set_id")
+    )
+    sums = {(r[0], r[1]): r[2] for r in votes.select("contest_id", "option_id", "value").rows()}
+    listed: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    for option, contest_id, label in options.rows():
+        listed[contest_id].append((option, label))
+    found = set()
+    for part in election.parts:
+        if part.kind in ("council", "mayor"):
+            continue
+        for contest in contests(election, part):
+            wanted = servel.key("contest", election.day, part.kind, contest.code)
+            counted = totals(contest)
+            printed = {fold(c.name): c.votes for c in contest.official.candidates} if contest.official else None
+            if printed is None or counted != printed:
+                continue
+            for name, value in counted.items():
+                option = _match(listed[wanted], name)
+                if option is not None and sums.get((wanted, option), 0) != value:
+                    found.add((election.day, part.kind, contest.code))
+    return found
 
 
 def build(election: Election) -> Package:
     day = election.day
-    deps = [f"{SOURCE}/geo", f"{SOURCE}/registry"]
-    if election.runoff_of is not None:
-        deps.append(f"{SOURCE}/{election.runoff_of}")
     p = Package(
-        f"{SOURCE}/{day}", SOURCE, f"{election.en} by commune from Servel's historical results site", depends=deps
+        f"{SOURCE}/{day}",
+        SOURCE,
+        f"Commune counts of the {election.en} that supersede Servel's workbooks by circunscripcion electoral",
+        depends=[f"{SOURCE}/registry", f"{servel.SOURCE}/{day}"],
     )
-    p.external.add(CHILE)
-    election_id = p.id("election", day)
-    p.add(
-        "election",
-        id=election_id,
-        polity_id=CHILE,
-        kind=election.kind,
-        date_from=day,
-        date_to=day,
-        date_precision="day",
-        status="held",
-    )
-    p.name(election_id, election.en, "en", "official")
-    p.name(election_id, election.es, "es", "native", False)
-    base = f"cl/{day}-{election.word}-by-commune"
-    p.add("slug", path=base, entity_id=election_id, is_current=True)
-    slugs: set[str] = set()
+    listed: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    for option, contest_id, label in _workbook(day, "contest_option").select("id", "contest_id", "ballot_label").rows():
+        listed[contest_id].append((option, label))
+    parties = {
+        row[0]
+        for row in pl.read_parquet(package.folder(f"{servel.SOURCE}/registry") / "build" / "party.parquet")
+        .select("id")
+        .rows()
+    }
     rows: list[dict[str, object]] = []
-    first = election.runoff_of
     for part in election.parts:
         for contest in contests(election, part):
-            _contest(p, election, part, contest, election_id, base, slugs, rows, first)
+            ident = (day, part.kind, contest.code)
+            if ident not in servel.SUPERSEDED:
+                continue
+            _supersede(p, part, contest, listed[servel.key("contest", *ident)], parties, rows)
+    schema = {"result_set_id": pl.String, "unit_id": pl.String, "option_id": pl.String, "measure": pl.Int64}
     p.frame(
         "result_value",
-        pl.DataFrame(rows, schema_overrides={"unit_id": pl.String}).with_columns(
+        pl.DataFrame(rows, schema_overrides={**schema, "value": pl.Int64}).with_columns(
             channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)
         ),
     )
     return p
 
 
-def _contest(
+def _supersede(
     p: Package,
-    election: Election,
     part: Part,
     contest: Contest,
-    election_id: str,
-    base: str,
-    slugs: set[str],
+    options: list[tuple[str, str]],
+    parties: set[str],
     rows: list[dict[str, object]],
-    first: date | None,
 ) -> None:
-    day = election.day
-    ident = (part.kind, contest.code)
-    contest_id = p.id("contest", day, *ident)
-    result_set = p.id("result_set", day, *ident)
-    p.add(
-        "contest",
-        id=contest_id,
-        election_id=election_id,
-        kind=contest.kind,
-        office_id=contest.office,
-        body_id=contest.body,
-        district_area_id=contest.district,
-        magnitude=contest.magnitude,
-        round_number=2 if first is not None else 1,
-        previous_round_id=None if first is None else p.id("contest", first, *ident),
-        electoral_system_id=None,
-        default_result_kind="counted",
-    )
-    p.name(contest_id, contest.title, "es", "official")
-    path = f"{base}/{changeset.slug(contest.title)}"
-    if path in slugs:
-        path = f"{path}-{changeset.slug(contest.code)}"
-    slugs.add(path)
-    p.add("slug", path=path, entity_id=contest_id, is_current=True)
+    day = date.fromisoformat(p.key.rpartition("/")[2])
+    ident = (day, part.kind, contest.code)
+    contest_id = servel.key("contest", *ident)
+    result_set = p.id("result_set", *ident)
     p.add(
         "result_set",
         id=result_set,
-        election_id=election_id,
+        election_id=servel.key("election", day),
         contest_id=contest_id,
         stage="certified",
         kind="counted",
         source_id=SOURCE_ID,
         status="active",
         is_default=True,
+        supersedes_id=servel.key("result_set", *ident),
         completeness=1.0,
     )
-    p.add("note", id=p.id("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
+    where = "country" if part.kind == "president" else contest.title.lower()
+    p.add(
+        "note",
+        id=p.id("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=f"{METHOD}\n\n{SUPERSEDES.format(where=where)}",
+        lang="en",
+    )
     for url in contest.urls:
         p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
-    options: dict[str, str] = {}
+    chosen: dict[str, str] = {}
     declared = contest.official.candidates if contest.official else []
-    seen: dict[str, int] = defaultdict(int)
-    order = {}
-    for page in contest.units.values():
-        for candidate in page.candidates:
-            order.setdefault((fold(candidate.name), fold(candidate.party)), candidate)
+    pages = [candidate for page in contest.units.values() for candidate in page.candidates]
+    for candidate in [*pages, *declared]:
+        folded = fold(candidate.name)
+        if folded in chosen:
+            continue
+        option = _match(options, candidate.name)
+        if option is None or option in chosen.values():
+            option = p.id("option", *ident, folded)
+            sigla = fold(candidate.party)
+            member = servel.party(sigla) if servel.party(sigla) in parties else None
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest_id,
+                kind="candidate",
+                party_id=member,
+                ballot_label=candidate.name,
+            )
+            person = p.id("person", *ident, folded)
+            p.add("person", id=person)
+            p.name(person, candidate.name, "es", "official")
+            p.add(
+                "candidacy",
+                id=p.id("candidacy", *ident, folded),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=candidate.name,
+                member_of_party_id=member,
+                is_independent=member is None,
+            )
+        chosen[folded] = option
     for candidate in declared:
-        order.setdefault((fold(candidate.name), fold(candidate.party)), candidate)
-    for (folded, sigla), candidate in order.items():
-        seen[folded] += 1
-        suffix = "" if seen[folded] == 1 else f"-{seen[folded]}"
-        option = p.id("option", day, *ident, folded + suffix)
-        options[f"{folded}|{sigla}"] = option
-        member = None if INDEPENDENT.match(sigla) else party(sigla)
-        p.add(
-            "contest_option",
-            id=option,
-            contest_id=contest_id,
-            kind="candidate",
-            party_id=member,
-            ballot_label=candidate.name,
-        )
-        person = p.id("person", day, *ident, folded + suffix)
-        p.add("person", id=person)
-        p.name(person, candidate.name, "es", "official")
-        p.add(
-            "candidacy",
-            id=p.id("candidacy", day, *ident, folded + suffix),
-            person_id=person,
-            option_id=option,
-            role="head",
-            ballot_name=candidate.name,
-            member_of_party_id=member,
-            is_independent=member is None,
-        )
-    for candidate in declared:
-        option = options[f"{fold(candidate.name)}|{fold(candidate.party)}"]
         if candidate.cargo:
             kind = "advanced" if fold(candidate.cargo).startswith("SELECCIONADO") else "elected"
-            p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
+            p.add("outcome", result_set_id=result_set, option_id=chosen[fold(candidate.name)], kind=kind)
     for code, page in contest.units.items():
         unit = key("unit", code)
         for candidate in page.candidates:
@@ -644,7 +642,7 @@ def _contest(
                 {
                     "result_set_id": result_set,
                     "unit_id": unit,
-                    "option_id": options[f"{fold(candidate.name)}|{fold(candidate.party)}"],
+                    "option_id": chosen[fold(candidate.name)],
                     "measure": 1,
                     "value": candidate.votes,
                 }
@@ -668,6 +666,9 @@ def packages() -> list[str]:
 
 def parse() -> None:
     print("\n".join([*reconcile(), *national()]), flush=True)
+    found = {ident for election in ELECTIONS for ident in differing(election)}
+    if found != servel.SUPERSEDED:
+        raise ValueError(f"contests to supersede changed: {sorted(found ^ servel.SUPERSEDED)}")
     geo().write()
     registry().write()
     for election in ELECTIONS:
