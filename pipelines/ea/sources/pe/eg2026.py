@@ -15,11 +15,13 @@ Peruvians living abroad; their outlines come from geoBoundaries, and no outline 
 import json
 import re
 import subprocess
+import time
 from collections import Counter
 from datetime import date
 from typing import NamedTuple
 from uuid import uuid5
 
+import httpx
 import shapely
 import shapely.geometry
 
@@ -222,10 +224,17 @@ def person(name: str) -> str:
 
 
 def fetch() -> None:
-    for url in RESOLUTIONS.values():
-        raw.fetch(SOURCE, url, suffix=".pdf")
-    raw.fetch(SOURCE, DEPARTMENTS_URL, suffix=".geojson")
-    raw.fetch(SOURCE, PROVINCES_URL, suffix=".geojson")
+    """Fetch every file, retrying each a few times: the host of the resolutions resets a connection now and then."""
+    urls = [(url, ".pdf") for url in RESOLUTIONS.values()]
+    for url, suffix in [*urls, (DEPARTMENTS_URL, ".geojson"), (PROVINCES_URL, ".geojson")]:
+        for attempt in range(4):
+            try:
+                raw.fetch(SOURCE, url, suffix=suffix)
+                break
+            except httpx.TransportError:
+                if attempt == 3:
+                    raise
+                time.sleep(5 * 2**attempt)
 
 
 def text(number_: str) -> list[str]:
