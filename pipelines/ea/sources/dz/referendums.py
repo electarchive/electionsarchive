@@ -14,6 +14,7 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.dz import boundaries
 from ea.sources.dz import referendum_tables as tables
 
 SOURCE = "dz.referendums"
@@ -413,13 +414,12 @@ def registry() -> Package:
         f"{SOURCE}/registry",
         SOURCE,
         "Algeria's national referendum units: the nation, the wilayas of 1974 and of 1984, and voters abroad",
+        depends=[f"{boundaries.SOURCE}/geo"],
     )
     p.external.update({ALGERIA, COUNTRY})
-    # dz.wilaya matches the row the boundaries and presidential pipelines write for the same scheme.
+    # dz.wilaya and dz.wilaya_1974 come from the boundaries geo package, which this package depends on.
     for code, rank, noun, system in (
         ("dz.nation", 1, "nation", None),
-        ("dz.wilaya_1974", 2, "wilaya (1974)", None),
-        ("dz.wilaya", 1, "wilaya", "wilaya_number"),
         ("dz.abroad", 2, "voters abroad", None),
     ):
         p.add("scheme", code=code, polity_id=ALGERIA, kind="administrative", rank=rank, noun=noun, code_system=system)
@@ -473,7 +473,11 @@ def registry() -> Package:
     ):
         for number, name in enumerate(names, 1):
             id = wilaya_unit(scheme, number)
-            unit(id, scheme, f"{number:02d}", "standard", "unlocated", None, NATION, since, until)
+            if scheme == "dz.wilaya_1974":
+                shape = boundaries.area(scheme, f"{number:02d}")
+                unit(id, scheme, f"{number:02d}", "standard", "equals", shape, NATION, since, until)
+            else:
+                unit(id, scheme, f"{number:02d}", "standard", "unlocated", None, NATION, since, until)
             p.name(id, name, "fr", "official")
     return p
 
