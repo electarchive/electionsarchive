@@ -1,4 +1,4 @@
-"""Sweden's Second Chamber (andra kammaren) elections of 1921 to 1968 by constituency, digitized from Statistics
+"""Sweden's Second Chamber (andra kammaren) elections of 1911 to 1968 by constituency, digitized from Statistics
 Sweden's Riksdagsmannavalen volumes.
 
 Each volume of Riksdagsmannavalen (Sveriges officiella statistik) prints a table of valid ballots by party and members
@@ -11,6 +11,8 @@ every figure on its page.
 
 The volumes and the tables used:
 
+- Riksdagsmannavalen åren 1909–1911, table 7: 1911.
+- Riksdagsmannavalen åren 1918–1920, table 6: 1920.
 - Riksdagsmannavalen år 1921, table 5: 1921, each constituency's rural districts and towns apart.
 - Riksdagsmannavalen åren 1925–1928, table 3: 1928 and 1924.
 - Riksdagsmannavalen åren 1933–1936, table 3: 1936 and 1932.
@@ -81,6 +83,20 @@ VOLUMES = {
     v.key: v
     for v in (
         Volume(
+            "1909-1911",
+            "1909-1910-1911",
+            "Riksdagsmannavalen åren 1909–1911",
+            "tab. 7",
+            {159: "H LS S O total invalid seats*"},
+        ),
+        Volume(
+            "1918-1920",
+            "1918-1919-1920",
+            "Riksdagsmannavalen åren 1918–1920",
+            "tab. 6",
+            {164: "H JR B JRB LS", 165: "S VS O total invalid seats*"},
+        ),
+        Volume(
             "1921",
             "1921",
             "Riksdagsmannavalen år 1921",
@@ -147,6 +163,7 @@ class Election:
     start: date
     end: date
     note: str = ""
+    precision: str = "day"
 
     @property
     def day(self) -> date:
@@ -154,6 +171,25 @@ class Election:
 
 
 ELECTIONS = [
+    Election(
+        1911,
+        "1909-1911",
+        date(1911, 9, 1),
+        date(1911, 9, 30),
+        "The first Second Chamber election under proportional representation. The constituencies voted on different "
+        "days in September: most on Sunday 3, 10, 17, or 24 September, and the town constituencies on weekdays.",
+        "month",
+    ),
+    Election(
+        1920,
+        "1918-1920",
+        date(1920, 9, 1),
+        date(1920, 9, 30),
+        "Most constituencies voted on Sunday 5 or 12 September, Gotlands län on Saturday 4 September, and the town "
+        "constituencies on weekdays early in the month. The elections in Västerbottens läns norra and Malmöhus läns "
+        "södra valkrets were held again on 12 and 19 December 1920 (omval).",
+        "month",
+    ),
     Election(
         1921,
         "1921",
@@ -225,7 +261,80 @@ class Krets:
         return scb.area(self.scheme, self.code)
 
 
-KRETSAR = {
+# The 56 constituencies of 1911 to 1920, in the tables' order. Göteborgs stad kept its constituency in 1921.
+KRETSAR_1911 = {
+    "stockholms-stad-1": Krets("Stockholms stads första valkrets", val.CONSTITUENCY, "AK1911-stockholms-stad-1"),
+    "stockholms-stad-2": Krets("Stockholms stads andra valkrets", val.CONSTITUENCY, "AK1911-stockholms-stad-2"),
+    "stockholms-lan-sodra": Krets("Stockholms läns södra valkrets", val.CONSTITUENCY, "AK1911-stockholms-lan-sodra"),
+    "stockholms-lan-norra": Krets("Stockholms läns norra valkrets", val.CONSTITUENCY, "AK1911-stockholms-lan-norra"),
+    "uppsala-lan": Krets("Uppsala läns valkrets", val.COUNTY, "03"),
+    "sodermanland-norra": Krets("Södermanlands läns norra valkrets", val.CONSTITUENCY, "AK1911-sodermanland-norra"),
+    "sodermanland-sodra": Krets("Södermanlands läns södra valkrets", val.CONSTITUENCY, "AK1911-sodermanland-sodra"),
+    "ostergotland-norra": Krets("Östergötlands läns norra valkrets", val.CONSTITUENCY, "AK1911-ostergotland-norra"),
+    "norrkoping-linkoping": Krets(
+        "Norrköpings och Linköpings valkrets", val.CONSTITUENCY, "AK1911-norrkoping-linkoping"
+    ),
+    "ostergotland-sodra": Krets("Östergötlands läns södra valkrets", val.CONSTITUENCY, "AK1911-ostergotland-sodra"),
+    "jonkoping-ostra": Krets("Jönköpings läns östra valkrets", val.CONSTITUENCY, "AK1911-jonkoping-ostra"),
+    "jonkoping-vastra": Krets("Jönköpings läns västra valkrets", val.CONSTITUENCY, "AK1911-jonkoping-vastra"),
+    "kronoberg-ostra": Krets("Kronobergs läns östra valkrets", val.CONSTITUENCY, "AK1911-kronoberg-ostra"),
+    "kronoberg-vastra": Krets("Kronobergs läns västra valkrets", val.CONSTITUENCY, "AK1911-kronoberg-vastra"),
+    "kalmar-norra": Krets("Kalmar läns norra valkrets", val.CONSTITUENCY, "AK1911-kalmar-norra"),
+    "kalmar-sodra": Krets("Kalmar läns södra valkrets", val.CONSTITUENCY, "AK1911-kalmar-sodra"),
+    "gotland-lan": Krets("Gotlands läns valkrets", val.COUNTY, "09"),
+    "blekinge-lan": Krets("Blekinge läns valkrets", val.COUNTY, "10"),
+    "kristianstad-nordvastra": Krets(
+        "Kristianstads läns nordvästra valkrets", val.CONSTITUENCY, "AK1911-kristianstad-nordvastra"
+    ),
+    "kristianstad-sydostra": Krets(
+        "Kristianstads läns sydöstra valkrets", val.CONSTITUENCY, "AK1911-kristianstad-sydostra"
+    ),
+    "malmohus-norra": Krets("Malmöhus läns norra valkrets", val.CONSTITUENCY, "AK1911-malmohus-norra"),
+    "malmohus-mellersta": Krets("Malmöhus läns mellersta valkrets", val.CONSTITUENCY, "AK1911-malmohus-mellersta"),
+    "malmohus-sodra": Krets("Malmöhus läns södra valkrets", val.CONSTITUENCY, "AK1911-malmohus-sodra"),
+    "halsingborg-landskrona-lund": Krets(
+        "Hälsingborgs, Landskronas och Lunds valkrets", val.CONSTITUENCY, "AK1911-halsingborg-landskrona-lund"
+    ),
+    "malmo-stad": Krets("Malmö stads valkrets", val.CONSTITUENCY, "AK1911-malmo-stad"),
+    "halland-lan": Krets("Hallands läns valkrets", val.COUNTY, "13"),
+    "goteborg-bohus-sodra": Krets(
+        "Göteborgs och Bohus läns södra valkrets", val.CONSTITUENCY, "AK1911-goteborg-bohus-sodra"
+    ),
+    "goteborg-bohus-norra": Krets(
+        "Göteborgs och Bohus läns norra valkrets", val.CONSTITUENCY, "AK1911-goteborg-bohus-norra"
+    ),
+    "goteborgs-stad": Krets("Göteborgs stads valkrets", val.CONSTITUENCY, "AK-goteborgs-stad"),
+    "alvsborg-norra-1911": Krets("Älvsborgs läns norra valkrets", val.CONSTITUENCY, "AK1911-alvsborg-norra-1911"),
+    "alvsborg-mellersta": Krets("Älvsborgs läns mellersta valkrets", val.CONSTITUENCY, "AK1911-alvsborg-mellersta"),
+    "alvsborg-sodra-1911": Krets("Älvsborgs läns södra valkrets", val.CONSTITUENCY, "AK1911-alvsborg-sodra-1911"),
+    "skaraborg-norra": Krets("Skaraborgs läns norra valkrets", val.CONSTITUENCY, "AK1911-skaraborg-norra"),
+    "skaraborg-sodra": Krets("Skaraborgs läns södra valkrets", val.CONSTITUENCY, "AK1911-skaraborg-sodra"),
+    "varmland-norra": Krets("Värmlands läns norra valkrets", val.CONSTITUENCY, "AK1911-varmland-norra"),
+    "varmland-ostra": Krets("Värmlands läns östra valkrets", val.CONSTITUENCY, "AK1911-varmland-ostra"),
+    "varmland-vastra": Krets("Värmlands läns västra valkrets", val.CONSTITUENCY, "AK1911-varmland-vastra"),
+    "orebro-norra": Krets("Örebro läns norra valkrets", val.CONSTITUENCY, "AK1911-orebro-norra"),
+    "orebro-sodra": Krets("Örebro läns södra valkrets", val.CONSTITUENCY, "AK1911-orebro-sodra"),
+    "vastmanland-ostra": Krets("Västmanlands läns östra valkrets", val.CONSTITUENCY, "AK1911-vastmanland-ostra"),
+    "vastmanland-vastra": Krets("Västmanlands läns västra valkrets", val.CONSTITUENCY, "AK1911-vastmanland-vastra"),
+    "kopparberg-ostra": Krets("Kopparbergs läns östra valkrets", val.CONSTITUENCY, "AK1911-kopparberg-ostra"),
+    "kopparberg-vastra": Krets("Kopparbergs läns västra valkrets", val.CONSTITUENCY, "AK1911-kopparberg-vastra"),
+    "kopparberg-norra": Krets("Kopparbergs läns norra valkrets", val.CONSTITUENCY, "AK1911-kopparberg-norra"),
+    "gastrikland": Krets("Gästriklands valkrets", val.CONSTITUENCY, "AK1911-gastrikland"),
+    "halsingland-sodra": Krets("Hälsinglands södra valkrets", val.CONSTITUENCY, "AK1911-halsingland-sodra"),
+    "halsingland-norra": Krets("Hälsinglands norra valkrets", val.CONSTITUENCY, "AK1911-halsingland-norra"),
+    "medelpad": Krets("Medelpads valkrets", val.CONSTITUENCY, "AK1911-medelpad"),
+    "angermanland-sodra": Krets("Ångermanlands södra valkrets", val.CONSTITUENCY, "AK1911-angermanland-sodra"),
+    "angermanland-norra": Krets("Ångermanlands norra valkrets", val.CONSTITUENCY, "AK1911-angermanland-norra"),
+    "jamtland-sodra": Krets("Jämtlands läns södra valkrets", val.CONSTITUENCY, "AK1911-jamtland-sodra"),
+    "jamtland-norra": Krets("Jämtlands läns norra valkrets", val.CONSTITUENCY, "AK1911-jamtland-norra"),
+    "vasterbotten-sodra": Krets("Västerbottens läns södra valkrets", val.CONSTITUENCY, "AK1911-vasterbotten-sodra"),
+    "vasterbotten-norra": Krets("Västerbottens läns norra valkrets", val.CONSTITUENCY, "AK1911-vasterbotten-norra"),
+    "norrbotten-sodra": Krets("Norrbottens läns södra valkrets", val.CONSTITUENCY, "AK1911-norrbotten-sodra"),
+    "norrbotten-norra": Krets("Norrbottens läns norra valkrets", val.CONSTITUENCY, "AK1911-norrbotten-norra"),
+}
+
+# The 28 constituencies of 1921 to 1970.
+KRETSAR_1921 = {
     "stockholms-stad": Krets("Stockholms stads valkrets", val.COUNTY, scb.STOCKHOLM_CITY),
     "stockholms-lan": Krets("Stockholms läns valkrets", val.COUNTY, scb.STOCKHOLM_COUNTY),
     "uppsala": Krets("Uppsala läns valkrets", val.COUNTY, "03"),
@@ -261,12 +370,28 @@ KRETSAR = {
     "vasterbotten": Krets("Västerbottens läns valkrets", val.COUNTY, "24"),
     "norrbotten": Krets("Norrbottens läns valkrets", val.COUNTY, "25"),
 }
-OWN_SINCE, OWN_UNTIL = date(1921, 1, 1), date(1971, 1, 1)
+KRETSAR = KRETSAR_1911 | KRETSAR_1921
+
+
+def kretsar(year: int) -> dict[str, Krets]:
+    return KRETSAR_1911 if year < 1921 else KRETSAR_1921
+
+
+def valid(krets: Krets) -> tuple[date, date]:
+    """When an own constituency area existed: the 1911 ones from the electoral law of 1909 until 1921, the 1921 ones
+    until the unicameral Riksdag; Göteborgs stad throughout."""
+    if krets.code == "AK-goteborgs-stad":
+        return date(1909, 1, 1), date(1971, 1, 1)
+    if krets.code.startswith("AK1911-"):
+        return date(1909, 1, 1), date(1921, 1, 1)
+    return date(1921, 1, 1), date(1971, 1, 1)
+
+
 OWN_NOTES = {
     "AK-fyrstadskretsen": "The towns of Malmö, Hälsingborg (Helsingborg), Landskrona, and Lund, which formed a "
     "Second Chamber constituency of their own.",
     "AK-malmohus": "Malmöhus län without the four towns of the Fyrstadskretsen constituency.",
-    "AK-goteborgs-stad": "The city of Göteborg, a Second Chamber constituency of its own.",
+    "AK-goteborgs-stad": "The city of Göteborg, a Second Chamber constituency of its own from 1911.",
     "AK-goteborg-bohus": "Göteborgs och Bohus län without the city of Göteborg: the area of the county council "
     "(landstingsområde).",
     "AK-alvsborg-norra": "The northern constituency of Älvsborgs län.",
@@ -302,6 +427,13 @@ PARTIES = {
         historical=(("Bondeförbundet", None, date(1957, 6, 1)),),
     ),
     "LS": Party("Liberala samlingspartiet", "L", english="Liberal Coalition Party"),
+    "JR": Party("Jordbrukarnas riksförbund", "JR", english="Farmers' National Union"),
+    "JRB": Party(
+        "Jordbrukarnas riksförbund och Bondeförbundet",
+        "JR+B",
+        kind="bloc",
+        english="Farmers' National Union and Farmers' League",
+    ),
     "L": Party("Sveriges liberala parti", "L", english="Liberal Party of Sweden"),
     "F": Party("Frisinnade folkpartiet", "F", english="Free-minded People's Party"),
     "LF": Party(
@@ -329,6 +461,7 @@ PARTIES = {
 
 # The party behind each column, where it differs from the column's own name.
 COLUMN_PARTY: dict[tuple[int, str], str] = {
+    (1920, "B"): "C",
     (1921, "B"): "C",
     (1921, "L"): "LS",
     (1924, "B"): "C",
@@ -350,6 +483,9 @@ LABELS: dict[str, str] = {
     "FP": "Folkpartiet",
     "S": "Socialdemokrater",
     "VS": "Vänstersocialister",
+    "LS": "Liberala",
+    "JR": "Jordbrukarnas riksförbund",
+    "JRB": "Jordbrukarnas riksförbund och bondeförbundet",
     "KH": "Kommunister (Höglundsriktningen)",
     "K": "Kommunister",
     "SP": "Socialistiska partiet",
@@ -360,6 +496,7 @@ LABELS: dict[str, str] = {
     "O": "Övriga",
 }
 YEAR_LABELS: dict[tuple[int, str], str] = {
+    (1911, "H"): "Moderata",
     (1924, "K"): "Kommunister (Kilbomsriktningen)",
     (1932, "FP"): "Liberala och frisinnade",
     (1932, "SP"): "Kilbomskommunister",
@@ -419,6 +556,10 @@ PRINTED: dict[tuple[str, int, str], int] = {
 }
 
 
+# Joint ballots of two parties under one designation, which the national row divides between the parties.
+JOINT = {"JRB": ("JR", "B")}
+
+
 def base(krets: str) -> str:
     """The constituency of a row: kalmar/lb (the rural districts of Kalmar läns valkrets) is kalmar."""
     return krets.split("/")[0]
@@ -434,19 +575,26 @@ def check(volume: str) -> None:
             raise ValueError(f"{volume} {year} {krets}: the party ballots do not add up to the printed total")
         if sum(row[c] or 0 for c in seats) != (row["seats"] or 0):
             raise ValueError(f"{volume} {year} {krets}: the party seats do not add up to the printed total")
-        if base(krets) != "riket" and base(krets) not in KRETSAR:
+        if base(krets) != "riket" and base(krets) not in kretsar(year):
             raise ValueError(f"{volume}: unknown constituency {krets}")
     for year in sorted({y for y, _, _ in found}):
         units = [(k, row) for y, k, row in found if y == year and base(k) != "riket"]
-        if {base(k) for k, _ in units} != set(KRETSAR):
-            raise ValueError(f"{volume} {year}: expected the {len(KRETSAR)} constituencies")
+        if [base(k) for k, _ in units if not k.endswith("/st")] != list(kretsar(year)):
+            raise ValueError(f"{volume} {year}: expected the {len(kretsar(year))} constituencies in order")
         for total in (k for y, k, _ in found if y == year and base(k) == "riket"):
             part = total.partition("/")[2]
             national = next(row for y, k, row in found if y == year and k == total)
             members = [row for k, row in units if not part or k.endswith(f"/{part}") or (part == "st" and "/" not in k)]
             for column in columns(volume):
+                if column in JOINT or any(column in parts for parts in JOINT.values()):
+                    continue
                 if sum(row[column] or 0 for row in members) != (national[column] or 0):
                     raise ValueError(f"{volume} {year}: column {column} does not add up to the {total} row")
+            for joint, parts in JOINT.items():
+                if joint in columns(volume):
+                    mine = sum(row[c] or 0 for row in members for c in (joint, *parts))
+                    if mine != sum(national[c] or 0 for c in parts):
+                        raise ValueError(f"{volume} {year}: {joint} and its parties do not add up to the {total} row")
 
 
 def page_sizes() -> dict[tuple[str, int], tuple[int, int]]:
@@ -547,7 +695,7 @@ def registry() -> Package:
     p = Package(
         REGISTRY,
         SOURCE,
-        "The Second Chamber of the bicameral Riksdag, its electoral systems, the parties of its elections of 1921 to "
+        "The Second Chamber of the bicameral Riksdag, its electoral systems, the parties of its elections of 1911 to "
         "1968, and the Riksdagsmannavalen volumes they are digitized from",
     )
     p.external.add(SWEDEN)
@@ -602,7 +750,7 @@ def geo() -> Package:
     p = Package(
         GEO,
         SOURCE,
-        "The six Second Chamber constituencies of 1921 to 1970 that were not a whole county",
+        "The Second Chamber constituencies of 1911 to 1970 that were not a whole county",
         depends=[f"{val.SOURCE}/geo"],
     )
     p.external |= {SWEDEN, COUNTRY, val.CONSTITUENCY}
@@ -610,16 +758,20 @@ def geo() -> Package:
         if krets.scheme != val.CONSTITUENCY:
             continue
         id = krets.area
+        since, until = valid(krets)
         p.add("area", id=id, scheme_code=val.CONSTITUENCY)
-        p.add("area_code", area_id=id, code=krets.code, valid_from=OWN_SINCE, valid_to=OWN_UNTIL)
-        p.add("area_parent", area_id=id, parent_id=COUNTRY, valid_from=OWN_SINCE, valid_to=OWN_UNTIL)
+        p.add("area_code", area_id=id, code=krets.code, valid_from=since, valid_to=until)
+        p.add("area_parent", area_id=id, parent_id=COUNTRY, valid_from=since, valid_to=until)
         p.name(id, krets.name, "sv", "official")
         p.add(
             "note",
             id=scb.key("note", id),
             entity_id=id,
             kind="context",
-            body_md=OWN_NOTES[krets.code],
+            body_md=OWN_NOTES.get(
+                krets.code,
+                "A Second Chamber constituency under the electoral law of 1909, used in the elections of 1911 to 1920.",
+            ),
             lang="en",
         )
     return p
@@ -683,7 +835,7 @@ def election(e: Election) -> Package:
         kind="general",
         date_from=e.start,
         date_to=e.end,
-        date_precision="day",
+        date_precision=e.precision,
         status="held",
     )
     p.name(election_id, f"{e.year} Swedish Second Chamber election", "en", "official")
@@ -872,6 +1024,7 @@ type Word = tuple[str, int, int, int, int]
 
 
 def _words(pdf: Path, page: int, folder: Path) -> tuple[list[Word], int, int]:
+    import os
     import subprocess
 
     from PIL import Image
@@ -884,7 +1037,25 @@ def _words(pdf: Path, page: int, folder: Path) -> tuple[list[Word], int, int]:
     image = stem.with_suffix(".png")
     width, height = Image.open(image).size
     tsv = subprocess.run(
-        ["tesseract", image, "-", "--psm", "6", "-l", "eng", "tsv"], capture_output=True, text=True, check=True
+        [
+            "tesseract",
+            image,
+            "-",
+            "--psm",
+            "6",
+            "-l",
+            "eng",
+            # Table finding stalls for minutes on some of the ruled pages and adds nothing to a word list.
+            "-c",
+            "textord_tabfind_find_tables=0",
+            "-c",
+            "textord_disable_pitch_test=1",
+            "tsv",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+        env={**os.environ, "OMP_THREAD_LIMIT": "1"},
     ).stdout
     words: list[Word] = []
     for r in csv.DictReader(tsv.splitlines(), delimiter="\t", quoting=csv.QUOTE_NONE):
