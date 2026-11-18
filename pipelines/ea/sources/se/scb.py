@@ -990,6 +990,28 @@ def parse() -> None:
         ep_election(year).write()
     scb_referendums.parse()
     scb_andra_kammaren.parse()
+    _check_areas()
+
+
+def _check_areas() -> None:
+    """Fail when a rebuilt geo drops an area, or a package places a unit or an area in one no geo mints.
+
+    A loaded geo package is replaced as a whole, so an area it no longer mints would be deleted from under the units
+    that other packages already placed in it. Without a built se.val/geo, only this pipeline's own areas are checked."""
+    from ea.sources.se import scb_andra_kammaren
+
+    def column(key: str, table: str, name: str) -> set[str]:
+        path = package.folder(key) / "build" / f"{table}.parquet"
+        return set(pl.read_parquet(path, columns=[name])[name].drop_nulls()) if path.exists() else set()
+
+    own = column(f"{SOURCE}/geo", "area", "id") | column(scb_andra_kammaren.GEO, "area", "id")
+    if dropped := {area(scheme, code) for scheme, code in OWN_AREAS} - own:
+        raise ValueError(f"{SOURCE}/geo no longer mints {sorted(dropped)}")
+    national = column(f"{val.SOURCE}/geo", "area", "id")
+    for key in packages():
+        used = column(key, "reporting_unit", "area_id") | column(key, "area_parent", "parent_id")
+        if national and (missing := used - own - national - {COUNTRY}):
+            raise ValueError(f"{key} uses areas that no geo package mints: {sorted(missing)}")
 
 
 NATIONAL = {"R": "VR00", "L": "00L", "K": "00"}
