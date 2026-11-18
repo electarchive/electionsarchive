@@ -15,7 +15,6 @@ from ea.package import Package
 
 SOURCE = "gr.ypes"
 HOME = "https://ekloges.ypes.gr/"
-HOST = "http://ekloges-prev.singularlogic.eu"
 GREECE = str(uuid5(package.NAMESPACE, "polity\x1fGR"))
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fGRC"))
 VOTES, REGISTERED, VALID, INVALID, BLANK = 1, 2, 4, 5, 6
@@ -24,31 +23,22 @@ ACCOUNTING = ((REGISTERED, "Gramenoi"), (VALID, "Egkyra"), (INVALID, "Akyra"), (
 
 @dataclass(frozen=True)
 class Year:
-    bundle: str  # the crawled folder of result files, as the raw cache keys it
+    bundle: str  # the saved set of result files, as the raw cache keys it
     first: date
     second: date
-    national: str | None  # a separate copy of the national totals file, when the bundle has none
     majority: float  # share of valid votes a first-round winner needs
 
 
-WAYBACK = "https://web.archive.org/web"
+SERVICE = "https://ekloges-prev.singularlogic.eu"
+LEGEND = (
+    "https://web.archive.org/web/20250319191034id_/"
+    "http://ekloges-prev.singularlogic.eu/2023/october/d/home/dist/model.el.js"
+)
 YEARS: dict[int, Year] = {
-    2010: Year(f"{HOST}/dn2010/{{dyn,stat}}/", date(2010, 11, 7), date(2010, 11, 14), None, 0.5),
-    2014: Year(f"{HOST}/may2014/{{dyn,stat}}/dn/", date(2014, 5, 18), date(2014, 5, 25), None, 0.5),
-    2019: Year(
-        f"{HOST}/2019/{{dyn,stat}}/dn/",
-        date(2019, 5, 26),
-        date(2019, 6, 2),
-        f"{WAYBACK}/20260115174418id_/{HOST}/2019/dyn/dn/epikratia.js",
-        0.5,
-    ),
-    2023: Year(
-        f"{HOST}/2023/october/{{dyn,stat}}/dn/",
-        date(2023, 10, 8),
-        date(2023, 10, 15),
-        f"{WAYBACK}/20250714164318id_/{HOST}/2023/october/dyn/dn/epikratia.js",
-        0.43,
-    ),
+    2010: Year(f"{SERVICE}/dn2010/{{stat,dyn}}/snom_n_{{id}}.js", date(2010, 11, 7), date(2010, 11, 14), 0.5),
+    2014: Year(f"{SERVICE}/may2014/{{stat,dyn}}/dn/snom_n_{{id}}.js", date(2014, 5, 18), date(2014, 5, 25), 0.5),
+    2019: Year(f"{SERVICE}/2019/{{stat,dyn}}/dn/snom_n_{{id}}.js", date(2019, 5, 26), date(2019, 6, 2), 0.5),
+    2023: Year(f"{SERVICE}/2023/october/{{stat,dyn}}/dn/snom_n_{{id}}.js", date(2023, 10, 8), date(2023, 10, 15), 0.43),
 }
 METHOD = (
     "Counted by the Ministry of Interior's results service per municipal unit (dimotiki enotita) for municipalities "
@@ -129,14 +119,14 @@ def clean(text: str | None) -> str:
 def fetch() -> None:
     """Reads the files saved from the results service into the raw cache.
 
-    The service no longer answers scripts, so a person saves each folder of result files as one document, with a
-    `<!-- URL: ... -->` line ahead of each file. Point EA_GR_YPES_INBOX at the folder that holds them and its
+    The service no longer answers scripts, so each election's result files were saved as one JSON-lines document
+    (`{"url": ..., "data": ...}` per file). Point EA_GR_YPES_INBOX at the folder that holds them and its
     `index.json`, which maps each URL to its `file`, `retrieved_at`, `media_type`, and, when a copy was read from
-    an archive, the `source` it came from.
+    an archive, the `source` it came from. The party legend of the October 2023 site is stored with them.
     """
     inbox = Path(os.environ["EA_GR_YPES_INBOX"])
     index: dict[str, dict[str, str]] = json.loads((inbox / "index.json").read_text())
-    wanted = {year.bundle for year in YEARS.values()} | {year.national for year in YEARS.values() if year.national}
+    wanted = {year.bundle for year in YEARS.values()} | {LEGEND}
     for url, entry in index.items():
         origin = entry.get("source", url)
         if origin not in wanted:
@@ -154,23 +144,59 @@ def fetch() -> None:
 
 def artifacts(year: int) -> list[raw.Artifact]:
     found = [raw.cached(SOURCE, YEARS[year].bundle)]
-    if YEARS[year].national:
-        found.append(raw.cached(SOURCE, str(YEARS[year].national)))
+    if year in LEGEND_YEARS:
+        found.append(raw.cached(SOURCE, LEGEND))
     return found
 
 
 @functools.cache
 def files(year: int) -> Mapping[str, Any]:
-    """Every file of one election's folder, parsed, keyed by its name (`dyn/dhm_d_9001.js` becomes `dhm_d_9001`)."""
-    text = raw.cached(SOURCE, YEARS[year].bundle).path.read_text(encoding="utf-8")
-    parts = re.split(r"^<!-- URL: (.*?) -->\n", text, flags=re.MULTILINE)
+    """Every file of one election, parsed, keyed by its name (`dyn/dhm_d_9001.js` becomes `dyn/dhm_d_9001`)."""
     out: dict[str, Any] = {}
-    for url, body in zip(parts[1::2], parts[2::2], strict=True):
-        found = re.search(r"/(dyn|stat)/(?:dn/)?((?:dhm_d|snom_n|epikratia|dhm_synoptiki)\w*)\.js$", url)
-        if found is None:
+    for line in raw.cached(SOURCE, YEARS[year].bundle).path.read_text(encoding="utf-8").split("\n"):
+        if not line:
             continue
-        out[f"{found[1]}/{found[2]}"] = json.loads(body)
+        row = json.loads(line)
+        found = re.search(r"/(dyn|stat)/(?:dn/)?((?:dhm_d|snom_n|epikratia|dhm_synoptiki)\w*)\.js$", row["url"])
+        if found is not None:
+            out[f"{found[1]}/{found[2]}"] = row["data"]
     return out
+
+
+# ---------------------------------------------------------------- party support
+
+LEGEND_YEARS = (2023,)
+# The support bits, from the `parseStirixi` function of the October 2023 site: a ticket's `ST_ID` is 1000 times
+# a bit set of the parties that back it plus the legend id of the party its candidate belongs to.
+SUPPORT_BITS = {1: 2, 2: 4, 4: 106, 8: 3, 64: 100, 128: 157, 256: 44}
+OTHER_SUPPORT = 16  # backed by parties the legend does not name
+RENUMBERED = {75: 44, 15: 28}  # ids the site rewrites to the legend's id for the same party
+INDEPENDENT = 998
+
+
+@functools.cache
+def legend() -> dict[int, tuple[str, str, str]]:
+    """The party table of the 2023 site: id -> name, short name, color."""
+    text = raw.cached(SOURCE, LEGEND).path.read_text(encoding="utf-8")
+    table = text[text.index("s={2:{id:2,") : text.index("},g={1:{id:1,")]
+    found = re.findall(
+        r"(\d+):\{id:\1,name:(?:\"(.*?)\"|'(.*?)'),shortName:\"(.*?)\",color:\"([0-9A-Fa-f]{6})\"\}", table
+    )
+    return {int(n): (clean(a or b), clean(c), color.lower()) for n, a, b, c, color in found}
+
+
+def decode(code: int) -> tuple[int | None, list[int], bool]:
+    """Splits a ticket's `ST_ID` into its candidate's party, the legend parties backing it, and whether others do."""
+    party, support = code % 1000, code // 1000
+    party = RENUMBERED.get(party, party)
+    if support & ~(OTHER_SUPPORT | sum(SUPPORT_BITS)):
+        raise ValueError(f"unknown support bits in {code}")
+    backers = [number for bit, number in SUPPORT_BITS.items() if support & bit]
+    return (None if party == INDEPENDENT else party), backers, bool(support & OTHER_SUPPORT)
+
+
+def party_id(number: int) -> str:
+    return key("party", number)
 
 
 @dataclass(frozen=True)
@@ -344,6 +370,22 @@ def registry() -> Package:
         depends=["gr.ypes/geo"],
     )
     p.external |= {GREECE, COUNTRY}
+    p.uses(raw.cached(SOURCE, LEGEND))
+    for number, (name, short, color) in legend().items():
+        if number == INDEPENDENT:
+            continue
+        p.add("party", id=party_id(number), kind="party", polity_id=GREECE)
+        p.name(party_id(number), name, "el", "official")
+        if short != name:
+            p.name(party_id(number), short, "el", "abbreviation", False)
+        p.add(
+            "party_color",
+            party_id=party_id(number),
+            color=f"#{color}",
+            valid_from=None,
+            valid_to=None,
+            source_id=SOURCE_ID,
+        )
     p.add("body", id=MUNICIPAL_COUNCIL, polity_id=GREECE, kind="council")
     p.name(MUNICIPAL_COUNCIL, "Municipal council", "en", "official")
     p.name(MUNICIPAL_COUNCIL, "Δημοτικό συμβούλιο", "el", "native", False)
@@ -439,6 +481,7 @@ def local(year: int) -> Package:
                     [c for c in race.candidates] if round_number == 1 else sorted(fin, key=lambda c: c["CAND_ID"])
                 )
                 votes = {c["CAND_ID"]: c[f"{letter}VOTES"] for c in contenders}
+                codes = {c["CAND_ID"]: c.get("ST_ID") for c in race.candidates}
                 if round_number == 1 and not runoff:
                     winners = [race.total["WIN_ID"]]
                     outcome = {n: "elected" if n in winners else "lost" for n in votes}
@@ -555,6 +598,9 @@ def local(year: int) -> Package:
                     options: dict[int, str] = {}
                     for number in votes:
                         ticket = race.tickets[number]
+                        code = codes.get(number) if year in LEGEND_YEARS else None
+                        member, backers, others = decode(code) if code else (None, [], False)
+                        sole = backers[0] if len(backers) == 1 and not others else None
                         option = options[number] = key("option", noun, year, round_number, race.id, kind, number)
                         p.add(
                             "contest_option",
@@ -563,7 +609,22 @@ def local(year: int) -> Package:
                             kind="candidate" if kind == "head" else "list",
                             ballot_position=number,
                             ballot_label=ticket["name"] if kind == "head" else ticket["ticket"],
+                            party_id=party_id(sole) if sole else None,
                         )
+                        if len(backers) + others > 1 or (others and backers):
+                            named = ", ".join(legend()[n][1] for n in backers)
+                            p.add(
+                                "note",
+                                id=key("note", option),
+                                entity_id=option,
+                                kind="caveat",
+                                body_md=(
+                                    "The service's party-support code for this ticket lists "
+                                    + (f"{named}" + (" and other parties" if others else ""))
+                                    + " as backing it, so no single party is linked to the ballot line."
+                                ),
+                                lang="en",
+                            )
                         if kind == "head":
                             p.name(option, ticket["ticket"], "el", "ballot", False)
                         person = key("person", noun, year, race.id, number)
@@ -577,7 +638,8 @@ def local(year: int) -> Package:
                             option_id=option,
                             role="head",
                             ballot_name=ticket["name"],
-                            is_independent=False,
+                            member_of_party_id=party_id(member) if member else None,
+                            is_independent=bool(code) and member is None,
                         )
                         if kind == "head":
                             p.add("outcome", result_set_id=result_set, option_id=option, kind=outcome[number])
@@ -659,9 +721,8 @@ def local(year: int) -> Package:
 
 def totals(year: int) -> list[str]:
     """Compares the sums over every unit with the national totals the service prints."""
-    spec = YEARS[year]
     data = files(year)
-    printed = json.loads(raw.cached(SOURCE, spec.national).path.read_text()) if spec.national else data["dyn/epikratia"]
+    printed = data["dyn/epikratia"]
     lines = []
     for tier, name in (("municipality", "dhm"), ("region", "snom")):
         rows = [r for r in races(year) if r.tier == tier]
