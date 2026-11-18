@@ -984,22 +984,25 @@
           "date": "2015-10-25",
           "election_kind": "local",
           "contests": 265,
+          "seats": 5181,
           "source": "cik_results",
-          "quote": "results.cik.bg/minr2015/tur1/mi2015.zip and tur2/mi2015.zip, round 1: 265 distinct municipalities with a council protocol"
+          "quote": "results.cik.bg/minr2015/tur1/mi2015.zip and tur2/mi2015.zip, round 1: 265 distinct municipalities with a council protocol; seats: the sum of the 265 councils' declared «Брой мандати за общински съветници» on results.cik.bg/minr2015/tur1/hnm/{code}.html, round 1"
         },
         {
           "date": "2019-10-27",
           "election_kind": "local",
           "contests": 265,
+          "seats": 5135,
           "source": "cik_results",
-          "quote": "results.cik.bg/mi2019/csv.zip, round 1: 265 distinct municipalities with a council protocol"
+          "quote": "results.cik.bg/mi2019/csv.zip, round 1: 265 distinct municipalities with a council protocol; seats: the sum of the 265 councils' declared «Брой мандати за общински съветници» on results.cik.bg/mi2019/tur1/hnm/{code}.html, round 1"
         },
         {
           "date": "2023-10-29",
           "election_kind": "local",
           "contests": 265,
+          "seats": 5053,
           "source": "cik_results",
-          "quote": "results.cik.bg/mi2023/tur1/opendata/export.zip, spreadsheet.zip and tur2/opendata, round 1: 265 distinct municipalities with council results"
+          "quote": "results.cik.bg/mi2023/tur1/opendata/export.zip, spreadsheet.zip and tur2/opendata, round 1: 265 distinct municipalities with council results; seats: the sum of the 265 councils' declared «Брой мандати за общински съветници» on results.cik.bg/mi2023/tur1/hnm/{code}.html, round 1"
         }
       ]
     },
