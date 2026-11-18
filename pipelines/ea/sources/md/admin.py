@@ -99,10 +99,10 @@ def circumscriptions() -> dict[str, int]:
     text = raw.cached(SOURCE, PAGE).path.read_text(encoding="utf-8", errors="replace")
     table = text[text.index('<table class="Table"') :]
     found: dict[str, int] = {}
-    for row in re.findall(r"<tr.*?</tr>", table[: table.index("</table>")], flags=re.S):
+    for row in re.findall(r"<tr.*?</tr>", table[: table.index("</table>")], flags=re.DOTALL):
         cells = [
             " ".join(html.unescape(re.sub(r"<[^>]+>", " ", cell)).split())
-            for cell in re.findall(r"<t[dh].*?</t[dh]>", row, flags=re.S)
+            for cell in re.findall(r"<t[dh].*?</t[dh]>", row, flags=re.DOTALL)
         ]
         match = re.match(r"^CE[MR]?\s+(.+?)\s+nr\.\s*\d+$", cells[1]) if len(cells) > 2 else None
         if match:
