@@ -115,6 +115,9 @@ DIK_SOURCE = key("source", "dik")
 PARLIAMENT = key("body", "parliament")
 PRESIDENCY = key("office", "president")
 SYSTEM_LIST = key("electoral_system", "parliament", "list")
+SYSTEM_LIST_2011 = key("electoral_system", "parliament", "list", "2011")
+# Law on the Election of Councilors and Members of Parliament, amended in Sl. list CG 46/11 (in force on 2011-09-24).
+LIST_RULES_2011 = date(2011, 9, 24)
 SYSTEM_PRESIDENT = key("electoral_system", "president", "two_round")
 SYSTEM_REFERENDUM = key("electoral_system", "referendum")
 
@@ -1136,17 +1139,48 @@ def registry() -> Package:
     p.add("office", id=PRESIDENCY, polity_id=MONTENEGRO, kind="head_of_state")
     p.name(PRESIDENCY, "President of Montenegro", "en", "official")
     p.name(PRESIDENCY, "Predsjednik Crne Gore", "sr", "native", False)
+    list_rules = {"formula": "dhondt", "threshold": {"level": "list", "scope": "contest", "percent": 3}}
     systems = (
         (
             SYSTEM_LIST,
-            {"formula": "dhondt", "threshold": {"level": "list", "scope": "contest", "percent": 3}},
+            list_rules,
             (
                 "One national constituency elects 81 members by party-list proportional representation. Only lists "
                 "with at least 3 percent of the valid votes in the constituency share in the allocation, as the "
                 "commission's decisions on the 2020 and 2023 results cite under article 94 of the Law on the Election "
-                "of Councilors and Members of Parliament. The rules for minority lists are not stored here, because "
-                "those decisions do not set them out."
+                "of Councilors and Members of Parliament. This system covers the 2006 and 2009 elections, held before "
+                "the amendment of 2011 (Sl. list CG 46/11) deleted article 94a and rewrote the minority provisions of "
+                "article 94. The minority-list rules in force at those two elections are not stored here, because the "
+                "consolidated text consulted does not carry the earlier wording."
             ),
+            None,
+            LIST_RULES_2011,
+        ),
+        (
+            SYSTEM_LIST_2011,
+            list_rules,
+            (
+                "One national constituency elects 81 members by party-list proportional representation, with seats "
+                "divided by the D'Hondt highest-quotient method (article 95). Only lists with at least 3 percent of "
+                "the valid votes share in the allocation (article 94, paragraph 1). The structured rules above carry "
+                "only that general threshold. Article 94, paragraph 2 sets exceptions for lists of a minority people "
+                "or national minority community named in the list's submission or name. (1) If no such list reaches "
+                "3 percent, the minority lists that each win at least 0.7 percent of the valid votes take part in the "
+                "allocation as one combined list with their summed votes, and the sum counts only up to the level "
+                "that yields at most three seats. The seats the combined list wins are divided among its member "
+                "lists by dividing each list's votes by 1, 2, 3 and so on, and taking the largest quotients (article "
+                "95). (2) If no list of the Croatian people in Montenegro qualifies under paragraph 1 or point 1, "
+                "the most successful of them with at least 0.35 percent of the valid votes wins one seat. Point 1 is "
+                "open only to lists of a people or community making up up to 15 percent of the population of the "
+                "constituency in the last census (paragraph 3). A minority list's membership in a pre-election "
+                "coalition with other lists does not deny the right to other submitters of that people's lists "
+                "(paragraph 5). Article 94a, the earlier minority provision, was deleted by Sl. list CG 46/11, in "
+                "force on 2011-09-24, so this system covers the 2012, 2016, 2020 and 2023 elections. The text is "
+                "the consolidated law in the State Election Commission's catalogue, which reads the same in its "
+                "versions amended through 2020 and through the 2025 and 2026 amendments."
+            ),
+            LIST_RULES_2011,
+            None,
         ),
         (
             SYSTEM_PRESIDENT,
@@ -1155,15 +1189,27 @@ def registry() -> Package:
                 "A candidate with a majority of the valid votes in the first round is elected; otherwise the two leading "
                 "candidates go to a second round."
             ),
+            None,
+            None,
         ),
         (
             SYSTEM_REFERENDUM,
             {"formula": "referendum", "majority": {"share": 0.55}},
             "A yes or no question put to all voters. The 2006 referendum on statehood required 55 percent in favor.",
+            None,
+            None,
         ),
     )
-    for id, rules, text in systems:
-        p.add("electoral_system", id=id, polity_id=MONTENEGRO, rules=rules, rules_version=1)
+    for id, rules, text, valid_from, valid_to in systems:
+        p.add(
+            "electoral_system",
+            id=id,
+            polity_id=MONTENEGRO,
+            valid_from=valid_from,
+            valid_to=valid_to,
+            rules=rules,
+            rules_version=1,
+        )
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=text, lang="en")
     for id, text in sorted(list_labels().items(), key=lambda item: item[1]):
         p.add(
@@ -1539,7 +1585,7 @@ def build_parliament(day: str) -> Package:
         f"me/{day}-general/parliament",
         body_id=PARLIAMENT,
         magnitude=81,
-        electoral_system_id=SYSTEM_LIST,
+        electoral_system_id=SYSTEM_LIST if first < LIST_RULES_2011 else SYSTEM_LIST_2011,
     )
     t = table(name)
     options = _list_options(p, name, contest, t.labels)
