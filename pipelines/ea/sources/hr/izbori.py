@@ -17,6 +17,7 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.hr import izabrani
 
 SOURCE = "hr.izbori"
 SITE = "https://www.izbori.hr/arhiva-izbora"
@@ -354,6 +355,13 @@ def fetch() -> None:
                 print(f"{url}: {failure.response.status_code}", flush=True)
         if d.family == "euparlament":
             raw.fetch(SOURCE, elected_url(d), suffix=".pdf")
+        if d.family == "parlament":
+            for contest in contests(d):
+                url = izabrani.url(d.year, contest)
+                try:
+                    raw.fetch(SOURCE, url, suffix=".pdf")
+                except httpx.HTTPStatusError as failure:
+                    print(f"{url}: {failure.response.status_code}", flush=True)
 
 
 @dataclass
@@ -366,6 +374,8 @@ class Option:
     seats: int | None = None
     candidates: list[tuple[int, str, int]] = field(default_factory=list)
     elected: list[int] = field(default_factory=list)  # ballot numbers of the candidates declared elected
+    members: list[str] = field(default_factory=list)  # names of the members elected from a list, when no numbers print
+    chosen: bool | None = None  # whether a candidate option was declared elected
 
 
 @dataclass
@@ -470,11 +480,71 @@ def declared(d: Day, contest: str) -> Declared | None:
         return None
     data = artifact.path.read_bytes()
     if url.endswith(".json"):
-        return _declared_json(url, json.loads(decode(data)))
+        found = _declared_json(url, json.loads(decode(data)))
+        if d.family == "parlament":
+            _elected_members(d, contest, found)
+        return found
     rows = [row for row in csv.reader(io.StringIO(decode(data)), delimiter=";") if any(cell.strip() for cell in row)]
     if d.family == "euparlament":
         return _declared_ep_csv(url, rows)
-    return _declared_csv(d, url, rows)
+    found = _declared_csv(d, url, rows)
+    if d.family == "parlament":
+        _elected_members(d, contest, found)
+    return found
+
+
+def _list_words(o: Option, leader: bool) -> set[str]:
+    return words(" ".join([*o.parties, o.leader or ""] if leader else [*o.parties, o.label]))
+
+
+def _elected_members(d: Day, contest: str, target: Declared) -> None:
+    """Read the commission's decision naming the members elected, and mark the options it names.
+
+    A district's decision gives each list its seats and the members elected from it. A minority unit's decision names
+    the candidates elected. The 2015 and 2016 summary files already carry the seats and members of the lists.
+    """
+    body = izabrani.read(d.year, contest)
+    if body is None:
+        return
+    if contest.startswith("12-"):
+        text = " ".join(re.split(r",?\s*a za zamjenika", line)[0] for line in izabrani.minority(body))
+        named = words(text)
+        for o in target.options:
+            mine = words(_strip_titles(o.leader or o.label))
+            o.chosen = len(mine) >= 2 and mine <= named
+        seats = 3 if contest == "12-1" and d.year > 2000 else 1
+        if sum(bool(o.chosen) for o in target.options) != seats:
+            raise ValueError(f"{d.year} {contest}: {seats} seats but the decision names another number of candidates")
+        return
+    if d.year in (2015, 2016):
+        return
+    for o in target.options:
+        o.seats = 0
+    used: set[int] = set()
+    for block in izabrani.lists(body):
+        wanted = words(" ".join(block.names))
+        first = words(_strip_titles(block.members[0].name)) if block.members else set()
+
+        def score(o: Option, wanted: set[str] = wanted, first: set[str] = first) -> float:
+            best = 0.0
+            for leader in (False, True):
+                have = _list_words(o, leader)
+                best = max(best, len(wanted & have) / len(wanted | have) if wanted | have else 0.0)
+            return best + (0.01 if first == words(_strip_titles(o.leader or "")) else 0.0)
+
+        pick = max((o for o in target.options if o.number not in used), key=score)
+        if score(pick) < 0.6:
+            raise ValueError(f"{d.year} {contest}: no list for {block.names}")
+        used.add(pick.number)
+        pick.seats = block.seats
+        if all(m.position is not None for m in block.members):
+            pick.elected = [m.position for m in block.members if m.position is not None]
+            printed = {n: words(_strip_titles(name)) for n, name, _ in pick.candidates}
+            for m in block.members:
+                if m.position not in printed or not printed[m.position] & words(_strip_titles(m.name)):
+                    raise ValueError(f"{d.year} {contest}: {m.name} is not candidate {m.position} of {pick.label}")
+        else:
+            pick.members = [m.name for m in block.members]
 
 
 # The archive already holds each European Parliament election in Croatia as a national result set, from the pipelines
@@ -1367,6 +1437,11 @@ def election(d: Day) -> Package:
             p.artifact(raw.cached(SOURCE, declared_url(d, contest)), SOURCE_ID)
         except LookupError:
             pass
+        if d.family == "parlament" and (d.year not in (2015, 2016) or contest.startswith("12-")):
+            try:
+                p.artifact(raw.cached(SOURCE, izabrani.url(d.year, contest)), SOURCE_ID)
+            except LookupError:
+                pass
     eu = national(d.year) if d.family == "euparlament" else None
     election_id = key("election", d.day)
     kind = {
@@ -1623,6 +1698,8 @@ def _options(
                 else:
                     kind = "elected" if 2 * o.votes > target.valid else "eliminated"
                 p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
+            elif o.chosen is not None:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="elected" if o.chosen else "lost")
             continue
         p.add(
             "contest_option",
@@ -1653,6 +1730,28 @@ def _options(
                 list_position=1,
                 ballot_name=clean(o.leader),
                 is_independent=option_party(o) is None,
+            )
+        for name in o.members:
+            # Decisions before 2015 print the elected members by name, in the order they took their seats.
+            leader = bool(o.leader) and words(_strip_titles(name)) == words(_strip_titles(o.leader or ""))
+            tag = f"{d.day}:{contest}:{o.number}:1" if leader else f"{d.day}:{contest}:{o.number}:{label(name)}"
+            if not leader:
+                person = _person(p, d, tag, _strip_titles(name))
+                p.add(
+                    "candidacy",
+                    id=key("candidacy", tag),
+                    person_id=person,
+                    option_id=option,
+                    role="list_member",
+                    ballot_name=clean(name),
+                    is_independent=option_party(o) is None,
+                )
+            p.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=option,
+                candidacy_id=key("candidacy", tag),
+                kind="elected",
             )
         for number_, name, _ in o.candidates:
             tag = f"{d.day}:{contest}:{o.number}:{number_}"
