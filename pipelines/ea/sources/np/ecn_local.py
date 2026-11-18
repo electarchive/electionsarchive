@@ -223,11 +223,13 @@ def text_of(reader: pdfglyphs.Reader, g: pdfglyphs.Glyph) -> str:
     return reader.char(g.font, g.gid)
 
 
-def lines(path: Path, reader: pdfglyphs.Reader) -> Iterator[Line]:
+def lines(path: Path, reader: pdfglyphs.Reader, pages: range | None = None) -> Iterator[Line]:
     """Each printed line of a book, as cells split at wide gaps, in the order the glyphs are drawn."""
     doc = pdfglyphs.Document(path.read_bytes())
     fonts: dict[int, pdfglyphs.Font] = {}
     for number, page in enumerate(doc.pages(), start=1):
+        if pages is not None and number not in pages:
+            continue
         drawn = list(pdfglyphs.glyphs(doc, page, fonts))
         for font in fonts.values():
             reader.remember(font)

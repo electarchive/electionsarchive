@@ -15,7 +15,7 @@ import pymupdf
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.np import books
+from ea.sources.np import books, lists
 from ea.store import DATA
 
 SOURCE = "np.eci"
@@ -46,14 +46,24 @@ WINS_2082 = (
 )
 HOR_2074 = WAYBACK + "20260504093822id_/https://election.gov.np/ecn/uploads/userfiles/ElectionResultBook/HoR2074.pdf"
 PA_2074 = WAYBACK + "20260819225743id_/https://election.gov.np/ecn/uploads/userfiles/ElectionResultBook/PA2074.pdf"
+HOR_2079_BOOK = "https://election.gov.np/admin/public//storage/Election_Result_Book_2079/HoR_2079_Final.pdf"
+PA_2079_BOOK = "https://election.gov.np/admin/public//storage/Election_Result_Book_2079/PA_2079_Final.pdf"
 BOOKS_URL = "https://election.gov.np/"
 FILES = [DISTRICTS_URL, PROVINCES_URL, HOR_2079, PA_2079, HOR_2079_BI, HOR_2082, PR_2082, WINS_2082]
 BOOK_FILES = [HOR_2074, PA_2074]
+BOOK_2079_FILES = [HOR_2079_BOOK, PA_2079_BOOK]
 
 ELECTIONS: dict[str, dict[str, Any]] = {
     "2017-11-26": {"kind": "general", "year": 2017, "bs": "२०७४ मंसिर १०", "hor": None, "pa": None, "phase": 1},
     "2017-12-07": {"kind": "general", "year": 2017, "bs": "२०७४ मंसिर २१", "hor": None, "pa": None, "phase": 2},
-    "2022-11-20": {"kind": "general", "year": 2022, "bs": "२०७९ मंसिर ४", "hor": HOR_2079, "pa": PA_2079},
+    "2022-11-20": {
+        "kind": "general",
+        "year": 2022,
+        "bs": "२०७९ मंसिर ४",
+        "hor": HOR_2079,
+        "pa": PA_2079,
+        "lists": True,
+    },
     "2023-04-23": {"kind": "by_election", "year": 2023, "bs": "२०८० वैशाख १०", "hor": HOR_2079_BI, "pa": None},
     "2026-03-05": {"kind": "general", "year": 2026, "bs": "२०८२ फागुन २१", "hor": HOR_2082, "pa": None},
 }
@@ -101,6 +111,7 @@ def area(scheme: str, code: str) -> str:
 
 NCOMMISSION = key("source", SOURCE)
 BOOKS = key("source", "result_books_2074")
+BOOKS_2079 = key("source", "result_books_2079")
 HOR = key("body", "house_of_representatives")
 FPTP = key("electoral_system", "fptp")
 PR = key("electoral_system", "house_pr")
@@ -124,8 +135,8 @@ def fetch() -> None:
 
 
 def fetch_books() -> None:
-    """Read the two 2074 result books from the snapshots of the commission's site."""
-    for url in BOOK_FILES:
+    """Read the two 2074 result books from the snapshots of the commission's site, and the two 2079 books from it."""
+    for url in BOOK_FILES + BOOK_2079_FILES:
         raw.fetch(SOURCE, url, suffix=".pdf")
 
 
@@ -386,6 +397,16 @@ def source(p: Package) -> None:
         license="No license stated; published by the electoral authority for public use",
         attribution="Election Commission, Nepal",
     )
+    p.add(
+        "source",
+        id=BOOKS_2079,
+        kind="official_body",
+        publisher="निर्वाचन आयोग, नेपाल (Election Commission, Nepal)",
+        title="Result books of the 2079 House of Representatives and Provincial Assembly elections",
+        url=BOOKS_URL,
+        license="No license stated; published by the electoral authority for public use",
+        attribution="Election Commission, Nepal",
+    )
 
 
 def geo() -> Package:
@@ -474,6 +495,8 @@ def registry() -> Package:
         p.artifact(raw.cached(SOURCE, url), NCOMMISSION)
     for url in BOOK_FILES:
         p.artifact(raw.cached(SOURCE, url), BOOKS)
+    for url in BOOK_2079_FILES:
+        p.artifact(raw.cached(SOURCE, url), BOOKS_2079)
     p.add("body", id=HOR, polity_id=NEPAL, kind="lower_house")
     p.name(HOR, "House of Representatives", "en", "official")
     p.name(HOR, "प्रतिनिधि सभा", "ne", "native", False)
@@ -747,6 +770,8 @@ def election(day: str) -> Package:
         _list_contest(p, el, path, int(str(year)))
     if day == "2017-12-07":
         short += _book_lists(p, el, path, int(str(year)), day)
+    if cfg.get("lists"):
+        short += _lists_2079(p, el, path, int(str(year)), day)
     if short:
         p.accept("accounting.votes_valid", "The result book's own figures disagree: " + "; ".join(short) + ".")
     return p
@@ -1015,3 +1040,283 @@ def verify_books() -> dict[str, Any]:
         "house_list_seats": sum(data["hor_seats"].values()),
         "province_list_sums": [sum(r.numbers[0] for _, _, r in rows) for rows in data["pa_lists"]],
     }
+
+
+LIST_METHOD_2079 = (
+    "The party-list votes of each party as printed in the Election Commission's result book of the 2079 elections. "
+    "A list that several parties contested under one symbol is one option, labeled as the book prints it and tied "
+    "to the party it names first. {where}"
+)
+HOR_LIST_WHERE = (
+    "The House of Representatives list is voted nationwide; the book prints each party's votes in every "
+    "constituency, with the registered voters, the votes cast, and the valid and invalid party-list votes of each "
+    "constituency. The seats are those the book prints for the parties above the 3 percent threshold."
+)
+PA_LIST_WHERE = (
+    "The Provincial Assembly list is voted within each province; the book prints each party's votes for the "
+    "province, with the registered voters, the votes cast, and the valid and invalid party-list votes of the "
+    "province, and the seats it allocates to the parties above the 1.5 percent threshold."
+)
+LIST_ALIASES = {
+    "तराई मधेश लोकतान्त्रिक पार्टी": "तराइ-मधेश लोकतान्त्रिक पार्टी",
+}
+
+
+def _lead(label: str) -> str:
+    """The first party of a list contested under one symbol, or the party the label names."""
+    if not label.startswith("एकल चिन्ह") or "(" not in label:
+        return label
+    inner = label[label.index("(") + 1 : label.rindex(")")]
+    depth = 0
+    out = ""
+    for ch in inner:
+        depth += ch == "("
+        depth -= ch == ")"
+        if ch == "/" and depth == 0:
+            break
+        out += ch
+    return " ".join(out.split())
+
+
+@functools.cache
+def _symbolless() -> dict[str, str]:
+    """The registry's party names by every spelling a book's name could match: exact, then without the symbol note
+    and with the spelling variants the books mix."""
+    names = sorted(party_names())
+    found: dict[str, str] = {}
+    for variant in (
+        lambda n: _party_key(n),
+        lambda n: _party_key(n.replace("(एकल चुनाव चिन्ह)", "")),
+        lambda n: _squash(_spaced(n.replace("(एकल चुनाव चिन्ह)", ""))),
+    ):
+        for n in names:
+            found.setdefault(variant(n), n)
+    return found
+
+
+def list_party(label: str) -> str:
+    """The registry party a book's list label stands for; an unknown party stops the build."""
+    lead = _lead(label)
+    lead = LIST_ALIASES.get(lead, lead)
+    table = _symbolless()
+    for key_ in (_party_key(lead), _squash(_spaced(lead))):
+        if key_ in table:
+            return party(table[key_])
+    raise ValueError(f"party {lead!r} is not in the registry")
+
+
+def _list_contest_2079(
+    p: Package,
+    el: str,
+    path: str,
+    day: str,
+    tag: str,
+    level: tuple[str, str],
+    body: str,
+    area_id: str,
+    slug: str,
+    cite: tuple[str, list[int]],
+    where: str,
+    options: list[tuple[int, str]],
+) -> tuple[str, dict[int, str]]:
+    """One list contest, its result set, and its options; returns the result set and the option of each serial."""
+    en, ne = level
+    c = key("contest", day, tag)
+    p.add(
+        "contest",
+        id=c,
+        election_id=el,
+        kind="list_allocation",
+        body_id=body,
+        district_area_id=area_id,
+        round_number=1,
+        electoral_system_id=PR,
+        default_result_kind="counted",
+    )
+    p.name(c, en, "en", "official")
+    p.name(c, ne, "ne", "native", False)
+    p.add("slug", path=f"{path}/{slug}", entity_id=c, is_current=True)
+    rs = key("result_set", day, tag)
+    p.add(
+        "result_set",
+        id=rs,
+        election_id=el,
+        contest_id=c,
+        stage="official",
+        kind="counted",
+        source_id=BOOKS_2079,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=key("note", rs),
+        entity_id=rs,
+        kind="methodology",
+        body_md=LIST_METHOD_2079.format(where=where),
+        lang="en",
+    )
+    p.add(
+        "citation",
+        id=key("citation", rs),
+        entity_id=rs,
+        source_id=BOOKS_2079,
+        locator={"file": cite[0], "pages": cite[1]},
+    )
+    option_of: dict[int, str] = {}
+    for serial, label in options:
+        option = key("option", day, tag, serial)
+        option_of[serial] = option
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=c,
+            kind="list",
+            party_id=list_party(label),
+            ballot_position=serial,
+            ballot_label=label,
+        )
+    return rs, option_of
+
+
+def _value(p: Package, rs: str, unit: str, option: str | None, measure: int, value: int) -> None:
+    p.add(
+        "result_value",
+        result_set_id=rs,
+        unit_id=unit,
+        option_id=option,
+        channel=0,
+        measure=measure,
+        count_round=0,
+        flags=0,
+        value=value,
+    )
+
+
+def _lists_2079(p: Package, el: str, path: str, year: int, day: str) -> list[str]:
+    """The party-list votes of the 2079 books: by constituency for the House list, by province for each assembly."""
+    p.uses(raw.cached(SOURCE, HOR_2079_BOOK))
+    p.uses(raw.cached(SOURCE, PA_2079_BOOK))
+    hor_doc, pa_doc = _book(HOR_2079_BOOK), _book(PA_2079_BOOK)
+    short: list[str] = []
+    stats, printed = lists.constituencies(hor_doc)
+    grids_ = lists.party_grids(hor_doc)
+    table, table_total = lists.national(hor_doc)
+    list_seats = lists.national_seats(hor_doc)
+    held, _ = seats(day)
+
+    by_seat = {(book_district(s.district), s.number): s for s in stats}
+    if len(by_seat) != len(stats) or set(by_seat) != held:
+        raise ValueError("the book's constituencies are not the constituencies of the election")
+    if tuple(sum(getattr(s, f) for s in stats) for f in ("registered", "cast", "valid", "invalid")) != printed:
+        raise ValueError("the constituencies do not add up to the printed totals")
+    if [g.number for g in grids_] != [r.serial for r in table]:
+        raise ValueError("the party tables are not in the order of the national table")
+    votes: dict[tuple[int, int], dict[int, int]] = defaultdict(dict)
+    for g, row in zip(grids_, table, strict=True):
+        if g.total != row.votes or _squash(g.name) != _squash(row.name):
+            raise ValueError(f"party {row.serial} {row.name}: table {g.name!r} adds up to {g.total}, not {row.votes}")
+        for _, district, number, count in g.cells:
+            votes[(book_district(district), number)][row.serial] = count
+    for seat, s in by_seat.items():
+        if sorted(votes[seat]) != [r.serial for r in table] or sum(votes[seat].values()) != s.valid:
+            raise ValueError(f"constituency {seat}: party votes do not add up to {s.valid}")
+        if s.valid + s.invalid != s.cast:
+            raise ValueError(f"constituency {seat}: valid and invalid votes do not add up to {s.cast}")
+    if sum(r.votes for r in table) != table_total or table_total != printed[2]:
+        raise ValueError("the national table does not add up to the valid votes")
+    if sum(list_seats.values()) != 110 or any(v not in {r.votes for r in table} for v in list_seats):
+        raise ValueError(f"list seats {list_seats}")
+
+    rs, option_of = _list_contest_2079(
+        p,
+        el,
+        path,
+        day,
+        "pr",
+        (f"{year} House of Representatives election, party-list vote", "प्रतिनिधि सभा निर्वाचन, समानुपातिक"),
+        HOR,
+        COUNTRY,
+        "house-party-list",
+        (
+            "HoR_2079_Final.pdf",
+            sorted(
+                {*lists.HOR_NATIONAL, lists.HOR_SEATS, *lists.HOR_CONSTITUENCIES, *(n for g in grids_ for n in g.pages)}
+            ),
+        ),
+        HOR_LIST_WHERE,
+        [(r.serial, r.name) for r in table],
+    )
+    for (d, n), s in sorted(by_seat.items()):
+        unit = key("unit", day, f"hor:{d}-{n}")
+        for measure, value in zip((REGISTERED, CAST, VALID, INVALID), (s.registered, s.cast, s.valid, s.invalid)):
+            _value(p, rs, unit, None, measure, value)
+        for serial, count in sorted(votes[(d, n)].items()):
+            _value(p, rs, unit, option_of[serial], 1, count)
+    for row in table:
+        p.add("declared", result_set_id=rs, option_id=option_of[row.serial], measure=1, value=row.votes)
+        if row.votes in list_seats:
+            p.add("outcome", result_set_id=rs, option_id=option_of[row.serial], kind="won", seats=list_seats[row.votes])
+    p.add("declared", result_set_id=rs, option_id=None, measure=VALID, value=table_total)
+
+    names = lookups()[1]
+    for province, (rows_, (printed_votes, printed_seats), totals) in lists.provinces(pa_doc).items():
+        name = PROVINCES_EN[province]
+        counted = sum(r.votes for r in rows_)
+        given = sum(r.seats or 0 for r in rows_)
+        if counted != totals[2]:
+            raise ValueError(f"{name}: parties add up to {counted}, not {totals[2]}")
+        if totals[2] + totals[3] != totals[1]:
+            raise ValueError(f"{name}: valid and invalid votes do not add up to {totals[1]}")
+        misprints = ""
+        if printed_votes != counted:
+            misprints += (
+                f" The table prints {printed_votes} as the total of the party votes; the votes of the parties add up "
+                f"to {counted}, the valid votes the book's other table prints for the province, and that is the "
+                "total stored."
+            )
+        if printed_seats != given:
+            misprints += (
+                f" The table prints {printed_seats} as the total of the list seats; the seats of the parties add up "
+                f"to {given}, and those are the seats stored."
+            )
+        pages = sorted({r.page for r in rows_})
+        province_pages = [*pages]
+        rs_p, option_p = _list_contest_2079(
+            p,
+            el,
+            path,
+            day,
+            f"pr:{province}",
+            (
+                f"{year} Provincial Assembly election, {name} party-list vote",
+                f"प्रदेश सभा निर्वाचन, {names[province].removesuffix(' प्रदेश')} समानुपातिक",
+            ),
+            key("body", "provincial_assembly", province),
+            area("np.province", str(province)),
+            f"province/{changeset.slug(name)}-party-list",
+            ("PA_2079_Final.pdf", province_pages),
+            PA_LIST_WHERE + misprints,
+            [(r.serial, r.name) for r in rows_],
+        )
+        unit = key("unit", day, f"pr:{province}")
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=NEPAL,
+            scheme_code="np.province",
+            code=f"{day}:{province}",
+            area_relation="equals",
+            area_id=area("np.province", str(province)),
+            kind="standard",
+        )
+        for measure, value in zip((REGISTERED, CAST, VALID, INVALID), totals):
+            _value(p, rs_p, unit, None, measure, value)
+        for r in rows_:
+            _value(p, rs_p, unit, option_p[r.serial], 1, r.votes)
+            p.add("declared", result_set_id=rs_p, option_id=option_p[r.serial], measure=1, value=r.votes)
+            if r.seats:
+                p.add("outcome", result_set_id=rs_p, option_id=option_p[r.serial], kind="won", seats=r.seats)
+        p.add("declared", result_set_id=rs_p, option_id=None, measure=VALID, value=totals[2])
+    return short
