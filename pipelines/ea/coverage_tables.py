@@ -312,14 +312,15 @@ def request() -> None:
         ).fetchone()
     if recent is not None and recent[0]:
         return
-    subprocess.Popen(
-        [sys.executable, "-c", "from ea.cli import main; main()", "coverage", "refresh"],
-        cwd=ROOT / "pipelines",
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        start_new_session=True,
-    )
+    with (ROOT / "data" / "logs" / "coverage.log").open("a") as log:
+        subprocess.Popen(
+            [sys.executable, "-c", "from ea.cli import main; main()", "coverage", "refresh"],
+            cwd=ROOT / "pipelines",
+            stdin=subprocess.DEVNULL,
+            stdout=log,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
 
 
 WORKERS = 8
@@ -465,8 +466,15 @@ COUNTRY_INPUTS = (
 )
 
 PART_SQL = """
-create table if not exists coverage_cache_part (stage text not null, part text not null, inputs text not null,
-    built_at timestamptz not null, seconds real not null, rows json not null, primary key (stage, part))
+do $$ begin
+if to_regclass('coverage_cache_part') is null then
+    create table coverage_cache_part (stage text not null, part text not null, inputs text not null,
+        built_at timestamptz not null, seconds real not null, rows json not null, primary key (stage, part));
+end if;
+if to_regclass('coverage_cache_area') is null then
+    create table coverage_cache_area (area_id uuid primary key);
+end if;
+end $$
 """
 
 AREA_SQL = (
@@ -730,7 +738,6 @@ def build(full: bool = False) -> str:
         }
         clock = time.monotonic()
         conn.execute(coverage.CACHE_SQL)
-        conn.execute("create table if not exists coverage_cache_area (area_id uuid primary key)")
         for statement in AREA_SQL:
             conn.execute(statement, {"since": parts.get(("cache", "area"), ("", "-infinity"))[1]})
         conn.execute("analyze coverage_cache_area")

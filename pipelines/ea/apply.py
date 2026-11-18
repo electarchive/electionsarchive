@@ -2215,11 +2215,7 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
             [reviewer, reviewer, changeset_id],
         )
         conn.execute(sql.SQL("drop schema {} cascade").format(sql.Identifier(stage.schema)))
-    us = conn.execute(
-        "select pipeline like 'us.%%' or scope->>'polity' = 'US' from changeset where id = %s", [changeset_id]
-    ).fetchone()
-    if us is not None and us[0]:
-        coverage_tables.request()
+    coverage_tables.request()
     provenance("publish", changeset_id, "published")
 
 
