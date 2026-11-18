@@ -4,8 +4,8 @@ Each election date is one package, `ie.housing/ep-<year>`, built on `ie.housing/
 parties). The archive already holds each election, its constituency contests, and their reporting units, so a package
 adds one official, candidate-level result set to each contest and references the rest by the ids the archive gave
 them. The volumes print each candidate's running total after every count. The parser reads
-and checks every count, and the package stores the first count, the first preferences, under count round 1, with
-the declared outcome of the full count.
+and checks every count, and the package stores each running total under its count round, with the non-transferable
+votes and the declared outcome of the full count.
 
 The 1979 to 1999 volumes are scans. The 1979, 1984, and 1989 brochures print each constituency's count table, and the
 package stores each candidate's first preference votes. The 1994 and 1999 leaflets print only each constituency's
@@ -148,8 +148,10 @@ PARTIES = {
     "II": ("Identity Ireland", "I.I."),
 }
 VOLUME_NOTE = (
-    "Each candidate's votes are the first preferences, the first count as the volume prints it, stored as count 1. "
-    "Who was elected follows the volume's full count. The ballots cast are the valid poll "
+    "Each candidate's votes are the running total after each count as the volume prints it, stored under that count's "
+    "round, so count 1 holds the first preferences and each later round holds the total after that transfer. The "
+    "non-transferable votes are stored the same way. Who was elected follows the volume's full count. The ballots "
+    "cast are the valid poll "
     "plus the invalid ballot papers. The volume prints the electorate, the invalid ballot papers, the valid poll, "
     "the seats, and the quota for each constituency."
 )
@@ -384,9 +386,11 @@ def ep_text_package(year: int) -> Package:
             )
             if measure != BALLOTS:
                 p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=amount)
-        # first preferences only: every count is checked above, but the archive's fact key holds one value per
-        # unit, option, and measure in a package, so later counts wait for a flow-aware package format
-        if table.exhausted[0]:
+        # the running total after each count is stored under that count's round, so the transfers are the differences
+        # between neighboring rounds; the non-transferable row is the votes that left the count
+        for count in range(rounds):
+            if count == 0 and not table.exhausted[0]:
+                continue
             p.add(
                 "result_value",
                 result_set_id=result_set,
@@ -394,9 +398,9 @@ def ep_text_package(year: int) -> Package:
                 option_id=None,
                 channel=0,
                 measure=EXHAUSTED,
-                count_round=1,
-                flags=DERIVED if 1 in table.derived else 0,
-                value=table.exhausted[0],
+                count_round=count + 1,
+                flags=DERIVED if count + 1 in table.derived else 0,
+                value=table.exhausted[count],
             )
         rows: list[dict[str, object]] = []
         for candidate in table.candidates:
@@ -432,17 +436,18 @@ def ep_text_package(year: int) -> Package:
                 option_id=option,
                 kind="elected" if won else "lost",
             )
-            rows.append(
+            rows.extend(
                 {
                     "result_set_id": result_set,
                     "unit_id": unit(code),
                     "option_id": option,
                     "channel": 0,
                     "measure": VOTES,
-                    "count_round": 1,
+                    "count_round": count + 1,
                     "flags": 0,
-                    "value": candidate.votes[0],
+                    "value": candidate.votes[count],
                 }
+                for count in range(rounds)
             )
         p.frame("result_value", pl.DataFrame(rows, schema=package.FACTS["result_value"], orient="row"))
     totals = national(pages, year)
