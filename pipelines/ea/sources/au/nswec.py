@@ -4,6 +4,7 @@ import io
 import re
 from collections import Counter, defaultdict
 from datetime import date
+from html.parser import HTMLParser
 from typing import NamedTuple
 from uuid import uuid5
 
@@ -161,6 +162,12 @@ BYE_METHOD = (
 def fetch() -> None:
     for year in STATE:
         raw.fetch(SOURCE, state_url(year), suffix=".xlsx")
+    for config in COUNCIL.values():
+        if config.workbook is not None:
+            raw.fetch(SOURCE, config.workbook, suffix=".xlsx")
+        for url in (config.groups, config.summary, config.elected, config.report):
+            if url is not None:
+                raw.fetch(SOURCE, url, suffix=".html")
 
 
 # Parsing ---------------------------------------------------------------------------------------------------------
@@ -761,6 +768,522 @@ def local_election(year: int) -> Package:
 # By-elections ----------------------------------------------------------------------------------------------------
 
 
+# Legislative Council -----------------------------------------------------------------------------------------------
+
+LC_BODY = key("body", "legislative-council")
+LC_SYSTEM = key("electoral_system", "legislative-council", "stv")
+LC_SEATS = 21
+LC_METHOD = (
+    "First preference votes for the statewide Legislative Council contest, as the NSW Electoral Commission "
+    "publishes them. A voter marks a group above the line or numbers candidates below the line: each group's "
+    "above-the-line votes are stored on the group's list option, and all below-the-line votes together on one "
+    "below-the-line option, so the two add up to the formal votes. Votes are stored per voting venue where the "
+    "commission's final votes spreadsheet reports them, and per vote type for the whole state where only the "
+    "statewide report exists. The candidates of each group are listed in ballot order with the 21 elected as "
+    "the commission's sequence of election gives them. A below-the-line vote for a candidate is not stored "
+    "against that candidate, and the distribution of preferences is not stored here."
+)
+LC_SYSTEMS_RULES = (
+    "Twenty-one members of the Legislative Council are elected from the whole state by single transferable vote. "
+    "Voters mark a group above the line or number candidates below the line."
+)
+
+
+class CouncilYear(NamedTuple):
+    year: int
+    day: date
+    workbook: str | None
+    groups: str | None
+    summary: str | None
+    elected: str
+    report: str | None
+
+
+def _council_year(year: int, day: date, folder: str, sheet: str) -> CouncilYear:
+    if year == 2015:
+        base = f"{PAST}/SGE2015/lc/state"
+        pages = (
+            f"{base}/fp_by_grp/index.htm",
+            f"{base}/cc/fp_summary/index.htm",
+            f"{base}/candidates_elected/index.htm",
+        )
+    else:
+        base = f"{PAST}/{folder}/LC/state"
+        pages = (f"{base}/fp_by_grp", f"{base}/cc/fp_summary", f"{base}/candidates_elected")
+    return CouncilYear(year, day, f"{PAST}/{sheet}", *pages, None)
+
+
+COUNCIL: dict[int, CouncilYear] = {
+    2011: CouncilYear(
+        2011,
+        date(2011, 3, 26),
+        None,
+        None,
+        None,
+        f"{PAST}/SGE2011/lc_finalcount.htm",
+        f"{PAST}/SGE2011/lcHTML/06_-_First_Preference_Group_And_Candidate_By_Vote_Type.htm",
+    ),
+    2015: _council_year(
+        2015, date(2015, 3, 28), "SGE2015", "SGE2015/data/lc/state/SGE%202015%20LC%20Final%20Votes.xlsx"
+    ),
+    2019: _council_year(2019, date(2019, 3, 23), "SG1901", "SG1901/LC/state/SGE%202019%20LC%20Final%20Votes.xlsx"),
+    2023: _council_year(2023, date(2023, 3, 25), "SG2301", "SG2301/LC/state/SGE%202023%20LC%20Final%20Votes.xlsx"),
+}
+VOTE_TYPES_2011 = ["Ordinary", "Absent", "DI/Pre-Poll", "Enrolment", "Postal/iVote", "Provisional/Silent"]
+
+
+class Cells(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.rows: list[list[str]] = []
+        self.row: list[str] | None = None
+        self.cell: str | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "tr":
+            self.row = []
+        elif tag in ("td", "th") and self.row is not None:
+            self.cell = ""
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in ("td", "th") and self.row is not None and self.cell is not None:
+            self.row.append(re.sub(r"\s+", " ", html.unescape(self.cell).replace("\xa0", " ")).strip())
+            self.cell = None
+        elif tag == "tr" and self.row is not None:
+            if self.row:
+                self.rows.append(self.row)
+            self.row = None
+
+    def handle_data(self, data: str) -> None:
+        if self.cell is not None:
+            self.cell += data
+
+
+def table_rows(url: str) -> list[list[str]]:
+    data = raw.cached(SOURCE, url).path.read_bytes()
+    text = data.decode("utf-8-sig") if b"charset=utf-8" in data[:3000].lower() else data.decode("cp1252", "replace")
+    parser = Cells()
+    parser.feed(text)
+    return parser.rows
+
+
+FOOTERS = ("Group Total", "Formal Votes", "Informal", "Total Votes")
+
+
+def number(text: str) -> int:
+    return int(text.replace(",", "").strip())
+
+
+def count(value: object) -> int:
+    if value is None:
+        return 0
+    if isinstance(value, int | float):
+        return int(value)
+    return int(str(value))
+
+
+def is_number(text: str) -> bool:
+    return re.fullmatch(r"\d[\d,]*", text) is not None
+
+
+class Candidate(NamedTuple):
+    group: str
+    ballot: str
+    position: int
+
+
+class CouncilPages(NamedTuple):
+    names: dict[str, str]
+    candidates: list[Candidate]
+    elected: list[tuple[str, str]]
+    atl: dict[str, int]
+    btl: int
+    formal: int | None
+    informal: int | None
+    by_type: dict[str, dict[str, int]]
+
+
+def lc_names(url: str) -> tuple[dict[str, str], int, int]:
+    names: dict[str, str] = {}
+    formal = informal = 0
+    for r in table_rows(url):
+        if re.fullmatch(r"[A-Z]", r[0]) and len(r) >= 6 and all(is_number(c) for c in r[-5:-3]):
+            names[r[0]] = " ".join(r[1:-5]).strip()
+        elif r[1].startswith("Total Formal Votes"):
+            formal = number([c for c in r if is_number(c)][2])
+        elif r[1].startswith("Informal"):
+            informal = number([c for c in r if is_number(c)][2])
+    return names, formal, informal
+
+
+def lc_summary(url: str) -> tuple[list[Candidate], dict[str, int], dict[str, str], int]:
+    """Candidates in ballot order, each group's above-the-line votes, group names, and the below-the-line total."""
+    candidates: list[Candidate] = []
+    atl: dict[str, int] = {}
+    names: dict[str, str] = {}
+    group = ""
+    position = 0
+    btl = 0
+    for r in table_rows(url):
+        if len(r) < 3 or r[0] == "Group":
+            continue
+        if re.fullmatch(r"[A-Z]", r[0]):
+            group, position = r[0], 0
+            names[group] = r[1]
+            atl[group] = number(r[2]) if r[2] else 0
+        elif r[0] == "" and r[1] == "UNGROUPED CANDIDATES":
+            group, position = "", 0
+        elif r[0] == "" and r[1] and is_number(r[2]) and not r[1].startswith(FOOTERS):
+            position += 1
+            candidates.append(Candidate(group, r[1], position))
+            btl += number(r[2])
+    return candidates, atl, names, btl
+
+
+def lc_elected(url: str) -> list[tuple[str, str]]:
+    found: list[tuple[str, str]] = []
+    for r in table_rows(url):
+        if len(r) >= 5 and r[0].isdigit() and re.fullmatch(r"[A-Z]?", r[2]):
+            found.append((r[2], r[1]))
+    return found
+
+
+def lc_pages_2011(config: CouncilYear) -> CouncilPages:
+    assert config.report is not None
+    names: dict[str, str] = {}
+    candidates: list[Candidate] = []
+    atl: dict[str, dict[str, int]] = {}
+    btl: dict[str, int] = defaultdict(int)
+    totals: dict[str, int] = {}
+    group = ""
+    position = 0
+    for r in table_rows(config.report):
+        if len(r) != 11 or r[0] == "Grp" or not is_number(r[8]):
+            continue
+        votes = dict(zip(VOTE_TYPES_2011, (number(c) for c in r[2:8]), strict=True))
+        if re.fullmatch(r"[A-Z]", r[0]):
+            group, position = r[0], 0
+            names[group] = r[1]
+            atl[group] = votes
+        elif r[1] == "Group Total":
+            continue
+        elif r[1] in ("FORMAL VOTES", "INFORMAL VOTES", "TOTAL VOTES"):
+            totals[r[1]] = number(r[8])
+            for kind, value in votes.items():
+                totals[f"{r[1]}:{kind}"] = value
+        else:
+            position += 1
+            candidates.append(Candidate(group, r[1], position))
+            for kind, value in votes.items():
+                btl[kind] += value
+    by_type: dict[str, dict[str, int]] = {kind: {} for kind in VOTE_TYPES_2011}
+    for g, votes in atl.items():
+        for kind, value in votes.items():
+            by_type[kind][g] = value
+    for kind, value in btl.items():
+        by_type[kind]["BTL"] = value
+    for kind in VOTE_TYPES_2011:
+        by_type[kind]["INFORMAL"] = totals[f"INFORMAL VOTES:{kind}"]
+        by_type[kind]["FORMAL"] = totals[f"FORMAL VOTES:{kind}"]
+    return CouncilPages(
+        names,
+        candidates,
+        lc_elected(config.elected),
+        {g: sum(v.values()) for g, v in atl.items()},
+        sum(btl.values()),
+        totals["FORMAL VOTES"],
+        totals["INFORMAL VOTES"],
+        by_type,
+    )
+
+
+def lc_pages(year: int) -> CouncilPages:
+    config = COUNCIL[year]
+    if config.groups is None or config.summary is None:
+        return lc_pages_2011(config)
+    candidates, atl, names, btl = lc_summary(config.summary)
+    listed, formal, informal = lc_names(config.groups)
+    return CouncilPages(
+        {**names, **{g: n or names.get(g, "") for g, n in listed.items()}},
+        candidates,
+        lc_elected(config.elected),
+        atl,
+        btl,
+        formal,
+        informal,
+        {},
+    )
+
+
+def lc_rows(year: int) -> list[dict[str, object]]:
+    assert COUNCIL[year].workbook is not None
+    path = raw.cached(SOURCE, str(COUNCIL[year].workbook)).path
+    frame = fastexcel.read_excel(str(path)).load_sheet("LC", header_row=0).to_polars()
+    return list(frame.iter_rows(named=True))
+
+
+def lc_letters(row: dict[str, object]) -> list[str]:
+    return [c for c in row if len(c) == 1]
+
+
+def lc_group_name(letter: str, names: dict[str, str]) -> str:
+    return names.get(letter) or f"Group {letter}"
+
+
+def lc_parties(years: list[int]) -> dict[str, str]:
+    found: dict[str, str] = {}
+    for year in years:
+        for name in lc_pages(year).names.values():
+            if name:
+                found.setdefault(changeset.slug(name), name)
+    return found
+
+
+def lc_registry(years: list[int]) -> Package:
+    found = lc_parties(years)
+    p = Package(
+        f"{SOURCE}/lc-registry",
+        SOURCE,
+        f"The New South Wales Legislative Council, its electoral system, and the {len(found)} groups and parties on "
+        "its ballots from 2011, as the NSW Electoral Commission names them",
+        depends=[f"{SOURCE}/geo"],
+    )
+    p.external |= {AUSTRALIA}
+    p.add("body", id=LC_BODY, polity_id=AUSTRALIA, kind="upper_house")
+    p.name(LC_BODY, "New South Wales Legislative Council", "en", "official")
+    p.add(
+        "electoral_system",
+        id=LC_SYSTEM,
+        polity_id=AUSTRALIA,
+        valid_from=date(1978, 1, 1),
+        valid_to=None,
+        rules={"formula": "stv", "quota": "droop"},
+        rules_version=1,
+    )
+    p.add(
+        "note", id=key("note", LC_SYSTEM), entity_id=LC_SYSTEM, kind="methodology", body_md=LC_SYSTEMS_RULES, lang="en"
+    )
+    for slug, name in sorted(found.items()):
+        id = key("party", "lc", slug)
+        p.add("party", id=id, kind="party", polity_id=AUSTRALIA)
+        p.name(id, name, "en", "official")
+    return p
+
+
+def lc_person_name(ballot: str) -> str:
+    tokens = ballot.split()
+    count = 0
+    for token in tokens:
+        if re.fullmatch(r"(Mc|Mac|O')?[A-Z][A-Z'\-]+", token) or token.isupper():
+            count += 1
+        else:
+            break
+    count = max(count, 1)
+    surname = " ".join(tokens[:count]).title()
+    surname = re.sub(r"\bMc([a-z])", lambda m: "Mc" + m.group(1).upper(), surname)
+    surname = re.sub(r"\bMac([a-z])(?=[a-z]{3,})", lambda m: "Mac" + m.group(1).upper(), surname)
+    return " ".join([*tokens[count:], surname]).strip()
+
+
+def council_election(year: int) -> Package:
+    config = COUNCIL[year]
+    day = config.day
+    pages = lc_pages(year)
+    depends = [f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/lc-registry"]
+    if year in STATE:
+        depends.append(f"{SOURCE}/{day}")
+    p = Package(
+        f"{SOURCE}/lc-{day}",
+        SOURCE,
+        f"The {year} New South Wales state election, Legislative Council groups, candidates, the 21 elected, and "
+        "first preferences" + (" by voting venue" if config.workbook else " by vote type") + ", from the NSW Electoral "
+        "Commission",
+        depends=depends,
+    )
+    p.external |= {AUSTRALIA}
+    for url in (config.workbook, config.groups, config.summary, config.elected, config.report):
+        if url is not None:
+            p.uses(raw.cached(SOURCE, url))
+    election_id = key("election", day)
+    path = f"au/nsw/{day}-general"
+    if year not in STATE:
+        p.add(
+            "election",
+            id=election_id,
+            polity_id=AUSTRALIA,
+            kind="general",
+            date_from=day,
+            date_to=day,
+            date_precision="day",
+            status="held",
+        )
+        p.name(election_id, f"{year} New South Wales state election", "en", "official")
+        p.add("slug", path=path, entity_id=election_id, is_current=True)
+    contest = key("contest", day, "council")
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election_id,
+        kind="list_allocation",
+        body_id=LC_BODY,
+        district_area_id=NSW,
+        magnitude=LC_SEATS,
+        round_number=1,
+        electoral_system_id=LC_SYSTEM,
+        default_result_kind="counted",
+    )
+    p.name(contest, "Legislative Council", "en", "official")
+    p.add("slug", path=f"{path}/council", entity_id=contest, is_current=True)
+    result_set = key("result_set", contest)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election_id,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=NSWEC,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=LC_METHOD, lang="en")
+    rows = lc_rows(year) if config.workbook else []
+    on_ballot = set(lc_letters(rows[0])) if rows else set(pages.names)
+    running = {c.group for c in pages.candidates}
+    letters = sorted(g for g in pages.names if g in on_ballot or g in running)
+    if on_ballot - set(letters):
+        raise ValueError(f"{year}: workbook groups missing from the pages: {sorted(on_ballot - set(letters))}")
+    options: dict[str, str] = {}
+    for letter in letters:
+        name = pages.names[letter]
+        id = options[letter] = key("option", day, "council", letter)
+        p.add(
+            "contest_option",
+            id=id,
+            contest_id=contest,
+            kind="list",
+            party_id=key("party", "lc", changeset.slug(name)) if name else None,
+            ballot_position=ord(letter) - 64,
+            ballot_label=lc_group_name(letter, pages.names),
+        )
+    ungrouped = [c for c in pages.candidates if c.group == ""]
+    if ungrouped:
+        options[""] = key("option", day, "council", "ungrouped")
+        p.add(
+            "contest_option",
+            id=options[""],
+            contest_id=contest,
+            kind="independents",
+            party_id=None,
+            ballot_position=None,
+            ballot_label="Ungrouped candidates",
+        )
+    below = key("option", day, "council", "below-the-line")
+    p.add(
+        "contest_option",
+        id=below,
+        contest_id=contest,
+        kind="others",
+        party_id=None,
+        ballot_position=None,
+        ballot_label="Below the line",
+    )
+    candidacies: dict[tuple[str, str], str] = {}
+    for c in pages.candidates:
+        person = key("person", day, "council", c.group, c.ballot)
+        p.add("person", id=person)
+        p.name(person, lc_person_name(c.ballot), "en", "official")
+        name = pages.names.get(c.group, "")
+        candidacy = candidacies[(c.group, c.ballot)] = key("candidacy", day, "council", c.group, c.ballot)
+        p.add(
+            "candidacy",
+            id=candidacy,
+            person_id=person,
+            option_id=options[c.group],
+            role="list_member",
+            list_position=c.position,
+            ballot_name=c.ballot,
+            member_of_party_id=key("party", "lc", changeset.slug(name)) if name else None,
+            is_independent=not name,
+        )
+    if len(pages.elected) != LC_SEATS:
+        raise ValueError(f"{year}: {len(pages.elected)} elected, expected {LC_SEATS}")
+    seats: Counter[str] = Counter()
+    for letter, ballot in pages.elected:
+        seats[letter] += 1
+        p.add(
+            "outcome",
+            result_set_id=result_set,
+            option_id=options[letter],
+            candidacy_id=candidacies[(letter, ballot)],
+            kind="elected",
+        )
+    for letter, n in sorted(seats.items()):
+        p.add("outcome", result_set_id=result_set, option_id=options[letter], kind="won", seats=n)
+    values = Values()
+    units: dict[str, str] = {}
+
+    def unit(code: str, label: str, kind: str, area_id: str) -> str:
+        id = units[code] = key("unit", day, "council", code)
+        p.add(
+            "reporting_unit",
+            id=id,
+            polity_id=AUSTRALIA,
+            scheme_code="au-nsw.venue",
+            code=f"{day}:council:{code}",
+            area_relation="within",
+            area_id=area_id,
+            kind=kind,
+        )
+        p.name(id, label, "en", "official")
+        return id
+
+    if config.workbook is None:
+        for kind in VOTE_TYPES_2011:
+            figures = pages.by_type[kind]
+            id = unit(kind, f"New South Wales: {kind}", "aggregate", NSW)
+            for letter in letters:
+                values.add(result_set, id, options[letter], 1, figures[letter])
+            values.add(result_set, id, below, 1, figures["BTL"])
+            values.add(result_set, id, None, 4, figures["FORMAL"])
+            values.add(result_set, id, None, 5, figures["INFORMAL"])
+            values.add(result_set, id, None, 3, figures["FORMAL"] + figures["INFORMAL"])
+    else:
+        sums: dict[tuple[str, str, str], Counter[str]] = defaultdict(Counter)
+        for r in rows:
+            ident = (
+                str(r["District"]).strip(),
+                str(r["Vote Sub Type"]).strip(),
+                str(r["Venue/Declaration Name"]).strip(),
+            )
+            for letter in lc_letters(r):
+                sums[ident][letter] += count(r[letter])
+            for column in ("BTL", "Formal", "Informal"):
+                sums[ident][column] += count(r[column])
+        for (district, subtype, venue), figures in sorted(sums.items()):
+            kind = unit_kind(subtype, venue)
+            area_id = area("au-nsw.district", f"{year}:{district}")
+            id = unit(
+                f"{district}:{subtype}:{venue}", venue if kind == "standard" else f"{district}: {venue}", kind, area_id
+            )
+            for letter in letters:
+                values.add(result_set, id, options[letter], 1, figures[letter])
+            values.add(result_set, id, below, 1, figures["BTL"])
+            values.add(result_set, id, None, 4, figures["Formal"])
+            values.add(result_set, id, None, 5, figures["Informal"])
+            values.add(result_set, id, None, 3, figures["Formal"] + figures["Informal"])
+    for letter in letters:
+        p.add("declared", result_set_id=result_set, option_id=options[letter], measure=1, value=pages.atl[letter])
+    p.add("declared", result_set_id=result_set, option_id=below, measure=1, value=pages.btl)
+    if pages.formal is not None and pages.informal is not None:
+        p.add("declared", result_set_id=result_set, option_id=None, measure=4, value=pages.formal)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=5, value=pages.informal)
+        p.add("declared", result_set_id=result_set, option_id=None, measure=3, value=pages.formal + pages.informal)
+    p.frame("result_value", values.frame())
+    return p
+
+
 class Bye(NamedTuple):
     code: str
     day: date
@@ -1070,6 +1593,8 @@ def packages() -> list[str]:
         f"{SOURCE}/registry",
         *(f"{SOURCE}/{c.day}" for c in STATE.values()),
         *(f"{SOURCE}/{c.day}" for c in LOCAL.values()),
+        f"{SOURCE}/lc-registry",
+        *(f"{SOURCE}/lc-{c.day}" for c in COUNCIL.values()),
         *(f"{SOURCE}/by-{day}" for day in bye_groups()),
     ]
 
@@ -1084,6 +1609,13 @@ def parse() -> None:
         local_election(year).write()
     for day, items in bye_groups().items():
         bye_election(day, items).write()
+    council()
+
+
+def council() -> None:
+    lc_registry(sorted(COUNCIL)).write()
+    for year in sorted(COUNCIL):
+        council_election(year).write()
 
 
 def emit() -> None:
