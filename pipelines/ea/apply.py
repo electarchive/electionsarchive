@@ -1926,6 +1926,65 @@ def _refuse_overlaps(conn: Connection, stage: Stage, changeset_id: str) -> None:
         )
 
 
+def _survivors(conn: Connection) -> set[tuple[str, str]]:
+    conn.execute(
+        """create temporary table if not exists survivor on commit drop as
+           with recursive chain (entity_id, into_id) as (
+             select entity_id, into_id from entity_merge
+             union select c.entity_id, m.into_id from chain c join entity_merge m on m.entity_id = c.into_id
+           )
+           select c.entity_id, c.into_id from chain c
+           where not exists (select from entity_merge m where m.entity_id = c.into_id)"""
+    )
+    conn.execute("analyze survivor")
+    types = [kind for (kind,) in conn.execute("select unnest(enum_range(null::entity_type))::text").fetchall()]
+    return {
+        (relation, column)
+        for relation, column in conn.execute(
+            """select c.conrelid::regclass::text, a.attname from pg_constraint c
+               join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+               where c.contype = 'f' and c.connamespace = 'public'::regnamespace
+                 and c.confrelid::regclass::text = any(%s)
+                 and not exists (
+                   select from pg_constraint k where k.conrelid = c.conrelid
+                     and (k.contype = 'p' or k.conname = 'person_party_membership_key')
+                     and a.attnum = any(k.conkey))""",
+            [["entity", *types]],
+        ).fetchall()
+        if (relation, column) != ("entity_merge", "entity_id")
+    } | {(fact, column) for fact in FACTS for column, parent in KEYS.items() if parent in types}
+
+
+def _follow(
+    conn: Connection, table: str, staged: sql.Composable, columns: list[str], referencing: set[tuple[str, str]]
+) -> None:
+    demoted = {"name": "is_preferred", "slug": "is_current"}.get(table)
+    for column in columns:
+        if (table, column) in referencing:
+            conn.execute(
+                sql.SQL("update {} t set {} = s.into_id{} from survivor s where t.{} = s.entity_id").format(
+                    staged,
+                    sql.Identifier(column),
+                    sql.SQL(", {} = false").format(sql.Identifier(demoted))
+                    if demoted is not None and demoted in columns
+                    else sql.SQL(""),
+                    sql.Identifier(column),
+                )
+            )
+
+
+def _refuse_merged(conn: Connection, changeset_id: str, tables: set[str]) -> None:
+    stray = checks.merged(conn, changeset_id, tables)
+    if stray:
+        raise ValueError(
+            f"{changeset_id} still references merged entities: "
+            + "; ".join(
+                f"{relation}.{column} {entity} ({rows} rows), merged into {into} by {merge}"
+                for relation, column, entity, into, merge, rows in stray[:10]
+            )
+        )
+
+
 def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) -> None:
     stage = _stage(conn, changeset_id)
     with conn.transaction():
@@ -1947,39 +2006,9 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
             conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
         if "entity_merge_drop" in stage.tables:
             _unmerge(conn, stage)
-        conn.execute(
-            """create temporary table survivor on commit drop as
-               with recursive chain (entity_id, into_id) as (
-                 select entity_id, into_id from entity_merge
-                 union select c.entity_id, m.into_id from chain c join entity_merge m on m.entity_id = c.into_id
-               )
-               select c.entity_id, c.into_id from chain c
-               where not exists (select from entity_merge m where m.entity_id = c.into_id)"""
-        )
-        conn.execute("analyze survivor")
-        types = [kind for (kind,) in conn.execute("select unnest(enum_range(null::entity_type))::text").fetchall()]
-        referencing = {
-            (relation, column)
-            for relation, column in conn.execute(
-                """select c.conrelid::regclass::text, a.attname from pg_constraint c
-                   join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
-                   where c.contype = 'f' and c.connamespace = 'public'::regnamespace
-                     and c.confrelid::regclass::text = any(%s)
-                     and not exists (
-                       select from pg_constraint k where k.conrelid = c.conrelid
-                         and (k.contype = 'p' or k.conname = 'person_party_membership_key')
-                         and a.attnum = any(k.conkey))""",
-                [["entity", *types]],
-            ).fetchall()
-        } | {(fact, column) for fact in FACTS for column, parent in KEYS.items() if parent in types}
+        referencing = _survivors(conn)
         for table, columns in stage.tables.items():
-            for column in columns:
-                if (table, column) in referencing and (table, column) != ("entity_merge", "entity_id"):
-                    conn.execute(
-                        sql.SQL("update {} t set {} = s.into_id from survivor s where t.{} = s.entity_id").format(
-                            stage.staged(table), sql.Identifier(column), sql.Identifier(column)
-                        )
-                    )
+            _follow(conn, table, stage.staged(table), columns, referencing)
         _refuse_overlaps(conn, stage, changeset_id)
         findings = checks.run(conn, stage)
         moved = (
@@ -2114,15 +2143,7 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
                 sql.SQL("update public.name set is_preferred = false where id in ({})").format(_outranked(stage))
             )
             conn.execute("select set_config('ea.repointing', 'off', true)")
-        stray = checks.merged(conn, changeset_id, set(stage.tables))
-        if stray:
-            raise ValueError(
-                f"{changeset_id} still references merged entities: "
-                + "; ".join(
-                    f"{relation}.{column} {entity} ({rows} rows), merged into {into} by {merge}"
-                    for relation, column, entity, into, merge, rows in stray[:10]
-                )
-            )
+        _refuse_merged(conn, changeset_id, set(stage.tables))
         if "election" in stage.tables:
             conn.execute(
                 sql.SQL(

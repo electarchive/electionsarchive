@@ -22,9 +22,9 @@ import polars as pl
 from psycopg import Connection, errors, sql
 
 from ea import covers, search, store, touched
-from ea.apply import MERGE_LOCK, _rollup
+from ea.apply import MERGE_LOCK, _follow, _refuse_merged, _rollup, _survivors
 from ea.changeset import Changeset
-from ea.checks import RULES
+from ea.checks import RULES, merged
 from ea.raw import Artifact
 from ea.store import DATA
 
@@ -960,7 +960,9 @@ def _drop(conn: Connection, table: str, staged: dict[str, tuple[str, list[str]]]
     ).rowcount
 
 
-def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded | None:
+def _facts(
+    conn: Connection, path: Path, accepted: dict[str, object], referencing: set[tuple[str, str]]
+) -> Loaded | None:
     manifest = _manifest(path)
     key = str(manifest["key"])
     missing = _missing(conn, manifest["external"])
@@ -974,13 +976,13 @@ def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded 
            where scope->>'package' = %s order by created_at""",
         [key],
     ).fetchall()
-    if prior and prior[-1][1] == manifest["digest"]:
+    files = {table: path / f"{table}.parquet" for table in [*TABLES, *FACTS] if (path / f"{table}.parquet").exists()}
+    if prior and prior[-1][1] == manifest["digest"] and not any(merged(conn, str(row[0]), set(files)) for row in prior):
         print(f"{key}: version {prior[-1][2]} already loaded, unchanged", flush=True)
         return None
     adopts = sorted({str(id) for row in prior for id in row[3] or []} | set(manifest.get("adopts", [])))
     owned = [str(row[0]) for row in prior] + adopts
     version = len(prior) + 1
-    files = {table: path / f"{table}.parquet" for table in [*TABLES, *FACTS] if (path / f"{table}.parquet").exists()}
     conn.execute("select pg_advisory_xact_lock(hashtext(%s))", [f"package:{key}"])
     inserted = conn.execute(
         """insert into changeset (author_kind, pipeline, pipeline_version, kind, status, summary, scope,
@@ -1016,6 +1018,7 @@ def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded 
         if table in TABLES:
             columns = list(TABLES[table][1])
             _stage(conn, table, columns, file)
+            _follow(conn, table, sql.Identifier(f"pkg_{table}"), columns, referencing)
             staged[table] = (f"pkg_{table}", columns)
     moved = [
         str(id)
@@ -1113,8 +1116,9 @@ def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded 
                 f"({error.diag.message_detail}); a package must keep every row other packages reference, "
                 "so build it from a full parse of its pipeline"
             ) from None
-    sizes, changed = _merge(conn, "result_value", files.get("result_value"), sets_before, counts)
-    _merge(conn, "value_locator", files.get("value_locator"), sets_before, counts)
+    sizes, changed = _merge(conn, "result_value", files.get("result_value"), sets_before, counts, referencing)
+    _merge(conn, "value_locator", files.get("value_locator"), sets_before, counts, referencing)
+    _refuse_merged(conn, changeset_id, set(files))
     current = conn.execute(
         """select k from result_set where id = any(%(sets)s::uuid[]) or contest_id = any(%(contests)s::uuid[])
            or election_id = any(%(elections)s::uuid[])""",
@@ -1131,7 +1135,12 @@ def _facts(conn: Connection, path: Path, accepted: dict[str, object]) -> Loaded 
 
 
 def _merge(
-    conn: Connection, table: str, file: Path | None, before: list[int], counts: dict[str, list[int]]
+    conn: Connection,
+    table: str,
+    file: Path | None,
+    before: list[int],
+    counts: dict[str, list[int]],
+    referencing: set[tuple[str, str]],
 ) -> tuple[dict[int, int], set[int]]:
     schema = FACTS[table]
     rest = [c for c in schema if c not in FACT]
@@ -1146,6 +1155,7 @@ def _merge(
         )
     else:
         rows = _stage(conn, table, list(schema), file, like=FACT_LIKE[table])
+        _follow(conn, table, sql.Identifier(f"pkg_{table}"), list(schema), referencing)
         made = conn.execute(
             sql.SQL(
                 """create temp table {k} on commit drop as
@@ -1313,7 +1323,10 @@ def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: M
         with conn.transaction():
             conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
             conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
-            loaded = [item for path, accepted in chunk if (item := _facts(conn, path, accepted)) is not None]
+            referencing = _survivors(conn)
+            loaded = [
+                item for path, accepted in chunk if (item := _facts(conn, path, accepted, referencing)) is not None
+            ]
             steps = [meter.step("facts")]
             if loaded:
                 steps += _derive(conn, loaded, meter)
