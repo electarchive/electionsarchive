@@ -63,6 +63,8 @@ def number(text: object) -> int | None:
 
 
 def url(path: str) -> str:
+    if path.startswith("https://"):
+        return path
     return f"{SITE}/opendata/{quote(path)}"
 
 
@@ -316,6 +318,7 @@ EP_DAYS = {
 }
 EP_SEATS = {2004: 14, 2009: 13, 2014: 13, 2019: 14, 2024: 15}
 PREZ_DAYS = {
+    1999: (date(1999, 5, 15), date(1999, 5, 29)),
     2004: (date(2004, 4, 3), date(2004, 4, 17)),
     2009: (date(2009, 3, 21), date(2009, 4, 4)),
     2014: (date(2014, 3, 15), date(2014, 3, 29)),
@@ -1320,6 +1323,7 @@ def _register() -> None:
         reader(functools.partial(ep_municipal, year), f"ep-{year}")
     for year in PREZ_OLD:
         reader(functools.partial(prez_municipal, year), f"prez-{year}")
+    reader(prez_1999, "prez-1999")
     for year in REF_OLD:
         reader(functools.partial(ref_municipal, year), f"ref-{year}")
     for year in (2010, 2015):
@@ -1370,6 +1374,9 @@ def files() -> list[str]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, TREE, suffix=".html")
+    pages = [*PREZ_1999_SUMMARY.values(), *PREZ_1999_VOTES.values(), *PREZ_1999_NATIONAL.values(), *PREZ_1999_INFO]
+    for page in dict.fromkeys(pages):
+        raw.fetch(SOURCE, page_url(page), suffix=".html")
     for path in files():
         raw.fetch(SOURCE, url(path), suffix=".csv")
 
@@ -1960,6 +1967,136 @@ def prez_municipal(year: int) -> Day:
             for column, label in options.items():
                 if column in national.columns:
                     c.declared[(fold(label), VOTES)] = number_or_zero(total[column])
+        presidential_outcomes(c)
+        d.contests.append(c)
+    return d
+
+
+# The 1999 presidential election, the first by direct vote, from the office's archived pages. The pages that list
+# results by municipality are one dynamic page per district that the archive did not keep, so the district (okres) is
+# the finest unit it holds.
+
+PREZ_1999 = "https://volby.statistics.sk/prez/prez1999/prezid99"
+PREZ_1999_SUMMARY = {1: "results/tab1", 2: "results/tab7"}
+PREZ_1999_VOTES = {1: "results/tab3", 2: "results/tab7"}
+PREZ_1999_NATIONAL = {1: "results/tab6", 2: "results/tab10"}
+PREZ_1999_INFO = ("info/kand99", "info/kand99_2", "info/okr99")
+CELL = re.compile(r"(?is)<t[dh]\b[^>]*>(.*?)(?=<t[dh]\b|</tr|</table|\Z)")
+ROW = re.compile(r"(?is)<tr\b[^>]*>(.*?)(?=<tr\b|</table|\Z)")
+WITHDRAWN = "Michal Kováč"
+"""The candidate who withdrew after the ballots were printed; the district tables total his votes as "ineligible
+candidates"."""
+
+
+def page_url(page: str) -> str:
+    return f"{PREZ_1999}/{page}.jsp.htm"
+
+
+def html_rows(page: str) -> list[list[str]]:
+    """The cells of every table row on one of the office's 1999 pages (Windows-1250 HTML)."""
+    text = raw.cached(SOURCE, page_url(page)).path.read_bytes().decode("cp1250")
+    rows = []
+    for row in ROW.findall(text):
+        cells = [clean(re.sub(r"(?s)<[^>]*>", " ", cell.replace("&nbsp;", " "))) for cell in CELL.findall(row)]
+        if any(cells):
+            rows.append(cells)
+    return rows
+
+
+def table_after(page: str, header: str, width: int) -> list[list[str]]:
+    """The rows under the first row that starts with `header`, up to the national total row if there is one."""
+    rows = html_rows(page)
+    start = next(i for i, r in enumerate(rows) if fold(r[0]) == header)
+    out = []
+    for r in rows[start + 1 :]:
+        if len(r) < width or not re.fullmatch(r"[\d\s]+", r[1]):
+            continue
+        out.append(r)
+        if fold(r[0]).startswith("spolu"):
+            break
+    return out
+
+
+def flat_table(page: str, width: int) -> tuple[list[str], list[list[str]]]:
+    """The header cells and district rows of a 1999 page whose markup has no row tags: every cell after "OKRES" in
+    one run, the header first, then `width` cells per district and a final national row."""
+    cells = [c for row in html_rows(page) for c in row]
+    start = next(i for i, c in enumerate(cells) if fold(c) == "okres")
+    cells = cells[start:]
+    first = next(i for i in range(1, len(cells) - 1) if re.fullmatch(r"\d+", cells[i + 1]) and not cells[i].isdigit())
+    header, body = cells[:first], cells[first:]
+    rows = []
+    for i in range(0, len(body) - width + 1, width):
+        rows.append(body[i : i + width])
+        if fold(body[i]).startswith("spolu"):
+            break
+    return header, rows
+
+
+def prez_1999() -> Day:
+    first, second = PREZ_DAYS[1999]
+    d = Day(str(first), "The 1999 presidential election, both rounds, by district", [])
+    d.method = (
+        " The office's archived pages give the 1999 election by district (okres), the finest unit they hold; the pages "
+        "that list each district's municipalities were not archived."
+    )
+    d.elections += prez_elections(1999)
+    pages = [*PREZ_1999_SUMMARY.values(), *PREZ_1999_VOTES.values(), *PREZ_1999_NATIONAL.values(), *PREZ_1999_INFO]
+    d.paths += [page_url(page) for page in dict.fromkeys(pages)]
+    for round_number, day in enumerate((first, second), start=1):
+        c = prez_contest(1999, round_number)
+        national = {
+            fold(r[0]): (clean(r[0]), number_or_zero(r[1]))
+            for r in table_after(PREZ_1999_NATIONAL[round_number], "meno a priezvisko", 2)
+            if not fold(r[0]).startswith("spolu")
+        }
+        if round_number == 1:
+            _, rows = flat_table(PREZ_1999_SUMMARY[1], 6)
+            header, tally = flat_table(PREZ_1999_VOTES[1], 12)
+            heads = header[2:]
+            surnames = {key_.split()[-1]: key_ for key_ in national}
+            order = [
+                fold(WITHDRAWN) if fold(h).startswith("nevolitel") else surnames[fold(h).split()[-1]] for h in heads
+            ]
+            votes_of = {fold(r[0]): [number(x) for x in r[2:]] for r in tally}
+        else:
+            header, rows = flat_table(PREZ_1999_SUMMARY[2], 10)
+            heads = header[6:8]
+            order = [fold(h) for h in heads]
+            votes_of = {fold(r[0]): [number(r[6]), number(r[8])] for r in rows}
+        for position, key_ in enumerate(order, start=1):
+            label = national[key_][0]
+            c.options.append(Option(key_, label, "candidate", position=position, person=label))
+        c.declared.update({(key_, VOTES): value for key_, (_, value) in national.items()})
+        total = next(r for r in rows if fold(r[0]).startswith("spolu"))
+        body = [r for r in rows if not fold(r[0]).startswith("spolu")]
+        for measure, figure in ((REGISTERED, total[2]), (VOTERS, total[3]), (CAST, total[4]), (VALID, total[5])):
+            c.declared[(None, measure)] = number_or_zero(figure)
+        frame = pl.DataFrame(
+            {
+                "okres": [r[0] for r in body],
+                "reg": [r[2] for r in body],
+                "issued": [r[3] for r in body],
+                "cast": [r[4] for r in body],
+                "valid": [r[5] for r in body],
+            }
+        ).with_columns(_okres=pl.col("okres").map_elements(okres_code, pl.String))
+        units, u = okres_units(frame, day)
+        d.units.append(units)
+        c.facts.append(
+            accounting(frame, u, {REGISTERED: ["reg"], VOTERS: ["issued"], CAST: ["cast"], VALID: ["valid"]})
+        )
+        c.facts.append(
+            pl.DataFrame(
+                [
+                    {"unit": f"{day}:okres:{okres_code(r[0])}", "option": key_, "measure": VOTES, "value": value}
+                    for r in body
+                    for key_, value in zip(order, votes_of[fold(r[0])], strict=True)
+                    if value is not None
+                ],
+                schema=FACT_SCHEMA,
+            )
+        )
         presidential_outcomes(c)
         d.contests.append(c)
     return d
