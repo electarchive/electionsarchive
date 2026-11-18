@@ -1,5 +1,7 @@
-"""Iceland's municipal elections of 16 May 2026 from the election reports of the National Electoral Commission."""
+"""Iceland's municipal elections of 16 May 2026 from the National Electoral Commission's election reports, and the
+candidate lists of the 2024 Althing election from the commission's notice of the lists."""
 
+import importlib
 import json
 import re
 import subprocess
@@ -10,6 +12,7 @@ from decimal import Decimal
 from functools import cache
 from uuid import uuid5
 
+import polars as pl
 import shapely
 import shapely.geometry
 
@@ -26,6 +29,11 @@ SCHEME = "is-lk.sveitarfelag"
 GEOBOUNDARIES = "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/ISL/ADM2"
 GB_URL = f"{GEOBOUNDARIES}/geoBoundaries-ISL-ADM2.geojson"
 SHAPES_FROM = date(2020, 1, 1)
+LISTS_PAGE = "https://island.is/s/landskjorstjorn/frett/frambodslistar"
+LISTS_2024 = (
+    "https://assets.ctfassets.net/8k0h54kbe6bj/1gtENqhJYNkfpbwfGjCMnv/7678c549ba1093e4d051a53abd20b71e/"
+    "Augl_sing_frambo_slista_til_Al_ingis_2024.pdf"
+)
 LETTER = "A-ZÞÆÖÐÁÉÍÓÚÝ"
 NUMBER = r"\d{1,3}(?:,\d{3})*"
 
@@ -55,6 +63,8 @@ def pdf_urls() -> list[str]:
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, LISTS_PAGE, suffix=".html")
+    raw.fetch(SOURCE, LISTS_2024, suffix=".pdf")
     raw.fetch(SOURCE, PAGE, suffix=".html")
     raw.fetch(SOURCE, GB_URL, suffix=".geojson")
     raw.fetch_many(SOURCE, pdf_urls(), suffix=".pdf", workers=8)
@@ -678,17 +688,190 @@ def election() -> Package:
     return p
 
 
+# ---------------------------------------------------------------- Althing candidate lists
+
+HAGSTOFA = "is.hagstofa"
+ALTHING_EKEY = "general-2024-11-30"
+ALTHING_PACKAGE = f"{SOURCE}/{ALTHING_EKEY}"
+NOTICE = key("source", "althing-lists", ALTHING_EKEY)
+# The constituencies as the notice heads them, by Statistics Iceland's constituency code.
+HEADINGS = {
+    "NORÐVESTURKJÖRDÆMI": "northwest-2003",
+    "NORÐAUSTURKJÖRDÆMI": "northeast-2003",
+    "SUÐURKJÖRDÆMI": "south-2003",
+    "SUÐVESTURKJÖRDÆMI": "southwest-2003",
+    "REYKJAVÍKURKJÖRDÆMI SUÐUR": "reykjavik-south-2003",
+    "REYKJAVÍKURKJÖRDÆMI NORÐUR": "reykjavik-north-2003",
+}
+LISTS_NOTE = (
+    "The candidates on each list, in the order the National Electoral Commission's notice of the lists in the "
+    "running gives them (auglýsing frá landskjörstjórn um framboð við alþingiskosningar 30. nóvember 2024, issued "
+    "on 6 November 2024 under article 47 of the Elections Act, no. 112/2021). Each list holds up to twice as many "
+    "candidates as its constituency elects members. A candidate whose occupation the notice gives as member of the "
+    "Althing is stored as an incumbent. The notice also prints each candidate's identity number, occupation, and "
+    "address, which the archive does not store; the year of birth is read from the identity number."
+)
+
+
+def hagstofa_key(kind: str, *parts: str) -> str:
+    """An id that Statistics Iceland's pipeline mints, built the same way it builds it."""
+    return str(uuid5(package.NAMESPACE, "\x1f".join([HAGSTOFA, kind, *parts])))
+
+
+def contest_of(code: str) -> str:
+    return hagstofa_key("contest", ALTHING_EKEY, f"althing:{code}")
+
+
+@dataclass
+class Listed:
+    constituency: str
+    letter: str
+    label: str
+    position: int
+    name: str
+    occupation: str
+    born: int
+
+
+def althing_lists() -> list[Listed]:
+    """Every candidate in the commission's notice of the 2024 Althing lists, constituency by constituency."""
+    lines = [clean(line) for line in text_of(LISTS_2024).splitlines()]
+    found: list[Listed] = []
+    constituency = letter = label = ""
+    pending: tuple[int, str] | None = None
+    for number, line in enumerate(lines):
+        if line in HEADINGS:
+            constituency = HEADINGS[line]
+            continue
+        heading = re.match(rf"^([{LETTER}]) - listi (.+):$", line)
+        if heading:
+            letter, label = heading.group(1), heading.group(2)
+            continue
+        entry = re.match(rf"^(\d{{1,2}})\.\s+([{LETTER}].+),$", line)
+        if entry and constituency and letter:
+            pending = (int(entry.group(1)), entry.group(2))
+            continue
+        detail = re.match(r"^kt\. (\d{2})(\d{2})(\d{2})-\d{3}(\d),\s*([^,]+)", line)
+        if detail:
+            if pending is None:
+                raise ValueError(f"line {number}: an identity number with no candidate before it")
+            century = {"9": 1900, "0": 2000}[detail.group(4)]
+            found.append(
+                Listed(
+                    constituency,
+                    letter,
+                    label,
+                    pending[0],
+                    pending[1],
+                    detail.group(5),
+                    century + int(detail.group(3)),
+                )
+            )
+            pending = None
+    if pending is not None:
+        raise ValueError(f"{pending[1]} has no identity number")
+    return found
+
+
+def hagstofa_magnitudes() -> dict[str, int]:
+    """The members each constituency elected in 2024, from Statistics Iceland's built package."""
+    folder = package.folder(f"{HAGSTOFA}/{ALTHING_EKEY}") / "build"
+    contests = pl.read_parquet(folder / "contest.parquet")
+    return {
+        code: int(row["magnitude"])
+        for row in contests.iter_rows(named=True)
+        for code in HEADINGS.values()
+        if row["id"] == contest_of(code)
+    }
+
+
+def hagstofa_options() -> dict[tuple[str, str], str]:
+    """Statistics Iceland's list option for each constituency and list letter, from its built 2024 package, whose
+    labels end in the letter, as in 'Progressive Party (B)'."""
+    folder = package.folder(f"{HAGSTOFA}/{ALTHING_EKEY}") / "build"
+    contests = {contest_of(code): code for code in HEADINGS.values()}
+    options: dict[tuple[str, str], str] = {}
+    table = pl.read_parquet(folder / "contest_option.parquet")
+    for row in table.iter_rows(named=True):
+        code = contests.get(row["contest_id"])
+        letter = re.search(r"\(([A-ZÞÆÖÐÁÉÍÓÚÝ])\)$", row["ballot_label"])
+        if code is not None and row["kind"] == "list" and letter is not None:
+            options[(code, letter.group(1))] = row["id"]
+    return options
+
+
+def althing() -> Package:
+    p = Package(
+        ALTHING_PACKAGE,
+        SOURCE,
+        "The candidates on every list in the 2024 Althing election, from the National Electoral Commission's notice "
+        "of the lists",
+        depends=[f"{HAGSTOFA}/geo", f"{HAGSTOFA}/registry", f"{HAGSTOFA}/{ALTHING_EKEY}"],
+    )
+    p.add(
+        "source",
+        id=NOTICE,
+        kind="official_body",
+        publisher="Landskjörstjórn (National Electoral Commission of Iceland)",
+        title="Auglýsing frá landskjörstjórn um framboð við alþingiskosningar 30. nóvember 2024",
+        url=LISTS_PAGE,
+        license="Public notices of the National Electoral Commission",
+        license_url="https://island.is/s/landskjorstjorn",
+        attribution="Landskjörstjórn, island.is",
+    )
+    p.artifact(raw.cached(SOURCE, LISTS_PAGE), NOTICE)
+    p.artifact(raw.cached(SOURCE, LISTS_2024), NOTICE)
+    election = hagstofa_key("election", ALTHING_EKEY)
+    note = key("note", "althing-lists", ALTHING_EKEY)
+    p.add("note", id=note, entity_id=election, kind="methodology", body_md=LISTS_NOTE, lang="en")
+    options = hagstofa_options()
+    magnitudes = hagstofa_magnitudes()
+    seen: dict[tuple[str, str], list[int]] = {}
+    for c in althing_lists():
+        option = options.get((c.constituency, c.letter))
+        if option is None:
+            raise LookupError(f"Statistics Iceland has no {c.letter} list in {c.constituency}")
+        seen.setdefault((c.constituency, c.letter), []).append(c.position)
+        tag = f"{c.constituency}:{c.letter}:{c.position}"
+        person = key("person", ALTHING_EKEY, tag)
+        p.add("person", id=person, birth_date=date(c.born, 1, 1), birth_precision="year")
+        p.name(person, c.name, "is", "official")
+        p.add(
+            "candidacy",
+            id=key("candidacy", ALTHING_EKEY, tag),
+            person_id=person,
+            option_id=option,
+            role="list_member",
+            list_position=c.position,
+            ballot_name=c.name,
+            is_incumbent=c.occupation.startswith("alþingismaður"),
+        )
+    if len(seen) != len(options):
+        raise ValueError(f"the notice holds {len(seen)} lists, and Statistics Iceland {len(options)}")
+    for (constituency, letter), positions in seen.items():
+        if positions != list(range(1, len(positions) + 1)):
+            raise ValueError(f"{constituency} {letter}: the places run {positions}")
+        if len(positions) > 2 * magnitudes[constituency]:
+            raise ValueError(f"{constituency} {letter}: {len(positions)} candidates")
+    return p
+
+
 # ---------------------------------------------------------------- run
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", PACKAGE]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", PACKAGE, ALTHING_PACKAGE]
 
 
 def parse() -> None:
     geo().write()
     registry().write()
     election().write()
+    hagstofa = importlib.import_module("ea.sources.is.hagstofa")
+    for event in hagstofa.events():
+        if event.ekey == ALTHING_EKEY:
+            hagstofa.build(event).write()
+    althing().write()
 
 
 def emit() -> None:
