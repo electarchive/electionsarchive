@@ -1,5 +1,8 @@
 """Ukraine: the regular local elections of 25 October 2020 from the Central Election Commission.
 
+The regular local elections of 25 October 2015 are built by ea.sources.ua.cvk_local_2015, which this module's
+fetch() and parse() call.
+
 The Commission's results site for the local elections of 2020 (cvk.gov.ua/pls/vm2020, election 695) publishes:
 
 - per council (pvm057): for a council elected by open lists (oblast, raion, and city-raion councils, and the
@@ -61,6 +64,9 @@ def _first_round(url: str) -> str:
 
 
 def fetch() -> None:
+    from ea.sources.ua import cvk_local_2015
+
+    cvk_local_2015.fetch()
     raw.fetch(SOURCE, SHAPES, suffix=".zip")
     raw.fetch(SOURCE, OPEN_DATA, suffix=".xml")
     raw.fetch(SOURCE, COUNCILS, suffix=".html")
@@ -799,15 +805,26 @@ def runoff_days() -> list[date]:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/{DAY}", *(f"{SOURCE}/{day}" for day in runoff_days())]
+    from ea.sources.ua import cvk_local_2015
+
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        f"{SOURCE}/{DAY}",
+        *(f"{SOURCE}/{day}" for day in runoff_days()),
+        *cvk_local_2015.packages(),
+    ]
 
 
 def parse() -> None:
+    from ea.sources.ua import cvk_local_2015
+
     geo().write()
     registry().write()
     first().write()
     for day in runoff_days():
         runoff(day).write()
+    cvk_local_2015.parse()
 
 
 def emit() -> None:
@@ -820,6 +837,7 @@ class Build:
     election: str
     base: str
     slugs: set[str] = field(default_factory=set)
+    source: str = CVK
 
     def slug(self, *names: str) -> str:
         for n in range(1, len(names) + 1):
@@ -845,7 +863,7 @@ class Build:
             contest_id=cid,
             stage="official",
             kind="counted",
-            source_id=CVK,
+            source_id=self.source,
             status="active",
             is_default=True,
             completeness=completeness,
