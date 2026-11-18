@@ -1,6 +1,7 @@
 """Tanzania's National Assembly elections of 2015 and 2020, by constituency, from the Government Gazette.
 
-The Union presidential elections printed in the same Gazettes are read in `president.py`.
+The Union presidential elections printed in the same Gazettes are read in `president.py`, and the 2015 Mainland
+councillors (General Notice No. 1547) in `wards.py`.
 
 The National Electoral Commission publishes the result of each general election in the Government Gazette. Notice
 No. 1546 (Gazette of 28 October 2016) prints the 2015 result and General Notice No. 30B (special Gazette of 5 January
@@ -46,7 +47,7 @@ ELECTIONS = {
         2015,
         date(2015, 10, 25),
         "Notice No. 1546",
-        "Notices No. 1545 and 1546",
+        "Notices No. 1545, 1546, and 1547",
         "28 October 2016",
         f"{UPLOADS}/sw-1713443566-1513775610-21-MATOKEO%20YA%20UCHAGUZI%20MKUU%202015.pdf",
         22,
@@ -145,22 +146,29 @@ def packages() -> list[str]:
         f"{SOURCE}/registry",
         *(f"{SOURCE}/assembly-{year}" for year in ELECTIONS),
         *(f"{SOURCE}/president-{year}" for year in ELECTIONS),
+        f"{SOURCE}/geo-wards",
+        f"{SOURCE}/councillors-2015",
     ]
 
 
 def fetch() -> None:
+    from ea.sources.tz import wards
+
     for election in ELECTIONS.values():
         raw.fetch(SOURCE, election.url, suffix=".pdf")
+    wards.fetch()
 
 
 def parse() -> None:
-    from ea.sources.tz import president
+    from ea.sources.tz import president, wards
 
     geo().write()
     registry().write()
     for year in ELECTIONS:
         build(year).write()
         president.build(year).write()
+    wards.geo().write()
+    wards.build().write()
 
 
 def emit() -> None:
@@ -362,7 +370,8 @@ def registry() -> Package:
             kind="official_body",
             publisher="Tume ya Taifa ya Uchaguzi (National Electoral Commission of Tanzania)",
             title=f"Government Gazette of the United Republic of Tanzania: {election.notices} of {election.published}, "
-            f"results of the {year} general election for President and the National Assembly",
+            f"results of the {year} general election for President and the National Assembly"
+            + (", and for councillors" if year == 2015 else ""),
             url=election.url,
             license="Official publication; reuse terms are not stated",
             attribution="National Electoral Commission of Tanzania, Government Gazette of the United Republic of Tanzania",
@@ -384,7 +393,13 @@ def registry() -> Package:
         ),
         lang="en",
     )
-    labels = sorted({c.party for year in ELECTIONS for s in seats(year) for c in s.candidates} | president.parties())
+    from ea.sources.tz import wards
+
+    labels = sorted(
+        {c.party for year in ELECTIONS for s in seats(year) for c in s.candidates}
+        | president.parties()
+        | wards.parties()
+    )
     for label in labels:
         id = party_id(label)
         p.add("party", id=id, kind="party", polity_id=TANZANIA)
