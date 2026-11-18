@@ -34,7 +34,15 @@ TABLES = {
 }
 
 
+EP_API = "https://api.scb.se/OV0104/v1/doris/sv/ssd/ME/ME0109"
+EP_TABLES = {"EUvalA": "ME0109A", "ME0109T01": "ME0109A", "EUmed": "ME0109B"}
+EP_YEARS = [1995, 1999]
+EP_DATES = {1995: date(1995, 9, 17), 1999: date(1999, 6, 13)}
+
+
 def url(table: str) -> str:
+    if table in EP_TABLES:
+        return f"{EP_API}/{EP_TABLES[table]}/{table}"
     return f"{API}/{TABLES[table][0]}/{table}"
 
 
@@ -64,8 +72,12 @@ def _get(job: tuple[str, int]) -> None:
 def fetch() -> None:
     for table in TABLES:
         raw.fetch(SOURCE, url(table), suffix=".json")
+    for table in EP_TABLES:
+        raw.fetch(SOURCE, url(table), suffix=".json")
+    jobs = [(table, year) for table in TABLES for year in YEARS]
+    jobs += [(table, year) for table in EP_TABLES for year in EP_YEARS]
     with ThreadPoolExecutor(WORKERS) as pool:
-        list(pool.map(_get, [(table, year) for table in TABLES for year in YEARS]))
+        list(pool.map(_get, jobs))
 
 
 # Membership of municipalities in the constituencies and county councils of Skåne and Västra Götaland. Statistics
@@ -304,6 +316,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 SOURCE_ID = str(uuid5(package.NAMESPACE, f"{SOURCE}\x1fsource\x1fstatistikdatabasen"))
+EP_SOURCE_ID = str(uuid5(package.NAMESPACE, f"{SOURCE}\x1fsource\x1fstatistikdatabasen-eu"))
 
 
 def area(scheme: str, code: str) -> str:
@@ -342,6 +355,17 @@ def _source(p: Package) -> None:
         publisher="Statistics Sweden (Statistiska centralbyrån)",
         title="Statistikdatabasen: Allmänna val, valresultat 1973–2022 (ME0104)",
         url="https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__ME__ME0104/",
+        license=LICENSE,
+        license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+        attribution="Statistics Sweden (SCB)",
+    )
+    p.add(
+        "source",
+        id=EP_SOURCE_ID,
+        kind="official_body",
+        publisher="Statistics Sweden (Statistiska centralbyrån)",
+        title="Statistikdatabasen: Europaparlamentsval, valresultat 1995–2024 (ME0109)",
+        url="https://www.statistikdatabasen.scb.se/pxweb/sv/ssd/START__ME__ME0109/",
         license=LICENSE,
         license_url="https://creativecommons.org/publicdomain/zero/1.0/",
         attribution="Statistics Sweden (SCB)",
@@ -404,6 +428,7 @@ SYSTEMS: dict[str, tuple[date, date | None, dict[str, object], str]] = {
         val.SYSTEMS["riksdag-1998"][2],
         val.SYSTEMS["riksdag-1998"][3],
     ),
+    "ep-1995": val.SYSTEMS["ep-1995"],
     "riksdag-1998": val.SYSTEMS["riksdag-1998"],
     "region-1998": val.SYSTEMS["region-1998"],
     "kommun-1998": val.SYSTEMS["kommun-1998"],
@@ -749,8 +774,185 @@ def _lumped(year: int, body: str) -> str:
     return text
 
 
+EP_TABLE = {"votes": "EUvalA", "seats": "ME0109T01", "electorate": "EUmed"}
+EP_PARTIES = ["M", "C", "FP", "KD", "MP", "S", "V", "ÖVRIGA"]
+EP_METHOD = (
+    "Statistics Sweden's election statistics for the European Parliament, compiled from the election authorities' "
+    "counts per municipality. Party votes are the valid votes; parties without a seat are summed as 'other parties' "
+    "(övriga partier). Invalid ballots (ogiltiga valsedlar) include blank ones. Ballots cast are the valid and invalid "
+    "ballots. The electorate is the Swedish and the foreign citizens who could vote, and it equals ballots cast plus "
+    "non-voters in every municipality. Municipalities carry their present codes. Sweden elects its members in one "
+    "national constituency, so each municipality's votes are stored as a unit of the national contest."
+)
+
+
+def ep_read(kind: str, year: int) -> Table:
+    table = EP_TABLE[kind]
+    d = json.loads(raw.cached(SOURCE, url(table), query(table, year)).path.read_text("utf-8"))
+    ids: list[str] = d["id"]
+    codes = []
+    for name in ids:
+        index = d["dimension"][name]["category"]["index"]
+        codes.append(list(index) if isinstance(index, list) else sorted(index, key=index.__getitem__))
+    wanted = {"EUvalA": "ME0109Z0", "ME0109T01": "ME0109A2", "EUmed": "ME0109B2"}[table]
+    found: Table = {}
+    for position, combo in enumerate(product(*codes)):
+        value = d["value"][position]
+        coordinates = dict(zip(ids, combo, strict=True))
+        if value is None or coordinates["ContentsCode"] != wanted:
+            continue
+        other = [c for name, c in coordinates.items() if name not in ("Region", "ContentsCode", "Tid")]
+        found.setdefault(coordinates.get("Region", ""), {})[other[0] if other else ""] = int(value)
+    return found
+
+
+def ep_election(year: int) -> Package:
+    day = EP_DATES[year]
+    votes = ep_read("votes", year)
+    electorate = ep_read("electorate", year)
+    seats = ep_read("seats", year)[""]
+    published = votes["00"]
+    towns = sorted(c for c in votes if is_town(c))
+    unit_names = names("EUvalA", year)
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        f"Sweden's European Parliament election of {day:%-d %B %Y} by municipality from Statistics Sweden",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{val.SOURCE}/geo"],
+    )
+    p.external |= {SWEDEN, COUNTRY, *SCHEMES}
+    for table in EP_TABLES:
+        p.uses(raw.cached(SOURCE, url(table), query(table, year)))
+        p.uses(raw.cached(SOURCE, url(table)))
+    kind, english, swedish, word = val.ELECTIONS["E"]
+    election_id = key("election", day, "E")
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=SWEDEN,
+        kind=kind,
+        date_from=day,
+        date_to=day,
+        date_precision="day",
+        status="held",
+    )
+    p.name(election_id, english.format(year=year), "en", "official")
+    p.name(election_id, swedish.format(year=year), "sv", "native", False)
+    p.add("slug", path=f"se/{day}-{word}", entity_id=election_id, is_current=True)
+    unit_ids = {t: key("unit", day, t) for t in towns}
+    p.frame(
+        "reporting_unit",
+        pl.DataFrame(
+            {
+                "id": [unit_ids[t] for t in towns],
+                "polity_id": [SWEDEN] * len(towns),
+                "scheme_code": [val.MUNICIPALITY] * len(towns),
+                "code": [f"{day}:{t}" for t in towns],
+                "area_relation": ["equals"] * len(towns),
+                "area_id": [area(val.MUNICIPALITY, t) for t in towns],
+                "kind": ["standard"] * len(towns),
+            }
+        ),
+    )
+    for t in towns:
+        p.name(unit_ids[t], unit_names[t], "sv", "official")
+    contest_id = key("contest", day, "E", "00")
+    p.add(
+        "contest",
+        id=contest_id,
+        election_id=election_id,
+        kind="list_allocation",
+        body_id=None,
+        district_area_id=COUNTRY,
+        magnitude=sum(seats.values()),
+        round_number=1,
+        electoral_system_id=system("ep-1995"),
+        default_result_kind="counted",
+    )
+    p.name(contest_id, "Europaparlamentet", "sv", "official")
+    p.add("slug", path=f"se/{day}-{word}/{changeset.slug('Europaparlamentet')}", entity_id=contest_id, is_current=True)
+    result_set = key("result_set", day, "E", "00")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election_id,
+        contest_id=contest_id,
+        stage="official",
+        kind="counted",
+        source_id=EP_SOURCE_ID,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=EP_METHOD,
+        lang="en",
+    )
+    options = {code: key("option", day, "E", "00", code) for code in EP_PARTIES if code in published}
+    for code, id in options.items():
+        p.add(
+            "contest_option",
+            id=id,
+            contest_id=contest_id,
+            kind="others" if code == "ÖVRIGA" else "list",
+            party_id=None if code == "ÖVRIGA" else party(code),
+            ballot_position=None,
+            ballot_label=LABELS[code],
+        )
+        if seats.get(code, 0) > 0:
+            p.add("outcome", result_set_id=result_set, option_id=id, kind="won", seats=seats[code])
+    unseated = {code for code, n in seats.items() if n and code not in options}
+    if unseated:
+        raise ValueError(f"{year}: seats for parties without votes: {sorted(unseated)}")
+    rows: list[tuple[str, str, str | None, int, int]] = []
+    for t in towns:
+        row = votes[t]
+        valid = sum(row.get(code, 0) for code in EP_PARTIES)
+        invalid = row["OGILTIGA"]
+        registered = sum(electorate[t].values())
+        if valid + invalid + row["VALSKOLKARE"] != registered:
+            raise ValueError(f"{year} {t}: valid, invalid, and non-voting do not add up to the electorate")
+        rows += [(result_set, unit_ids[t], options[code], VOTES, row[code]) for code in options if code in row]
+        rows += [
+            (result_set, unit_ids[t], None, REGISTERED, registered),
+            (result_set, unit_ids[t], None, CAST, valid + invalid),
+            (result_set, unit_ids[t], None, VALID, valid),
+            (result_set, unit_ids[t], None, INVALID, invalid),
+        ]
+    for code, id in options.items():
+        p.add("declared", result_set_id=result_set, option_id=id, measure=VOTES, value=published[code])
+    p.add("declared", result_set_id=result_set, option_id=None, measure=INVALID, value=published["OGILTIGA"])
+    p.add(
+        "declared", result_set_id=result_set, option_id=None, measure=REGISTERED, value=sum(electorate["00"].values())
+    )
+    p.frame(
+        "result_value",
+        pl.DataFrame(
+            rows,
+            schema={
+                "result_set_id": pl.String,
+                "unit_id": pl.String,
+                "option_id": pl.String,
+                "measure": pl.Int16,
+                "value": pl.Int64,
+            },
+            orient="row",
+        ).with_columns(channel=pl.lit(0), count_round=pl.lit(0), flags=pl.lit(0)),
+    )
+    return p
+
+
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{DATES[year]}" for year in YEARS)]
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/{DATES[year]}" for year in YEARS),
+        *(f"{SOURCE}/{EP_DATES[year]}" for year in EP_YEARS),
+    ]
 
 
 def parse() -> None:
@@ -758,6 +960,8 @@ def parse() -> None:
     registry().write()
     for year in YEARS:
         election(year).write()
+    for year in EP_YEARS:
+        ep_election(year).write()
 
 
 NATIONAL = {"R": "VR00", "L": "00L", "K": "00"}
