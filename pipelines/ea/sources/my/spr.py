@@ -83,7 +83,8 @@ STATE_DAYS = {
 }
 # Polling days of by-elections, keyed by the contest's seat code and year, each with the Commission's media statement
 # that gives it: the statement on the eve of polling, or the one that fixed the election's dates. A by-election not
-# listed here is dated to its year; the Commission's statement archive does not reach back before 2022.
+# listed here is dated to its year: the Commission's media statements do not reach back before 2023, and none
+# gives the polling day of the 2022 Bugaya or the 2023 Kuala Terengganu by-election.
 STATEMENTS = "https://spr.gov.my/wp-content/uploads"
 PULAI = (
     f"{STATEMENTS}/2025/10/KM-BIL-31-2023-MENJELANG-PROSES-PENGUNDIAN-PRK-PARLIMEN-P161-PULAI-DAN-DEWAN-NEGERI-"
@@ -113,6 +114,18 @@ BY_DAYS: dict[tuple[str, int], tuple[date, str]] = {
     ("N.43", 2024): (
         date(2024, 8, 17),
         f"{STATEMENTS}/2024/12/KM-BIL-31-2024-MENJELANG-HARI-MENGUNDI-PRK-DEWAN-NEGERI-N.43-NENGGIRI-KELANTAN.pdf",
+    ),
+    ("P.040", 2023): (
+        date(2023, 12, 2),
+        f"{STATEMENTS}/2025/10/KM-BIL-58-2023-KEPUTUSAN-PRK-PARLIMEN-P040-KEMAMAN.pdf",
+    ),
+    ("N.20", 2024): (
+        date(2024, 7, 6),
+        f"{STATEMENTS}/2024/07/KM-BIL-22-2024-MENJELANG-HARI-MENGUNDI-PRK-DEWAN-UNDANGAN-N.20-SUNGAI-BAKAP-PULAU-PINANG.pdf",
+    ),
+    ("N.48", 2025): (
+        date(2025, 4, 26),
+        f"{STATEMENTS}/2025/04/KM-BIL-11-2025-MENJELANG-HARI-MENGUNDI-PRK-DUN-N48-AYER-KUNING-PERAK-V2.pdf",
     ),
     ("N.29", 2024): (
         date(2024, 9, 28),
