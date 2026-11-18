@@ -459,7 +459,9 @@ def table(day: str, which: str = "") -> Table:
 
 
 def packages() -> list[str]:
-    return ["md.cec/registry", *(f"md.cec/{day}" for day in DAYS)]
+    from ea.sources.md import local
+
+    return ["md.cec/registry", *(f"md.cec/{day}" for day in DAYS), *local.packages()]
 
 
 def fetch() -> None:
@@ -471,12 +473,18 @@ def fetch() -> None:
     from ea.sources.md import early2010
 
     early2010.fetch()
+    from ea.sources.md import local
+
+    local.fetch()
 
 
 def parse() -> None:
     registry().write()
     for day in DAYS:
         build(day).write()
+    from ea.sources.md import local
+
+    local.parse()
 
 
 def emit() -> None:
