@@ -906,10 +906,11 @@
       "kind": "compendium"
     },
     "xfr": {
-      "publisher": "University of Pretoria repository",
-      "title": "The Federation of Rhodesia and Nyasaland 1953-1963: A Retrospective",
-      "url": "https://repository.up.ac.za/server/api/core/bitstreams/42c7e524-5f70-4780-bae5-ce135bb96bf2/content",
-      "kind": "compendium"
+      "publisher": "The National Archives (legislation.gov.uk)",
+      "title": "The Federation of Rhodesia and Nyasaland (Constitution) Order in Council 1953 (S.I. 1953/1199), as made",
+      "url": "https://www.legislation.gov.uk/uksi/1953/1199/made",
+      "kind": "official_body",
+      "note": "Made on 1 August 1953 under the Rhodesia and Nyasaland Federation Act 1953; section 1 associates Southern Rhodesia, Northern Rhodesia, and Nyasaland in a Federation under the Constitution in the Annex. The end date is set by the Federation of Rhodesia and Nyasaland (Dissolution) Order in Council 1963 (legislation.gov.uk/uksi/1963/2085/made), whose section 1 dissolves the Federation, the Federal Government, and the Federal Legislature immediately before 1 January 1964."
     }
   },
   "countries": [
@@ -3416,9 +3417,9 @@
       "iso": "XFR",
       "name_en": "Federation of Rhodesia and Nyasaland",
       "status": "former",
-      "reason": "Federal Assembly elections in 1953, 1958, and 1962.",
+      "reason": "Established by the Federation of Rhodesia and Nyasaland (Constitution) Order in Council made on 1 August 1953, which joined Southern Rhodesia, Northern Rhodesia, and Nyasaland in a Federation, and dissolved immediately before 1 January 1964 by the Dissolution Order in Council of 20 December 1963, the Territories continuing as Southern Rhodesia, Zambia, and Malawi. It held three general elections of the Federal Assembly: on 15 December 1953, in November 1958 for the Assembly enlarged from 35 to 59 members, and on 27 April 1962.",
       "source": "xfr",
-      "locator": "https://repository.up.ac.za/server/api/core/bitstreams/42c7e524-5f70-4780-bae5-ce135bb96bf2/content"
+      "locator": "https://www.legislation.gov.uk/uksi/1953/1199/made (Made 1st August, 1953; section 1: Southern Rhodesia, Northern Rhodesia and Nyasaland shall be associated in a Federation)"
     }
   ]
 }

@@ -1,0 +1,419 @@
+{
+  "polity": "XFR",
+  "name": "Federation of Rhodesia and Nyasaland",
+  "sources": {
+    "constitution-1953": {
+      "title": "The Federation of Rhodesia and Nyasaland (Constitution) Order in Council 1953 (S.I. 1953/1199), as made",
+      "publisher": "The National Archives (legislation.gov.uk)",
+      "url": "https://www.legislation.gov.uk/uksi/1953/1199/made",
+      "kind": "official_body",
+      "note": "Made on 1 August 1953 under the Rhodesia and Nyasaland Federation Act 1953. Section 1 associates Southern Rhodesia, Northern Rhodesia, and Nyasaland in a Federation under the Constitution in the Annex. Article 9 gives the Federal Assembly a Speaker and 35 members: 26 elected members (14 from Southern Rhodesia, 8 from Northern Rhodesia, 4 from Nyasaland), 6 specially elected African members (2 from each Territory), and 3 European members for African interests (one specially elected in Southern Rhodesia, one appointed by each Governor of the two northern Territories). Articles 10 to 13 govern elections, article 27 a five-year term, and article 28 a general election within three months of a dissolution, appointed by proclamation in the official Gazette of the Federation."
+    },
+    "dissolution-1963": {
+      "title": "The Federation of Rhodesia and Nyasaland (Dissolution) Order in Council 1963 (S.I. 1963/2085), as made",
+      "publisher": "The National Archives (legislation.gov.uk)",
+      "url": "https://www.legislation.gov.uk/uksi/1963/2085/made",
+      "kind": "official_body",
+      "note": "Made on 20 December 1963 under the Rhodesia and Nyasaland Act 1963. Section 1: the Federation, the Federal Government, the Federal Legislature, and the other Federal authorities shall be dissolved immediately before 1 January 1964, and the Federal Constitution thereupon ceases to have effect."
+    },
+    "act-1953": {
+      "title": "Rhodesia and Nyasaland Federation Act 1953 (1 & 2 Eliz. 2 c. 30), as enacted",
+      "publisher": "The National Archives (legislation.gov.uk)",
+      "url": "https://www.legislation.gov.uk/ukpga/Eliz2/1-2/30/enacted",
+      "kind": "official_body",
+      "note": "Royal Assent on 14 July 1953; section 1 empowers Her Majesty by Order in Council to provide for the federation of Southern Rhodesia, Northern Rhodesia, and Nyasaland and to establish a Federal Government and Federal Legislature."
+    },
+    "act-1963": {
+      "title": "Rhodesia and Nyasaland Act 1963 (c. 34), as enacted",
+      "publisher": "The National Archives (legislation.gov.uk)",
+      "url": "https://www.legislation.gov.uk/ukpga/1963/34/enacted",
+      "kind": "official_body",
+      "note": "Royal Assent on 31 July 1963; section 1 empowers Her Majesty by Order in Council to provide for the dissolution of the Federation of Rhodesia and Nyasaland."
+    },
+    "hansard-1953-oct": {
+      "title": "New Federation (Progress), House of Commons, 22 October 1953",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1953/oct/22/new-federation-progress",
+      "kind": "official_body",
+      "note": "Lord Llewellin assumed office as Governor-General at Salisbury on 4 September 1953; Sir Godfrey Huggins was sworn in as Prime Minister on 7 September; the remaining provisions of the Constitution came into force on 23 October 1953 by the Governor-General's proclamation, and the first general election to the Federal Assembly was planned for the middle of December."
+    },
+    "hansard-1953-dec-lords": {
+      "title": "Central African Federal Elections, House of Lords, 8 December 1953",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/lords/1953/dec/08/central-african-federal-elections",
+      "kind": "official_body",
+      "note": "Regulations made by the Governor of Southern Rhodesia require the nomination of an African candidate for the two specially elected African seats from Southern Rhodesia to be supported by at least twenty-five Africans qualified to vote; four candidates were nominated for those two seats."
+    },
+    "hansard-1953-dec": {
+      "title": "Central African Federation, House of Commons, 16 December 1953",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1953/dec/16/central-african-federation",
+      "kind": "official_body",
+      "note": "A question of 16 December 1953 refers to the results of the Federal elections held the day before."
+    },
+    "hansard-1957": {
+      "title": "Rhodesia and Nyasaland (Constitution), House of Commons debate of 25 November 1957",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1957/nov/25/rhodesia-and-nyasaland-constitution",
+      "kind": "official_body",
+      "note": "Debate on the Federal Constitution Amendment Bill and the Federal Electoral Bill: the Federal Assembly grows from 35 members (nine of them, six Africans and three Europeans, for African interests) to 59 (fifteen, twelve Africans and three Europeans, for African interests), with 44 members elected in the ordinary way, eight Elected African Members chosen by general and special roll voters, four African members chosen by African electoral colleges in the two northern Protectorates, and the two European members for African interests there appointed."
+    },
+    "hansard-1958-nov": {
+      "title": "Federal General Election (Voters), House of Commons, 4 November 1958",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1958/nov/04/federal-general-election-voters",
+      "kind": "official_body",
+      "note": "Questions on registration for the second Federal General Election; the Colonial Secretary replies that the figures are a matter within the sole responsibility of the Federal Government."
+    },
+    "hansard-1958-nov27": {
+      "title": "Northern Rhodesia (Constitutional Changes), House of Commons, 27 November 1958",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1958/nov/27/northern-rhodesia-constitutional-changes",
+      "kind": "official_body",
+      "note": "The Colonial Secretary welcomes Sir Roy Welensky to London so soon after his formidable triumph in the Federal elections."
+    },
+    "hansard-1962-mar": {
+      "title": "Rhodesia and Nyasaland (General Election), House of Commons, 20 March 1962",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1962/mar/20/rhodesia-and-nyasaland-general-election",
+      "kind": "official_body",
+      "note": "The Prime Minister states that the Governor-General dissolves the Federal Assembly in his own discretion, following the conventions that apply to the Crown in the United Kingdom."
+    },
+    "hansard-1962-lords": {
+      "title": "The Federation of Rhodesia and Nyasaland, House of Lords debate of 27 March 1962",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/lords/1962/mar/27/the-federation-of-rhodesia-and-nyasaland",
+      "kind": "official_body",
+      "note": "Gives 27 April 1962 as the date of the Federal general election called by Sir Roy Welensky."
+    },
+    "hansard-1962-may": {
+      "title": "Central Africa, House of Commons debate of 8 May 1962",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/commons/1962/may/08/central-africa",
+      "kind": "official_body",
+      "note": "The April 1962 Federal election was almost totally boycotted by Africans; the total vote was only 14,000, and the United Federal Party won every seat."
+    },
+    "hansard-1963-lords": {
+      "title": "Federation of Rhodesia and Nyasaland (Dissolution) Order in Council, 1963, House of Lords debate of 17 December 1963",
+      "publisher": "UK Parliament (Hansard)",
+      "url": "https://api.parliament.uk/historic-hansard/lords/1963/dec/17/federation-of-rhodesia-and-nyasaland",
+      "kind": "official_body",
+      "note": "The Victoria Falls Conference of June 1963 decided that the date of dissolution should be 31 December 1963."
+    }
+  },
+  "tiers": [
+    {
+      "key": "national",
+      "name": "Federation of Rhodesia and Nyasaland",
+      "name_en": "Federation of Rhodesia and Nyasaland (Central African Federation)",
+      "parent": null,
+      "polity_kind": "historical_state",
+      "source": "constitution-1953",
+      "valid_from": "1953-08-01",
+      "valid_to": "1964-01-01"
+    },
+    {
+      "key": "constituency",
+      "name": "Electoral districts",
+      "name_en": "Electoral districts of the Federal Assembly, delimited separately in each Territory",
+      "parent": "national",
+      "source": "constitution-1953",
+      "valid_from": "1953-08-01",
+      "valid_to": "1964-01-01"
+    },
+    {
+      "key": "territory",
+      "name": "Territories",
+      "name_en": "Southern Rhodesia, Northern Rhodesia, and Nyasaland",
+      "parent": "national",
+      "elects": false,
+      "source": "constitution-1953",
+      "valid_from": "1953-08-01",
+      "valid_to": "1964-01-01"
+    }
+  ],
+  "classes": [
+    {
+      "key": "federal_assembly",
+      "tier": "constituency",
+      "name": "General election to the Federal Assembly",
+      "name_en": "Federal Assembly of Rhodesia and Nyasaland, general elections of 1953, 1958, and 1962",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution-1953",
+      "locator": "https://www.legislation.gov.uk/uksi/1953/1199/made (Annex, Chapter II, articles 9 to 13, 27, and 28)",
+      "valid_from": "1953-08-01",
+      "valid_to": "1964-01-01",
+      "first_held": "1953-12-15",
+      "disposition": "blocked",
+      "disposition_reason": "Returns by electoral district were declared by returning officers and published in the official Gazettes (the Territories' Gazettes for the first election, held under regulations the Governor-General made under articles 11 and 12 of the Constitution, and the Federal Gazette after the Federal Electoral Act of 1958) and in the papers of the Federal Assembly, none of which is online. The UK Government told the House of Commons in November 1958 that registration figures were a matter for the Federal Government alone; the Parliament of Zimbabwe's site refused automated requests (403), the Parliaments of Zambia and Malawi did not answer from here, and the Federation's records in the National Archives of Zimbabwe, Zambia, and Malawi are not online.",
+      "finest_note": "Electoral district, delimited by the Governor-General's regulations for the first election and by Federal law thereafter; no official return is online.",
+      "note": "Under the 1953 Constitution, 29 of the 35 members were chosen by the voters: 26 elected members in electoral districts (14 in Southern Rhodesia, 8 in Northern Rhodesia, 4 in Nyasaland) and, in Southern Rhodesia, two specially elected African members and the specially elected European member for African interests. The Constitution Amendment Act and Electoral Act of 1957 and 1958 raised the Assembly to 59: 44 elected members (24 from Southern Rhodesia), eight Elected African Members (four from Southern Rhodesia and two from each northern Territory) chosen by general and special roll voters together, and the Southern Rhodesian European member for African interests, likewise elected, so that 53 seats went to the polls. The 1962 election was boycotted by the opposition and by African voters; the United Federal Party won every seat on a total vote of about 14,000.",
+      "match": [
+        {
+          "election_kinds": [
+            "general"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "XFR",
+          "valid_from": "1953-08-01",
+          "valid_to": "1964-01-01"
+        }
+      ],
+      "cadence": [
+        {
+          "term_years": 5,
+          "called": true,
+          "partisan": true,
+          "runoff": "none",
+          "administered_by": "Returning officers under the Governor-General's regulations (1953) and the Federal Electoral Act (1958 and 1962)",
+          "vacancy_rule": "by-election",
+          "valid_from": "1953-08-01",
+          "valid_to": "1964-01-01",
+          "source": "constitution-1953",
+          "locator": "https://www.legislation.gov.uk/uksi/1953/1199/made (Annex, articles 27 and 28: dissolution at the latest five years after the Assembly first meets, and a general election within three months of a dissolution)"
+        }
+      ],
+      "est_votes": 120000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1953-12-15",
+          "seats": 29,
+          "source": "hansard-1953-dec",
+          "quote": "in view of the results of the Federal elections yesterday",
+          "note": "First general election, under regulations the Governor-General made for each Territory. 26 elected members, with the two specially elected African members and the specially elected European member from Southern Rhodesia, who were elected by the Southern Rhodesian electorate (article 13(1)); the four specially elected African members from the northern Territories were chosen by African councils, and two European members were appointed by the northern Governors."
+        },
+        {
+          "date": "1958-11-12",
+          "seats": 53,
+          "source": "hansard-1957",
+          "quote": "These electors are to be responsible for electing 44 members of the new House of 59.",
+          "note": "Second general election, the first for the enlarged Assembly of 59: 44 elected members, eight Elected African Members, and the Southern Rhodesian European member for African interests went to the polls. The month is confirmed by the House of Commons on 4 and 27 November 1958; the day is taken from the general literature and is not yet confirmed from an official record."
+        },
+        {
+          "date": "1962-04-27",
+          "source": "hansard-1962-lords",
+          "quote": "the Federal general election, which takes place on April 27",
+          "note": "Called early by Sir Roy Welensky and boycotted by the opposition parties and by African voters; the total vote was about 14,000 (House of Commons, 8 May 1962)."
+        }
+      ]
+    },
+    {
+      "key": "federal_by",
+      "tier": "constituency",
+      "name": "By-election",
+      "name_en": "Federal Assembly by-elections",
+      "category": "legislature",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution-1953",
+      "locator": "https://www.legislation.gov.uk/uksi/1953/1199/made (Annex, article 10(1)(b) and (e): the Federal Legislature provides by law for vacation of seats and the holding of elections)",
+      "valid_from": "1953-12-16",
+      "valid_to": "1964-01-01",
+      "disposition": "blocked",
+      "disposition_reason": "Returns were declared by returning officers and published in the Federal Gazette, which is not online; no official list of Federal by-elections is reachable from here.",
+      "note": "Vacancies among the members chosen by the voters were filled by by-election between general elections.",
+      "match": [
+        {
+          "election_kinds": [
+            "by_election"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "XFR"
+        }
+      ],
+      "est_votes": 15000,
+      "effort": 5,
+      "dates": [
+        {
+          "date": "1953-12-16",
+          "through": "1963-12-31",
+          "note": "By-elections in this span are not yet counted from an official record."
+        }
+      ]
+    },
+    {
+      "key": "special_african",
+      "tier": "national",
+      "name": "Specially elected African members",
+      "name_en": "Specially elected African members from Northern Rhodesia and Nyasaland, chosen by African councils",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution-1953",
+      "locator": "https://www.legislation.gov.uk/uksi/1953/1199/made (Annex, article 13(2) and (3))",
+      "valid_from": "1953-08-01",
+      "valid_to": "1964-01-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The two members from Northern Rhodesia and the two from Nyasaland were elected by a body each Governor designated as representative of Africans (in Nyasaland, for the first election, the Nyasaland Protectorate Council), not by a popular ballot.",
+      "note": "Four seats throughout (six specially elected African seats in 1953, two of them from Southern Rhodesia and elected by its voters; after 1958 the Southern Rhodesian African seats became Elected African Members). The two European members for African interests from the northern Territories were appointed by their Governors.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "body_kinds": [
+            "unicameral"
+          ],
+          "iso_pattern": "XFR"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "head_of_state",
+      "tier": "national",
+      "name": "Governor-General",
+      "name_en": "Governor-General and Commander-in-Chief of the Federation",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution-1953",
+      "locator": "https://www.legislation.gov.uk/uksi/1953/1199/made (Annex, article 2: a Governor-General and Commander-in-Chief appointed by Her Majesty)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Governor-General was appointed by the Crown; no one voted for the office.",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_state"
+          ],
+          "iso_pattern": "XFR"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "prime_minister",
+      "tier": "national",
+      "name": "Prime Minister",
+      "name_en": "Federal Prime Minister",
+      "category": "executive",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution-1953",
+      "locator": "https://www.legislation.gov.uk/uksi/1953/1199/made (Annex, article 37(1): The Governor-General shall appoint a Prime Minister and other Ministers of the Federal Government)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Governor-General appointed the Prime Minister and the other Ministers (Constitution, article 37); there was no ballot for the office.",
+      "match": [
+        {
+          "office_kinds": [
+            "head_of_government"
+          ],
+          "iso_pattern": "XFR"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "speaker",
+      "tier": "national",
+      "name": "Election of the Speaker",
+      "name_en": "Speaker of the Federal Assembly",
+      "category": "indirect",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution-1953",
+      "locator": "https://www.legislation.gov.uk/uksi/1953/1199/made (Annex, article 16: election etc. of Speaker)",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Elected by the members of the Federal Assembly from among themselves or from outside (article 16), an internal vote recorded in its proceedings rather than run or published as an election.",
+      "match": [
+        {
+          "election_kinds": [
+            "indirect"
+          ],
+          "office_kinds": [
+            "speaker"
+          ],
+          "iso_pattern": "XFR"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "referendum",
+      "tier": "national",
+      "name": "Referendum",
+      "name_en": "Federation-wide referendums",
+      "category": "direct_democracy",
+      "goal": "referendums",
+      "measure": {
+        "unit": "question"
+      },
+      "source": "constitution-1953",
+      "disposition": "out_of_scope",
+      "disposition_reason": "The Federal Constitution made no provision for a referendum and none was held across the Federation. The Southern Rhodesian referendum of 9 April 1953 on joining the Federation, and the Southern Rhodesian constitutional referendum of 1961, were held by that colony and are counted under Southern Rhodesia (RHO).",
+      "match": [
+        {
+          "election_kinds": [
+            "referendum"
+          ],
+          "contest_kinds": [
+            "ballot_question"
+          ],
+          "iso_pattern": "XFR"
+        }
+      ],
+      "dates": []
+    },
+    {
+      "key": "territorial_legislatures",
+      "tier": "territory",
+      "name": "Territorial legislatures and local councils",
+      "name_en": "Southern Rhodesian Legislative Assembly, Northern Rhodesian and Nyasaland Legislative Councils, and local councils",
+      "category": "legislature",
+      "goal": "subnational",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "constitution-1953",
+      "locator": "https://www.legislation.gov.uk/uksi/1953/1199/made (section 14 and Annex, article 29: the Territories kept their own constitutions and legislatures for matters outside the Federal lists)",
+      "valid_from": "1953-08-01",
+      "valid_to": "1964-01-01",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Each Territory kept its own legislature, franchise, and local government under its own constitution, and their elections are counted under Southern Rhodesia (RHO), Zambia (ZM), and Malawi (MW). The Federation itself had no local tier.",
+      "match": [],
+      "dates": []
+    },
+    {
+      "key": "party_selection",
+      "tier": "constituency",
+      "name": "Party candidate selection",
+      "name_en": "Party selection of Federal Assembly candidates",
+      "category": "nominating",
+      "goal": "national",
+      "measure": {
+        "unit": "contest"
+      },
+      "source": "hansard-1962-may",
+      "disposition": "out_of_scope",
+      "disposition_reason": "Run by the parties under their own rules, not by returning officers; no results were published officially.",
+      "match": [
+        {
+          "election_kinds": [
+            "primary"
+          ],
+          "iso_pattern": "XFR"
+        }
+      ],
+      "dates": []
+    }
+  ]
+}
