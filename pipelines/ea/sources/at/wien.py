@@ -486,7 +486,7 @@ def geo() -> Package:
         "the City of Vienna's open data",
         depends=[f"{lander.SOURCE}/geo"],
     )
-    p.external |= {AUSTRIA, COUNTRY}
+    p.external |= {AUSTRIA, COUNTRY, LAND_POLITY}
     p.add(
         "source",
         id=SHAPES_ID,
@@ -573,7 +573,7 @@ def registry() -> Package:
         "Vienna's election results",
         depends=[f"{SOURCE}/geo"],
     )
-    p.external |= {AUSTRIA, COUNTRY}
+    p.external |= {AUSTRIA, COUNTRY, LAND_POLITY}
     p.add(
         "source",
         id=SOURCE_ID,
@@ -787,7 +787,7 @@ def landtag(year: int) -> Package:
         f"The {day} Viennese Gemeinderat and Landtag election by polling district from the city's election office",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
-    p.external |= {AUSTRIA}
+    p.external |= {AUSTRIA, LAND_POLITY}
     for url in [*files(year, True), *pages(year, True)]:
         p.uses(raw.cached(SOURCE, url))
     id = key("election", gr(year))
@@ -817,7 +817,7 @@ def councils(year: int) -> Package:
         "city's election office",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/{gr(year)}"],
     )
-    p.external |= {AUSTRIA}
+    p.external |= {AUSTRIA, LAND_POLITY}
     for url in [*files(year, False), *pages(year, False)]:
         p.uses(raw.cached(SOURCE, url))
     id = key("election", bv(year))
