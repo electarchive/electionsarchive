@@ -5,6 +5,7 @@ import difflib
 import functools
 import html
 import io
+import json
 import re
 import subprocess
 import zipfile
@@ -12,6 +13,7 @@ from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
+from typing import Any
 from uuid import uuid5
 
 import pymupdf
@@ -38,6 +40,10 @@ PARTIES = {
     "AJP": "Animal Justice Party",
     "RCH": "Responsible Capitalist Party",
     "SAB": "SA Best",
+    "FGA": "Sarah Game Fair Go for Australians",
+    "LCP": "Legalise Cannabis South Australia Party",
+    "UVA": "United Voice Australia",
+    "JLP": "Jing Lee - Better Community",
     "LDP": "Liberal Democratic Party",
     "DEM": "Australian Democrats",
     "DIG": "Danig",
@@ -261,6 +267,99 @@ def event_2022() -> Event:
     event = Event("2022-03-19", "general", [ELECTION_2022, TCP_2022])
     for name, text in first.items():
         event.districts.append(parse_2022(name, text, runoff.get(name)))
+    return event
+
+
+# 2026 state election: the commission's results site reads JSON from a public API, one static file of candidates and
+# one file of counts for the House of Assembly, and the same pair for the Legislative Council.
+
+API = "https://apim-ecsa-production.azure-api.net/results-display"
+STATIC_2026 = f"{API}/HAStatic/2026-03-21"
+COUNTS_2026 = f"{API}/HAChange/2026-03-21/0"
+COUNCIL_STATIC_2026 = f"{API}/LCStatic/2026-03-21"
+COUNCIL_COUNTS_2026 = f"{API}/LCChange/2026-03-21/0"
+
+
+def api_json(url: str) -> dict[str, Any]:
+    out = json.loads(raw.cached(SOURCE, url).path.read_text())
+    assert isinstance(out, dict)
+    return out
+
+
+def name_key(text: str) -> str:
+    """The words of 'SANDERSON, Rachel' or 'Rachel SANDERSON', lowercased and sorted, to match one name to the other."""
+    return " ".join(sorted(text.replace(",", " ").lower().split()))
+
+
+def parse_2026(static: dict[str, Any], counts: dict[str, Any]) -> District:
+    ids = [c["candidateId"] for c in static["candidates"]]
+    candidates = [Candidate(c["candidateName"], c["partyId"]) for c in static["candidates"]]
+    width = len(ids)
+    runoff_ids = [
+        i
+        for i in ids
+        if any(
+            c["candidateId"] == i and c["twoCandidatePref"] is not None
+            for place in counts["pollingPlaces"]
+            for c in place["pollingCandidates"]
+        )
+    ]
+    finalists = [ids.index(i) for i in runoff_ids] if len(runoff_ids) == 2 else None
+    places: list[Place] = []
+
+    def leaf(name: str, votes: dict[int, int], informal: int, runoff: dict[int, int | None], kind: str) -> Place:
+        row = [votes.get(i) for i in ids]
+        formal = sum(v or 0 for v in row)
+        pair = [runoff.get(i) for i in runoff_ids] if finalists else None
+        return Place(name, row, formal, informal, formal + informal, kind, pair)
+
+    for place in counts["pollingPlaces"]:
+        places.append(
+            leaf(
+                place["pollingPlaceName"],
+                {c["candidateId"]: c["formalVotes"] for c in place["pollingCandidates"]},
+                place["informalVotes"],
+                {c["candidateId"]: c["twoCandidatePref"] for c in place["pollingCandidates"]},
+                "standard",
+            )
+        )
+    for group, label in (("declarations", "declarationType"), ("absentOrdinary", "absentOrdinaryType")):
+        for item in counts[group]:
+            places.append(
+                leaf(
+                    item[label],
+                    {c["candidateId"]: c["votes"] for c in item["candidateVotes"]},
+                    item["informalVotes"],
+                    {
+                        c["candidateId"]: c.get("twoCandidatePrefVoteCount", c.get("twoCandidatePrefVotes"))
+                        for c in item["candidateVotes"]
+                    },
+                    "aggregate",
+                )
+            )
+    rounds = counts["finalDistribution"]
+    by_name = {name_key(c.name): n for n, c in enumerate(candidates)}
+    first = [0] * width
+    for r in rounds[0]["candidateResults"]:
+        first[by_name[name_key(r["candidateName"])]] = r["progressiveTotal"]
+    formal = sum(first)
+    informal = sum(p.informal or 0 for p in places)
+    declared = Place("District Total", list(first), formal, informal, formal + informal)
+    elected = [by_name[name_key(r["candidateName"])] for r in rounds[-1]["candidateResults"] if r["isElected"]]
+    if finalists:
+        last = {by_name[name_key(r["candidateName"])]: r["progressiveTotal"] for r in rounds[-1]["candidateResults"]}
+        declared.runoff = [last[i] for i in finalists]
+    return District(
+        static["districtName"], candidates, static["districtEnrolled"], places, declared, finalists, winners=elected
+    )
+
+
+def event_2026() -> Event:
+    static, counts = api_json(STATIC_2026), api_json(COUNTS_2026)
+    event = Event("2026-03-21", "general", [STATIC_2026, COUNTS_2026])
+    by_district = {d["districtId"]: d for d in counts["districts"]}
+    for d in static["districts"]:
+        event.districts.append(parse_2026(d, by_district[d["districtName"]]))
     return event
 
 
@@ -1144,6 +1243,7 @@ def events() -> dict[str, Callable[[], Event]]:
         **article_events(),
         "2018-03-17": event_2018,
         "2022-03-19": event_2022,
+        "2026-03-21": event_2026,
     }
     return dict(sorted(out.items()))
 
@@ -1153,6 +1253,10 @@ def packages() -> list[str]:
 
 
 def fetch() -> None:
+    for url in (STATIC_2026, COUNTS_2026, COUNCIL_STATIC_2026, COUNCIL_COUNTS_2026):
+        raw.fetch(SOURCE, url, suffix=".json")
+    for url in (COUNCIL_ELECTED_2026, COUNCIL_SEATS_2026):
+        raw.fetch(SOURCE, url, suffix=".csv")
     for url in (ELECTION_2022, TCP_2022, COUNCIL_2022_PLACES):
         raw.fetch(SOURCE, url, suffix=".zip")
     for url in (JAENSCH, COUNCIL_HISTORY):
@@ -1613,7 +1717,7 @@ def build(name: str) -> Package:
                     id=key("note", result_set, "places"),
                     entity_id=result_set,
                     kind="caveat",
-                    body_md="The history's polling place table adds up to a different number of votes than its "
+                    body_md="The polling place table adds up to a different number of votes than the "
                     f"district total for {len(differ)} of the {len(options)} candidates"
                     + (
                         ", because it leaves some votes out"
@@ -2594,6 +2698,69 @@ def event_council_2022() -> CouncilEvent:
     return CouncilEvent(date(2022, 3, 19), "general", files, [contest])
 
 
+ASSETS = "https://result.ecsa.sa.gov.au/assets"
+COUNCIL_ELECTED_2026 = f"{ASSETS}/Elected_Members_of_Parliament_2026.csv"
+COUNCIL_SEATS_2026 = f"{ASSETS}/lc_quotas_seats_won_2026.csv"
+
+
+def member_2026(cell: str, party: str) -> Candidate:
+    """'* Mira EL DANNAWI' (a star marks an existing member) to a candidate."""
+    incumbent = cell.startswith("*")
+    words = cell.lstrip("*").split()
+    split = next((i for i, w in enumerate(words) if w.replace("'", "").replace("-", "").isupper()), len(words))
+    given, surname = " ".join(words[:split]), " ".join(words[split:])
+    return Candidate(f"{surname}, {given}", party, incumbent, f"{given} {surname.title()}")
+
+
+def event_council_2026() -> CouncilEvent:
+    static, counts = api_json(COUNCIL_STATIC_2026), api_json(COUNCIL_COUNTS_2026)
+    elected = list(csv.reader(io.StringIO(csv_text(COUNCIL_ELECTED_2026))))
+    seats = {
+        r[0].strip(): int(r[2])
+        for r in csv.reader(io.StringIO(csv_text(COUNCIL_SEATS_2026)))
+        if len(r) > 2 and re.fullmatch(r"\d+", r[2].strip())
+    }
+    votes = {p["id"]: p["votes"] for p in counts["parties"]}
+    group = {p["id"]: p["groupId"] for p in counts["parties"]}
+    options: list[Option] = []
+    won: dict[int, int] = {}
+    winners: list[int] = []
+    for p in sorted(static["parties"], key=lambda p: group[p["id"]]):
+        members = [
+            member_2026(r[1], p["partyId"])
+            for r in elected
+            if len(r) > 3 and re.fullmatch(r"\d+", r[3].strip()) and r[2].strip() == p["partyName"]
+        ]
+        if seats.get(p["partyName"], 0) != len(members):
+            raise ValueError(
+                f"2026: {p['partyName']} won {seats.get(p['partyName'])} seats and has {len(members)} members"
+            )
+        label = f"Group {group[p['id']]}: {p['partyName']}"
+        if members:
+            won[len(options)] = len(members)
+        options.append(Option(label, "list", p["partyId"], None, members))
+    ids = [p["id"] for p in sorted(static["parties"], key=lambda p: group[p["id"]])]
+    row: list[int | None] = [votes[i] for i in ids]
+    formal, informal = counts["totalFormalVotes"], counts["totalInformalVotes"]
+    if sum(v or 0 for v in row) != formal:
+        raise ValueError("2026: group votes do not add up to the formal votes")
+    declared = Leaf("State of South Australia", row, formal, informal, formal + informal)
+    contest = CouncilContest("State of South Australia", static["lcSeatsContested"], COUNCIL_STV, options, declared)
+    contest.won = won
+    contest.winners = winners
+    contest.notes.append(
+        "The commission publishes the votes of each group, above and below the line together, and not the votes of "
+        "individual candidates. Each list shows only the members it elected, in order of election. The commission's "
+        "tables by division omit the votes of some pools, so only the statewide totals are stored."
+    )
+    return CouncilEvent(
+        date(2026, 3, 21),
+        "general",
+        [COUNCIL_STATIC_2026, COUNCIL_COUNTS_2026, COUNCIL_ELECTED_2026, COUNCIL_SEATS_2026],
+        [contest],
+    )
+
+
 @functools.cache
 def council_events() -> dict[str, Callable[[], CouncilEvent]]:
     out: dict[str, Callable[[], CouncilEvent]] = {
@@ -2601,6 +2768,7 @@ def council_events() -> dict[str, Callable[[], CouncilEvent]]:
         "2014-03-15": functools.partial(summary_event, "2014-03-15", COUNCIL_2014),
         "2018-03-17": functools.partial(summary_event, "2018-03-17", COUNCIL_2018),
         "2022-03-19": event_council_2022,
+        "2026-03-21": event_council_2026,
     }
     return dict(sorted(out.items()))
 
