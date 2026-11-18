@@ -67,6 +67,8 @@ class Poll(NamedTuple):
     printed: Printed
     data: str
     stations: bool = False
+    # Whether the station rows were read by hand from a scan (tha_data/<data>_stations.txt) rather than the text layer.
+    scanned: bool = False
 
 
 # The comparison tables of the 2021 and 2026 reports print each election's electorate, ballots cast, and rejected
@@ -81,7 +83,7 @@ POLLS = [
     Poll(date(2009, 1, 19), 2009, Printed(42623, 24034, 118), "2009"),
     Poll(date(2013, 1, 21), 2013, Printed(46601, 32657, 136), "2013"),
     Poll(date(2017, 1, 23), 2017, Printed(48980, 24343, 85), "2017"),
-    Poll(date(2021, 1, 25), 2021, Printed(51062, 26474, 88), "2021"),
+    Poll(date(2021, 1, 25), 2021, Printed(51062, 26474, 88), "2021", True, True),
     Poll(date(2021, 12, 6), 2022, Printed(51383, 29273, 98), "2021b", True),
     Poll(date(2026, 1, 12), 2026, Printed(53239, 26989, 103), "2026", True),
 ]
@@ -245,7 +247,58 @@ def station_rows(report: int) -> dict[str, tuple[list[tuple[str, bool, str, list
     return found
 
 
+def attach_scanned(poll: Poll, found: list[District]) -> None:
+    """Station rows read by hand from a scanned statement of the poll, whose columns follow the ballot."""
+    rows: dict[str, tuple[list[str], list[list[str]]]] = {}
+    current = ""
+    for line in (DATA / f"{poll.data}_stations.txt").read_text().splitlines():
+        if not line or line.startswith("#"):
+            continue
+        cells = line.split("|")
+        if cells[0] == "D":
+            current = norm(cells[1])
+            rows[current] = (cells[2:], [])
+        else:
+            rows[current][1].append(cells[1:])
+    if set(rows) != {norm(d.name) for d in found}:
+        raise ValueError(f"{poll.day}: station rows cover {sorted(rows)}")
+    for d in found:
+        surnames, lines = rows[norm(d.name)]
+        count = len(d.candidates)
+        order: list[int] = []
+        for surname in surnames:
+            hits = [i for i, c in enumerate(d.candidates) if norm(c.name).endswith(norm(surname))]
+            if len(hits) != 1:
+                raise ValueError(f"{poll.day} {d.name}: {surname} matches {hits}")
+            order.append(hits[0])
+        if sorted(order) != list(range(count)):
+            raise ValueError(f"{poll.day} {d.name}: columns {order}")
+        for line in lines:
+            if len(line) != count + 5:
+                raise ValueError(f"{poll.day} {d.name}: {line}")
+            numbers = [int(x) for x in line[2:]]
+            votes = [0] * count
+            for column, index in enumerate(order):
+                votes[index] = numbers[column]
+            code = line[0].lstrip("*")
+            d.stations.append(
+                Station(
+                    code,
+                    line[0].startswith("*"),
+                    line[1],
+                    votes,
+                    numbers[count],
+                    numbers[count + 1],
+                    numbers[count + 2],
+                )
+            )
+    verify_stations(poll, found)
+
+
 def attach_stations(poll: Poll, found: list[District]) -> None:
+    if poll.scanned:
+        attach_scanned(poll, found)
+        return
     rows = station_rows(poll.report)
     for d in found:
         got, total = rows[norm(d.name)]
@@ -269,6 +322,12 @@ def attach_stations(poll: Poll, found: list[District]) -> None:
             d.stations.append(
                 Station(code, special, venue, votes, numbers[count], numbers[count + 1], numbers[count + 2])
             )
+    verify_stations(poll, found)
+
+
+def verify_stations(poll: Poll, found: list[District]) -> None:
+    for d in found:
+        count = len(d.candidates)
         sums = [sum(s.votes[i] for s in d.stations) for i in range(count)]
         if sums != [c.votes for c in d.candidates]:
             raise ValueError(f"{poll.day} {d.name}: stations add up to {sums}")
@@ -394,6 +453,16 @@ METHODS = {
         "report's own summary and of the comparison table of the commission's later reports. Ballots cast are valid "
         "votes plus rejected ballots."
     ),
+    "stations": (
+        "From the commission's report on the election, whose statements of the poll give each candidate's votes, the "
+        "valid votes, the rejected ballots, and the names on the revised list at each polling station, and whose "
+        "results table gives each district's candidates, parties, and totals. The report is a scan; the statements "
+        "were read from the page by hand. Every station's votes add up to its valid votes, every district's "
+        "stations add up to the district's candidate votes, rejected ballots, and electorate, and the districts add "
+        "up to the national electorate, ballots cast, and rejected ballots of the report's own comparison table. "
+        "Ballots cast are valid votes plus rejected ballots. Stations marked with an asterisk held the ballots of "
+        "special electors."
+    ),
     "text": (
         "From the commission's report on the election, whose statements of the poll give each candidate's votes, the "
         "valid votes, the rejected ballots, and the names on the revised list at each polling station, and whose "
@@ -404,6 +473,32 @@ METHODS = {
     ),
 }
 TEXT_REPORTS = {2022, 2026}
+
+
+# Appendix IX of the 2026 report compares the island totals of every election since 1980: districts, names on the
+# revised list, votes cast, turnout, rejected votes, and their share of votes cast. The rows before 2021, as printed.
+HISTORY = [
+    ("1980", 12, "24,141", "15,990", "66.24%", 95, "0.59%"),
+    ("1984", 12, "28,220", "19,786", "70.11%", 123, "0.62%"),
+    ("1988", 12, "31,224", "16,720", "53.55%", 60, "0.36%"),
+    ("1992", 12, "31,503", "17,860", "56.69%", 140, "0.78%"),
+    ("1996", 12, "34,245", "15,034", "43.90%", 103, "0.69%"),
+    ("2001", 12, "37,616", "22,619", "60.13%", 150, "0.66%"),
+    ("2005", 12, "38,608", "21,013", "54.43%", 93, "0.44%"),
+    ("2009", 12, "42,623", "24,034", "56.39%", 118, "0.49%"),
+    ("2013", 12, "46,601", "32,657", "70.08%", 136, "0.42%"),
+    ("2017", 12, "48,980", "24,343", "49.70%", 85, "0.35%"),
+]
+
+
+def history_note() -> str:
+    head = (
+        "The commission's comparison of the results of Tobago House of Assembly elections, as printed in Appendix IX "
+        "of its report on the 2026 election, for the elections before 2021. These are island totals only.\n\n"
+        "| Year | Districts | Names on the revised list | Votes cast | Votes cast against electorate | "
+        "Votes rejected | Rejected against votes cast |\n|---|---|---|---|---|---|---|\n"
+    )
+    return head + "\n".join(f"| {y} | {n} | {r} | {v} | {t} | {j} | {q} |" for y, n, r, v, t, j, q in HISTORY)
 
 
 def _value(p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int) -> None:
@@ -439,7 +534,7 @@ def general(poll: Poll) -> Package:
     urls = [REPORTS[poll.report]] + ([RESULTS_2017] if poll.report == 2017 else [])
     for url in urls:
         p.uses(raw.cached(SOURCE, url))
-    method = METHODS["text" if poll.report in TEXT_REPORTS else "scan"]
+    method = METHODS["text" if poll.report in TEXT_REPORTS else "stations" if poll.scanned else "scan"]
     election = key("election", day)
     rerun = key("election", date(2021, 1, 25)) if day == date(2021, 12, 6) else None
     p.add(
@@ -456,6 +551,15 @@ def general(poll: Poll) -> Package:
     path = f"tt/tha-{day}"
     p.add("slug", path=path, entity_id=election, is_current=True)
     p.add("citation", id=key("citation", election), entity_id=election, source_id=SOURCE_ID, locator=None)
+    if poll.report == 2026:
+        p.add(
+            "note",
+            id=key("note", election, "history"),
+            entity_id=election,
+            kind="context",
+            body_md=history_note(),
+            lang="en",
+        )
     for d in found:
         code = norm(d.name)
         contest = key("contest", day, code)
