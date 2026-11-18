@@ -22,6 +22,8 @@ The volumes and the tables used:
 - Riksdagsmannavalen åren 1949–1952, table 3: 1952 and 1948.
 - Riksdagsmannavalen åren 1957–1958, part I, table 2: 1958 and 1956.
 - Riksdagsmannavalen åren 1959–1960, part I, table 2: 1960 (its 1958 rows match the 1957–1958 volume).
+- Riksdagsmannavalen åren 1961–1964, part I, tables 9 and 4: 1964, from the rows for whole constituencies (hela
+  valkretsen) of the table by municipality and election district, with the electorate, and the members elected.
 - Riksdagsmannavalen åren 1965–1968, part 1, tables 4 and 5: 1968, with the electorate.
 """
 
@@ -176,6 +178,13 @@ VOLUMES = {
             {14: "H C FP S", 15: "K O total invalid seats*"},
         ),
         Volume(
+            "1961-1964",
+            "1961-1964-I",
+            "Riksdagsmannavalen åren 1961–1964, I",
+            "tab. 9 (the rows for whole constituencies) and tab. 4",
+            {},
+        ),
+        Volume(
             "1965-1968",
             "1965-1968-1",
             "Riksdagsmannavalen åren 1965–1968, del 1: Andrakammarvalet 1968",
@@ -310,6 +319,7 @@ ELECTIONS = [
         "An extra election, held after the Second Chamber was dissolved on 28 April 1958.",
     ),
     Election(1960, "1959-1960", date(1960, 9, 18), date(1960, 9, 18)),
+    Election(1964, "1961-1964", date(1964, 9, 20), date(1964, 9, 20)),
     Election(1968, "1965-1968", date(1968, 9, 15), date(1968, 9, 15)),
 ]
 BY_TAG = {e.tag: e for e in ELECTIONS}
@@ -527,6 +537,12 @@ PARTIES = {
     ),
     "N": Party("Sveriges nationella förbund", "N", english="National League of Sweden"),
     "KDS": Party("Kristen demokratisk samling", "KDS", english="Christian Democratic Unity"),
+    "MbS": Party(
+        "Medborgerlig samling",
+        "MbS",
+        kind="bloc",
+        english="Civic Unity (Right, Centre, and People's parties)",
+    ),
     "S68": Party("Samling 68", "S 68", kind="bloc", english="Samling 68 (Right, Centre, and People's parties)"),
     "MP": Party("Mittenpartierna", "Mp", kind="bloc", english="Centre parties (Centre and People's parties)"),
 }
@@ -568,6 +584,7 @@ LABELS: dict[str, str] = {
     "N": "Nationella",
     "KDS": "Kristen demokratisk samling",
     "S68": "Samling 68",
+    "MbS": "Medborgerlig samling",
     "MP": "Mittenpartierna",
     "O": "Övriga",
 }
@@ -580,6 +597,7 @@ YEAR_LABELS: dict[tuple[int, str], str] = {
     (1932, "SP"): "Kilbomskommunister",
     (1932, "K"): "Sillénkommunister",
     (1960, "H"): "Högerpartiet",
+    (1964, "H"): "Högerpartiet",
     (1968, "H"): "Högerpartiet",
 }
 
@@ -634,6 +652,9 @@ PRINTED: dict[tuple[str, int, str], int] = {
 }
 
 
+# Columns a national row is not checked against, because a constituency's figure is illegible and not stored.
+ILLEGIBLE = {("1961-1964", 1964, "registered")}
+
 # Joint ballots of two parties under one designation, which the national row divides between the parties.
 JOINT = {"JRB": ("JR", "B")}
 
@@ -665,6 +686,8 @@ def check(volume: str) -> None:
             members = [row for k, row in units if not part or k.endswith(f"/{part}") or (part == "st" and "/" not in k)]
             for column in columns(volume):
                 if column in JOINT or any(column in parts for parts in JOINT.values()):
+                    continue
+                if (volume, year, column) in ILLEGIBLE:
                     continue
                 if sum(row[column] or 0 for row in members) != (national[column] or 0):
                     raise ValueError(f"{volume} {year}: column {column} does not add up to the {total} row")
@@ -868,6 +891,18 @@ INVALID_TEXT = (
     "invalid ballots are the envelopes without accepted contents (valkuvert utan godkänt innehåll), which the table "
     "prints beside them."
 )
+INVALID_1964 = (
+    "invalid ballots are the invalid ballots (ogiltiga valsedlar), and the electorate is the persons entitled to "
+    "vote (röstberättigade)."
+)
+NOTE_1964 = (
+    " The members elected on the joint lists of Medborgerlig samling (the Right, Centre, and People's parties in the "
+    "Fyrstadskretsen) and Mittenpartierna (the Centre and People's parties in Gotland) are counted for those lists; "
+    "table 4 counts them by their own party. The electorate of Hallands läns valkrets is illegible in the scan and "
+    "not stored, and that of Västernorrlands läns valkrets is stored as printed (189,630), though the table's own "
+    "percentages for it imply about 188,930; with the printed figures, the national electorate leaves 117,401 for "
+    "Halland."
+)
 INVALID_1968 = (
     "invalid ballots are the voters with invalid ballots (röstande med ogiltiga valsedlar), and the electorate is "
     "the persons entitled to vote (röstberättigade) in table 4."
@@ -936,8 +971,10 @@ def election(e: Election) -> Package:
     method = METHOD.format(
         table=volume.table,
         title=volume.title,
-        invalid=INVALID_1968 if e.year == 1968 else INVALID_TEXT,
+        invalid=INVALID_1968 if e.year == 1968 else INVALID_1964 if e.year == 1964 else INVALID_TEXT,
     )
+    if e.year == 1964:
+        method += NOTE_1964
     if any("/" in k for k, _ in found):
         method += PARTS
     groups: dict[str, list[tuple[str, Row]]] = {}
@@ -1313,6 +1350,68 @@ def _fit(scan: Scan, anchors: list[tuple[int, float]], index: int, row: Row) -> 
     )
 
 
+# The left page of table 9 that ends each constituency of 1964 with its row for the whole constituency, in the order
+# of the TSV; the national row (hela riket) follows Norrbotten's on the last page.
+PAGES_1964 = [42, 54, 58, 66, 74, 82, 88, 98, 100, 104, 114, 120, 130, 134, 138, 146, 154, 160, 170, 182, 188, 194]
+PAGES_1964 += [204, 212, 222, 230, 244, 254, 254]
+LEFT_1964 = ("registered", "invalid", "total")
+
+
+def _locate_1964(
+    volume: Volume, found: list[tuple[int, str, Row]], folder: Path, sizes: list[list[object]]
+) -> dict[tuple[int, str], tuple[int, float, float, float, float]]:
+    """Each row for a whole constituency, found by its label (hela valkretsen, hela riket) on its left page, and the
+    line at the same height on the right page, aligned by their rows of ink."""
+    import statistics
+
+    pdf = raw.cached(SOURCE, volume.url).path
+    boxes: dict[tuple[int, str], tuple[int, float, float, float, float]] = {}
+    scans: dict[int, tuple[list[list[Word]], list[float]]] = {}
+
+    def scan(page: int) -> tuple[list[list[Word]], list[float]]:
+        if page not in scans:
+            import numpy as np
+            from PIL import Image
+
+            words, width, height = _words(pdf, page, folder)
+            sizes.append([volume.key, page, round(width / 3), round(height / 3)])
+            dark = np.asarray(Image.open(folder / f"{page}.png").convert("L")) < 128
+            scans[page] = (_lines(words), [float(v) for v in dark.mean(axis=1)])
+        return scans[page]
+
+    seen: dict[int, int] = {}
+    for index, page in enumerate(PAGES_1964):
+        lines, profile = scan(page)
+        labelled = [
+            line
+            for line in lines
+            if any(("VALKRETS" in w[0].upper() or "RIKET" in w[0].upper()) for w in line[:3])
+            and any(w[0][:1].isdigit() for w in line)
+        ]
+        which = seen.get(page, 0)
+        seen[page] = which + 1
+        if which >= len(labelled):
+            continue
+        left = labelled[which]
+        y = statistics.median((w[2] + w[4]) / 2 for w in left)
+        right_lines, right_profile = scan(page + 1)
+        shift = _offset(right_profile, profile)
+        middles = [statistics.median((w[2] + w[4]) / 2 for w in line) for line in right_lines]
+        right = right_lines[min(range(len(right_lines)), key=lambda li: abs(middles[li] - (y + shift)))]
+        row = found[index][2]
+        for line, columns, at in ((left, LEFT_1964, page), (right, party_columns(volume.key), page + 1)):
+            numbers = _numbers(line)
+            for column in columns:
+                value = row.get(column)
+                if value is None or value < 10:
+                    continue
+                match = [box for n, box in numbers if n == value] or [box for n, box in numbers if _near(n, value)]
+                if len(match) >= 1:
+                    box = match[0]
+                    boxes[(index, column)] = (at, box[0] / 3, box[1] / 3, box[2] / 3, box[3] / 3)
+    return boxes
+
+
 def locate() -> None:
     import itertools
     import statistics
@@ -1325,6 +1424,13 @@ def locate() -> None:
         found = rows(volume.key)
         cols = columns(volume.key)
         boxes: dict[tuple[int, str], tuple[int, float, float, float, float]] = {}
+        if not volume.layout:
+            with tempfile.TemporaryDirectory() as folder:
+                boxes = _locate_1964(volume, found, Path(folder), sizes)
+            for index, (year, krets, row) in enumerate(found):
+                out += [[volume.key, year, krets, c, *boxes[(index, c)]] for c in cols if (index, c) in boxes]
+            print(f"{volume.key}: {len(boxes)} figures boxed")
+            continue
         read: set[tuple[int, str]] = set()
         near: set[tuple[int, str]] = set()
         scans: list[Scan] = []
