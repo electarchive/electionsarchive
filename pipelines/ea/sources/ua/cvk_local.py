@@ -64,10 +64,11 @@ def _first_round(url: str) -> str:
 
 
 def fetch() -> None:
-    from ea.sources.ua import cvk_local_2010, cvk_local_2015
+    from ea.sources.ua import cvk_local_2010, cvk_local_2015, cvk_local_interim
 
     cvk_local_2010.fetch()
     cvk_local_2015.fetch()
+    cvk_local_interim.fetch()
     raw.fetch(SOURCE, SHAPES, suffix=".zip")
     raw.fetch(SOURCE, OPEN_DATA, suffix=".xml")
     raw.fetch(SOURCE, COUNCILS, suffix=".html")
@@ -806,7 +807,7 @@ def runoff_days() -> list[date]:
 
 
 def packages() -> list[str]:
-    from ea.sources.ua import cvk_local_2010, cvk_local_2015
+    from ea.sources.ua import cvk_local_2010, cvk_local_2015, cvk_local_interim
 
     return [
         f"{SOURCE}/geo",
@@ -815,11 +816,12 @@ def packages() -> list[str]:
         *(f"{SOURCE}/{day}" for day in runoff_days()),
         *cvk_local_2015.packages(),
         *cvk_local_2010.packages(),
+        *cvk_local_interim.packages(),
     ]
 
 
 def parse() -> None:
-    from ea.sources.ua import cvk_local_2010, cvk_local_2015
+    from ea.sources.ua import cvk_local_2010, cvk_local_2015, cvk_local_interim
 
     geo().write()
     registry().write()
@@ -828,6 +830,7 @@ def parse() -> None:
         runoff(day).write()
     cvk_local_2015.parse()
     cvk_local_2010.parse()
+    cvk_local_interim.parse()
 
 
 def emit() -> None:
