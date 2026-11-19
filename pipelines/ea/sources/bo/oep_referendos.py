@@ -1,13 +1,19 @@
-"""Bolivia's referendums and recalls, by municipality, from the Órgano Electoral Plurinacional's published tables.
+"""Bolivia's referendums and recalls, by municipality and by polling table, from the Órgano Electoral Plurinacional.
 
 The Atlas Electoral de Bolivia, volume II (Tribunal Supremo Electoral and UNDP, 2012), prints every municipality's
 results for the referendums of 2004 to 2009 in tables with a text layer. This module reads each table from the word
 boxes of its PDF, joins the municipalities that the tables name differently, and checks every department's rows against
 the department total the same table prints, and every national sum against the national total. The shapes of the
 departments and municipalities are the GeoBolivia boundaries as redistributed by geoBoundaries (public domain).
+
+The digital Atlas Electoral publishes one file per process with the counts of every polling table (mesa). Where a
+process has one, each question also gets a second, finer result set by polling table; the municipal set stays the
+default and holds the outcome.
 """
 
+import csv
 import functools
+import io
 import json
 import re
 from datetime import date
@@ -22,7 +28,7 @@ from ea import package, raw
 from ea.changeset import slug
 from ea.package import Package
 from ea.sources.bo import atlas, bulletins
-from ea.sources.bo.places import NAMES, Places, department, fold
+from ea.sources.bo.places import NAMES, Places, department, fold, variants
 
 SOURCE = "bo.oep_referendos"
 GEOSOURCE = "bo.geoboundaries"
@@ -48,6 +54,51 @@ LICENSE = (
     "facts published with attribution"
 )
 ATTRIBUTION = "Órgano Electoral Plurinacional de Bolivia (Tribunal Supremo Electoral), Atlas Electoral de Bolivia"
+DIGITAL = "https://atlaselectoral.oep.org.bo/"
+# The digital Atlas's process number of each section that it publishes by polling table.
+PROCESSES = {
+    2: "2008-president",
+    42: "2009-autonomy",
+    41: "2009-aioc",
+    34: "2009-regional",
+    43: "2015-statutes",
+    35: "2015-eta",
+    44: "2015-eta",
+    38: "2016-constitutional",
+    36: "2016-eta",
+    39: "2016-eta",
+    45: "2016-eta",
+    37: "2017-eta",
+    40: "2017-eta",
+}
+COLUMNS = {
+    "yes": "SÍ",
+    "no": "NO",
+    "valid": "VALIDOS",
+    "blank": "BLANCOS",
+    "null": "NULOS",
+    "cast": "EMITIDOS",
+    "registered": "INSCRITOS",
+}
+# Municipalities, by the code the digital Atlas gives them, whose names there differ from the printed Atlas's.
+TOWNS = {
+    "010602": "1:yamparaez",
+    "030802": "3:toco",
+    "051102": "5:caiza-d",
+    "051302": "5:acasio",
+    "070404": "7:colonia-japonesa-san-juan",
+    "071002": "7:agustin-saavedra",
+    "071501": "7:ascension-de-guarayos",
+    "080401": "8:santa-ana-del-yacuma",
+    "090303": "9:sena",
+    "090401": "9:santa-rosa-del-abuna",
+}
+# Municipalities created after the printed Atlas: the digital Atlas's code, then the code, name, and outline here.
+NEW_TOWNS = {
+    "010704": ("1:villa-charcas", "Villa Charcas", "1:Villa Charcas"),
+    "020203": ("2:chua-cocani", "Chua Cocani", "2:Chua Cocani"),
+    "020206": ("2:huatajata", "Huatajata", "2:Huatajata"),
+}
 RULES = {"formula": "referendum"}
 YES_NO = (("Sí", "Yes"), ("No", "No"))
 
@@ -140,12 +191,14 @@ CURATED = {
     "5:Vitiche": "5:vitichi",
     "6:San Lorenzo": "6:villa-san-lorenzo",
     "6:Villa Montes": "6:villamontes",
+    "4:Paria": "4:soracachi",
     "7:General Saavedra": "7:agustin-saavedra",
     "7:Ascención de Guarayos": "7:ascension-de-guarayos",
     "7:Moromoro": "7:moro-moro",
     "7:Postrervalle": "7:postrer-valle",
     "7:San Ignacio": "7:san-ignacio-de-velasco",
     "7:San José": "7:san-jose-de-chiquitos",
+    "7:San Juan": "7:colonia-japonesa-san-juan",
     "7:San Miguel": "7:san-miguel-de-velasco",
     "7:Santa Rosa": "7:santa-rosa-del-sara",
     "8:Guayaramerín": "8:puerto-guayaramerin",
@@ -567,7 +620,15 @@ ELECTIONS: dict[date, Spec] = {
         ETA_METHOD,
     ),
 }
-FILES = dict.fromkeys((ATLAS1, ATLAS2, B2015, B2016, S2016, R2017), ".pdf")
+FILES = dict.fromkeys((ATLAS1, ATLAS2, B2015, B2016, S2016, R2017), ".pdf") | {
+    f"{DIGITAL}descarga/{n}/votos_totales.csv": ".csv" for n in PROCESSES
+}
+MESA_METHOD = (
+    "Counts of each polling table (mesa) from the digital Atlas Electoral's votos_totales file of the process. "
+    "Registered voters are the table's roll where the file gives it, ballots cast are the ballots issued, and valid "
+    "votes are the votes for the options; blank and null ballots are counted apart. The municipal result set from the "
+    "printed tables stays the default; this set's completeness is its valid votes over that set's valid votes."
+)
 
 
 def packages() -> list[str]:
@@ -745,6 +806,101 @@ def places() -> Places:
     return found
 
 
+# Reading the digital Atlas's polling tables.
+
+
+class Mesa(NamedTuple):
+    process: int
+    code: str
+    dept: str
+    town: str  # the digital Atlas's municipality code
+    name: str  # the municipality as the file names it
+    counts: dict[str, int]
+
+
+def process_url(n: int) -> str:
+    return f"{DIGITAL}descarga/{n}/votos_totales.csv"
+
+
+@functools.cache
+def mesas(n: int) -> list[Mesa]:
+    text = raw.cached(SOURCE, process_url(n)).path.read_text(encoding="utf-8-sig")
+    rows = list(csv.reader(io.StringIO(text), delimiter="|"))
+    header = rows[0]
+    out = []
+    for row in rows[1:]:
+        if not row:
+            continue
+        if len(row) == len(header) - 4 and row[3] == "RAQAYPAMPA":
+            row = row[:2] + ["03", "COCHABAMBA", "", ""] + row[2:]  # the territory has no department columns
+        if len(row) != len(header):
+            raise ValueError(f"process {n}: {len(row)} columns in {row[:12]}")
+        cells = dict(zip(header, row, strict=True))
+        counts = {name: int(cells[column]) for name, column in COLUMNS.items() if column in cells}
+        if counts["yes"] + counts["no"] != counts["valid"]:
+            raise ValueError(f"process {n}: mesa {cells['Codigo MESA']} does not add up: {counts}")
+        town = cells["Codigo MUNICIPIO"]
+        out.append(
+            Mesa(
+                n, cells["Codigo MESA"], str(int(cells["Codigo DEPARTAMENTO"])), town, cells["Nombre MUNICIPIO"], counts
+            )
+        )
+    return out
+
+
+def mesa_area(mesa: Mesa, found: Places) -> str:
+    if mesa.name == "RAQAYPAMPA":
+        return area("bo.eta", "Raqaypampa")
+    if mesa.town in NEW_TOWNS:
+        return area("bo.municipio", NEW_TOWNS[mesa.town][0])
+    if mesa.town in TOWNS:
+        return area("bo.municipio", TOWNS[mesa.town])
+    assert found.settled is not None
+    codes = {found.settled[(mesa.dept, name)] for name in variants(mesa.name) if (mesa.dept, name) in found.settled}
+    if len(codes) != 1:
+        raise ValueError(f"process {mesa.process}: {mesa.name} in department {mesa.dept} is {codes or 'unknown'}")
+    return area("bo.municipio", codes.pop())
+
+
+def district(contest: Contest, found: Places) -> str:
+    """The area a question was put to."""
+    if contest.where is None:
+        return COUNTRY
+    if contest.where in NAMES:
+        return area("bo.departamento", contest.where)
+    first = select(contest)[0][0]
+    if first.scheme == "bo.eta":
+        return area("bo.eta", first.name)
+    return area("bo.municipio", found.code(first.dept, first.name))
+
+
+def contest_mesas(contest: Contest, found: Places) -> list[Mesa]:
+    """The polling tables of a question, from the files of its section."""
+    rows = [mesa for n, name in PROCESSES.items() if name == contest.section for mesa in mesas(n)]
+    if contest.where is None:
+        return rows
+    if contest.where in NAMES:
+        return [mesa for mesa in rows if mesa.dept == contest.where]
+    target = district(contest, found)
+    return [mesa for mesa in rows if mesa_area(mesa, found) == target]
+
+
+def check_mesas() -> None:
+    """Every polling table of every file belongs to exactly one question."""
+    found = places()
+    used: dict[tuple[int, str], int] = {}
+    for spec in ELECTIONS.values():
+        for contest in spec.contests:
+            for mesa in contest_mesas(contest, found):
+                used[(mesa.process, mesa.code)] = used.get((mesa.process, mesa.code), 0) + 1
+    for n in PROCESSES:
+        for mesa in mesas(n):
+            if used.get((n, mesa.code)) != 1:
+                raise ValueError(
+                    f"process {n}: mesa {mesa.code} of {mesa.name} is in {used.get((n, mesa.code))} questions"
+                )
+
+
 # Geography.
 
 
@@ -803,8 +959,6 @@ class Geo(NamedTuple):
 
 @functools.cache
 def geometry() -> Geo:
-    from ea.sources.bo.places import variants
-
     depts: dict[str, shapely.MultiPolygon] = {}
     for b in boundaries(ADM1):
         code = department(b["name"])
@@ -832,6 +986,8 @@ def geometry() -> Geo:
         hits = {code for variant in variants(b["name"]) for code in by_variant.get((dept, variant), [])}
         if not hits and f"{dept}:{b['name']}" in CURATED:
             hits = {CURATED[f"{dept}:{b['name']}"]}
+        if not hits:
+            hits = {code for code, _, label in NEW_TOWNS.values() if label == f"{dept}:{b['name']}"}
         if len(hits) == 1:
             towns.setdefault(hits.pop(), []).append(b["shape"])
         else:
@@ -868,6 +1024,7 @@ def geo() -> Package:
         "scheme", code="bo.eta", polity_id=BOLIVIA, kind="administrative", rank=2, noun="autonomous territorial entity"
     )
     p.add("scheme", code="bo.exterior", polity_id=BOLIVIA, kind="precinct", rank=3, noun="country of the vote abroad")
+    p.add("scheme", code="bo.mesa", polity_id=BOLIVIA, kind="precinct", rank=3, noun="polling table")
     for scheme in ("bo.departamento", "bo.municipio"):
         p.add(
             "boundary_set",
@@ -943,6 +1100,13 @@ def geo() -> Package:
             area_id=id,
             kind="standard",
         )
+    for code, name, _ in NEW_TOWNS.values():
+        id = area("bo.municipio", code)
+        p.add("area", id=id, scheme_code="bo.municipio")
+        p.add("area_code", area_id=id, code=code)
+        p.add("area_parent", area_id=id, parent_id=area("bo.departamento", code.split(":")[0]))
+        p.name(id, name, "es", "official")
+        outline(p, id, shapes.towns[code])
     return p
 
 
@@ -1011,11 +1175,30 @@ def build(day: date) -> Package:
     p.name(election, spec.es, "es", "native", False)
     base = f"bo/{day}-{spec.slug}"
     p.add("slug", path=base, entity_id=election, is_current=True)
+    sections = {contest.section for contest in spec.contests}
+    files = [n for n, name in PROCESSES.items() if name in sections]
+    digital = p.id("source", DIGITAL)
+    if files:
+        p.add(
+            "source",
+            id=digital,
+            kind="official_body",
+            publisher="Órgano Electoral Plurinacional de Bolivia",
+            title="Atlas Electoral de Bolivia (digital), counts by polling table",
+            url=DIGITAL,
+            license=LICENSE,
+            attribution=ATTRIBUTION,
+        )
+        for n in files:
+            p.artifact(raw.cached(SOURCE, process_url(n)), digital)
     found = places()
     over = []
     short = []
+    tables: list[str] = []
+    units: set[str] = set()
     for contest in spec.contests:
-        add_contest(p, election, base, source, contest, found, spec.method)
+        cid = add_contest(p, election, base, source, contest, found, spec.method)
+        tables += add_mesas(p, day, election, cid, digital, contest, found, units)
         short += [
             f"{part.name}: valid {part.counts['valid']:,} + blank {part.counts['blank']:,} + null {part.counts['null']:,} "
             f"is {part.counts['valid'] + part.counts['blank'] + part.counts['null']:,}, not the {part.counts['cast']:,} printed"
@@ -1034,13 +1217,21 @@ def build(day: date) -> Package:
             + "; ".join(sorted(set(short)))
             + ". The figures are as the bulletin prints them.",
         )
+    reasons = []
     if over:
-        p.accept(
-            "accounting.turnout",
+        reasons.append(
             "The Atlas prints more ballots cast than registered voters for "
             + "; ".join(sorted(set(over)))
-            + ". The department's printed total is the sum of these printed rows, so the figures are the source's own.",
+            + ". The department's printed total is the sum of these printed rows, so the figures are the source's own."
         )
+    if tables:
+        reasons.append(
+            f"The digital Atlas's file gives more ballots cast than registered voters at {len(tables)} polling tables ("
+            + ", ".join(sorted(tables))
+            + "); the file's figures are stored as published."
+        )
+    if reasons:
+        p.accept("accounting.turnout", " ".join(reasons))
     return p
 
 
@@ -1071,25 +1262,15 @@ def select(contest: Contest) -> tuple[list[Part], dict[str, int], bool]:
     return parts, total or summed(parts), total is not None
 
 
-def add_contest(
-    p: Package, election: str, base: str, source: str, contest: Contest, found: Places, method: str
-) -> None:
+def add_contest(p: Package, election: str, base: str, source: str, contest: Contest, found: Places, method: str) -> str:
     parts, total, printed = select(contest)
     cid = p.id("contest", election, contest.id)
-    district = area("bo.departamento", contest.where) if contest.where in NAMES else COUNTRY
-    if contest.where is not None and contest.where not in NAMES:
-        first = parts[0]
-        district = (
-            area("bo.eta", first.name)
-            if first.scheme == "bo.eta"
-            else area("bo.municipio", found.code(first.dept, first.name))
-        )
     p.add(
         "contest",
         id=cid,
         election_id=election,
         kind="ballot_question",
-        district_area_id=district,
+        district_area_id=district(contest, found),
         electoral_system_id=SYSTEM,
         round_number=1,
         default_result_kind="counted",
@@ -1176,11 +1357,108 @@ def add_contest(
             (BLANK, "blank"),
         ):
             p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=total[name])
+    return cid
+
+
+def add_mesas(
+    p: Package, day: date, election: str, cid: str, source: str, contest: Contest, found: Places, units: set[str]
+) -> list[str]:
+    """The finer result set of a question by polling table; returns the tables with more ballots than voters."""
+    rows = contest_mesas(contest, found)
+    if not rows:
+        return []
+    options = [p.id("option", cid, position) for position in (1, 2)]
+    official = select(contest)[1]
+    valid = sum(mesa.counts["valid"] for mesa in rows)
+    result_set = p.id("result_set", cid, "mesa")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=cid,
+        stage="official",
+        kind="counted",
+        source_id=source,
+        status="active",
+        is_default=False,
+        completeness=round(valid / official["valid"], 6),
+    )
+    p.add("note", id=p.id("note", result_set), entity_id=result_set, kind="methodology", body_md=MESA_METHOD, lang="en")
+    p.add(
+        "citation",
+        id=p.id("citation", result_set),
+        entity_id=result_set,
+        source_id=source,
+        locator={"files": sorted({process_url(mesa.process) for mesa in rows})},
+    )
+    values: list[tuple[str, str | None, int, int]] = []
+    over = []
+    for mesa in rows:
+        unit_id = key("unit", "bo.mesa", f"{day}:{mesa.code}")
+        if unit_id not in units:
+            units.add(unit_id)
+            p.add(
+                "reporting_unit",
+                id=unit_id,
+                polity_id=BOLIVIA,
+                scheme_code="bo.mesa",
+                code=f"{day}:{mesa.code}",
+                area_relation="within",
+                area_id=mesa_area(mesa, found),
+                kind="standard",
+            )
+        c = mesa.counts
+        values += [(unit_id, options[0], VOTES, c["yes"]), (unit_id, options[1], VOTES, c["no"])]
+        values += [
+            (unit_id, None, measure, c[name])
+            for measure, name in (
+                (REGISTERED, "registered"),
+                (BALLOTS, "cast"),
+                (VALID, "valid"),
+                (INVALID, "null"),
+                (BLANK, "blank"),
+            )
+            if name in c
+        ]
+        if "registered" in c and c["cast"] > c["registered"]:
+            over.append(f"{mesa.code} with {c['cast']} ballots and {c['registered']} voters")
+    p.frame(
+        "result_value",
+        pl.DataFrame(values, schema=["unit_id", "option_id", "measure", "value"], orient="row").with_columns(
+            result_set_id=pl.lit(result_set),
+            channel=pl.lit(0, pl.Int16),
+            count_round=pl.lit(0, pl.Int16),
+            flags=pl.lit(0, pl.Int16),
+            measure=pl.col("measure").cast(pl.Int16),
+        ),
+    )
+    return over
+
+
+def compare() -> list[str]:
+    """Each question's polling tables summed against its municipal result set, as lines of text."""
+    found = places()
+    out = []
+    for day, spec in ELECTIONS.items():
+        for contest in spec.contests:
+            rows = contest_mesas(contest, found)
+            if not rows:
+                continue
+            official = select(contest)[1]
+            summed_rows = {name: sum(mesa.counts.get(name, 0) for mesa in rows) for name in official}
+            if not all("registered" in mesa.counts for mesa in rows):
+                summed_rows.pop("registered")
+            diff = {
+                name: summed_rows[name] - official[name] for name in summed_rows if summed_rows[name] != official[name]
+            }
+            out.append(f"{day} {contest.id}: {len(rows)} mesas; differences from the municipal set {diff or 'none'}")
+    return out
 
 
 def parse() -> None:
     for name in SECTIONS:
         check(name)
+    check_mesas()
     geo().write()
     registry().write()
     for day in ELECTIONS:
