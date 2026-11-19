@@ -561,13 +561,12 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
             same = sql.SQL(" and ").join(
                 [
                     *(
-                        sql.SQL("p.{} is not distinct from ({})").format(
-                            sql.Identifier(column),
-                            sql.SQL("%(key)s -> {}").format(sql.Literal(column))
-                            if kind == "jsonb"
-                            else sql.SQL("(%(key)s ->> {})::{}").format(
-                                sql.Literal(column), sql.SQL(cast(LiteralString, kind))
-                            ),
+                        sql.SQL("coalesce(p.{0}, 'null'::jsonb) = %(key)s -> {1}").format(
+                            sql.Identifier(column), sql.Literal(column)
+                        )
+                        if kind == "jsonb"
+                        else sql.SQL("p.{} is not distinct from (%(key)s ->> {})::{}").format(
+                            sql.Identifier(column), sql.Literal(column), sql.SQL(cast(LiteralString, kind))
                         )
                         for column, kind in kinds.items()
                     ),
