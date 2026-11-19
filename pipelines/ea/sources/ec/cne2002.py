@@ -30,6 +30,7 @@ area = cne.area
 CNE_SOURCE = cne.CNE_SOURCE
 ANDEAN = cne2017.ANDEAN
 PROVINCIAL_COUNCIL = key("body", "provincial-council")
+CONGRESS = key("body", "national-congress")
 SYSTEM_DHONDT = key("electoral_system", "lists", "dhondt")
 SHAPE_SOURCE = cne2017.SHAPE_SOURCE
 ADM1 = cne2017.GBOPEN + "ECU/ADM1/geoBoundaries-ECU-ADM1.geojson"
@@ -74,6 +75,7 @@ FORMER = {
 # the atlas page of each table
 PRESIDENT = {2002: 32, 2006: 46}
 ANDEAN_PAGE = {2002: 63, 2006: 65}
+CONGRESS_PAGES = {2002: range(76, 78), 2006: range(80, 82)}
 COUNCILLORS = {2002: range(97, 108), 2004: range(108, 119), 2006: range(119, 130)}
 PREFECTS = range(85, 96)
 
@@ -163,13 +165,16 @@ def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry-2002",
         SOURCE,
-        "Ecuador's provincial councils, its members of the Andean Parliament, and the D'Hondt list system that filled "
+        "Ecuador's National Congress, its provincial councils, its members of the Andean Parliament, and the D'Hondt list system that filled "
         "their seats from 2002 to 2006",
     )
     p.external.add(ECUADOR)
     p.add("body", id=PROVINCIAL_COUNCIL, polity_id=ECUADOR, kind="council")
     p.name(PROVINCIAL_COUNCIL, "Provincial councils of Ecuador", "en", "official")
     p.name(PROVINCIAL_COUNCIL, "Consejos provinciales del Ecuador", "es", "native", False)
+    p.add("body", id=CONGRESS, polity_id=ECUADOR, kind="unicameral")
+    p.name(CONGRESS, "National Congress of Ecuador", "en", "official")
+    p.name(CONGRESS, "Congreso Nacional del Ecuador", "es", "native", False)
     p.add("body", id=ANDEAN, polity_id=ECUADOR, kind="unicameral")
     p.name(ANDEAN, "Ecuador's members of the Andean Parliament", "en", "official")
     p.name(ANDEAN, "Parlamentarios andinos del Ecuador", "es", "native", False)
@@ -400,9 +405,12 @@ def lists(
     result_set = b.result_set(contest, token)
     options: list[str] = []
     numbers = Counter(row.number for row in table.rows)
+    pairs = Counter((row.number, row.sigla) for row in table.rows)
     for position, row in enumerate(table.rows, 1):
         # a list number can appear twice in one province when two local movements drew the same number
         tag = row.number if numbers[row.number] == 1 else f"{row.number}/{row.sigla}"
+        if pairs[row.number, row.sigla] > 1:
+            tag = f"{row.number}/{row.sigla}/{position}"
         option = key("option", b.day, token, tag)
         options.append(option)
         p.add(
@@ -631,6 +639,22 @@ def andean(b: Builder, year: int) -> None:
     )
 
 
+def congress(b: Builder, year: int) -> None:
+    table = atlas2002.congress(CONGRESS_PAGES[year])
+    lists(
+        b,
+        table,
+        "congress",
+        f"{year} Ecuadorian election of provincial deputies to the National Congress",
+        f"Diputados provinciales al Congreso Nacional del Ecuador {year}",
+        "national-congress",
+        CONGRESS,
+        b.national(),
+        None,
+        None,
+    )
+
+
 ELECTIONS = {
     "2002-10-20": ("general", "2002 Ecuadorian general election", "Elecciones generales del Ecuador 2002", "general"),
     "2002-11-24": (
@@ -682,6 +706,7 @@ def build(day: str) -> Package:
     elif kind == "general":
         president(b, year, False)
         andean(b, year)
+        congress(b, year)
         councillors(b, year)
     else:
         prefects(b)
