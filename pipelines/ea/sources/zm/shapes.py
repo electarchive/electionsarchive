@@ -18,6 +18,7 @@ import zipfile
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date
+from difflib import SequenceMatcher
 from uuid import uuid5
 
 import numpy
@@ -129,6 +130,7 @@ RENAMED = {"LUANO": "MKUSHISOUTH", "MUSHINDAMO": "SOLWEZIEAST"}
 SPLIT = {"KYAWAMA", "KIMALE", "KAZHIBA", "KIVUKU", "KYAFUKUMA", "KIFUBWA"}
 CONSTITUENCIES = 156
 WARDS = 1853
+WARD_MATCH = 0.85  # the least likeness of two ward spellings that counts as one ward
 TOLERANCE = 0.0001  # degrees, about 11 meters
 # the dataset names three Solwezi seats after the districts they became
 ALIASES = {"SOLWEZICENTRAL": "SOLWEZI", "SOLWEZIEAST": "MUSHINDAMO", "SOLWEZIWEST": "KALUMBILA"}
@@ -161,6 +163,10 @@ def constituency_area_2026(number: int) -> str:
 
 def ward_area(pcode: str) -> str:
     return key("area", "zm.ward", 2021, pcode)
+
+
+def ward_area_2006(constituency: str, name: str) -> str:
+    return key("area", "zm.ward", 2006, constituency, name)
 
 
 @dataclass(frozen=True)
@@ -219,6 +225,83 @@ def old_plan() -> dict[str, shapely.Geometry]:
 @functools.cache
 def new_plan() -> dict[str, shapely.Geometry]:
     return _layer(NEW, "constName")
+
+
+@dataclass(frozen=True)
+class OldWard:
+    constituency: str  # the layer's constituency letters
+    name: str
+    shape: shapely.Geometry
+
+
+@functools.cache
+def wards_2006() -> dict[tuple[str, str], OldWard]:
+    """The wards of the 2006 to 2010 maps by their constituency's and their own letters, simplified as one coverage.
+    A ward the layer splits into several parts is one ward, so its parts are dissolved."""
+    parts = {suffix: raw.cached(SOURCE, NEW + suffix).path for suffix in PARTS}
+    reader = shapefile.Reader(
+        shp=io.BytesIO(parts["shp"].read_bytes()),
+        shx=io.BytesIO(parts["shx"].read_bytes()),
+        dbf=io.BytesIO(parts["dbf"].read_bytes()),
+        encoding="latin-1",
+    )
+    move = pyproj.Transformer.from_crs(pyproj.CRS.from_wkt(parts["prj"].read_text()), 4326, always_xy=True).transform
+    grouped: dict[tuple[str, str], list[shapely.Geometry]] = {}
+    names: dict[tuple[str, str], str] = {}
+    for record, outline in zip(reader.records(), reader.shapes(), strict=True):
+        if record is None or outline is None:
+            raise ValueError("the 2006 to 2010 layer holds a record without a shape")
+        found = (letters(str(record["constName"])), letters(str(record["wardName"])))
+        names.setdefault(found, " ".join(str(record["wardName"]).split()))
+        grouped.setdefault(found, []).append(transform(move, shapely.make_valid(shape(outline.__geo_interface__))))
+    order = sorted(grouped)
+    merged = [shapely.make_valid(shapely.union_all(grouped[found]).buffer(0)) for found in order]
+    simple = shapely.coverage_simplify(numpy.array(merged), TOLERANCE)
+    return {
+        found: OldWard(found[0], names[found], _multi(outline)) for found, outline in zip(order, simple, strict=True)
+    }
+
+
+def ward_constituency(notice: str, listed: str) -> str | None:
+    """The 2006 to 2010 layer's letters for the constituency a 2011 notice names, or else the 2008 list's name for
+    its number, which a later notice may have renamed. The layer's ward labels follow the notices' own spellings,
+    unlike its swapped shapes for Mansa and Chembe. None where the layer holds no wards for either."""
+    held = {found[0] for found in wards_2006()}
+    for name in (letters(notice), letters(listed)):
+        for spelled in (name, NEW_NAMES.get(name)):
+            if spelled in held:
+                return spelled
+    return None
+
+
+def match_wards_2006(wanted: Mapping[str, tuple[str, str]]) -> dict[str, OldWard]:
+    """The layer's ward for each notice ward, by code, as (constituency letters, ward name): a ward of the same
+    spelling in the same constituency first, then, among the wards still unclaimed, the one spelled alike enough that
+    no other in the constituency comes close. Each layer ward goes to at most one notice ward."""
+    layer = wards_2006()
+    found: dict[str, OldWard] = {}
+    claimed: set[tuple[str, str]] = set()
+    for code, (constituency, name) in wanted.items():
+        key_ = (constituency, letters(name))
+        if key_ in layer and key_ not in claimed:
+            found[code] = layer[key_]
+            claimed.add(key_)
+    for code, (constituency, name) in wanted.items():
+        if code in found:
+            continue
+        spelled = letters(name)
+        scored = sorted(
+            (
+                (SequenceMatcher(None, spelled, other[1]).ratio(), other)
+                for other in layer
+                if other[0] == constituency and other not in claimed
+            ),
+            reverse=True,
+        )
+        if scored and scored[0][0] >= WARD_MATCH and (len(scored) == 1 or scored[1][0] < scored[0][0] - 0.1):
+            found[code] = layer[scored[0][1]]
+            claimed.add(scored[0][1])
+    return found
 
 
 def seat_150(name: str) -> str:
@@ -404,16 +487,31 @@ def _outline(p: Package, id: str, geometry: shapely.Geometry, source: str, start
     )
 
 
+@dataclass(frozen=True)
+class Ward2006:
+    """A ward of the 2011 councillor notice that the 2006 to 2010 layer holds: its notice code, name, and
+    constituency number, and the layer's ward."""
+
+    code: str
+    name: str
+    constituency: int
+    found: OldWard
+
+
 def geo(
-    listed: dict[int, str], ward_names: dict[str, str], listed_150: dict[int, str], listed_2026: dict[int, str]
+    listed: dict[int, str],
+    ward_names: dict[str, str],
+    listed_150: dict[int, str],
+    listed_2026: dict[int, str],
+    placed_2006: list[Ward2006],
 ) -> Package:
     """The constituencies, `listed` by number as a notice prints them, and the wards, named by `ward_names` by p-code
     where a notice names them and by the dataset otherwise."""
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "Zambia's 150 constituencies of 1991 to 2016, its 156 of 2016 to 2026, its 226 from 2026, and its 1,853 wards "
-        "of 2021 to 2026, with their shapes from public-domain ward layers, the COD-AB dataset compiled by the "
+        "Zambia's 150 constituencies of 1991 to 2016, its 156 of 2016 to 2026, its 226 from 2026, its wards of 2006 to "
+        "2016 that the 2006 to 2010 ward maps hold, and its 1,853 wards of 2021 to 2026, with their shapes from public-domain ward layers, the COD-AB dataset compiled by the "
         "Disaster Management and Mitigation Unit, and the Electoral Commission's 2026 delimitation schedules",
         depends=[f"{SOURCE}/registry"],
     )
@@ -463,8 +561,8 @@ def geo(
         attribution="Nicholas Eubank",
         notes=(
             "Best estimates of the wards, georeferenced from printed maps the Electoral Commission of Zambia "
-            "provided; dissolved here by constituency, moved from UTM zone 35S to WGS 84, and simplified to about "
-            "11 meters as one coverage."
+            "provided; moved from UTM zone 35S to WGS 84 and simplified to about 11 meters as one coverage, "
+            "dissolved by constituency for the constituencies and kept as wards for the wards of the 2011 notice."
         ),
     )
     for base, source in ((OLD, old), (NEW, new)):
@@ -517,6 +615,28 @@ def geo(
         p.add("area_parent", area_id=id, parent_id=by_pcode[place.parent], valid_from=WARDS_2021, valid_to=PLAN_2026)
         p.name(id, ward_names.get(place.pcode, place.name), "en", "official")
         _outline(p, id, place.shape, cod, WARDS_2021, PLAN_2026)
+    p.add(
+        "boundary_set",
+        id=key("boundary_set", "zm.ward", "2006"),
+        scheme_code="zm.ward",
+        vintage="2006",
+        valid_from=PLAN_2006,
+        valid_to=PLAN_2016,
+        as_of=PLAN_2006,
+    )
+    for ward_2006 in placed_2006:
+        id = ward_area_2006(ward_2006.found.constituency, letters(ward_2006.found.name))
+        p.add("area", id=id, scheme_code="zm.ward")
+        p.add("area_code", area_id=id, code=ward_2006.code, valid_from=PLAN_2006, valid_to=PLAN_2016)
+        p.add(
+            "area_parent",
+            area_id=id,
+            parent_id=constituency_area_150(ward_2006.constituency),
+            valid_from=PLAN_2006,
+            valid_to=PLAN_2016,
+        )
+        p.name(id, ward_2006.name, "en", "official")
+        _outline(p, id, ward_2006.found.shape, new, PLAN_2006, PLAN_2016)
     schedules = key("source", "delimitation-2026")
     p.add(
         "source",
