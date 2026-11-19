@@ -8,7 +8,7 @@ from ea.sources.tr.ysk import PROVINCES
 from ea.store import connect
 
 SOURCE = "tr.belde_ilce"
-VERSION = "1"
+VERSION = "2"
 
 
 def emit() -> Path | None:
@@ -48,7 +48,7 @@ def emit() -> Path | None:
                     changed += 1
                 for parent, start, start_precision, columns in conn.execute(
                     """select parent_id, valid_from, valid_from_precision,
-                              to_jsonb(p) - 'changeset_id' - 'recorded_from' - 'valid'
+                              to_jsonb(p) - 'changeset_id' - 'recorded_from'
                        from area_parent p where area_id = %s and valid @> %s""",
                     [area, end],
                 ).fetchall():
