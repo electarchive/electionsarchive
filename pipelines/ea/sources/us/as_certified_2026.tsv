@@ -1,0 +1,116 @@
+kind	key	id
+contest	2026-11-03:AS:60:house:district-1-manua	8e01e59c-83a5-5f4a-8060-8430352e4c1e
+contest	2026-11-03:AS:60:house:district-10-maoputasi-4	beaf1074-791d-5aa6-8f37-e57a8f322551
+contest	2026-11-03:AS:60:house:district-11-maoputasi-5	e33825d8-1e9c-535f-a9bd-f0a468ec1ee6
+contest	2026-11-03:AS:60:house:district-12-ituau	31797247-4f96-5b26-8a94-6738603fad39
+contest	2026-11-03:AS:60:house:district-13-fofo	b6398bdd-9a56-5443-8ed8-3f6113afb774
+contest	2026-11-03:AS:60:house:district-14-alataua	d4c51339-88c3-5935-97d6-a525e488db60
+contest	2026-11-03:AS:60:house:district-15-tualauta	5caa449d-1f99-5af3-b173-729b961b5b1e
+contest	2026-11-03:AS:60:house:district-16-tualatai	36c7d123-5f78-5636-a754-fb1f7a216e89
+contest	2026-11-03:AS:60:house:district-17-aitulagi-leasina	d209d6e1-ac93-518f-b371-ffd588698d30
+contest	2026-11-03:AS:60:house:district-2-manua	29213a6b-4920-5c8b-bd0c-4304629a9450
+contest	2026-11-03:AS:60:house:district-3-vaifanua	2de9130f-e6a8-5934-9b9e-ec5bb83e72e4
+contest	2026-11-03:AS:60:house:district-4-saole	55c69694-e915-5b00-988d-2169e216d7e4
+contest	2026-11-03:AS:60:house:district-5-sua-1	a0167431-af77-57a5-a382-91ac8f8ef389
+contest	2026-11-03:AS:60:house:district-6-sua-2	98829022-b2da-5b67-bcf8-88f242746d2f
+contest	2026-11-03:AS:60:house:district-7-maoputasi-1	acd02030-bcf9-5d7f-9836-f054e1ffff9a
+contest	2026-11-03:AS:60:house:district-8-maoputasi-2	9a656a2a-ae2a-5aa5-a8f7-ac450f95cc10
+contest	2026-11-03:AS:60:house:district-9-maoputasi-3	914dc3e0-17e2-513a-9d1c-da0f36a0fbcb
+contest	2026-11-03:AS:house:0	06654bd0-a38f-5c60-9526-5252197ccc49
+election	2026-11-03:AS:60:house:district-1-manua	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-10-maoputasi-4	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-11-maoputasi-5	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-12-ituau	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-13-fofo	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-14-alataua	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-15-tualauta	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-16-tualatai	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-17-aitulagi-leasina	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-2-manua	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-3-vaifanua	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-4-saole	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-5-sua-1	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-6-sua-2	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-7-maoputasi-1	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-8-maoputasi-2	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:60:house:district-9-maoputasi-3	475228a2-84d1-5dc0-afdf-deecf171d178
+election	2026-11-03:AS:house:0	475228a2-84d1-5dc0-afdf-deecf171d178
+option	2026-11-03:AS:60:house:district-1-manua|Fetui F. Fetu Jr.	80ecc2f0-0826-567b-b6b0-68ab82ca83f5
+option	2026-11-03:AS:60:house:district-1-manua|Mana’oimalo Fa’aaliga Matagi	f52f639c-3db6-522b-8ea4-5e9f35c70006
+option	2026-11-03:AS:60:house:district-1-manua|Paepaetele Mapu Jamias	08ac8913-832a-5522-a3a9-e010397ca1c2
+option	2026-11-03:AS:60:house:district-1-manua|Satia Aokuso Satia	acf3b969-3c32-55d0-b211-7c143e3cd767
+option	2026-11-03:AS:60:house:district-1-manua|Vala Porotesano Liusamoa	96bee0bd-54d4-5bcc-aeaa-a5db1ca9d37d
+option	2026-11-03:AS:60:house:district-10-maoputasi-4|Saena Omar Shalhout	aa6e27e7-e57d-57c2-9d9c-93d9c7f5303b
+option	2026-11-03:AS:60:house:district-10-maoputasi-4|Talali Perry T. Loloaso Wightman-Uia	8fd9c682-90ef-5da6-b691-03ff952c96e4
+option	2026-11-03:AS:60:house:district-10-maoputasi-4|Tapai Alailepule Ben Vaivao	5730dcbe-ddc9-5aee-8803-c33213486770
+option	2026-11-03:AS:60:house:district-11-maoputasi-5|Faimealelei Anthony Fu’e Allen	6442c269-7372-5f46-99f3-37c523892c11
+option	2026-11-03:AS:60:house:district-11-maoputasi-5|Muaiavaona Fofoga Pila	9c068d0c-9b43-5b4d-9233-e6bec35d4519
+option	2026-11-03:AS:60:house:district-12-ituau|Manumaua Wayne Wilson	e006dc83-988d-5c27-85e0-247db9730c3d
+option	2026-11-03:AS:60:house:district-12-ituau|Sauasetoa Tautoloitua Soliai Ho Ching	ad433836-ee7e-570e-8e63-0b0cf0fb6069
+option	2026-11-03:AS:60:house:district-13-fofo|Fiu J. Saelua	2353a10e-533f-5a40-827b-3302bf4defd3
+option	2026-11-03:AS:60:house:district-14-alataua|Mona Uli	7baf4042-7e7b-54ad-971d-76f9d86058ce
+option	2026-11-03:AS:60:house:district-14-alataua|Savali Talavou Ale	3fad259a-5eca-50a3-a3a7-5f87cbea28ed
+option	2026-11-03:AS:60:house:district-15-tualauta|Alex Sene Jr.	6ae349ee-2647-560e-b4ff-6961fe701b03
+option	2026-11-03:AS:60:house:district-15-tualauta|Ben Vaomu Solomona Sauvao	7ce7f054-aff0-5643-b038-c1ae3ff76634
+option	2026-11-03:AS:60:house:district-15-tualauta|Fagaima Larry Sanitoa	d0bfeb7c-2d67-5853-bb37-e12e17ea4ac9
+option	2026-11-03:AS:60:house:district-15-tualauta|Sefulu Mika Kelemete	c39000bc-97ef-5a3c-8400-fe746249bc42
+option	2026-11-03:AS:60:house:district-15-tualauta|Tapusalaia “Tap” Moemalemalo Maneafaiga	8cfba6c3-2f69-5c46-afb9-95441f24e04f
+option	2026-11-03:AS:60:house:district-16-tualatai|Manavaalofa Tutuila Manase	b17e87db-6d0e-5be6-a078-ce389b8e51ac
+option	2026-11-03:AS:60:house:district-17-aitulagi-leasina|Ape Mike Asifoa	fcce11b3-cf08-5471-83cf-b07137b31634
+option	2026-11-03:AS:60:house:district-17-aitulagi-leasina|Fuasali’i I. Iose	b1a8debd-bcb3-54e8-af7b-f437aa84092e
+option	2026-11-03:AS:60:house:district-2-manua|Niuatoa Loleni Faiai	4b04e773-1c15-5747-9d71-1af6c6f9b547
+option	2026-11-03:AS:60:house:district-2-manua|Tiaoali’i Fauagiga T. Sai	1d4b78af-8ef3-54a6-8c42-c29d53be2587
+option	2026-11-03:AS:60:house:district-3-vaifanua|Shaun O. Va’a	4260e9b7-2891-5026-98ba-394cfc0b8d92
+option	2026-11-03:AS:60:house:district-3-vaifanua|Tiapula Dr. Toafa Vaiaga’e	6a98dc1d-5dcc-57e1-b362-9dff39cbfee5
+option	2026-11-03:AS:60:house:district-4-saole|Dr. Va’asa Simanu	8362e297-67f4-5bcf-8606-11207236c33d
+option	2026-11-03:AS:60:house:district-4-saole|Titiali’i Kitara Vaiau	e607d905-902b-5d0f-ad57-38c955e3e919
+option	2026-11-03:AS:60:house:district-4-saole|Vitolio Ioane Lotu	0c08136a-3e46-5df8-bc14-39dffa6fea01
+option	2026-11-03:AS:60:house:district-5-sua-1|Luaitaua Gene Pan	aa6c270b-eda1-5986-881d-cd59412e78fa
+option	2026-11-03:AS:60:house:district-5-sua-1|Lynn Nu’uuli Pulou-Alaimalo	1d2285b8-a67f-5568-a4e7-66cfdec48851
+option	2026-11-03:AS:60:house:district-6-sua-2|Avaolagi Ta’atiatia I.Mata’utia Sua	49ab912d-17f0-5f18-a040-2612144111f2
+option	2026-11-03:AS:60:house:district-6-sua-2|Matagaono Vaimaga Maiava	579f4142-e4ab-5e7d-9857-807cd371981b
+option	2026-11-03:AS:60:house:district-7-maoputasi-1|Vailoata Eteuati Amituanai	8cc373df-a0df-5162-8499-7830c65342da
+option	2026-11-03:AS:60:house:district-8-maoputasi-2|Leiviifiloa Mariota K. Tuiasosopo	dfb701b8-dc33-50a2-9150-6f2e49d64ddb
+option	2026-11-03:AS:60:house:district-8-maoputasi-2|Malaeoletalu Melesio Gurr	431eb4c9-c472-553e-aafc-d2089bbac7c8
+option	2026-11-03:AS:60:house:district-9-maoputasi-3|Trude Gasetotolemasina Ledoux-Sunia	eec9844b-0d1b-52ae-8a7f-1ca9cf8164cd
+option	2026-11-03:AS:house:0|Aumua Amata	925980e7-d62d-592a-b1c2-6058fc9b8051
+option	2026-11-03:AS:house:0|Fualaau Rosie Tago Lancaster	5a9db7e9-0a4e-5303-bc17-deb4ef418779
+option	2026-11-03:AS:house:0|Meleagi Suitonu Chapman	c4a91af9-1f35-57f5-a1d6-357b0a806432
+option	2026-11-03:AS:house:0|Sandra King Young	0969cfaf-0e19-550c-86e8-d9f539096ce3
+option	2026-11-03:AS:house:0|Tuifagaloa Dr. Afu Lefaoseu	77fb9718-f160-5e99-b3f1-bc1d174979a0
+prelim	2026-11-03:AS:60:house:district-1-manua	b0eb1a98-e547-595a-a197-ad2b1727980f
+prelim	2026-11-03:AS:60:house:district-10-maoputasi-4	9ef522ea-39f4-5a3c-909c-f247932f86db
+prelim	2026-11-03:AS:60:house:district-11-maoputasi-5	8ab829e5-7f15-5775-8fd8-bb3b1748de0f
+prelim	2026-11-03:AS:60:house:district-12-ituau	8917da84-fbd5-5c98-aa08-680fdd98ff4b
+prelim	2026-11-03:AS:60:house:district-13-fofo	9a144b67-fde7-56ef-a856-be3339ce91e2
+prelim	2026-11-03:AS:60:house:district-14-alataua	2bb9d930-2ebe-5efe-9301-c0af6f3a0c3c
+prelim	2026-11-03:AS:60:house:district-15-tualauta	872c4e20-1a64-50f4-8ed1-bee1a96319d1
+prelim	2026-11-03:AS:60:house:district-16-tualatai	70d730d8-81ff-5d13-a5ce-350b2d7748a8
+prelim	2026-11-03:AS:60:house:district-17-aitulagi-leasina	6c353e84-c548-517b-a4ab-a7243a564d71
+prelim	2026-11-03:AS:60:house:district-2-manua	477b8509-0537-5ae2-ba96-091e10aaf1d8
+prelim	2026-11-03:AS:60:house:district-3-vaifanua	3bea8cb8-02d4-54d6-b888-2cfb2e315f37
+prelim	2026-11-03:AS:60:house:district-4-saole	0bcc848a-ad42-5fc2-9398-e0c1bd83562a
+prelim	2026-11-03:AS:60:house:district-5-sua-1	e981c303-e59f-56cf-941b-3ebc0638a762
+prelim	2026-11-03:AS:60:house:district-6-sua-2	7cf868ae-c1f3-5aab-88da-7c091cdf48e0
+prelim	2026-11-03:AS:60:house:district-7-maoputasi-1	280727c5-453d-5d0a-ba0b-83249efa129b
+prelim	2026-11-03:AS:60:house:district-8-maoputasi-2	6da2e14c-5fd8-5fa2-ab8b-6d59ed0a844d
+prelim	2026-11-03:AS:60:house:district-9-maoputasi-3	5b2c82c0-95d9-582f-a25d-19aec9b919b1
+prelim	2026-11-03:AS:house:0	4bbe090e-d4f1-5a5d-90cf-8011b154ed1a
+unit	2026-11-03:AS:central	5ed6cac9-aeed-50aa-b233-ae3b1e1e2ff2
+unit	2026-11-03:AS:d01	698c2795-25ee-58a0-bc2c-20b053a3c433
+unit	2026-11-03:AS:d02	666a4e91-3949-5eb0-a5bf-c502e33a93f2
+unit	2026-11-03:AS:d03	a3d8f4fd-6e68-59c6-899e-1723c5c8d328
+unit	2026-11-03:AS:d04	bdce5c89-422b-51d6-9de8-9cca047a711b
+unit	2026-11-03:AS:d05	ff56c377-d032-50fa-802e-bda831e7be7e
+unit	2026-11-03:AS:d06	9603aab3-dc0a-5064-b339-7417e8a5ab46
+unit	2026-11-03:AS:d07	25daebf4-f902-586b-8175-b971a366fa8d
+unit	2026-11-03:AS:d08	07d4afcb-c707-5f34-b906-e6a1db285618
+unit	2026-11-03:AS:d09	af3b8f76-6b0b-5dee-a878-b0e4c6fd8c09
+unit	2026-11-03:AS:d10	eab9a4ae-52a3-5cf3-bc05-f1863f69fe5a
+unit	2026-11-03:AS:d11	a39af852-81d9-5d35-b6b3-bb4fc364f5e4
+unit	2026-11-03:AS:d12	f2af805b-ba92-5548-bf9b-190a1bfc0e9d
+unit	2026-11-03:AS:d13	1dd6f28c-0405-5595-8e0d-d13291c6d758
+unit	2026-11-03:AS:d14	9e537ec0-b801-5c14-a574-20fb9a40fa90
+unit	2026-11-03:AS:d15	42a47f3c-9942-5df1-be21-5704a6f34c2b
+unit	2026-11-03:AS:d16	0a4a893e-cd27-589d-b84e-0c8c3769d065
+unit	2026-11-03:AS:d17	f2e0165f-8c13-576a-ae45-89075106c288
