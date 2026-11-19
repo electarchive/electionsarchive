@@ -1,8 +1,9 @@
 """Greece's national elections from the Ministry of Interior's results site, down to the municipal unit.
 
 The Ministry publishes each election as a set of small script files, one per electoral district (`ep_N.js`), and,
-for the elections from 2012 to 2015, one per municipality (`dhm_N.js`) and municipal unit (`den_N.js`). Files saved
-from a browser concatenate many of them under `<!-- url -->` headers; `split` takes them apart again.
+for the elections from 2012 to 2023, one per municipality (`dhm_N.js`) and municipal unit (`den_N.js`); from 2023 the
+votes cast abroad come by city. Files saved from a browser concatenate many of them under `<!-- url -->` headers, or
+gather them in a JSON object keyed by address; `split` takes them apart again.
 
 The 1996, 1999, 2000, and 2004 European pages give only the national result. The 2004 to 2009 parliamentary and 2009
 European elections, which the Ministry published only by electoral district, are built by `ypes_national`. The 2019
