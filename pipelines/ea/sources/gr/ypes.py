@@ -371,21 +371,15 @@ def registry() -> Package:
     )
     p.external |= {GREECE, COUNTRY}
     p.uses(raw.cached(SOURCE, LEGEND))
-    for number, (name, short, color) in legend().items():
+    # The legend's colors are left out: the party rows are shared with the national results registry, and another
+    # pipeline already holds an open-ended color for some of them, which a second color here would clash with.
+    for number, (name, short, _) in legend().items():
         if number == INDEPENDENT:
             continue
         p.add("party", id=party_id(number), kind="party", polity_id=GREECE)
         p.name(party_id(number), name, "el", "official")
         if short != name:
             p.name(party_id(number), short, "el", "abbreviation", False)
-        p.add(
-            "party_color",
-            party_id=party_id(number),
-            color=f"#{color}",
-            valid_from=None,
-            valid_to=None,
-            source_id=SOURCE_ID,
-        )
     p.add("body", id=MUNICIPAL_COUNCIL, polity_id=GREECE, kind="council")
     p.name(MUNICIPAL_COUNCIL, "Municipal council", "en", "official")
     p.name(MUNICIPAL_COUNCIL, "Δημοτικό συμβούλιο", "el", "native", False)
