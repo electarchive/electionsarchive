@@ -61,7 +61,7 @@ def _explore(comuna: int, *, fetch: bool) -> dict[str, str]:
         seen.update(terms)
         urls = [tsj_establishments_url(BUILDINGS, comuna, term) for term in terms]
         if fetch:
-            raw.fetch_many(SOURCE, urls, suffix=".json", workers=WORKERS)
+            raw.fetch_many(SOURCE, urls, suffix=".json", workers=WORKERS, keep_cookies=False)
         more: list[str] = []
         for term, url in zip(terms, urls, strict=True):
             listed = _codes(url)
@@ -100,9 +100,10 @@ def fetch_tsj(pages: list[int]) -> list[str]:
         ],
         suffix=".json",
         workers=WORKERS,
+        keep_cookies=False,
     )
     urls = [table.url for page in pages for table in tsj_tables(page)]
-    raw.fetch_many(SOURCE, urls, suffix=".html", workers=WORKERS, batch=500)
+    raw.fetch_many(SOURCE, urls, suffix=".html", workers=WORKERS, batch=500, keep_cookies=False)
     return urls
 
 
@@ -136,12 +137,12 @@ def te_tables(comuna: int) -> list[Table]:
 
 
 def fetch_te() -> list[str]:
-    raw.fetch_many(SOURCE, [te_section_url(c) for c in COMUNAS], suffix=".html", workers=WORKERS)
+    raw.fetch_many(SOURCE, [te_section_url(c) for c in COMUNAS], suffix=".html", workers=WORKERS, keep_cookies=False)
     raw.fetch_many(
         SOURCE, [link for c in COMUNAS for link in te_establishment_links(c)], suffix=".html", workers=WORKERS
     )
     urls = [table.url for c in COMUNAS for table in te_tables(c)]
-    raw.fetch_many(SOURCE, urls, suffix=".html", workers=WORKERS, batch=500)
+    raw.fetch_many(SOURCE, urls, suffix=".html", workers=WORKERS, batch=500, keep_cookies=False)
     return urls
 
 
