@@ -922,11 +922,66 @@ def settle(table: dict, shaped: dict, cells: dict | None) -> dict:
     return merged
 
 
-CORRECTED = {(1977, "p024"): {"CRUISE": {9: 6629}, "WOODS": {9: 7352}}}
+# Counts read off the page image where the reads misplace them, keyed by a row label's surname and the count's index
+# (0 for the first count). In the 1961 volume's by-elections, Dublin North-Central 1957 (p048) and Dublin
+# South-Central 1958 (p050), the later counts' cells drift down a row across the skewed scan, so the reads give each
+# result to the candidate below; every count as printed sums to the valid poll and moves each total by its printed
+# transfer.
+CORRECTED = {
+    (1977, "p024"): {"CRUISE": {9: 6629}, "WOODS": {9: 7352}},
+    (1961, "p048"): {
+        "CARTON": {3: 0},
+        "GARLAND": {2: 0, 3: 0},
+        "O'BYRNE": {3: 4179},
+        "HERLIHY": {1: 0, 2: 0, 3: 0},
+        "SHERWIN": {3: 6910},
+    },
+    (1961, "p050"): {
+        "CLUSKEY": {2: 0, 3: 0},
+        "CUMMINS": {2: 7111, 3: 7988},
+        "HARTNETT": {1: 0, 2: 0, 3: 0},
+        "HEGARTY": {2: 4386, 3: 0},
+        "MACBRIDE": {2: 4925, 3: 7083},
+    },
+}
+
+
+# Row boxes measured on the page renders, in thousandths of the image, where the read's boxes miss the printed rows
+# (they sit 10 to 15 points above them on both pages).
+BOXES = {
+    (1961, "p048"): {
+        "CARTON": [90, 655, 1000, 686],
+        "GARLAND": [90, 686, 1000, 712],
+        "O'BYRNE": [90, 712, 1000, 741],
+        "HERLIHY": [90, 741, 1000, 769],
+        "SHERWIN": [90, 769, 1000, 808],
+        "NON-TRANSFERABLE": [90, 808, 1000, 855],
+    },
+    (1961, "p050"): {
+        "CLUSKEY": [112, 581, 1000, 610],
+        "CUMMINS": [112, 610, 1000, 639],
+        "HARTNETT": [112, 639, 1000, 667],
+        "HEGARTY": [112, 667, 1000, 695],
+        "MACBRIDE": [112, 695, 1000, 722],
+        "NON-TRANSFERABLE": [112, 722, 1000, 782],
+    },
+}
 
 
 def correct(year: int, page: str, merged: dict) -> dict:
-    for key, fixes in CORRECTED.get((year, page), {}).items():
+    fixed = CORRECTED.get((year, page), {})
+    if fixed:
+        # The image settles the cells it corrects, so the look-alike changes the solver made to them no longer stand.
+        rows = [row for row in merged["rows"] if row["role"] != "total"]
+        settled = {
+            (index, count)
+            for index, row in enumerate(rows)
+            for key, fixes in fixed.items()
+            if key in row["label"].upper()
+            for count in fixes
+        }
+        merged["changes"] = [change for change in merged["changes"] if (change[0], change[1]) not in settled]
+    for key, fixes in fixed.items():
         for row in merged["rows"]:
             if key in row["label"].upper():
                 for count, value in fixes.items():
@@ -1349,7 +1404,10 @@ def contest(entry: dict, areas: dict[int, dict[frozenset[str], str]]) -> dict:
                 "party": party,
                 "independent": independent,
                 "results": row["results"][: merged["counts"]],
-                "box": printed["box"],
+                "box": next(
+                    (box for key, box in BOXES.get((year, entry["page"]), {}).items() if key in row["label"].upper()),
+                    printed["box"],
+                ),
             }
         )
     spoilt = [row for row in rows if row["role"] == "spoilt"]
