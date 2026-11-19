@@ -639,5 +639,74 @@
   "1962 was the first election under the constituency division of the law of 9 December 1960: 15 constituencies (one fewer than before). The former eastern and western Kuopio constituencies became Pohjois-Karjalan and Kuopion läänin vaalipiiri; Keski-Suomen läänin vaalipiiri roughly replaces the former eastern Vaasa constituency (plus some communes formerly in Häme and Mikkeli provinces); Vaasan läänin vaalipiiri combines nearly all communes of the former southern and northern Vaasa constituencies.",
   "Registered voters and voters are from table 1 (pages 12-13 of the PDF, printed pages 12-15); the voters total equals the grand total of ballots in table 2."
  ],
- "misprints": []
+ "misprints": [],
+ "alliances": [
+  {
+   "key": "ml+kansanpuolue_kekkonen+rkp_kekkonen+kekkonen_other",
+   "members": [
+    "ml",
+    "kansanpuolue_kekkonen",
+    "rkp_kekkonen",
+    "kekkonen_other"
+   ],
+   "districts": [
+    "Helsingin kaupungin vaalipiiri",
+    "Uudenmaan läänin vaalipiiri",
+    "Turun läänin eteläinen vaalipiiri",
+    "Turun läänin pohjoinen vaalipiiri",
+    "Hämeen läänin eteläinen vaalipiiri",
+    "Hämeen läänin pohjoinen vaalipiiri",
+    "Kymen läänin vaalipiiri",
+    "Mikkelin läänin vaalipiiri",
+    "Pohjois-Karjalan läänin vaalipiiri",
+    "Kuopion läänin vaalipiiri",
+    "Keski-Suomen läänin vaalipiiri",
+    "Vaasan läänin vaalipiiri",
+    "Oulun läänin vaalipiiri",
+    "Lapin läänin vaalipiiri"
+   ],
+   "page": 27,
+   "name_en": "Electoral union of Mr Kekkonen",
+   "name_fi": "Kekkosen vaaliliitto"
+  },
+  {
+   "key": "kok+vapaamieliset",
+   "members": [
+    "kok",
+    "vapaamieliset"
+   ],
+   "districts": [
+    "Helsingin kaupungin vaalipiiri",
+    "Uudenmaan läänin vaalipiiri"
+   ],
+   "page": 27,
+   "name_en": "National Coalition Party and Liberal Union electoral alliance"
+  },
+  {
+   "key": "kok+kansanpuolue",
+   "members": [
+    "kok",
+    "kansanpuolue"
+   ],
+   "districts": [
+    "Mikkelin läänin vaalipiiri",
+    "Kuopion läänin vaalipiiri"
+   ],
+   "page": 27,
+   "name_en": "National Coalition Party and Finnish People's Party electoral alliance"
+  },
+  {
+   "key": "kok+vapaamieliset+kansanpuolue",
+   "members": [
+    "kok",
+    "vapaamieliset",
+    "kansanpuolue"
+   ],
+   "districts": [
+    "Kymen läänin vaalipiiri"
+   ],
+   "page": 27,
+   "name_en": "National Coalition Party and Liberal Union and Finnish People's Party electoral alliance"
+  }
+ ]
 }

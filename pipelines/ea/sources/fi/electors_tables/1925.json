@@ -562,5 +562,61 @@
   "Footnotes of Table IV: Uusimaa: one list outside the Agrarian League's electoral alliance received 66 votes (included in ml). Turku-Pori south, Turku-Pori north, Häme north, Vaasa north: the National Coalition and the Agrarian League had a joint electoral alliance. Häme south: 4 lists outside the Social Democratic alliance received 1 220 votes (included in sdp); one list outside the Progressive Party's alliance received 56 votes (included in edistys). Viipuri west: one list outside the Social Democratic alliance received 249 votes (included in sdp). Mikkeli, Vaasa south: the National Coalition, the Agrarian League and the National Progressive Party had a joint electoral alliance. Kuopio west: 4 lists outside the Social Democratic alliance received 636 votes; the Agrarian League and the Progressive Party had a joint alliance; the workers' and smallholders' lists were not in an alliance with each other. Kuopio east: one list outside the Agrarian League's alliance received 60 votes. Vaasa east: the Agrarian League and the Progressive Party had a joint alliance. Vaasa north: one list outside the Social Democratic alliance received 119 votes. Oulu south: one list outside the workers' and smallholders' alliance received 19 votes. Oulu north: the National Coalition and the Progressive Party had a joint alliance; one list outside the workers' and smallholders' alliance received 54 votes.",
   "Women among electors elected: 19 of 300 (sdp 12, kok 3, rkp 1, edistys 1, stpv 2)."
  ],
- "misprints": []
+ "misprints": [],
+ "alliances": [
+  {
+   "key": "kok+ml",
+   "members": [
+    "kok",
+    "ml"
+   ],
+   "districts": [
+    "Turun-Porin läänin eteläinen vaalipiiri",
+    "Turun-Porin läänin pohjoinen vaalipiiri",
+    "Hämeen läänin pohjoinen vaalipiiri",
+    "Vaasan läänin pohjoinen vaalipiiri"
+   ],
+   "page": 66,
+   "name_en": "National Coalition Party and Agrarian League electoral alliance"
+  },
+  {
+   "key": "kok+ml+edistys",
+   "members": [
+    "kok",
+    "ml",
+    "edistys"
+   ],
+   "districts": [
+    "Mikkelin läänin vaalipiiri",
+    "Vaasan läänin eteläinen vaalipiiri"
+   ],
+   "page": 66,
+   "name_en": "National Coalition Party and Agrarian League and National Progressive Party electoral alliance"
+  },
+  {
+   "key": "ml+edistys",
+   "members": [
+    "ml",
+    "edistys"
+   ],
+   "districts": [
+    "Kuopion läänin läntinen vaalipiiri",
+    "Vaasan läänin itäinen vaalipiiri"
+   ],
+   "page": 66,
+   "name_en": "Agrarian League and National Progressive Party electoral alliance"
+  },
+  {
+   "key": "kok+edistys",
+   "members": [
+    "kok",
+    "edistys"
+   ],
+   "districts": [
+    "Oulun läänin pohjoinen vaalipiiri"
+   ],
+   "page": 66,
+   "name_en": "National Coalition Party and National Progressive Party electoral alliance"
+  }
+ ]
 }

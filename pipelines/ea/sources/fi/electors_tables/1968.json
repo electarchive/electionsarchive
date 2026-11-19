@@ -671,5 +671,79 @@
   "Constituencies unchanged from 1962; seats were increased by two in Helsinki and Uusimaa and by one in Häme South, and reduced by one in Mikkeli, North Karelia, Central Finland, Vaasa and Oulu.",
   "Polling days 15 and 16 January 1968. The volume has English, not French, headings, so fr is null."
  ],
- "misprints": []
+ "misprints": [],
+ "alliances": [
+  {
+   "key": "skdl+tpsl+sdp+ml+kekkonen_union_rkp+kekkonen_union_ind",
+   "members": [
+    "skdl",
+    "tpsl",
+    "sdp",
+    "ml",
+    "kekkonen_union_rkp",
+    "kekkonen_union_ind"
+   ],
+   "districts": [
+    "Helsingin kaupungin vaalipiiri",
+    "Uudenmaan läänin vaalipiiri",
+    "Turun läänin eteläinen vaalipiiri",
+    "Turun läänin pohjoinen vaalipiiri",
+    "Hämeen läänin eteläinen vaalipiiri",
+    "Hämeen läänin pohjoinen vaalipiiri",
+    "Kymen läänin vaalipiiri",
+    "Mikkelin läänin vaalipiiri",
+    "Pohjois-Karjalan läänin vaalipiiri",
+    "Kuopion läänin vaalipiiri",
+    "Keski-Suomen läänin vaalipiiri",
+    "Vaasan läänin vaalipiiri",
+    "Oulun läänin vaalipiiri",
+    "Lapin läänin vaalipiiri"
+   ],
+   "page": 13,
+   "name_en": "Electoral union of Mr Kekkonen",
+   "name_fi": "Kekkosen vaaliliitto"
+  },
+  {
+   "key": "rkp_kekkonen+rkp_vennamo+rkp_virkkunen",
+   "members": [
+    "rkp_kekkonen",
+    "rkp_vennamo",
+    "rkp_virkkunen"
+   ],
+   "districts": [
+    "Helsingin kaupungin vaalipiiri",
+    "Uudenmaan läänin vaalipiiri",
+    "Turun läänin eteläinen vaalipiiri",
+    "Vaasan läänin vaalipiiri"
+   ],
+   "page": 13,
+   "name_en": "Electoral union of the Swedish People's Party",
+   "name_fi": "Ruotsalaisen Kansanpuolueen vaaliliitto"
+  },
+  {
+   "key": "kok+kok_ind",
+   "members": [
+    "kok",
+    "kok_ind"
+   ],
+   "districts": [
+    "Helsingin kaupungin vaalipiiri",
+    "Uudenmaan läänin vaalipiiri",
+    "Turun läänin eteläinen vaalipiiri",
+    "Turun läänin pohjoinen vaalipiiri",
+    "Hämeen läänin eteläinen vaalipiiri",
+    "Hämeen läänin pohjoinen vaalipiiri",
+    "Kymen läänin vaalipiiri",
+    "Mikkelin läänin vaalipiiri",
+    "Pohjois-Karjalan läänin vaalipiiri",
+    "Kuopion läänin vaalipiiri",
+    "Keski-Suomen läänin vaalipiiri",
+    "Vaasan läänin vaalipiiri",
+    "Oulun läänin vaalipiiri",
+    "Lapin läänin vaalipiiri"
+   ],
+   "page": 13,
+   "name_en": "National Coalition Party and independents electoral alliance"
+  }
+ ]
 }

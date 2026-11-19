@@ -542,5 +542,23 @@
     "Table 1 is a two-page spread (printed pages 10-11) on PDF page 10; table 2 rows for Uusimaa-Kuopio east are on PDF page 11, Vaasa east-Lappi and the national total on PDF page 12; table 8 is printed page 42 on PDF page 28.",
     "Not a data issue but noted: table 1 prints the turnout percentage of Turun läänin eteläinen vaalipiiri as 82.1 %; 138 138 / 222 344 = 62.1 %."
   ],
-  "misprints": []
+  "misprints": [],
+  "alliances": [
+    {
+      "key": "kok+edistys",
+      "members": [
+        "kok",
+        "edistys"
+      ],
+      "districts": [
+        "Turun läänin pohjoinen vaalipiiri",
+        "Hämeen läänin eteläinen vaalipiiri",
+        "Hämeen läänin pohjoinen vaalipiiri",
+        "Kuopion läänin itäinen vaalipiiri",
+        "Vaasan läänin itäinen vaalipiiri"
+      ],
+      "page": 26,
+      "name_en": "National Coalition Party and National Progressive Party electoral alliance"
+    }
+  ]
 }

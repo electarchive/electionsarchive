@@ -139,9 +139,12 @@ BODY_METHOD = (
 SYSTEM_METHOD = (
     "Each constituency elected its share of the electors, set by its population, from candidate lists that parties "
     "or groups of voters put forward. Lists could form electoral alliances (vaaliliitot), and the seats went to the "
-    "lists and alliances by D'Hondt, as in parliamentary elections. The archive stores each party's votes and "
-    "electors as the volume prints them, by party rather than by alliance, so the engine's allocation by party can "
-    "differ from the declared one where alliances joined."
+    "lists and alliances by D'Hondt, as in parliamentary elections: the votes of the lists in an alliance were "
+    "pooled, the alliance won its electors, and they went to its lists by D'Hondt again. The archive stores each "
+    "party's votes and electors as the volume prints them, and links each list to the alliance the volume's table of "
+    "alliances names, so the engine's allocation pools the votes the way the count did. Lists outside any alliance "
+    "ran alone; where a volume counts several unaffiliated lists of one party separately, the votes of those lists "
+    "are not printed apart, and the allocation by party can differ from the declared one."
 )
 DIRECT_METHOD = (
     "The direct vote of 31 January and 1 February 1988: a candidate with more than half of the valid votes would "
@@ -284,7 +287,7 @@ def registry() -> Package:
         polity_id=FINLAND,
         valid_from=date(1919, 7, 17),
         valid_to=date(1991, 1, 1),
-        rules={"formula": "dhondt"},
+        rules={"formula": "dhondt", "pooling": "alliance"},
         rules_version=1,
     )
     p.add("note", id=p.id("note", system), entity_id=system, kind="methodology", body_md=SYSTEM_METHOD, lang="en")
@@ -530,6 +533,11 @@ def build(year: int) -> Package:
             "constituency's figures together with the ballots sent in from other constituencies, which the volume "
             "prints as a line of their own. Communes are stored as the volume names them, without a shape."
         )
+    if data.get("alliances"):
+        method += (
+            " Lists that joined an electoral alliance (vaaliliitto) are linked to it, as the volume's table of "
+            "alliances and its introduction name them for each constituency."
+        )
     if "written" in {party["key"] for party in data["parties"]}:
         method += (
             " Accepted handwritten candidate lists count only toward the valid ballots in the party table; their votes, "
@@ -542,6 +550,7 @@ def build(year: int) -> Package:
         )
     body = p.id("body", "electors")
     system = p.id("electoral_system", "electors")
+    alliance_of = _alliances(p, data, election, source, volume)
     parties = {party["key"]: party for party in data["parties"]}
     unprinted = set(data.get("unprinted", []))
     order = [party["key"] for party in data["parties"]]
@@ -618,6 +627,7 @@ def build(year: int) -> Package:
                 party_id=p.id("party", owner) if owner else None,
                 ballot_position=position + 1,
                 ballot_label=party["fi"],
+                alliance_id=alliance_of.get((row["fi"], key)),
             )
             if row["electors"].get(key):
                 p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=row["electors"][key])
@@ -679,6 +689,40 @@ def build(year: int) -> Package:
     for code, reason in data.get("accept", {}).items():
         p.accept(code, reason)
     return p
+
+
+def _alliances(
+    p: Package, data: dict[str, Any], election: str, source: str, volume: Volume
+) -> dict[tuple[str, str], str]:
+    """The electoral alliances (vaaliliitot) the volume's alliance table names, as alliances of the election, and the
+    alliance each list joined in each constituency, by constituency name and column key."""
+    found: dict[tuple[str, str], str] = {}
+    year = int(data["year"])
+    for item in data.get("alliances", []):
+        alliance = p.id("alliance", year, item["key"])
+        p.add("alliance", id=alliance, kind="electoral_alliance", election_id=election)
+        p.name(alliance, item["name_en"], "en", "english")
+        if item.get("name_fi"):
+            p.name(alliance, item["name_fi"], "fi", "official", False)
+        p.add(
+            "citation",
+            id=p.id("citation", alliance),
+            entity_id=alliance,
+            source_id=source,
+            locator={"page": item["page"]},
+        )
+        for owner in dict.fromkeys(party_of(k) for k in item["members"]):
+            if owner:
+                p.add("alliance_member", alliance_id=alliance, party_id=p.id("party", owner), role=None)
+        by_name = {row["fi"]: row for row in data["districts"]}
+        for district in item["districts"]:
+            row = by_name[district]
+            for key in item["members"]:
+                if key in row["votes"] or key in row["electors"]:
+                    if (district, key) in found:
+                        raise ValueError(f"{year} {district}: {key} is in two alliances")
+                    found[(district, key)] = alliance
+    return found
 
 
 def _communes(

@@ -581,5 +581,22 @@
   "Table IV footnote (Vaasan läänin itäinen vaalipiiri, ikl column): includes 32 votes of two lists left outside the electoral alliance.",
   "The electors table has no column for 'Muut' (other); of the 300 electors 17 were women."
  ],
- "misprints": []
+ "misprints": [],
+ "alliances": [
+  {
+   "key": "svinhufvud_general+ikl",
+   "members": [
+    "svinhufvud_general",
+    "ikl"
+   ],
+   "districts": [
+    "Turun läänin eteläinen vaalipiiri",
+    "Vaasan läänin eteläinen vaalipiiri",
+    "Vaasan läänin pohjoinen vaalipiiri",
+    "Oulun läänin pohjoinen vaalipiiri"
+   ],
+   "page": 59,
+   "name_en": "Svinhufvud's general alliance and Patriotic People's Movement electoral alliance"
+  }
+ ]
 }

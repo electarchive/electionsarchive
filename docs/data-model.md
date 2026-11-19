@@ -140,7 +140,7 @@ A party's kind is `party`, `independent_group`, `list_vehicle`, `federation`, `b
 
 The `party_affiliation` table records membership in a larger body, such as a European Parliament group. `party_color` holds dated, sourced colors. `party_position` places a party on a scale from `-3` to `3`. `party_founding` holds the founding date.
 
-Alliances live in `alliance`, with kinds `electoral_alliance`, `joint_list`, `federation`, and `apparentement`. An option joins an alliance through `contest_option.alliance_id`.
+Alliances live in `alliance`, with kinds `electoral_alliance`, `joint_list`, `federation`, and `apparentement`. An option joins an alliance through `contest_option.alliance_id`. A package writes the `alliance` and `alliance_member` tables and the optional `alliance_id` column of `contest_option`. An alliance belongs to one election, and its `alliance_member` rows name its parties; the option of each list that joined it carries `alliance_id`, so the engine pools the votes under rules with `pooling: alliance`. Package checks refuse an option whose alliance belongs to another election.
 
 Party logos live in `party_image`. The years a logo was in use come from its Wikidata statement, from the Commons file's own description, or from a cited source, and never from the date the file was uploaded. Each logo carries its license and author. Only public domain, CC0, CC BY, and CC BY-SA files qualify.
 

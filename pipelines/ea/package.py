@@ -145,6 +145,8 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
             "rerun_of_id": U,
         },
     ),
+    "alliance": (("id",), {"id": U, "kind": U, "election_id": U}),
+    "alliance_member": (None, {"alliance_id": U, "party_id": U, "role": U}),
     "contest": (
         ("id",),
         {
@@ -171,6 +173,7 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
             "party_id": U,
             "ballot_position": I32,
             "ballot_label": U,
+            "alliance_id": U,
         },
     ),
     "candidacy": (
@@ -312,7 +315,10 @@ JSON_COLUMNS = {"kinds", "rules", "locator"}
 # Columns added to the format after packages were already built. A writer leaves one out of the Parquet file when
 # every row leaves it empty, so earlier packages and their digests stay valid, and every reader takes a missing one
 # as null.
-OPTIONAL: dict[str, frozenset[str]] = {"candidacy": frozenset({"preference_option_id"})}
+OPTIONAL: dict[str, frozenset[str]] = {
+    "candidacy": frozenset({"preference_option_id"}),
+    "contest_option": frozenset({"alliance_id"}),
+}
 
 
 def _empty(table: str, frame: pl.LazyFrame) -> list[str]:
@@ -668,6 +674,10 @@ REFERENCES = [
     ("contest_option", "contest_id", "contest"),
     ("contest_option", "parent_option_id", "contest_option"),
     ("contest_option", "party_id", "party"),
+    ("contest_option", "alliance_id", "alliance"),
+    ("alliance", "election_id", "election"),
+    ("alliance_member", "alliance_id", "alliance"),
+    ("alliance_member", "party_id", "party"),
     ("party_color", "party_id", "party"),
     ("party_color", "source_id", "source"),
     ("candidacy", "person_id", "person"),
@@ -780,6 +790,10 @@ CHECKS = {
                                    join all_contest c on c.id = r.contest_id
                                    where c.magnitude = 1 and o.kind = 'elected' group by all)
                                  select * from w where winners > 1""",
+    "fact.alliance_election": """select o.id, o.alliance_id, a.election_id, c.election_id as contest_election
+                                 from all_contest_option o join all_alliance a on a.id = o.alliance_id
+                                 join all_contest c on c.id = o.contest_id
+                                 where a.election_id is distinct from c.election_id""",
     "unique.preference_option": """select preference_option_id, count(*) as n from all_candidacy
                                    where preference_option_id is not null group by all having count(*) > 1""",
     "fact.preference_option": """select k.id, k.option_id, k.preference_option_id, l.kind, o.kind, o.parent_option_id
