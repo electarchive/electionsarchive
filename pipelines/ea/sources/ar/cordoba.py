@@ -14,6 +14,7 @@ import shapely.geometry
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.ar import cordoba_acts as acts
 
 SOURCE = "ar.cordoba"
 BASE = "https://www.justiciacordoba.gob.ar/Estatico/JEL/Escrutinios"
@@ -183,6 +184,9 @@ def fetch() -> None:
         raw.fetch(SHAPES, url, suffix=".geojson")
     for url in (CONSULTA_2001, CONVENTION_2001):
         raw.fetch(SOURCE, url, suffix=".pdf")
+    for day in DAYS:
+        for url in acts.sources(day):
+            raw.fetch(SOURCE, url, suffix=".pdf")
     for day in DAYS:
         raw.fetch(SOURCE, menu_url(day), suffix=".htm")
     for day in DAYS:
@@ -739,6 +743,100 @@ CIRCUIT_METHOD = (
 )
 
 
+# --- the adjudication and proclamation acts ----------------------------------------------------------------------
+ACT_METHOD = (
+    "The seats and offices are those the electoral court declared in its adjudication and proclamation acts after the "
+    "count. Where several parties summed their votes, the seats are recorded on the party whose own votes lead the "
+    "sum; the people are the ones the proclamation names, with the sum's votes as the act prints them."
+)
+ACT_KINDS = {"governor": "governor", "legislators": "legislators", "audit": "audit_provincial"}
+
+
+class Built(NamedTuple):
+    contest: str
+    result_set: str
+    options: dict[str, str]
+    votes: dict[str, int]
+    names: dict[str, str]
+
+
+def tally(lines: list[tuple[str, str, int]]) -> dict[str, int]:
+    out: dict[str, int] = {}
+    for code, _, votes in lines:
+        out[code] = out.get(code, 0) + votes
+    return out
+
+
+def winner(day: str, act: acts.Act, built: Built) -> str:
+    """The existing option an act's winning list is: the one whose votes in the contest equal the votes the act prints
+    for it, or for the leading party of a sum."""
+    want = act.own if act.own is not None else act.votes
+    hits = [code for code, votes in built.votes.items() if votes == want and built.options.get(code)]
+    if len(hits) > 1:
+        lead = party_key(act.lead)
+        hits = [code for code in hits if lead in built.names[code] or built.names[code] in lead]
+    if len(hits) != 1:
+        raise ValueError(
+            f"{day} {act.kind} {act.scope}: {len(hits)} lists have the {want} votes printed for {act.lead!r}"
+        )
+    return built.options[hits[0]]
+
+
+def declare(p: Package, day: str, made: dict[tuple[str, str | None], Built]) -> list[str]:
+    """Add the outcomes the day's acts declare to the contests already built; returns the files the acts came from."""
+    listed = acts.declared(day, lambda url: raw.cached(SOURCE, url).path)
+    for act in listed:
+        built = made.get((ACT_KINDS.get(act.kind, act.kind), department(act.scope) if act.scope else None))
+        if built is None:
+            raise KeyError(f"{day}: the act declares {act.kind} {act.scope}, which has no contest")
+        option = winner(day, act, built)
+        seats = act.seats
+        p.add("outcome", result_set_id=built.result_set, option_id=option, kind="won", seats=seats)
+        for index, named in enumerate(act.people, 1):
+            tag = f"{day}:{act.kind}:{act.scope or '-'}:{act.order}:{index}"
+            person = key("person", tag)
+            p.add("person", id=person)
+            p.name(person, named.name, "es", "official")
+            candidacy = key("candidacy", tag)
+            if act.kind == "governor":
+                role, position = ("head" if index == 1 else "running_mate"), None
+            else:
+                role, position = "list_member", index
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=option,
+                role=role,
+                list_position=position,
+                ballot_name=named.name,
+                member_of_party_id=None,
+                is_independent=False,
+            )
+            if act.kind != "governor":
+                p.add(
+                    "outcome", result_set_id=built.result_set, option_id=option, candidacy_id=candidacy, kind="elected"
+                )
+    for result_set in dict.fromkeys(built.result_set for built in made.values()):
+        if any(o["result_set_id"] == result_set for o in p.rows.get("outcome", [])):
+            p.add(
+                "note",
+                id=key("note", result_set, "acts"),
+                entity_id=result_set,
+                kind="methodology",
+                body_md=ACT_METHOD,
+                lang="en",
+            )
+            p.add(
+                "citation",
+                id=key("citation", result_set, "acts"),
+                entity_id=result_set,
+                source_id=JEL_SOURCE,
+                locator={"urls": acts.sources(day)},
+            )
+    return acts.sources(day)
+
+
 def election(day: str) -> Package:
     year = day[:4]
     when = day_of(day)
@@ -870,6 +968,7 @@ def election(day: str) -> Package:
             for code, name, _ in item.lines:
                 if code in out:
                     continue
+                labels.setdefault(id, {})[code] = party_key(name)
                 out[code] = key("option", id, code.strip())
                 answer = code.startswith("v")
                 digits = re.match(r"\d+", code.lstrip("AP"))
@@ -884,6 +983,8 @@ def election(day: str) -> Package:
                 )
         return out
 
+    labels: dict[str, dict[str, str]] = {}
+    made_contests: dict[tuple[str, str | None], Built] = {}
     cited: list[str] = []
     over: list[str] = []
     short: list[str] = []
@@ -903,6 +1004,9 @@ def election(day: str) -> Package:
                     cargo, kind, label, number, place.name, True, area("ar-x.departamento", number)
                 )
                 options = options_of(id, kind, [r for _, r in rows])
+                made_contests[(kind, department(place.name))] = Built(
+                    id, result_set, options, tally(top.lines), labels[id]
+                )
                 for circuit, item in rows:
                     _values(p, result_set, unit("C", circuit), item, options)
                     cite("C", circuit, cargo)
@@ -919,6 +1023,13 @@ def election(day: str) -> Package:
                 continue
             id, result_set = contest(cargo, kind, label, "P", None, True, PROVINCE)
             options = options_of(id, kind, [r for _, r in rows])
+            made_contests[(kind, None)] = Built(
+                id,
+                result_set,
+                options,
+                tally(top.lines if top is not None else [line for _, r in rows for line in r.lines]),
+                labels[id],
+            )
             for circuit, item in rows:
                 _values(p, result_set, unit("C", circuit), item, options)
                 cite("C", circuit, cargo)
@@ -1003,6 +1114,8 @@ def election(day: str) -> Package:
             + " differ from the sum of the circuit reports assigned to them, because circuits without a report of "
             "their own are part of the locality; every vote count agrees with the printed totals.",
         )
+    if day in acts.URLS:
+        cited += declare(p, day, made_contests)
     seen_artifacts: set[str] = set()
     for url in cited:
         artifact = raw.cached(SOURCE, url)
