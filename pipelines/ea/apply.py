@@ -11,7 +11,7 @@ from psycopg import sql
 from psycopg.types.json import Jsonb
 
 from ea import checks, coverage_tables, covers, search, touched
-from ea.checks import FACTS, KEYS, Stage
+from ea.checks import FACTS, KEYS, MERGE_DELETES, UNFOLLOWED, Stage
 from ea.store import DATA, Connection, connect, provenance
 
 MERGE_LOCK = 1700949316
@@ -888,7 +888,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
                         current=sql.SQL(", ").join(sql.SQL("p.{}").format(column) for column in filled),
                     )
                 )
-            if kind in ("contest_option", "candidacy", "contest", "reporting_unit"):
+            if kind in MERGE_DELETES:
                 conn.execute(
                     sql.SQL("delete from public.{} where id in (select entity_id from {})").format(
                         sql.Identifier(kind), staged
@@ -1926,7 +1926,7 @@ def _refuse_overlaps(conn: Connection, stage: Stage, changeset_id: str) -> None:
         )
 
 
-def _survivors(conn: Connection) -> set[tuple[str, str]]:
+def _survivors(conn: Connection) -> dict[tuple[str, str], list[list[str]]]:
     conn.execute(
         """create temporary table if not exists survivor on commit drop as
            with recursive chain (entity_id, into_id) as (
@@ -1936,41 +1936,97 @@ def _survivors(conn: Connection) -> set[tuple[str, str]]:
            select c.entity_id, c.into_id from chain c
            where not exists (select from entity_merge m where m.entity_id = c.into_id)"""
     )
+    conn.execute("create index if not exists survivor_entity on survivor (entity_id)")
     conn.execute("analyze survivor")
     types = [kind for (kind,) in conn.execute("select unnest(enum_range(null::entity_type))::text").fetchall()]
+    keys: dict[str, list[list[str]]] = {}
+    for owner, key in conn.execute(
+        """select c.conrelid::regclass::text, array_agg(a.attname order by k.ordinality)
+           from pg_constraint c
+           cross join lateral unnest(c.conkey) with ordinality k(attnum, ordinality)
+           join pg_attribute a on a.attrelid = c.conrelid and a.attnum = k.attnum
+           where c.contype in ('p', 'u') and c.connamespace = 'public'::regnamespace
+           group by c.oid, c.conrelid"""
+    ).fetchall():
+        keys.setdefault(owner, []).append(key)
     return {
-        (relation, column)
+        (relation, column): [key for key in keys.get(relation, []) if column in key]
         for relation, column in conn.execute(
             """select c.conrelid::regclass::text, a.attname from pg_constraint c
                join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
                where c.contype = 'f' and c.connamespace = 'public'::regnamespace
-                 and c.confrelid::regclass::text = any(%s)
-                 and not exists (
-                   select from pg_constraint k where k.conrelid = c.conrelid
-                     and (k.contype = 'p' or k.conname = 'person_party_membership_key')
-                     and a.attnum = any(k.conkey))""",
+                 and c.confrelid::regclass::text = any(%s) and a.attname <> 'id'""",
             [["entity", *types]],
         ).fetchall()
-        if (relation, column) != ("entity_merge", "entity_id")
-    } | {(fact, column) for fact in FACTS for column, parent in KEYS.items() if parent in types}
+        if (relation, column) not in UNFOLLOWED
+    } | {(fact, column): [] for fact in FACTS for column, parent in KEYS.items() if parent in types}
 
 
 def _follow(
-    conn: Connection, table: str, staged: sql.Composable, columns: list[str], referencing: set[tuple[str, str]]
+    conn: Connection,
+    table: str,
+    staged: sql.Composable,
+    columns: list[str],
+    referencing: dict[tuple[str, str], list[list[str]]],
+    ours: sql.Composable,
 ) -> None:
+    if table in MERGE_DELETES and "id" in columns:
+        conn.execute(sql.SQL("delete from {} t using survivor s where t.id = s.entity_id").format(staged))
     demoted = {"name": "is_preferred", "slug": "is_current"}.get(table)
-    for column in columns:
-        if (table, column) in referencing:
-            conn.execute(
-                sql.SQL("update {} t set {} = s.into_id{} from survivor s where t.{} = s.entity_id").format(
-                    staged,
-                    sql.Identifier(column),
-                    sql.SQL(", {} = false").format(sql.Identifier(demoted))
-                    if demoted is not None and demoted in columns
-                    else sql.SQL(""),
-                    sql.Identifier(column),
-                )
+
+    def span(alias: str) -> sql.Composable:
+        return sql.SQL("daterange({}, {}, '[)')").format(
+            *(
+                sql.SQL("{}.{}").format(sql.Identifier(alias), sql.Identifier(bound))
+                if bound in columns
+                else sql.SQL("null::date")
+                for bound in ("valid_from", "valid_to")
             )
+        )
+
+    for column in columns:
+        moved = sql.Identifier(column)
+        if (table, column) not in referencing or conn.execute(
+            sql.SQL("select exists (select from {} t join survivor s on s.entity_id = t.{})").format(staged, moved)
+        ).fetchone() != (True,):
+            continue
+        for key in referencing[(table, column)]:
+            others = [other for other in key if other not in (column, "valid")]
+            if not set(others) <= set(columns):
+                continue
+            equal = [sql.SQL("x.{0} is not distinct from t.{0}").format(sql.Identifier(other)) for other in others]
+            dated = "valid" in key
+            twin = sql.SQL(" and ").join(
+                [sql.SQL("true"), *equal, *([sql.SQL("{} && {}").format(span("x"), span("t"))] if dated else [])]
+            )
+            held = sql.SQL(" and ").join(
+                [sql.SQL("true"), *equal, *([sql.SQL("x.valid && {}").format(span("t"))] if dated else [])]
+            )
+            for rival in (
+                sql.SQL("select from {} x where x.{} = s.into_id and {}").format(staged, moved, twin),
+                sql.SQL(
+                    """select from {} x join survivor y on y.entity_id = x.{}
+                       where y.into_id = s.into_id and x.ctid < t.ctid and {}"""
+                ).format(staged, moved, twin),
+                sql.SQL("select from public.{} x where x.{} = s.into_id and {} and not ({})").format(
+                    sql.Identifier(table), moved, held, ours
+                ),
+            ):
+                conn.execute(
+                    sql.SQL("delete from {} t using survivor s where t.{} = s.entity_id and exists ({})").format(
+                        staged, moved, rival
+                    )
+                )
+        conn.execute(
+            sql.SQL("update {} t set {} = s.into_id{} from survivor s where t.{} = s.entity_id").format(
+                staged,
+                moved,
+                sql.SQL(", {} = false").format(sql.Identifier(demoted))
+                if demoted is not None and demoted in columns
+                else sql.SQL(""),
+                moved,
+            )
+        )
 
 
 def _refuse_merged(conn: Connection, changeset_id: str, tables: set[str]) -> None:
@@ -2008,7 +2064,16 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
             _unmerge(conn, stage)
         referencing = _survivors(conn)
         for table, columns in stage.tables.items():
-            _follow(conn, table, stage.staged(table), columns, referencing)
+            _follow(
+                conn,
+                table,
+                stage.staged(table),
+                columns,
+                referencing,
+                sql.SQL("x.changeset_id in (select id from changeset where pipeline = any({}))").format(
+                    stage.writers(table)
+                ),
+            )
         _refuse_overlaps(conn, stage, changeset_id)
         findings = checks.run(conn, stage)
         moved = (

@@ -19,6 +19,13 @@ KEYS = {
     "option_id": "contest_option",
     "from_option_id": "contest_option",
 }
+MERGE_DELETES = ("contest_option", "candidacy", "contest", "reporting_unit")
+UNFOLLOWED = {
+    ("entity_merge", "entity_id"),
+    ("entity_merge_drop", "entity_id"),
+    ("entity_retirement", "entity_id"),
+    ("entity_subtype_drop", "entity_id"),
+}
 REPLACEABLE = ("area_geometry", "area_parent", "tenure_affiliation")
 DROPPABLE = ("area_code", "area_parent", "area_geometry", "area_kind", "area_membership")
 SWEEPABLE = {
@@ -1424,11 +1431,9 @@ def merged(
            from pg_constraint c join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
            where c.contype = 'f' and c.connamespace = 'public'::regnamespace
              and c.confrelid::regclass::text = any(%s)
-             and c.conrelid::regclass::text not in ('search_document', 'entity_merge')
-             and not exists (
-               select from pg_constraint k where k.conrelid = c.conrelid and k.contype = 'p'
-                 and a.attnum = any(k.conkey))""",
-        [["entity", *types]],
+             and c.conrelid::regclass::text not in ('search_document', 'entity_merge', 'entity_merge_drop', 'entity_subtype_drop')
+             and (a.attname <> 'id' or c.conrelid::regclass::text = any(%s))""",
+        [["entity", *types], list(MERGE_DELETES)],
     ).fetchall():
         if changeset_id is not None and not stamped or tables is not None and relation not in tables:
             continue

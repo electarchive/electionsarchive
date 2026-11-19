@@ -24,7 +24,7 @@ from psycopg import Connection, errors, sql
 from ea import covers, search, store, touched
 from ea.apply import MERGE_LOCK, _follow, _refuse_merged, _rollup, _survivors
 from ea.changeset import Changeset
-from ea.checks import RULES, merged
+from ea.checks import MERGE_DELETES, RULES, merged
 from ea.raw import Artifact
 from ea.store import DATA
 
@@ -1047,7 +1047,7 @@ def _drop(conn: Connection, table: str, staged: dict[str, tuple[str, list[str]]]
 
 
 def _facts(
-    conn: Connection, path: Path, accepted: dict[str, object], referencing: set[tuple[str, str]]
+    conn: Connection, path: Path, accepted: dict[str, object], referencing: dict[tuple[str, str], list[list[str]]]
 ) -> Loaded | None:
     manifest = _manifest(path)
     key = str(manifest["key"])
@@ -1114,7 +1114,14 @@ def _facts(
                         )
                     )
                     columns.append(column)
-            _follow(conn, table, sql.Identifier(f"pkg_{table}"), columns, referencing)
+            _follow(
+                conn,
+                table,
+                sql.Identifier(f"pkg_{table}"),
+                columns,
+                referencing,
+                sql.SQL("x.changeset_id = any({}::uuid[])").format(sql.Literal(owned)),
+            )
             staged[table] = (f"pkg_{table}", columns)
     moved = [
         str(id)
@@ -1236,7 +1243,7 @@ def _merge(
     file: Path | None,
     before: list[int],
     counts: dict[str, list[int]],
-    referencing: set[tuple[str, str]],
+    referencing: dict[tuple[str, str], list[list[str]]],
 ) -> tuple[dict[int, int], set[int]]:
     schema = FACTS[table]
     rest = [c for c in schema if c not in FACT]
@@ -1251,7 +1258,7 @@ def _merge(
         )
     else:
         rows = _stage(conn, table, list(schema), file, like=FACT_LIKE[table])
-        _follow(conn, table, sql.Identifier(f"pkg_{table}"), list(schema), referencing)
+        _follow(conn, table, sql.Identifier(f"pkg_{table}"), list(schema), referencing, sql.SQL("false"))
         made = conn.execute(
             sql.SQL(
                 """create temp table {k} on commit drop as
@@ -1337,7 +1344,16 @@ def _verify(conn: Connection, loaded: list[Loaded]) -> None:
                 continue
             ids = pl.read_parquet(file, columns=["id"])["id"].unique().to_list()
             found = conn.execute(
-                sql.SQL("select count(*) from {} where id = any(%s::uuid[])").format(sql.Identifier(table)), [ids]
+                sql.SQL(
+                    """select count(*) from unnest(%s::uuid[]) i(id)
+                       where exists (select from {} t where t.id = i.id){}"""
+                ).format(
+                    sql.Identifier(table),
+                    sql.SQL(" or exists (select from entity_merge m where m.entity_id = i.id)")
+                    if table in MERGE_DELETES
+                    else sql.SQL(""),
+                ),
+                [ids],
             ).fetchone()
             present = 0 if found is None else int(found[0])
             if present != len(ids):
