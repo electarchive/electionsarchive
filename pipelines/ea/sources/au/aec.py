@@ -78,6 +78,8 @@ EVENTS = [
     Event(31496, date(2025, 5, 3), "general", "2025 Australian federal election"),
     Event(31633, date(2026, 5, 9), "by_election", "2026 Farrer by-election", "NSW", "Farrer"),
 ]
+# The Cook by-election was first loaded as au.aec/2024-07-06; the 2024-04-13 package takes over those rows.
+ADOPTS = {date(2024, 4, 13): ["01a1e7a8-6bc6-72dc-8ac5-a62f4d1312db"]}
 HEADER = re.compile(r'^"?(StateAb|DivisionI[dD]|PartyAb|QuestionNo|State)"?,')
 # Published as HTML pages only, without CSV downloads; election_html builds them.
 HTML_ONLY = {10822, 12426}
@@ -1219,6 +1221,7 @@ def election(day: date) -> Package:
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external |= {AUSTRALIA, COUNTRY}
+    p.adopts += ADOPTS.get(day, [])
     for event in held:
         for url in _cited(event):
             p.uses(raw.cached(SOURCE, url))
