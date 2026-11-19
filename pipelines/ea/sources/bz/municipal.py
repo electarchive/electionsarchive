@@ -159,9 +159,12 @@ def clean(name: str) -> str:
 
 
 def fetch() -> None:
+    from ea.sources.bz import polling
+
     for link in URLS.values():
         raw.fetch(SOURCE, link, suffix=".pdf")
     raw.fetch(SOURCE, outline_url(), suffix=".json")
+    polling.fetch()
 
 
 def outline_url() -> str:
@@ -459,7 +462,9 @@ def party(code: str) -> str:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in DAYS)]
+    from ea.sources.bz import polling
+
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in DAYS), *polling.packages()]
 
 
 def parse() -> None:
@@ -467,6 +472,9 @@ def parse() -> None:
     registry().write()
     for day in DAYS:
         build(day).write()
+    from ea.sources.bz import polling
+
+    polling.build().write()
 
 
 def emit() -> None:
@@ -667,6 +675,9 @@ def _put(p: Package, rs: str, unit: str, option: str | None, measure: int, value
 
 
 def _council(p: Package, day: date, eid: str, path: str, town: Town, sheet: Sheet) -> None:
+    from ea.sources.bz import polling
+
+    refined = day == polling.DAY and town.key in polling.LAYOUTS
     unit = key("unit", day, town.key)
     p.add(
         "reporting_unit",
@@ -709,7 +720,7 @@ def _council(p: Package, day: date, eid: str, path: str, town: Town, sheet: Shee
             kind="counted",
             source_id=EBC_SOURCE,
             status="active",
-            is_default=True,
+            is_default=not refined,
             completeness=1.0,
         )
         method = METHOD.format(seats=town.seats)
@@ -717,6 +728,8 @@ def _council(p: Package, day: date, eid: str, path: str, town: Town, sheet: Shee
             method += f" {fixes[1][0].upper()}{fixes[1][1:]}."
         for note in sheet.notes:
             method += f" {note}."
+        if refined:
+            method += " A finer set by polling area, from the Department's combined 2009 sheet, supersedes it."
         if day.year == 2012:
             method += f" {INDEPENDENTS_2012}"
         if day.year == 2021:
