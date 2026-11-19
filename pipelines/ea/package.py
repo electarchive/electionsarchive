@@ -989,6 +989,13 @@ def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
         errors = [error.message for error in RULES.iter_errors(json.loads(rules))]
         if errors:
             findings.append(("rules.schema", len(errors), [(rules, errors[0])]))
+    bad: list[tuple[object, ...]] = [
+        (code, kinds)
+        for code, kinds in con.execute("select code, kinds from scheme where kinds is not null").fetchall()
+        if not isinstance(json.loads(kinds), dict)
+    ]
+    if bad:
+        findings.append(("fact.scheme_kinds", len(bad), bad[:5]))
     for code, query in CHECKS.items():
         rows = con.execute(query).fetchall()
         if rows:
