@@ -17,6 +17,7 @@ import io
 import json
 import re
 from datetime import date
+from pathlib import Path
 from typing import Any, NamedTuple
 from uuid import uuid5
 
@@ -107,6 +108,8 @@ def key(kind: str, *parts: object) -> str:
     return _IDS.id(kind, *parts)
 
 
+# The pages of tables 4 to 8 of the 2015 bulletin: the municipalities of the five departments that voted.
+STATUTE_PAGES = range(9, 20)
 SYSTEM = key("electoral_system", "referendum")
 GEO_SOURCE = key("source", "geoboundaries")
 
@@ -355,6 +358,15 @@ BULLETIN_METHOD = (
     "country of a vote cast abroad. The bulletin's tables add up to the totals it prints. The municipal tables of "
     "the bulletins and the lists of polling places are not read here."
 )
+STATUTES_METHOD = (
+    "Counts from the results bulletin of the Servicio Intercultural de Fortalecimiento Democrático of the Tribunal "
+    "Supremo Electoral. The departmental statutes are read per municipality from the bulletin's tables 4 to 8, which "
+    "print each department's provinces and municipalities; every province adds up to its municipalities, every "
+    "department to its provinces and to the department's row of the bulletin's first table, and the five departments "
+    "to that table's total. The charters and the indigenous autonomy statutes are the totals the bulletin prints for "
+    "the municipality. Registered voters are the people entitled to vote, valid votes are the votes for Sí and No, and "
+    "ballots cast are the valid, blank, and null ballots together."
+)
 ETA_METHOD = (
     "Counts of each autonomous territorial entity as the Órgano Electoral Plurinacional's official results report "
     "prints them. Registered voters are the people entitled to vote, valid votes are the votes for Sí and No, and "
@@ -584,7 +596,7 @@ ELECTIONS: dict[date, Spec] = {
         B2015,
         "Boletín estadístico, referendo de aprobación de estatutos autonómicos, cartas orgánicas y AIOC, 2015",
         contests_2015(),
-        BULLETIN_METHOD,
+        STATUTES_METHOD,
     ),
     date(2016, 2, 21): Spec(
         date(2016, 2, 21),
@@ -654,6 +666,12 @@ class Part(NamedTuple):
     counts: dict[str, int]
     page: int
     scheme: str = "bo.municipio"
+
+
+class BoxProvince(NamedTuple):
+    name: str
+    counts: dict[str, int]
+    rows: list[bulletins.BoxRow]
 
 
 class Result(NamedTuple):
@@ -746,6 +764,49 @@ def eta_part(text_name: str, table: dict[str, tuple[str, tuple[str, str]]], coun
     return Part(dept, eta_name(key), counts, 0)
 
 
+def statute_municipalities(pdf: Path, totals: dict[str, list[dict[str, int]]]) -> list[Part]:
+    """The municipalities of tables 4 to 8, each department checked against its printed total.
+
+    Every table opens with the department's total, then lists each province in capitals, followed by its municipalities.
+    Every province must add up to its municipalities, every department to its provinces and to table 1's row of it,
+    and the five departments to table 1's total.
+    """
+    parts: list[Part] = []
+    department_total: dict[str, int] | None = None
+    province: BoxProvince | None = None
+    provinces: list[BoxProvince] = []
+    code = ""
+    sums: list[tuple[str, dict[str, int], list[BoxProvince]]] = []
+    for row in bulletins.box_rows(pdf, STATUTE_PAGES):
+        if row.name == "TOTAL":
+            matches = [c for c, printed in totals.items() if c != "country" and row.counts in printed]
+            if len(matches) != 1:
+                raise ValueError(f"page {row.page}: a table total {row.counts} that table 1 does not print")
+            code, department_total, provinces = matches[0], row.counts, []
+            sums.append((code, department_total, provinces))
+        elif row.name.isupper():
+            province = BoxProvince(row.name, row.counts, [])
+            provinces.append(province)
+        else:
+            assert province is not None
+            province.rows.append(row)
+            name = re.sub(r"^Capital - ", "", row.name)
+            parts.append(Part(code, name, row.counts, row.page))
+    grand: dict[str, int] = {}
+    for code, department_total, provinces in sums:
+        for prov in provinces:
+            found = summed([Part(code, r.name, r.counts, r.page) for r in prov.rows])
+            if found != prov.counts:
+                raise ValueError(f"{NAMES[code]}, {prov.name}: municipalities add up to {found}, not {prov.counts}")
+        found = summed([Part(code, p.name, p.counts, 0) for p in provinces])
+        if found != department_total:
+            raise ValueError(f"{NAMES[code]}: provinces add up to {found}, not {department_total}")
+        grand = add(grand, department_total)
+    if sorted(code for code, _, _ in sums) != ["1", "2", "3", "4", "5"] or grand != totals["country"][0]:
+        raise ValueError(f"the five departments add up to {grand}, not {totals['country'][0]}")
+    return parts
+
+
 @functools.cache
 def bulletin(name: str) -> Result:
     text = bulletins.lines(raw.cached(SOURCE, BULLETINS[name]).path)
@@ -758,7 +819,8 @@ def bulletin(name: str) -> Result:
             code = department(label)
             if code is None:
                 raise ValueError(f"{name}: {label}")
-            parts.append(Part(code, label, counts, 0, "bo.departamento"))
+            totals[code] = [counts]
+        parts = statute_municipalities(raw.cached(SOURCE, BULLETINS[name]).path, totals)
     elif name == "2015-eta":
         for key, (dept, _) in ETA_2015.items():
             parts.append(Part(dept, eta_name(key), bulletins.locality_total(text, key), 0))
@@ -1101,6 +1163,8 @@ def geo() -> Package:
             kind="standard",
         )
     for code, name, _ in NEW_TOWNS.values():
+        if code in found.names():
+            continue  # the bulletin of 2015 already names it
         id = area("bo.municipio", code)
         p.add("area", id=id, scheme_code="bo.municipio")
         p.add("area_code", area_id=id, code=code)

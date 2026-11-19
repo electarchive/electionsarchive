@@ -40,7 +40,12 @@ JOINED = [
     ("1", "huacaya", "villa de huacaya"),
     ("4", "yunguyo de litoral", "yunguyo del litoral"),
     ("7", "postrervalle", "postrer valle"),
+    ("2", "villa libertad licoma", "licoma pampa"),
+    ("5", "chuqihuta ayllu jucumani", "chuquihuta"),
+    ("5", "ckocas", "ckochas"),
 ]
+# Names whose municipality keeps its code from before the bulletin of 2015 spelled it differently.
+KEPT = {("2", "licoma pampa"), ("5", "chuquihuta"), ("5", "ckochas")}
 CAPITALS = {"cruz de la sierra": "santa cruz de la sierra", "nuestra senora de la paz": "la paz"}
 PREFIX = re.compile(r"^(ciudad capital|capital ciudad|ciudad de|ciudad|capital)\s+", re.IGNORECASE)
 
@@ -148,7 +153,8 @@ class Places:
                     self.parent[node] = others[0]
         self.settled = {}
         for root, nodes in groups.items():
-            code = f"{root[0]}:{min(n[1] for n in nodes).replace(' ', '-')}"
+            name = min((n[1] for n in nodes if n in KEPT), default=min(n[1] for n in nodes))
+            code = f"{root[0]}:{name.replace(' ', '-')}"
             for node in nodes:
                 self.settled[node] = code
 
