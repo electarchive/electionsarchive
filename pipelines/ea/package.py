@@ -759,6 +759,10 @@ REFERENCES = [
     ("body_size", "body_id", "body"),
 ]
 TARGET_KEY = {"scheme": "code", "polity": "id"}
+ENTITY_TABLES = (
+    "polity", "area", "reporting_unit", "election", "contest", "contest_option", "result_set", "electoral_system",
+    "party", "alliance", "person", "candidacy", "body", "office", "seat", "tenure", "source",
+)  # fmt: skip
 OUTSIDE = ("seat",)
 
 CHECKS = {
@@ -988,6 +992,15 @@ def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
         ).fetchall()
         if rows:
             findings.append((f"reference.{table}.{column}", len(rows), rows[:5]))
+    entities = " union all ".join(
+        f'select id as v from "all_{t}"' for t in ENTITY_TABLES if t in TABLES or t in OUTSIDE
+    )
+    rows = con.execute(
+        f"select distinct entity_id from note where entity_id is not null and entity_id not in "
+        f"({entities} union all select id as v from external)"
+    ).fetchall()
+    if rows:
+        findings.append(("reference.note.entity_id", len(rows), rows[:5]))
     for (rules,) in con.execute("select rules from electoral_system").fetchall():
         errors = [error.message for error in RULES.iter_errors(json.loads(rules))]
         if errors:
