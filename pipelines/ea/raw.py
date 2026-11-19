@@ -306,11 +306,14 @@ def fetch_many(
     batch: int = 2000,
     attempts: int = 4,
     verify: ssl.SSLContext | bool = True,
+    keep_cookies: bool = True,
 ) -> dict[str, Artifact]:
     """Fetch many GET URLs into the cache concurrently, writing the index once per batch instead of once per file,
     so a source of tens of thousands of small API responses does not rewrite its index for each one. Cached URLs are
-    reused, and a URL that still fails after its attempts is left out of the result."""
+    reused, and a URL that still fails after its attempts is left out of the result. `keep_cookies=False` refuses
+    every cookie, for a server that locks its session and so answers one request per session at a time."""
     from concurrent.futures import ThreadPoolExecutor
+    from http.cookiejar import CookieJar, DefaultCookiePolicy
     from time import sleep
 
     folder = DATA / "raw" / source
@@ -318,7 +321,10 @@ def fetch_many(
     index = _read(source)
     out = {url: _artifact(source, url, index[url]) for url in urls if url in index}
     pending = [url for url in dict.fromkeys(urls) if url not in index]
-    client = httpx.Client(headers={"User-Agent": USER_AGENT}, follow_redirects=True, timeout=120, verify=verify)
+    jar = None if keep_cookies else CookieJar(DefaultCookiePolicy(allowed_domains=[]))
+    client = httpx.Client(
+        headers={"User-Agent": USER_AGENT}, follow_redirects=True, timeout=120, verify=verify, cookies=jar
+    )
 
     def one(url: str) -> tuple[str, dict[str, str | int | None]] | None:
         for attempt in range(attempts):
