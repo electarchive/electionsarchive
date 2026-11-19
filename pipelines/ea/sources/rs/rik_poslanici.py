@@ -3,7 +3,8 @@
 The archive holds these elections only as scans. For 1992, 1993 and 1997 the Commission's report of the overall
 results prints, for every list, its votes and seats in each constituency (izborna jedinica) and in the Republic: nine
 constituencies in 1992 and 1993, twenty-nine in 1997. For 2000, when the whole Republic was one constituency, the
-report prints each list's national votes and seats. Every figure was read from the page images, each list's
+report prints each list's national votes and seats, and the Commission's statistical book prints the registered
+voters, ballots and each list's votes for every municipality. Every figure was read from the page images, each list's
 constituency votes and seats checked against the national total the report prints for it, and each constituency's
 seats against the seats it prints for the constituency; the transcription, with each figure's page and bounding box,
 lives in ``rik_poslanici.json`` beside this module.
@@ -22,7 +23,7 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
-from ea.sources.rs import rik, rik_predsednik
+from ea.sources.rs import rik, rik_poslanici_2000, rik_predsednik, rik_scans
 
 DATA_FILE = Path(__file__).with_name("rik_poslanici.json")
 DIGITIZED = rik_predsednik.DIGITIZED
@@ -192,11 +193,17 @@ METHOD = (
     "value. Lists are numbered in the report's order, by seats and then votes, not by their place on the ballot."
 )
 METHOD_2000 = (
-    "Digitized from the Republic Electoral Commission's report of the overall results of the election, adopted on 12 "
-    "January 2001 and published in its archive as a scan. The whole Republic was one constituency; the report prints "
-    "each list's votes and seats and the Republic's registered voters, voters, and ballots. Ballots cast are the "
-    "ballots used. The lists' votes add up to the valid ballots and their seats to 250. Voting was repeated at some "
-    "polling stations on 10 January 2001. Lists are numbered as the report numbers them."
+    "Digitized from the Republic Statistical Office's book on the election, published in the Republic Electoral "
+    "Commission's archive as a scan, whose Tables 2.1 and 2.2 print for each of 174 municipalities the registered "
+    "voters, the voters, the ballots used, the invalid and valid ballots, and each list's votes. The whole Republic "
+    "was one constituency; the report of the overall results, adopted on 12 January 2001, prints each list's votes "
+    "and seats and the Republic's totals, which the municipal rows add up to exactly. Each figure was read from the "
+    "page image and keeps its page and bounding box. Every municipality's invalid and valid ballots add up to the "
+    "ballots used and its lists' votes to its valid ballots, every printed percentage agrees with its figures, and "
+    "each district's municipalities add up to the district, the districts to Central Serbia, Vojvodina and Kosovo "
+    "and Metohija, and these to the Republic. The book prints 13 municipalities of Kosovo and Metohija, and prints "
+    "Niška Banja apart from Niš. Ballots cast are the ballots used. Voting was repeated at some polling stations on 10 January 2001. Lists are numbered as the report "
+    "numbers them."
 )
 
 
@@ -220,6 +227,7 @@ def packages() -> list[str]:
 def fetch() -> None:
     for url in URLS.values():
         raw.fetch(rik.SOURCE, url, suffix=".pdf")
+    rik_scans.fetch("2000")
 
 
 def parse() -> None:
@@ -438,12 +446,13 @@ def build_2000() -> Package:
     p = Package(
         f"{rik.SOURCE}/{s}",
         rik.SOURCE,
-        "The 2000 Serbian parliamentary election, national totals digitized from the Republic Electoral Commission's "
-        "report of the overall results",
+        "The 2000 Serbian parliamentary election by municipality, digitized from the Republic Statistical Office's "
+        "book, with the national totals of the Republic Electoral Commission's report",
         depends=[f"{rik.SOURCE}/geo", f"{rik.SOURCE}/registry"],
     )
     p.external |= {rik.SERBIA, COUNTRY}
     p.artifact(raw.cached(rik.SOURCE, URLS["2000"]), rik.SOURCE_ID)
+    p.artifact(raw.cached(rik.SOURCE, rik_scans.url("2000")), rik.SOURCE_ID)
     title = "2000 Serbian parliamentary election"
     native = "Избори за народне посланике у Народну скупштину Републике Србије 2000."
     election, path = _election(p, s, day, date(2001, 1, 10), title, native)
@@ -479,10 +488,10 @@ def build_2000() -> Package:
     p.add(
         "note", id=rik.key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD_2000, lang="en"
     )
-    unit = rik_predsednik._unit(p, f"{day}:np:total", "aggregate", COUNTRY, "Република Србија")
-    rows: list[tuple[str, str | None, int, int]] = [(unit, None, m, v) for m, v in DECLARED_2000.items()]
+    options: list[str] = []
     for number, (label, votes, seats) in enumerate(LISTS_2000, 1):
         option = rik.key("option", s, number)
+        options.append(option)
         p.add(
             "contest_option",
             id=option,
@@ -495,8 +504,41 @@ def build_2000() -> Package:
         if seats:
             p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=seats)
         p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=votes)
-        rows.append((unit, option, VOTES, votes))
     for measure, value in DECLARED_2000.items():
         p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
-    _values(p, result_set, rows, [])
+    table = [r for r in rik_poslanici_2000.data() if r["kind"] == "muni"]
+    used = {int(cell[1]) for r in table for cell in r["cells"].values()}
+    pages = _pages(p, rik_scans.url("2000"), used)
+    scale = 100 / 72
+    measures = {
+        "registered": REGISTERED,
+        "voters": VOTERS,
+        "used": CAST,
+        "invalid": INVALID,
+        "valid": VALID,
+    }
+    rows: list[tuple[str, str | None, int, int]] = []
+    locators: list[tuple[str, str | None, int, str, float, float, float, float]] = []
+    summed: dict[tuple[int | None, int], int] = {}
+    for r in table:
+        code = rik_poslanici_2000.code_of(r["name"], r["okrug"])
+        if code is None:
+            raise ValueError(f"{r['name']} has no code in the register")
+        name = f"Београд-{r['name']}" if r["okrug"] == 0 else r["name"]
+        unit = rik_predsednik._unit(p, f"{day}:{code}", "standard", rik.area("rs.opstina", code), name)
+        figures = [(key, None, measure) for key, measure in measures.items()]
+        figures += [(key, option, VOTES) for key, option in zip(rik_poslanici_2000.LISTS, options, strict=True)]
+        for key, option, measure in figures:
+            value, page, x0, y0, x1, y1 = r["cells"][key]
+            rows.append((unit, option, measure, value))
+            locators.append((unit, option, measure, pages[int(page)], x0 * scale, y0 * scale, x1 * scale, y1 * scale))
+            position = None if option is None else options.index(option)
+            summed[(position, measure)] = summed.get((position, measure), 0) + value
+    for measure, value in DECLARED_2000.items():
+        if summed[(None, measure)] != value:
+            raise ValueError(f"2000: municipalities add up to {summed[(None, measure)]} of {measure}, not {value}")
+    for position, (_, votes, _) in enumerate(LISTS_2000):
+        if summed[(position, VOTES)] != votes:
+            raise ValueError(f"2000: municipalities add up to {summed[(position, VOTES)]} for list {position + 1}")
+    _values(p, result_set, rows, locators)
     return p
