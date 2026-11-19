@@ -1,6 +1,7 @@
 import functools
 import json
 import re
+import shutil
 import subprocess
 import unicodedata
 import zipfile
@@ -71,6 +72,7 @@ COUNCIL_METHOD = (
 def fetch() -> None:
     raw.fetch(SOURCE, BOUNDARIES, suffix=".zip")
     fetch_history()
+    fetch_2023()
     for url in (*WORKBOOKS, *MODULES):
         artifact = raw.fetch(SOURCE, url, suffix="." + url.rsplit(".", 1)[1])
         # The portal answers every unknown path with its HTML shell, so a missing file arrives as a page.
@@ -258,12 +260,22 @@ def parse() -> None:
     compare2008()
     compare2013()
     compare2010()
+    compare2023()
     geo().write()
     registry().write()
     election().write()
     history().write()
     memoir_parties().write()
-    for build in (vice_2000, general_2008, municipal_2010, general_2013, municipal_2015, general_2018, municipal_2021):
+    for build in (
+        vice_2000,
+        general_2008,
+        municipal_2010,
+        general_2013,
+        municipal_2015,
+        general_2018,
+        municipal_2021,
+        general_2023,
+    ):
         build().write()
 
 
@@ -1049,6 +1061,7 @@ HISTORY_FILES = {
 GENERAL_2008 = date(2008, 4, 20)
 GENERAL_2018 = date(2018, 4, 22)
 MUNICIPAL_2021 = date(2021, 10, 10)
+GENERAL_2023 = date(2023, 4, 30)
 VICE_2000 = date(2000, 8, 13)
 MUNICIPAL_2015 = date(2015, 11, 15)
 MUNICIPAL_2010 = date(2010, 11, 7)
@@ -1061,6 +1074,7 @@ HISTORY_DAYS = (
     MUNICIPAL_2015,
     GENERAL_2018,
     MUNICIPAL_2021,
+    GENERAL_2023,
 )
 ABROAD = 18
 UNIT_KEY = ("dep", "dis", "zona", "local", "mesa")
@@ -1363,7 +1377,12 @@ def _candidates(
     p: Package, day: date, spec: Spec, contest: str, result_set: str, tally: Tally, options: dict[int, str]
 ) -> pl.DataFrame:
     assert tally.preferences is not None
-    positions = tally.preferences.select("lista", "orden").unique().sort("lista", "orden")
+    named = pl.DataFrame(
+        [(lista, position) for lista, position, _ in (*tally.members, *tally.candidates)],
+        schema={"lista": pl.Int64, "orden": pl.Int64},
+        orient="row",
+    )
+    positions = pl.concat([tally.preferences.select("lista", "orden"), named]).unique().sort("lista", "orden")
     ids = []
     for lista, orden in positions.iter_rows():
         option = key("option", day, spec.key, lista, orden)
@@ -4446,4 +4465,572 @@ def municipal_2010() -> Package:
             channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)
         ),
     )
+    return p
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The general election of 30 April 2023.
+
+OPEN_DATA_FILES = "https://www.datos.gov.py/sites/default/files"
+GENERAL_2023_PAGES = (
+    "https://www.datos.gov.py/dataset/resultados-de-elecciones-generales-2023-por-mesa",
+    "https://www.datos.gov.py/dataset/elecciones-generales-2023-votos-preferentes-para-senadores-diputados-y-junta-departamental",
+)
+GENERAL_2023_FILES = {
+    "mesa": f"{OPEN_DATA_FILES}/resultados-2023-por-local.xlsx",
+    "mesa_schema": f"{OPEN_DATA_FILES}/esquema-resultados-2023-por-local.xlsx",
+    "district": f"{OPEN_DATA_FILES}/Resultados-1996-a-2023-municipales-y-generales-por-distrito.csv",
+    "district_schema": f"{OPEN_DATA_FILES}/esquema-resultados-1996-2023-por-distrito.csv",
+    "senate_mesa": f"{OPEN_DATA_FILES}/1VotosPref_Dep_Dis_Local_Mesa_Senadores2023_da.xlsx",
+    "senate_district": f"{OPEN_DATA_FILES}/1VotosPref_Dep_Dis_Senadores2023_da.xlsx",
+    "senate_department": f"{OPEN_DATA_FILES}/1VotosPref_Dep_Senadores2023_da.xlsx",
+    "senate_national": f"{OPEN_DATA_FILES}/1VotosPref_ResumenNacional_Senadores2023_da.xlsx",
+    "deputies_mesa": f"{OPEN_DATA_FILES}/2VotosPref_Dep_Dis_Local_Mesa_Diputados2023_da.xlsx",
+    "deputies_district": f"{OPEN_DATA_FILES}/2VotosPref_Dep_Dis_Diputados2023_da.xlsx",
+    "deputies_department": f"{OPEN_DATA_FILES}/2VotosPref_Dep_Diputados2023_da.xlsx",
+    "board_mesa": f"{OPEN_DATA_FILES}/3VotosPref_Dep_Dis_Local_Mesa_JuntaDep2023_da.xlsx",
+    "board_district": f"{OPEN_DATA_FILES}/3VotosPref_Dep_Dis_JuntaDep2023_da.xlsx",
+}
+LISTS_2023 = f"{OPEN_DATA_FILES}/listas-inscriptas-1996-a-2023-mun-y-generales.csv"
+PRESIDENT_2023, SENATE_2023, DEPUTIES_2023, GOVERNOR_2023, BOARD_2023 = 1, 2, 3, 4, 5
+BLANK_ROW, INVALID_ROW, TOTAL_ROW = 9991, 9992, 9993
+SENATE_SYSTEM_2023 = key("electoral_system", "senate", 2023)
+CHAMBER_SYSTEM_2023 = key("electoral_system", "chamber", 2023)
+BOARD_SYSTEM_2023 = key("electoral_system", "board", 2023)
+OPEN_LISTS = {"formula": "dhondt", "lists": {"order": "open", "vacancy": "next_on_list"}}
+OPEN_NOTE = (
+    "Since 2023 the lists are open (listas desbloqueadas): each list's seats go to its candidates with the most "
+    "preference votes."
+)
+SYSTEMS_2023 = (
+    (SENATE_SYSTEM_2023, "The 45 senators are elected from one national constituency by D'Hondt. " + OPEN_NOTE),
+    (CHAMBER_SYSTEM_2023, "Deputies are elected by D'Hondt from the lists of each department. " + OPEN_NOTE),
+    (
+        BOARD_SYSTEM_2023,
+        "Departmental board members are elected by D'Hondt from the lists of each department. " + OPEN_NOTE,
+    ),
+)
+LIST_SCHEME_2023 = "py.tsje.lista"
+GENERAL_2023_NOTE = (
+    "Counted by the Tribunal Superior de Justicia Electoral per polling table (mesa receptora de votos), as "
+    "published in its per-table results workbook for the general elections of 30 April 2023. Valid votes are the "
+    "votes for lists (tickets for President and governors); blank and null ballots and ballots cast are the table's "
+    "own counts. The Tribunal's results file by municipality (distrito) agrees with the sum of the tables for every "
+    "list and every count, in every municipality. The workbook does not give a table's registered voters, so none "
+    "are stored. Tables abroad (Argentina, the United States, Spain, and Brazil) have no place in the archive's "
+    "geography. The source files do not declare who won the presidency or a governorship, so no winner is stored "
+    "for those contests."
+)
+PREFERENCE_NOTE_2023 = (
+    " Preference votes are the per-table counts of the Tribunal's preferential-vote workbooks, stored on each "
+    "candidate under the list; they agree with the Tribunal's own totals by municipality, department, and nation, "
+    "and with each list's votes at every table. The same workbooks flag the elected candidates, which is where the "
+    "seats and members come from."
+)
+SOURCE_ID_2023 = key("source", SOURCE, "general-2023")
+
+
+def fetch_2023() -> None:
+    for url in (*GENERAL_2023_FILES.values(), LISTS_2023):
+        artifact = raw.fetch(SOURCE, url, suffix="." + url.rsplit(".", 1)[1])
+        if artifact.media_type is not None and artifact.media_type.startswith("text/html"):
+            raise LookupError(f"{url} is not published (the portal served an HTML page)")
+
+
+def _read(url: str) -> pl.DataFrame:
+    """The first sheet of a workbook as text, without caching it: the table-level workbooks are large."""
+    reader = fastexcel.read_excel(str(raw.cached(SOURCE, url).path))
+    return reader.load_sheet(reader.sheet_names[0], dtypes="string").to_polars()
+
+
+@functools.cache
+def districts2023() -> pl.DataFrame:
+    """The Tribunal's results by municipality: one row per contest, municipality, and list or count."""
+    path = raw.cached(SOURCE, GENERAL_2023_FILES["district"]).path
+    frame = pl.read_csv(path, separator=";", encoding="latin1", infer_schema=False)
+    return frame.filter(pl.col("año") == "2023").select(
+        cand=_int("candidatura"),
+        dep=_int("dep"),
+        dis=_int("dis"),
+        lista=_int("lista"),
+        sigla=pl.col("siglas_lista").str.strip_chars(),
+        name=pl.col("nombre_lista").map_elements(clean, return_dtype=pl.String),
+        votes=_int("votos"),
+    )
+
+
+def _list_column(column: str, known: set[tuple[int, str]]) -> tuple[int, str]:
+    """The list a column of the table workbook stands for: `lista`, its number, and its acronym (which the
+    workbook sometimes follows with a digit to keep two columns apart)."""
+    found = re.fullmatch(r"lista(\d+)(.+)", column)
+    if found is None:
+        raise ValueError(f"2023 table workbook: unexpected column {column}")
+    number, rest = int(found[1]), found[2]
+    match = [
+        sigla
+        for lista, sigla in known
+        if lista == number and (rest == sigla or (rest.startswith(sigla) and rest[len(sigla) :].isdigit()))
+    ]
+    if len(match) != 1:
+        raise ValueError(f"2023 table workbook: column {column} matches {match} on the district file")
+    return number, match[0]
+
+
+@functools.cache
+def mesa2023() -> tuple[pl.DataFrame, pl.DataFrame]:
+    """The table workbook as (list rows, per-table counts): (cand, table, lista, votes) and (cand, table, total,
+    blank, invalid, valid)."""
+    frame = _read(GENERAL_2023_FILES["mesa"])
+    known = {(lista, sigla) for lista, sigla in districts2023().select("lista", "sigla").unique().iter_rows() if sigla}
+    columns = [c for c in frame.columns if c.startswith("lista")]
+    numbers = {c: _list_column(c, known)[0] for c in columns}
+    wide = frame.select(
+        cand=_code("candidatura"),
+        dep=_code("departamento"),
+        dis=_code("distrito"),
+        zona=_code("zona"),
+        local=_code("local"),
+        mesa=_int("nromesa"),
+        total=_int("total"),
+        blank=_int("blancos"),
+        invalid=_int("nulos"),
+        **{c: _int(c) for c in columns},
+    )
+    if wide.select("cand", *UNIT_KEY).null_count().sum_horizontal().item():
+        raise ValueError("2023 table workbook: rows without a table code")
+    if wide.select("cand", *UNIT_KEY).is_duplicated().any():
+        raise ValueError("2023 table workbook: a table appears twice in a contest")
+    long = (
+        wide.unpivot(columns, index=["cand", *UNIT_KEY], variable_name="column", value_name="votes")
+        .filter(pl.col("votes").is_not_null())
+        .with_columns(lista=pl.col("column").replace_strict(numbers, return_dtype=pl.Int64))
+        .select("cand", *UNIT_KEY, "lista", "votes")
+    )
+    if long.select("cand", *UNIT_KEY, "lista").is_duplicated().any():
+        raise ValueError("2023 table workbook: a list appears twice on a table")
+    valid = long.group_by("cand", *UNIT_KEY).agg(pl.col("votes").sum().alias("valid"))
+    tables = wide.select("cand", *UNIT_KEY, "total", "blank", "invalid").join(valid, on=["cand", *UNIT_KEY], how="left")
+    tables = tables.with_columns(pl.col("valid").fill_null(0))
+    broken = tables.filter(pl.col("valid") + pl.col("blank") + pl.col("invalid") != pl.col("total"))
+    if broken.height:
+        raise ValueError(f"2023 table workbook: {broken.height} tables do not add up to their printed total")
+    return long, tables
+
+
+@functools.cache
+def preferences2023(name: str) -> pl.DataFrame:
+    """Preference votes per table and candidate: (dep, dis, zona, local, mesa, lista, orden, votes). The workbook
+    has one row per candidate and polling place, with one column per table of the place."""
+    frame = _read(GENERAL_2023_FILES[f"{name}_mesa"]).filter(pl.col("CANDIDATURA").is_not_null())
+    mesas = [c for c in frame.columns if c.isdigit()]
+    wide = frame.select(
+        dep=_int("DEPART"),
+        dis=_int("DISTRITO"),
+        zona=_int("ZONA"),
+        local=_int("LOCAL"),
+        lista=_int("NRO_LISTA"),
+        orden=_int("ORDEN_LISTA"),
+        total=_int("Total general"),
+        **{c: _int(c) for c in mesas},
+    )
+    del frame
+    off = wide.filter(pl.sum_horizontal(mesas) != pl.col("total"))
+    if off.height:
+        raise ValueError(f"2023 {name} preferences: {off.height} rows whose tables do not add up to the row total")
+    parts = [
+        piece.unpivot(
+            mesas, index=["dep", "dis", "zona", "local", "lista", "orden"], variable_name="mesa", value_name="votes"
+        )
+        .filter(pl.col("votes").is_not_null())
+        .with_columns(pl.col("mesa").cast(pl.Int64))
+        .select(*UNIT_KEY, "lista", "orden", "votes")
+        for piece in wide.iter_slices(40_000)
+    ]
+    return pl.concat(parts)
+
+
+@functools.cache
+def printed_preferences2023(name: str, level: str) -> pl.DataFrame:
+    """The Tribunal's own totals of preference votes, per candidate: (dep, dis, lista, orden, name, elected, votes).
+    `dep` and `dis` are null where the file does not break the figures down that far."""
+    frame = _read(GENERAL_2023_FILES[f"{name}_{level}"]).filter(pl.col("CANDIDATURA").is_not_null())
+    columns = frame.columns
+    return frame.select(
+        dep=_int("DEPART") if "DEPART" in columns else pl.lit(None, pl.Int64),
+        dis=_int("DISTRITO") if "DISTRITO" in columns else pl.lit(None, pl.Int64),
+        lista=_int("NRO_LISTA"),
+        orden=_int("ORDEN_LISTA"),
+        name=pl.col("NOMBRE Y APELLIDO").map_elements(clean, return_dtype=pl.String),
+        elected=pl.col("ELECTO-NO").is_not_null() & (pl.col("ELECTO-NO") != "NO ELECTO"),
+        votes=_int("Total general"),
+    )
+
+
+@functools.cache
+def candidates2023(name: str) -> pl.DataFrame:
+    """Every candidate of a contest with the Tribunal's total and elected flag: (dep, lista, orden, name, elected,
+    votes). The Senate is one national constituency, so its `dep` is null."""
+    if name == "senate":
+        return printed_preferences2023(name, "national").drop("dis")
+    if name == "deputies":
+        return printed_preferences2023(name, "department").drop("dis")
+    rows = printed_preferences2023(name, "district")
+    each = rows.group_by("dep", "lista", "orden").agg(
+        pl.col("name").n_unique().alias("names"),
+        pl.col("elected").n_unique().alias("flags"),
+        pl.col("name").first(),
+        pl.col("elected").first(),
+        pl.col("votes").sum(),
+    )
+    if each.filter((pl.col("names") > 1) | (pl.col("flags") > 1)).height:
+        raise ValueError("2023 board file: a candidate has two names or two outcomes in different municipalities")
+    return each.drop("names", "flags")
+
+
+@functools.cache
+def labels2023() -> dict[tuple[int, int | None, int], tuple[str, str]]:
+    """The ballot label and acronym of each list: by contest, department (national contests use None), and list."""
+    rows = districts2023().filter(pl.col("lista") < BLANK_ROW)
+    out: dict[tuple[int, int | None, int], tuple[str, str]] = {}
+    for national in (True, False):
+        part = rows.filter(pl.col("cand").is_in([PRESIDENT_2023, SENATE_2023]) == national)
+        keys = ["cand", "lista"] if national else ["cand", "dep", "lista"]
+        counted = part.group_by(*keys, "name", "sigla").len().sort("len", "name", descending=[True, False])
+        for row in counted.unique(keys, keep="first", maintain_order=True).iter_rows(named=True):
+            out[(row["cand"], None if national else row["dep"], row["lista"])] = (row["name"], row["sigla"])
+    return out
+
+
+def compare2023() -> dict[str, int]:
+    """Check the table workbook against the Tribunal's results by municipality and its preference files."""
+    long, tables = mesa2023()
+    problems: list[str] = []
+    printed = districts2023()
+    special = {BLANK_ROW: "blank", INVALID_ROW: "invalid", TOTAL_ROW: "total"}
+    ours = long.group_by("cand", "dep", "dis", "lista").agg(pl.col("votes").sum())
+    counts = (
+        tables.group_by("cand", "dep", "dis")
+        .agg(pl.col("blank"), pl.col("invalid"), pl.col("total"))
+        .select(
+            "cand",
+            "dep",
+            "dis",
+            blank=pl.col("blank").list.sum(),
+            invalid=pl.col("invalid").list.sum(),
+            total=pl.col("total").list.sum(),
+        )
+    )
+    for row, name in ((BLANK_ROW, "blank"), (INVALID_ROW, "invalid"), (TOTAL_ROW, "total")):
+        theirs = printed.filter(pl.col("lista") == row).select("cand", "dep", "dis", pl.col("votes").alias(name))
+        gap = counts.select("cand", "dep", "dis", name).join(
+            theirs, on=["cand", "dep", "dis"], how="full", coalesce=True, suffix="_printed"
+        )
+        gap = gap.filter(pl.col(name).fill_null(0) != pl.col(f"{name}_printed").fill_null(0))
+        if gap.height:
+            problems.append(f"{gap.height} municipality {special[row]} counts differ from the district file")
+    lists = printed.filter(pl.col("lista") < BLANK_ROW).select(
+        "cand", "dep", "dis", "lista", pl.col("votes").alias("printed")
+    )
+    gap = ours.join(lists, on=["cand", "dep", "dis", "lista"], how="full", coalesce=True)
+    gap = gap.filter(pl.col("votes").fill_null(0) != pl.col("printed").fill_null(0))
+    if gap.height:
+        problems.append(f"{gap.height} municipality list totals differ from the district file")
+    out = {
+        "tables": tables.select(UNIT_KEY).unique().height,
+        "municipality rows": printed.height,
+        "table rows": long.height,
+    }
+    for name, cand in (("senate", SENATE_2023), ("deputies", DEPUTIES_2023), ("board", BOARD_2023)):
+        out |= {f"{name} preference rows": _compare_preferences(name, cand, long, problems)}
+    if problems:
+        raise ValueError(f"2023: {len(problems)} differences from the Tribunal's files: {problems[:10]}")
+    out["senate seats"] = int(candidates2023("senate")["elected"].sum())
+    out["deputy seats"] = int(candidates2023("deputies")["elected"].sum())
+    out["board seats"] = int(candidates2023("board")["elected"].sum())
+    out["president votes"] = int(ours.filter(pl.col("cand") == PRESIDENT_2023)["votes"].sum())
+    out["senate votes"] = int(ours.filter(pl.col("cand") == SENATE_2023)["votes"].sum())
+    print(f"2023: {out}", flush=True)
+    return out
+
+
+def _compare_preferences(name: str, cand: int, long: pl.DataFrame, problems: list[str]) -> int:
+    prefs = preferences2023(name)
+    keys = [*UNIT_KEY, "lista"]
+    by_table = prefs.group_by(keys).agg(pl.col("votes").sum().alias("preferences"))
+    lists = long.filter(pl.col("cand") == cand)
+    gap = lists.join(by_table, on=keys, how="full", coalesce=True)
+    gap = gap.filter(pl.col("votes").fill_null(0) != pl.col("preferences").fill_null(0))
+    if gap.height:
+        problems.append(f"{name}: {gap.height} table lists whose preference votes do not sum to the list's votes")
+    district = printed_preferences2023(name, "district")
+    by_district = prefs.group_by("dep", "dis", "lista", "orden").agg(pl.col("votes").sum())
+    gap = by_district.join(district, on=["dep", "dis", "lista", "orden"], how="full", coalesce=True, suffix="_printed")
+    gap = gap.filter(pl.col("votes").fill_null(0) != pl.col("votes_printed").fill_null(0))
+    if gap.height:
+        problems.append(f"{name}: {gap.height} candidate-by-municipality totals differ from the district file")
+    if name != "board":
+        level = "national" if name == "senate" else "department"
+        total = printed_preferences2023(name, level)
+        by = ["lista", "orden"] if name == "senate" else ["dep", "lista", "orden"]
+        ours = (
+            prefs.group_by(by).agg(pl.col("votes").sum())
+            if name == "senate"
+            else (prefs.group_by("dep", "lista", "orden").agg(pl.col("votes").sum()))
+        )
+        gap = ours.join(total, on=by, how="full", coalesce=True, suffix="_printed")
+        gap = gap.filter(pl.col("votes").fill_null(0) != pl.col("votes_printed").fill_null(0))
+        if gap.height:
+            problems.append(f"{name}: {gap.height} candidate totals differ from the {level} file")
+    return prefs.height
+
+
+@functools.cache
+def shared_parties() -> frozenset[str]:
+    """Normalized names of the parties the registry and history packages already hold."""
+    held = {normal(name) for name in (*NATIONAL_PARTIES.values(), *PARTIES_2008.values())}
+    return registry_parties() | held
+
+
+def party2023(name: str) -> str:
+    """The party record of a list's organization: the shared one when the pipeline already holds it, else 2023's own."""
+    return party(name) if normal(name) in shared_parties() else key("party", "2023", normal(name))
+
+
+def kind2023(name: str) -> str:
+    plain = normal(name)
+    if plain.startswith(("ALIANZA", "CONCERTACION")):
+        return "bloc"
+    if plain.startswith(("MOVIMIENTO", "MOV ")):
+        return "independent_group"
+    return "party"
+
+
+def _declared2023(cand: int, dep: int | None) -> tuple[tuple[int | None, int, int], ...]:
+    """What the Tribunal's results by municipality add up to for a contest: each list's votes and the three counts."""
+    rows = districts2023().filter(pl.col("cand") == cand, *([] if dep is None else [pl.col("dep") == dep]))
+    out: list[tuple[int | None, int, int]] = []
+    for lista, votes in rows.group_by("lista").agg(pl.col("votes").sum()).sort("lista").iter_rows():
+        measure = {BLANK_ROW: BLANK, INVALID_ROW: INVALID, TOTAL_ROW: CAST}.get(lista)
+        out.append((None, measure, votes) if measure else (lista, 1, votes))
+    return tuple(out)
+
+
+def general_2023() -> Package:
+    day = GENERAL_2023
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        "Paraguay's general elections of 30 April 2023 (President, Senate, Chamber of Deputies, governors, and "
+        "departmental boards), by polling table and with preference votes per candidate, from the Tribunal "
+        "Superior de Justicia Electoral",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/history"],
+    )
+    p.external |= {PARAGUAY, COUNTRY}
+    _source(
+        p,
+        SOURCE_ID_2023,
+        "Resultados de las Elecciones Generales 2023: resultados por mesa, por municipio y votos preferentes",
+        GENERAL_2023_PAGES[0],
+        (*GENERAL_2023_FILES.values(), LISTS_2023),
+    )
+    election_id = key("election", day)
+    path = f"py/{day}-general"
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=PARAGUAY,
+        kind="general",
+        date_from=day,
+        date_to=day,
+        date_precision="day",
+        status="held",
+    )
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    p.name(election_id, "2023 Paraguayan general election", "en", "official")
+    p.name(election_id, "Elecciones generales 2023", "es", "native", False)
+    for id, method in SYSTEMS_2023:
+        p.add(
+            "electoral_system",
+            id=id,
+            polity_id=PARAGUAY,
+            valid_from=date(2023, 1, 1),
+            rules=OPEN_LISTS,
+            rules_version=1,
+        )
+        p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=method, lang="en")
+
+    long, tables = mesa2023()
+    units = _old_units(p, day, tables.select(UNIT_KEY).unique().sort(UNIT_KEY))
+    unit_ids = units.select(*UNIT_KEY, "unit_id")
+    long = long.join(unit_ids, on=UNIT_KEY)
+    tables = tables.join(unit_ids, on=UNIT_KEY)
+    names = _dep_names()
+    slugs = {dep: changeset.slug(name) for dep, name in names.items()}
+    labels = labels2023()
+
+    own: dict[str, tuple[str, Counter[str]]] = {}
+    for (_, _, _), (name, sigla) in sorted(labels.items()):
+        if normal(name) not in shared_parties():
+            own.setdefault(normal(name), (name, Counter()))[1][sigla] += 1
+    for normalized, (name, acronyms) in sorted(own.items()):
+        id = key("party", "2023", normalized)
+        p.add("party", id=id, kind=kind2023(name), polity_id=PARAGUAY)
+        p.add("external_id", entity_id=id, scheme=LIST_SCHEME_2023, value=normalized)
+        p.name(id, name, "es", "official")
+        if acronyms:
+            p.name(id, acronyms.most_common(1)[0][0], "es", "abbreviation", False)
+
+    parts = package.folder(p.key) / "parts"
+    shutil.rmtree(parts, ignore_errors=True)
+    parts.mkdir(parents=True)
+    counts: Counter[str] = Counter()
+
+    def contest(cand: int, dep: int | None, spec: Spec, name: str | None) -> None:
+        """One contest; `name` is the preference workbook of a list contest, and `dep` is None for national ones."""
+        here = [pl.col("cand") == cand, *([] if dep is None else [pl.col("dep") == dep])]
+        part = long.filter(*here)
+        found = {
+            lista: labels[(cand, dep, lista)]
+            for lista in sorted(set(part["lista"]) | {k[2] for k in labels if k[0] == cand and k[1] == dep})
+        }
+        tally = Tally(
+            rows=part.select("unit_id", "lista", "votes"),
+            totals=tables.filter(*here).select(
+                "unit_id", pl.lit(None, pl.Int64).alias("registered"), "total", "blank", "invalid"
+            ),
+            labels={lista: (label, party2023(label)) for lista, (label, _) in found.items()},
+            declared=_declared2023(cand, dep),
+        )
+        note = GENERAL_2023_NOTE
+        if name is not None:
+            note += PREFERENCE_NOTE_2023
+            ranked = candidates2023(name)
+            if dep is not None:
+                ranked = ranked.filter(pl.col("dep") == dep)
+            winners = ranked.filter("elected")
+            seats = dict(winners.group_by("lista").len().iter_rows())
+            prefs = preferences2023(name).join(unit_ids, on=UNIT_KEY)
+            if dep is not None:
+                prefs = prefs.filter(pl.col("dep") == dep)
+            tally = tally._replace(
+                seats=seats,
+                members=tuple(
+                    (lista, orden, who) for lista, orden, who in winners.select("lista", "orden", "name").iter_rows()
+                ),
+                candidates=tuple(
+                    (lista, orden, who)
+                    for lista, orden, who in ranked.filter(~pl.col("elected"))
+                    .select("lista", "orden", "name")
+                    .iter_rows()
+                ),
+                preferences=prefs.select("unit_id", "lista", "orden", "votes"),
+                declared_preferences=tuple(ranked.select("lista", "orden", "votes").sort("lista", "orden").iter_rows()),
+            )
+            spec = spec._replace(magnitude=sum(seats.values()))
+            counts["seats"] += sum(seats.values())
+        facts = _add_contest(p, election_id, day, path, spec, tally, SOURCE_ID_2023, note)
+        file = parts / f"{counts['contests']:03d}.parquet"
+        facts.with_columns(
+            channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)
+        ).write_parquet(file)
+        p.part("result_value", file)
+        counts["contests"] += 1
+
+    contest(
+        PRESIDENT_2023,
+        None,
+        Spec(
+            "president",
+            "office",
+            "2023 Paraguayan presidential election",
+            "Elección presidencial 2023",
+            "president",
+            COUNTRY,
+            PRESIDENCY,
+            None,
+            PRESIDENT_SYSTEM,
+            1,
+            "ticket",
+        ),
+        None,
+    )
+    contest(
+        SENATE_2023,
+        None,
+        Spec(
+            "senate",
+            "list_allocation",
+            "2023 Paraguayan Senate election",
+            "Elección de senadores 2023",
+            "senate",
+            COUNTRY,
+            None,
+            SENATE,
+            SENATE_SYSTEM_2023,
+            45,
+            "list",
+        ),
+        "senate",
+    )
+    deps = sorted(set(long.filter(pl.col("cand") == DEPUTIES_2023)["dep"]))
+    for dep in deps:
+        place, district = names[dep], area("py.departamento", str(dep))
+        contest(
+            DEPUTIES_2023,
+            dep,
+            Spec(
+                f"deputies:{dep}",
+                "list_allocation",
+                f"2023 Chamber of Deputies election, {place}",
+                f"Elección de diputados 2023, {place}",
+                f"deputies-{slugs[dep]}",
+                district,
+                None,
+                CHAMBER,
+                CHAMBER_SYSTEM_2023,
+                None,
+                "list",
+            ),
+            "deputies",
+        )
+    for dep in sorted(set(long.filter(pl.col("cand") == GOVERNOR_2023)["dep"])):
+        place, district = names[dep], area("py.departamento", str(dep))
+        contest(
+            GOVERNOR_2023,
+            dep,
+            Spec(
+                f"governor:{dep}",
+                "office",
+                f"2023 governor election, {place}",
+                f"Elección de gobernador 2023, {place}",
+                f"governor-{slugs[dep]}",
+                district,
+                key("office", "governor", dep),
+                None,
+                GOVERNOR_SYSTEM,
+                1,
+                "candidate",
+            ),
+            None,
+        )
+    for dep in sorted(set(long.filter(pl.col("cand") == BOARD_2023)["dep"])):
+        place, district = names[dep], area("py.departamento", str(dep))
+        contest(
+            BOARD_2023,
+            dep,
+            Spec(
+                f"board:{dep}",
+                "list_allocation",
+                f"2023 {place} Departmental Board election",
+                f"Elección de la Junta Departamental de {place} 2023",
+                f"departmental-board-{slugs[dep]}",
+                district,
+                None,
+                key("body", "board", dep),
+                BOARD_SYSTEM_2023,
+                None,
+                "list",
+            ),
+            "board",
+        )
     return p
