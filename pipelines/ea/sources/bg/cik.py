@@ -106,8 +106,6 @@ FIRST_ROUND = {
 SECOND_ROUND = {first: second for second, first in FIRST_ROUND.items()}
 # Packages that share a bundle with an earlier package they depend on, which holds the artifact row.
 SHARED_BUNDLE = {"pr-2016-11-13": "pr-2016-11-06", "ns-2021-11-14": "pr-2021-11-14"}
-# Rounds whose first-round package is already loaded and is not rebuilt here.
-KEEP_FIRST = {"pr-2026-10-25"}
 ELECTIONS = [
     Election("ns-2005-06-25", "ns", date(2005, 6, 25), "http://pi2005.cik.bg/results/export.zip", "ns2005"),
     Election("pr-2011-10-23", "pres", date(2011, 10, 23), Z + "mipvr2011/el2011_t1.zip", "pres2011", None, 1),
@@ -1354,7 +1352,7 @@ def build(e: Election) -> Package:
                     "outcome", result_set_id=sets[m], option_id=options[(m, n)], candidacy_id=candidacy, kind="elected"
                 )
     second = next((x for x in ELECTIONS if x.id == SECOND_ROUND.get(e.id)), None)
-    if second is not None and e.id not in KEEP_FIRST:
+    if second is not None:
         finalists = {x.name for x in candidates(second)}
         for c in cands:
             kind = "advanced" if c.name in finalists else "eliminated"
