@@ -39,9 +39,37 @@ NATIONAL_ASSEMBLY = key("body", "national_assembly")
 PRESIDENCY = key("office", "president")
 ODIHR_2007 = "https://cdn.osce.org/sites/default/files/f/documents/d/d/26606.pdf"
 ODIHR_ID = key("source", "osce.odihr")
+ODIHR_2003 = "https://cdn.osce.org/sites/default/files/f/documents/1/2/42370.pdf"
+NDI_1999 = "https://www.ndi.org/sites/default/files/337_am_1999final_5.pdf"
 PRESIDENT_SYSTEM = key("electoral_system", "president")
 REFERENDUM_SYSTEM = key("electoral_system", "referendum")
 LIST_SYSTEMS: list[tuple[str, date, date | None, dict[str, object], str]] = [
+    (
+        key("electoral_system", "national_assembly", 1999),
+        date(1999, 2, 17),
+        date(2003, 1, 1),
+        {"formula": "hare", "threshold": [{"percent": 5, "level": "party"}]},
+        (
+            "A mixed parallel system for 131 deputies under the Electoral Code signed on 17 February 1999: 75 elected "
+            "in single-mandate constituencies by plurality, and 56 from national party and bloc lists in one "
+            "constituency, allocated by the largest remainder method. A list needs 5% of the valid votes and "
+            "inaccuracies to share in the list seats. The Hare quota with largest remainders reproduces the declared "
+            "seats. The end of the period is the start of the year the 2002 amendments took effect by, as the "
+            "amendments' own date is not printed in the sources."
+        ),
+    ),
+    (
+        key("electoral_system", "national_assembly", 2003),
+        date(2003, 1, 1),
+        date(2007, 1, 1),
+        {"formula": "hare", "threshold": [{"percent": 5, "level": "party"}]},
+        (
+            "After the 2002 amendments to the Electoral Code, the proportions reversed: 75 deputies from national "
+            "party and bloc lists in one constituency, for lists with more than 5% of the votes cast, and 56 in "
+            "single-mandate constituencies by plurality in one round. The Hare quota with largest remainders "
+            "reproduces the declared seats."
+        ),
+    ),
     (
         key("electoral_system", "national_assembly", 2007),
         date(2007, 1, 1),
@@ -332,6 +360,8 @@ def fetch() -> None:
         if e.report:
             raw.fetch(SOURCE, e.report, suffix=".pdf")
     raw.fetch(SOURCE, ARCHIVE, suffix=".html")
+    for d in EARLY:
+        raw.fetch(SOURCE, d.report, suffix=".pdf")
     for e in ELECTIONS:
         page(e)
 
@@ -1019,6 +1049,8 @@ class Early:
     names: tuple[str, str]  # English, Armenian
     invalid: str  # the label that starts the invalid ballots row
     total: str  # the label that starts the row that sums the votes for the lists
+    report: str  # the observation report the list seats come from
+    seats: tuple[tuple[str, int], ...]  # list seats each ballot label won
 
 
 EARLY = [
@@ -1028,6 +1060,15 @@ EARLY = [
         ("1999 Armenian parliamentary election", "Ազգային ժողովի ընտրություններ, 1999"),
         "Քվեատուփում առկա անվավեր",
         "Կուսակցությունների կամ կուսակցությունների դաշինքի օգտին",
+        NDI_1999,
+        (
+            ("ՄԻԱՍՆՈՒԹՅՈՒՆ ԴԱՇԻՆՔ", 29),
+            ("ՀԱՅԱՍՏԱՆԻ ԿՈՄՈՒՆԻՍՏԱԿԱՆ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 8),
+            ("ԻՐԱՎՈՒՆՔ ԵՎ ՄԻԱԲԱՆՈՒԹՅՈՒՆ ԴԱՇԻՆՔ", 6),
+            ("ՀԱՅ ՅԵՂԱՓՈԽԱԿԱՆ ԴԱՇՆԱԿՑՈՒԹՅՈՒՆ", 5),
+            ("ՕՐԻՆԱՑ ԵՐԿԻՐ", 4),
+            ("ԱԶԱՅԻՆ ԺՈՂՈՎՐԴԱԿԱՆ ՄԻՈՒԹՅՈՒՆ", 4),
+        ),
     ),
     Early(
         date(2003, 5, 25),
@@ -1035,6 +1076,15 @@ EARLY = [
         ("2003 Armenian parliamentary election", "Ազգային ժողովի ընտրություններ, 2003"),
         "Անվավեր քվեաթերթիկների",
         "Կողմ քվեարկված քվեաթերթիկների ընդհանուր",
+        ODIHR_2003,
+        (
+            ("ՀԱՅԱՍՏԱՆԻ ՀԱՆՐԱՊԵՏԱԿԱՆ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 23),
+            ("ԱՐԴԱՐՈՒԹՅԱՆ ԴԱՇԻՆՔ", 14),
+            ("ՕՐԻՆԱՑ ԵՐԿԻՐ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 12),
+            ("ՀԱՅ ՅԵՂԱՓՈԽԱԿԱՆ ԴԱՇՆԱԿՑՈՒԹՅՈՒՆ", 11),
+            ("ԱԶԳԱՅԻՆ ՄԻԱԲԱՆՈՒԹՅՈՒՆ", 9),
+            ("ՄԻԱՎՈՐՎԱԾ ԱՇԽԱՏԱՆՔԱՅԻՆ ԿՈՒՍԱԿՑՈՒԹՅՈՒՆ", 6),
+        ),
     ),
 ]
 
@@ -1103,6 +1153,31 @@ def early(d: Early) -> Package:
     )
     p.external |= {ARMENIA, COUNTRY}
     p.artifact(raw.cached(SOURCE, ARCHIVE), SOURCE_ID)
+    report_id = key("source", "report", d.day)
+    p.add(
+        "source",
+        id=report_id,
+        kind="official_body" if d.report == ODIHR_2003 else "compendium",
+        publisher=(
+            "OSCE Office for Democratic Institutions and Human Rights"
+            if d.report == ODIHR_2003
+            else "National Democratic Institute for International Affairs"
+        ),
+        title=(
+            "Republic of Armenia, Parliamentary Elections, 25 May 2003: OSCE/ODIHR Final Report"
+            if d.report == ODIHR_2003
+            else "The May 30, 1999 Parliamentary Elections in Armenia: final report"
+        ),
+        url=d.report,
+        license="Published by its authors; cited for the list seat counts it prints",
+        license_url="https://www.osce.org/" if d.report == ODIHR_2003 else "https://www.ndi.org/",
+        attribution=(
+            "OSCE/ODIHR Final Report, Armenia, 25 May 2003"
+            if d.report == ODIHR_2003
+            else "NDI final report on the 30 May 1999 parliamentary elections in Armenia"
+        ),
+    )
+    p.artifact(raw.cached(SOURCE, d.report), report_id)
     data = tally(d)
     day = d.day
     election_id = key("election", day, "parliament")
@@ -1119,7 +1194,9 @@ def early(d: Early) -> Package:
         kind="list_allocation",
         body_id=NATIONAL_ASSEMBLY,
         district_area_id=COUNTRY,
+        magnitude=sum(n for _, n in d.seats),
         round_number=1,
+        electoral_system_id=list_system(day),
         default_result_kind="counted",
     )
     p.name(contest, f"{d.names[0]}, national list", "en", "official")
@@ -1166,6 +1243,7 @@ def early(d: Early) -> Package:
     for measure, value in ((REGISTERED, data.registered), (VOTERS, data.voters), (INVALID, data.invalid)):
         values.add(result_set, unit, None, measure, value)
         p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+    seats = {fold(name): n for name, n in d.seats}
     lines: list[tuple[str, int, bool]] = [(name, votes, True) for name, votes in data.parties]
     if data.against is not None:
         lines.append(("Against all lists", data.against, False))
@@ -1182,6 +1260,24 @@ def early(d: Early) -> Package:
         )
         values.add(result_set, unit, option, VOTES, votes)
         p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=votes)
+        if listed:
+            won = seats.pop(fold(name), None)
+            p.add(
+                "outcome", result_set_id=result_set, option_id=option, kind="lost" if won is None else "won", seats=won
+            )
+    if seats:
+        raise LookupError(f"{day}: no ballot line for {sorted(seats)}")
+    p.add(
+        "note",
+        id=key("note", result_set, "seats"),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=(
+            "Seats are the list seats each list won, as the observation report prints them, "
+            f"{sum(n for _, n in d.seats)} in all. The single-mandate seats are not in this contest."
+        ),
+        lang="en",
+    )
     p.frame("result_value", values.frame())
     print(f"{early_key(d)}: {len(data.parties)} lists, total {data.total}", flush=True)
     return p
