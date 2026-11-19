@@ -114,7 +114,7 @@ SYSTEM = key("electoral_system", "house", "fptp")
 
 
 def packages() -> list[str]:
-    from ea.sources.jm import local
+    from ea.sources.jm import local, parochial
 
     return [
         "jm.ecj/registry",
@@ -122,6 +122,7 @@ def packages() -> list[str]:
         *(f"jm.ecj/{day}" for day in FILES),
         *(f"jm.ecj/{day}" for day in scanned.DAYS),
         *local.packages(),
+        *parochial.packages(),
     ]
 
 
@@ -136,7 +137,7 @@ def fetch() -> None:
 
 
 def parse() -> None:
-    from ea.sources.jm import local
+    from ea.sources.jm import local, parochial
 
     registry().write()
     general_registry().write()
@@ -145,6 +146,7 @@ def parse() -> None:
     for day in scanned.DAYS:
         build_scanned(day).write()
     local.parse()
+    parochial.parse()
 
 
 def emit() -> None:
