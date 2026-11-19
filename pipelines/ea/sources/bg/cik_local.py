@@ -862,6 +862,7 @@ def build(day: Day) -> Package:
         depends=[
             f"{SOURCE}/geo",
             f"{SOURCE}/registry",
+            "bg.cik/geo",
             *([f"{SOURCE}/{first.id}"] if first is not None else []),
         ],
     )
