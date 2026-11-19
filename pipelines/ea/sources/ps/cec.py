@@ -10,12 +10,15 @@ box, and print the names as images, which were read from the page images (`candi
 """
 
 import html
+import json
 import re
 import subprocess
 import unicodedata
 from datetime import date
 from pathlib import Path
 from uuid import uuid5
+
+import shapely
 
 from ea import package, raw
 from ea.package import Package
@@ -45,6 +48,12 @@ FILES = {
     "2006-district-ballots": f"{PDF}/PLC2006-ResultsBallotsStatisticsOnDistLevelForDistsElections_AR.pdf",
     "2006-winners": f"{PDF}/PLC2006-ResultsDistrictsWinners.pdf",
 }
+COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fPSE"))
+GEOBOUNDARIES = "ps.geoboundaries"
+GEO_URL = (
+    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/PSE/ADM2/"
+    "geoBoundaries-PSE-ADM2_simplified.geojson"
+)
 DAYS = {"1996-01-20": date(1996, 1, 20), "2005-01-09": date(2005, 1, 9), "2006-01-25": date(2006, 1, 25)}
 
 
@@ -198,7 +207,7 @@ def clean(text: object) -> str:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in DAYS)]
+    return [f"{SOURCE}/registry", f"{SOURCE}/geo", *(f"{SOURCE}/{day}" for day in DAYS)]
 
 
 def fetch() -> None:
@@ -206,6 +215,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".html")
     for url in FILES.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
+    raw.fetch(GEOBOUNDARIES, GEO_URL, suffix=".geojson")
 
 
 def text(name: str) -> str:
@@ -217,6 +227,7 @@ def text(name: str) -> str:
 
 def parse() -> None:
     registry().write()
+    geo().write()
     for day in DAYS:
         build(day).write()
 
@@ -267,6 +278,14 @@ NAMES_1996 = {
     9: "طولكرم", 10: "قلقيلية", 11: "نابلس", 12: "شمال غزة (جباليا)", 13: "دير البلح", 14: "غزة",
     15: "خانيونس", 16: "رفح",
 }  # fmt: skip
+# The governorate (geoBoundaries ADM2 code) each numbered district of 1996 follows.
+ISO_1996 = {1: "PS-JEM", 2: "PS-JRH", 3: "PS-BTH", 4: "PS-JEN", 5: "PS-HBN", 6: "PS-RBH*", 7: "PS-SLT", 8: "PS-TBS",
+            9: "PS-TKM", 10: "PS-QQA", 11: "PS-NBS", 12: "PS-NGZ", 13: "PS-DEB", 14: "PS-GZA*", 15: "PS-KYS",
+            16: "PS-RFH"}  # fmt: skip
+# The same for the districts of 2005 and 2006, which share one numbering.
+ISO_2006 = {1: "PS-JEM", 2: "PS-JEN", 3: "PS-TKM", 4: "PS-TBS", 5: "PS-NBS", 6: "PS-QQA", 7: "PS-SLT", 8: "PS-RBH*",
+            9: "PS-JRH", 10: "PS-BTH", 11: "PS-HBN", 12: "PS-NGZ", 13: "PS-GZA*", 14: "PS-DEB", 15: "PS-KYS",
+            16: "PS-RFH"}  # fmt: skip
 PARTY_KEYS = {label: name for name, (label, _) in PARTIES.items()}
 
 
@@ -374,13 +393,85 @@ def registry() -> Package:
     return p
 
 
+def area(iso: str) -> str:
+    return key("area", "ps.district", iso.rstrip("*"))
+
+
+GB_SOURCE = key("source", "geoboundaries")
+
+
+def geo() -> Package:
+    p = Package(
+        f"{SOURCE}/geo",
+        SOURCE,
+        "The sixteen electoral districts of the 1996, 2005, and 2006 elections, each placed on its governorate's shape "
+        "from geoBoundaries",
+        depends=[f"{SOURCE}/registry"],
+    )
+    p.external |= {PALESTINE, COUNTRY}
+    artifact = raw.cached(GEOBOUNDARIES, GEO_URL)
+    p.add(
+        "source",
+        id=GB_SOURCE,
+        kind="academic",
+        publisher="geoBoundaries (Open Data Watch)",
+        title="geoBoundaries gbOpen State of Palestine ADM2 (governorates), 2017",
+        url="https://www.geoboundaries.org/",
+        license="CC BY 4.0",
+        license_url="https://creativecommons.org/licenses/by/4.0/",
+        attribution="geoBoundaries (William & Mary geoLab), Open Data Watch",
+    )
+    p.artifact(artifact, GB_SOURCE)
+    days = list(DAYS.values())
+    for index, day in enumerate(days):
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", "ps.district", day),
+            scheme_code="ps.district",
+            vintage=str(day.year),
+            valid_from=day,
+            valid_to=days[index + 1] if index + 1 < len(days) else None,
+            as_of=day,
+        )
+    features = {
+        str(f["properties"]["shapeISO"]).replace("_", "-"): f
+        for f in json.loads(artifact.path.read_text("utf-8"))["features"]
+    }
+    if set(features) != set(ISO_2006.values()) or set(ISO_1996.values()) != set(ISO_2006.values()):
+        raise ValueError("geoBoundaries governorates do not match the districts")
+    for iso, feature in sorted(features.items()):
+        id = area(iso)
+        code = iso.rstrip("*")
+        p.add("area", id=id, scheme_code="ps.district")
+        p.add("area_code", area_id=id, code=code)
+        p.add("area_parent", area_id=id, parent_id=COUNTRY)
+        p.name(id, str(feature["properties"]["shapeName"]), "en", "english", True)
+        shape = shapely.make_valid(shapely.geometry.shape(feature["geometry"]))
+        shape = shapely.MultiPolygon([g for g in shapely.get_parts(shape) if shapely.get_type_id(g) == 3])
+        shape = shapely.set_srid(shape, 4326)
+        geom = shapely.to_wkb(shape, hex=True, include_srid=True)
+        label = shapely.to_wkb(shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True)
+        for index, day in enumerate(days):
+            p.add(
+                "area_geometry",
+                area_id=id,
+                valid_from=day,
+                valid_to=days[index + 1] if index + 1 < len(days) else None,
+                geom=geom,
+                label_point=label,
+                quality="academic",
+                source_id=GB_SOURCE,
+            )
+    return p
+
+
 def build(day: str) -> Package:
     first = DAYS[day]
     p = Package(
         f"{SOURCE}/{day}",
         SOURCE,
         f"The Palestinian elections of {first} by electoral district, from the Central Elections Commission's tables",
-        depends=[f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/registry", f"{SOURCE}/geo"],
     )
     p.external.add(PALESTINE)
     {"1996-01-20": general_1996, "2005-01-09": president_2005, "2006-01-25": legislative_2006}[day](p, first)
@@ -430,7 +521,7 @@ def _result_set(p: Package, election: str, contest: str, name: str, note: str = 
     return result_set
 
 
-def _unit(p: Package, day: date, code: str, name: str, kind: str = "standard") -> str:
+def _unit(p: Package, day: date, code: str, name: str, kind: str = "standard", iso: str | None = None) -> str:
     unit = key("unit", day, code)
     p.add(
         "reporting_unit",
@@ -438,8 +529,8 @@ def _unit(p: Package, day: date, code: str, name: str, kind: str = "standard") -
         polity_id=PALESTINE,
         scheme_code="ps.district",
         code=f"{day}:{code}",
-        area_relation="unlocated",
-        area_id=None,
+        area_relation="equals" if iso else "unlocated",
+        area_id=area(iso) if iso else None,
         kind=kind,
     )
     p.name(unit, name, "ar", "official")
@@ -543,7 +634,7 @@ def general_1996(p: Package, day: date) -> None:
             electoral_system_id=SYSTEM_BLOCK,
         )
         result_set = _result_set(p, election, contest, f"1996:district:{number}", note)
-        unit = _unit(p, day, f"{number:02d}", name)
+        unit = _unit(p, day, f"{number:02d}", name, iso=ISO_1996[number])
         for position, (label, person_name, votes, reserved) in enumerate(winners[number], 1):
             tag = f"1996:district:{number}"
             option = key("option", tag, position)
@@ -621,7 +712,7 @@ def president_2005(p: Package, day: date) -> None:
             p.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
     for index, name in enumerate(DISTRICTS_2005):
         number = 16 - index
-        unit = _unit(p, day, f"{number:02d}", name)
+        unit = _unit(p, day, f"{number:02d}", name, iso=ISO_2006[number])
         column = index + 1
         for option, row in zip(options, rows[:7], strict=True):
             _put(p, result_set, unit, option, VOTES, row[column])
@@ -678,7 +769,9 @@ def legislative_2006(p: Package, day: date) -> None:
         p.add("outcome", result_set_id=result_set, option_id=options[number], kind="won", seats=seats)
     for measure, value in zip((REGISTERED, CAST, VALID, INVALID, BLANK), NATIONAL_BALLOTS_2006, strict=True):
         _declare(p, result_set, None, measure, value)
-    units = {number: _unit(p, day, f"{number:02d}", name) for number, name in DISTRICTS_2006.items()}
+    units = {
+        number: _unit(p, day, f"{number:02d}", name, iso=ISO_2006[number]) for number, name in DISTRICTS_2006.items()
+    }
     for number, unit in units.items():
         for list_number, votes in zip(LIST_NAMES, LISTS_2006[number], strict=True):
             _put(p, result_set, unit, options[list_number], VOTES, votes)
