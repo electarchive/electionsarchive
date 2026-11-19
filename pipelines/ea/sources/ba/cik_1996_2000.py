@@ -131,11 +131,12 @@ class Member:
 
     name: str  # as printed, in the script of the list
     race: str  # the report's race code, which is the district for lists that run in several
-    votes: int
+    votes: int | None  # the candidate's preference votes; none where the report prints only the elected
     rank: int | None  # the order the report prints the list's candidates in
     position: int | None  # the place on the list; none for a candidate seated by a compensation mandate
     elected: bool
     compensation: bool = False
+    substitute: bool = False  # seated by the minority-gender substitution rule, out of list order
 
 
 @dataclass
@@ -151,6 +152,7 @@ class Contest:
     member: str | None = None  # the Presidency member's people (Bosniak, Croat, Serb)
     seats_url: str | None = None  # the file the seats come from, when another
     members_url: str | None = None  # the candidate vote report
+    gaps: list[str] = field(default_factory=list)  # lists whose elected candidates differ from their seats
 
     def total(self, option: Option) -> int:
         return sum(option.votes.values())
@@ -497,6 +499,132 @@ def elected_1998() -> dict[str, str]:
         if single and race not in out and (m := re.fullmatch(r" {20,}1 +(\S.+)", line)):
             out[race] = spaced(m[1])
     return out
+
+
+def label_key(label: str) -> str:
+    """A list's name folded to compare across reports: the member parties of a coalition are sorted, because the
+    reports print them in different orders."""
+    m = re.fullmatch(r"(.*?)\(([^)]*)\)\s*", label)
+    if not m:
+        return fold(label)
+    return fold(m[1]) + "(" + ",".join(sorted(fold(part) for part in m[2].split(","))) + ")"
+
+
+def find_option(c: Contest, label: str) -> Option | None:
+    options = {label_key(o.label): o for o in c.options}
+    name = label_key(label)
+    return options.get(name) or next((o for k, o in options.items() if k.startswith(name) or name.startswith(k)), None)
+
+
+def elected_1996() -> dict[str, list[tuple[str, list[Member]]]]:
+    """The gazette's lists of elected candidates by contest key: each list's name and its elected candidates in the
+    order of the list. The text is read in its raw order, which follows the two columns of each page."""
+    text = subprocess.run(
+        ["pdftotext", "-raw", str(raw.cached(SOURCE, GAZETTE).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    out: dict[str, list[tuple[str, list[Member]]]] = {}
+    started = cantons = False
+    ckey: str | None = None
+    race = ""
+    label: list[str] | None = None
+    members: list[Member] | None = None
+    for line in text.splitlines():
+        line = yuscii(line)
+        t = spaced(line)
+        if not t or "SLUŽBENE NOVINE" in t or "listopada 1996" in t or t.startswith(("Godina III", "S A R A J")):
+            continue
+        if t == "Sarajevo":  # the signature closing the gazette's notice
+            break
+        if t.startswith("LISTA IZABRANIH"):
+            started, label, members, ckey, race = True, None, None, None, ""
+            cantons = "POJEDINE" in t
+            continue
+        if not started:
+            continue
+        if t.startswith("ZASTUPNIČKOG DOMA FEDERACIJE"):
+            ckey, race, label, members = "fbih_hor", "fbih_hor", None, None
+        elif t.startswith("S TERITORIJA FEDERACIJE"):
+            ckey, race, label, members = "bih_hor:1", "bih_hor", None, None
+        elif t.startswith(("S TERITORIJE REPUBLIKE SRPSKE", "S TERITORIJA REPUBLIKE SRPSKE")):
+            ckey, race, label, members = "bih_hor:2", "bih_hor", None, None
+        elif cantons and (m := re.fullmatch(r"Županija (\d+)", t)):
+            ckey, race, label, members = f"canton:{m[1]}", "canton", None, None
+        elif t.startswith("ŽUPANIJSKE SKUPŠTINE"):
+            ckey, cantons, label, members = None, False, None, None
+        elif t.startswith("ZASTUPNIČKOG DOMA BOSNE"):
+            pass
+        elif ckey is None:
+            continue
+        elif m := re.match(r"Stranka/koalicija:\s*(.*)", t):
+            label, members = [m[1]] if m[1] else [], None
+        elif t.startswith("Red. br."):
+            members = []
+            out.setdefault(ckey, []).append((spaced(" ".join(label or [])), members))
+        elif members is not None and (m := re.fullmatch(r"(\d+) (\S.*)", t)):
+            members.append(Member(m[2], race, None, int(m[1]), int(m[1]), True))
+        elif label is not None and members is None:
+            label.append(t)
+        else:
+            raise ValueError(f"1996 elected candidates: unread line {t!r}")
+    return out
+
+
+ELECTED_ROW = re.compile(r"^ {23,}(\*)? *(\d+) +(\S.*?) *$")
+PARTY_ROW = re.compile(r"^ {10,22}(\d{2}) {2,}(\S.*?) *$")
+
+
+def elected_lists_1998() -> dict[str, list[tuple[str, list[Member]]]]:
+    """The elected candidates of the multi-member races of 1998 by race code: each party's name and its elected
+    candidates in list order (the Presidency and the RS President are single winners, read by `elected_1998`)."""
+    names: dict[str, list[list[str]]] = {}
+    lists: dict[str, list[list[Member]]] = {}
+    race: str | None = None
+    for line in pdf_text(ELECTED_1998).splitlines():
+        line = yuscii(line)
+        t = spaced(line)
+        if not t or t.startswith(("Electoral Unit", "Elected Candidates", "* Minority")) or "Page " in t:
+            continue
+        if m := re.match(r"(\d{3}) {3,}(.+)$", line):
+            race = None if m[1] in PRESIDENCY_CODES or m[1] == "600" else m[1]
+            if race:
+                names[race], lists[race] = [], []
+            continue
+        if race is None:
+            continue
+        if m := PARTY_ROW.match(line):
+            names[race].append([m[2]])
+            lists[race].append([])
+        elif m := ELECTED_ROW.match(line):
+            if not lists[race]:
+                raise ValueError(f"1998 {race}: candidate before a party: {t!r}")
+            position = int(m[2])
+            lists[race][-1].append(Member(spaced(m[3]), race, None, position, position, True, substitute=bool(m[1])))
+        elif names[race] and not lists[race][-1]:
+            names[race][-1].append(t)  # a long party name wraps onto the next line
+        else:
+            raise ValueError(f"1998 elected candidates: unread line {t!r}")
+    return {r: [(spaced(" ".join(n)), m) for n, m in zip(names[r], lists[r], strict=True)] for r in names}
+
+
+# The gazette's seat tables for cantons 1 and 2 name the Croat party "Hrvatska demokratska stranka", while its lists
+# of elected candidates name it "Hrvatska demokratska zajednica"; the seats and the elected candidates agree.
+ALIASES = {(f"canton:{n}", "HRVATSKA DEMOKRATSKA ZAJEDNICA"): "HRVATSKA DEMOKRATSKA STRANKA" for n in ("1", "2")}
+
+
+def attach_elected(c: Contest, lists: list[tuple[str, list[Member]]], url: str) -> None:
+    """Put the elected candidates on their lists' options, and check each list's count against its seats."""
+    for label, members in lists:
+        found = find_option(c, label)
+        if found is None and (alias := ALIASES.get((c.key, label))):
+            found = find_option(c, alias)
+        if found is None:
+            raise ValueError(f"{c.key}: elected candidates of {label}, which has no votes")
+        found.members += members
+    c.members_url = url
+    for o in c.options:
+        elected = sum(m.elected for m in o.members)
+        if elected != (o.seats or 0):
+            c.gaps.append(f"{o.label} has {o.seats or 0} seats and {elected} elected candidates")
 
 
 def merge_seats(contests: list[Contest], seats: dict[str, list[Allocated]]) -> None:
@@ -854,13 +982,21 @@ def attach_members(c: Contest, url: str, slates: list[Slate], *, complete: bool)
 
 def contests(e: Election) -> list[Contest]:
     if e.slug == "1996-09-14":
-        return parse_1996()
+        out = parse_1996()
+        by_key = {c.key: c for c in out}
+        for ckey, lists in elected_1996().items():
+            attach_elected(by_key[ckey], lists, GAZETTE)
+        return out
     if e.slug == "1997-09-14":
         return parse_1997()
     if e.slug == "1998-09-13":
         out = parse_1998()
         merge_seats(out, seats_1998())
         winners = elected_1998()
+        by_key = {c.key: c for c in out}
+        for code, lists in elected_lists_1998().items():
+            if contest_key(code) in by_key:  # Dobretići's council has no vote count in the summary
+                attach_elected(by_key[contest_key(code)], lists, ELECTED_1998)
         for c in out:
             if c.race in {"presidency", "rs_president"}:
                 code = next(k for k, v in PRESIDENCY_CODES.items() if v == c.member) if c.member else "600"
@@ -1223,7 +1359,8 @@ METHODS = {
         "The certified results as the Provisional Election Commission published them in the Federation's official "
         "gazette (Službene novine Federacije BiH 20/1996): each list's or candidate's votes and seats for the whole "
         "district, with its valid, invalid, and total ballots. The gazette prints one invalid count for the "
-        "Federation's Presidency ballot, under both its Bosniak and its Croat member."
+        "Federation's Presidency ballot, under both its Bosniak and its Croat member. Its lists of elected "
+        "candidates give each list's elected candidates by their place on the list."
     ),
     "1997-09-14": (
         "The Provisional Election Commission's final results for the municipality: each list's votes cast in the "
@@ -1233,7 +1370,9 @@ METHODS = {
     "1998-09-13": (
         "The Provisional Election Commission's vote count summary for the whole race, with its valid, invalid, and "
         "total ballots, and its seat allocation by party. Where parties ran as a technical alliance for seats, the "
-        "allocation lists each member party's seats, which are stored on that party's list."
+        "allocation lists each member party's seats, which are stored on that party's list. The list of elected "
+        "candidates gives each party's elected candidates by their place on the list; a place marked with an "
+        "asterisk was filled under the minority-gender substitution rule (rule 7.50)."
     ),
     "2000-04-08": (
         "The Provisional Election Commission's final results for the municipality: each list's votes cast in the "
@@ -1307,6 +1446,7 @@ def election(e: Election, report: Report) -> Package:
     people: set[str] = set()
     over: list[str] = []
     short: list[str] = []
+    gaps: list[str] = []
     for c in everything(e):
         files.add(c.url)
         if c.seats_url:
@@ -1415,14 +1555,15 @@ def election(e: Election, report: Report) -> Package:
             p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=c.total(o))
             for m in o.members:
                 member = key("option", e.slug, c.key, label, m.race, m.rank if m.rank else fold(m.name))
-                p.add(
-                    "contest_option",
-                    id=member,
-                    contest_id=contest,
-                    kind="candidate",
-                    parent_option_id=option,
-                    ballot_label=m.name,
-                )
+                if m.votes is not None:
+                    p.add(
+                        "contest_option",
+                        id=member,
+                        contest_id=contest,
+                        kind="candidate",
+                        parent_option_id=option,
+                        ballot_label=m.name,
+                    )
                 person = key("person", e.slug, c.key, label, m.race, m.rank if m.rank else fold(m.name))
                 p.add("person", id=person)
                 p.name(person, proper(m.name), "bs", "official")
@@ -1440,6 +1581,8 @@ def election(e: Election, report: Report) -> Package:
                 )
                 if m.elected:
                     p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
+                if m.votes is None:
+                    continue
                 for column, value in zip(rows, (result_set, units["all"], member, PREFERENCES, m.votes), strict=True):
                     rows[column].append(value)
             for tag, n in o.votes.items():
@@ -1454,6 +1597,7 @@ def election(e: Election, report: Report) -> Package:
         for measure in ACCOUNTING:
             if measure in declared:
                 p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=declared[measure])
+        gaps.extend(f"{en}: {gap}" for gap in c.gaps)
         won = sum(o.seats or 0 for o in c.options)
         if not candidates and c.magnitude and won and won != c.magnitude:
             short.append(f"{en}, {c.magnitude} seats printed and {won} allocated")
@@ -1471,6 +1615,12 @@ def election(e: Election, report: Report) -> Package:
     if over:
         why = "The Commission's own figures disagree: " + "; ".join(over)
         p.accept("accounting.votes_valid", why)
+    if gaps:
+        p.accept(
+            "outcomes.list_members",
+            "The Commission's list of elected candidates prints fewer candidates than the seats it allocates: "
+            + "; ".join(gaps),
+        )
     if short:
         p.accept(
             "outcomes.seats_magnitude",
