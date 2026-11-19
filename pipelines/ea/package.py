@@ -883,7 +883,7 @@ CHECKS = {
                                            and l.unit_id = p.unit_id and l.option_id = k.option_id
                                            and l.channel = p.channel and l.count_round = p.count_round and l.measure = 1
                                           where p.measure = 7 and p.value > l.value * coalesce(k.ballot_lines, 1)""",
-    "result_set.default": """select contest_id, stage, count(*) as n from all_result_set where is_default
+    "result_set.default": """select election_id, contest_id, stage, count(*) as n from all_result_set where is_default
                              group by all having count(*) > 1""",
     "result_set.empty": """select r.id from result_set r where r.completeness > 0
                            and not exists (select 1 from result_value v where v.result_set_id = r.id)""",
