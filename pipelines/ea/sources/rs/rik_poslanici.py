@@ -2,7 +2,10 @@
 
 The archive holds these elections only as scans. For 1992, 1993 and 1997 the Commission's report of the overall
 results prints, for every list, its votes and seats in each constituency (izborna jedinica) and in the Republic: nine
-constituencies in 1992 and 1993, twenty-nine in 1997. For 2000, when the whole Republic was one constituency, the
+constituencies in 1992 and 1993, twenty-nine in 1997. The Republic Statistical Office's book on each of these
+elections prints each list's votes in every municipality of each constituency, which ``rik_poslanici_opstine`` reads;
+those figures form a second, finer result set for each constituency beside the report's. For 2000, when the whole
+Republic was one constituency, the
 report prints each list's national votes and seats, and the Commission's statistical book prints the registered
 voters, ballots and each list's votes for every municipality. Every figure was read from the page images, each list's
 constituency votes and seats checked against the national total the report prints for it, and each constituency's
@@ -23,10 +26,11 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
-from ea.sources.rs import rik, rik_poslanici_2000, rik_predsednik, rik_scans
+from ea.sources.rs import rik, rik_poslanici_2000, rik_poslanici_opstine, rik_predsednik, rik_scans
 
 DATA_FILE = Path(__file__).with_name("rik_poslanici.json")
 DIGITIZED = rik_predsednik.DIGITIZED
+DERIVED = 1  # result_value.flags: a figure the archive computed from the source's, not one the source prints
 COUNTRY = rik_predsednik.COUNTRY
 VOTES, REGISTERED, CAST, VALID, INVALID, VOTERS = (
     rik.VOTES,
@@ -192,6 +196,14 @@ METHOD = (
     "for the constituency. A dash in the report, for a list that did not run in a constituency, is stored as no "
     "value. Lists are numbered in the report's order, by seats and then votes, not by their place on the ballot."
 )
+METHOD_BOOK = (
+    "Digitized from the Republic Statistical Office's book on the election, published in the Republic Electoral "
+    "Commission's archive as a scan. For every constituency it prints each list's votes in each municipality of the "
+    "constituency{voters}, under the constituency's total. Each figure was read from the page image and keeps its page "
+    "and bounding box, and each list's municipal votes add up to the constituency's total the book prints. Each list is "
+    "matched to the Commission's report of the overall results by that total, which is the list's constituency vote "
+    "in the report. The report's constituency totals, with the seats, remain the default result of each constituency."
+)
 METHOD_2000 = (
     "Digitized from the Republic Statistical Office's book on the election, published in the Republic Electoral "
     "Commission's archive as a scan, whose Tables 2.1 and 2.2 print for each of 174 municipalities the registered "
@@ -227,7 +239,8 @@ def packages() -> list[str]:
 def fetch() -> None:
     for url in URLS.values():
         raw.fetch(rik.SOURCE, url, suffix=".pdf")
-    rik_scans.fetch("2000")
+    for year in ("1992", "1993", "1997", "2000"):
+        rik_scans.fetch(year)
 
 
 def parse() -> None:
@@ -295,6 +308,7 @@ def _values(
     result_set: str,
     rows: list[tuple[str, str | None, int, int]],
     locators: list[tuple[str, str | None, int, str, float, float, float, float]],
+    flags: list[int] | None = None,
 ) -> None:
     p.frame(
         "result_value",
@@ -307,7 +321,7 @@ def _values(
             result_set_id=pl.lit(result_set),
             channel=pl.lit(0, pl.Int16),
             count_round=pl.lit(0, pl.Int16),
-            flags=pl.lit(DIGITIZED, pl.Int16),
+            flags=pl.Series(flags or [DIGITIZED] * len(rows), dtype=pl.Int16),
             measure=pl.col("measure").cast(pl.Int16),
         ),
     )
@@ -366,6 +380,13 @@ def build(e: Election) -> Package:
     _national(p, s, election, e.day, e.declared, METHOD + " " + e.note)
     used = {int(cell[2][0]) for row in lists for cell in row["cells"].values()}
     pages = _pages(p, URLS[e.year], used)
+    p.artifact(raw.cached(rik.SOURCE, rik_scans.url(e.year)), rik.SOURCE_ID)
+    book = rik_poslanici_opstine.data()[e.year]
+    used = {
+        int(cell[1]) for t in book.values() for col in [*t["lists"].values(), t["voters"] or []] for cell in col if cell
+    }
+    book_pages = _pages(p, rik_scans.url(e.year), used)
+    notes: list[str] = []
     scale = 100 / 72
     for number, (place, seats) in enumerate(zip(e.constituencies, e.seats, strict=True), 1):
         c = str(number)
@@ -431,6 +452,11 @@ def build(e: Election) -> Package:
         if total != seats:
             raise ValueError(f"{s}: constituency {number} has {total} seats against {seats} printed")
         _values(p, result_set, rows, locators)
+        _book(p, e, election, contest, number, lists, book_pages, notes)
+    for number, caveat in enumerate(notes):
+        p.add(
+            "note", id=rik.key("note", s, "book", number), entity_id=election, kind="caveat", body_md=caveat, lang="en"
+        )
     if CAST in e.declared and e.declared[VALID] + e.declared[INVALID] != e.declared[CAST]:
         p.accept(
             "accounting.ballots_sum",
@@ -439,6 +465,124 @@ def build(e: Election) -> Package:
             "printed.",
         )
     return p
+
+
+def _match_lists(year: str, number: int, columns: dict[str, Any], lists: list[dict[str, Any]]) -> dict[str, int]:
+    """The report's list (by its number) for each of a constituency's columns in the book, by the column's total.
+
+    A column whose total no list in the constituency has is the one column left once the others are matched, and it
+    goes to the one list left; the book and the report disagree on that list's votes.
+    """
+    c = str(number)
+    running = {row["n"]: row["cells"][c][0] for row in lists if c in row["cells"]}
+    found: dict[str, int] = {}
+    for code, column in columns.items():
+        same = [n for n, votes in running.items() if votes == column[0][0] and n not in found.values()]
+        if same:
+            found[code] = same[0]
+    left = [code for code in columns if code not in found]
+    rest = [n for n in running if n not in found.values() and running[n] > 0] or [
+        n for n in running if n not in found.values()
+    ]
+    if len(left) == 1 and len(rest) == 1:
+        found[left[0]] = rest[0]
+    elif left:
+        raise ValueError(f"{year}: constituency {number} has book columns {left} that match no list")
+    return found
+
+
+def _book(
+    p: Package,
+    e: Election,
+    election: str,
+    contest: str,
+    number: int,
+    lists: list[dict[str, Any]],
+    pages: dict[int, str],
+    notes: list[str],
+) -> None:
+    """A constituency's votes by municipality, from the Statistical Office's book, as a finer set beside the report's."""
+    s = slug(e.year)
+    table = rik_poslanici_opstine.data()[e.year][str(number)]
+    columns: dict[str, Any] = table["lists"]
+    matched = _match_lists(e.year, number, columns, lists)
+    by_n = {row["n"]: row for row in lists}
+    result_set = rik.key("result_set", s, number, "book")
+    reported = sum(row["cells"][str(number)][0] for row in lists if str(number) in row["cells"])
+    counted = sum(cell[0] for column in columns.values() for cell in column[1:] if cell)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=rik.SOURCE_ID,
+        status="active",
+        is_default=False,
+        completeness=round(counted / reported, 6) if reported else None,
+    )
+    voters = " and how many voters voted" if e.year == "1997" else ""
+    p.add(
+        "note",
+        id=rik.key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=METHOD_BOOK.format(voters=voters),
+        lang="en",
+    )
+    scale = 100 / 72
+    rows: list[tuple[str, str | None, int, int]] = []
+    flags: list[int] = []
+    locators: list[tuple[str, str | None, int, str, float, float, float, float]] = []
+    units: list[str] = []
+    for name in table["rows"]:
+        if name == rik_poslanici_opstine.SUPPLEMENT:
+            units.append(
+                rik_predsednik._unit(
+                    p, f"{e.day}:np:dop:{number}", "aggregate", COUNTRY, f"{name}, изборна јединица {number}"
+                )
+            )
+            continue
+        code = rik_predsednik.CODES.get(name)
+        place = rik.area("rs.opstina", code) if code else COUNTRY
+        units.append(rik_predsednik._unit(p, f"{e.day}:np:{code or '~' + rik._norm(name)}", "standard", place, name))
+    figures: list[tuple[str | None, int, list[Any]]] = []
+    for code, column in columns.items():
+        option = rik.key("option", s, number, matched[code])
+        figures += [(option, VOTES, column)]
+        printed = column[0][0]
+        listed = by_n[matched[code]]["cells"][str(number)][0]
+        if printed != listed:
+            report = f"{listed:,}" if listed else "no figure"
+            notes.append(
+                f"In constituency {number} the book prints {printed:,} votes for {by_n[matched[code]]['name']}, "
+                f"which its municipal figures add up to, and the report of the overall results {report}."
+            )
+        hidden = [table["rows"][i - 1] for i, cell in enumerate(column) if cell is None]
+        derived = [table["rows"][i - 1] for i, cell in enumerate(column) if cell and cell[-1] == "derived"]
+        name = by_n[matched[code]]["name"]
+        if hidden:
+            notes.append(
+                f"In constituency {number} the scan of the book does not show the votes for {name} in "
+                f"{' and '.join(hidden)}, under a stain or a gap in the page; they are left out of the municipal figures."
+            )
+        if derived:
+            notes.append(
+                f"In constituency {number} the scan of the book does not show the votes for {name} in "
+                f"{derived[0]}; they are the constituency's total less the other municipalities, and flagged as derived."
+            )
+    if table["voters"]:
+        figures.append((None, VOTERS, table["voters"]))
+    for option, measure, column in figures:
+        for unit, cell in zip(units, column[1:], strict=True):
+            if cell is None:
+                continue
+            value, page, x0, y0, x1, y1 = cell[:6]
+            rows.append((unit, option, measure, value))
+            flags.append(rik_predsednik.DIGITIZED | (DERIVED if cell[-1] == "derived" else 0))
+            locators.append((unit, option, measure, pages[int(page)], x0 * scale, y0 * scale, x1 * scale, y1 * scale))
+    _values(p, result_set, rows, locators, flags)
 
 
 def build_2000() -> Package:
