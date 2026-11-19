@@ -20,6 +20,9 @@ stored only for the state as a whole, as the publication prints them by party. P
 votes against its valid votes, every region against its land and the state totals, and the state totals against the
 national tables and the cross-year summaries (Tab. 1.1, 1.2, 2.1, 2.2). A mismatch raises.
 
+The shapes of the state, its lands, and the regions that OpenHistoricalMap's dated relations can draw come from
+`csu_shapes`.
+
 The elections are stored under Czechia, the census tier that holds the Czechoslovak National Assembly, and cover the
 whole state, including Slovakia and Subcarpathian Ruthenia.
 """
@@ -33,6 +36,7 @@ import xlrd
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.cz import csu_shapes
 
 SOURCE = "cz.csu"
 CZECHIA = str(uuid5(package.NAMESPACE, "polity\x1fCZ"))
@@ -297,6 +301,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, OVERVIEW, suffix=".pdf")
     for name in FILES:
         raw.fetch(SOURCE, url(name), suffix=".xls")
+    csu_shapes.fetch(SOURCE)
 
 
 def parse() -> None:
@@ -557,7 +562,50 @@ def geo() -> Package:
                 p.add("area_code", area_id=id, code=code, valid_from=start, valid_to=end)
                 p.add("area_parent", area_id=id, parent_id=land(parent[name]), valid_from=start, valid_to=end)
                 p.name(id, text, "cs", "official")
+    shapes(p)
     return p
+
+
+OHM = key("source", "openhistoricalmap")
+
+
+def shapes(p: Package) -> None:
+    """The shape of every area that OpenHistoricalMap's relations draw or build, dated to the plan."""
+    p.add(
+        "source",
+        id=OHM,
+        kind="community",
+        publisher="OpenHistoricalMap",
+        title="OpenHistoricalMap: Czechoslovakia, its lands, the Těšín Silesia, and the judicial districts of Bohemia",
+        url="https://www.openhistoricalmap.org/",
+        license="CC0 1.0",
+        license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+        attribution="OpenHistoricalMap contributors",
+    )
+    for link in csu_shapes.urls():
+        p.artifact(raw.cached(SOURCE, link), OHM)
+    built = csu_shapes.build(SOURCE, PLAN_FROM, PLAN_TO, OSTRAVA_MERGE, CHAMBER.scheme, SENATE.scheme)
+    ids = {("cz.ns1920_zeme", code): land(name) for name, code in LAND_CODES.items()}
+    for chamber in CHAMBERS:
+        for name in chamber.regions:
+            ids[(chamber.scheme, name)] = area(chamber, name)
+    rows: list[tuple[str, csu_shapes.Version]] = [
+        (STATE, v) for v in built.state if v.end > date(1918, 10, 28) and v.start < PLAN_TO
+    ]
+    for (scheme, name), versions in built.areas.items():
+        rows.extend((ids[(scheme, name)], v) for v in versions)
+    for id, version in rows:
+        geometry = csu_shapes.multi(version.geometry)
+        p.add(
+            "area_geometry",
+            area_id=id,
+            valid_from=max(version.start, date(1918, 10, 28)),
+            valid_to=min(version.end, PLAN_TO),
+            geom=csu_shapes.wkb(geometry),
+            label_point=csu_shapes.label(geometry),
+            quality="osm",
+            source_id=OHM,
+        )
 
 
 def source_id() -> str:
