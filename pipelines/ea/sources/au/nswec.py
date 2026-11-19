@@ -4,6 +4,7 @@ import io
 import re
 from collections import Counter, defaultdict
 from datetime import UTC, date, datetime
+from functools import cache
 from html.parser import HTMLParser
 from time import sleep
 from typing import NamedTuple
@@ -1848,17 +1849,30 @@ def bye_outcomes(b: Bye) -> dict[str, str]:
     return result
 
 
+# By-election parties keep the keys they were first loaded with: printed names and acronyms are matched against
+# the 2015-2023 Assembly parties with the aliases of that first load, so a later alias (GNS for the Greens, added
+# for 2011) does not move a by-election candidate to another party row.
+BYE_STATE_YEARS = (2015, 2019, 2023)
+BYE_ALIASES = {"LAB": "ALP", "NP": "NAT", "PHON": "ON"}
+
+
+@cache
+def bye_state_parties() -> dict[str, str]:
+    return state_parties(list(BYE_STATE_YEARS))
+
+
 def bye_party(name: str, acronym: str) -> tuple[str, str]:
     """The party key and display name for a by-election candidate's printed party."""
+    sparties = bye_state_parties()
     if name and name not in NO_PARTY:
         flat = re.sub(r"[^a-z0-9]+", "", re.sub(r"\b(the|nsw)\b", "", name.lower()))
-        for code, label in state_parties(sorted(STATE)).items():
+        for code, label in sparties.items():
             if re.sub(r"[^a-z0-9]+", "", re.sub(r"\b(the|nsw)\b", "", label.lower())) == flat:
                 return key("party", "state", code), label
         return key("party", "bye", flat), name
     if acronym and acronym not in NO_PARTY:
-        code = state_party(acronym)
-        if code in state_parties(sorted(STATE)):
+        code = BYE_ALIASES.get(acronym, acronym)
+        if code in sparties:
             return key("party", "state", code), ""
         return key("party", "bye", code.lower()), code
     return "", ""
@@ -1871,7 +1885,7 @@ def bye_parties() -> dict[str, str]:
             pid, label = bye_party(party, acronym)
             if pid and label:
                 names.setdefault(pid, label)
-    state = {key("party", "state", c) for c in state_parties(sorted(STATE))}
+    state = {key("party", "state", c) for c in bye_state_parties()}
     return {pid: n for pid, n in names.items() if pid not in state}
 
 
