@@ -1,4 +1,5 @@
-"""Zambia's constituencies of the 2016 and 2026 plans and wards of the 2021 plan, with their shapes, for `zm.ecz`.
+"""Zambia's districts, constituencies of the 2016 and 2026 plans, and wards of the 2021 plan, with their shapes, for
+`zm.ecz`.
 
 The shapes come from OCHA's COD-AB dataset for Zambia, which the Disaster Management and Mitigation Unit compiled from
 the Electoral Commission's delimitation: its third level holds the 156 constituencies and its fourth the 1,853 wards.
@@ -7,7 +8,10 @@ dataset. Each ward matches a notice's ward by name within its district, after th
 
 The 226 constituencies of the 2026 plan are drawn from the same wards. The Commission's delimitation schedules list
 the wards of each new or reviewed constituency; every other constituency keeps the wards it held in 2016, less any
-that a schedule gives to another. Solwezi Central and Solwezi North share six wards cut from the dataset's Rodwell
+that a schedule gives to another. The 116 districts are the dataset's second level. A district that a Provincial and District Boundaries (Division)
+Amendment Order inserted after 2010 starts on the Gazette date of that order; the others have no start.
+
+Solwezi Central and Solwezi North share six wards cut from the dataset's Rodwell
 Mwepu ward, so those two have no shape.
 """
 
@@ -100,6 +104,40 @@ TERRITORY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fZMB"))
 PLAN_2016 = date(2016, 8, 11)
 WARDS_2021 = date(2021, 8, 12)
 PLAN_2026 = date(2026, 8, 13)
+LAWS = "https://commons.laws.africa/akn/zm/act/si"
+
+
+def _order(year: int, number: int) -> str:
+    return f"{LAWS}/{year}/{number}/media/publication/zm-act-si-{year}-{number}-publication-document.pdf"
+
+
+# The orders under the Provincial and District Boundaries Act that insert a district into the First Schedule of the
+# principal Order (S.I. No. 106 of 1996), each with the date of its Gazette and the districts it inserts, by their
+# letters. A district that no order here inserts is one of the principal Order's, or one whose order the archive
+# could not read, and has no creation date.
+DISTRICT_ORDERS: tuple[tuple[date, str, tuple[str, ...]], ...] = (
+    (date(2011, 4, 29), _order(2011, 42), ("MAFINGA",)),
+    (date(2013, 3, 15), _order(2013, 28), ("MWANSABOMBWE", "RUFUNSA", "SHIBUYUNJI")),
+    (
+        date(2013, 6, 21),
+        _order(2013, 49),
+        ("CHISAMBA", "CHITAMBO", "LUANO", "CHEMBE", "SHIWANGANDU", "LUAMPA", "MITETE", "NKEYEMA"),
+    ),
+    (date(2014, 3, 21), _order(2014, 28), ("NGABWE",)),
+    (date(2016, 6, 3), _order(2016, 39), ("KALUMBILA", "MUSHINDAMO", "SENGAHILL")),
+    (date(2017, 1, 27), _order(2017, 9), ("KANCHIBIYA", "LAVUSHIMANDA", "LUNTE")),
+    (
+        date(2018, 4, 6),
+        _order(2018, 26),
+        ("CHASEFU", "CHIPANGALI", "KASENENGWA", "LUMEZI", "LUSANGAZI", "CHIFUNABULI"),
+    ),
+    (date(2018, 6, 22), _order(2018, 51), ("LUPOSOSHI",)),
+)
+# Orders cited for what they say about districts without inserting one: the councils of eight districts (S.I. No.
+# 41 of 2012), the moves of Chirundu, Siavonga, and Itezhi-Tezhi, Shibuyunji, and Chama between provinces.
+DISTRICT_NOTES = tuple(_order(year, number) for year, number in ((2012, 41), (2012, 22), (2018, 28), (2021, 114)))
+DISTRICT_URLS = tuple(url for _, url, _ in DISTRICT_ORDERS) + DISTRICT_NOTES
+DISTRICTS = 116
 UPLOADS = "https://www.elections.org.zm/wp-content/uploads"
 DELIMITATION = "https://www.elections.org.zm/?p=5529"
 PROVINCES = (
@@ -159,6 +197,10 @@ def constituency_area(number: int) -> str:
 
 def constituency_area_2026(number: int) -> str:
     return key("area", "zm.constituency", 2026, f"{number:03d}")
+
+
+def district_area(pcode: str) -> str:
+    return key("area", "zm.district", pcode)
 
 
 def ward_area(pcode: str) -> str:
@@ -347,6 +389,29 @@ def constituencies() -> dict[str, Place]:
 
 
 @functools.cache
+def districts() -> dict[str, Place]:
+    """The 116 districts of the dataset's second level by p-code."""
+    found = {place.pcode: place for place in _level("zmb_admin2", 2)}
+    if len(found) != DISTRICTS:
+        raise ValueError(f"the dataset holds {len(found)} districts, not {DISTRICTS}")
+    return found
+
+
+@functools.cache
+def district_created() -> dict[str, tuple[date, str]]:
+    """The Gazette date and order URL of the order that created each district it inserts, by p-code."""
+    by_letters = {letters(place.name): place.pcode for place in districts().values()}
+    out: dict[str, tuple[date, str]] = {}
+    for day, url, names in DISTRICT_ORDERS:
+        for name in names:
+            pcode = by_letters.get(name)
+            if pcode is None or pcode in out:
+                raise ValueError(f"the order of {day} names district {name}, which is not one district of the dataset")
+            out[pcode] = (day, url)
+    return out
+
+
+@functools.cache
 def wards() -> list[Place]:
     found = _level("zmb_admin4", 4)
     if len(found) != WARDS:
@@ -472,7 +537,15 @@ def district_code(name: str) -> str | None:
     return _district_codes().get(spelled)
 
 
-def _outline(p: Package, id: str, geometry: shapely.Geometry, source: str, start: date, end: date | None) -> None:
+def district_of(name: str) -> str | None:
+    """The area of the district a mayoral or chairperson unit names, if the dataset holds it."""
+    code = district_code(name)
+    return district_area(code) if code else None
+
+
+def _outline(
+    p: Package, id: str, geometry: shapely.Geometry, source: str, start: date | None, end: date | None
+) -> None:
     p.add(
         "area_geometry",
         area_id=id,
@@ -511,7 +584,7 @@ def geo(
         f"{SOURCE}/geo",
         SOURCE,
         "Zambia's 150 constituencies of 1991 to 2016, its 156 of 2016 to 2026, its 226 from 2026, its wards of 2006 to "
-        "2016 that the 2006 to 2010 ward maps hold, and its 1,853 wards of 2021 to 2026, with their shapes from public-domain ward layers, the COD-AB dataset compiled by the "
+        "2016 that the 2006 to 2010 ward maps hold, and its 1,853 wards of 2021 to 2026, and its 116 districts, with their shapes from public-domain ward layers, the COD-AB dataset compiled by the "
         "Disaster Management and Mitigation Unit, and the Electoral Commission's 2026 delimitation schedules",
         depends=[f"{SOURCE}/registry"],
     )
@@ -637,6 +710,53 @@ def geo(
         )
         p.name(id, ward_2006.name, "en", "official")
         _outline(p, id, ward_2006.found.shape, new, PLAN_2006, PLAN_2016)
+    orders = key("source", "district-orders")
+    p.add(
+        "source",
+        id=orders,
+        kind="official_body",
+        publisher="Government of Zambia",
+        title="Provincial and District Boundaries (Division) Orders and Local Government (Establishment of Councils) "
+        "Orders, 2011 to 2021",
+        url="https://commons.laws.africa/",
+        license="No license stated; Statutory Instruments published in the Government Gazette",
+        attribution="Government of Zambia, through Laws.Africa",
+        notes=(
+            "Each order amends the First Schedule of the Provincial and District Boundaries (Division) Order, 1996 "
+            "(S.I. No. 106 of 1996) and is dated by its Gazette. A district's creation date is the Gazette date of "
+            "the order that inserts it: Mafinga 29 April 2011 (S.I. No. 42); Mwansabombwe, Rufunsa, and Shibuyunji "
+            "15 March 2013 (No. 28); Chisamba, Chitambo, Luano, Chembe, Shiwang'andu, Luampa, Mitete, and Nkeyema 21 "
+            "June 2013 (No. 49); Ngabwe 21 March 2014 (No. 28); Kalumbila, Mushindamo, and Senga Hill 3 June 2016 "
+            "(No. 39 of 2016); Kanchibiya, Lavushimanda, and Lunte 27 January 2017 (No. 9); Chasefu, Chipangali, "
+            "Kasenengwa, Lumezi, Lusangazi, and Chifunabuli 6 April 2018 (No. 26); Lupososhi 22 June 2018 (No. 51). "
+            "Any other district has no creation date here: it is one of the 1996 Order's, or its order was not "
+            "readable. The Local Government (Establishment of Councils) Order, 2012 (S.I. No. 41, 15 June 2012) set "
+            "up the councils of Chikankata, Chilanga, Chirundu, Lunga, Mulobezi, Nsama, Sinda, and Vubwi, which shows "
+            "only that they existed by then. S.I. No. 22 of 2012, No. 28 of 2018, and No. 114 of 2021 moved "
+            "districts between provinces without creating any."
+        ),
+    )
+    for url in DISTRICT_URLS:
+        p.artifact(raw.cached(SOURCE, url), orders)
+    district_set = key("boundary_set", "zm.district", "2020")
+    p.add(
+        "boundary_set",
+        id=district_set,
+        scheme_code="zm.district",
+        vintage="2020",
+        valid_from=None,
+        as_of=WARDS_2021,
+    )
+    created = district_created()
+    for pcode, place in sorted(districts().items()):
+        id = district_area(pcode)
+        start, url = created.get(pcode, (None, ""))
+        p.add("area", id=id, scheme_code="zm.district")
+        p.add("area_code", area_id=id, code=pcode, valid_from=start, valid_to=None)
+        p.add("area_parent", area_id=id, parent_id=TERRITORY, valid_from=start, valid_to=None)
+        p.add("external_id", entity_id=id, scheme="cod_ab", value=pcode)
+        p.name(id, place.name, "en", "official")
+        _outline(p, id, place.shape, cod, start, None)
     schedules = key("source", "delimitation-2026")
     p.add(
         "source",
