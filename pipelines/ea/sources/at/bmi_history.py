@@ -605,7 +605,7 @@ def election(e: Edition) -> Package:
             f"{SOURCE}/geo",
             f"{SOURCE}/registry",
             REGISTRY,
-            *(["at.parlament/geo"] if wks else []),
+            *(["at.parlament/geo"] if any(unit not in NAMES_1994 for unit in wks) else []),
             *([f"{SOURCE}/{previous.key}"] if previous else []),
         ],
     )
@@ -768,7 +768,9 @@ def election(e: Edition) -> Package:
     sizes = _pages(stored.path)
     page_ids: dict[int, str] = {}
     shared = {table.page for table in transcription(previous.key).tables} if previous else set()
-    for number in pages:
+    # Every page the transcription covers keeps its row, including the state tables an edition by constituency only
+    # checks against: earlier versions of the package, and value locators elsewhere, cite them.
+    for number in sorted({table.page for table in t.tables}):
         width, height = sizes[number]
         page_ids[number] = key("page", e.file, number)
         if number in shared:
