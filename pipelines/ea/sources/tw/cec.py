@@ -1,6 +1,7 @@
 """Taiwan's presidential and legislative elections, special municipality mayors, and county magistrates and city mayors,
-from the Central Election Commission's election database. The 2008 and 2012 legislative archives are .rar files; parsing
-them needs the `unar` command."""
+from the Central Election Commission's election database. The .rar archives (the 2008 and 2012 legislative elections and
+the 2005 to 2010 local executives) are read from their members, each stored in the raw cache under the archive's URL
+with `#<member path>` appended; `ea fetch` downloads only the archives whose members are not in the cache."""
 
 import functools
 import json
@@ -860,7 +861,28 @@ def leg_urls(day: str) -> list[str]:
 def fetch_legislative() -> None:
     for day in leg_days():
         for url in leg_urls(day):
-            raw.fetch(SOURCE, url, suffix=Path(url.split("?")[0]).suffix)
+            if not staged(url):
+                raw.fetch(SOURCE, url, suffix=Path(url.split("?")[0]).suffix)
+
+
+@functools.cache
+def staged(url: str) -> list[str]:
+    """The raw-cache keys of an archive's members, stored one by one as `<archive URL>#<member path>`."""
+    prefix = f"{url}#"
+    return sorted(key for key in raw.keys(SOURCE) if key.startswith(prefix))
+
+
+def cited(url: str) -> list[str]:
+    """The raw-cache keys a package cites for a URL: an archive's stored members where the cache holds them."""
+    return staged(url) or [url]
+
+
+def bulk_members(url: str) -> list[tuple[str, bytes]]:
+    """Every file of a downloaded archive with its path inside the archive, from its stored members if any."""
+    keys = staged(url)
+    if keys:
+        return [(key[len(url) + 1 :], raw.cached(SOURCE, key).path.read_bytes()) for key in keys]
+    return archive_members(raw.cached(SOURCE, url).path)
 
 
 @functools.cache
@@ -1082,7 +1104,7 @@ def merge(type_: str, tables: list[Table]) -> Table:
 
 @functools.cache
 def leg_members(day: str) -> list[tuple[str, bytes]]:
-    return archive_members(raw.cached(SOURCE, leg_bulk_url(day)).path)
+    return bulk_members(leg_bulk_url(day))
 
 
 def official_options(day: str, type_: str) -> list[tuple[int, str, str]]:
@@ -1226,7 +1248,7 @@ def leg_parties() -> set[str]:
 
 
 def leg_artifacts(day: str) -> list[raw.Artifact]:
-    return [raw.cached(SOURCE, url) for url in leg_urls(day)]
+    return [raw.cached(SOURCE, key) for url in leg_urls(day) for key in cited(url)]
 
 
 def leg_station_rows(day: str) -> pl.DataFrame:
@@ -1702,6 +1724,8 @@ def local_urls_after_areas(theme: Theme) -> list[str]:
 def local_fetch() -> None:
     for theme in THEMES:
         for url in local_urls(theme):
+            if staged(url):
+                continue
             suffix = ".json" if url.endswith(".json") else url[url.rindex(".") :]
             raw.fetch(SOURCE, url, suffix=suffix)
         for url in local_urls_after_areas(theme):
@@ -1709,7 +1733,7 @@ def local_fetch() -> None:
 
 
 def local_artifacts(theme: Theme) -> list[str]:
-    return [*local_urls(theme), *local_urls_after_areas(theme)]
+    return [key for url in (*local_urls(theme), *local_urls_after_areas(theme)) for key in cited(url)]
 
 
 # --- reading the local executive files
@@ -1721,6 +1745,8 @@ def decoded(name: str | bytes) -> str:
 
 def local_members(url: str) -> list[tuple[str, bytes]]:
     """The files in one downloaded workbook, zip, or rar, with their names decoded."""
+    if staged(url):
+        return [(name.rsplit("/", 1)[-1], data) for name, data in bulk_members(url)]
     path = raw.cached(SOURCE, url).path
     if url.lower().endswith(".xls"):
         return [(url.rsplit("/", 1)[-1], path.read_bytes())]
