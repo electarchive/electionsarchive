@@ -258,6 +258,12 @@ def _resolve(row: Row, names: dict[str, tuple[str, str]], taken: set[str]) -> st
 
 
 @functools.cache
+def held_1994() -> set[str]:
+    """The 1994 municipality codes that `fi.vaalit` holds as areas: the municipalities of the elections from 2003."""
+    return set(vaalit.places()["fi.kunta"]) & set(municipalities_1994())
+
+
+@functools.cache
 def count_1994() -> Count1994:
     rows = read_1994()
     names = municipalities_1994()
@@ -432,7 +438,8 @@ METHOD_1994 = (
     "checked every row: 24 rows had a misread digit that the sums corrected, and 14 figures that the sums could not "
     "settle were read from the page image or from the printed subtotals. The "
     "municipalities add up to the constituencies' totals, and the constituencies to the country's. The "
-    "municipalities of 1994 are not yet matched to the archive's areas. The country's "
+    "municipalities that still exist under the same code are matched to their areas, and the constituencies to "
+    "the archive's constituencies; the municipalities merged away since 1994 have no area. The country's "
     "Yes, No, and valid votes are those of the Ministry of Justice's notice 921/1994. The persons entitled to vote "
     "and the persons who voted are the volume's own totals. Cast ballots are the valid and rejected ballots together."
 )
@@ -709,6 +716,8 @@ def election_1994() -> Package:
         f"fi/{day}-referendum",
     )
     p = b.p
+    p.depends.append(f"{vaalit.SOURCE}/geo")
+    held = held_1994()
     p.uses(raw.cached(SOURCE, PDF_1994))
     p.uses(raw.cached(SOURCE, FINLEX_1994))
     p.uses(raw.cached(SOURCE, CLASS_FI))
@@ -787,8 +796,8 @@ def election_1994() -> Package:
             polity_id=vaalit.FINLAND,
             scheme_code=SCHEME,
             code=f"{day}:{code}",
-            area_relation="unlocated",
-            area_id=None,
+            area_relation="equals" if code in held else "unlocated",
+            area_id=vaalit.area("fi.kunta", code) if code in held else None,
             kind="standard",
         )
         finnish, swedish = names[code]
@@ -818,8 +827,8 @@ def election_1994() -> Package:
             polity_id=vaalit.FINLAND,
             scheme_code=CONSTITUENCY_SCHEME_NEW,
             code=f"{day}:{code}",
-            area_relation="unlocated",
-            area_id=None,
+            area_relation="equals",
+            area_id=vaalit.area("fi.vaalipiiri", code),
             kind="standard",
         )
         p.name(unit, f"{CONSTITUENCY_NAMES[code]} constituency", "en", "official")
