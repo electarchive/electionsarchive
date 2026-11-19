@@ -2359,6 +2359,9 @@ PV2009 = f"{ARCHIVE}/pv-2009-rezultati/"
 PV2010 = (f"{ARCHIVE}/roja-2010-velesanas/", f"{ARCHIVE}/mersrags-2010-velesanas/")
 PV2013 = f"{ARCHIVE}/pv-2013-rezultati/"
 PV2013_RIGA = f"{ARCHIVE}/pv-2013-velesanu-iecirkni-riga/"
+# The commission's own 2013 results site answers over plain HTTP only.
+PV2013_SITE = "http://pv2013.cvk.lv"
+PV2013_MENU = f"{PV2013_SITE}/result-menu.html"
 RD2020 = "https://archive.cvk.lv/rd2020"
 RD2020_VERSION = "a4360265-c143-47ec-b78f-0fe75a54fb4b"
 RD2020_RESULTS = f"{RD2020}/ElectionResults/ElectionResultsData?versionId={RD2020_VERSION}&locationId=riga"
@@ -2542,6 +2545,101 @@ def read_2010() -> Early:
     )
 
 
+class SitePage(HTMLParser):
+    """A page of the 2013 results site: its titles, and its tables as rows of cells with the links each holds."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.titles: dict[str, str] = {}
+        self.tables: list[list[list[tuple[str, str | None]]]] = []
+        self._span: str | None = None
+        self._rows: list[list[tuple[str, str | None]]] | None = None
+        self._row: list[tuple[str, str | None]] | None = None
+        self._cell: list[str] | None = None
+        self._href: str | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        found = dict(attrs)
+        if tag == "span" and (found.get("class") or "") in ("table_title", "table_subtitle", "table_comment"):
+            self._span = found["class"] or ""
+            self.titles[self._span] = self.titles.get(self._span, "")
+        elif tag == "br" and self._span:
+            self.titles[self._span] += "\n"
+        elif tag == "table":
+            self._rows = []
+        elif tag == "tr" and self._rows is not None:
+            self._row = []
+        elif tag in ("td", "th") and self._row is not None:
+            self._cell, self._href = [], None
+        elif tag == "a" and self._cell is not None:
+            self._href = found.get("href")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "span":
+            self._span = None
+        elif tag in ("td", "th") and self._row is not None and self._cell is not None:
+            self._row.append((clean("".join(self._cell)), self._href))
+            self._cell = None
+        elif tag == "tr" and self._rows is not None and self._row is not None:
+            self._rows.append(self._row)
+            self._row = None
+        elif tag == "table" and self._rows is not None:
+            self.tables.append(self._rows)
+            self._rows = None
+
+    def handle_data(self, data: str) -> None:
+        if self._cell is not None:
+            self._cell.append(data)
+        elif self._span:
+            self.titles[self._span] += data
+
+
+def site_page(url: str) -> SitePage:
+    page = SitePage()
+    page.feed(raw.cached(SOURCE, url).path.read_text(encoding="utf-8-sig"))
+    return page
+
+
+def site_councils() -> list[tuple[str, str]]:
+    """The council pages of the 2013 results site, each with the council's name, Riga first."""
+    text = raw.cached(SOURCE, PV2013_MENU).path.read_text(encoding="utf-8-sig")
+    return [
+        (f"{PV2013_SITE}/{href}", clean(re.sub(r"<[^>]+>", "", name)))
+        for href, name in re.findall(r'<a[^>]*href="(ResNovPart-\d+\.html)"[^>]*>(.*?)</a>', text, re.DOTALL)
+    ]
+
+
+def site_stations(council: str) -> list[tuple[str, str, str, str]]:
+    """The polling stations a council page lists: number, url, venue, and address."""
+    out = []
+    for row in site_page(council).tables[-1][1:]:
+        if len(row) == 3 and row[1][1]:
+            out.append((row[0][0].rstrip("."), f"{PV2013_SITE}/{row[1][1]}", row[1][0], row[2][0]))
+    return out
+
+
+def site_race(url: str, name: str) -> Race:
+    day = "2013-06-01"
+    page = site_page(url)
+    cells = [[text for text, _ in row] for row in page.tables[0]]
+    # The total row is printed as a label and one number, not under the list and marks columns.
+    cells = [["Summa:", "", row[1]] if row[0].startswith("Summa") else row for row in cells]
+    found = re.search(r"\((\d+)\)", cells[0][-1])
+    race = _table_race(day, name, cells, int(found.group(1)) if found else None, False)
+    counts: list[Count] = []
+    for number, station, venue, address in site_stations(url):
+        marks: dict[int, tuple[int, int | None, int | None]] = {}
+        for row in site_page(station).tables[0][1:]:
+            if row[0][0].rstrip(".").isdigit():
+                marks[int(row[0][0].rstrip("."))] = (_num(row[2][0]), _num(row[3][0]), _num(row[4][0]))
+        counts.append(Count(f"{day}:{race.slug}:{number}", venue, address, None, None, None, marks))
+    for slate in race.slates:
+        if sum(c.marks.get(slate.number, (0, 0, 0))[0] for c in counts) != slate.marks:
+            raise ValueError(f"2013 {name} list {slate.number}: station marks do not add up to the council's")
+    race.counts, race.level = counts, "station"
+    return race
+
+
 def read_2013() -> Early:
     heading, rows = sections(PV2013)[0]
     found = re.search(r"\((\d+)\)", rows[0][-1])
@@ -2565,17 +2663,24 @@ def read_2013() -> Early:
     if sum(s.marks for s in race.slates) != total:
         raise ValueError("2013 Riga: list marks do not add up to the printed total")
     race.counts, race.level = counts, "station"
+    others = [(url, name) for url, name in site_councils() if name != "Rīga"]
+    urls = [PV2013, PV2013_RIGA, PV2013_MENU]
+    races = [race]
+    for url, name in others:
+        urls += [url, *(station for _, station, _, _ in site_stations(url))]
+        races.append(site_race(url, name))
     return Early(
         ("2013 Latvian municipal elections", "2013. gada pašvaldību vēlēšanas"),
-        "The commission's archive holds results by list and polling station only for Riga; the other councils elected "
-        "that day are not part of this package.",
+        "",
         EARLY_METHOD.format(
             unit="polling station",
-            extra="Polling stations are named by the venue, because the archive prints no station numbers. The archive "
-            "prints no ballots cast, valid marks, or registered voters per polling station.",
+            extra="Riga comes from the commission's archive pages and the other councils from its 2013 results site. "
+            "Polling stations are named by the venue; the commission's own numbers are part of each code for the "
+            "councils other than Riga, whose stations are numbered by their order on the page. The commission prints "
+            "no ballots cast, valid marks, or registered voters per polling station.",
         ),
-        [PV2013, PV2013_RIGA],
-        [race],
+        urls,
+        races,
     )
 
 
@@ -2786,6 +2891,11 @@ def fetch_early() -> None:
         raw.fetch(SOURCE, url, suffix=".json" if url.startswith(RD2020) else ".html")
     for url in vrd2021_pages():
         raw.fetch(SOURCE, url, suffix=".html")
+    raw.fetch(SOURCE, PV2013_MENU, suffix=".html")
+    for council, _ in site_councils():
+        raw.fetch(SOURCE, council, suffix=".html")
+        for _, station, _, _ in site_stations(council):
+            raw.fetch(SOURCE, station, suffix=".html")
 
 
 # Local council elections of 1997-2005, from the commission's archive pages. The archive prints list seats for every
