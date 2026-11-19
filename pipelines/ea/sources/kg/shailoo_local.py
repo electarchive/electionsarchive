@@ -16,7 +16,7 @@ import fastexcel
 
 from ea import package, raw
 from ea.package import Package
-from ea.sources.kg import shailoo
+from ea.sources.kg import cod, shailoo
 from ea.sources.kg.shailoo import BASE, COUNTRY, KYRGYZSTAN, SOURCE, SOURCE_ID, against, clean, key, num
 
 LOCAL = "kg.shailoo.local"
@@ -297,6 +297,7 @@ def councils() -> list[Council]:
 
 def fetch() -> None:
     discover()
+    cod.fetch()
 
 
 def packages() -> list[str]:
@@ -327,6 +328,19 @@ def geo(items: list[Council]) -> Package:
     for council in items:
         for url in council.files:
             p.uses(raw.cached(SOURCE, url))
+    boundaries = key("source", cod.SOURCE)
+    p.add(
+        "source",
+        id=boundaries,
+        kind="official_body",
+        publisher="Ministry of Emergency Situations of the Kyrgyz Republic",
+        title="Kyrgyzstan administrative boundaries, levels 0 to 3, as distributed in the OCHA COD-AB (version 01, 2018)",
+        url=cod.PAGE,
+        license="CC BY-IGO 3.0",
+        license_url="https://creativecommons.org/licenses/by/3.0/igo/",
+        attribution="Ministry of Emergency Situations of the Kyrgyz Republic; OCHA Field Information Services Section",
+    )
+    p.artifact(raw.cached(cod.SOURCE, cod.URL), boundaries)
     for code, rank, kind, noun in (
         ("kg.council", 1, "electoral_district", "local council"),
         ("kg.uik", 2, "electoral_district", "polling station"),
@@ -339,6 +353,35 @@ def geo(items: list[Council]) -> Package:
         p.add("area_parent", area_id=id, parent_id=COUNTRY)
         p.name(id, english(council), "en", "official")
         p.name(id, council.name, "ky", "official", False)
+    shapes = cod.shapes()
+    pcodes = cod.crosswalk()
+    unknown = sorted(set(pcodes) - {item.code for item in items})
+    if unknown:
+        raise ValueError(f"{cod.CROSSWALK.name} names councils that have no results: {unknown}")
+    for council in items:
+        pcode = pcodes.get(council.code)
+        if pcode is None:
+            continue
+        geometry = shapes[pcode]
+        p.add(
+            "area_geometry",
+            area_id=area(council.code),
+            valid_from=None,
+            valid_to=None,
+            geom=cod.wkb(geometry),
+            label_point=cod.label(geometry),
+            quality="official",
+            source_id=boundaries,
+        )
+    p.add(
+        "boundary_set",
+        id=p.id("boundary_set", "kg.council", "2018"),
+        scheme_code="kg.council",
+        vintage="2018",
+        valid_from=None,
+        valid_to=None,
+        as_of=date(2018, 11, 19),
+    )
     return p
 
 
