@@ -158,13 +158,28 @@ def fetch() -> None:
 
 
 def parse() -> None:
+    built = [*(election(e) for e in ELECTIONS), local_election(), *(by_election(b) for b in BY)]
+    parties = registry()
+    _cover(parties, built)
     geo().write()
-    registry().write()
-    for e in ELECTIONS:
-        election(e).write()
-    local_election().write()
-    for b in BY:
-        by_election(b).write()
+    parties.write()
+    for p in built:
+        p.write()
+
+
+def _cover(parties: Package, built: list[Package]) -> None:
+    """Fail when an election package names a party the registry leaves out, since the loaded rows still use it."""
+    held = {row["id"] for row in parties.rows.get("party", [])}
+    for p in built:
+        used = {
+            row[column]
+            for table in ("contest_option", "candidacy")
+            for row in p.rows.get(table, [])
+            for column in ("party_id", "member_of_party_id")
+            if row.get(column)
+        }
+        if missing := used - held:
+            raise RuntimeError(f"{p.key} names parties the registry leaves out: {sorted(map(str, missing))}")
 
 
 def emit() -> None:
