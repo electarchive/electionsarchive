@@ -8,7 +8,8 @@ continue it. Each form is matched to the Board's typed English list of council w
 gives the constituency's English name and the winners' names in English and gender.
 
 Run with the work folder holding ``ocr.jsonl``, ``vision/v_*.jsonl``, and ``vision2/w_*.jsonl``:
-``uv run python -m ea.sources.et.nebe_rc_reconcile <work>``.
+``uv run python -m ea.sources.et.nebe_rc_reconcile <work>``. Only the (poll, region) pairs read in the work folder are
+replaced; the forms of other pairs stay, so regions can be digitized in separate runs.
 """
 
 import collections
@@ -275,9 +276,24 @@ def _english(form: dict, listed: list[dict], unresolved: list[str]) -> None:
     form["winners_en"] = english
 
 
+def _merge(old: list[dict], new: list[dict], replaced: set[tuple[str, str]]) -> list[dict]:
+    """Replace the forms of the (poll, region) pairs read in this run, keeping every other pair's forms in place."""
+    merged: list[dict] = []
+    inserted = False
+    for form in old:
+        if (form["poll"], form["region"]) in replaced:
+            if not inserted:
+                merged += new
+                inserted = True
+        else:
+            merged.append(form)
+    return merged if inserted else merged + new
+
+
 def main() -> None:
     work = Path(sys.argv[1])
     forms, unresolved = build(work)
+    replaced = {(form["poll"], form["region"]) for form in forms}
     kept = []
     for form in forms:
         pages = {form["page"], *(c["page"] for c in form["candidates"])}
@@ -294,6 +310,7 @@ def main() -> None:
         print(line)
     print(f"{len(forms)} forms, {len(unresolved)} unresolved", file=sys.stderr)
     out = Path(nebe.__file__).with_name("nebe_rc_2021.json")
+    forms = _merge(json.loads(out.read_text())["forms"] if out.exists() else [], forms, replaced)
     out.write_text(json.dumps({"forms": forms}, ensure_ascii=False, indent=1) + "\n")
 
 
