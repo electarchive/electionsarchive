@@ -843,7 +843,9 @@ def everything(e: Election) -> list[Contest]:
 # Places.
 
 # The geoBoundaries outline of each municipality whose name differs, by the Commission's code; the municipalities the
-# entity line split are named by their Republika Srpska part after a slash, matched by that name otherwise.
+# entity line split are named by their Republika Srpska part after a slash, matched by that name otherwise. The 2013
+# set labels Višegrad's outline "Republika Srpska": that feature is the one lying around the town, with the area of the
+# Dayton-era municipality and no other outline beside it.
 OUTLINE_NAMES = {
     "006": "Kupra na Uni",
     "007": "Novi Grad@west",
@@ -865,6 +867,7 @@ OUTLINE_NAMES = {
     "140": "Istočno Novo Sarajevo",
     "141": "Trnovo (BiH)",
     "143": "Pale-Prača",
+    "147": "Republika Srpska",
     "144": "Pale",
     "157": "Mostar",
     "158": "Istočni Mostar",
@@ -872,7 +875,7 @@ OUTLINE_NAMES = {
     "166": "Foča",
     "168": "Ustiprača",
 }
-NO_OUTLINE = {"147": "Višegrad", **{str(150 + n): "a Mostar city municipality" for n in range(1, 7)}}
+NO_OUTLINE = {str(150 + n): "a Mostar city municipality" for n in range(1, 7)}
 CANTON_OUTLINES = {
     "1": "Una-Sana Canton",
     "2": "Posavina Canton",
@@ -1062,11 +1065,9 @@ def parent(
     entities: dict[str, shapely.Geometry],
 ) -> str:
     """A municipality's canton or entity, from where its outline lies; the Mostar city municipalities lie in the
-    City of Mostar, Višegrad in Republika Srpska, and Brčko, split by the entity line until 2000, in the country."""
+    City of Mostar and Brčko, split by the entity line until 2000, in the country."""
     if code in MOSTAR_AREAS.values():
         return area(MUNICIPALITY, MOSTAR)
-    if code == "147":
-        return area(ENTITY, "2")
     if code == "028" or shape is None:
         return COUNTRY
     point = shapely.point_on_surface(shape)
