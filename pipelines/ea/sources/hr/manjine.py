@@ -21,7 +21,7 @@ import shapely
 from ea import package, raw
 from ea.changeset import slug
 from ea.package import Package
-from ea.sources.hr import granice, izbori, lokalni
+from ea.sources.hr import granice, izbori, lokalni, manjine_kandidature
 
 SOURCE = "hr.manjine"
 SITE = "https://www.izbori.hr/arhiva-izbora"
@@ -51,6 +51,7 @@ def fetch() -> None:
     for url in (lokalni.GB_COUNTIES, lokalni.GB_TOWNS):
         raw.fetch(SOURCE, url, suffix=".geojson")
     raw.fetch(granice.SOURCE, granice.UNITS, suffix=".gml")
+    manjine_kandidature.fetch()
 
 
 def clean(text: object) -> str:
@@ -411,6 +412,27 @@ def area_of(c: Contest) -> tuple[str, str]:
     return "hr.opcina", f"{c.county}:{unit_place(c.county, c.unit)}"
 
 
+def candidacy_listings(year: int) -> dict[tuple[str, str, str, str], tuple[str, manjine_kandidature.Listing]]:
+    """The candidacy listings of a year by (county, unit code, kind, minority) with the URL of the file they are in."""
+    if year not in manjine_kandidature.YEARS:
+        return {}
+    out = {}
+    for (county, unit, _), (url, found) in manjine_kandidature.listings(year).items():
+        for listing in found:
+            if listing.none:
+                continue
+            out[(county, unit, listing.kind, minority_of(listing.minority))] = (url, listing)
+    return out
+
+
+def candidacy_codes(year: int) -> dict[tuple[str, str], str]:
+    out = {}
+    for code, name, county in manjine_kandidature.grop(year):
+        folded = izbori.place(re.sub(r"\s*-\s+", " - ", name))
+        out[(county, ALIASES.get(folded, folded))] = code
+    return out
+
+
 def area_id(scheme: str, code: str) -> str:
     return izbori.area(scheme, code)
 
@@ -466,7 +488,7 @@ def system(name: str) -> str:
 # Names of candidates.
 
 DATE = re.compile(r"\b(\d{2})\.(\d{2})\.(\d{4})\.?")
-LETTERS = re.compile(r"[A-Za-zČĆŽŠĐčćžšđ.'\-]+")
+LETTERS = re.compile(r"(?:[^\W\d_]|[.'\-])+")
 
 
 def person_of(text: str) -> tuple[str, date | None]:
@@ -499,8 +521,9 @@ METHOD = (
     "unit's results: the county's own minority councils and representatives, then those of each town and "
     "municipality. A report gives each contest's registered voters, the voters who took part, and the valid and "
     "invalid ballots, and lists the elected candidates with their votes. It does not publish the votes of candidates "
-    "who were not elected, so only the elected candidates appear here. A contest in which no candidate stood is "
-    "not recorded as held. The council and representative elections of one unit and minority are separate contests."
+    "who were not elected. For 2019 and 2023 it also publishes each unit's candidacy lists, from which the candidates "
+    "who were not elected appear here without votes; for the earlier years only the elected candidates appear. A "
+    "contest in which no candidate stood is not recorded as held. The council and representative elections of one unit and minority are separate contests."
 )
 SYSTEM_COUNCIL = (
     "Members of a national minority on a county, town, or municipal roll elect the minority's council of 10, 15, or "
@@ -714,6 +737,30 @@ def packages() -> list[str]:
     return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(d) for _, _, d in days())]
 
 
+Placement = tuple[int, int, int, manjine_kandidature.Entry]
+
+
+def placements(
+    listing: manjine_kandidature.Listing, elected: list[Candidate]
+) -> tuple[list[Placement | None], list[Placement]]:
+    """Each elected candidate's place on the valid lists, and the places of the candidates who were not elected.
+
+    A place is the candidate's position over all lists in the order the file prints them, the list's number, the
+    position on that list, and the printed entry."""
+    free: list[Placement] = []
+    for number, slate in enumerate(listing.slates, 1):
+        for position, entry in enumerate(slate.entries, 1):
+            free.append((len(free) + 1, number, position, entry))
+    matched: list[Placement | None] = []
+    for candidate in elected:
+        words = frozenset(fold(DATE.sub("", candidate.name.split(",", 1)[0])).split())
+        hit = next((f for f in free if frozenset(fold(f[3].name).split()) == words), None) if words else None
+        if hit:
+            free.remove(hit)
+        matched.append(hit)
+    return matched, free
+
+
 def round_of(c: Contest, number: int) -> Round | None:
     return c.rounds[number - 1] if len(c.rounds) >= number else None
 
@@ -761,6 +808,9 @@ def election(year: int, number: int, day: date) -> Package:
     p.add("note", id=key("note", election_id), entity_id=election_id, kind="methodology", body_md=METHOD, lang="en")
     columns: dict[str, list[object]] = {k: [] for k in ("result_set_id", "unit_id", "option_id", "measure", "value")}
     units: set[str] = set()
+    listed = candidacy_listings(year) if number == 1 else {}
+    codes = candidacy_codes(year) if listed else {}
+    cited: set[str] = set()
     for c in contests(year):
         r = round_of(c, number)
         if r is None:
@@ -834,14 +884,56 @@ def election(year: int, number: int, day: date) -> Package:
                 for name, item in zip(columns, (result_set, unit, None, measure, value), strict=True):
                     columns[name].append(item)
         outcome = verdict(c, r)
+        found = None
+        if listed:
+            unit_no = "0000" if not c.unit else codes.get((c.county, unit_place(c.county, c.unit)))
+            found = listed.get((c.county, unit_no, c.kind, c.minority)) if unit_no else None
+        matched: list[Placement | None] = [None] * len(r.elected)
+        rest: list[Placement] = []
+        total = 0
+        if found:
+            url, listing = found
+            matched, rest = placements(listing, r.elected)
+            total = sum(len(s.entries) for s in listing.slates)
+            cited.add(url)
+            p.add(
+                "citation",
+                id=key("citation", result_set, "candidacy"),
+                entity_id=result_set,
+                source_id=SOURCE_ID,
+                locator={
+                    "file": url.rsplit("/", 1)[1],
+                    "unit": where,
+                    "contest": c.kind,
+                    "minority": MINORITIES[c.minority][0],
+                    "list": "candidacies",
+                },
+            )
+            who_lists = "; ".join(
+                f"{slate.proposer} ({len(slate.entries)} {'candidates' if council else 'candidate'})"
+                for slate in listing.slates
+            )
+            p.add(
+                "note",
+                id=key("note", contest_id, "candidacy"),
+                entity_id=contest_id,
+                kind="context",
+                body_md=(
+                    f"Valid {'lists' if council else 'candidacies'} and their proposers, as the commission prints "
+                    f"them: {who_lists}. Candidates who were not elected are recorded without votes, because the "
+                    "commission does not publish them."
+                ),
+                lang="en",
+            )
         for rank, candidate in enumerate(r.elected, 1):
+            place = matched[rank - 1]
             option = key("option", year, number, *c.ident, rank)
             p.add(
                 "contest_option",
                 id=option,
                 contest_id=contest_id,
                 kind="candidate",
-                ballot_position=rank,
+                ballot_position=place[0] if place else (total + rank if found else rank),
                 ballot_label=candidate.name or UNREADABLE,
             )
             who = key("person", year, number, *c.ident, rank)
@@ -855,7 +947,7 @@ def election(year: int, number: int, day: date) -> Package:
                 person_id=who,
                 option_id=option,
                 role="head",
-                list_position=rank,
+                list_position=place[2] if place else rank,
                 ballot_name=candidate.name or None,
             )
             if candidate.deputy:
@@ -879,6 +971,45 @@ def election(year: int, number: int, day: date) -> Package:
             for name_, item in zip(columns, (result_set, unit, option, VOTES, candidate.votes), strict=True):
                 columns[name_].append(item)
             p.add("outcome", result_set_id=result_set, option_id=option, kind=outcome)
+        for overall, _, position, entry in rest:
+            option = key("option", year, number, *c.ident, "listed", overall)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest_id,
+                kind="candidate",
+                ballot_position=overall,
+                ballot_label=entry.name,
+            )
+            who = key("person", year, number, *c.ident, "listed", overall)
+            name, _ = person_of(entry.name)
+            p.add("person", id=who)
+            p.name(who, name or entry.name, "hr", "official")
+            p.add(
+                "candidacy",
+                id=key("candidacy", year, number, *c.ident, "listed", overall),
+                person_id=who,
+                option_id=option,
+                role="head",
+                list_position=position,
+                ballot_name=entry.name,
+            )
+            if entry.deputy:
+                deputy = key("person", year, number, *c.ident, "listed", overall, "deputy")
+                deputy_name, _ = person_of(entry.deputy)
+                p.add("person", id=deputy)
+                p.name(deputy, deputy_name or entry.deputy, "hr", "official")
+                p.add(
+                    "candidacy",
+                    id=key("candidacy", year, number, *c.ident, "listed", overall, "deputy"),
+                    person_id=deputy,
+                    option_id=option,
+                    role="substitute",
+                    ballot_name=entry.deputy,
+                )
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="lost")
+    for url in sorted(cited):
+        p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
     frame = pl.DataFrame(
         columns,
         schema={
