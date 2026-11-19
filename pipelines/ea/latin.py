@@ -616,6 +616,17 @@ def source(cs: Changeset) -> object:
     return id
 
 
+def reviewing(conn: Connection) -> set[str]:
+    waiting: set[str] = set()
+    for (id,) in conn.execute(
+        "select id::text from changeset where pipeline = %s and status = 'pending_review'", [PIPELINE]
+    ):
+        path = DATA / "changesets" / id / "name.parquet"
+        if path.exists():
+            waiting |= set(pl.read_parquet(path, columns=["entity_id"])["entity_id"].cast(pl.String).to_list())
+    return waiting
+
+
 def emit(conn: Connection, names: list[Name]) -> list[str]:
     folders: list[str] = []
     grouped: dict[str, list[Name]] = collections.defaultdict(list)
@@ -720,6 +731,8 @@ def run() -> str:
                 for want in wants:
                     queue[want.key] = want.__dict__
                     pending.add(entity[0])
+            waiting = reviewing(conn)
+            names = [name for name in names if name.entity not in waiting]
             folders = emit(conn, names) if names else []
         published: list[tuple[str, int]] = []
         held_back: list[tuple[str, str]] = []
