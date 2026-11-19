@@ -32,7 +32,7 @@ import re
 import subprocess
 import unicodedata
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from functools import cache
 from pathlib import Path
 from typing import NamedTuple
@@ -792,6 +792,8 @@ def build(e: Election) -> Package:
             kind="standard",
             valid_from=e.day,
             valid_from_precision="day",
+            valid_to=e.day + timedelta(days=1),
+            valid_to_precision="day",
         )
         p.name(unit, area_name(e.plan, code), "ro", "official")
         for field, (option, measure) in measures.items():
@@ -938,6 +940,8 @@ def build_referendum(r: Referendum) -> Package:
             kind="standard",
             valid_from=r.day,
             valid_from_precision="day",
+            valid_to=r.day + timedelta(days=1),
+            valid_to_precision="day",
         )
         p.name(unit, area_name(r.plan, code), "ro", "official")
 
