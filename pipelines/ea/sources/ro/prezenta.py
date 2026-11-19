@@ -1029,7 +1029,8 @@ def local(day: str, parties: set[str]) -> tuple[Package, Build]:
         again = {local_contest(day, local_kind(r), r.county or "", r.uat) for r in signed("2024-07-07")}
         b.elected = [(contest, option) for contest, option in b.elected if contest not in again]
     if b.elected:
-        for url in BEC_LOCAL:
+        # a runoff's package depends on the first round's, which already holds the Bureau's records
+        for url in () if runoff else BEC_LOCAL:
             p.artifact(raw.cached(SOURCE, url), BEC_SOURCE)
         p.add("note", id=key("note", eid, "elected"), entity_id=eid, kind="context", body_md=ELECTED_NOTE, lang="en")
     if day == "2024-06-09":
