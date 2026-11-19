@@ -60,9 +60,10 @@ URLS = {
     "1997-ii-report": _url("1997 II/3. - 1997 (II) izvestaj o ukupnim rezultatima pr.pdf"),
 }
 
-# Each municipality the 1997 book prints, and its code in the Commission's register. The six Kosovo municipalities the
-# register no longer lists (Glogovac, Kačanik, Štimlje, Dečani, Đakovica and Suva Reka) are left out and placed within
-# the country; Belgrade's municipalities are printed as "Београд-..." and Niš as one municipality, as they were then.
+# Each municipality the 1997 book prints, and its code in the Statistical Office's register. The six Kosovo
+# municipalities the Commission's register no longer lists (Glogovac, Kačanik, Štimlje, Dečani, Đakovica and Suva Reka)
+# take their codes from the Office's register of settlements, and rik.OLDER gives them their okrug; Belgrade's
+# municipalities are printed as "Београд-..." and Niš as one municipality, as they were then.
 CODES = {
     "Београд-Врачар": "70114",
     "Београд-Палилула": "70203",
@@ -247,6 +248,12 @@ CODES = {
     "Пећ": "90239",
     "Призрен": "90255",
     "Гора": "90336",
+    "Глоговац": "90034",
+    "Качаник": "90115",
+    "Штимље": "90310",
+    "Дечани": "90069",
+    "Ђаковица": "90085",
+    "Сува Река": "90280",
 }
 
 
