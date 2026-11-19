@@ -112,9 +112,12 @@ export function touched(changesets: SQL, records: SQL) {
   `;
 }
 
-export async function touches(changesets: SQL, records: SQL) {
+export async function touches(changesets: Array<string>, records: SQL) {
   const result = await db.execute<{ kind: string; id: string; at: string }>(
-    touched(changesets, records),
+    touched(
+      sql`select id, published_at from changeset where id = any(${sql.param(changesets)}::uuid[])`,
+      records,
+    ),
   );
   const marks = new Map<string, number>();
   for (const row of result.rows) {
@@ -162,7 +165,7 @@ async function load() {
     const unseen = ids.filter((id) => !state.seen.has(id));
     if (unseen.length > 0) {
       const marks = await touches(
-        sql`select id, published_at from changeset where id = any(${sql.param(unseen)}::uuid[])`,
+        unseen,
         sql`select polity_id, record from polity_record`,
       );
       for (const [key, at] of marks) {

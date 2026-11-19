@@ -40,13 +40,23 @@ export async function rebuild(targets: Array<string> = []) {
         mark::text as mark, deps
       from polity_record
     `);
+    const floor = await db.execute<{
+      at: string | null;
+      built: string | null;
+    }>(sql`
+      select at::text as at, (extract(epoch from at) * 1000000)::int8::text as built
+      from (select mode() within group (order by built_at) as at from polity_record) f
+    `);
+    const since = floor.rows[0];
+    const published = await db.execute<{ id: string }>(sql`
+      select id::text as id from changeset
+      where status = 'published' and published_at > ${since?.at ?? "infinity"}::timestamptz
+    `);
     const marks = await touches(
-      sql`
-        select id, published_at from changeset where status = 'published'
-          and published_at > (select coalesce(min(built_at), 'infinity') from polity_record)
-      `,
+      published.rows.map((row) => row.id),
       sql`select polity_id, record from polity_record`,
     );
+    const oldest = Number(since?.built ?? 0);
     const rows = new Map(stored.rows.map((row) => [row.id, row]));
     queue = [];
     for (const id of eligible) {
@@ -55,7 +65,9 @@ export async function rebuild(targets: Array<string> = []) {
         queue.push(id);
         continue;
       }
-      const isStale = isTouched(marks, id, row.parties, Number(row.built));
+      const built = Number(row.built);
+      const isStale =
+        built < oldest || isTouched(marks, id, row.parties, built);
       const byKeys = await keeps(
         row.mark == null ? null : Number(row.mark),
         row.deps,
