@@ -38,6 +38,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.at import wahlkreise_1923
 from ea.sources.at.bmi import NATIONAL_COUNCIL
 
 SOURCE = "at.parlament"
@@ -408,6 +409,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".pdf")
     raw.fetch(SOURCE, PARLIAMENT, suffix=".html")
     raw.fetch(SOURCE, HISTORY, suffix=".html")
+    wahlkreise_1923.fetch()
 
 
 def parse() -> None:
@@ -672,7 +674,7 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         "The 38 constituencies of the Constituent National Assembly election of 1919 and the 25 National Council "
-        "constituencies of Austria from 1923 to 1930",
+        "constituencies of Austria from 1923 to 1930, with shapes for the 25",
     )
     p.external |= {AUSTRIA, COUNTRY}
     p.add(
@@ -690,6 +692,7 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=f"1923:{number}", valid_from=PLAN, valid_to=date(1934, 5, 1))
         p.add("area_parent", area_id=id, parent_id=COUNTRY, valid_from=PLAN, valid_to=date(1934, 5, 1))
         p.name(id, text, "de", "official")
+    wahlkreise_1923.add(p, {number: area(number) for number in range(1, len(NAMES_1923) + 1)})
     for number, text in NAMES_1919.items():
         id = area(number, 1919)
         p.add("area", id=id, scheme_code=SCHEME)
