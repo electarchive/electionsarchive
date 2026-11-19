@@ -4,6 +4,9 @@ The Assembly publishes the stenographic notes of each plenary session on sobrani
 record the vote: the voting commission's report gives the deputies who voted, the votes for the one candidate, and the
 invalid ballots (printed as a word). The 1991 Constitution made the office directly elected, so this was the last
 election of its kind.
+
+The same sitting then voted twice on the Vice-President of the Republic, proposed by the President. Neither ballot
+reached two thirds of all deputies, so nobody was elected. Each ballot is stored as its own round contest.
 """
 
 import re
@@ -29,6 +32,7 @@ VOTES, BALLOTS, VALID, INVALID = 1, 3, 4, 5
 FLAG_DERIVED = 1
 DAY = date(1991, 1, 27)
 WINNER = "Киро Глигоров"
+DEPUTY = "Љупчо Ѓеорѓиевски"
 ASSEMBLY_SIZE = 120
 _IDS = Package(SOURCE, SOURCE, "ids")
 
@@ -39,6 +43,7 @@ def key(kind: str, *parts: object) -> str:
 
 ASSEMBLY = key("source", "sobranie")
 PRESIDENCY = key("office", "president")
+VICE = key("office", "vice_president")
 SYSTEM = key("electoral_system", "president")
 
 
@@ -54,10 +59,25 @@ COUNTS = (
     Count(WINNER, 114, r"Киро\s+Глигоров\s+гласале\s+(114)\s+пратеници"),
     Count("invalid", 5, r"Неважечки\s+гласачки\s+ливчиња\s+имаше\s+(пет)"),
 )
+DEPUTY_ANCHOR = "Минуваме на точката два"
+DEPUTY_ROUNDS = (
+    (
+        Count("took_part", 119, r"од\s+вкупно\s+(119)\s+пратеници\s+кои\s+гласале"),
+        Count(DEPUTY, 78, r"гласале\s+(78)\s+пратеници"),
+        Count("invalid", 41, r"Неважечки\s+гласачки\s+ливчиња\s+има\s+(41)"),
+    ),
+    (
+        Count("took_part", 118, r"од\s+вкупно\s+(118)\s+пратеници\s+кои\s+гласале"),
+        Count(DEPUTY, 73, r"гласале\s+(73)\s+пратеници"),
+        Count("invalid", 45, r"Неважечки\s+гласачки\s+ливчиња\s+има\s+(45)"),
+    ),
+)
 NEEDLES = (
     "избран за претседател на социјалистичка република македонија",
     "двотретинско мнозинство",
     "петата седница на собранието",
+    "не е избран за потпретседател",
+    "гласањето се повторува",
 )
 
 
@@ -101,12 +121,15 @@ def read() -> tuple[str, list[tuple[int, int, int]], list[Page]]:
     return text, spans, pages
 
 
-def locate() -> dict[str, tuple[int, float, float, float, float]]:
-    """Each printed count's page (from 1) and normalized box, found in order in the notes."""
+def locate(
+    counts: tuple[Count, ...] = COUNTS, anchor: str = "Комисијата за гласање го поднесува", after: int = 0
+) -> tuple[dict[str, tuple[int, float, float, float, float]], int]:
+    """Each printed count's page (from 1) and normalized box, found in order in the notes from `anchor`, with the
+    text position the last count ends at."""
     text, spans, pages = read()
     found: dict[str, tuple[int, float, float, float, float]] = {}
-    position = text.index("Комисијата за гласање го поднесува")
-    for count in COUNTS:
+    position = text.index(anchor, after)
+    for count in counts:
         match = re.compile(count.pattern, re.IGNORECASE).search(text, position)
         if match is None:
             raise ValueError(f"the notes do not print {count.field} {count.value}")
@@ -125,7 +148,7 @@ def locate() -> dict[str, tuple[int, float, float, float, float]]:
             word[4] / page.width,
             word[5] / page.height,
         )
-    return found
+    return found, position
 
 
 def check() -> None:
@@ -141,6 +164,12 @@ def check() -> None:
         raise ValueError("the votes and invalid ballots do not add up to the deputies who voted")
     if votes[WINNER] * 3 < ASSEMBLY_SIZE * 2:
         raise ValueError("the winner lacks two thirds of all deputies")
+    for counts in DEPUTY_ROUNDS:
+        votes = {c.field: c.value for c in counts}
+        if votes[DEPUTY] + votes["invalid"] != votes["took_part"]:
+            raise ValueError("the votes and invalid ballots do not add up to the deputies who voted")
+        if votes[DEPUTY] * 3 >= ASSEMBLY_SIZE * 2:
+            raise ValueError("the deputy candidate has two thirds of all deputies, so was elected")
 
 
 def packages() -> list[str]:
@@ -168,6 +197,9 @@ def registry() -> Package:
     p.add("office", id=PRESIDENCY, polity_id=MACEDONIA, kind="head_of_state")
     p.name(PRESIDENCY, "President of the Republic of Macedonia", "en", "official")
     p.name(PRESIDENCY, "Претседател на Република Македонија", "mk", "official", False)
+    p.add("office", id=VICE, polity_id=MACEDONIA, kind="other")
+    p.name(VICE, "Vice-President of the Republic of Macedonia", "en", "official")
+    p.name(VICE, "Потпретседател на Република Македонија", "mk", "official", False)
     p.add(
         "electoral_system",
         id=SYSTEM,
@@ -183,8 +215,9 @@ def registry() -> Package:
         entity_id=SYSTEM,
         kind="methodology",
         body_md="The Assembly elected the President of the Republic by secret ballot, by a two-thirds majority of the "
-        "votes of all its deputies, from candidates proposed by a group of deputies. The 1991 Constitution replaced "
-        "this with direct election.",
+        "votes of all its deputies, from candidates proposed by a group of deputies. It elected the Vice-President "
+        "the same way, in the sitting that elected the President, on the President's proposal; a ballot without two "
+        "thirds was repeated. The 1991 Constitution replaced this with direct election.",
         lang="en",
     )
     return p
@@ -228,12 +261,16 @@ def election() -> Package:
         area_id=COUNTRY,
         kind="aggregate",
     )
-    boxes = locate()
+    boxes, end = locate()
+    deputy_boxes: list[dict[str, tuple[int, float, float, float, float]]] = []
+    for counts in DEPUTY_ROUNDS:
+        found, end = locate(counts, DEPUTY_ANCHOR if not deputy_boxes else "", end)
+        deputy_boxes.append(found)
     pages: dict[int, str] = {}
-    for number, *_rest in boxes.values():
+    for number, *_rest in [*boxes.values(), *(b for each in deputy_boxes for b in each.values())]:
         if number not in pages:
             pages[number] = key("page", DAY, number)
-            width, height = page_size(stored.path, number)
+            width, height = render(stored.path, stored.sha256, number)
             p.add(
                 "source_page",
                 id=pages[number],
@@ -325,6 +362,100 @@ def election() -> Package:
             }
         )
     rows.append((result_set, unit, None, VALID, COUNTS[1].value, FLAG_DERIVED))
+    deputy = key("person", DEPUTY)
+    p.add("person", id=deputy)
+    p.name(deputy, DEPUTY, "mk", "official")
+    p.name(deputy, "Ljupco Georgievski", "en", "official", False)
+    previous: str | None = None
+    for number, (counts, found) in enumerate(zip(DEPUTY_ROUNDS, deputy_boxes, strict=True), start=1):
+        vice = key("contest", DAY, "vice", number)
+        p.add(
+            "contest",
+            id=vice,
+            election_id=id,
+            kind="office",
+            office_id=VICE,
+            magnitude=1,
+            round_number=number,
+            previous_round_id=previous,
+            electoral_system_id=SYSTEM,
+            default_result_kind="counted",
+        )
+        previous = vice
+        p.name(vice, f"1991 vice-presidential election, ballot {number}", "en", "official")
+        p.add("slug", path=f"{path}/vice-president/ballot-{number}", entity_id=vice, is_current=True)
+        vice_set = key("result_set", DAY, "vice", number)
+        p.add(
+            "result_set",
+            id=vice_set,
+            election_id=id,
+            contest_id=vice,
+            stage="official",
+            kind="counted",
+            source_id=ASSEMBLY,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        voted, for_, invalid = (c.value for c in counts)
+        p.add(
+            "note",
+            id=key("note", vice_set),
+            entity_id=vice_set,
+            kind="methodology",
+            body_md=f"Ballot {number} of the Assembly's vote on the Vice-President, as its president announced the "
+            f"voting commission's result in the plenary session of 27 January 1991, from the stenographic notes. "
+            f"Ljupco Georgievski was the only candidate, proposed by the President of the Republic and by a deputy "
+            f"of the Macedonian party. Of {voted} deputies who voted, {for_} voted for him and {invalid} ballots "
+            f"were invalid, short of the two thirds of all 120 deputies that the law requires, so nobody was elected"
+            f"{' and the vote was repeated' if number == 1 else ' and the whole procedure was to be repeated'}.",
+            lang="en",
+        )
+        vice_option = key("option", DAY, "vice", number, DEPUTY)
+        p.add(
+            "contest_option",
+            id=vice_option,
+            contest_id=vice,
+            kind="candidate",
+            ballot_position=1,
+            ballot_label=DEPUTY,
+        )
+        p.add(
+            "candidacy",
+            id=key("candidacy", DAY, "vice", number, DEPUTY),
+            person_id=deputy,
+            option_id=vice_option,
+            role="head",
+            ballot_name=DEPUTY,
+            is_independent=False,
+        )
+        for count in counts:
+            if count.field == "took_part":
+                option_id, measure = None, BALLOTS
+            elif count.field == "invalid":
+                option_id, measure = None, INVALID
+            else:
+                option_id, measure = vice_option, VOTES
+            rows.append((vice_set, unit, option_id, measure, count.value, 0))
+            p.add("declared", result_set_id=vice_set, option_id=option_id, measure=measure, value=count.value)
+            page, x0, y0, x1, y1 = found[count.field]
+            locators.append(
+                {
+                    "result_set_id": vice_set,
+                    "unit_id": unit,
+                    "option_id": option_id,
+                    "channel": 0,
+                    "measure": measure,
+                    "count_round": 0,
+                    "page_id": pages[page],
+                    "source_id": None,
+                    "x0": x0,
+                    "y0": y0,
+                    "x1": x1,
+                    "y1": y1,
+                }
+            )
+        rows.append((vice_set, unit, None, VALID, for_, FLAG_DERIVED))
     p.frame(
         "result_value",
         pl.DataFrame(
@@ -363,11 +494,30 @@ def election() -> Package:
     return p
 
 
-def page_size(path: Path, number: int) -> tuple[int, int]:
-    out = subprocess.run(
-        ["pdfinfo", "-f", str(number), "-l", str(number), str(path)], capture_output=True, text=True, check=True
-    ).stdout
-    found = re.search(rf"Page\s+{number} size:\s+([\d.]+) x ([\d.]+)", out)
+def render(path: Path, sha256: str, number: int) -> tuple[int, int]:
+    """Render a page to `data/pages/...` for upload and return its size in pixels."""
+    target = package.DATA / "pages" / SOURCE / sha256
+    target.mkdir(parents=True, exist_ok=True)
+    stem = target / str(number)
+    subprocess.run(
+        [
+            "pdftoppm",
+            "-r",
+            "150",
+            "-gray",
+            "-png",
+            "-f",
+            str(number),
+            "-l",
+            str(number),
+            "-singlefile",
+            str(path),
+            str(stem),
+        ],
+        check=True,
+    )
+    out = subprocess.run(["file", str(stem.with_suffix(".png"))], capture_output=True, text=True, check=True).stdout
+    found = re.search(r"(\d+) x (\d+)", out)
     if found is None:
-        raise ValueError(f"{path}: no size for page {number}")
-    return round(float(found[1])), round(float(found[2]))
+        raise ValueError(f"{stem}.png: no size")
+    return int(found[1]), int(found[2])
