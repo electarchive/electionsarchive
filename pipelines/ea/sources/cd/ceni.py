@@ -10,7 +10,9 @@ the valid and blank ballots, and each list's votes across the province.
 The circonscriptions are those of Loi n°23/025 of 15 June 2023: the territoire and the ville in the provinces, and in
 Kinshasa four groupings of communes for the national deputies and the 24 communes for the provincial deputies.
 Outlines come from geoBoundaries' open set: its ADM1 layer for the provinces and its ADM2 layer (OCHA's territories
-and cities) for the circonscriptions it draws.
+and cities) for the circonscriptions it draws. OpenStreetMap's boundaries draw Kinshasa's communes (and so its
+districts as their unions), the ville of Kalemie, and the territoire of Beni; OCHA's ADM3 layer draws the ville of
+Kamina.
 """
 
 import functools
@@ -18,6 +20,7 @@ import json
 import re
 import subprocess
 import unicodedata
+import zipfile
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
@@ -70,6 +73,52 @@ GEOBOUNDARIES = "https://media.githubusercontent.com/media/wmgeolab/geoBoundarie
 GB_PROVINCES = f"{GEOBOUNDARIES}/ADM1/geoBoundaries-COD-ADM1.geojson"
 GB_TERRITORIES = f"{GEOBOUNDARIES}/ADM2/geoBoundaries-COD-ADM2.geojson"
 SIMPLIFY = 0.002
+# Outlines of towns and communes keep more detail than those of territoires.
+FINE = 0.0002
+# Closes the slivers between communes' simplified outlines when they are joined into a district.
+SLIVER = 0.00005
+# OpenStreetMap's administrative relations (admin_level 7) for Kinshasa's 24 communes, the ville of Kalemie, and the
+# territoire of Beni, fetched in one lookup. Kinshasa's communes are keyed by their folded names.
+OSM_COMMUNES = {
+    "bandalungwa": 388091,
+    "barumbu": 388104,
+    "bumbu": 388134,
+    "gombe": 388098,
+    "kalamu": 388127,
+    "kasavubu": 388094,
+    "kimbanseke": 389614,
+    "kinshasa": 388103,
+    "kintambo": 388090,
+    "kisenso": 389536,
+    "lemba": 10089740,
+    "limete": 388599,
+    "lingwala": 388097,
+    "makala": 388133,
+    "maluku": 389746,
+    "masina": 389694,
+    "matete": 389334,
+    "montngafula": 389761,
+    "ndjili": 389659,
+    "ngaba": 388139,
+    "ngaliema": 389760,
+    "ngiringiri": 10993823,
+    "nsele": 389689,
+    "selembao": 388135,
+}
+# Other circonscriptions drawn from OpenStreetMap, by code.
+OSM_OTHERS = {"CD-TA:ville-de-kalemie": 9330398, "CD-NK:beni": 5327776}
+OSM_IDS = sorted([*OSM_COMMUNES.values(), *OSM_OTHERS.values()])
+OSM_LOOKUP = (
+    "https://nominatim.openstreetmap.org/lookup?osm_ids="
+    + ",".join(f"R{i}" for i in OSM_IDS)
+    + "&format=geojson&polygon_geojson=1&extratags=1"
+)
+# OCHA DR Congo's COD-AB (CC BY 3.0 IGO), whose ADM3 layer draws the ville of Kamina.
+OCHA = (
+    "https://data.humdata.org/dataset/f42132b9-8cc6-4201-b020-9259c56e8868/resource/"
+    "97260e2b-65b1-41e3-aef2-fb0e6874e406/download/cod_admin_boundaries.geojson.zip"
+)
+OCHA_KAMINA = ("CD-HL:ville-de-kamina", "CD730202")
 # A territoire's outline covers more than this many square degrees; a ville's covers less.
 VILLE_AREA = 0.3
 
@@ -137,8 +186,9 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".pdf")
     for url in PAGES.values():
         raw.fetch(SOURCE, url, suffix=".html")
-    for url in (GB_PROVINCES, GB_TERRITORIES):
+    for url in (GB_PROVINCES, GB_TERRITORIES, OSM_LOOKUP):
         raw.fetch(SOURCE, url, suffix=".geojson")
+    raw.fetch(SOURCE, OCHA, suffix=".zip")
 
 
 # ---------------------------------------------------------------- reading
@@ -378,8 +428,8 @@ def fold(text: str) -> str:
     return re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower())
 
 
-def _shape(geometry: dict[str, Any]) -> shapely.Geometry:
-    found = shapely.make_valid(shapely.simplify(shapely.geometry.shape(geometry), SIMPLIFY, preserve_topology=True))
+def _shape(geometry: dict[str, Any], tolerance: float = SIMPLIFY) -> shapely.Geometry:
+    found = shapely.make_valid(shapely.simplify(shapely.geometry.shape(geometry), tolerance, preserve_topology=True))
     polygons = [
         polygon
         for part in shapely.get_parts(found)
@@ -414,6 +464,39 @@ def outlines() -> tuple[dict[str, shapely.Geometry], dict[str, shapely.Geometry]
     return by_province, drawn
 
 
+@functools.cache
+def osm_outlines() -> dict[str, shapely.Geometry]:
+    """OpenStreetMap's outline of each Kinshasa commune and of the other circonscriptions it draws, by code."""
+    data = json.loads(raw.cached(SOURCE, OSM_LOOKUP).path.read_text())
+    by_id = {int(f["properties"]["osm_id"]): f["geometry"] for f in data["features"]}
+    found: dict[str, shapely.Geometry] = {}
+    for c in {c.code: c for c in circs().values() if c.scheme == COMMUNE}.values():
+        found[c.code] = _shape(by_id[OSM_COMMUNES[fold(c.name)]], FINE)
+    for code, relation in OSM_OTHERS.items():
+        found[code] = _shape(by_id[relation], FINE if code != "CD-NK:beni" else SIMPLIFY)
+    return found
+
+
+def district_outlines() -> dict[str, shapely.Geometry]:
+    """Each Kinshasa district's outline, the union of the outlines of its communes under Loi 23/025."""
+    communes = osm_outlines()
+    found: dict[str, shapely.Geometry] = {}
+    for printed, (_, members) in KINSHASA.items():
+        shapes = [communes[_circ("KINSHASA", m).code] for m in members]
+        union = shapely.union_all(shapes).buffer(SLIVER).buffer(-SLIVER)
+        found[_circ("KINSHASA", printed).code] = _shape(shapely.geometry.mapping(union), FINE)
+    return found
+
+
+@functools.cache
+def kamina() -> shapely.Geometry:
+    """The ville of Kamina, the ADM3 unit of OCHA's COD-AB that carries its pcode."""
+    with zipfile.ZipFile(raw.cached(SOURCE, OCHA).path) as archive:
+        data = json.loads(archive.read("cod_admin3.geojson"))
+    (feature,) = [f for f in data["features"] if f["properties"]["adm3_pcode"] == OCHA_KAMINA[1]]
+    return _shape(feature["geometry"], FINE)
+
+
 # ---------------------------------------------------------------- packages
 
 
@@ -425,6 +508,8 @@ NATION, PROVINCE, SCHEME, COMMUNE = "cd.nation", "cd.province", "cd.circonscript
 CENI = key("source", "ceni")
 LAW_SOURCE = key("source", "loi-23-025")
 GB_ADM1, GB_ADM2 = key("source", "geoboundaries-adm1"), key("source", "geoboundaries-adm2")
+OSM = key("source", "openstreetmap")
+OCHA_ADM3 = key("source", "ocha-cod-ab-adm3")
 ASSEMBLY = key("body", "assemblee-nationale")
 PR_NATIONAL = key("electoral_system", "national-pr")
 PR_PROVINCIAL = key("electoral_system", "provincial-pr")
@@ -507,6 +592,31 @@ def _sources(p: Package) -> None:
             attribution="geoBoundaries (William & Mary geoLab); OCHA DR Congo",
             notes=notes,
         )
+    p.add(
+        "source",
+        id=OSM,
+        kind="community",
+        publisher="OpenStreetMap contributors",
+        title="OpenStreetMap administrative boundaries of Kinshasa's 24 communes, the ville of Kalemie, and the "
+        "territoire of Beni, through Nominatim",
+        url="https://www.openstreetmap.org/",
+        license="Open Database License 1.0",
+        license_url="https://opendatacommons.org/licenses/odbl/1-0/",
+        attribution="© OpenStreetMap contributors",
+        notes="Kinshasa's four districts are the unions of their communes' outlines under Loi 23/025.",
+    )
+    p.add(
+        "source",
+        id=OCHA_ADM3,
+        kind="official_body",
+        publisher="OCHA DR Congo",
+        title="Common Operational Datasets - Administrative Boundaries: Democratic Republic of the Congo, ADM3",
+        url="https://data.humdata.org/dataset/cod-ab-cod",
+        license="CC BY 3.0 IGO",
+        license_url="https://creativecommons.org/licenses/by/3.0/igo/",
+        attribution="OCHA DR Congo",
+        notes="Draws the ville of Kamina as its ADM3 unit CD730202. Boundary year 2019.",
+    )
 
 
 def geo() -> Package:
@@ -514,13 +624,16 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         "The 26 provinces of the Democratic Republic of the Congo, the circonscriptions of its national and "
-        "provincial deputies under Loi 23/025, and Kinshasa's communes, with geoBoundaries outlines",
+        "provincial deputies under Loi 23/025, and Kinshasa's communes, with outlines from geoBoundaries, "
+        "OpenStreetMap, and OCHA",
     )
     p.external |= {CONGO, COUNTRY}
     _sources(p)
     p.artifact(raw.cached(SOURCE, LAW), LAW_SOURCE)
     p.artifact(raw.cached(SOURCE, GB_PROVINCES), GB_ADM1)
     p.artifact(raw.cached(SOURCE, GB_TERRITORIES), GB_ADM2)
+    p.artifact(raw.cached(SOURCE, OSM_LOOKUP), OSM)
+    p.artifact(raw.cached(SOURCE, OCHA), OCHA_ADM3)
     for code, rank, kind, noun in (
         (NATION, 0, "administrative", "country"),
         (PROVINCE, 1, "administrative", "province"),
@@ -573,11 +686,12 @@ def geo() -> Package:
             label_point=shapely.to_wkb(
                 shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
             ),
-            quality="academic",
+            quality="osm" if source == OSM else "academic",
             source_id=source,
         )
 
     by_province, drawn = outlines()
+    osm, districts = osm_outlines(), district_outlines()
     for iso, name, _ in PROVINCES.values():
         place(PROVINCE, iso, name, COUNTRY)
         outline(area(PROVINCE, iso), by_province[iso], PROVINCES_FROM, GB_ADM1)
@@ -586,6 +700,12 @@ def geo() -> Package:
         place(c.scheme, c.code, c.name, c.parent)
         if c.code in drawn and c.scheme == SCHEME:
             outline(area(SCHEME, c.code), drawn[c.code], PLAN_FROM, GB_ADM2)
+        elif c.code in districts:
+            outline(area(c.scheme, c.code), districts[c.code], PLAN_FROM, OSM)
+        elif c.code in osm:
+            outline(area(c.scheme, c.code), osm[c.code], PLAN_FROM, OSM)
+        elif c.code == OCHA_KAMINA[0]:
+            outline(area(c.scheme, c.code), kamina(), PLAN_FROM, OCHA_ADM3)
     return p
 
 
