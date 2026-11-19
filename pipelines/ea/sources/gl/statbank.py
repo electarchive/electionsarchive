@@ -23,6 +23,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.gl import kommune_pre2009
 
 SOURCE = "gl.statbank"
 API = "https://bank.stat.gl/api/v1/en/Greenland/SA/SA99/SA30"
@@ -132,6 +133,7 @@ def fetch() -> None:
     for table, _, _ in FAMILIES.values():
         raw.fetch(SOURCE, url(table), suffix=".csv", body=BODY)
     raw.fetch(SOURCE, YEARBOOK, suffix=".htm")
+    kommune_pre2009.fetch()
 
 
 def packages() -> list[str]:
@@ -297,6 +299,7 @@ def geo() -> Package:
         p.add("area_code", area_id=id, code=slug(name), valid_from=None, valid_to=OLD_MUNICIPALITIES_END)
         p.add("area_parent", area_id=id, parent_id=COUNTRY, valid_from=None, valid_to=OLD_MUNICIPALITIES_END)
         p.name(id, name, "da", "official")
+    kommune_pre2009.add(p, {name: area(name) for name in OLD})
     return p
 
 
