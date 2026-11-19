@@ -16,7 +16,7 @@ from shapely.geometry import shape
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.lr import president
+from ea.sources.lr import house, president
 
 SOURCE = "lr.nec"
 LIBERIA = str(uuid5(package.NAMESPACE, "polity\x1fLR"))
@@ -77,6 +77,16 @@ PARTIES_2005 = {
     "CDC": "Congress for Democratic Change",
     "LPL": "Labor Party of Liberia",
 }
+# Parties of the later House elections whose names the Commission's pages do not print; the names are the
+# parties' own, as Wikipedia's list of by-elections links them.
+PARTIES_LATER = {
+    "CPP": "Collaborating Political Parties",
+    "LRP": "Liberia Restoration Party",
+    "MDR": "Movement for Democracy and Reconstruction",
+    "MPC": "Movement for Progressive Change",
+    "NDC": "National Democratic Coalition",
+    "PUP": "People's Unification Party",
+}
 INDEPENDENT = "Ind"
 SENATE_PERIOD = "The 2005 Senate ballot let each voter mark up to two candidates"
 
@@ -111,7 +121,7 @@ def county_url(code: str) -> str:
 
 
 def urls() -> list[str]:
-    found = [REPORT, RUNOFF_REPORT, HOUSE_PAGES, SENATE_PAGES, *president.urls()]
+    found = [REPORT, RUNOFF_REPORT, HOUSE_PAGES, SENATE_PAGES, *president.urls(), *house.urls()]
     for code, (_, stem, _) in COUNTIES.items():
         found += [pdf_url(stem, False), pdf_url(stem, True), county_url(code)]
     return found
@@ -122,8 +132,9 @@ def fetch() -> None:
     # raw.store under the keys above, so fetching asks only for what is not cached.
     for url in urls():
         if url.startswith("http"):
-            raw.fetch(SOURCE, url, suffix=".html" if url in president.urls() else ".pdf")
+            raw.fetch(SOURCE, url, suffix=".html" if url in (*president.urls(), *house.urls()) else ".pdf")
     raw.fetch(SOURCE, BOUNDARIES, suffix=".geojson")
+    raw.fetch(SOURCE, house.DATES, suffix=".html")
 
 
 def text_of(url: str) -> str:
@@ -541,7 +552,15 @@ def parties() -> dict[str, str]:
     for round in president.ROUNDS:
         for label in president.tallies(round.tally)[0].candidates:
             used[party_of(label)] += 1
-    return {abbr: PARTIES_2005.get(abbr, abbr) for abbr in sorted(used) if party_id(abbr) is not None}
+    for edition in house.EDITIONS:
+        for district in house.parsed(edition.day).districts:
+            for label in district.options:
+                used[party_of(label)] += 1
+    return {
+        abbr: PARTIES_2005.get(abbr, PARTIES_LATER.get(abbr, abbr))
+        for abbr in sorted(used)
+        if party_id(abbr) is not None
+    }
 
 
 def party_id(abbr: str) -> str | None:
@@ -558,6 +577,7 @@ def packages() -> list[str]:
         f"{SOURCE}/2014-12-20",
         *(f"{SOURCE}/{by.day}" for by in BY_ELECTIONS),
         *(f"{SOURCE}/{round.day}" for round in president.ROUNDS if round.day > "2014"),
+        *(f"{SOURCE}/{edition.day}" for edition in house.EDITIONS if not edition.general),
     ]
 
 
@@ -571,6 +591,9 @@ def parse() -> None:
         by_election(by).write()
     for round in president.ROUNDS:
         president_election(round).write()
+    for edition in house.EDITIONS:
+        if not edition.general:
+            house_by_election(edition).write()
 
 
 def emit() -> None:
@@ -678,11 +701,15 @@ def districts() -> list[tuple[str, int]]:
 
 @functools.cache
 def later_districts() -> set[tuple[str, int]]:
-    """The electoral districts the presidential results of 2011 to 2023 name."""
+    """The electoral districts the presidential and House results of 2011 to 2025 name."""
     return {
         (precinct.county, precinct.district)
         for round in president.ROUNDS
         for precinct in president.precincts(round.day, round.number)
+    } | {
+        (district.county, district.number)
+        for edition in house.EDITIONS
+        for district in house.parsed(edition.day).districts
     }
 
 
@@ -794,6 +821,8 @@ class Builder:
         self.units: dict[tuple[str, str, int], str] = {}
         self.over: list[tuple[str, int, int]] = []
         self.people: dict[str, str] = {}
+        self.made: set[str] = set()
+        self.differs: list[str] = []
 
     def unit(self, day: date, place: Place) -> str:
         code = f"{day}:{place.code}"
@@ -820,7 +849,9 @@ class Builder:
             self.p.name(id, f"{place.name}, polling place {place.number}", "en", "official")
         return id
 
-    def result_set(self, election: str, contest: str, tag: str, methodology: str, notes: str = "") -> str:
+    def result_set(
+        self, election: str, contest: str, tag: str, methodology: str, notes: str = "", completeness: float = 1.0
+    ) -> str:
         id = key("result_set", tag)
         self.p.add(
             "result_set",
@@ -832,7 +863,7 @@ class Builder:
             source_id=NEC_SOURCE,
             status="active",
             is_default=True,
-            completeness=1.0,
+            completeness=completeness,
         )
         self.p.add(
             "note",
@@ -1461,6 +1492,218 @@ def by_election(by: ByElection) -> Package:
     return p
 
 
+def polling_units(b: Builder, day: str, precinct: president.Precinct, district: str) -> tuple[str, list[str]]:
+    """The reporting units of a precinct and of its polling places on a polling day, each added once."""
+    p = b.p
+    code = f"{day}:{precinct.code}"
+    parent = key("unit", code)
+    if parent not in b.made:
+        b.made.add(parent)
+        p.add(
+            "reporting_unit",
+            id=parent,
+            polity_id=LIBERIA,
+            scheme_code="lr.precinct",
+            code=code,
+            area_relation="within",
+            area_id=district,
+            kind="standard",
+        )
+        p.name(parent, precinct.name, "en", "official")
+    units = []
+    for column in precinct.places:
+        found = re.fullmatch(r"PP(\d+)", column)
+        if found is None:
+            raise ValueError(f"precinct {precinct.code}: polling place {column!r}")
+        number_ = int(found.group(1))
+        unit = key("unit", f"{code}-{number_}")
+        if unit not in b.made:
+            b.made.add(unit)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=LIBERIA,
+                scheme_code="lr.polling_place",
+                code=f"{code}-{number_}",
+                parent_id=parent,
+                area_relation="within",
+                area_id=district,
+                kind="standard",
+            )
+            p.name(unit, f"{precinct.name}, polling place {number_}", "en", "official")
+        units.append(unit)
+    return parent, units
+
+
+HOUSE_METHOD = (
+    "Counted by the National Elections Commission at each polling place and published on its results portal as one "
+    "page for each voting precinct, with a column for each polling place, and as a page for each electoral district. "
+    "The portal prints the registered voters of a precinct, not of a polling place, so they are stored on the "
+    "precinct's own unit. Ballots cast are the portal's total of valid and invalid votes, and the candidates' votes "
+    "are the valid votes."
+)
+MISFILED_NOTE = (
+    "{n} precincts' pages name an electoral district in their heading but list the candidates of another district. "
+    "The Commission's district pages count none of those candidates' votes there, so the polling-place results of "
+    "these precincts are left out of the House results."
+)
+
+
+def house_contests(b: Builder, election: str, path: str, day: str) -> None:
+    """The House contests of a polling day, one for each electoral district, at polling-place level."""
+    p = b.p
+    found = house.parsed(day)
+    p.uses(raw.cached(SOURCE, next(e.url for e in house.EDITIONS if e.day == day)))
+    skipped = house.misfiled(day)
+    by_district: dict[tuple[str, int], list[president.Precinct]] = {}
+    for precinct in found.precincts:
+        if precinct.code not in skipped:
+            by_district.setdefault((precinct.county, precinct.district), []).append(precinct)
+    notes = MISFILED_NOTE.format(n=len(skipped)) if skipped else ""
+    for page in found.districts:
+        code, number_ = page.county, page.number
+        contest = key("contest", day, "house", code, number_)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="body_seats",
+            body_id=HOUSE_BODY,
+            district_area_id=area("lr.house_district", f"{code}{number_:02d}"),
+            magnitude=1,
+            round_number=1,
+            electoral_system_id=HOUSE_SYSTEM,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"{county_name(code)} County, Electoral District {number_}", "en", "official")
+        p.add(
+            "slug",
+            path=f"{path}/house-{changeset.slug(county_name(code))}-{number_}",
+            entity_id=contest,
+            is_current=True,
+        )
+        tag = f"{day}:house:{code}:{number_}"
+        result_set = b.result_set(
+            election, contest, tag, HOUSE_METHOD, notes, completeness=page.received / page.expected
+        )
+        printed = sorted(page.options, key=lambda label: (-page.options[label], label))
+        options = {label: b.option(contest, tag, None, label) for label in printed}
+        sums: Counter[str] = Counter()
+        figures: Counter[str] = Counter()
+        for precinct in by_district.get((code, number_), []):
+            district = area("lr.house_district", f"{code}{number_:02d}")
+            parent, units = polling_units(b, day, precinct, district)
+            p.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=parent,
+                option_id=None,
+                channel=0,
+                measure=2,
+                count_round=0,
+                flags=0,
+                value=precinct.registered,
+            )
+            for i, unit in enumerate(units):
+                tally = Tally(
+                    [(label, votes[i]) for label, votes in precinct.candidates.items()],
+                    precinct.valid[i],
+                    precinct.invalid[i],
+                    precinct.total[i],
+                )
+                b.values(result_set, unit, tally, options, None)
+                sums.update(dict(tally.candidates))
+                figures.update(valid=precinct.valid[i], invalid=precinct.invalid[i], total=precinct.total[i])
+        b.declare(result_set, options, Declared(dict(page.options), page.valid, page.invalid, page.total))
+        if any(sums[label] != votes for label, votes in page.options.items()) or (
+            figures["valid"],
+            figures["invalid"],
+            figures["total"],
+        ) != (page.valid, page.invalid, page.total):
+            b.differs.append(f"{county_name(code)} {number_}")
+        won = leaders(dict(page.options), 1)
+        for label in printed:
+            p.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=options[label],
+                kind="elected" if label in won else "lost",
+            )
+
+
+def house_checks(b: Builder, day: str) -> None:
+    """Compare the polling-place sums with the portal's national and county tallies; record what the district pages
+    print differently."""
+    found = house.parsed(day)
+    places = sum(len(precinct.places) for precinct in found.precincts)
+    ballots = sum(precinct.total[-1] for precinct in found.precincts)
+    if places != found.national.received or ballots != found.national.total:
+        raise ValueError(f"{day}: polling-place sums differ from the portal's national tally")
+    by_county: Counter[str] = Counter()
+    for precinct in found.precincts:
+        by_county[precinct.county] += precinct.total[-1]
+    for name, tally in found.counties.items():
+        if by_county[county_code(name)] != tally.total:
+            raise ValueError(f"{day}: {name} differs from the polling-place sums")
+    if b.differs:
+        b.p.accept(
+            "accounting.declared",
+            f"In {len(b.differs)} districts ({', '.join(sorted(b.differs))}) the Commission's district page prints "
+            "invalid and total votes that exceed the sums of the polling-place results stored here. The page counts "
+            "the invalid votes of precincts whose own page lists another district's candidates; those precincts' "
+            "results are left out, and every candidate's votes and the valid votes equal the district page. Both "
+            "figures are stored as printed.",
+        )
+
+
+WIKIPEDIA_SOURCE = key("source", "wikipedia-by-elections")
+
+
+def house_by_election(edition: house.Edition) -> Package:
+    day = date.fromisoformat(edition.day)
+    found = house.parsed(edition.day)
+    names = [f"{county_name(page.county)} County, Electoral District {page.number}" for page in found.districts]
+    what = f"by-election, {names[0]}" if len(names) == 1 else "by-elections"
+    p = Package(
+        f"{SOURCE}/{edition.day}",
+        SOURCE,
+        f"The {day.day} {day:%B} {day.year} Liberian House of Representatives {what} by polling place",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {LIBERIA, TERRITORY}
+    b = Builder(p)
+    election = key("election", edition.day)
+    path = f"lr/{edition.day}-house-by-election"
+    p.add(
+        "election",
+        id=election,
+        polity_id=LIBERIA,
+        kind="by_election",
+        date_from=day,
+        date_to=day,
+        status="held",
+    )
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    title = f"{day.year} Liberian House of Representatives {what}"
+    p.name(election, title, "en", "official")
+    p.add(
+        "source",
+        id=WIKIPEDIA_SOURCE,
+        kind="community",
+        publisher="Wikipedia",
+        title="List of by-elections in Liberia",
+        url=house.DATES,
+        license="CC BY-SA 4.0",
+        license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+        attribution="Wikipedia contributors, “List of by-elections in Liberia”",
+        notes="Gives the polling day of each by-election; the Commission's portal does not print it.",
+    )
+    p.artifact(raw.cached(SOURCE, house.DATES), WIKIPEDIA_SOURCE)
+    house_contests(b, election, path, edition.day)
+    house_checks(b, edition.day)
+    return p
+
+
 PRESIDENT_METHOD = (
     "Counted by the National Elections Commission at each polling place and published on its results portal as one "
     "page for each voting precinct, with a column for each polling place. The portal prints the registered voters of "
@@ -1482,8 +1725,14 @@ def president_election(round: president.Round) -> Package:
     p = Package(
         f"{SOURCE}/{round.day}",
         SOURCE,
-        f"The {day.day} {day:%B} {year} Liberian presidential "
-        + ("election" if first else "runoff")
+        f"The {day.day} {day:%B} {year} Liberian "
+        + (
+            "general election (President and House of Representatives)"
+            if first and any(e.general and e.day == round.day for e in house.EDITIONS)
+            else "presidential election"
+            if first
+            else "presidential runoff"
+        )
         + " by polling place",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", *([] if first else [f"{SOURCE}/{earlier.day}"])],
     )
@@ -1549,19 +1798,7 @@ def president_election(round: president.Round) -> Package:
     totals: Counter[str] = Counter()
     for precinct in precincts:
         district = area("lr.house_district", f"{precinct.county}{precinct.district:02d}")
-        code = f"{round.day}:{precinct.code}"
-        parent = key("unit", code)
-        p.add(
-            "reporting_unit",
-            id=parent,
-            polity_id=LIBERIA,
-            scheme_code="lr.precinct",
-            code=code,
-            area_relation="within",
-            area_id=district,
-            kind="standard",
-        )
-        p.name(parent, precinct.name, "en", "official")
+        parent, place_units = polling_units(b, round.day, precinct, district)
         p.add(
             "result_value",
             result_set_id=result_set,
@@ -1574,24 +1811,7 @@ def president_election(round: president.Round) -> Package:
             value=precinct.registered,
         )
         county = sums.setdefault(precinct.county, Counter())
-        for i, column in enumerate(precinct.places):
-            found = re.fullmatch(r"PP(\d+)", column)
-            if found is None:
-                raise ValueError(f"precinct {precinct.code}: polling place {column!r}")
-            number_ = int(found.group(1))
-            unit = key("unit", f"{code}-{number_}")
-            p.add(
-                "reporting_unit",
-                id=unit,
-                polity_id=LIBERIA,
-                scheme_code="lr.polling_place",
-                code=f"{code}-{number_}",
-                parent_id=parent,
-                area_relation="within",
-                area_id=district,
-                kind="standard",
-            )
-            p.name(unit, f"{precinct.name}, polling place {number_}", "en", "official")
+        for i, unit in enumerate(place_units):
             tally = Tally(
                 [(label, votes[i]) for label, votes in precinct.candidates.items()],
                 precinct.valid[i],
@@ -1619,4 +1839,7 @@ def president_election(round: president.Round) -> Package:
         else:
             kind = "elected" if label == ranked[0] else "lost"
         p.add("outcome", result_set_id=result_set, option_id=options[label], kind=kind)
+    if first and any(e.general and e.day == round.day for e in house.EDITIONS):
+        house_contests(b, election, path, round.day)
+        house_checks(b, round.day)
     return p
