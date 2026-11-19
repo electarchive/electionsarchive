@@ -995,6 +995,9 @@ class Loaded(NamedTuple):
     repointed: list[str]
     sets: dict[int, int]
     counts: dict[str, list[int]]
+    owned: list[str]
+    deferred: list[str]
+    retire: dict[str, tuple[str, list[str]]]
 
 
 def _missing(conn: Connection, external: object) -> list[str]:
@@ -1156,6 +1159,11 @@ def _facts(
     counts: dict[str, list[int]] = {}
     touched_ids: dict[str, list[str]] = {}
     deferred: list[str] = []
+    polity = key.split(".")[0].upper()
+    claim = sql.SQL(
+        "exists (select from changeset c where c.id = t.changeset_id and c.scope->>'polity' = {p} "
+        "and c.scope->>'package' <> {k})"
+    ).format(p=sql.Literal(polity), k=sql.Literal(key))
     for table in reversed(TABLES):
         try:
             with conn.transaction():
@@ -1178,10 +1186,15 @@ def _facts(
                 c=listed,
                 s=sql.Identifier(name),
                 k=sql.SQL(", ").join(map(sql.Identifier, key_columns)),
-                action=sql.SQL("update set ({r}) = row({x}) where ({tr}) is distinct from ({x})").format(
+                action=sql.SQL(
+                    "update set ({r}) = row({x}), changeset_id = case when {claim} then {now} else t.changeset_id end "
+                    "where ({tr}) is distinct from ({x}) or {claim}"
+                ).format(
                     r=sql.SQL(", ").join(map(sql.Identifier, rest)),
                     x=sql.SQL(", ").join(sql.SQL("excluded.{}").format(sql.Identifier(c)) for c in rest),
                     tr=sql.SQL(", ").join(sql.SQL("t.{}").format(sql.Identifier(c)) for c in rest),
+                    claim=claim,
+                    now=sql.SQL("current_setting('ea.changeset_id')::uuid"),
                 )
                 if rest
                 else sql.SQL("nothing"),
@@ -1210,15 +1223,14 @@ def _facts(
                 )
             ).rowcount
         counts.setdefault(table, [0, 0])[0] = written
+    retire: dict[str, tuple[str, list[str]]] = {}
     for table in deferred:
-        try:
-            counts.setdefault(table, [0, 0])[1] = _drop(conn, table, staged, owned)
-        except errors.ForeignKeyViolation as error:
-            raise ValueError(
-                f"{key} v{version} would delete {table} rows that other packages still use "
-                f"({error.diag.message_detail}); a package must keep every row other packages reference, "
-                "so build it from a full parse of its pipeline"
-            ) from None
+        if table in staged:
+            name = f"retire_{changeset_id.replace('-', '')}_{table}"
+            conn.execute(
+                sql.SQL("alter table {} rename to {}").format(sql.Identifier(staged[table][0]), sql.Identifier(name))
+            )
+            retire[table] = (name, staged[table][1])
     sizes, changed = _merge(conn, "result_value", files.get("result_value"), sets_before, counts, referencing)
     _merge(conn, "value_locator", files.get("value_locator"), sets_before, counts, referencing)
     _refuse_merged(conn, changeset_id, set(files))
@@ -1234,7 +1246,32 @@ def _facts(
     changed |= {k for (k,) in current}
     changed -= set(dropped_sets)
     rolled = {k: sizes.get(k, 0) for k in changed}
-    return Loaded(key, version, changeset_id, path, moved, touched_ids.get("reporting_unit", []), rolled, counts)
+    return Loaded(
+        key,
+        version,
+        changeset_id,
+        path,
+        moved,
+        touched_ids.get("reporting_unit", []),
+        rolled,
+        counts,
+        owned,
+        deferred,
+        retire,
+    )
+
+
+def _retire(conn: Connection, loaded: list[Loaded]) -> None:
+    for item in loaded:
+        for table in item.deferred:
+            try:
+                item.counts.setdefault(table, [0, 0])[1] = _drop(conn, table, item.retire, item.owned)
+            except errors.ForeignKeyViolation as error:
+                raise ValueError(
+                    f"{item.key} v{item.version} would delete {table} rows that other packages still use "
+                    f"({error.diag.message_detail}); a package must keep every row other packages reference, "
+                    "so build it from a full parse of its pipeline"
+                ) from None
 
 
 def _merge(
@@ -1441,6 +1478,8 @@ def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: M
             ]
             steps = [meter.step("facts")]
             if loaded:
+                _retire(conn, loaded)
+                steps.append(meter.step("retire"))
                 steps += _derive(conn, loaded, meter)
                 _verify(conn, loaded)
                 steps.append(meter.step("verify"))
