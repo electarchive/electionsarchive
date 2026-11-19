@@ -569,36 +569,18 @@ def emit() -> Path:
             cs.add(
                 "scheme", code=code, polity_id=korea, kind=kind, rank=rank, noun=noun, kinds=None, code_system=system
             )
-        nation = cs.area("kr.nation", "KR")
-        cs.add("area", id=nation, scheme_code="kr.nation")
-        cs.add("area_code", area_id=nation, code="KR", valid_from=None)
-        name(nation, "대한민국")
-        name(nation, "South Korea", "en", "english")
-        cs.add("polity_territory", polity_id=korea, area_id=nation)
-        country = conn.execute(
-            "select encode(st_asewkb(g.geom), 'hex'), encode(st_asewkb(g.label_point), 'hex'), g.source_id from area_geometry g"
-            " join area a on a.id = g.area_id join area_code c on c.area_id = a.id"
-            " where a.scheme_code = 'world.country' and c.code = 'KOR'"
-        ).fetchone()
-        if country is None:
-            raise ValueError("world.country KOR has no geometry")
-        shape, point, shape_source = country
-        cs.add(
-            "area_geometry",
-            area_id=nation,
-            valid_from=None,
-            valid_to=None,
-            geom=shape,
-            label_point=point,
-            quality="academic",
-            source_id=shape_source,
-        )
+        # South Korea's one national area is the world.country area that kr.nec_stats parents its provinces to.
+        nation = cs.area("world.country", "KOR")
+        parented = {
+            row[0] for row in conn.execute("select area_id from area_parent where parent_id = %s", [nation]).fetchall()
+        }
         sidos: dict[str, UUID] = {}
         for code, (_, full, english) in SIDO.items():
             area = sidos[code] = cs.area("kr.sido", code)
             cs.add("area", id=area, scheme_code="kr.sido")
             cs.add("area_code", area_id=area, code=code, valid_from=None)
-            cs.add("area_parent", area_id=area, parent_id=nation, valid_from=None)
+            if area not in parented:
+                cs.add("area_parent", area_id=area, parent_id=nation, valid_from=None)
             polity = cs.polity(f"KR-{code}")
             cs.add("polity", id=polity, kind="region", iso_code=f"KR-{code}")
             cs.add("slug", path=f"kr/{english.lower().replace(' ', '-')}", entity_id=polity)
