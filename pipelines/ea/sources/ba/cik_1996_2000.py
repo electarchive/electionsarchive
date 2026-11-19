@@ -14,7 +14,8 @@ elections from 1996 to 2000:
 - 2000 municipal elections: one final report per municipality, with each list's votes in and out of the
   municipality and its seats.
 - 2000 general elections: the final report of each race, with each list's votes in and out of the municipality,
-  and the candidate vote reports, which name the elected candidates of each list and so give its seats.
+  and the candidate vote reports, which give each candidate's preference votes and name the elected candidates of
+  each list and so give its seats (the general elections' report only prints the slates that won a seat).
 
 Each is a text PDF, read here with poppler's pdftotext. The 1996 and 1998 files spell Bosnian letters in the 7-bit
 YUSCII code page ("[" for Š, "~" for č, and so on), which is decoded before parsing.
@@ -41,7 +42,7 @@ SOURCE = "ba.cik_1996_2000"
 SHAPES = "ba.geoboundaries"
 BIH = str(uuid5(package.NAMESPACE, "polity\x1fBA"))
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fBIH"))
-VOTES, BALLOTS, VALID, INVALID = 1, 3, 4, 5
+VOTES, BALLOTS, VALID, INVALID, PREFERENCES = 1, 3, 4, 5, 7
 _IDS = Package(SOURCE, SOURCE, "ids")
 
 
@@ -121,6 +122,20 @@ class Option:
     seats: int | None = None
     candidate: str | None = None  # a candidate's name, as printed
     elected: bool = False
+    members: list[Member] = field(default_factory=list)  # the list's candidates, with their preference votes
+
+
+@dataclass
+class Member:
+    """A candidate on a list, from a candidate vote report."""
+
+    name: str  # as printed, in the script of the list
+    race: str  # the report's race code, which is the district for lists that run in several
+    votes: int
+    rank: int | None  # the order the report prints the list's candidates in
+    position: int | None  # the place on the list; none for a candidate seated by a compensation mandate
+    elected: bool
+    compensation: bool = False
 
 
 @dataclass
@@ -135,6 +150,7 @@ class Contest:
     magnitude: int | None = None
     member: str | None = None  # the Presidency member's people (Bosniak, Croat, Serb)
     seats_url: str | None = None  # the file the seats come from, when another
+    members_url: str | None = None  # the candidate vote report
 
     def total(self, option: Option) -> int:
         return sum(option.votes.values())
@@ -757,36 +773,80 @@ def parse_2000_general() -> tuple[list[Contest], list[Contest]]:
     return now, then
 
 
+@dataclass
+class Slate:
+    race: str  # the report's race code
+    label: str  # the list's name as printed
+    total: int  # the votes the report prints for the list
+    members: list[Member]
+
+
+LIST_HEADER = re.compile(r"Party List:\s+(.+)")
+RACE_HEADER = re.compile(r"Electoral Race:\s+(\d{3})\b")
+RANKED = re.compile(r"^\s*(\d+)\s+(\S.*?)\s{2,}(\d+)\s+(\d+)\s*$")
+COMPENSATED = re.compile(r"^\s+(\S.*?)\s{2,}\S+ \S+\s+(\d+)\s*$")
+
+
+def candidate_report(url: str) -> list[Slate]:
+    """The lists of a candidate vote report: each list's total and its candidates, elected ones first (regular
+    seats ranked, compensation seats unranked and without a place on the list)."""
+    out: list[Slate] = []
+    race = ""
+    label: list[str] = []
+    slate: Slate | None = None
+    elected = False
+    for line in pdf_text(url).splitlines():
+        text = spaced(line)
+        if m := RACE_HEADER.match(text):
+            race, slate = m[1], None
+        elif m := LIST_HEADER.match(text):
+            label, slate, elected = [m[1]], None, False
+        elif m := re.match(r"Total No\. of votes for the list:\s+(\d+)", text):
+            slate = Slate(race, spaced(" ".join(label)), int(m[1]), [])
+            out.append(slate)
+        elif slate is None:
+            if text and label and not text.startswith(("Name ", "General", "Municipal")):
+                label.append(text)  # a long list name wraps onto the next line
+        elif text == "ELECTED":
+            elected = True
+        elif text == "NOT ELECTED":
+            elected = False
+        elif m := RANKED.match(line):
+            slate.members.append(Member(m[2], slate.race, int(m[4]), int(m[1]), int(m[3]), elected))
+        elif (m := COMPENSATED.match(line)) and elected and "Page" not in text:
+            slate.members.append(Member(m[1], slate.race, int(m[2]), None, None, True, True))
+    return out
+
+
 def seats_2000(code: str) -> tuple[str, dict[str, int]]:
     """A race's elected candidates counted by list, from its candidate vote report (regular and compensation
     seats alike)."""
     url = doc(f"2000gen/{CANDIDATES_2000[code]}")
     seats: Counter[str] = Counter()
-    party: list[str] = []
-    reading = False
-    elected = False
-    for line in pdf_text(url).splitlines():
-        text = spaced(line)
-        if m := re.match(r"Party List:\s+(.+)", text):
-            party = [m[1]]
-            reading, elected = True, False
-            continue
-        wraps = reading and not elected and text and not text.startswith(("Total No.", "Name "))
-        if wraps and re.match(r"^ {20,}\S", line) and not re.search(r"\d+$", text):
-            party.append(text)  # a long list name wraps onto the next line
-            continue
-        if text.startswith("Total No."):
-            reading = False
-            continue
-        if text == "ELECTED":
-            elected = True
-            continue
-        if text == "NOT ELECTED" or text.startswith(("General Elections", "Candidate Votes", "Electoral Race")):
-            elected = False
-            continue
-        if elected and party and re.search(r"[^\W\d_].* \d+$", text) and "Page" not in text:
-            seats[spaced(" ".join(party))] += 1
-    return url, dict(seats)
+    for slate in candidate_report(url):
+        seats[slate.label] += sum(m.elected for m in slate.members)
+    return url, {label: n for label, n in seats.items() if n}
+
+
+def attach_members(c: Contest, url: str, slates: list[Slate], *, complete: bool) -> None:
+    """Put each list's candidates from a candidate vote report on the list's option. A complete report prints every
+    district's slate of every list, and its list totals must equal the votes. The general elections' print only the
+    slates that won a seat, with list totals that can differ by a few votes from the race's own report."""
+    options = {fold(o.label): o for o in c.options}
+    totals: Counter[int] = Counter()
+    for slate in slates:
+        name = fold(slate.label)
+        found = options.get(name) or next(
+            (o for k, o in options.items() if k.startswith(name) or name.startswith(k)), None
+        )
+        if found is None:
+            raise ValueError(f"{c.key}: candidates of {slate.label}, which has no votes")
+        found.members += slate.members
+        totals[id(found)] += slate.total
+    for o in c.options:
+        if complete and o.members and totals[id(o)] != c.total(o):
+            raise ValueError(f"{c.key}: {o.label} has {c.total(o)} votes, its candidate report {totals[id(o)]}")
+    c.members_url = url
 
 
 # The contests of each election.
@@ -811,12 +871,21 @@ def contests(e: Election) -> list[Contest]:
                     best.candidate = winner
         return out
     if e.slug == "2000-04-08":
-        return parse_2000_municipal()
+        out = parse_2000_municipal()
+        by_key = {c.key: c for c in out}
+        for url in files(225, r"/FinalCandidateVotes\d{3}"):
+            slates = candidate_report(url)
+            for race in dict.fromkeys(slate.race for slate in slates):
+                if f"council:{race}" not in by_key:
+                    raise ValueError(f"{url}: candidates of race {race}, which has no council")
+                attach_members(by_key[f"council:{race}"], url, [s for s in slates if s.race == race], complete=True)
+        return out
     out, _ = parse_2000_general()
     for c in out:
         code = next(k for k in GENERAL_2000 if contest_key(k) == c.key)
         url, seats = seats_2000(code)
         c.seats_url = url
+        attach_members(c, url, candidate_report(url), complete=False)
         options = {fold(o.label): o for o in c.options}
         for o in c.options:
             o.seats = 0
@@ -1169,13 +1238,17 @@ METHODS = {
     "2000-04-08": (
         "The Provisional Election Commission's final results for the municipality: each list's votes cast in the "
         "municipality, and its votes cast out of it (counted in the Counting Centre), each as one counting unit, "
-        "with the seats it won. The reports print no invalid ballots."
+        "with the seats it won. The reports print no invalid ballots. The candidate vote report gives every candidate "
+        "of each list the votes cast for them in the municipality and out of it together, and names the elected "
+        "candidates; those preference votes are separate from the list's own votes."
     ),
     "2000-11-11": (
         "The Provisional Election Commission's final results for the whole race: each list's votes cast in the "
         "municipalities and out of them (counted in the Counting Centre), each as one counting unit. Its seats are "
         "its elected candidates, regular and compensatory, counted from the race's candidate vote report; the "
-        "multi-member constituencies' own votes are not published. The reports print no invalid ballots."
+        "multi-member constituencies' own votes are not published. The reports print no invalid ballots. The "
+        "candidate vote report prints only the slates that won a seat, with each elected candidate's preference "
+        "votes (all districts together), and a compensation-mandate candidate has no place on the list."
     ),
 }
 ACCOUNTING = (VALID, INVALID, BALLOTS)
@@ -1238,6 +1311,8 @@ def election(e: Election, report: Report) -> Package:
         files.add(c.url)
         if c.seats_url:
             files.add(c.seats_url)
+        if c.members_url:
+            files.add(c.members_url)
         contest = key("contest", e.slug, c.key)
         result_set = key("result_set", e.slug, c.key)
         en, bs = contest_name(c)
@@ -1286,7 +1361,9 @@ def election(e: Election, report: Report) -> Package:
         units = {
             tag: key("unit", e.slug, c.key, tag)
             for tag in ("all", "in", "out")
-            if any(tag in o.votes for o in c.options) or tag in c.accounting
+            if any(tag in o.votes for o in c.options)
+            or tag in c.accounting
+            or (tag == "all" and any(o.members for o in c.options))
         }
         for tag, unit in units.items():
             p.add(
@@ -1336,6 +1413,35 @@ def election(e: Election, report: Report) -> Package:
             if not candidates and o.seats:
                 p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=o.seats)
             p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=c.total(o))
+            for m in o.members:
+                member = key("option", e.slug, c.key, label, m.race, m.rank if m.rank else fold(m.name))
+                p.add(
+                    "contest_option",
+                    id=member,
+                    contest_id=contest,
+                    kind="candidate",
+                    parent_option_id=option,
+                    ballot_label=m.name,
+                )
+                person = key("person", e.slug, c.key, label, m.race, m.rank if m.rank else fold(m.name))
+                p.add("person", id=person)
+                p.name(person, proper(m.name), "bs", "official")
+                candidacy = key("candidacy", e.slug, c.key, label, m.race, m.rank if m.rank else fold(m.name))
+                p.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=option,
+                    role="list_member",
+                    list_position=m.position,
+                    ballot_name=m.name,
+                    member_of_party_id=None,
+                    is_independent=None,
+                )
+                if m.elected:
+                    p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
+                for column, value in zip(rows, (result_set, units["all"], member, PREFERENCES, m.votes), strict=True):
+                    rows[column].append(value)
             for tag, n in o.votes.items():
                 for column, value in zip(rows, (result_set, units[tag], option, VOTES, n), strict=True):
                     rows[column].append(value)
