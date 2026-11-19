@@ -7,8 +7,12 @@ assigned to the chairperson or member count by their place on the sheet and chec
 """
 
 import functools
+import io
+import json
 import re
 import subprocess
+import unicodedata
+import zipfile
 from collections import Counter
 from dataclasses import dataclass, field, replace
 from datetime import date
@@ -16,6 +20,10 @@ from html import unescape
 from itertools import pairwise
 from uuid import uuid5
 from xml.etree import ElementTree
+
+import shapely
+import shapely.geometry
+import shapely.ops
 
 from ea import changeset, package, raw
 from ea.package import Package
@@ -43,6 +51,7 @@ BY_FILES = [
     f"{U}/2026/08/Los-Tambos.pdf",
     f"{U}/2026/09/San-Lazaro-Official-Result-.pdf",
 ]
+PLACES = "https://production-raw-data-api.s3.amazonaws.com/ISO3/BLZ/populated_places/hotosm_blz_populated_places_osm_geojson.zip"
 LINK = re.compile(r'<a [^>]*href="([^"]*\.pdf)"', re.DOTALL)
 
 
@@ -58,6 +67,7 @@ def fetch() -> None:
     urls = [u for page in YEAR_PAGES.values() for u in listing(page)]
     urls += BY_FILES
     raw.fetch_many(SOURCE, urls, suffix=".pdf")
+    raw.fetch(SOURCE, PLACES, suffix=".zip")
 
 
 DATE = re.compile(r"\d{1,2}/\d{1,2}/\d{2,4}")
@@ -760,10 +770,120 @@ def office(district: str, key: str) -> str:
     return ident("office", district, key)
 
 
+OSM_SOURCE = ident("source", "osm")
+SETTLEMENTS = {"village", "hamlet", "town", "city", "suburb", "neighbourhood"}
+NEAR = 100 / 111_000  # degrees; a residential area this close to a village's point is taken as the village's
+
+
+def squash(name: str) -> str:
+    text = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode().lower()
+    text = re.sub(r"\b(village|community|council|the)\b", " ", text).replace("saint", "st").replace("centre", "center")
+    return re.sub(r"[^a-z0-9]", "", text)
+
+
+def area(district: str, key: str) -> str:
+    return ident("area", district, key)
+
+
+@functools.cache
+def outlines() -> dict[tuple[str, str], shapely.Geometry]:
+    """The OpenStreetMap outline of each village that has one, by district and key.
+
+    A village's outline is the polygon mapped for its place when there is one, and otherwise the mapped residential
+    area that holds, or lies within 100 meters of, the village's place point. A village with neither has no outline.
+    """
+    with zipfile.ZipFile(io.BytesIO(raw.cached(SOURCE, PLACES).path.read_bytes())) as z:
+        collection = json.loads(z.read("populated_places.geojson"))
+    places: dict[tuple[str, str], list[shapely.Geometry]] = {}
+    residential = []
+    for f in collection["features"]:
+        props, shape = f["properties"], shapely.geometry.shape(f["geometry"])
+        if props["name"] and props["place"] in SETTLEMENTS:
+            places.setdefault((props["adm1_name"], squash(props["name"])), []).append(shape)
+        elif props["landuse"] == "residential" and not props["place"] and shape.geom_type != "Point":
+            residential.append(shape)
+    tree = shapely.STRtree(residential)
+    found: dict[tuple[str, str], shapely.Geometry] = {}
+    for (district, key), (name,) in villages().items():
+        shapes = places.get((district, squash(name)), [])
+        polygons = [s for s in shapes if s.geom_type in ("Polygon", "MultiPolygon")]
+        if polygons:
+            shape = shapely.ops.unary_union(polygons)
+        elif shapes:
+            point = shapes[0]
+            hit = tree.query(point, predicate="within")
+            if not len(hit):
+                near = tree.nearest(point)
+                hit = [near] if near is not None and point.distance(residential[int(near)]) <= NEAR else []
+            if not len(hit):
+                continue
+            shape = residential[int(hit[0])]
+        else:
+            continue
+        shape = shapely.force_2d(shapely.make_valid(shape))
+        if shape.geom_type == "GeometryCollection":
+            shape = shapely.ops.unary_union([g for g in shape.geoms if g.geom_type in ("Polygon", "MultiPolygon")])
+        found[(district, key)] = shape
+    return found
+
+
+def first_day() -> date:
+    return min(h.day for h in held())
+
+
 def geo() -> Package:
-    p = Package(f"{SOURCE}/geo", SOURCE, "Belize's villages and communities as the units of their council elections")
+    p = Package(
+        f"{SOURCE}/geo",
+        SOURCE,
+        "Belize's villages and communities as the units of their council elections, with outlines from OpenStreetMap",
+    )
     p.external.add(BELIZE)
+    artifact = raw.cached(SOURCE, PLACES)
+    p.add(
+        "source",
+        id=OSM_SOURCE,
+        kind="community",
+        publisher="OpenStreetMap contributors",
+        title="OpenStreetMap populated places of Belize, as exported by the Humanitarian OpenStreetMap Team",
+        url="https://data.humdata.org/dataset/hotosm_blz_populated_places",
+        license="Open Database License 1.0",
+        license_url="https://opendatacommons.org/licenses/odbl/1-0/",
+        attribution="© OpenStreetMap contributors",
+        notes=(
+            "Belize publishes no village boundaries. Each outline is the extent OpenStreetMap contributors have "
+            "mapped for the settlement: the polygon of its place when it has one, and otherwise the residential area "
+            "that holds the village's place point. It is the built-up area, not the council's legal boundary, and it "
+            "is as retrieved, not as drawn in the year of each election. Villages with no mapped extent have no outline."
+        ),
+    )
+    p.artifact(artifact, OSM_SOURCE)
     p.add("scheme", code=SCHEME, polity_id=BELIZE, kind="administrative", rank=3, noun="village")
+    vintage = artifact.retrieved_at.date()
+    start = first_day()
+    p.add(
+        "boundary_set",
+        id=ident("boundary_set", SCHEME, vintage),
+        scheme_code=SCHEME,
+        vintage=f"OpenStreetMap {vintage}",
+        valid_from=start,
+        as_of=vintage,
+    )
+    for (district, key), shape in outlines().items():
+        id = area(district, key)
+        p.add("area", id=id, scheme_code=SCHEME)
+        p.add("area_code", area_id=id, code=f"{changeset.slug(district)}/{key}")
+        p.name(id, villages()[(district, key)][0], "en", "official")
+        p.add(
+            "area_geometry",
+            area_id=id,
+            valid_from=start,
+            geom=shapely.to_wkb(shapely.set_srid(shape, 4326), hex=True, include_srid=True),
+            label_point=shapely.to_wkb(
+                shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+            ),
+            quality="osm",
+            source_id=OSM_SOURCE,
+        )
     return p
 
 
@@ -941,13 +1061,15 @@ def _election(p: Package, h: Held, parent: str | None, path: str, repeat: bool) 
     for text_ in caveats:
         p.add("note", id=ident("note", election, text_), entity_id=election, kind="caveat", body_md=text_, lang="en")
     unit = ident("unit", h.tag)
+    located = (h.record.district, h.record.key) in outlines()
     p.add(
         "reporting_unit",
         id=unit,
         polity_id=BELIZE,
         scheme_code=SCHEME,
         code=f"{h.day}:{changeset.slug(h.record.district)}:{changeset.slug(v.name)}",
-        area_relation="unlocated",
+        area_relation="equals" if located else "unlocated",
+        area_id=area(h.record.district, h.record.key) if located else None,
         kind="standard",
     )
     registered = v.chair.registered if v.chair.registered is not None else v.members.registered
