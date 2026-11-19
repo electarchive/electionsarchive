@@ -28,18 +28,26 @@ BOOKS = {
 DPI = 200
 
 
+def url(year: str) -> str:
+    return f"{BASE}/{BOOKS[year]}"
+
+
 def fetch(year: str) -> Path:
-    return raw.fetch(SOURCE, f"{BASE}/{BOOKS[year]}", suffix=".pdf").path
+    return raw.fetch(SOURCE, url(year), suffix=".pdf").path
 
 
-def ocr(year: str, out: Path) -> None:
-    """Write `{page: [[x0, y0, x1, y1, text, confidence], ...]}` for a book, boxes in PDF points."""
+def ocr(year: str, out: Path, pages: range | None = None) -> None:
+    """Write `{page: [[x0, y0, x1, y1, text, confidence], ...]}` for a book, boxes in PDF points.
+
+    `pages` limits the read to those pages (1-based).
+    """
     engine: Any = importlib.import_module("rapidocr_onnxruntime").RapidOCR()  # optional: `uv sync --group scans`
     pdf = fetch(year)
     scale = 72 / DPI
-    pages: dict[int, list[list[float | str]]] = {}
+    book: dict[int, list[list[float | str]]] = {}
     with tempfile.TemporaryDirectory() as tmp:
-        subprocess.run(["pdftoppm", "-r", str(DPI), "-png", str(pdf), f"{tmp}/p"], check=True)
+        span = ["-f", str(pages.start), "-l", str(pages.stop - 1)] if pages else []
+        subprocess.run(["pdftoppm", "-r", str(DPI), "-png", *span, str(pdf), f"{tmp}/p"], check=True)
         for image in sorted(Path(tmp).glob("p-*.png")):
             found, _ = engine(str(image))
             words: list[list[float | str]] = []
@@ -47,5 +55,5 @@ def ocr(year: str, out: Path) -> None:
                 xs, ys = [c[0] for c in corners], [c[1] for c in corners]
                 box = [round(v * scale, 1) for v in (min(xs), min(ys), max(xs), max(ys))]
                 words.append([*box, text, round(float(confidence), 3)])
-            pages[int(image.stem.split("-")[-1])] = words
-    out.write_text(json.dumps(pages, separators=(",", ":")))
+            book[int(image.stem.split("-")[-1])] = words
+    out.write_text(json.dumps(book, separators=(",", ":")))
