@@ -2101,7 +2101,13 @@ class Draft(Changeset):
     def _settle(self, table: str, frame: pl.DataFrame) -> pl.DataFrame:
         if frame.height == 0:
             return frame
-        columns = [column for column in frame.columns if column != "id"]
+        keyed = None if table in DERIVED_IDS or table not in TABLES else TABLES[table][0]
+        minted = table in DERIVED_IDS or keyed == ("id",) and "id" not in frame.columns
+        if minted:
+            keyed = None
+        elif keyed is not None and not set(keyed) <= set(frame.columns):
+            return frame
+        columns = [column for column in frame.columns if column != "id" or keyed is not None]
         frame = frame.unique(subset=columns, maintain_order=True)
         required = _not_null(self.conn, table)
         staged = sql.Identifier(f"draft_{table}")
@@ -2121,41 +2127,59 @@ class Draft(Changeset):
                 copy.write_row(
                     [json.dumps(value) if isinstance(value, dict | list) else value for value in row] + [number]
                 )
-        same = sql.SQL(" and ").join(
-            sql.SQL("p.{0} = s.{0}" if column in required else "p.{0} is not distinct from s.{0}").format(
-                sql.Identifier(column)
+        pipeline = str(self.manifest["pipeline"])
+        if keyed is not None:
+            found = self.conn.execute(
+                sql.SQL(
+                    """select s.draft_row, null, case when ({p}) is not distinct from ({s}) then c.pipeline end
+                       from {staged} s left join public.{table} p on {on}
+                       left join changeset c on c.id = p.changeset_id order by s.draft_row"""
+                ).format(
+                    p=sql.SQL(", ").join(sql.SQL("p.{}").format(sql.Identifier(c)) for c in columns),
+                    s=sql.SQL(", ").join(sql.SQL("s.{}").format(sql.Identifier(c)) for c in columns),
+                    staged=staged,
+                    table=sql.Identifier(table),
+                    on=sql.SQL(" and ").join(sql.SQL("p.{0} = s.{0}").format(sql.Identifier(c)) for c in keyed),
+                )
+            ).fetchall()
+        else:
+            same = sql.SQL(" and ").join(
+                sql.SQL("p.{0} = s.{0}" if column in required else "p.{0} is not distinct from s.{0}").format(
+                    sql.Identifier(column)
+                )
+                for column in columns
             )
-            for column in columns
-        )
-        derived = sql.SQL(
-            "overlay(overlay(md5(concat_ws(chr(31), {}, {}, {})) placing '8' from 13 for 1) placing '8' from 17 for 1)"
-        ).format(
-            sql.Literal(table),
-            sql.Literal(str(self.manifest["pipeline"])),
-            sql.SQL(", ").join(
-                sql.SQL("{}, coalesce(s.{}::text, chr(30))").format(sql.Literal(column), sql.Identifier(column))
-                for column in sorted(columns)
-            ),
-        )
-        found = self.conn.execute(
-            sql.SQL(
-                """select s.draft_row, {id}, m.pipeline
-                   from {staged} s left join lateral (
-                     select {existing} as id, c.pipeline from public.{table} p join changeset c on c.id = p.changeset_id
-                     where {same} order by c.pipeline = %s desc limit 1) m on true
-                   order by s.draft_row"""
+            derived = sql.SQL(
+                "overlay(overlay(md5(concat_ws(chr(31), {}, {}, {})) placing '8' from 13 for 1)"
+                " placing '8' from 17 for 1)"
             ).format(
-                id=sql.SQL("coalesce(m.id, {})").format(derived) if table in DERIVED_IDS else sql.SQL("null"),
-                existing=sql.SQL("p.id::text") if table in DERIVED_IDS else sql.SQL("null::text"),
-                staged=staged,
-                table=sql.Identifier(table),
-                same=same,
-            ),
-            [str(self.manifest["pipeline"])],
-        ).fetchall()
+                sql.Literal(table),
+                sql.Literal(pipeline),
+                sql.SQL(", ").join(
+                    sql.SQL("{}, coalesce(s.{}::text, chr(30))").format(sql.Literal(column), sql.Identifier(column))
+                    for column in sorted(columns)
+                ),
+            )
+            found = self.conn.execute(
+                sql.SQL(
+                    """select s.draft_row, {id}, m.pipeline
+                       from {staged} s left join lateral (
+                         select {existing} as id, c.pipeline from public.{table} p
+                         join changeset c on c.id = p.changeset_id
+                         where {same} order by c.pipeline = %s desc limit 1) m on true
+                       order by s.draft_row"""
+                ).format(
+                    id=sql.SQL("coalesce(m.id, {})").format(derived) if minted else sql.SQL("null"),
+                    existing=sql.SQL("p.id::text") if minted else sql.SQL("null::text"),
+                    staged=staged,
+                    table=sql.Identifier(table),
+                    same=same,
+                ),
+                [pipeline],
+            ).fetchall()
         self.conn.execute(sql.SQL("drop table {}").format(staged))
-        keep = [pipeline in (None, self.manifest["pipeline"]) for _, _, pipeline in found]
-        if table in DERIVED_IDS:
+        keep = [owner in (None, pipeline) for _, _, owner in found]
+        if minted:
             frame = frame.with_columns(pl.Series("id", [str(id) for _, id, _ in found], dtype=pl.String))
         return frame.filter(pl.Series(keep))
 
@@ -2204,7 +2228,7 @@ class Draft(Changeset):
             raise ValueError(f"{pipeline} sets changeset scope {extra}, which a package cannot express")
         tables = self._tables()
         for table, frame in list(tables.items()):
-            if table in DERIVED_IDS or (table in TABLES and TABLES[table][0] is None):
+            if table in TABLES or table in DERIVED_IDS:
                 tables[table] = self._settle(table, frame)
         out = folder(key) / "build"
         if out.exists():
