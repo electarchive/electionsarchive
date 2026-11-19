@@ -2872,6 +2872,9 @@ def build_council(name: str) -> Package:
             p.add("slug", path=path, entity_id=election, is_current=True)
             p.name(election, f"{day.year} {c.name} Legislative Council by-election", "en", "official")
         tag = (day.isoformat(), "council", slug)
+        if not general and day.isoformat() in council_events():
+            # A by-election held on the day of a general election for the same district is a separate contest.
+            tag = (day.isoformat(), "council-by-election", slug)
         contest = key("contest", *tag)
         p.add(
             "contest",
