@@ -599,6 +599,11 @@ UNIT_SCHEME = "cl.historial_comuna_votes"
 # once the election packages load.
 
 
+# The listings name 346 communes; a short count means a listing page is missing from the cache, and a geo built from
+# it would drop areas that loaded contests and units use.
+COMMUNES = 346
+
+
 def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo", SOURCE, "Chile's communes, electoral districts, and senatorial constituencies, 1989-2010"
@@ -615,7 +620,12 @@ def geo() -> Package:
 
     for url in listings():
         p.uses(raw.cached(SOURCE, url))
-    for code, name in communes().items():
+    # Every commune of the listings, whether or not its pages are complete: the cut-off 2008 pages of Viña del Mar
+    # and Maipú drop those communes from a contest, never from geo.
+    found = communes()
+    if len(found) != COMMUNES:
+        raise ValueError(f"the listings name {len(found)} communes, not {COMMUNES}; fetch the missing listing pages")
+    for code, name in found.items():
         place("cl.historial_comuna", code, name)
     for number in range(1, 61):
         place("cl.historial_distrito", str(number), f"Distrito {number} (1989–2013)")
@@ -1012,8 +1022,18 @@ def parse() -> None:
     found = {ident for election in ELECTIONS for ident in differing(election)}
     if found != servel.SUPERSEDED:
         raise ValueError(f"contests to supersede changed: {sorted(found ^ servel.SUPERSEDED)}")
-    geo().write()
-    registry().write()
+    places = geo()
+    areas = {row["id"] for row in places.rows["area"]}
+    first = {key("area", "cl.historial_comuna", code) for code in communes()}
+    first |= {key("area", "cl.historial_distrito", str(number)) for number in range(1, 61)}
+    first |= {key("area", "cl.historial_circunscripcion", str(number)) for number in range(1, 20)}
+    if first - areas:
+        raise ValueError(f"geo drops {len(first - areas)} areas the first version wrote")
+    places.write()
+    units = registry()
+    if missing := {row["area_id"] for row in units.rows["reporting_unit"]} - areas:
+        raise ValueError(f"reporting units name areas geo lacks: {sorted(str(area) for area in missing)}")
+    units.write()
     for election in ELECTIONS:
         build(election).write()
 
