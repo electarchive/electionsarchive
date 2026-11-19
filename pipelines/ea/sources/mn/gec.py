@@ -1,6 +1,7 @@
 """Mongolia's General Election Commission: presidential and parliamentary elections by polling section."""
 
 import functools
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
@@ -8,7 +9,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.mn import early, local, local2012, parliament, places, polls, sheets, soums, translit
+from ea.sources.mn import early, elected, local, local2012, parliament, places, polls, sheets, soums, translit
 
 SOURCE = "mn.gec"
 MONGOLIA = str(uuid5(package.NAMESPACE, "polity\x1fMN"))
@@ -856,6 +857,46 @@ def _value(p: Package, result_set: str, unit: str, option: str | None, measure: 
     )
 
 
+PARTY_2024 = {"МАН": "МАН", "АН": "АН", "ХҮН НАМ": "ХҮН"}
+
+
+def _given(label: str) -> str:
+    return label.split()[-1].casefold()
+
+
+def winners_2024(contests: list[parliament.Contest]) -> tuple[dict[int, set[int]], dict[str, list[elected.Member2024]]]:
+    """The candidates the Commission declared elected in each 2024 constituency (by candidate index), and the
+    party-list members by the party's name on the list ballot."""
+    members = elected.members_2024()
+    by_number = {c.number: c for c in contests if c.number is not None}
+    won: dict[int, set[int]] = {number: set() for number in by_number}
+    listed: dict[str, list[elected.Member2024]] = {}
+    ballot = {c.label.casefold().strip(): c.label for c in contests[-1].candidates}
+    for member in members:
+        if member.constituency is None:
+            name = member.party.strip().casefold()
+            full = {"ман": "монгол ардын нам", "ан": "ардчилсан нам"}.get(name, name)
+            listed.setdefault(ballot[full], []).append(member)
+            continue
+        contest = by_number[member.constituency]
+        found = [
+            i
+            for i, c in enumerate(contest.candidates)
+            if _given(c.label) == member.given.strip().casefold() and c.party == PARTY_2024[member.party.strip()]
+        ]
+        if len(found) > 1:
+            found = [i for i in found if contest.candidates[i].label.casefold()[:3] == member.patronymic.casefold()[:3]]
+        if len(found) != 1:
+            raise ValueError(f"2024 constituency {member.constituency}: cannot place elected member {member}")
+        won[member.constituency].add(found[0])
+    for number, contest in by_number.items():
+        if len(won[number]) != contest.seats:
+            raise ValueError(f"2024 constituency {number}: {len(won[number])} elected for {contest.seats} seats")
+    if sum(len(m) for m in listed.values()) != contests[-1].seats:
+        raise ValueError("2024 party-list members do not total the list seats")
+    return won, listed
+
+
 def legislature_2024() -> Package:
     day = parliament.DAY_2024
     contests = parliament_2024()
@@ -869,6 +910,8 @@ def legislature_2024() -> Package:
     p.external |= {MONGOLIA, TERRITORY}
     for url in sorted({url for contest in contests for url in contest.files}):
         p.uses(raw.cached(SOURCE, url))
+    p.uses(raw.cached(SOURCE, elected.LEGACY_FILES))
+    won, listed = winners_2024(contests)
     election_id = key("election", str(day))
     p.add("election", id=election_id, polity_id=MONGOLIA, kind="general", date_from=day, date_to=day, status="held")
     p.name(election_id, "2024 Mongolian parliamentary election", "en", "official")
@@ -982,11 +1025,86 @@ def legislature_2024() -> Package:
                 )
             if contest.declared is not None:
                 p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=contest.declared[index])
+            if contest.number is not None:
+                p.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=option,
+                    kind="elected" if index in won[contest.number] else "lost",
+                )
+            else:
+                members = listed.get(entry.label, [])
+                p.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=option,
+                    kind="won" if members else "lost",
+                    seats=len(members) or None,
+                )
+                for place, member in enumerate(members):
+                    person = key("person", str(day), tag, "elected", index, place)
+                    name = f"{member.patronymic.strip()} {member.given.strip()}"
+                    p.add("person", id=person)
+                    p.name(person, name, "mn", "official")
+                    candidacy = key("candidacy", str(day), tag, "elected", index, place)
+                    p.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=person,
+                        option_id=option,
+                        role="list_member",
+                        ballot_name=name,
+                        member_of_party_id=party(BY_NAME[entry.label.casefold()]),
+                        is_independent=False,
+                    )
+                    p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
         for row in contest.rows:
             for option, value in zip(options, row.votes, strict=True):
                 if value is not None:
                     _value(p, result_set, units[row.code], option, 1, value)
     return p
+
+
+# The one member of the Commission's table who is not among the first count's candidates: in Tsengel soum's
+# constituency 5, a tie at 369 votes was decided by a supplementary vote, and the table lists its winner.
+UNPLACED_2024 = ("soum:071:цэнгэл", 5, "Шархүү ЭНХБАЯР")
+
+
+def _surname(label: str) -> str:
+    found = re.search(r"[А-ЯӨҮЁ]{2,}[А-ЯӨҮЁ-]*$", label)
+    return found[0].casefold() if found else label.casefold()
+
+
+def council_winners(blocks: list[local.Block]) -> dict[tuple[str, int], set[int]]:
+    """The candidates the Commission declared elected in each 2024 council constituency, by candidate index. A
+    member is placed by name in the constituency the table gives; where the table's name is spelled differently
+    from the results workbook's, by the surname, and where it names a neighboring constituency of the same council,
+    by name in that council."""
+    where = {(block.council.key, block.number): block for block in blocks}
+    in_council: dict[str, list[tuple[int, int, str]]] = {}
+    for block in blocks:
+        for index, entry in enumerate(block.candidates):
+            in_council.setdefault(block.council.key, []).append((block.number, index, entry.label.casefold()))
+    won: dict[tuple[str, int], set[int]] = {key_: set() for key_ in where}
+    unplaced: list[elected.Councillor] = []
+    for member in elected.councillors_2024():
+        name = member.name.casefold()
+        block = where[(member.council, member.constituency)]
+        found = [i for i, c in enumerate(block.candidates) if c.label.casefold() == name]
+        if not found:
+            surname = [i for i, c in enumerate(block.candidates) if _surname(c.label) == _surname(member.name)]
+            found = surname if len(surname) == 1 else []
+        if len(found) == 1:
+            won[(member.council, member.constituency)].add(found[0])
+            continue
+        elsewhere = [(n, i) for n, i, label in in_council[member.council] if label == name]
+        if len(elsewhere) != 1:
+            unplaced.append(member)
+            continue
+        won[(member.council, elsewhere[0][0])].add(elsewhere[0][1])
+    if [(m.council, m.constituency, m.name) for m in unplaced] != [UNPLACED_2024]:
+        raise ValueError(f"2024 council members not placed: {unplaced}")
+    return won
 
 
 def councils(spec: LocalElection) -> Package:
@@ -1018,6 +1136,10 @@ def councils(spec: LocalElection) -> Package:
         p.external |= inherited({c.party for block in blocks for c in block.candidates}, spec.aliases)
     for url in spec.files:
         p.uses(raw.cached(SOURCE, url))
+    winners: dict[tuple[str, int], set[int]] | None = None
+    if day == "2024-10":
+        p.uses(raw.cached(SOURCE, elected.COUNCIL_TABLES))
+        winners = council_winners(blocks)
     if day == "2024-10-13":
         p.accept(
             "accounting.declared",
@@ -1141,6 +1263,13 @@ def councils(spec: LocalElection) -> Package:
             )
             if block.declared is not None:
                 p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=block.declared[index])
+            if winners is not None and index in winners[(block.council.key, block.number)]:
+                p.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=option,
+                    kind="elected",
+                )
         for row in block.rows:
             for option, value in zip(options, row.votes, strict=True):
                 if value is not None:
@@ -1467,6 +1596,10 @@ def legislature_2020() -> Package:
     p.external |= {MONGOLIA, TERRITORY}
     for name in (parliament.RESULTS_2020, parliament.TURNOUT_2020):
         p.uses(raw.cached(SOURCE, sheets.url(name)))
+    p.uses(raw.cached(SOURCE, elected.LEGACY_FILES))
+    winners: dict[int, list[int]] = {}
+    for member in elected.members_2020():
+        winners.setdefault(member.constituency, []).append(member.votes)
     election_id = key("election", str(day))
     p.add("election", id=election_id, polity_id=MONGOLIA, kind="general", date_from=day, date_to=day, status="held")
     p.name(election_id, "2020 Mongolian parliamentary election", "en", "official")
@@ -1558,6 +1691,18 @@ def legislature_2020() -> Package:
             )
             _value(p, result_set, unit, option, 1, votes)
             p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=votes)
+            p.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=option,
+                kind="elected" if votes in winners[entry.number] else "lost",
+            )
+        if sum(votes in winners[entry.number] for _, _, votes in entry.candidates) != len(winners[entry.number]):
+            raise ValueError(f"2020 constituency {entry.number}: elected members do not match the candidates' votes")
+        if len(winners[entry.number]) != entry.seats:
+            raise ValueError(
+                f"2020 constituency {entry.number}: {len(winners[entry.number])} elected for {entry.seats}"
+            )
     return p
 
 
