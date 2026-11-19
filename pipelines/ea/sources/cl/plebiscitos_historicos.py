@@ -1,10 +1,16 @@
 """Chile's national consultation of 4 January 1978 and constitutional plebiscite of 11 September 1980, by region.
 
 Both votes were run by the Interior Ministry under decrees of the military government, with no electoral register.
-The results are the official tables the ministry and the national scrutiny college published afterward.
+The results are the official tables the ministry and the national scrutiny college published afterward. For 1978 a
+second package holds every commune and province of the ministry's table, keyed from the newspaper reproduction in
+`SFMI-10.pdf`: `consulta_1978_comunas.tsv` holds the commune rows and `consulta_1978_provincias.tsv` the province
+rows of the ministry's typed summary on the file's third page.
 """
 
+import csv
+import unicodedata
 from datetime import date
+from pathlib import Path
 from typing import NamedTuple
 from uuid import uuid5
 
@@ -30,6 +36,16 @@ DECREES = {
         (LEY + "17039", "Decreto 1150 (21 October 1980): texto de la Constitución Política de la República de Chile"),
     ),
 }
+
+
+HERE = Path(__file__).parent
+CONSULTA = date(1978, 1, 4)
+FINE = f"{SOURCE}/{CONSULTA}-communes"
+PROVINCE_SCHEME = "cl.consulta_1978_provincia"
+COMMUNE_SCHEME = "cl.consulta_1978_comuna"
+# The 1978 provinces that lie today in a region carved out after 1978: Arica (Arica y Parinacota, 2007), Valdivia
+# (Los Ríos, 2007), and Ñuble (Ñuble, 2018). Every other province lies within the region of its 1978 number.
+MOVED = {(1, "Arica"): 15, (10, "Valdivia"): 14, (8, "Ñuble"): 16}
 
 
 class Row(NamedTuple):
@@ -108,8 +124,8 @@ ELECTIONS: dict[date, Spec] = {
         (
             "Totals per region from the 'Sub total' rows of the Interior Ministry's official and final results table "
             "for the consultation of 4 January 1978, as the newspaper El Cronista reproduced it on 19 January 1978. "
-            "The table also lists each province and, for the Santiago region, each commune; this package holds only "
-            "the regional totals. It prints null and blank ballots as one column, which this package does not "
+            "The table also lists each province and commune; the package of communes holds those figures and is the "
+            "default count, and this one holds only the regional totals. It prints null and blank ballots as one column, which this package does not "
             "store. The decree counted only 'SI' and 'NO' votes. The regions add up to the national totals the "
             "table prints: 4,177,064 'SI', 1,131,115 'NO', 258,109 null and blank, 5,566,288 in all."
         ),
@@ -140,7 +156,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/{day}" for day in ELECTIONS]
+    return [*(f"{SOURCE}/{day}" for day in ELECTIONS), FINE]
 
 
 def fetch() -> None:
@@ -162,6 +178,7 @@ def parse() -> None:
                 raise ValueError(f"{day} {name}: regions add up to {summed}, not the printed {spec.national[i]}")
     for day in ELECTIONS:
         build(day).write()
+    communes().write()
 
 
 def emit() -> None:
@@ -252,7 +269,7 @@ def build(day: date) -> Package:
         kind="counted",
         source_id=source,
         status="active",
-        is_default=True,
+        is_default=day != CONSULTA,
         completeness=1.0,
     )
     p.add(
@@ -294,3 +311,161 @@ def build(day: date) -> Package:
         ),
     )
     return p
+
+
+def fold(text: str) -> str:
+    plain = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
+    return "-".join("".join(c if c.isalnum() else " " for c in plain).split())
+
+
+def _table(name: str) -> list[dict[str, str]]:
+    with (HERE / name).open(encoding="utf-8", newline="") as handle:
+        return list(csv.DictReader(handle, delimiter="\t"))
+
+
+def _row(record: dict[str, str]) -> Row:
+    yes, no, other, total = (int(record[k]) for k in ("si", "no", "nulos_blancos", "total"))
+    return Row(yes, no, None, None, other, total)
+
+
+def provinces() -> dict[tuple[int, str], Row]:
+    """The province rows of the ministry's typed summary (the third page of SFMI-10.pdf)."""
+    return {(int(r["region"]), r["provincia"]): _row(r) for r in _table("consulta_1978_provincias.tsv")}
+
+
+def commune_rows() -> list[tuple[int, str, str, Row]]:
+    """The commune rows of El Cronista's reproduction (the first two pages of SFMI-10.pdf), in printed order."""
+    return [(int(r["region"]), r["provincia"], r["comuna"], _row(r)) for r in _table("consulta_1978_comunas.tsv")]
+
+
+def _sum(rows: list[Row]) -> Row:
+    other = sum(row.other or 0 for row in rows)
+    return Row(sum(r.yes for r in rows), sum(r.no for r in rows), None, None, other, sum(r.total for r in rows))
+
+
+def checked() -> tuple[dict[tuple[int, str], Row], list[tuple[int, str, str, Row]]]:
+    """Every count adds up: rows to their totals, communes to their provinces, provinces to the regions."""
+    above = provinces()
+    rows = commune_rows()
+    for region, province, commune, row in [*((r, p, "", row) for (r, p), row in above.items()), *rows]:
+        if row.yes + row.no + (row.other or 0) != row.total:
+            raise ValueError(f"1978 {region} {province} {commune}: counts do not add up to the printed total")
+    if len({fold(commune) for _, _, commune, _ in rows}) != len(rows):
+        raise ValueError("1978: two communes fold to the same code")
+    for (region, province), row in above.items():
+        below = _sum([r for g, p, _, r in rows if (g, p) == (region, province)])
+        if below != row:
+            raise ValueError(f"1978 {region} {province}: communes add up to {below}, not the printed {row}")
+    for region, row in V1978.items():
+        below = _sum([r for (g, _), r in above.items() if g == region])
+        if below != row:
+            raise ValueError(f"1978 region {region}: provinces add up to {below}, not the printed {row}")
+    return above, rows
+
+
+def communes() -> Package:
+    above, rows = checked()
+    day = CONSULTA
+    spec = ELECTIONS[day]
+    p = Package(
+        FINE,
+        SOURCE,
+        f"{spec.en} by commune and province, from the official results table",
+        depends=[f"{SOURCE}/{day}", "cl.servel/registry"],
+    )
+    p.external.add(CHILE)
+    source = p.id("source", day)
+    p.uses(raw.cached(SOURCE, RESULTS[day]))
+    for code, rank, noun in (
+        (PROVINCE_SCHEME, 2, "province or Santiago area count (1978 consultation)"),
+        (COMMUNE_SCHEME, 3, "commune count (1978 consultation)"),
+    ):
+        p.add("scheme", code=code, polity_id=CHILE, kind="precinct", rank=rank, noun=noun, code_system=None)
+
+    def within(region: int, province: str) -> str:
+        return servel.area("cl.region", str(MOVED.get((region, province), region)))
+
+    parents: dict[tuple[int, str], str] = {}
+    for region, province in above:
+        unit = p.id("unit", "province", day, region, province)
+        parents[(region, province)] = unit
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=CHILE,
+            scheme_code=PROVINCE_SCHEME,
+            code=f"{region}:{fold(province)}",
+            parent_id=p.id("unit", region),
+            area_relation="within",
+            area_id=within(region, province),
+            kind="standard",
+        )
+        label = province if region == 13 else f"Provincia de {province}"
+        p.name(unit, label, "es", "official")
+
+    contest = p.id("contest", day)
+    options = [p.id("option", day, position) for position in (1, 2)]
+    coarse = p.id("result_set", day)
+    result_set = p.id("result_set", day, "communes")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=p.id("election", day),
+        contest_id=contest,
+        stage="certified",
+        kind="counted",
+        source_id=source,
+        status="active",
+        is_default=True,
+        supersedes_id=coarse,
+        completeness=1.0,
+    )
+    p.add("note", id=p.id("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
+    p.add("outcome", result_set_id=result_set, option_id=options[0], kind="won")
+    values: list[tuple[str, str | None, int, int]] = []
+    for region, province, commune, row in rows:
+        unit = p.id("unit", "commune", day, region, commune)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=CHILE,
+            scheme_code=COMMUNE_SCHEME,
+            code=f"{region}:{fold(commune)}",
+            parent_id=parents[(region, province)],
+            area_relation="within",
+            area_id=within(region, province),
+            kind="standard",
+        )
+        p.name(unit, commune, "es", "official")
+        values += [(unit, options[0], 1, row.yes), (unit, options[1], 1, row.no), (unit, None, 3, row.total)]
+    for option, measure, value in ((options[0], 1, N1978.yes), (options[1], 1, N1978.no), (None, 3, N1978.total)):
+        p.add("declared", result_set_id=result_set, option_id=option, measure=measure, value=value)
+    p.frame(
+        "result_value",
+        pl.DataFrame(values, schema=["unit_id", "option_id", "measure", "value"], orient="row").with_columns(
+            result_set_id=pl.lit(result_set),
+            channel=pl.lit(0, pl.Int16),
+            count_round=pl.lit(0, pl.Int16),
+            flags=pl.lit(0, pl.Int16),
+            measure=pl.col("measure").cast(pl.Int16),
+        ),
+    )
+    return p
+
+
+METHOD = (
+    "Counts per commune from the Interior Ministry's official and final results table for the consultation of "
+    "4 January 1978, as the newspaper El Cronista reproduced it on 19 January 1978 (pages 22 and 23 and the "
+    "facing spread), keyed by hand. Each commune's 'SI', 'NO', null and blank, and total figures add up, the "
+    "communes add up to the province subtotals the newspaper prints, the provinces add up to the province rows of "
+    "the ministry's typed summary filed with the same reproduction, and those add up to the regional and national "
+    "totals: 4,177,064 'SI', 1,131,115 'NO', 258,109 null and blank, 5,566,288 in all. The table prints null and "
+    "blank ballots as one column, which this result set does not store, and the decree counted only 'SI' and 'NO' "
+    "votes. Communes are those of 1978, before the 1979-1981 reform of communes; each is placed within the present "
+    "region that contains its province (Arica in Arica y Parinacota, Valdivia in Los Ríos, Ñuble in Ñuble), with no "
+    "shape of its own. The province names are the ministry's: the newspaper heads Huasco 'Vallenar' and Llanquihue "
+    "'Puerto Montt'. The Santiago region is counted by the four areas of the city of Santiago and the departments "
+    "of Talagante (with area 4), Pedro Aguirre Cerda, Puente Alto, San Bernardo-Maipo, and Melipilla, as the "
+    "newspaper groups them; the ministry's summary heads the last two 'San Bernardo' and 'Maipo'. A dash in the "
+    "table is stored as zero."
+)
