@@ -1,4 +1,5 @@
 import html
+import json
 import re
 import struct
 import subprocess
@@ -90,9 +91,18 @@ PAPUA_FINAL = (
     COURT,
 )
 COUNTS = {2004: 32, 2009: 33}
+VOTES_2004 = (
+    "https://web.archive.org/web/20040611230329id_/http://www.kpu.go.id:80/suara/hasilsuara_dpd_sah.php",
+    (
+        "Hasil Perhitungan Suara Sah DPD: all provinces (KPU, kpu.go.id/suara/hasilsuara_dpd_sah.php, archived "
+        "11 June 2004)"
+    ),
+    KPU,
+)
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, VOTES_2004[0], suffix=".php")
     for url, _, _ in (E3_LIVE, PAPUA_INTERIM, PAPUA_FINAL):
         raw.fetch(SOURCE, url, suffix=".pdf")
     for url, suffix in ((E3[0], ".pdf"), (RULING[0], ".pdf"), (LIST_2004[0], ".htm")):
@@ -236,6 +246,12 @@ def parse() -> None:
     else:
         _members()
     papua_2009().write()
+    try:
+        raw.cached(SOURCE, VOTES_2004[0])
+    except LookupError:
+        pass
+    else:
+        votes_2004().write()
 
 
 def _members() -> None:
@@ -754,4 +770,153 @@ def papua_2009() -> Package:
             seats=1 if top else None,
         )
         p.add("result_value", **fact, result_set_id=revised, flags=DERIVED, value=int(str(row["votes"])))
+    return p
+
+
+# KPU's count of each candidate's votes in the 2004 DPD election, onto the contests and options that the changeset
+# above holds for the four members declared elected in each province. The ids file maps each province's code on KPU's
+# page to the contest, the reporting unit, and the options of those members (by ballot number) that production holds.
+ELECTION_2004 = "b05d3054-0285-5735-906e-c9478432b9ec"
+NATION = "518ec4bb-3c49-597a-9cb0-071beb1a090b"
+IDS_2004 = Path(__file__).with_name("kpu_dpd_2004_ids.json")
+VALID = 4  # result_value.measure: valid votes
+VOTES_2004_NOTE = (
+    "Each candidate's votes and the province's total of valid votes, as KPU's results page for the DPD election "
+    "showed them in June 2004, from the first archived copy of the page. The page lists every candidate of the "
+    "province in order of votes, with the ballot number, and marks the first four, who took the province's four "
+    "seats, in red. KPU's later list of the members declared elected (August 2004) is the certified set; it names "
+    "KH. Achmad Chalwani in Central Java where this page's first four include Drs. H. Dahlan Rais, M. Hum."
+)
+
+
+def _votes_page() -> dict[str, list[tuple[str, int, int, str]]]:
+    """The page's tables by province name: each candidate's name, ballot number, votes, and the marker color."""
+    text = raw.cached(SOURCE, VOTES_2004[0]).path.read_bytes().decode("cp1252")
+    tables: dict[str, list[tuple[str, int, int, str]]] = {}
+    for table in text.split("<tr bgcolor=FC9601>")[1:]:
+        name = re.search(r"color=white>([^<]+)</font>", table)
+        if name is None:
+            raise ValueError("province table without a name")
+        rows: list[tuple[str, int, int, str]] = []
+        total = None
+        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", table, re.DOTALL):
+            cells = [
+                html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+                for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
+            ]
+            color = re.search(r"color=(red|blue)>", row)
+            if len(cells) == 4 and cells[1].isdigit():
+                rows.append(
+                    (re.sub(r"\s+", " ", cells[0]), int(cells[1]), _figure(cells[2]), color[1] if color else "")
+                )
+            elif cells and cells[0] == "Total":
+                total = _figure(cells[1])
+        if total is None or sum(votes for _, _, votes, _ in rows) != total:
+            raise ValueError(f"{name[1]}: candidates do not sum to the printed total")
+        rows.append(("Total", 0, total, ""))
+        tables[name[1]] = rows
+    return tables
+
+
+def votes_2004() -> Package:
+    p = Package(
+        "id.kpu_dpd_early/dpd-2004-votes",
+        SOURCE,
+        "Each candidate's votes in the 2004 Regional Representative Council election in 32 provinces, from KPU's "
+        "results page",
+    )
+    ids = json.loads(IDS_2004.read_text())
+    tables = _votes_page()
+    if len(tables) != len(ids):
+        raise ValueError(f"{len(tables)} provinces on the page, {len(ids)} in the ids file")
+    url, title, publisher = VOTES_2004
+    source = p.id("source", url)
+    p.add(
+        "source",
+        id=source,
+        kind="official_body",
+        publisher=publisher,
+        title=title,
+        url=url,
+        license="Public record: official publication, no license stated",
+        license_url="https://www.kpu.go.id",
+    )
+    p.artifact(raw.cached(SOURCE, url), source)
+    p.external |= {INDONESIA, ELECTION_2004, NATION, "id.provinsi"}
+    for code, entry in sorted(ids.items()):
+        key = f"2004-04-05:dpd:{code}"
+        rows = tables[entry["name"]]
+        contest = entry["contest"]
+        unit = entry["unit"]
+        if unit is None:  # South Sulawesi together with West Sulawesi, created in October 2004
+            unit = p.id("unit", entry["unit_code"])
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=INDONESIA,
+                scheme_code="id.provinsi",
+                code=entry["unit_code"],
+                area_relation="within",
+                area_id=NATION,
+                kind="standard",
+            )
+            p.name(unit, "Sulawesi Selatan", "id", "official")
+            p.name(unit, "South Sulawesi, including West Sulawesi", "en", "english")
+        p.external |= {contest, unit} if entry["unit"] else {contest}
+        result_set = p.id("result_set", key, "official")
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=ELECTION_2004,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=source,
+            status="active",
+            is_default=True,
+            completeness=0,
+        )
+        p.add(
+            "note",
+            id=p.id("note", result_set, "methodology"),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=VOTES_2004_NOTE,
+            lang="en",
+        )
+        for ballot, number, votes, _ in rows:
+            fact: dict[str, object]
+            if ballot == "Total":
+                fact = {"unit_id": unit, "option_id": None, "channel": 0, "measure": VALID, "count_round": 0}
+            else:
+                option = entry["options"].get(str(number))
+                if option is None:
+                    tag = f"{key}:{number}"
+                    option = p.id("option", tag)
+                    person = p.id("person", tag)
+                    p.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=None,
+                        ballot_position=number,
+                        ballot_label=ballot,
+                    )
+                    p.add("person", id=person)
+                    p.name(person, ballot, "id", "official")
+                    p.add(
+                        "candidacy",
+                        id=p.id("candidacy", tag),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=ballot,
+                        is_independent=True,
+                    )
+                else:
+                    p.external.add(option)
+                fact = {"unit_id": unit, "option_id": option, "channel": 0, "measure": 1, "count_round": 0}
+            p.add("result_value", **fact, result_set_id=result_set, flags=0, value=votes)
+            p.add("value_locator", **fact, result_set_id=result_set, page_id=None, source_id=source)
     return p

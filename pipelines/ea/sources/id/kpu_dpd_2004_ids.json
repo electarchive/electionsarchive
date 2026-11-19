@@ -1,0 +1,386 @@
+{
+ "11": {
+  "contest": "6caae3c6-2f4e-5ee8-af39-5183d32025d0",
+  "name": "Nanggroe Aceh Darussalam",
+  "options": {
+   "26": "4a00bd95-3f8e-58ac-8d44-8b8c28d85d08",
+   "3": "7184f004-9334-563e-8eba-3b8c6692e97a",
+   "5": "a9678cdc-d335-505e-ad1c-e4a3c7d624a6",
+   "7": "c30a913a-c5fa-55b1-9fc6-9ecc42b5fc92"
+  },
+  "unit": "4da0812d-8bc2-5935-8ba2-682d129ab18d",
+  "unit_code": "11"
+ },
+ "12": {
+  "contest": "83f915f6-09d9-5c95-8599-c0d7008cc469",
+  "name": "Sumatera Utara",
+  "options": {
+   "30": "201b0364-4d8f-5c81-b781-56912a3d5e9d",
+   "44": "7177831d-fd83-5b95-9e40-311db6bd92f5",
+   "7": "4c4ade83-b8b6-502b-90e6-a66bc9f1f7b2",
+   "9": "958c4325-b8b7-5c7f-884c-bce81568f222"
+  },
+  "unit": "c6a19705-4ca7-53b9-9cfe-6785595da90d",
+  "unit_code": "12"
+ },
+ "13": {
+  "contest": "dc88c25f-c4e6-5f7c-a22d-b7dee6910653",
+  "name": "Sumatera Barat",
+  "options": {
+   "20": "1bc210a8-317a-5af9-b3f4-5db627c15954",
+   "4": "b9290994-547a-5a87-beb2-65cb304bc718",
+   "5": "a6728200-b70a-5858-acb2-41265b23bd8a",
+   "9": "9606a8e0-cfdc-553d-9a60-203124c6f897"
+  },
+  "unit": "5a471da7-bf54-5ec8-846d-629de9659a89",
+  "unit_code": "13"
+ },
+ "14": {
+  "contest": "699fe5d7-513c-5be5-8cc9-5c9b8e02a3ae",
+  "name": "Riau",
+  "options": {
+   "17": "f8c84988-a0f9-52c6-beda-0498c228d6dd",
+   "18": "005b3cc1-c014-5f1a-8e9a-710148abd77f",
+   "20": "63b5e902-a6dc-5417-b4c6-e43fd5926bfa",
+   "9": "cab6fafb-ffd8-55bf-9d37-717da7f86789"
+  },
+  "unit": "f439dc01-fc72-5edc-85de-fcbfd5222940",
+  "unit_code": "14"
+ },
+ "15": {
+  "contest": "221adb84-f9aa-588c-acd6-42acf4b80b9c",
+  "name": "Jambi",
+  "options": {
+   "11": "ebd0e93f-c531-5d7e-822e-08373b12db8f",
+   "14": "bb180ae1-bc6d-53b4-9029-874eb3450a27",
+   "4": "1ea44c90-cc37-586b-a6cd-8488a047e8b8",
+   "8": "18fc0a8d-1f12-5440-87b9-c2400271147d"
+  },
+  "unit": "b8e07c14-c221-5a7d-8753-e5dbbec74e87",
+  "unit_code": "15"
+ },
+ "16": {
+  "contest": "1e1ab2da-80fc-59bf-a7d6-2b9d29d213ef",
+  "name": "Sumatera Selatan",
+  "options": {
+   "14": "4e61ff7c-dd5f-5faa-a7b0-d8573a8f8581",
+   "20": "92efe4b1-e24d-5271-a57b-dba10ce3d754",
+   "4": "fa35a538-c2ee-5cdb-9b7e-7000e79fc95a",
+   "9": "aaf732a4-73ed-5dae-b1e5-fba6f5207817"
+  },
+  "unit": "481033aa-a214-5d90-9f14-947c6e9f5811",
+  "unit_code": "16"
+ },
+ "17": {
+  "contest": "788df7dc-5906-5670-879d-1d2aaf494c35",
+  "name": "Bengkulu",
+  "options": {
+   "1": "bb86a915-e91b-5947-a4fa-366f565dc137",
+   "10": "77da12b5-f8d1-5484-bd6a-821ce9a5b649",
+   "3": "7802c662-bc35-500b-90fa-7fd8611e8723",
+   "8": "da3671fe-5274-5bbc-9493-ed6ae15c27a8"
+  },
+  "unit": "48f70a9a-e825-5ef0-9a7a-8b32cf9edf74",
+  "unit_code": "17"
+ },
+ "18": {
+  "contest": "edc840d8-efa0-5705-8243-68a895588ffd",
+  "name": "Lampung",
+  "options": {
+   "10": "f46da192-6174-544f-9115-f7ecaeab888a",
+   "18": "668bef48-c818-56b7-a244-373425d3743c",
+   "20": "349c9856-769c-55ca-aefb-e0408b0b431f",
+   "33": "3ad5e17b-befb-5a2c-ab46-f1a23b91c3c9"
+  },
+  "unit": "819a427a-9d20-5084-a22c-ec21716d3979",
+  "unit_code": "18"
+ },
+ "19": {
+  "contest": "e704c819-06d6-5034-949f-68ce3960cd6f",
+  "name": "Bangka Belitung",
+  "options": {
+   "12": "fd27e469-b7ff-5e2d-be2d-919c6025c9e6",
+   "15": "4441c3d4-d3fc-5274-b69b-4eba8bee41eb",
+   "2": "d34f574d-46d0-53e3-b3af-bcdd63a55d81",
+   "3": "1bdd75a9-c434-5eb1-9136-2b9e75a9661f"
+  },
+  "unit": "883e119b-a2d6-5802-98e2-52e7bdff7116",
+  "unit_code": "19"
+ },
+ "20": {
+  "contest": "78c1ab02-b7e4-53c0-98dd-12d0833a8c48",
+  "name": "Kepulauan Riau",
+  "options": {
+   "1": "75b48cce-debc-5dd2-baed-e99253095410",
+   "13": "62828ec8-83ff-51c0-9c49-8567ba17105c",
+   "5": "f198668d-8db5-5b53-a174-fcab253249cc",
+   "9": "32daee07-3154-59e1-a86a-3f7daf936511"
+  },
+  "unit": "595435a1-7b13-5d73-acbc-390e2f671d05",
+  "unit_code": "21"
+ },
+ "31": {
+  "contest": "63bc959c-6f5e-5b5f-a438-dd8578510749",
+  "name": "DKI Jakarta",
+  "options": {
+   "15": "93abc087-fe79-5920-a1a0-b252210671a4",
+   "37": "eddc341c-80cd-5b1a-a214-f546b6062f11",
+   "5": "3d6167ad-22de-5460-a10c-d6d5c8cb7c9c",
+   "8": "24256f9b-352b-5d50-8c0f-7e08cff8ffc6"
+  },
+  "unit": "4ffcd5a3-e3d7-5223-a819-a39bc1ae29e6",
+  "unit_code": "31"
+ },
+ "32": {
+  "contest": "7a6cc172-42b8-57c2-b061-6db2b27f8fb7",
+  "name": "Jawa Barat",
+  "options": {
+   "13": "7df3e251-63cb-5043-ad04-4c8145e44018",
+   "22": "6a58d7ff-3671-5112-87eb-11e3e4135a79",
+   "26": "5366274c-b6a3-5f16-80cb-ac88a0dc61aa",
+   "5": "cbdca8f2-2205-5136-9642-41de40e8ea04"
+  },
+  "unit": "0d491542-395c-5a40-9003-b2185d28ab0b",
+  "unit_code": "32"
+ },
+ "33": {
+  "contest": "694498c2-02ba-5bd3-aea5-50f078ce5410",
+  "name": "Jawa Tengah",
+  "options": {
+   "15": "255d2813-b1af-55b3-a8b3-4053850954dd",
+   "4": "c470b524-28ca-5764-97e2-356a9b54652f",
+   "40": "5e94e65c-0800-5352-8eac-b52c94427e3d",
+   "47": "981ce4f6-4da0-5aa0-b437-ed5aa2c452ae"
+  },
+  "unit": "5d6067e7-e183-5169-aa4e-61b9f4647fe2",
+  "unit_code": "33"
+ },
+ "34": {
+  "contest": "1906e0b2-7e47-5e83-9fc4-8c7a7f1222ba",
+  "name": "DI Yogyakarta",
+  "options": {
+   "12": "eb5d2415-6b0d-563a-81c3-d69509604ace",
+   "26": "f8e42916-7216-54f1-babb-0eb29a8bd39e",
+   "28": "8ff5bca1-3afe-5172-ad76-2414c9e637e0",
+   "32": "d016899e-7b5d-5de7-9dae-5a019313f09f"
+  },
+  "unit": "47f1c28f-4457-584a-ba0d-590487e1262e",
+  "unit_code": "34"
+ },
+ "35": {
+  "contest": "b75e2e64-25d9-55cd-b5a8-d01afbd12567",
+  "name": "Jawa Timur",
+  "options": {
+   "13": "864a7ef5-254c-5ff0-af80-67742897cbf2",
+   "36": "d765b710-962c-549e-9920-c638805208a6",
+   "4": "bb4f175c-5049-5460-956d-63c9a0dfb832",
+   "44": "e2b4065f-f5de-5b51-8a8c-b31218fcb29c"
+  },
+  "unit": "ab31dca7-02fe-5166-9771-14d321385565",
+  "unit_code": "35"
+ },
+ "36": {
+  "contest": "32d51009-d719-5059-9b01-cd2b411fb473",
+  "name": "Banten",
+  "options": {
+   "16": "542d90f0-174f-5b72-b583-c19c36d13fb4",
+   "20": "0c2ec28b-ae42-5706-bea4-9dfb8341e6e9",
+   "5": "72009e8a-b9dd-5199-a164-ec59ef752172",
+   "9": "1bed47c4-2c68-56bb-b4f2-c7e77ed68d3d"
+  },
+  "unit": "4ec48434-0524-5c8e-8d90-5e675f2775df",
+  "unit_code": "36"
+ },
+ "51": {
+  "contest": "bb01171b-3612-5663-8047-2fe22cc05dc1",
+  "name": "Bali",
+  "options": {
+   "1": "c307a46f-9648-547d-a0ac-cda08df4a1fd",
+   "18": "52842a67-7951-51a0-bc85-ee0b314503b6",
+   "32": "b8a89db6-6075-54c0-9ccd-118a1f4f63a6",
+   "35": "806764af-cafb-53af-bc2b-9e7f49593328"
+  },
+  "unit": "577e9a87-ac41-5092-9ae0-c8d06f715fd1",
+  "unit_code": "51"
+ },
+ "52": {
+  "contest": "2efc8586-cdfb-53ac-ab8f-dd1393067820",
+  "name": "Nusa Tenggara Barat",
+  "options": {
+   "23": "76567b80-f0a4-5933-9d68-ca79eb9d9067",
+   "3": "04e2ec74-4a4c-5035-8eb1-b44a41d9432d",
+   "32": "90136ce0-2c61-5a6f-8e0a-6d57af79dae5",
+   "6": "a5e70d49-7fcf-53f5-9d47-cbd202dcf608"
+  },
+  "unit": "b69a6106-1108-5843-abca-99614867fde2",
+  "unit_code": "52"
+ },
+ "53": {
+  "contest": "4b8abb93-284f-5f97-9012-24850e569232",
+  "name": "Nusa Tenggara Timur",
+  "options": {
+   "19": "cbb2f2ba-0f9d-5099-9ca2-a6b40afa397c",
+   "4": "df9f04f7-2051-5742-9efe-968df51eb7cc",
+   "5": "99c02380-3f50-5781-b269-ae864ab4035e",
+   "6": "892f4eef-d05e-5e91-8de8-0e08bb46972a"
+  },
+  "unit": "16bc069c-330f-58af-bd0d-6f478b0a7db6",
+  "unit_code": "53"
+ },
+ "61": {
+  "contest": "f50db902-d5d0-599d-a09e-6b3c93f17972",
+  "name": "Kalimantan Barat",
+  "options": {
+   "10": "f175ecb7-65fd-53e1-8162-59dc379f1a68",
+   "16": "48c3293f-046f-5406-bebc-10accb98af5a",
+   "18": "1e1a3be4-b4f5-5e5c-8626-920b334d1250",
+   "20": "e5a5e51b-4776-5146-b40d-e2adc27bbe01"
+  },
+  "unit": "84e0464a-2390-59dc-8ba3-32176491bbbe",
+  "unit_code": "61"
+ },
+ "62": {
+  "contest": "4a6d0352-c8db-5ad3-9ead-b15856c8565a",
+  "name": "Kalimantan Tengah",
+  "options": {
+   "20": "c2fdb389-c773-5d66-96d0-f7413a186c59",
+   "23": "f54c9b44-138d-5d29-b4b2-84345d2c5f5b",
+   "24": "89e766a3-1333-56da-8a15-448eb397d0c7",
+   "6": "0edacc16-59b4-56e1-89e4-23a3e2a761a0"
+  },
+  "unit": "77a15bf6-9e70-51a7-8c8c-6f9f8974b560",
+  "unit_code": "62"
+ },
+ "63": {
+  "contest": "d7ca3f6a-2b1a-54f6-8578-830c8a9a80de",
+  "name": "Kalimantan Selatan",
+  "options": {
+   "1": "6f77addc-d2d0-500e-951e-cfd8b8ceea8d",
+   "2": "8938d75a-22d8-56b4-808f-157736238338",
+   "20": "0b01e508-5a0f-5a9c-a90e-09dd55dfccba",
+   "6": "cc38b8ab-4493-507a-9853-e90752d40c35"
+  },
+  "unit": "37a7253a-2dbd-58ee-8bba-59fb52dfa69a",
+  "unit_code": "63"
+ },
+ "64": {
+  "contest": "d2be1647-abed-5972-9fac-555ab3169859",
+  "name": "Kalimantan Timur",
+  "options": {
+   "10": "1664fa7f-d2c3-5795-b190-f371aa178a01",
+   "19": "9746cb57-b32d-545d-9378-8d2786effc27",
+   "2": "2f4226dd-1bfe-5d5c-8ca1-353b1b883398",
+   "6": "5acd25f7-454f-553e-ac28-b017ebc7ed97"
+  },
+  "unit": "e8c35ebe-5bca-51c9-9628-76d4b85c572f",
+  "unit_code": "64+65"
+ },
+ "71": {
+  "contest": "b1c2394e-cff4-5efd-82b8-f1bbe2a9d954",
+  "name": "Sulawesi Utara",
+  "options": {
+   "12": "7519986e-5ab4-51d3-88dc-7090b93f4644",
+   "13": "c57d3faf-0927-59e8-b137-407659a2b8a9",
+   "2": "4197b414-9eff-5f47-843a-10cd805a810c",
+   "31": "d650a770-04f5-5a09-a23e-c9f63182e4ae"
+  },
+  "unit": "5ba50a6f-c750-5567-8351-415c3a2a4ba6",
+  "unit_code": "71"
+ },
+ "72": {
+  "contest": "19f72bf0-77da-572b-b689-5e9d6c2427c3",
+  "name": "Sulawesi Tengah",
+  "options": {
+   "10": "bce8c1d9-0bc0-5849-94a4-d6c50482ec5f",
+   "15": "4dd3351e-5fef-52dd-8cad-9a70ca1169f2",
+   "20": "45fd26ec-13f1-575b-a64d-a9da677aa2a1",
+   "5": "f23bd4b4-81f8-5934-84ff-9a433c25d48c"
+  },
+  "unit": "e9e23951-02ce-5a11-b900-ab69d0ec3c55",
+  "unit_code": "72"
+ },
+ "73": {
+  "contest": "339d2d45-d3d9-5dc4-aec1-553b002f65f2",
+  "name": "Sulawesi Selatan",
+  "options": {
+   "31": "103a2f16-a955-577f-b465-bbfc69b597b0",
+   "33": "da5636b9-615a-528e-9cf5-d6abb9bfb445",
+   "34": "0646084a-0165-5e8e-a4e2-47a9333f8fa2",
+   "41": "c26f952b-3bdd-5810-b42a-e4925334dbf1"
+  },
+  "unit": null,
+  "unit_code": "73+76"
+ },
+ "74": {
+  "contest": "edc266f7-1970-50a0-9bc4-f645924e3a8d",
+  "name": "Sulawesi Tenggara",
+  "options": {
+   "1": "7cd386bb-db25-5622-9d94-2e55139ebf18",
+   "4": "457810ef-b84b-5ac5-9aec-94532f40b1b7",
+   "6": "ab732fec-73f3-5b2d-bc96-cc6c205d41d3",
+   "8": "b310206e-653c-5225-8869-4a2a58335693"
+  },
+  "unit": "ed721e6e-32df-5f4a-907a-749410258421",
+  "unit_code": "74"
+ },
+ "75": {
+  "contest": "7acb229d-a2aa-5dad-b52f-2bb4a8891712",
+  "name": "Gorontalo",
+  "options": {
+   "10": "d23b2678-648c-5eb7-a95a-7dbe702cd82a",
+   "11": "abe67200-cfeb-5a23-97b1-54acc038692a",
+   "20": "864469ca-9654-5403-b9dd-72469e944a70",
+   "3": "837ebc16-e0da-5133-a5ca-b7a96de01127"
+  },
+  "unit": "e7e75d8f-4754-56ea-813e-0aca3ed2a8fb",
+  "unit_code": "75"
+ },
+ "81": {
+  "contest": "c362387b-0802-5050-9922-51ca5314b6b4",
+  "name": "Maluku",
+  "options": {
+   "2": "e9308de3-e28e-5104-8c41-a53f7df0f302",
+   "21": "ecbbfbc9-500d-52d4-9b24-3425f487a2b0",
+   "23": "a5ecf5df-2b5f-525f-9f2a-b380ddedbe3e",
+   "6": "fc4fd916-d5c5-575f-b36e-bf205a42731f"
+  },
+  "unit": "2829a9e2-8a99-549a-a10a-61f6503fdcd5",
+  "unit_code": "81"
+ },
+ "82": {
+  "contest": "d100fc1f-609d-5dc3-b5c2-5eaf5d309e1e",
+  "name": "Maluku Utara",
+  "options": {
+   "1": "7146f989-c9cd-51ec-a5f6-b7747c413e5c",
+   "12": "d0deb2b2-b145-5d04-8f82-be3c6cbaf47d",
+   "4": "2266263c-7017-52b7-9b48-85148b108328",
+   "6": "8f01509d-f77e-596e-a196-9bc007f7ce54"
+  },
+  "unit": "50efc6ea-e850-5360-a111-7891b514aca1",
+  "unit_code": "82"
+ },
+ "91": {
+  "contest": "7f3a29dc-3334-5e26-b49f-77e58190fc65",
+  "name": "Irian Jaya Barat",
+  "options": {
+   "1": "b0815c75-1ce3-5589-b3f2-01de275097c9",
+   "2": "68211b4f-d566-5e21-9fb0-a8f7d7225eef",
+   "3": "d68b05cc-4bc3-52ff-951a-c5db545f7db0",
+   "4": "6cf4635a-4959-58ef-a89c-6e170c23daf4"
+  },
+  "unit": "d05463a9-939b-5664-a699-0efac8a890d5",
+  "unit_code": "92+96"
+ },
+ "94": {
+  "contest": "050d9686-a148-5a09-95ec-b9fe84968f5b",
+  "name": "Papua",
+  "options": {
+   "11": "119ef491-3c8f-57bd-ad70-296a54cf4917",
+   "6": "de13cc10-3d9b-57b4-8d8d-8a2a2cb363a7",
+   "7": "cb510f27-6423-599a-ab04-23ba09d8f3d4",
+   "8": "1acff267-7f60-5cd2-b1af-9d40d6518b91"
+  },
+  "unit": "3c75eaab-b7df-5cf1-8320-a458d8f38472",
+  "unit_code": "91+93+94+95"
+ }
+}
