@@ -192,10 +192,11 @@ def _suffix(url: str) -> str:
 
 
 def fetch() -> None:
-    from ea.sources.au import aec_cd, aec_pages
+    from ea.sources.au import aec_cd, aec_handbook, aec_pages
 
     aec_cd.fetch()
     aec_pages.fetch()
+    aec_handbook.fetch()
     fetch_html()
     for event in EVENTS:
         if event.id in HTML_ONLY:
@@ -1187,7 +1188,9 @@ def days() -> list[date]:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in days())]
+    from ea.sources.au import aec_handbook
+
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in days()), *aec_handbook.packages()]
 
 
 def _cited(event: Event) -> list[str]:
@@ -1277,10 +1280,13 @@ def build(day: date) -> Package:
 
 
 def parse() -> None:
+    from ea.sources.au import aec_handbook
+
     geo().write()
     registry().write()
     for day in days():
         build(day).write()
+    aec_handbook.parse()
 
 
 def emit() -> None:
