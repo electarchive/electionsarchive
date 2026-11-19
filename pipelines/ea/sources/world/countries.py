@@ -5,7 +5,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "world.countries"
-VERSION = "3"
+VERSION = "4"
 COUNTRIES: dict[str, tuple[str, list[tuple[str, str]]]] = {
     "AL": ("Q222", [("sq", "Shqipëria")]),
     "AM": ("Q399", [("hy", "Հայաստան")]),
@@ -84,6 +84,26 @@ COUNTRIES: dict[str, tuple[str, list[tuple[str, str]]]] = {
 
 
 POLITIES: dict[str, tuple[str, str | None, str, list[tuple[str, str]], str, str, str | None]] = {
+    "PK-KP": (
+        "federal_unit",
+        "PK",
+        "Khyber Pakhtunkhwa",
+        [("ps", "خیبر پښتونخوا"), ("ur", "خیبر پختونخوا")],
+        "1947-08-14",
+        "day",
+        None,
+    ),
+    "PK-PB": ("federal_unit", "PK", "Punjab", [("ur", "پنجاب")], "1947-08-14", "day", None),
+    "PK-SD": ("federal_unit", "PK", "Sindh", [("sd", "سنڌ"), ("ur", "سندھ")], "1947-08-14", "day", None),
+    "PK-BA": (
+        "federal_unit",
+        "PK",
+        "Balochistan",
+        [("bal", "بلوچستان"), ("ur", "بلوچستان")],
+        "1970-07-01",
+        "day",
+        None,
+    ),
     "CY-NC": (
         "de_facto_state",
         "CY",
