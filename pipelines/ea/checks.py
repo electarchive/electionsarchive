@@ -75,7 +75,7 @@ class Stage:
     tables: dict[str, list[str]]
     entities: set[str]
     pipeline: str
-    polity: str
+    polity: str | None
     temporal: dict[str, list[str]]
     parents: dict[str, str]
     owners: dict[str, str]
@@ -858,7 +858,9 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
         )
     for table, columns in stage.tables.items():
         entity = sql.SQL("s.id" if table in stage.entities and "id" in columns else "null::uuid")
-        if "polity_id" in columns and table != "polity_parent":
+        # A changeset scoped to no polity (world.countries and other cross-country pipelines) has no
+        # country to confine its polity rows to, so only a country-scoped changeset is checked.
+        if stage.polity is not None and "polity_id" in columns and table != "polity_parent":
             queries.append(
                 (
                     "scope.polity",
