@@ -65,8 +65,33 @@ PAGES_2012 = {
     "98": "20180730121413id_/http://www4.cne.gob.ve:80/resultado_presidencial_2012/r/0/reg_980000.html",
 }
 PAGES_2013 = {
-    "00": "20240728022606id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_000000.html",
-    "01": "20240411112458id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_010000.html",
+    "00": "20130502075216id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_000000.html",
+    "01": "20130914090033id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_010000.html",
+    "02": "20240411112813id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_020000.html",
+    "03": "20240411112510id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_030000.html",
+    "04": "20230204193913id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_040000.html",
+    "05": "20240411112602id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_050000.html",
+    "06": "20240411112635id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_060000.html",
+    "07": "20240411112533id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_070000.html",
+    "08": "20240411112502id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_080000.html",
+    "09": "20240411112527id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_090000.html",
+    "10": "20240411112458id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_100000.html",
+    "11": "20240411112639id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_110000.html",
+    "12": "20240411112819id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_120000.html",
+    "13": "20240411112537id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_130000.html",
+    "14": "20240411112645id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_140000.html",
+    "15": "20240411112637id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_150000.html",
+    "16": "20240411112644id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_160000.html",
+    "17": "20240411112641id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_170000.html",
+    "18": "20240411112948id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_180000.html",
+    "19": "20240411112648id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_190000.html",
+    "20": "20240411112533id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_200000.html",
+    "21": "20231118003000id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_210000.html",
+    "22": "20240411112611id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_220000.html",
+    "23": "20240411112500id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_230000.html",
+    "24": "20240411112718id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_240000.html",
+    "98": "20130914095605id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/0/reg_980000.html",
+    "99": "20220518122041id_/http://www.cne.gob.ve/resultado_presidencial_2013/r/1/reg_990000.html",
 }
 VENEZUELA = str(uuid5(package.NAMESPACE, "polity\x1fVE"))
 TERRITORY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fVEN"))
@@ -828,8 +853,8 @@ def e2013(p: Package) -> None:
         p,
         2013,
         pages(2013),
-        "The archive holds only the page of the Capital District; the pages of the 23 states and the votes abroad "
-        "were not reachable.",
+        "The national page is a snapshot of 2 May 2013 and the unit pages are snapshots of various dates, so the "
+        "national figures need not equal the sum of the units'.",
     )
 
 
@@ -855,7 +880,7 @@ SUMMARIES = {
     2000: "The 30 July 2000 presidential election by state and abroad",
     2006: "The 3 December 2006 presidential election by state and abroad",
     2012: "The 7 October 2012 presidential election by state, with the national total",
-    2013: "The 14 April 2013 presidential election: the national total and the Capital District",
+    2013: "The 14 April 2013 presidential election by state and abroad, with the national total",
     2018: "The 20 May 2018 presidential election: the national total",
 }
 COMMON = (
@@ -886,10 +911,11 @@ METHODS = {
     "units of their own. The pages of Lara, Portuguesa, and Sucre were not reachable. Registered voters are the "
     "electors expected, and ballots cast are the votes counted (valid and null). Votes by municipality, parish, "
     "voting center, and table are not stored. Hugo Chávez was proclaimed the winner.",
-    2013: COMMON
-    + "The source is the divulgation site's national page and its page of the Capital District, as snapshots; "
-    "the other states' pages were not reachable. Registered voters are the electors expected, and ballots "
-    "cast are the votes counted (valid and null). Nicolás Maduro was proclaimed the winner.",
+    2013: COMMON + "The source is the divulgation site's national page and the pages of the 24 first-level units, as "
+    "snapshots captured on various dates, with the embassies and the remote zones (zonas inhóspitas) as units "
+    "of their own. Registered voters are the electors expected, and ballots cast are the votes counted (valid "
+    "and null). Votes by municipality, parish, voting center, and table are not stored. Nicolás Maduro was "
+    "proclaimed the winner.",
     2018: COMMON
     + "The source is the divulgation page updated on 28 May 2018, which prints the national total of the two "
     "candidates whom it lists, Nicolás Maduro, who is marked as awarded the office, and Henri Falcón, "
