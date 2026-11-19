@@ -170,7 +170,9 @@ def judge(
     while stack:
         x = stack.pop()
         for y in placed:
-            if y.id not in reached and (x.areas & y.areas or any(p.national and len(p.areas) >= HUB for p in (x, y))):
+            if y.id not in reached and (
+                x.areas & y.areas or (x.national or y.national) and max(len(x.areas), len(y.areas)) >= HUB
+            ):
                 reached.add(y.id)
                 stack.append(y)
     if len(reached) < len(placed):
