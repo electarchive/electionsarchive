@@ -1,4 +1,4 @@
-"""Tucumán provincial elections of 2007, 2011, and 2015 from the Junta Electoral's published count sheets."""
+"""Tucumán provincial elections of 2007, 2011, 2015, 2019, and 2023 from the Junta Electoral's published count sheets."""
 
 import functools
 import json
@@ -10,7 +10,8 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
-from urllib.parse import unquote, urljoin
+from time import sleep
+from urllib.parse import quote, unquote, urljoin
 from uuid import uuid5
 
 import httpx
@@ -42,11 +43,20 @@ EXTRA_2015 = (
     f"{SITE}/wp-content/uploads/2015_ComComunal_SanPablo_Lules_Definitivo.pdf",
 )
 MESAS_2015 = f"{SITE}/wp-content/uploads/2015_escrutinio_mesa_a_mesa_capital.pdf"
+PAGE_2019 = f"{SITE}/elecciones-generales-2019/"
+PAGE_2023 = f"{SITE}/elecciones-generales-2023/"
+ELECTED_2023 = f"{SITE}/wp-content/uploads/2023_tucuman_electos_web.pdf"
 GEOBOUNDARIES = "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/ARG"
 ARGENTINA = str(uuid5(package.NAMESPACE, "polity\x1fAR"))
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fARG"))
 PROVINCE = "AR-T"
-DAYS = {2007: date(2007, 8, 26), 2011: date(2011, 8, 28), 2015: date(2015, 8, 23)}
+DAYS = {
+    2007: date(2007, 8, 26),
+    2011: date(2011, 8, 28),
+    2015: date(2015, 8, 23),
+    2019: date(2019, 6, 9),
+    2023: date(2023, 6, 11),
+}
 
 
 def key(kind: str, *parts: object) -> str:
@@ -88,11 +98,36 @@ def _text(path: Path) -> str:
 def _links(page: str, pattern: str) -> list[str]:
     html = raw.cached(SOURCE, page).path.read_bytes().decode("utf-8", "replace")
     found = re.findall(r'href="([^"]+)"', html)
-    return sorted({urljoin(page, link) for link in found if re.search(pattern, link)})
+    return sorted({quote(urljoin(page, link), safe=":/%()") for link in found if re.search(pattern, link)})
+
+
+def urls_2019() -> list[str]:
+    """The 2019 results page's definitive count sheets and mesa-by-mesa files."""
+    return _links(PAGE_2019, r"2019 Elecciones/Resultados/.*\.pdf$")
+
+
+def urls_2023() -> list[str]:
+    """The 2023 results page's definitive count PDFs (one per section or department) and mesa-by-mesa files."""
+    return _links(PAGE_2023, r"uploads/(?:[A-Z-]+-Resultados-Generales|2023_mesa_a_mesa_\w+)\.pdf$")
+
+
+def is_mesa_file(url: str) -> bool:
+    return "Mesas-" in url or "mesa_a_mesa" in url
 
 
 def urls_2015() -> list[str]:
     return [*_links(PAGE_2015, r"Resultados2015/.*\.pdf$"), *EXTRA_2015]
+
+
+def _fetch_pdf(url: str) -> None:
+    """Fetches one PDF, waiting and trying again when the site answers with its holding page instead of the file."""
+    for attempt in range(4):
+        try:
+            raw.fetch(SOURCE, url, suffix=".pdf", check=_pdf)
+            return
+        except (ValueError, httpx.HTTPError) as failure:
+            print(f"{url}: {failure}", flush=True)
+            sleep(5 * (attempt + 1))
 
 
 def fetch() -> None:
@@ -110,6 +145,11 @@ def fetch() -> None:
         except httpx.HTTPStatusError as failure:
             print(f"{url}: {failure.response.status_code}", flush=True)
     raw.fetch(SOURCE, MESAS_2015, suffix=".pdf", check=_pdf)
+    for page in (PAGE_2019, PAGE_2023):
+        raw.fetch(SOURCE, page, suffix=".html")
+    raw.fetch(SOURCE, ELECTED_2023, suffix=".pdf", check=_pdf)
+    for url in (*urls_2019(), *urls_2023()):
+        _fetch_pdf(url)
     for level in ("ADM1", "ADM2"):
         raw.fetch(SOURCE, f"{GEOBOUNDARIES}/{level}/geoBoundaries-ARG-{level}_simplified.geojson", suffix=".geojson")
 
@@ -249,6 +289,37 @@ def sheets_2011() -> list[Sheet]:
     return out
 
 
+def sheets_in(file: str, year: int, text: str) -> list[Sheet]:
+    """Reads every count sheet in a PDF: the page numbered 1 starts a sheet and the pages after it continue it."""
+    groups: list[list[str]] = []
+    for page in text.split("\f"):
+        if re.search(r"Paginas:[ \t]*1[ \t]*$", page, re.MULTILINE):
+            groups.append([page])
+        elif page.strip():
+            if not groups:
+                raise ValueError(f"{file}: a page with no sheet heading")
+            groups[-1].append(page)
+    return [sheet(file, year, "\f".join(group)) for group in groups]
+
+
+@functools.cache
+def sheets_2019() -> list[Sheet]:
+    out = []
+    for url in urls_2019():
+        if not is_mesa_file(url):
+            out.extend(sheets_in(unquote(url.rsplit("/", 1)[1]), 2019, _text(raw.cached(SOURCE, url).path)))
+    return out
+
+
+@functools.cache
+def sheets_2023() -> list[Sheet]:
+    out = []
+    for url in urls_2023():
+        if not is_mesa_file(url):
+            out.extend(sheets_in(unquote(url.rsplit("/", 1)[1]), 2023, _text(raw.cached(SOURCE, url).path)))
+    return out
+
+
 def sheet_2007(file: str, text: str, category: str, section: str | None) -> Sheet:
     """Reads a 2007 sheet, which prints electors, ballots cast, and each list's votes beside its head candidate."""
     registered = re.search(r"TOTAL ELECTORES:\s*([\d.]+)", text)
@@ -315,32 +386,36 @@ class MesaCount:
 
 @dataclass
 class Mesa:
-    """One polling table's count in the capital: its circuit and, per category, each list's votes and the totals."""
+    """One polling table's count: where it sits and, per category, each list's votes and the totals."""
 
     number: int
-    circuit: str
     voters: int
     envelopes: int
+    section: str = ""
+    department: str = ""
+    jurisdiction: str = ""
+    circuit: str = ""
     categories: dict[str, MesaCount] = field(default_factory=dict)
 
 
-PAGE_NOISE = re.compile(r"^\s*(Fecha:|Junta Electoral Provincial|ELECCIONES PROVINCIALES|TUCUMAN\s*$)")
+PAGE_NOISE = re.compile(
+    r"^\s*(Fecha:|Junta Electoral Provincial|ELECCIONES PROVINCIALES|TUCUMAN\s*$|Paginas:|Hora:)", re.IGNORECASE
+)
 MESA_HEAD = re.compile(
     r"^\s*MESA\s*:\s*(\d+)\s+VOTANTES\s*:\s*(\d+)\s+SOBRES\s*:\s*(\d+)\s+DIFERENCIA\s*:\s*(-?\d+)\s*$"
 )
-MESA_PLACE = re.compile(
-    r"^\s*SECCION\s*:\s*CAPITAL\s+DEPARTAMENTO\s*:\s*CAPITAL\s*$|"
-    r"^\s*JURISDICCION\s*:\s*Municipio SAN MIGUEL DE TUCUMAN\s+CIRCUITO\s*:\s*(\w+)\s*$"
-)
+MESA_SECTION = re.compile(r"^\s*SECCION\s*:\s*(\w*)\s+DEPARTAMENTO\s*:\s*(.*?)\s*$")
+MESA_PLACE = re.compile(r"^\s*JURISDICCION\s*:\s*(.*?)\s+CIRCUITO\s*:\s*(\w+)\s*$")
 MESA_ENTRY = re.compile(r"^\s*(\d+) - (\S.*?)\s+(\d+)\s*$")
 MESA_TOTALS = {"VOTOS POSITIVOS": "positive", "VOTOS EN BLANCO": "blank", "VOTOS NULOS": "null", "VOTOS TOTAL": "total"}
 
 
 def mesa_sheets(file: str, text: str) -> list[Mesa]:
-    """Reads the capital's mesa-by-mesa count: four categories per table, each checked against its own totals."""
+    """Reads a mesa-by-mesa count: a block per table, each category checked against its own totals."""
     out: list[Mesa] = []
     mesa: Mesa | None = None
     count_: MesaCount | None = None
+    first_word = ""
     for line in text.splitlines():
         if not line.strip() or PAGE_NOISE.match(line) or "LISTA" in line and "VOTOS" in line and "TOTAL" not in line:
             continue
@@ -348,20 +423,27 @@ def mesa_sheets(file: str, text: str) -> list[Mesa]:
         if head:
             if mesa is not None:
                 _close(file, mesa)
-            mesa = Mesa(int(head.group(1)), "", int(head.group(2)), int(head.group(3)))
+            mesa = Mesa(int(head.group(1)), int(head.group(2)), int(head.group(3)))
             out.append(mesa)
             count_ = None
             continue
         if mesa is None:
             raise ValueError(f"{file}: text before the first table: {line!r}")
+        section = MESA_SECTION.match(line)
+        if section:
+            mesa.section, mesa.department = section.group(1), section.group(2)
+            continue
         place = MESA_PLACE.match(line)
         if place:
-            if place.group(1):
-                mesa.circuit = place.group(1)
+            mesa.jurisdiction, mesa.circuit = place.group(1), place.group(2)
             continue
-        category = re.match(r"^\s*CATEGORIA\s*:\s*(\w+)\s*$", line)
+        if line.strip() == "COMISIONADO":  # the heading "COMISIONADO COMUNAL" wraps, its first word above the label
+            first_word = "COMISIONADO "
+            continue
+        category = re.match(r"^\s*CATEGORIA\s*:\s*(\w+(?: \w+)?)\s*$", line)
         if category:
-            name = CATEGORIES[category.group(1)]
+            name = CATEGORIES[first_word + category.group(1)]
+            first_word = ""
             count_ = mesa.categories[name] = MesaCount()
             continue
         if count_ is None:
@@ -381,7 +463,7 @@ def mesa_sheets(file: str, text: str) -> list[Mesa]:
 
 
 def _close(file: str, mesa: Mesa) -> None:
-    if not mesa.circuit or set(mesa.categories) != {"gobernador", "legislador", "intendente", "concejal"}:
+    if not mesa.circuit or not mesa.section or not mesa.categories:
         raise ValueError(f"{file}: mesa {mesa.number} is incomplete")
     for name, c in mesa.categories.items():
         if sum(v for _, _, v in c.lists) != c.positive or c.positive + c.blank + c.null != c.total:
@@ -389,10 +471,20 @@ def _close(file: str, mesa: Mesa) -> None:
 
 
 @functools.cache
-def mesas_2015() -> list[Mesa]:
-    if MESAS_2015 not in raw.keys(SOURCE):
-        return []
-    out = mesa_sheets("capital", _text(raw.cached(SOURCE, MESAS_2015).path))
+def mesas(year: int) -> list[Mesa]:
+    """Every polling table's count the Junta published for one election."""
+    if year == 2015:
+        urls = [MESAS_2015] if MESAS_2015 in raw.keys(SOURCE) else []
+    else:
+        urls = [u for u in (urls_2019() if year == 2019 else urls_2023() if year == 2023 else []) if is_mesa_file(u)]
+    # A section's count can run over several files (Capital-1, Capital-2), with a table split across the cut.
+    files: dict[str, list[str]] = defaultdict(list)
+    for url in urls:
+        files[re.sub(r"-\d(?=\.pdf$)", "", url)].append(url)
+    out: list[Mesa] = []
+    for name, parts in files.items():
+        text = "\n".join(_text(raw.cached(SOURCE, url).path) for url in sorted(parts))
+        out.extend(mesa_sheets(unquote(name.rsplit("/", 1)[1]), text))
     if len({m.number for m in out}) != len(out):
         raise ValueError("a mesa number repeats")
     return out
@@ -430,6 +522,8 @@ def department(s: Sheet) -> str | None:
     """The department a municipal or communal sheet belongs to, from its file's folder or name."""
     if s.category in ("gobernador", "legislador"):
         return None
+    if s.year >= 2019:
+        return DEPARTMENT_OF[plain(s.department or "")]
     if s.year == 2011:
         return DEPARTMENT_OF[plain(s.file.split("/")[1])]
     extra = re.match(r"2015_ComComunal_(.+?)_(?:Acumulado)?Definitivo", s.file)
@@ -506,7 +600,31 @@ def places() -> dict[tuple[str, str, str], Place]:
             if len(longest) > len(name) and len(name) < 25:
                 raise ValueError(f"{name!r} is a short prefix of {longest!r}")
             out[(dept, kind, name)] = Place(dept, kind, title(longest))
+    for ss in (sheets_2019(), sheets_2023()):
+        for s in ss:
+            if s.place and s.category not in ("gobernador", "legislador"):
+                dept, kind, name = str(department(s)), (s.kind or "").lower(), label(s.place)
+                if (dept, kind, name) in out:
+                    continue
+                if (dept, kind, name) in PLACE_ALIAS:
+                    out[(dept, kind, name)] = out[(dept, kind, PLACE_ALIAS[(dept, kind, name)])]
+                else:
+                    out[(dept, kind, name)] = Place(dept, kind, title(name))
     return out
+
+
+# The Junta spells some communes differently from 2019 on than it did in 2011 and 2015: the same word order changed, a
+# word was added, or a word was dropped. Each is the only commune of its department that appears in one period and not
+# the other, so the later spelling folds into the earlier place and its code stays the same.
+PLACE_ALIAS = {
+    ("burruyacu", "comuna", "BENJAMIN ARAOZ Y EL TAJAMAR"): "EL TAJAMAR Y VILLA BENJAMIN ARA",
+    ("burruyacu", "comuna", "GOBERNADOR GARMENDIA"): "GARMENDIA",
+    ("chicligasta", "comuna", "LA TRINIDAD"): "TRINIDAD",
+    ("chicligasta", "comuna", "MEDINAS"): "MEDINA",
+    ("cruz_alta", "comuna", "EL BRACHO Y EL CEVILAR"): "EL BRACHO",
+    ("monteros", "comuna", "LEON ROUGES Y SANTA ROSA"): "SANTA ROSA Y LEON ROUGES",
+    ("monteros", "comuna", "SUBTENIENTE BERDINA"): "TENIENTE BERDINA",
+}
 
 
 def place_of(s: Sheet) -> Place:
@@ -528,7 +646,7 @@ class Member:
     party: str
 
 
-ELECTED_URL = {2011: ELECTED_2011, 2015: ELECTED_2015}
+ELECTED_URL = {2011: ELECTED_2011, 2015: ELECTED_2015, 2023: ELECTED_2023}
 # Graneros' 2015 mayoral sheet carries a governor heading, so the count is not loaded and its proclamation has no contest.
 NO_CONTEST = {(2015, ("intendente", "graneros:municipio:graneros"))}
 SEATED = ("legislador", "concejal", "comisionado")
@@ -543,7 +661,7 @@ def proclaimed_blocks(text: str) -> list[tuple[str, list[Member]]]:
         if heading:
             blocks.append((heading.group(1), []))
             continue
-        entry = re.match(r"^\s*(\d+)\s+(.*?)\s+(?:\d{6,9}\s+)?(\d+)\s+(\S.*?)\s*$", line)
+        entry = re.match(r"^\s*(\d+)\s+(.*?)\s+(?:\d{6,9}\s+){0,2}(\d+)\s+(\S.*?)\s*$", line)
         if entry and blocks:
             name = entry.group(2).strip()
             blocks[-1][1].append(
@@ -753,14 +871,8 @@ def mayor(place: Place) -> str:
     return key("office", place.kind, place.code)
 
 
-@functools.cache
-def party_names() -> dict[int, list[str]]:
-    """Each party number's distinct names across the sheets, with a truncated spelling folded into its full one."""
-    seen: dict[int, set[str]] = defaultdict(set)
-    for ss in (sheets_2007(), sheets_2011(), sheets_2015()):
-        for s in ss:
-            for number, name, _, _ in s.lists:
-                seen[number].add(name)
+def _fold(seen: dict[int, set[str]]) -> dict[int, list[str]]:
+    """Each number's distinct names, with a truncated spelling folded into its full one."""
     out: dict[int, list[str]] = {}
     for number, names in seen.items():
         folded: dict[str, str] = {}
@@ -771,11 +883,42 @@ def party_names() -> dict[int, list[str]]:
     return out
 
 
+def _matches(number: int, name: str, known: dict[int, list[str]]) -> bool:
+    return any(
+        plain(full).startswith(plain(name)) or plain(name).startswith(plain(full)) for full in known.get(number, [])
+    )
+
+
+@functools.cache
+def party_names() -> dict[int, list[str]]:
+    """Each party number's distinct names across the 2007, 2011, and 2015 sheets. Their ids stay as they were first
+    published, so later elections add to this set and never rename it."""
+    seen: dict[int, set[str]] = defaultdict(set)
+    for ss in (sheets_2007(), sheets_2011(), sheets_2015()):
+        for s in ss:
+            for number, name, _, _ in s.lists:
+                seen[number].add(name)
+    return _fold(seen)
+
+
+@functools.cache
+def later_party_names() -> dict[int, list[str]]:
+    """The names on the 2019 and 2023 sheets that no earlier name of the same number covers."""
+    seen: dict[int, set[str]] = defaultdict(set)
+    for ss in (sheets(2019), sheets(2023)):
+        for s in ss:
+            for number, name, _, _ in s.lists:
+                if not _matches(number, name, party_names()):
+                    seen[number].add(name)
+    return _fold(seen)
+
+
 def party(number: int, name: str) -> str:
     """The party id for a printed list name: the longest spelling of that number's name that it prefixes."""
-    for full in party_names()[number]:
-        if plain(full).startswith(plain(name)) or plain(name).startswith(plain(full)):
-            return key("party", number, plain(full))
+    for known in (party_names(), later_party_names()):
+        for full in known.get(number, []):
+            if plain(full).startswith(plain(name)) or plain(name).startswith(plain(full)):
+                return key("party", number, plain(full))
     raise KeyError((number, name))
 
 
@@ -784,7 +927,7 @@ def registry() -> Package:
         f"{SOURCE}/registry",
         SOURCE,
         "Tucumán's legislature, governorship, municipal councils and mayoralties, communal commissions, and the "
-        "parties and alliances on the 2007, 2011, and 2015 ballots",
+        "parties and alliances on the 2007, 2011, 2015, 2019, and 2023 ballots",
         depends=[f"{SOURCE}/geo"],
     )
     p.external.add(ARGENTINA)
@@ -793,6 +936,9 @@ def registry() -> Package:
         ZIP_2011,
         ELECTED_2011,
         ELECTED_2015,
+        ELECTED_2023,
+        *urls_2019(),
+        *urls_2023(),
         *(u for u in urls_2015() if u in raw.keys(SOURCE)),
     ):
         p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
@@ -818,7 +964,7 @@ def registry() -> Package:
             p.add("office", id=id, polity_id=ARGENTINA, kind="other")
             p.name(id, f"Communal Commissioner of {place.name}", "en", "official")
             p.name(id, f"Comisionado Comunal de {place.name}", "es", "native", False)
-    for number, names in sorted(party_names().items()):
+    for number, names in sorted([*party_names().items(), *later_party_names().items()]):
         for name in names:
             id = key("party", number, plain(name))
             bloc = re.match(r"(ALIANZA|FRENTE|ACUERDO|COALICION)\b", plain(name)) is not None
@@ -840,6 +986,10 @@ METHOD = {
     2015: "Counts are from the Junta Electoral Provincial's definitive count sheets (escrutinio definitivo), one per "
     "category and jurisdiction. The two communes that voted again on 8 November 2015 and Los Ralos come from the "
     "cumulative sheets the Junta published separately.",
+    2019: "Counts are from the Junta Electoral Provincial's definitive count sheets (escrutinio definitivo), one per "
+    "category and jurisdiction.",
+    2023: "Counts are from the Junta Electoral Provincial's definitive count sheets (escrutinio definitivo), one per "
+    "category and jurisdiction.",
 }
 CATEGORY_TITLES = {
     "intendente": ("Intendente de {}", "intendente"),
@@ -848,10 +998,62 @@ CATEGORY_TITLES = {
 }
 
 
+def mesa_only_sheets(year: int, have: list[Sheet]) -> list[Sheet]:
+    """A sheet for each municipal or communal contest whose polling tables are published but whose count sheet is
+    not, summed from those tables."""
+    held = {(s.category, place_of(s).code) for s in have if s.place}
+    sums: dict[tuple[object, ...], Sheet] = {}
+    seen: dict[tuple[object, ...], dict[tuple[int, str], int]] = defaultdict(lambda: defaultdict(int))
+    for m in mesas(year):
+        for category, c in m.categories.items():
+            if category in ("gobernador", "legislador"):
+                continue
+            scope = mesa_scope(m, category)
+            if scope in held:
+                continue
+            kind, _, name = m.jurisdiction.partition(" ")
+            one = sums.setdefault(
+                scope,
+                Sheet(
+                    file=f"mesas:{scope[1]}",
+                    year=year,
+                    category=category,
+                    section=m.section,
+                    department=m.department,
+                    kind=kind,
+                    place=name,
+                    positive=0,
+                    blank=0,
+                    null=0,
+                    total=0,
+                    registered=None,
+                    tables_counted=None,
+                    tables=None,
+                ),
+            )
+            one.positive += c.positive
+            one.blank += c.blank
+            one.null += c.null
+            one.total += c.total
+            for number, list_name, votes in c.lists:
+                seen[scope][(number, list_name)] += votes
+    for scope, one in sums.items():
+        one.lists = [(number, name, votes, None) for (number, name), votes in sorted(seen[scope].items())]
+    return list(sums.values())
+
+
+MESA_ONLY = (
+    "The Junta Electoral Provincial published no count sheet for this contest, so the counts are the sums of its "
+    "polling tables from the mesa-by-mesa definitive count."
+)
+
+
 def sheets(year: int) -> list[Sheet]:
     if year == 2007:
         return sheets_2007()
-    return [s for s in (sheets_2011() if year == 2011 else sheets_2015()) if s.file not in MISFILED]
+    found = {2011: sheets_2011, 2015: sheets_2015, 2019: sheets_2019, 2023: sheets_2023}[year]()
+    found = [s for s in found if s.file not in MISFILED]
+    return [*found, *mesa_only_sheets(year, found)] if year >= 2019 else found
 
 
 def sources_of(year: int) -> list[str]:
@@ -859,9 +1061,13 @@ def sources_of(year: int) -> list[str]:
         return list(URLS_2007.values())
     if year == 2011:
         return [ZIP_2011, ELECTED_2011]
+    if year == 2019:
+        return urls_2019()
+    if year == 2023:
+        return [*urls_2023(), ELECTED_2023]
     return [
         *(u for u in urls_2015() if u in raw.keys(SOURCE)),
-        *([MESAS_2015] if mesas_2015() else []),
+        *([MESAS_2015] if mesas(2015) else []),
         ELECTED_2015,
     ]
 
@@ -880,28 +1086,59 @@ def _vote(p: Package, result_set: str, unit: str, option: str | None, measure: i
     )
 
 
+# One commune's name in the 2019 mesa-by-mesa file is spelled differently from its count sheets.
+MESA_SPELLING = {("rio_chico", "Comuna LOS SARMIENTOS Y LA TIPA"): "LOS SARMIENTOS Y LAS TIPAS"}
+
+
+def place_in(dept: str, jurisdiction: str) -> Place:
+    """The place a mesa's jurisdiction line names ("Municipio X" or "Comuna X") inside one department. The Junta cuts
+    some names short, so a long name matches the start of its place's name."""
+    kind, _, name = jurisdiction.partition(" ")
+    wanted = label(MESA_SPELLING.get((dept, jurisdiction), name)).replace(" ", "")
+    found = set()
+    for (found_dept, place_kind, printed), pl in places().items():
+        squeezed = printed.replace(" ", "")
+        if found_dept == dept and place_kind == kind.lower() and (squeezed == wanted or squeezed.startswith(wanted)):
+            found.add(pl)
+    if len(found) != 1:
+        raise ValueError(f"{dept} {jurisdiction!r} matches {len(found)} places")
+    return found.pop()
+
+
+def mesa_scope(m: Mesa, category: str) -> tuple[object, ...]:
+    """The contest a polling table's category belongs to, keyed like the contests."""
+    if category == "gobernador":
+        return ("gobernador",)
+    if category == "legislador":
+        return ("legislador", m.section)
+    return (category, place_in(DEPARTMENT_OF[plain(m.department)], m.jurisdiction).code)
+
+
 def mesa_sets(
     p: Package,
+    year: int,
     tag: str,
     contests: dict[tuple[object, ...], str],
     sets: dict[tuple[object, ...], str],
     options: dict[tuple[object, ...], str],
-    units: dict[str, str],
-    everything: list[Sheet],
+    official: dict[tuple[object, ...], int],
 ) -> None:
-    """Adds a mesa-by-mesa result set beside each capital contest's official total, which stays the default."""
-    tables = mesas_2015() if tag.startswith("2015") else []
+    """Adds a mesa-by-mesa result set beside each contest's official total, which stays the default. Each table is a
+    reporting unit inside the jurisdiction it votes in, or its department when it votes in none."""
+    tables = mesas(year)
     if not tables:
         return
-    capital = next(pl for (dept, kind, _), pl in places().items() if dept == "capital" and kind == "municipio")
-    by_scope: dict[tuple[object, ...], str] = {
-        ("legislador", "CAPITAL"): "legislador",
-        ("intendente", capital.code): "intendente",
-        ("concejal", capital.code): "concejal",
-    }
+    by_scope: dict[tuple[object, ...], list[tuple[Mesa, MesaCount]]] = defaultdict(list)
+    for m in tables:
+        for category, c in m.categories.items():
+            # The 2015 file covers only the capital, so its governor count stays the province sheet alone.
+            if year == 2015 and category == "gobernador":
+                continue
+            by_scope[mesa_scope(m, category)].append((m, c))
     mesa_units: dict[int, str] = {}
-    for scope, category in by_scope.items():
-        sheet_set = sets[scope]
+    for scope, counts in sorted(by_scope.items(), key=lambda item: tuple(str(part) for part in item[0])):
+        if scope not in contests:
+            raise ValueError(f"mesas report {scope}, which has no contest")
         number_of = {k[len(scope)]: v for k, v in options.items() if k[: len(scope)] == scope}
         set_id = key("result_set", tag, "mesa", *scope)
         p.add(
@@ -921,17 +1158,18 @@ def mesa_sets(
             id=key("note", set_id),
             entity_id=set_id,
             kind="methodology",
-            body_md="Counts are from the Junta Electoral Provincial's mesa-by-mesa definitive count of the capital "
-            "(escrutinio definitivo), one table per polling table of San Miguel de Tucumán, with the circuit each "
-            "belongs to in its unit code. The contest's default set stays the official total by jurisdiction.",
+            body_md="Counts are from the Junta Electoral Provincial's mesa-by-mesa definitive count (escrutinio "
+            "definitivo), one table per polling table, with the circuit each belongs to in its unit code. The "
+            "contest's default set stays the official total by jurisdiction.",
             lang="en",
         )
         sheet_total = 0
-        for m in tables:
-            c = m.categories[category]
+        for m, c in counts:
             code = f"mesa:{m.circuit}:{m.number:04d}"
             if m.number not in mesa_units:
                 mesa_units[m.number] = key("unit", tag, "ar-t.mesa", code)
+                dept = DEPARTMENT_OF[plain(m.department)]
+                where = place_in(dept, m.jurisdiction).area if m.jurisdiction else area("ar-t.departamento", dept)
                 p.add(
                     "reporting_unit",
                     id=mesa_units[m.number],
@@ -939,7 +1177,7 @@ def mesa_sets(
                     scheme_code="ar-t.mesa",
                     code=f"{tag}:{code}",
                     area_relation="within",
-                    area_id=capital.area,
+                    area_id=where,
                     kind="standard",
                 )
             unit_id = mesa_units[m.number]
@@ -952,14 +1190,8 @@ def mesa_sets(
             _vote(p, set_id, unit_id, None, 5, c.null)
             _vote(p, set_id, unit_id, None, 6, c.blank)
             sheet_total += c.positive
-        official = next(
-            r["value"]
-            for r in p.rows["result_value"]
-            if r["result_set_id"] == sheet_set and r["option_id"] is None and r["measure"] == 4
-        )
         row = next(r for r in p.rows["result_set"] if r["id"] == set_id)
-        assert isinstance(official, int)
-        row["completeness"] = round(sheet_total / official, 6)
+        row["completeness"] = round(sheet_total / official[scope], 6)
 
 
 def outcomes(
@@ -1074,6 +1306,8 @@ def general(year: int) -> Package:
     sets: dict[tuple[object, ...], str] = {}
     options: dict[tuple[object, ...], str] = {}
     progress: dict[tuple[object, ...], list[int]] = defaultdict(lambda: [0, 0])
+    official: dict[tuple[object, ...], int] = defaultdict(int)
+    sheetless: set[tuple[object, ...]] = set()
     party_of: dict[str, str] = {}
     declared = proclaimed(year)
 
@@ -1142,7 +1376,7 @@ def general(year: int) -> Package:
             id=key("note", result_set),
             entity_id=result_set,
             kind="methodology",
-            body_md=METHOD[year],
+            body_md=MESA_ONLY if scope in sheetless else METHOD[year],
             lang="en",
         )
         return id
@@ -1184,11 +1418,13 @@ def general(year: int) -> Package:
         _vote(p, result_set, unit_id, None, 4, s.positive)
         _vote(p, result_set, unit_id, None, 5, s.null)
         _vote(p, result_set, unit_id, None, 6, s.blank)
+        official[scope] += s.positive
         if s.tables:
             progress[scope][0] += s.tables_counted or 0
             progress[scope][1] += s.tables
 
     everything = sheets(year)
+    sheetless |= {(s.category, place_of(s).code) for s in everything if s.file.startswith("mesas:")}
     governor_sheets = [s for s in everything if s.category == "gobernador"]
     province_sheet = next((s for s in governor_sheets if s.section is None), None)
     section_sheets = [s for s in governor_sheets if s.section is not None]
@@ -1255,7 +1491,7 @@ def general(year: int) -> Package:
             body_id=None if office else council(place),
         )
         record(scope, s, unit("ar-t.jurisdiccion", place.code, place.area), True)
-    mesa_sets(p, tag, contests, sets, options, units, everything)
+    mesa_sets(p, year, tag, contests, sets, options, official)
     outcomes(p, tag, year, declared, contests, sets, options, party_of)
     blank = sum(not m.name for members in declared.values() for m in members)
     if blank:
