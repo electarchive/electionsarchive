@@ -54,6 +54,7 @@ class Row(NamedTuple):
     names: tuple[str, ...]  # province, municipality, locality as far as the table has them
     counts: dict[str, int]
     level: str  # department, municipality, or locality; a row that totals its table is level total
+    y: float = 0.0  # the height on the page of the row's numbers
 
 
 def pages(pdf: Path) -> list[list[Word]]:
@@ -170,7 +171,7 @@ def table(page_number: int, words: list[Word]) -> list[Row]:
                 if "localidad" in heading
                 else "municipality"
             )
-        found.append(Row(page_number, department, heading, texts, counts, level))
+        found.append(Row(page_number, department, heading, texts, counts, level, row[0].y))
     return found
 
 
