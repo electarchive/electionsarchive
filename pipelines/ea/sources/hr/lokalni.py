@@ -26,7 +26,7 @@ import shapely.geometry
 from ea import package, raw
 from ea.changeset import slug
 from ea.package import Package
-from ea.sources.hr import granice
+from ea.sources.hr import granice, lokalni_izabrani
 
 SOURCE = "hr.lokalni"
 IZBORI = "hr.izbori"
@@ -174,6 +174,14 @@ def summary_urls(year: int) -> list[str]:
     return urls
 
 
+def report_url(year: int, county: str) -> str:
+    return f"{DATA}/{year}/izabrani/i_06_{county}_0000.pdf"
+
+
+def counties(year: int) -> list[str]:
+    return sorted({county for kind, county, town, _ in listing(year)[1] if kind in COUNTY_TYPES and town == "0000"})
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, GB_COUNTIES, suffix=".geojson")
     raw.fetch(SOURCE, GB_TOWNS, suffix=".geojson")
@@ -181,6 +189,9 @@ def fetch() -> None:
     for year in YEARS:
         raw.fetch(SOURCE, zip_url(year), suffix=".zip")
         raw.fetch(SOURCE, dao_url(year), suffix=".js")
+    for year in YEARS:
+        for county in counties(year):
+            raw.fetch(SOURCE, report_url(year, county), suffix=".pdf")
     for year in YEARS:
         urls = summary_urls(year)
         got = raw.fetch_many(SOURCE, urls, suffix="." + urls[0].rsplit(".", 1)[1], workers=6)
@@ -595,8 +606,8 @@ SYSTEMS = [
             "A county assembly, the Zagreb City Assembly, and each town and municipal council is elected from closed "
             "lists in one constituency, with seats divided by the D'Hondt method among the lists that win at least 5% "
             "of the valid votes (Zakon o lokalnim izborima, NN 144/2012). Where a national minority reaches the "
-            "thresholds of the Constitutional Act on National Minorities, seats are reserved for it. The results "
-            "files do not print the seats each list won, so none are recorded."
+            "thresholds of the Constitutional Act on National Minorities, seats are reserved for it. The seats each "
+            "list won and the members elected are as the commission declares them in its reports of elected members."
         ),
     ),
     (
@@ -953,11 +964,13 @@ METHOD = (
     "(Državno izborno povjerenstvo) in its results archive. Registered voters are the polling station's roll, voters "
     "are those who signed the roll, ballots cast are the ballots found in the box, and valid and invalid ballots are as "
     "printed. A polling station is placed in its town or municipality. The commission's printed totals for a contest, "
-    "where its results pages carry them, are stored as declared values beside the station counts."
+    "where its results pages carry them, are stored as declared values beside the station counts. The seats each list "
+    "won, the council members elected, and the mayor or župan declared elected are from the commission's reports of "
+    "elected members, one PDF per county."
 )
 CAVEAT = (
-    "The commission publishes the elected candidates only as PDF reports. The outcome recorded here follows from the "
-    "counted votes and the rule of Art. 94 of the Zakon o lokalnim izborima: a candidate with more than half of the "
+    "The commission's report of elected members does not carry this contest. The outcome recorded here follows from "
+    "the counted votes and the rule of Art. 94 of the Zakon o lokalnim izborima: a candidate with more than half of the "
     "valid votes is elected in the first round, the leading two advance, and the leader of the second round is "
     "elected."
 )
@@ -1032,6 +1045,149 @@ def verdicts(c: Contest) -> dict[int, str]:
     return {i: ("elected" if i == leaders[0] else "lost") for i in range(len(sums))}
 
 
+# The commission's elected-members reports: the seats each list won, the members, and the executive declared elected.
+
+
+@dataclass
+class Elected:
+    url: str
+    section: lokalni_izabrani.Section
+    columns: dict[int, int]  # a contest's column -> the printed entry it is
+
+
+BARE = re.compile(r"^((?:dr|mr|prof|doc|mag|dipl|ing|univ|spec|sc)\.?(?:sc\.?)?\s*)+", re.IGNORECASE)
+
+
+def bare(name: str) -> str:
+    """A person's name as printed, without the academic titles before or after it."""
+    return clean(BARE.sub("", _strip(name)))
+
+
+@functools.cache
+def reports(year: int) -> tuple[tuple[str, lokalni_izabrani.Section], ...]:
+    out = []
+    for county in counties(year):
+        path = raw.cached(SOURCE, report_url(year, county)).path
+        out.extend((county, section) for section in lokalni_izabrani.sections(lokalni_izabrani.text_of(path)))
+    return tuple(out)
+
+
+def _votes(c: Contest) -> list[tuple[int, ...]]:
+    found = [tuple(sorted(sum(s.votes[i] for s in c.stations) for i in range(len(c.header))))]
+    if c.summary is not None:
+        found.append(tuple(sorted(o.votes for o in c.summary.options)))
+    return found
+
+
+def _stem(text: str) -> set[str]:
+    return {w[:4] for w in label(text).split() if len(w) > 2}
+
+
+def _entry_columns(c: Contest, section: lokalni_izabrani.Section) -> dict[int, int] | None:
+    """Which printed entry each column of a contest is, by its votes and then by its names."""
+    values: list[set[int]] = []
+    for column in range(len(c.header)):
+        found = {sum(s.votes[column] for s in c.stations)}
+        index = c.link[column] if column < len(c.link) else None
+        if index is not None and c.summary is not None:
+            found.add(c.summary.options[index].votes)
+        values.append(found)
+    out: dict[int, int] = {}
+    for index, entry in enumerate(section.entries):
+        near = [col for col in range(len(c.header)) if entry.votes in values[col] and col not in out]
+        if not near:
+            return None
+        names = [
+            col for col in near if similar(c.header[col], entry.head) > 0 or similar(c.header[col], entry.text) > 0
+        ]
+        pool = names or near
+        out[
+            min(
+                pool,
+                key=lambda col: (-max(similar(c.header[col], entry.head), similar(c.header[col], entry.text)), col),
+            )
+        ] = index
+    return out if len(out) == len(c.header) == len(section.entries) else None
+
+
+@functools.cache
+def elected(year: int) -> dict[tuple[int, tuple[str, ...]], Elected]:
+    """The report section for each contest, found by the votes it prints."""
+    by_votes: dict[tuple[object, ...], list[Contest]] = {}
+    for c in contests(year):
+        for found in _votes(c):
+            listing_ = c.kind in ("council", "assembly")
+            group = by_votes.setdefault((c.county, c.round, listing_, found), [])
+            if c not in group:
+                group.append(c)
+    out: dict[tuple[int, tuple[str, ...]], Elected] = {}
+    for county, section in reports(year):
+        key_ = (county, section.round, section.kind == "council", tuple(sorted(e.votes for e in section.entries)))
+        near = [c for c in by_votes.get(key_, []) if (c.round, c.ident) not in out]
+        if len(near) > 1:
+            heading = _stem(section.title)
+            near.sort(key=lambda c: -len(_stem(c.muni) & heading))
+            if len(_stem(near[0].muni) & heading) == len(_stem(near[1].muni) & heading):
+                print(f"{year}: {section.title}: {len(near)} contests print these votes", flush=True)
+                continue
+        if not near and section.kind == "executive":
+            # The report's votes may differ from the tables' (a corrected count); the candidates still name the contest.
+            near = [
+                c
+                for c in contests(year)
+                if c.county == county
+                and c.round == section.round
+                and c.kind not in ("council", "assembly")
+                and (c.round, c.ident) not in out
+                and len(c.header) == len(section.entries)
+                and all(max(similar(bare(h), bare(e.head)) for h in c.header) >= 0.6 for e in section.entries)
+                and (c.level == "county" or len(_stem(c.muni) & _stem(section.title)) > 0)
+            ]
+            near = near[:1] if len(near) == 1 else []
+            if near:
+                columns = {
+                    max(range(len(near[0].header)), key=lambda col: similar(bare(near[0].header[col]), bare(e.head))): i
+                    for i, e in enumerate(section.entries)
+                }
+                if len(columns) == len(section.entries):
+                    out[(near[0].round, near[0].ident)] = Elected(report_url(year, county), section, columns)
+                    print(f"{year}: {section.title}: matched by candidates; printed votes differ", flush=True)
+                    continue
+                near = []
+        if not near:
+            print(f"{year}: {section.title} ({county}): no contest prints these votes", flush=True)
+            continue
+        columns = _entry_columns(near[0], section)
+        if columns is None:
+            print(f"{year}: {section.title}: entries do not match the columns", flush=True)
+            continue
+        out[(near[0].round, near[0].ident)] = Elected(report_url(year, county), section, columns)
+    return out
+
+
+def declared_verdicts(c: Contest, found: Elected) -> dict[int, str]:
+    """The outcome the commission's report prints for each candidate of a single-seat contest."""
+    section = found.section
+    by_entry = {index: column for column, index in found.columns.items()}
+
+    def pick(names: list[str]) -> set[int]:
+        out = set()
+        for name in names:
+            best = max(range(len(section.entries)), key=lambda i: similar(bare(section.entries[i].head), bare(name)))
+            if similar(bare(section.entries[best].head), bare(name)) < 0.6:
+                raise ValueError(f"{c.member}: {name} is not among the candidates")
+            out.add(by_entry[best])
+        return out
+
+    if section.elected:
+        winner = pick(section.elected[:1])
+        return {i: ("elected" if i in winner else "lost") for i in range(len(c.header))}
+    if section.advanced:
+        moving = pick(section.advanced)
+        return {i: ("advanced" if i in moving else "eliminated") for i in range(len(c.header))}
+    return {}
+
+
 class Facts:
     """Result values gathered column by column, since a year of local elections holds a few hundred thousand."""
 
@@ -1054,6 +1210,36 @@ class Facts:
                 "value": pl.Int64,
             },
         ).with_columns(channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16))
+
+
+def seats(p: Package, r: Round, c: Contest, result_set: str, option: str, column: int, found: Elected) -> None:
+    """A list's declared seats, and a candidacy and an elected outcome for each member the report names."""
+    section = found.section
+    entry = section.entries[found.columns[column]]
+    block = next((b for b in section.blocks if b.rank == entry.rank), None)
+    # Lists given additional members for a national minority are named by their leader, not their number.
+    more = [x for x in section.extra if x.head and similar(bare(x.head), bare(entry.head)) >= 0.6]
+    given = [(m, 0) for m in block.members] if block is not None else []
+    given += [(m, 1000 * (i + 1)) for i, x in enumerate(more) for m in x.members]
+    total = (block.seats if block is not None else 0) + sum(x.seats for x in more)
+    p.add("outcome", result_set_id=result_set, option_id=option, kind="won" if total else "lost", seats=total)
+    for member, offset in given:
+        position = member.position + offset
+        who = key("person", r.year, *c.ident, column + 1, " ".join(sorted(words(bare(member.name)))), position)
+        candidacy = key("candidacy", r.year, r.number, *c.ident, column + 1, "member", position)
+        p.add("person", id=who)
+        p.name(who, title(bare(member.name)), "hr", "official")
+        p.add(
+            "candidacy",
+            id=candidacy,
+            person_id=who,
+            option_id=option,
+            role="list_member",
+            ballot_name=member.name,
+            member_of_party_id=option_party(c, column),
+            is_independent=option_party(c, column) is None,
+        )
+        p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
 
 
 def district(c: Contest) -> str:
@@ -1148,9 +1334,26 @@ def election(r: Round) -> Package:
             is_default=True,
             completeness=completeness,
         )
-        verdict = {} if listing_ else verdicts(c)
-        if verdict:
-            p.add("note", id=key("note", result_set), entity_id=result_set, kind="caveat", body_md=CAVEAT, lang="en")
+        found = elected(r.year).get((c.round, c.ident))
+        if found is None:
+            problems.append(f"{c.member}: no elected-members report")
+            elected_here = None
+        else:
+            elected_here = found
+            if found.url not in cited:
+                cited.add(found.url)
+                # One county report holds every round, so the first round's package owns it.
+                if r.number == 1:
+                    p.artifact(raw.cached(SOURCE, found.url), SOURCE_ID)
+                else:
+                    p.uses(raw.cached(SOURCE, found.url))
+        verdict = {} if listing_ else (declared_verdicts(c, found) if found is not None else {})
+        if not listing_ and not verdict:
+            verdict = verdicts(c)
+            if verdict:
+                p.add(
+                    "note", id=key("note", result_set), entity_id=result_set, kind="caveat", body_md=CAVEAT, lang="en"
+                )
         options: list[str] = []
         for column, name in enumerate(c.header):
             option = key("option", r.year, r.number, *c.ident, column + 1)
@@ -1166,6 +1369,8 @@ def election(r: Round) -> Package:
                     ballot_position=column + 1,
                     ballot_label=name,
                 )
+                if elected_here is not None:
+                    seats(p, r, c, result_set, option, column, elected_here)
                 continue
             p.add(
                 "contest_option",
