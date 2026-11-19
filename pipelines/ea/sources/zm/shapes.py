@@ -310,8 +310,9 @@ def geo(listed: dict[int, str], ward_names: dict[str, str], listed_150: dict[int
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "Zambia's 156 constituencies of 2016 to 2026 and its 1,853 wards of 2021 to 2026, with their shapes from the "
-        "COD-AB dataset compiled by the Disaster Management and Mitigation Unit",
+        "Zambia's 150 constituencies of 1991 to 2016, its 156 of 2016 to 2026, and its 1,853 wards of 2021 to 2026, with "
+        "their shapes from public-domain ward layers and the COD-AB dataset compiled by the Disaster Management and "
+        "Mitigation Unit",
         depends=[f"{SOURCE}/registry"],
     )
     p.external |= {ZAMBIA, TERRITORY}
