@@ -36,9 +36,11 @@ ABROAD = 57
 A = "browser://20261116-222821-308b6c/"
 B = "browser://20261116-224930-393d08/"
 C = "browser://20261117-133413-6c56bf/"
+D = "browser://20261119-211248-684d3e/"
 OLD = "http://ekloges-prev.singularlogic.eu/"
 GEO = f"{SOURCE}/national-geo"  # `ypes` builds the local elections' geo and registry
 REGISTRY = f"{SOURCE}/national-registry"
+STATION = "gr.polling_station"
 
 
 @dataclass(frozen=True)
@@ -49,6 +51,7 @@ class Election:
     files: tuple[str, ...]
     extra: tuple[str, ...] = ()  # single district files the bundles lack
     legacy: bool = False  # a page that gives only the national result
+    stations: tuple[str, ...] = ()  # files of polling-station counts, one `tm_<id>.js` pair for each station
 
     @property
     def package(self) -> str:
@@ -68,7 +71,13 @@ ELECTIONS = [
     Election(
         "ref-2015", date(2015, 7, 5), "referendum", (B + "gr-2015-referendum-national-district-municipality.txt",)
     ),
-    Election("ps-2015-09", date(2015, 9, 20), "parliament", (B + "gr-2015-sep-national-district-municipality.txt",)),
+    Election(
+        "ps-2015-09",
+        date(2015, 9, 20),
+        "parliament",
+        (D + "gr-2015-09-parliament-upper-levels.txt", OLD + "v2015b/dyn/v/epik_1.js"),
+        stations=tuple(D + f"gr-2015-09-parliament-stations-part{n}.txt" for n in range(1, 9)),
+    ),
     Election(
         "ps-2019",
         date(2019, 7, 7),
@@ -164,6 +173,9 @@ def split(text: str, url: str) -> dict[str, str]:
             bundle = None
         if isinstance(bundle, dict) and bundle and all(str(k).startswith("http") for k in bundle):
             return {str(k): str(v) for k, v in bundle.items()}  # a bundle of files, keyed by their addresses
+    if text.startswith("### "):  # files saved from a browser, each under a `### <path>` line
+        parts = re.split(r"^### (\S+)\n", text, flags=re.MULTILINE)
+        return dict(zip(parts[1::2], parts[2::2], strict=True))
     parts = re.split(r"<!-- (\S+) -->\n?", text)
     if len(parts) == 1:
         return {url: text}
@@ -264,6 +276,17 @@ class Data:
     official: bool
     cities: dict[int, Figures] = field(default_factory=dict)  # votes abroad, by city
     city_names: dict[int, tuple[str, str]] = field(default_factory=dict)  # city and country
+    stations: list[Station] = field(default_factory=list)
+
+
+@dataclass
+class Station:
+    id: int
+    district: int  # the district whose contest counts the station
+    unit: int  # the Ministry's code of the municipal unit, or 0 for a station of voters registered elsewhere
+    kind: str
+    name: str
+    figures: Figures
 
 
 def number(text: str) -> int:
@@ -311,6 +334,34 @@ def legacy(election: Election) -> Data:
     )
 
 
+STATION_KINDS = {"Κ": "standard", "Ε": "standard", "Μ": "standard", "Φ": "prison"}
+
+
+def load_stations(election: Election) -> list[Station]:
+    stat: dict[int, dict[str, object]] = {}
+    dyn: dict[int, dict[str, object]] = {}
+    for url in election.stations:
+        for name, text in split(decode(cached(url).path.read_bytes()), url).items():
+            found = re.search(r"/(stat|dyn)/v/\d+/tm_(\d+)\.js$", name)
+            if found is None:
+                continue
+            row = mapping(json.JSONDecoder().raw_decode(text.strip())[0])
+            (stat if found.group(1) == "stat" else dyn)[int(found.group(2))] = row
+    if set(stat) != set(dyn):
+        raise ValueError(f"{election.key}: stations lack a static file or a count: {sorted(set(stat) ^ set(dyn))[:5]}")
+    return [
+        Station(
+            tm,
+            int(str(stat[tm]["EP_ID"])),
+            int(str(stat[tm]["DEN_ID"])),
+            STATION_KINDS[str(stat[tm]["TM_KIND"])],
+            re.sub(r"\s+", " ", str(stat[tm]["Descr"])).strip(),
+            figures(dyn[tm], dyn[tm]["party"], None),
+        )
+        for tm in sorted(stat)
+    ]
+
+
 def load(election: Election) -> Data:
     if election.legacy:
         return legacy(election)
@@ -318,6 +369,7 @@ def load(election: Election) -> Data:
     for url in (*election.files, *election.extra):
         artifact = cached(url)
         segments.update(split(decode(artifact.path.read_bytes()), url))
+    stations = load_stations(election)
     ep: dict[int, object] = {}
     dhm: dict[int, object] = {}
     den: dict[int, object] = {}
@@ -403,6 +455,7 @@ def load(election: Election) -> Data:
         official=bool(mapping(epik).get("official")),
         cities={n: figures(row, mapping(row)["party"], None) for n, row in city.items()},
         city_names=city_names,
+        stations=stations,
     )
 
 
@@ -459,7 +512,7 @@ def emit() -> None:
 
 
 def citations(p: Package, election: Election, registry_too: bool = False) -> None:
-    for url in (*election.files, *election.extra):
+    for url in (*election.files, *election.extra, *election.stations):
         if registry_too:
             p.artifact(cached(url), YPES)
         else:
@@ -515,6 +568,7 @@ def geo() -> Package:
     p.add("scheme", code="gr.district", polity_id=GREECE, kind="electoral_district", rank=1, noun="electoral district")
     p.add("scheme", code="gr.municipality", polity_id=GREECE, kind="administrative", rank=2, noun="municipality")
     p.add("scheme", code="gr.unit", polity_id=GREECE, kind="administrative", rank=3, noun="municipal unit")
+    p.add("scheme", code=STATION, polity_id=GREECE, kind="precinct", rank=4, noun="polling station")
     districts = latest("district")
     for code, name in sorted(districts.items()):
         if code == 57:
@@ -729,7 +783,16 @@ class Build:
         self.sets: list[str] = []
         self.stage = "official" if self.d.official else "preliminary"
 
-    def unit(self, scheme: str, code: str, where: str | None, relation: str, kind: str) -> str:
+    def unit(
+        self,
+        scheme: str,
+        code: str,
+        where: str | None,
+        relation: str,
+        kind: str,
+        parent: str | None = None,
+        name: str | None = None,
+    ) -> str:
         id = key("unit", self.election.key, scheme, code)
         self.p.add(
             "reporting_unit",
@@ -740,7 +803,10 @@ class Build:
             area_relation=relation,
             area_id=where,
             kind=kind,
+            parent_id=parent,
         )
+        if name:
+            self.p.name(id, name, "el", "official")
         return id
 
     def build(self) -> Package:
@@ -806,6 +872,8 @@ class Build:
         if e.legacy:
             leaf = Leaf(self.unit("gr.country", "national", TERRITORY, "equals", "standard"), d.national)
             self.leaves[0].append(leaf)
+        elif d.stations:
+            self.station_leaves()
         elif e.key in UNITS:
             for code, figures_ in sorted(d.units.items()):
                 municipality = d.unit_names[code][1]
@@ -845,6 +913,47 @@ class Build:
         self.everything = [leaf for n in sorted(self.leaves) for leaf in self.leaves[n]]
         rest = subtract(d.national, [x.figures for x in self.everything])
         self.rest = rest
+
+    def station_leaves(self) -> None:
+        """Each polling station is a leaf under its municipal unit, or under its district when it has no unit.
+
+        The stations of a municipal unit must add up to the unit's own file, which is checked here.
+        """
+        d = self.d
+        held: dict[int, list[Figures]] = defaultdict(list)
+        for s in d.stations:
+            held[s.unit].append(s.figures)
+        for code, parts in sorted(held.items()):
+            if code:
+                if code not in d.units:
+                    raise ValueError(f"{self.election.key}: stations lie in unit {code}, which has no file")
+                gap = subtract(d.units[code], parts)
+                if gap.registered or gap.valid or gap.invalid or gap.blank or any(gap.votes.values()):
+                    raise ValueError(f"{self.election.key}: unit {code}'s stations differ from its file")
+        if set(d.units) - set(held):
+            raise ValueError(f"{self.election.key}: units without stations: {sorted(set(d.units) - set(held))[:5]}")
+        districts = {
+            n: self.unit("gr.district", str(n), area("gr.district", n), "equals", "aggregate")
+            for n in sorted({s.district for s in d.stations})
+        }
+        parents: dict[int, str] = {}
+        for code, (_, municipality) in sorted(d.unit_names.items()):
+            if code in held:
+                n = d.municipality_names[municipality][1]
+                parents[code] = self.unit(
+                    "gr.unit", str(code), area("gr.unit", code), "equals", "aggregate", districts[n]
+                )
+        for s in d.stations:
+            if s.unit:
+                parent, where = parents[s.unit], area("gr.unit", s.unit)
+            else:
+                parent, where = districts[s.district], area("gr.district", s.district)
+            leaf = self.unit(STATION, str(s.id), where, "within", s.kind, parent, s.name)
+            self.leaves[s.district].append(Leaf(leaf, s.figures))
+        for n, whole in sorted(d.districts.items()):
+            rest = subtract(whole, [x.figures for x in self.leaves[n]])
+            if rest.valid or rest.registered or rest.invalid or rest.blank or any(rest.votes.values()):
+                raise ValueError(f"{self.election.key}: district {n} differs from its stations")
 
     def result_set(self, suffix: str, contest: str, note: str) -> str:
         id = key("result_set", self.election.key, suffix)
