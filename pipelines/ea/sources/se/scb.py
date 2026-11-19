@@ -1007,6 +1007,12 @@ def _check_areas() -> None:
     own = column(f"{SOURCE}/geo", "area", "id") | column(scb_andra_kammaren.GEO, "area", "id")
     if dropped := {area(scheme, code) for scheme, code in OWN_AREAS} - own:
         raise ValueError(f"{SOURCE}/geo no longer mints {sorted(dropped)}")
+    # Every area a geo package has minted, listed by package; a rebuild must keep each one, because units loaded from
+    # earlier packages stay placed in it. Add rows here when a geo gains an area, never remove them.
+    for line in (Path(__file__).parent / "scb_geo_areas.tsv").read_text().splitlines()[1:]:
+        key_, code, area_id = line.split("\t")
+        if area_id not in column(key_, "area", "id"):
+            raise ValueError(f"{key_} no longer mints area {code} ({area_id})")
     national = column(f"{val.SOURCE}/geo", "area", "id")
     for key in packages():
         used = column(key, "reporting_unit", "area_id") | column(key, "area_parent", "parent_id")
