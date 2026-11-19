@@ -30,6 +30,7 @@ import shapely
 from ea import changeset, raw
 from ea.latin import ukrainian
 from ea.package import Package
+from ea.sources.ua import cvk
 from ea.sources.ua import cvk_local as base
 from ea.sources.ua.cvk import clean, norm, number, text
 
@@ -803,6 +804,33 @@ def nominators() -> dict[str, str]:
     return _spellings()
 
 
+def loose(code: str) -> str:
+    """A party code without case, spacing, quote style, or punctuation, the way the same party's spellings compare."""
+    return re.sub(r"[\W_]+", "", code.casefold())
+
+
+@functools.cache
+def national() -> dict[str, str]:
+    """The national registry's parties, by loose code, with the ids that registry gave them."""
+    return {loose(code): cvk.party(code) for code in cvk.party_names()}
+
+
+@functools.cache
+def local() -> dict[str, str]:
+    """The 2020 local registry's parties, by loose code, with the ids that registry gave them."""
+    return {loose(code): base.party(code) or "" for code in base.nominators()}
+
+
+def existing(code: str) -> str | None:
+    """The id of the party an already-landed registry declares under ua.cvk.party, spelled as this code or alike."""
+    return local().get(loose(code)) or national().get(loose(code))
+
+
+def party_ids(codes: set[str]) -> set[str]:
+    """The ids of the national registry's parties among the codes, for the package to list as external."""
+    return {id for code in codes if (id := existing(code)) is not None and id not in local().values()}
+
+
 def registry() -> Package:
     p = Package(
         REGISTRY,
@@ -838,9 +866,8 @@ def registry() -> Package:
         p.add(
             "note", id=key("note", system(kind)), entity_id=system(kind), kind="methodology", body_md=method, lang="en"
         )
-    known = set(base.nominators())
     for code, name in sorted(nominators().items()):
-        if code in known:
+        if existing(code) is not None:
             continue
         id = key("party", code)
         p.add("party", id=id, kind="party", polity_id=UKRAINE)
@@ -922,7 +949,9 @@ def label_of(c: Council | Head) -> str:
 
 def party_of(name: str, known: set[str]) -> str | None:
     id = base.party(name)
-    return id if id is not None and norm(name) in known else None
+    if id is None or norm(name) not in known:
+        return None
+    return existing(name) or id
 
 
 def _merge(page: list[Deputy], departed: list[Deputy]) -> list[Deputy]:
@@ -956,6 +985,7 @@ def first() -> Package:
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", GEO, REGISTRY],
     )
     p.external.add(UKRAINE)
+    p.external |= party_ids(set(nominators()))
     for url in [COUNCILS, HEADS, DEPARTED_DEPUTIES, DEPARTED_HEADS, *_links(COUNCILS, "pvm037")]:
         cite(p, url)
     for url in _links(HEADS, "pvm038"):
@@ -1187,6 +1217,7 @@ def runoff() -> Package:
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", GEO, REGISTRY, f"{SOURCE}/{DAY}"],
     )
     p.external.add(UKRAINE)
+    p.external |= party_ids(set(nominators()))
     for url in [RUNOFF_HEADS, DEPARTED_RUNOFF_HEADS, *_links(RUNOFF_HEADS, "pvm038")]:
         cite(p, url)
     b = _election(p, RUNOFF_DAY, "runoff")
