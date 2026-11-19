@@ -106,7 +106,7 @@ NO_SHAPE = {
 }  # fmt: skip
 # Kosovo municipalities the Commission's gazetteer gained from the 1997 tables after the loaded `rs.rik/geo`; their
 # outlines still count toward their district's union, and are drawn once that gazetteer is loaded.
-PENDING = {"90034", "90069", "90085", "90115", "90247", "90310"}
+PENDING = {"90034", "90069", "90085", "90115", "90247", "90280", "90310"}
 ALIAS = {"80284": "89010"}
 GRID = 1e-6
 CYRILLIC = dict(
