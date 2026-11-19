@@ -1,0 +1,206 @@
+code	dzongkhag	gewog	layer
+01.01	Bumthang	Chhoekhor	Chhoekhor
+01.02	Bumthang	Chhumig	Chhume
+01.03	Bumthang	Tang	Tang
+01.04	Bumthang	Ura	Ura
+02.01	Chhukha	Bjagchhog	Bjachho
+02.02	Chhukha	Bongo	Bongo
+02.03	Chhukha	Chapchha	Chapchha
+02.04	Chhukha	Darla	Dala
+02.05	Chhukha	Doongna	Dungna
+02.06	Chhukha	Geling	Geling
+02.07	Chhukha	Getana	Getana
+02.08	Chhukha	Loggchina	Logchina
+02.09	Chhukha	Maedtabkha	Metap
+02.10	Chhukha	Phuentshogling	Phuentsholing
+02.11	Chhukha	Samphelling (Bhalujora)	Samphelling
+03.01	Dagana	Dorona	Dorona
+03.02	Dagana	Drukjegang	Drugyelgang
+03.03	Dagana	Gesarling	Gesarling
+03.04	Dagana	Gozhi	Gozhi
+03.05	Dagana	Karmaling (Deorali)	Deorali
+03.06	Dagana	Karna	Kalidzingkha
+03.07	Dagana	Khebisa	Khipisa
+03.08	Dagana	Largyab	Lajab
+03.09	Dagana	Lhamoi-Dzingkha	Lhamoizingkha
+03.10	Dagana	Nichula	Nichula
+03.11	Dagana	Tashiding	Trashiding
+03.12	Dagana	Tsangkha	Tsangkha
+03.13	Dagana	Tsenda-Gang	Tsendagang
+03.14	Dagana	Tseza	Tseza
+04.01	Gasa	Khamaed	Goenkhame
+04.02	Gasa	Khatoed	Goenkhatoe
+04.03	Gasa	Laya	Laya
+04.04	Gasa	Lunana	Lunana
+05.01	Haa	Bji	Bji
+05.02	Haa	Gakidling	Gakiling
+05.03	Haa	Kar-tshog	Katsho
+05.04	Haa	Samar	Sama
+05.05	Haa	Sangbay	Sombey
+05.06	Haa	Uesu	Uesu
+06.01	Lhuentse	Gangzur	Gangzur
+06.02	Lhuentse	Jarey	Jaray
+06.03	Lhuentse	Khoma	Khoma
+06.04	Lhuentse	Kurtoed	Kurtoe
+06.05	Lhuentse	Maedtsho	Metsho
+06.06	Lhuentse	Maenbi	Menbi
+06.07	Lhuentse	Minjey	Minjay
+06.08	Lhuentse	Tsaenkhar	Tsenkhar
+07.01	Monggar	Balam	Balam
+07.02	Monggar	Chagsakhar	Chaskhar
+07.03	Monggar	Chhaling	Chhali
+07.04	Monggar	Dramedtse	Narang
+07.05	Monggar	Drepoong	Drepung
+07.06	Monggar	Gongdue	Gongdue
+07.07	Monggar	Jurmed	Jurmey
+07.08	Monggar	Kengkhar	Kengkhar
+07.09	Monggar	Monggar	Mongar
+07.10	Monggar	Na-Rang	Drametse
+07.11	Monggar	Ngatshang	Ngatshang
+07.12	Monggar	Saling	Saleng
+07.13	Monggar	Shermuhoong	Shermung
+07.14	Monggar	Silambi	Silambi
+07.15	Monggar	Thang-Rong	Thangrong
+07.16	Monggar	Tsakaling	Tsakaling
+07.17	Monggar	Tsamang	Tsamang
+08.01	Paro	Dokar	Doga
+08.02	Paro	Dopshar-ri	Dopshari
+08.03	Paro	Doteng	Doteng
+08.04	Paro	Hoongrel	Hungrel
+08.05	Paro	Lamgong	Lamgong
+08.06	Paro	Loong-nyi	Lungnyi
+08.07	Paro	Nagya	Naja
+08.08	Paro	Sharpa	Shapa
+08.09	Paro	Tsento	Tsento
+08.10	Paro	Wangchang	Wangchang
+09.01	Pema Gatshel	Chhimoong	Chhimung
+09.02	Pema Gatshel	Chhoekhorling	Chokhorling
+09.03	Pema Gatshel	Chongshing	Chongshing
+09.04	Pema Gatshel	Dechhenling	Dechhenling
+09.05	Pema Gatshel	Dungmaed	Dungmin
+09.06	Pema Gatshel	Khar	Khar
+09.07	Pema Gatshel	Nanong	Nanong
+09.08	Pema Gatshel	Norboogang	Norbugang
+09.09	Pema Gatshel	Shumar	Shumer
+09.10	Pema Gatshel	Yurung	Yurung
+09.11	Pema Gatshel	Zobel	Zobel
+10.01	Punakha	Barp	Bapisa
+10.02	Punakha	Chhuboog	Chhubu
+10.03	Punakha	Dzomi	Dzoma
+10.04	Punakha	Goenshari	Goenshari
+10.05	Punakha	Guma	Guma
+10.06	Punakha	Kabisa	Kabjisa
+10.07	Punakha	Lingmukha	Lingmukha
+10.08	Punakha	Shelnga-Bjemi	Shengabjimi
+10.09	Punakha	Talog	Talo
+10.10	Punakha	Toedwang	Toewang
+10.11	Punakha	Toepaisa	Toepisa
+11.01	Samdrup Jongkhar	Dewathang	Dewathang
+11.02	Samdrup Jongkhar	Gomdar	Gomdar
+11.03	Samdrup Jongkhar	Langchenphu	Langchhenphu
+11.04	Samdrup Jongkhar	Lauri	Lauri
+11.05	Samdrup Jongkhar	Martshala	Martshala
+11.06	Samdrup Jongkhar	Orong	Jangchhubling
+11.07	Samdrup Jongkhar	Pemathang	Pemathang
+11.08	Samdrup Jongkhar	Phuentshogthang	Phuntsthothang
+11.09	Samdrup Jongkhar	Samrang	Samrang
+11.10	Samdrup Jongkhar	Serthig	Serthig
+11.11	Samdrup Jongkhar	Wangphoog	Wangphu
+12.01	Samtse	Doongtoed (Dumtoe)	Dungtoe
+12.02	Samtse	Dophoogchen(Dorokha)	Dorokha
+12.03	Samtse	Duenchhukha	Denchhukha
+12.04	Samtse	Namgaychoeling (Lahireni)	Namgyel Chhoeling
+12.05	Samtse	Norboogang (Chengmari)	Chengmari
+12.06	Samtse	Norgaygang (Bara)	Bara
+12.07	Samtse	Pemaling (Biru)	Biru
+12.08	Samtse	Phuentshogpelri (Pugli)	Pagli
+12.09	Samtse	Sa-Ngag-Chhoeling (Chargharey)	Chargharay
+12.10	Samtse	Samtse	Samtse
+12.11	Samtse	Tading	Tading
+12.12	Samtse	Tashichhoeling (Sipsu)	Sipsu
+12.13	Samtse	Tendruk	Tendu
+12.14	Samtse	Ugyentse (Nainital)	Ugentse
+12.15	Samtse	Yoeseltse (Ghumauney)	Yoeseltse
+13.01	Sarpang	Chhudzom	Doban
+13.02	Sarpang	Chhuzaggang	Chhuzagang
+13.03	Sarpang	Dekidling	Dekiling
+13.04	Sarpang	Gakidling	Hiley
+13.05	Sarpang	Gelegphu	Gelephu
+13.06	Sarpang	Jigme-Chhoeling	Jigmichhoeling
+13.07	Sarpang	Samtenling	Bhur
+13.08	Sarpang	Seng-Gey	Senge
+13.09	Sarpang	Serzhong	Sherzhong
+13.10	Sarpang	Shompangkha	Shompangkha
+13.11	Sarpang	Tareythang	Taklai
+13.12	Sarpang	Umling	Umling
+14.01	Thimphu	Chang	Chang
+14.02	Thimphu	Darkarla	Dagala
+14.03	Thimphu	Genyen	Genye
+14.04	Thimphu	Kawang	Kawang
+14.05	Thimphu	Lingzhi	Lingzhi
+14.06	Thimphu	Maedwang	Mewang
+14.07	Thimphu	Naro	Naro
+14.08	Thimphu	Soe	Soe
+15.01	Trashigang	Bartsham	Bartsham
+15.02	Trashigang	Bidoong	Bidung
+15.03	Trashigang	Kanglung	Kanglung
+15.04	Trashigang	Kangpar	Kangpara
+15.05	Trashigang	Khaling	Khaling
+15.06	Trashigang	Lumang	Lumang
+15.07	Trashigang	Merag	Merak
+15.08	Trashigang	Phongmed	Phongme
+15.09	Trashigang	Radi	Radi
+15.10	Trashigang	Sagteng	Sakteng
+15.11	Trashigang	Samkhar	Samkhar
+15.12	Trashigang	Shongphoog	Shongphu
+15.13	Trashigang	Thrimshing	Thrimshing
+15.14	Trashigang	Udzorong	Udzorong
+15.15	Trashigang	Yangnyer	Yangnyer
+16.01	Trashi Yangtse	Boomdeling	Bumdeling
+16.02	Trashi Yangtse	Jamkhar	Jamkhar
+16.03	Trashi Yangtse	Khamdang	Khamdang
+16.04	Trashi Yangtse	Ramjar	Ramjar
+16.05	Trashi Yangtse	Toedtsho	Toetsho
+16.06	Trashi Yangtse	Tongmizhangsa	Tomzhangtshen
+16.07	Trashi Yangtse	Yalang	Yalang
+16.08	Trashi Yangtse	Yangtse	Trashiyangtse
+17.01	Trongsa	Draagteng	Dragteng
+17.02	Trongsa	Korphoog	Korphu
+17.03	Trongsa	Langthil	Langthil
+17.04	Trongsa	Nubi	Nubi
+17.05	Trongsa	Tangsibji	Tangsibji
+18.01	Tsirang	Barshong	Barzhong
+18.02	Tsirang	Doonglagang	Dunglegang
+18.03	Tsirang	Gosarling	Gosarling
+18.04	Tsirang	Kilkhorthang	Kikorthang
+18.05	Tsirang	Mendrelgang	Mendrelgang
+18.06	Tsirang	Patshaling (Beteni)	Beteni
+18.07	Tsirang	Pungtenchhu	Phuentenchhu
+18.08	Tsirang	Rangthangling	Rangthangling
+18.09	Tsirang	Semjong	Shemjong
+18.10	Tsirang	Sergithang (Patala)	Patakla
+18.11	Tsirang	Tsholingkhar	Tsholingkhor
+18.12	Tsirang	Tsirang Toed	Tsirangtoe
+19.01	Wangdue Phodrang	Athang	Athang
+19.02	Wangdue Phodrang	Bjednag	Bjena
+19.03	Wangdue Phodrang	Dangchhu	Dangchhu
+19.04	Wangdue Phodrang	Darkar	Daga
+19.05	Wangdue Phodrang	Gangteng	Gangte
+19.06	Wangdue Phodrang	Gase Tsho-gongm	Gasetsho Gom
+19.07	Wangdue Phodrang	Gase Tsho-wongm	Gasetsho Om
+19.08	Wangdue Phodrang	Kazhi	Kazhi
+19.09	Wangdue Phodrang	Nahi	Nahi
+19.10	Wangdue Phodrang	Nyishog	Nyisho
+19.11	Wangdue Phodrang	Phangyuel	Phangyuel
+19.12	Wangdue Phodrang	Phobji	Phobji
+19.13	Wangdue Phodrang	Ruebisa	Ruepisa
+19.14	Wangdue Phodrang	Saephoog	Sephu
+19.15	Wangdue Phodrang	Thedtsho	Thedtsho
+20.01	Zhemgang	Bardo	Bardo
+20.02	Zhemgang	Bjoka	Bjoka
+20.03	Zhemgang	Goshing	Gozhing
+20.04	Zhemgang	Nangkor	Nangkor
+20.05	Zhemgang	Ngangla	Ngangla
+20.06	Zhemgang	Phangkhar	Pangkhar
+20.07	Zhemgang	Shingkhar	Shingkhar
+20.08	Zhemgang	Trong	Trong
