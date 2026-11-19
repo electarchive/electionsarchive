@@ -215,6 +215,7 @@ FILES = {
     "2022-totals": xls(41895, "Tabela2_konacna_Nuts_.XLS"),
     "2022-stations": xls(41904, "Tabela3_konacna_GM_.XLS"),
     "2026-export": f"{BASE}/export-results/{ROUND_2026}/2",
+    "settlements": "https://opendata.stat.gov.rs/data/WcfJsonRestService.Service1.svc/dataset/SIFNAS/1/csv",
 }
 
 
@@ -291,7 +292,7 @@ def fetch() -> None:
     for name, url in FILES.items():
         for attempt in range(4):
             try:
-                suffix = ".csv" if name.endswith("export") else "." + url.rsplit(".", 1)[1].lower()
+                suffix = ".csv" if name.endswith(("export", "settlements")) else "." + url.rsplit(".", 1)[1].lower()
                 artifact = raw.fetch(SOURCE, url, suffix=suffix)
                 if artifact.bytes == 0 or "html" in (artifact.media_type or ""):
                     raise RuntimeError(f"{url} was served as an empty or HTML page; remove its raw entry and run again")
@@ -613,8 +614,19 @@ def _norm(text: object) -> str:
 
 # names the archive's older tables print that two municipalities share, and the one each means
 ALIASES = {"палилула": "70203", "новисад": "89010", "петровац": "70912"}
-# municipalities that appear in older tables only, with their okrug
-OLDER = {"70858": ("20", "Град Ниш"), "90247": ("25", "Подујево")}
+# The six Kosovo municipalities the 1997 presidential tables print and the Commission's registers no longer list take
+# their codes from the Statistical Office's register of settlements (dataset SIFNAS, municipality code of each
+# settlement) and their okrug from the Government's decree on administrative districts.
+OLDER = {
+    "70858": ("20", "Град Ниш"),
+    "90247": ("25", "Подујево"),
+    "90034": ("25", "Глоговац"),
+    "90115": ("25", "Качаник"),
+    "90310": ("25", "Штимље"),
+    "90069": ("26", "Дечани"),
+    "90085": ("26", "Ђаковица"),
+    "90280": ("27", "Сува Река"),
+}
 
 
 def _match(name: str) -> str:
@@ -899,6 +911,7 @@ def geo() -> Package:
         ("rs.biracko_mesto", 3, "precinct", "polling station"),
     ):
         p.add("scheme", code=code, polity_id=SERBIA, kind=kind, rank=rank, noun=noun, code_system=None)
+    p.uses(raw.cached(SOURCE, FILES["settlements"]))
     okruzi, opstine, names = gazetteer()
     special = {ABROAD, PRISONS}
     for code, name in sorted(okruzi.items()):
