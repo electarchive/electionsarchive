@@ -16,14 +16,24 @@ from anthropic.types import ImageBlockParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from PIL import Image
 
-from ea import batch, raw
-from ea.changeset import Changeset, slug
+from ea import batch, package, raw
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.id.kpu_pilpres import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "id.kpu_dpd_2014"
-VERSION = "1"
+KEY = f"{SOURCE}/all"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
+SUMMARY = (
+    "Indonesia's Regional Representative Council (DPD) election of 2014: candidates, votes, and the four elected "
+    "members in each of 33 provinces, from KPU decrees 411 and 417 of 2014"
+)
+# North Kalimantan (65) was split from East Kalimantan (64) in 2012, but the 2014 DPD election still filled East
+# Kalimantan's four seats from both provinces together, as in 2004 and 2009; North Kalimantan elected its own members
+# from 2019. Its contest is counted at the spanning unit those years use and has no single-province district.
+SPANNING = {"KALIMANTAN TIMUR": "64+65"}
 KPU = "Komisi Pemilihan Umum Republik Indonesia"
 JDIH = "https://jdih.kpu.go.id/data/data_kepkpu/"
 DAY = date(2014, 4, 9)
@@ -351,6 +361,7 @@ def parse() -> None:
     frame.write_parquet(PARSED / "results.parquet")
     pl.DataFrame(candidates).write_parquet(PARSED / "candidates.parquet")
     print(f"{len(results)} results rows ({boxed} with a box), {len(candidates)} candidates")
+    print(build())
 
 
 SYSTEM_NOTE = (
@@ -367,20 +378,17 @@ NOTE = (
 MEASURE_IDS = {"votes": 1, "valid": 4}
 
 
-def emit() -> Path:
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package id.kpu_dpd_2014/all from the parsed tables. It reads the database, through Draft, so the
+    rows it rebuilds keep the ids the changeset path gave them."""
     results = pl.read_parquet(PARSED / "results.parquet")
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
     with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary=(
-                "Indonesia's Regional Representative Council (DPD) election of 2014: candidates, votes, and the four "
-                "elected members in each of 33 provinces, from KPU decrees 411 and 417 of 2014"
-            ),
-            polity="ID",
-        )
+        cs = Draft(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="ID")
 
         def name(entity: UUID, text: str, lang: str = "id", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
@@ -441,6 +449,8 @@ def emit() -> Path:
         def unit(code: str) -> UUID:
             if code not in units:
                 found = units[code] = cs.unit("id.provinsi", code)
+                if found in cs.minted and "+" in code:
+                    raise LookupError(f"the archive lacks the id.provinsi unit {code}; load id.kpu_pilpres first")
                 if found in cs.minted:
                     cs.add(
                         "reporting_unit",
@@ -457,6 +467,7 @@ def emit() -> Path:
         day = DAY.isoformat()
         for province in sorted(set(candidates["province"])):
             code = PROVINCES[province]
+            counted = SPANNING.get(province, code)
             key = f"{day}:dpd:{code}"
             contest = cs.key("id.contest", key)
             cs.add(
@@ -465,7 +476,7 @@ def emit() -> Path:
                 election_id=election,
                 kind="body_seats",
                 body_id=body,
-                district_area_id=cs.area("id.provinsi", code),
+                district_area_id=None if province in SPANNING else cs.area("id.provinsi", code),
                 term="full",
                 magnitude=4,
                 round_number=1,
@@ -476,7 +487,10 @@ def emit() -> Path:
             label = province.title().replace("Dki", "DKI").replace("Di ", "DI ")
             name(contest, f"2014 Regional Representative Council election in {label}", "en", "english")
             name(contest, f"Pemilihan Umum Anggota DPD Tahun 2014 Provinsi {label}")
-            cs.add("slug", path=f"id/{day}-legislative/dpd/{slug(label)}", entity_id=contest)
+            # The first load put the contests under dpd/<province>; that path stays as a redirect. It comes before
+            # the current path, so the load demotes it before it adds the new current slug.
+            cs.add("slug", path=f"id/{day}-legislative/dpd/{slug(label)}", entity_id=contest, is_current=False)
+            cs.add("slug", path=f"id/{day}-legislative/dpd-{slug(label)}", entity_id=contest, is_current=True)
             result_set = cs.key(f"{SOURCE}.result_set", key)
             cs.add(
                 "result_set",
@@ -532,7 +546,7 @@ def emit() -> Path:
             ):
                 fact = {
                     "result_set_id": result_set,
-                    "unit_id": unit(code),
+                    "unit_id": unit(counted),
                     "option_id": None if number is None else options[number],
                     "channel": 0,
                     "measure": MEASURE_IDS[measure],
@@ -545,3 +559,83 @@ def emit() -> Path:
                 x0, y0, x1, y1 = box
                 cs.add("value_locator", **fact, page_id=found, source_id=None, x0=x0, y0=y0, x1=x1, y1=y1)
         return cs.write()
+
+
+def package_from_export() -> Path:
+    """Build id.kpu_dpd_2014/all from the archive's published rows (`ea package export`) with the changes `build`
+    makes to them: East Kalimantan's contest counted at the unit for East and North Kalimantan together, with no
+    single-province district, and every contest's slug in the dpd-<province> form the other DPD years use, the old
+    path kept as a redirect. It reads no raw files, so it runs where the scans' transcriptions are not cached."""
+    out = package.export(SOURCE)
+    manifest = json.loads((out / "package.json").read_text())
+    before = {code: n for code, n, _ in package.check(out)}
+    tables = {file.stem: pl.read_parquet(file) for file in out.glob("*.parquet")}
+    keys = tables["external_id"]
+    day = DAY.isoformat()
+
+    def keyed(scheme: str, value: str) -> str:
+        (found,) = keys.filter((pl.col("scheme") == scheme) & (pl.col("value") == value))["entity_id"]
+        return str(found)
+
+    old = re.compile(rf"id/{day}-legislative/dpd/([a-z0-9-]+)")
+    moved: list[tuple[str, str, bool]] = []
+    for path, entity, current in tables["slug"].select("path", "entity_id", "is_current").iter_rows():
+        found = old.fullmatch(path)
+        if found and current:
+            moved += [(path, entity, False), (f"id/{day}-legislative/dpd-{found.group(1)}", entity, True)]
+        else:
+            moved.append((path, entity, current))
+    # A demoted path comes before the entity's current one: the load writes the slugs in file order, and an entity
+    # may hold only one current slug at a time.
+    slugs = pl.DataFrame(moved, schema=tables["slug"].schema, orient="row").sort("is_current", maintain_order=True)
+    codes = [code for province, spanning in SPANNING.items() for code in (PROVINCES[province], spanning)]
+    with connect() as conn:
+        units: dict[str, str] = dict(
+            conn.execute(
+                """select code, id::text from reporting_unit
+                   where scheme_code = 'id.provinsi' and code = any(%s) and valid_to is null""",
+                [codes],
+            ).fetchall()
+        )
+        held = conn.execute(
+            "select path, entity_id::text from slug where path = any(%s)", [slugs["path"].to_list()]
+        ).fetchall()
+        # The export cites its files by storage key alone; as a Draft package does, the manifest cites each with its
+        # url and sha256, which the inbox verifies the cache against.
+        cited = package._cited(conn, package._adopted(conn, SOURCE)[1], tables.get("source_artifact"))
+    if set(units) != set(codes):
+        raise LookupError(f"the archive lacks the id.provinsi units {sorted(set(codes) - set(units))}")
+    owners = dict(slugs.select("path", "entity_id").iter_rows())
+    if clash := [path for path, entity in held if owners[path] != entity]:
+        raise ValueError(f"other entities hold the paths {clash}")
+    current = slugs.filter(pl.col("is_current"))
+    if current.height != current["entity_id"].n_unique() or any(old.fullmatch(path) for path in current["path"]):
+        raise ValueError("a contest is left with a current slug in the old form, or with two")
+    tables["slug"] = slugs
+    for province, spanning in SPANNING.items():
+        code = PROVINCES[province]
+        contest = keyed("id.contest", f"{day}:dpd:{code}")
+        result_set = keyed(f"{SOURCE}.result_set", f"{day}:dpd:{code}")
+        tables["contest"] = tables["contest"].with_columns(
+            district_area_id=pl.when(pl.col("id") != contest).then(pl.col("district_area_id"))
+        )
+        for table in ("result_value", "value_locator"):
+            mine = pl.col("result_set_id") == result_set
+            found = set(tables[table].filter(mine)["unit_id"])
+            if not found or not found <= {units[code], units[spanning]}:
+                raise ValueError(f"{province}: {table} holds the units {found}")
+            tables[table] = tables[table].with_columns(
+                unit_id=pl.when(mine).then(pl.lit(units[spanning])).otherwise(pl.col("unit_id"))
+            )
+    counts = dict(manifest["tables"])
+    for table in ("contest", "slug", "result_value", "value_locator"):
+        tables[table].write_parquet(out / f"{table}.parquet", statistics=False)
+        counts[table] = tables[table].height
+    built = package._seal(KEY, SOURCE, SUMMARY, out, counts, manifest["adopts"], cited, None)
+    after = {code: n for code, n, _ in package.check(out)}
+    if after != before:
+        raise ValueError(f"{KEY}: the changes move the check findings from {before} to {after}")
+    built["accepted"] = manifest["accepted"]
+    (out / "package.json").write_text(json.dumps(built, indent=1) + "\n")
+    print(f"{KEY}: {len(SPANNING)} contest counted at a spanning unit, {current.height} current slugs", flush=True)
+    return out
