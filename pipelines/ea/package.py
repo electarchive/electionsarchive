@@ -1748,7 +1748,7 @@ union select id from area where scheme_code like 'world.%' or scheme_code like '
 
 
 PART: LiteralString = "coalesce(nullif(upper(split_part(coalesce(scope->>'polity', ''), '-', 1)), ''), '_')"
-LABEL: LiteralString = "(select n.text from name n where n.entity_id = {}.id order by n.is_preferred desc, n.lang = 'en' desc, n.text limit 1)"
+LABEL: LiteralString = "(select l.text from ref_name l where l.entity_id = {}.id)"
 PUBLISH: dict[str, tuple[LiteralString, dict[str, pl.DataType]]] = {
     "polity": (
         f"select t.id::text, t.iso_code, t.kind::text, {LABEL.format('t')}, c.pipeline from polity t",
@@ -1868,6 +1868,7 @@ PUBLISH: dict[str, tuple[LiteralString, dict[str, pl.DataType]]] = {
     ),
 }
 REFRESH = 86400
+REBUILD = 3600
 
 
 class Reference(NamedTuple):
@@ -1930,6 +1931,14 @@ def _partition(conn: Connection, target: Path, part: str) -> dict[str, int]:
         [part],
     )
     conn.execute("analyze ref_changeset")
+    conn.execute("drop table if exists ref_name")
+    conn.execute(
+        """create temp table ref_name as select distinct on (n.entity_id) n.entity_id, n.text
+           from name n join ref_changeset c on c.id = n.changeset_id
+           order by n.entity_id, n.is_preferred desc, n.lang = 'en' desc, n.text"""
+    )
+    conn.execute("create index on ref_name (entity_id)")
+    conn.execute("analyze ref_name")
     counts: dict[str, int] = {}
     with _connect() as con:
         for table, (query, schema) in PUBLISH.items():
@@ -1963,7 +1972,12 @@ def publish(target: Path) -> None:
         stale = sorted(
             str(part)
             for part, when in latest
-            if full or part not in partitions or when > datetime.fromisoformat(str(partitions[part]["built"]))
+            if full
+            or part not in partitions
+            or (
+                when > datetime.fromisoformat(str(partitions[part]["built"]))
+                and (began - datetime.fromisoformat(str(partitions[part]["built"]))).total_seconds() > REBUILD
+            )
         )
         for part in stale:
             built = datetime.now(UTC)
