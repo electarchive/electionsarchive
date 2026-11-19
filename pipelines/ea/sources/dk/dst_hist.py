@@ -94,6 +94,10 @@ class Unit:
     where: dict[tuple[str | None, int], tuple[int, Box]] = field(default_factory=dict)  # (option, measure) -> page, box
     invalids: list[int] | None = None  # invalid votes per question, when each question prints its own
     wheres: list[dict[tuple[str | None, int], tuple[int, Box]]] | None = None  # where, per question
+    casts: list[int] | None = None  # ballots cast per question, when each question prints its own
+
+
+YES_NO = (("yes", "Ja"), ("no", "Nej"))
 
 
 @dataclass
@@ -101,6 +105,7 @@ class Question:
     code: str
     english: str
     danish: str
+    options: tuple[tuple[str, str], ...] = YES_NO  # (code, ballot label), in the order of each unit's answers
 
 
 @dataclass
@@ -115,6 +120,8 @@ class Vote:
     pages: str = ""
     scanned: bool = False
     reading: str = ""
+    declared: dict[str, int] = field(default_factory=dict)  # the stated national result, where it differs from totals
+    accepted: dict[str, str] = field(default_factory=dict)
 
 
 def modern(volume: str, votes: tuple[str, str], ballots: tuple[str, str]) -> tuple[list[Unit], dict[str, int]]:
@@ -310,7 +317,7 @@ def election(vote: Vote) -> Package:
             lang="en",
         )
         options = {}
-        for position, (code, label) in enumerate((("yes", "Ja"), ("no", "Nej")), 1):
+        for code, label in question.options:
             options[code] = key("option", vote.day, question.code, code)
             p.add(
                 "contest_option",
@@ -324,8 +331,8 @@ def election(vote: Vote) -> Package:
             )
         for position, unit in enumerate(vote.units):
             uid = units[position]
-            yes, no = unit.answers[index]
-            put(p, result_set, uid, None, VALID, yes + no)
+            answers = unit.answers[index]
+            put(p, result_set, uid, None, VALID, sum(answers))
             if unit.registered is not None:
                 put(p, result_set, uid, None, REGISTERED, unit.registered)
             if unit.cast is not None and unit.invalid is not None:
@@ -333,8 +340,10 @@ def election(vote: Vote) -> Package:
                 put(p, result_set, uid, None, INVALID, unit.invalid)
             elif unit.invalids is not None:
                 put(p, result_set, uid, None, INVALID, unit.invalids[index])
-            put(p, result_set, uid, options["yes"], VOTES, yes)
-            put(p, result_set, uid, options["no"], VOTES, no)
+                if unit.casts is not None:
+                    put(p, result_set, uid, None, CAST, unit.casts[index])
+            for (code, _label), value in zip(question.options, answers, strict=True):
+                put(p, result_set, uid, options[code], VOTES, value)
             for (code, measure), (page, box) in (unit.wheres[index] if unit.wheres else unit.where).items():
                 width, height = page_sizes(vote.volume)[page]
                 if page not in pages:
@@ -363,13 +372,14 @@ def election(vote: Vote) -> Package:
                     x1=box[2] / width,
                     y1=box[3] / height,
                 )
+        stated = vote.totals | vote.declared
+        counts = [stated[f"{code}{index}"] for code, _label in question.options]
         for code, measure, value in (
-            (None, VALID, vote.totals[f"yes{index}"] + vote.totals[f"no{index}"]),
-            (None, REGISTERED, vote.totals.get("registered")),
-            (None, CAST, vote.totals.get("cast")),
-            (None, INVALID, vote.totals.get(f"invalid{index}", vote.totals.get("invalid"))),
-            ("yes", VOTES, vote.totals[f"yes{index}"]),
-            ("no", VOTES, vote.totals[f"no{index}"]),
+            (None, VALID, sum(counts)),
+            (None, REGISTERED, stated.get("registered")),
+            (None, CAST, stated.get(f"cast{index}", stated.get("cast"))),
+            (None, INVALID, stated.get(f"invalid{index}", stated.get("invalid"))),
+            *((code, VOTES, count) for (code, _label), count in zip(question.options, counts, strict=True)),
         ):
             if value is not None:
                 p.add(
@@ -379,6 +389,8 @@ def election(vote: Vote) -> Package:
                     measure=measure,
                     value=value,
                 )
+    for code, reason in vote.accepted.items():
+        p.accept(code, reason)
     return p
 
 
@@ -494,26 +506,27 @@ def against_summary(volume: str, root: Node) -> list[str]:
     return found
 
 
-def check(volume: str, units: list[Unit], totals: dict[str, int]) -> None:
+def check(volume: str, units: list[Unit], totals: dict[str, int], questions: list[Question] | None = None) -> None:
     """Fail unless the districts add up to each other and to the printed national figures."""
     for unit in units:
-        for yes, no in unit.answers:
-            if unit.invalids is None and yes + no != unit.valid:
-                raise ValueError(f"{volume} {unit.name}: yes {yes} and no {no} do not make valid {unit.valid}")
-    for index in range(len(units[0].answers)):
-        for measure, value in (
-            (f"yes{index}", sum(u.answers[index][0] for u in units)),
-            (f"no{index}", sum(u.answers[index][1] for u in units)),
-        ):
+        for answers in unit.answers:
+            if unit.invalids is None and sum(answers) != unit.valid:
+                raise ValueError(f"{volume} {unit.name}: the answers {answers} do not make valid {unit.valid}")
+    for index, question in enumerate(questions or [Question("question", "", "")] * len(units[0].answers)):
+        for position, (code, _label) in enumerate(question.options):
+            measure = f"{code}{index}"
+            value = sum(u.answers[index][position] for u in units)
             if value != totals[measure]:
                 raise ValueError(f"{volume} {measure}: districts add to {value}, the volume prints {totals[measure]}")
     for index in range(len(units[0].answers)):
-        if f"invalid{index}" in totals:
-            value = sum((u.invalids or [])[index] for u in units)
-            if value != totals[f"invalid{index}"]:
-                raise ValueError(
-                    f"{volume} invalid{index}: districts add to {value}, the volume prints {totals[f'invalid{index}']}"
-                )
+        for name, parts in (("invalid", lambda u: u.invalids), ("cast", lambda u: u.casts)):
+            if f"{name}{index}" in totals:
+                value = sum((parts(u) or [])[index] for u in units)
+                if value != totals[f"{name}{index}"]:
+                    raise ValueError(
+                        f"{volume} {name}{index}: districts add to {value}, "
+                        f"the volume prints {totals[f'{name}{index}']}"
+                    )
     for measure, value in (
         ("cast", sum(u.cast or 0 for u in units)),
         ("invalid", sum(u.invalid or 0 for u in units)),
@@ -1081,19 +1094,41 @@ def printed_1986() -> Vote:
     )
 
 
-# The 1961, 1963, and 1969 volumes are scans with an embedded text layer. Each table is kept as a tab-separated file
+# The 1920, 1939, 1953, 1961, 1963, and 1969 volumes are scans with an embedded text layer. Each table is kept as a tab-separated file
 # with one line per printed row: its kind, region, county or metropolitan constituency, number and name, then the
 # printed counts, then the page and box of each count. A figure the layer misreads or lacks was settled from the
 # page image and the table's own sums. The rows are checked here: the counts of each row follow from each other, the
 # districts add up to their county, the counties to the three regions, and the regions to the national figures.
 
 FILE_TABLES = {
+    "1920": ("dst_hist_1920.tsv", 4),  # yes, no, invalid, votes cast
+    "1939": ("dst_hist_1939.tsv", 4),  # yes, no, invalid, votes cast
+    "1953": ("dst_hist_1953.tsv", 8),  # yes, no, blank and invalid, votes cast; then the same for the voting age
     "1961": ("dst_hist_1961.tsv", 6),  # registered, yes, no, blank, other invalid, votes cast
     "1963": ("dst_hist_1963.tsv", 13),  # registered, then yes, no, invalid for each of the four proposals
     "1969": ("dst_hist_1969.tsv", 8),  # registered, cast, invalid, blank, other invalid, valid, yes, no
 }
-DAYS = {"1961": date(1961, 5, 30), "1963": date(1963, 6, 25), "1969": date(1969, 6, 24)}
+DAYS = {
+    "1920": date(1920, 9, 6),
+    "1939": date(1939, 5, 23),
+    "1953": date(1953, 5, 28),
+    "1961": date(1961, 5, 30),
+    "1963": date(1963, 6, 25),
+    "1969": date(1969, 6, 24),
+}
 TABLE_TITLES = {
+    "1920": (
+        "1920 referendum on the amendment of the Constitution",
+        "Folkeafstemningen den 6. september 1920 om forandringer i grundloven",
+    ),
+    "1939": (
+        "1939 referendum on a new Constitution",
+        "Folkeafstemningen den 23. maj 1939 om Danmarks Riges Grundlov",
+    ),
+    "1953": (
+        "1953 referendums on the Constitution and the voting age",
+        "Folkeafstemningerne den 28. maj 1953 om grundloven og valgretsalderen",
+    ),
     "1961": (
         "1961 referendum on lowering the voting age for the Folketing to 21",
         "Folkeafstemningen den 30. maj 1961 om ændring af valgretsalderen til folketinget",
@@ -1138,8 +1173,24 @@ PROPOSALS_1963 = (
         "Forslag til lov om ændringer i lov om naturfredning (grøn stemmeseddel)",
     ),
 )
+QUESTIONS_1953 = (
+    Question(
+        "constitution",
+        "Amendment of the Constitution of the Kingdom of Denmark",
+        "Ændring af Danmarks Riges Grundlov",
+    ),
+    Question(
+        "voting-age",
+        "The future voting age for the Folketing: 23 or 21 years",
+        "Den fremtidige valgretsalder til folketinget: 23 eller 21 år",
+        (("age-23", "For 23 år"), ("age-21", "For 21 år")),
+    ),
+)
 # the national figures each volume prints in its own summary table or text, in the order of the stored counts
 PRINTED_TOTALS = {
+    "1920": (614227, 19592, 6940, 640759),
+    "1939": (966277, 85717, 11770, 1063764),
+    "1953": (1183292, 319135, 17193 + 8038, 1527658, 840815, 700122, 67688, 1608625),
     "1961": (2880337, 586113, 479146, 1527, 7772, 1074558),
     "1963": (
         3043170,
@@ -1159,6 +1210,32 @@ PRINTED_TOTALS = {
     "1969": (3309551, 2103848, 8436, 1938, 6498, 2095412, 448724, 1646688),
 }
 LAYOUT_NOTES = {
+    "1920": (
+        " The table prints the yes, no, and invalid votes and the votes cast for each of the 111 districts; it prints "
+        "no voters entitled to vote below the national figure, which the volume estimates at 1,291,745 including the "
+        "Faroe Islands. The Faroe Islands are listed after the three regions and counted in the national figures. In "
+        "every row the yes, no, and invalid votes add up to the votes cast. The table prints 37,000 votes cast for the "
+        "county of Randers, where its districts and its own yes, no, and invalid votes make 30,700; the region and "
+        "country totals use 30,700. The volume's text states the national result as 614,130 yes, 19,581 no, and "
+        "7,048 invalid votes, which is the declared result stored here; the districts of its table add up to "
+        "614,227 yes, 19,592 no, and 6,940 invalid votes, with the same 640,759 votes cast."
+    ),
+    "1939": (
+        " The table prints the yes, no, and invalid votes and the votes cast for each district; it prints no voters "
+        "entitled to vote below the national figure, which the volume estimates at 2,173,420 including the Faroe "
+        "Islands. The Faroe Islands are listed after the three regions and counted in the national figures. In every "
+        "row the yes, no, and invalid votes add up to the votes cast, and the national figures match the volume's "
+        "summary."
+    ),
+    "1953": (
+        " The table prints, for each district, the yes and no votes, the blank and invalid votes together, and the "
+        "votes cast on the Constitution, and the votes for a voting age of 23 and of 21 years, the blank and invalid "
+        "votes, and the votes cast on the voting age. Voters aged 21 to 24 voted only on the voting age, so the two "
+        "questions have different electorates. The table prints no voters entitled to vote below the national "
+        "figure, which the volume estimates at 2,585,800 for the Constitution. The Faroe Islands are listed after "
+        "Denmark and counted in the national figures. In every row the answers and the blank and invalid votes add up "
+        "to the votes cast, and the national figures match the volume's summary."
+    ),
     "1961": (
         " The table prints the voters entitled to vote, the yes and no votes, the blank and other invalid votes, and "
         "the votes cast for each district. The Faroe Islands and Greenland are listed after the three regions and "
@@ -1178,6 +1255,13 @@ LAYOUT_NOTES = {
         "yes and no votes, and the votes cast from the invalid and valid votes."
     ),
 }
+PAGE_READING = (
+    " The volume is a scan. Each figure was read from the page image, checked against the volume's embedded text "
+    "layer, and is stored with the page and the box where it is printed. Every figure was then settled by the "
+    "table's own sums: the answers and the invalid votes add up to the votes cast in each row, the districts add "
+    "up to each county or metropolitan constituency, these to the three regions, and the regions to the national "
+    "figures printed in the volume."
+)
 READING = (
     " The volume is a scan. Each figure was read from the volume's embedded text layer and is stored with the page and "
     "the box where it is printed. Where the layer misread or omitted a figure, it was settled from the page image and "
@@ -1219,11 +1303,15 @@ def table_check(volume: str, entries: list[Entry]) -> None:
     width = FILE_TABLES[volume][1]
     for entry in entries:
         v = entry.values
-        wrong = {
-            "1961": v[1] + v[2] + v[3] + v[4] != v[5],
-            "1963": False,
-            "1969": v[2] != v[3] + v[4] or v[5] != v[6] + v[7] or v[1] != v[2] + v[5],
-        }[volume]
+        rules: dict[str, Callable[[], bool]] = {
+            "1920": lambda: v[0] + v[1] + v[2] != v[3],
+            "1939": lambda: v[0] + v[1] + v[2] != v[3],
+            "1953": lambda: v[0] + v[1] + v[2] != v[3] or v[4] + v[5] + v[6] != v[7],
+            "1961": lambda: v[1] + v[2] + v[3] + v[4] != v[5],
+            "1963": lambda: False,
+            "1969": lambda: v[2] != v[3] + v[4] or v[5] != v[6] + v[7] or v[1] != v[2] + v[5],
+        }
+        wrong = rules[volume]()
         if wrong:
             raise ValueError(f"{volume} {entry.name}: the counts of the row do not follow from each other: {v}")
 
@@ -1243,7 +1331,7 @@ def table_check(volume: str, entries: list[Entry]) -> None:
     inside = next((e for e in entries if e.kind == "dk"), None)
     outside = [leaf for leaf in leaves if not leaf.region]
     if inside is None:
-        agree(country, regions)
+        agree(country, [*regions, *outside])
     else:
         agree(inside, regions)
         agree(country, [inside, *outside])
@@ -1258,11 +1346,12 @@ def table_vote(volume: str) -> Vote:
     entries = table_entries(volume)
     table_check(volume, entries)
     english, danish = TABLE_TITLES[volume]
-    questions = (
-        [Question(code, en, da) for code, en, da in PROPOSALS_1963]
-        if volume == "1963"
-        else [Question("question", english, danish)]
-    )
+    if volume == "1963":
+        questions = [Question(code, en, da) for code, en, da in PROPOSALS_1963]
+    elif volume == "1953":
+        questions = list(QUESTIONS_1953)
+    else:
+        questions = [Question("question", english, danish)]
     units: list[Unit] = []
     for entry in entries:
         if entry.kind != "leaf":
@@ -1299,7 +1388,41 @@ def table_vote(volume: str) -> Vote:
                 )
             )
             continue
-        if volume == "1961":
+        if volume == "1953":
+            wheres = [
+                {
+                    **at(code, VOTES, 4 * q),
+                    **at(other, VOTES, 1 + 4 * q),
+                    **at(None, INVALID, 2 + 4 * q),
+                    **at(None, CAST, 3 + 4 * q),
+                }
+                for q, (code, other) in enumerate((("yes", "no"), ("age-23", "age-21")))
+            ]
+            units.append(
+                Unit(
+                    entry.group,
+                    entry.number,
+                    entry.name,
+                    None,
+                    v[0] + v[1],
+                    [(v[0], v[1]), (v[4], v[5])],
+                    where=wheres[0],
+                    invalids=[v[2], v[6]],
+                    wheres=wheres,
+                    casts=[v[3], v[7]],
+                )
+            )
+            continue
+        if volume in ("1920", "1939"):
+            yes, no, invalid, cast = v
+            registered = None
+            where = {
+                **at("yes", VOTES, 0),
+                **at("no", VOTES, 1),
+                **at(None, INVALID, 2),
+                **at(None, CAST, 3),
+            }
+        elif volume == "1961":
             registered, yes, no, blank, other, cast = v
             where = {
                 **at(None, REGISTERED, 0),
@@ -1322,7 +1445,28 @@ def table_vote(volume: str) -> Vote:
             Unit(entry.group, entry.number, entry.name, registered, yes + no, [(yes, no)], cast, invalid, where=where)
         )
     top = next(e for e in entries if e.kind == "total").values
-    if volume == "1963":
+    declared: dict[str, int] = {}
+    accepted: dict[str, str] = {}
+    if volume == "1953":
+        totals = {
+            "yes0": top[0],
+            "no0": top[1],
+            "invalid0": top[2],
+            "cast0": top[3],
+            "age-231": top[4],
+            "age-211": top[5],
+            "invalid1": top[6],
+            "cast1": top[7],
+        }
+    elif volume in ("1920", "1939"):
+        totals = {"yes0": top[0], "no0": top[1], "invalid": top[2], "cast": top[3]}
+        if volume == "1920":
+            declared = {"yes0": 614130, "no0": 19581, "invalid": 7048}
+            accepted["accounting.declared"] = (
+                "the volume's text declares 614,130 yes, 19,581 no, and 7,048 invalid votes, while the districts of "
+                "its own table add up to 614,227 yes, 19,592 no, and 6,940 invalid votes; both make 640,759 votes cast"
+            )
+    elif volume == "1963":
         totals = {"registered": top[0]}
         for q in range(4):
             totals |= {f"yes{q}": top[1 + 3 * q], f"no{q}": top[2 + 3 * q], f"invalid{q}": top[3 + 3 * q]}
@@ -1330,6 +1474,17 @@ def table_vote(volume: str) -> Vote:
         totals = {"registered": top[0], "yes0": top[1], "no0": top[2], "invalid": top[3] + top[4], "cast": top[5]}
     else:
         totals = {"registered": top[0], "cast": top[1], "invalid": top[2], "yes0": top[6], "no0": top[7]}
-    check(volume, units, totals)
-    reading = READING + LAYOUT_NOTES[volume]
-    return Vote(volume, DAYS[volume], english, danish, questions, units, totals, reading=reading)
+    check(volume, units, totals, questions)
+    reading = (PAGE_READING if volume in ("1920", "1939", "1953") else READING) + LAYOUT_NOTES[volume]
+    return Vote(
+        volume,
+        DAYS[volume],
+        english,
+        danish,
+        questions,
+        units,
+        totals,
+        reading=reading,
+        declared=declared,
+        accepted=accepted,
+    )
