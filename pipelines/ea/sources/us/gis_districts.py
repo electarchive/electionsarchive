@@ -91,7 +91,8 @@ def parse() -> None:
                 """select a.id::text, ac.code from area a join area_code ac on ac.area_id = a.id
                    where a.scheme_code in ('us.local_district', 'us.special_district')
                      and ac.code ~ '^(21|22|27):'
-                     and not exists (select 1 from area_geometry g where g.area_id = a.id)"""
+                     and not exists (select 1 from area_geometry g where g.area_id = a.id)
+                     and not exists (select from entity_merge m where m.entity_id = a.id)"""
             )
         }
     rows = []

@@ -347,7 +347,8 @@ def emit() -> Path:
         kept = {code for code, _ in shown} | set(moved.values())
         for code, id in conn.execute(
             """select c.code, a.id::text from area a join area_code c on c.area_id = a.id
-               join changeset s on s.id = c.changeset_id where a.scheme_code = 'us.precinct' and s.pipeline = %s""",
+               join changeset s on s.id = c.changeset_id where a.scheme_code = 'us.precinct' and s.pipeline = %s
+                 and not exists (select from entity_merge m where m.entity_id = a.id)""",
             [SOURCE],
         ).fetchall():
             if code not in kept and id not in kept:

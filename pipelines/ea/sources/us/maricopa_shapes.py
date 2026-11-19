@@ -29,7 +29,8 @@ def parse() -> None:
             """select a.id::text, ac.code from area a join area_code ac on ac.area_id = a.id
                where a.scheme_code = 'us.local_district'
                  and ac.code ~ '^04:04013:(justice-of-the-peace|constable):district-'
-                 and not exists (select 1 from area_geometry g where g.area_id = a.id)"""
+                 and not exists (select 1 from area_geometry g where g.area_id = a.id)
+                 and not exists (select from entity_merge m where m.entity_id = a.id)"""
         ).fetchall()
     rows = []
     for area, code in wanted:

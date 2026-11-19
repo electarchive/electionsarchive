@@ -456,6 +456,7 @@ def emit() -> Path:
                 """select distinct c.area_id from area_code c join area a on a.id = c.area_id
                    join changeset w on w.id = c.changeset_id
                    where a.scheme_code = 'fr.circonscription' and w.pipeline = 'fr.interieur' and c.valid_from >= %s
+                     and not exists (select from entity_merge m where m.entity_id = c.area_id)
                      and c.area_id <> all(%s::uuid[])""",
                 [REDISTRICTING, [str(area) for area in areas.values()]],
             ).fetchall()

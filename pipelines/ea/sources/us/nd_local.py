@@ -725,7 +725,8 @@ def fold(
                 cs.merge(person, cs.key(f"{SOURCE}.person", f"{target}:{key.removeprefix(f'{code}:')}"))
                 merged.add(person)
         for district, area in conn.execute(
-            "select code, area_id from area_code where code like %s", [f"38:{code}:%"]
+            "select c.code, c.area_id from area_code c where c.code like %s and not exists (select from entity_merge m where m.entity_id = c.area_id)",
+            [f"38:{code}:%"],
         ).fetchall():
             twin = f"38:{target}:{district.removeprefix(f'38:{code}:')}"
             if twin not in districts:

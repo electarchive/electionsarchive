@@ -33,7 +33,7 @@ def emit() -> Path:
                join polity_territory t on t.area_id = n.entity_id
                join polity p on p.id = t.polity_id and p.kind = 'municipality'
                join area_code c on c.area_id = t.area_id and c.code like '36%'
-               where n.is_preferred and n.text ~ '^[^(]+ City, NY$' and n.text <> 'New York City, NY'
+               where n.is_preferred and n.text ~ '^[^(]+ City, NY$' and n.text <> 'New York City, NY' and not exists (select from entity_merge m where m.entity_id = p.id)
                order by 1"""
         ).fetchall():
             cs.add("name", **dict(zip(COLUMNS, row, strict=True)), is_preferred=False)

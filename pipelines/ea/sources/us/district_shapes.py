@@ -229,7 +229,8 @@ def parse() -> None:
             wanted = conn.execute(
                 """select a.id::text, ac.code from area a join area_code ac on ac.area_id = a.id
                    where a.scheme_code = 'us.local_district' and ac.code ~ %s
-                     and not exists (select 1 from area_geometry g where g.area_id = a.id)""",
+                     and not exists (select 1 from area_geometry g where g.area_id = a.id)
+                     and not exists (select from entity_merge m where m.entity_id = a.id)""",
                 [layer["pattern"]],
             ).fetchall()
             matched = 0

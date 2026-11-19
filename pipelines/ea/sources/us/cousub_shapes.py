@@ -37,7 +37,8 @@ def parse() -> None:
                join area_code ac on ac.area_id = a.id
                left join name n on n.entity_id = a.id and n.is_preferred and n.lang = 'en'
                where a.scheme_code = 'us.local_district' and ac.code ~ '^51:51[0-9]{3}:board-of-supervisors:'
-                 and not exists (select 1 from area_geometry g where g.area_id = a.id)"""
+                 and not exists (select 1 from area_geometry g where g.area_id = a.id)
+                 and not exists (select from entity_merge m where m.entity_id = a.id)"""
         ).fetchall()
     bodies: dict[str, list[tuple[str, str]]] = {}
     for area, code, _ in wanted:
