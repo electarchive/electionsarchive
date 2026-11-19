@@ -15,6 +15,7 @@ from (
     from area a join area_geometry g on g.area_id = a.id
     left join display.clipped c on c.area_id = g.area_id and c.valid = g.valid and c.mask_version = %s
     where a.scheme_code = %s and g.valid @> %s::date
+      and not exists (select from entity_merge m where m.entity_id = a.id)
 ) x
 where p is not null
 """

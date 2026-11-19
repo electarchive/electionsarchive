@@ -100,6 +100,7 @@ hit as (
     select distinct on (up.aid) up.aid, p.iso_code
     from up join polity_territory pt on pt.area_id = up.cur
     join polity p on p.id = pt.polity_id and p.kind in ('federal_unit', 'region') and p.iso_code like '%%-%%'
+        and not exists (select from entity_merge m where m.entity_id = p.id)
     order by up.aid, up.depth
 ),
 code as (

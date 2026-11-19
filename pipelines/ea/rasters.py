@@ -24,6 +24,7 @@ select k, p as geom from (
     select a.k, {plane} as p
     from area a join area_geometry g on g.area_id = a.id
     where a.scheme_code = %s and g.valid @> %s::date
+      and not exists (select from entity_merge m where m.entity_id = a.id)
 ) x where p is not null
 """
 

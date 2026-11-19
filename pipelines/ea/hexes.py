@@ -161,7 +161,7 @@ def centers(tiles: Tiles, day: date) -> dict[str, tuple[str, float, float]]:
               join area_code pc on pc.area_id = pa.id) on ap.area_id = a.id and ap.valid @> %(day)s
             join area_geometry g on g.area_id = a.id and (g.valid @> %(day)s or g.valid is null),
             lateral st_pointonsurface(st_transform(g.geom, %(srid)s)) p
-            where a.scheme_code = %(scheme)s
+            where a.scheme_code = %(scheme)s and not exists (select from entity_merge m where m.entity_id = a.id)
             """,
             {"day": day, "srid": tiles.srid, "scheme": tiles.scheme, "parent": tiles.parent},
         ).fetchall()
