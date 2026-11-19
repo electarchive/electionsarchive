@@ -10,19 +10,7 @@ from ea.checks import MERGE_DELETES, references
 from ea.store import Connection, connect
 
 SOURCE = "merged_strays"
-VERSION = "1"
-HELD = {
-    "area_code": "area_id",
-    "area_parent": "area_id",
-    "area_geometry": "area_id",
-    "polity_parent": "polity_id",
-    "polity_territory": "polity_id",
-    "party_color": "party_id",
-    "party_position": "party_id",
-    "party_affiliation": "party_id",
-    "tenure_affiliation": "tenure_id",
-}
-LOOSE = {"valid", "valid_from", "valid_to", "valid_from_precision", "valid_to_precision", "source_id"}
+VERSION = "2"
 
 
 def _columns(conn: Connection, table: str) -> dict[str, str]:
@@ -48,43 +36,45 @@ def _key(columns: dict[str, str]) -> sql.Composable:
     )
 
 
-def _entities(conn: Connection, table: str) -> set[str]:
-    return {
-        column
-        for (column,) in conn.execute(
-            """select a.attname from pg_constraint c
-               join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
-               where c.contype = 'f' and c.conrelid = %s::regclass
-                 and c.confrelid::regclass::text = any(array['entity'] || enum_range(null::entity_type)::text[])""",
-            [f"public.{table}"],
+def _periods(conn: Connection) -> list[tuple[str, str, list[str]]]:
+    keys = dict(
+        conn.execute(
+            """select c.conrelid::regclass::text, array_agg(a.attname order by k.ordinality)
+               from pg_constraint c
+               cross join lateral unnest(c.conkey) with ordinality k(attnum, ordinality)
+               join pg_attribute a on a.attrelid = c.conrelid and a.attnum = k.attnum
+               where c.conperiod and c.contype in ('p', 'u') and c.connamespace = 'public'::regnamespace
+                 and a.attname <> 'valid'
+               group by c.oid, c.conrelid"""
         ).fetchall()
-    }
-
-
-def _duplicates(conn: Connection, table: str, column: str) -> list[dict[str, object]]:
-    columns = _columns(conn, table)
-    entities = _entities(conn, table)
-    same = [
-        sql.SQL(
-            "coalesce((select into_id from survivor where entity_id = t.{0}), t.{0}) is not distinct from x.{0}"
-            if other in entities
-            else "x.{0} is not distinct from t.{0}"
-        ).format(sql.Identifier(other))
-        for other in columns
-        if other != column and other not in LOOSE
+    )
+    return [
+        (relation, column, [other for other in keys[relation] if other != column])
+        for relation, column in conn.execute(
+            """select c.conrelid::regclass::text, a.attname from pg_constraint c
+               join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+               where c.contype = 'f' and c.connamespace = 'public'::regnamespace and a.attname <> 'id'
+                 and c.confrelid::regclass::text = any(array['entity'] || enum_range(null::entity_type)::text[])
+               order by 1, 2"""
+        ).fetchall()
+        if column in keys.get(relation, [])
     ]
+
+
+def _overridden(conn: Connection, table: str, column: str, others: list[str]) -> list[dict[str, object]]:
     return [
         key
         for (key,) in conn.execute(
             sql.SQL(
                 """select {key} from public.{table} t join survivor s on s.entity_id = t.{column}
-                   where exists (select from public.{table} x where x.{column} = s.into_id
-                                   and x.valid @> t.valid and {same})"""
+                   where exists (select from public.{table} x where x.{column} = s.into_id and x.valid && t.valid{same})"""
             ).format(
-                key=_key(columns),
+                key=_key(_columns(conn, table)),
                 table=sql.Identifier(table),
                 column=sql.Identifier(column),
-                same=sql.SQL(" and ").join([sql.SQL("true"), *same]),
+                same=sql.SQL("").join(
+                    sql.SQL(" and x.{0} is not distinct from t.{0}").format(sql.Identifier(other)) for other in others
+                ),
             )
         ).fetchall()
     ]
@@ -147,17 +137,17 @@ def emit() -> Path | None:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Clear rows that still reference merged-away entities and that the survivor already holds",
+            summary="Clear rows that still reference merged-away entities where the survivor holds its own row",
             polity=None,
             kind="correction",
         )
         dropped: Counter[str] = Counter()
-        for table, column in HELD.items():
-            for key in _duplicates(conn, table, column):
+        for table, column, others in _periods(conn):
+            for key in _overridden(conn, table, column, others):
                 cs.add(
                     "row_drop",
                     id=uuid7(),
-                    reason="Duplicate of a row the survivor of this entity's merge already holds for the same period",
+                    reason="The survivor of this entity's merge holds its own row for this period",
                     relation=table,
                     key=key,
                 )

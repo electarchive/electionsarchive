@@ -769,6 +769,16 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
                             ),
                         )
                     )
+            dated = column in periods.get(referencing, [])
+            held = sql.SQL("exists (select from public.{} x where x.{} = s.into_id and x.valid && t.valid{})").format(
+                sql.Identifier(referencing),
+                moved,
+                sql.SQL("").join(
+                    sql.SQL(" and x.{0} is not distinct from t.{0}").format(sql.Identifier(key))
+                    for key in periods.get(referencing, [])
+                    if key != column
+                ),
+            )
             conn.execute("select set_config('ea.repointing', 'on', true)")
             conn.execute(
                 sql.SQL(
@@ -784,22 +794,16 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
                         else ""
                     ),
                     staged=staged,
-                    guard=sql.SQL(
-                        " and not exists (select from public.{} x where x.{} = s.into_id and x.valid && t.valid{})"
-                    ).format(
-                        sql.Identifier(referencing),
-                        moved,
-                        sql.SQL("").join(
-                            sql.SQL(" and x.{0} is not distinct from t.{0}").format(sql.Identifier(key))
-                            for key in periods[referencing]
-                            if key != column
-                        ),
-                    )
-                    if column in periods.get(referencing, [])
-                    else sql.SQL(""),
+                    guard=sql.SQL(" and not {}").format(held) if dated else sql.SQL(""),
                 )
             )
             conn.execute("select set_config('ea.repointing', 'off', true)")
+            if dated:
+                conn.execute(
+                    sql.SQL("delete from public.{} t using {} s where t.{} = s.entity_id and {}").format(
+                        sql.Identifier(referencing), staged, moved, held
+                    )
+                )
         for relation, column, parent in checks.references(conn):
             if parent not in types:
                 continue
@@ -1735,10 +1739,12 @@ REVIEWED = (
 )
 
 
-def _matching(alias: str, key: list[str], column: str, owner: sql.Composable) -> sql.Composable:
+def _matching(alias: str, key: list[str], column: str, owner: sql.Composable, period: bool = False) -> sql.Composable:
     return sql.SQL(" and ").join(
         sql.SQL("{}.{} = {}").format(sql.Identifier(alias), sql.Identifier(name), owner)
         if name == column
+        else sql.SQL("{0}.{1} && h.{1}").format(sql.Identifier(alias), sql.Identifier(name))
+        if period and name == "valid"
         else sql.SQL("{0}.{1} is not distinct from h.{1}").format(sql.Identifier(alias), sql.Identifier(name))
         for name in key
     )
@@ -1784,6 +1790,7 @@ def _unmerge(conn: Connection, stage: Stage) -> None:
                where c.contype = 'f' and c.connamespace = 'public'::regnamespace
                  and c.confrelid::regclass::text = any(%s) and a.attname <> 'id'
                  and c.conrelid::regclass::text not in ('search_document', 'entity_merge_drop')
+                 and to_regclass(c.conrelid::regclass::text || '_history') is not null
                  and (c.conrelid::regclass::text, a.attname) <> ('entity_merge', 'entity_id')""",
             [["entity", kind]],
         ).fetchall():
@@ -1857,7 +1864,7 @@ def _unmerge(conn: Connection, stage: Stage) -> None:
                 ).fetchall()
             ]
             for period, key in keys:
-                if period or column not in key:
+                if column not in key:
                     continue
                 conn.execute(
                     sql.SQL(
@@ -1875,8 +1882,8 @@ def _unmerge(conn: Connection, stage: Stage) -> None:
                         history=history,
                         moved=moved,
                         repointed=repointed,
-                        mine=_matching("t", identity, column, sql.SQL("%(entity)s")),
-                        theirs=_matching("t", key, column, sql.SQL("any(%(chain)s)")),
+                        mine=_matching("t", key if period else identity, column, sql.SQL("%(entity)s"), period),
+                        theirs=_matching("t", key, column, sql.SQL("any(%(chain)s)"), period),
                     ),
                     bound,
                 )
