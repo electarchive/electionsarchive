@@ -21,6 +21,7 @@ import shapely.geometry
 from ea import changeset, package, raw
 from ea.package import Package
 from ea.sources.cr.tse import dsr
+from ea.sources.iq import ihec_shapes
 
 SOURCE = "iq.ihec"
 IRAQ = str(uuid5(package.NAMESPACE, "polity\x1fIQ"))
@@ -84,6 +85,19 @@ TABLES: dict[str, tuple[str, tuple[str, ...]]] = {
     "cancelled": (
         "CANCELED_PS_STATS_28_11",
         ("PC_PS", "Edno", "PC_NO", "PS_NO", "ValidBallot", "InvalidBallot", "Voters", "reason"),
+    ),
+    "pc": (
+        "pc",
+        (
+            "pcCode",
+            "governorateCode",
+            "constituencyCode",
+            "vrcCode",
+            "pctypeen",
+            "electionType",
+            "latitude_final",
+            "longitude_final",
+        ),
     ),
     "districts": (
         "1_constituency",
@@ -150,6 +164,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, HOME, suffix=".html")
     raw.fetch(SOURCE, GB_GOVERNORATES, suffix=".geojson")
     raw.fetch(SOURCE, GB_META, suffix=".json")
+    raw.fetch(SOURCE, ihec_shapes.ADM2, suffix=".geojson")
+    raw.fetch(SOURCE, ihec_shapes.ADM2_META, suffix=".json")
     for name, (entity, columns) in TABLES.items():
         restart = None
         page = 0
@@ -286,6 +302,8 @@ def district_area(edno: str) -> str:
 
 IHEC = key("source", "ihec")
 GEO = key("source", "geoboundaries-adm1")
+GEO_QADHAS = key("source", "geoboundaries-adm2")
+CENTERS = key("source", "ihec-polling-centers")
 COUNCIL = key("body", "council-of-representatives")
 SYSTEM_DISTRICT = key("electoral_system", "district")
 SYSTEM_QUOTA = key("electoral_system", "quota")
@@ -387,6 +405,23 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=governorate_area(GOVERNORATES[govno][0]))
         p.name(id, english, "en", "official")
         p.name(id, native, "ar", "native", False)
+    p.add(
+        "boundary_set",
+        id=key("boundary_set", DISTRICT_SCHEME, 2021),
+        scheme_code=DISTRICT_SCHEME,
+        vintage="2021",
+        valid_from=ihec_shapes.LAW_IN_FORCE,
+        as_of=DAY,
+    )
+    ihec_shapes.add(
+        p,
+        table("pc"),
+        pages("pc"),
+        {str(row["edno"]): district_area(str(row["edno"])) for row in regular()},
+        GEO_QADHAS,
+        CENTERS,
+        lambda edno: key("note", "district-shape", edno),
+    )
     return p
 
 
