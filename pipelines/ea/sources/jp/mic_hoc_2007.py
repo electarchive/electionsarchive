@@ -191,9 +191,9 @@ def existing(pairs: set[tuple[str, str]]) -> dict[tuple[str, str], str]:
         found = {
             (scheme, value): str(entity)
             for scheme, value, entity in conn.execute(
-                "select scheme, value, entity_id from external_id"
-                " where (scheme, value) in (select * from unnest(%s::text[], %s::text[]))",
-                [[s for s, _ in pairs], [v for _, v in pairs]],
+                "select e.scheme, e.value, e.entity_id from external_id e join changeset c on c.id = e.changeset_id"
+                " where c.pipeline <> %s and (e.scheme, e.value) in (select * from unnest(%s::text[], %s::text[]))",
+                [SOURCE, [s for s, _ in pairs], [v for _, v in pairs]],
             ).fetchall()
         }
         merged: dict[str, str] = {}
@@ -262,8 +262,9 @@ def build() -> Package:
         held_units = {
             str(row[0])
             for row in conn.execute(
-                "select id from reporting_unit where scheme_code in ('jp.municipality', 'jp.ward', %s)",
-                [mic.PIECES],
+                "select u.id from reporting_unit u join changeset c on c.id = u.changeset_id"
+                " where c.pipeline <> %s and u.scheme_code in ('jp.municipality', 'jp.ward', %s)",
+                [SOURCE, mic.PIECES],
             ).fetchall()
         }
 
