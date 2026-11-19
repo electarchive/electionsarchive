@@ -5,6 +5,8 @@ import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import pymupdf
+
 PERCENT = re.compile(r"^\d+(?:[.,]\d+)?%$")
 DECIMAL = re.compile(r"^\d+[.,]\d{1,2}$")
 INTEGER = re.compile(r"^\d{1,3}(?:[, ]\d{3})*$|^\d+$")
@@ -565,4 +567,35 @@ def national_1996(path: Path) -> National:
         if out.votes and len(numbers) >= 4 and re.fullmatch(r"[\d., ]+", line.strip()):
             out.valid, out.rejected, out.cast, out.registered = numbers[:4]
             break
+    return out
+
+
+def read_schedule(path: Path) -> list[tuple[str, str, str]]:
+    """A 2026 delimitation schedule's rows as (district, constituency, ward). A district and its constituency are
+    printed only on a constituency's first row, so later rows carry them over, across pages too. The columns are
+    told apart by where each word starts against the page's header."""
+    out: list[tuple[str, str, str]] = []
+    district = constituency = ""
+    for page in pymupdf.open(path):
+        rows: dict[int, list[tuple[float, str]]] = {}
+        for word in page.get_text("words"):
+            rows.setdefault(round(word[3]), []).append((word[0], word[4]))
+        header: dict[str, float] = {}
+        for y in sorted(rows):
+            words = sorted(rows[y])
+            if words[0][1] == "District":
+                header = {text: x for x, text in words}
+                continue
+            line = " ".join(text for _, text in words)
+            if not header or re.fullmatch(r"\d+ of \d+", line):
+                continue
+            columns = ["", "", ""]
+            for x, text in words:
+                at = 0 if x < header["Constituency"] - 45 else 1 if x < header["Ward"] - 80 else 2
+                columns[at] = f"{columns[at]} {text}".strip()
+            district = columns[0] or district
+            constituency = columns[1] or constituency
+            if not (district and constituency and columns[2]):
+                raise ValueError(f"{path.name}: row {line!r} lacks a district, constituency, or ward")
+            out.append((district, constituency, columns[2]))
     return out

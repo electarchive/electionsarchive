@@ -1,9 +1,14 @@
-"""Zambia's constituencies of the 2016 plan and wards of the 2021 plan, with their shapes, for `zm.ecz`.
+"""Zambia's constituencies of the 2016 and 2026 plans and wards of the 2021 plan, with their shapes, for `zm.ecz`.
 
 The shapes come from OCHA's COD-AB dataset for Zambia, which the Disaster Management and Mitigation Unit compiled from
 the Electoral Commission's delimitation: its third level holds the 156 constituencies and its fourth the 1,853 wards.
 Each constituency matches the Commission's notices by name; three Solwezi seats carry their district's name in the
 dataset. Each ward matches a notice's ward by name within its district, after the curated spellings below.
+
+The 226 constituencies of the 2026 plan are drawn from the same wards. The Commission's delimitation schedules list
+the wards of each new or reviewed constituency; every other constituency keeps the wards it held in 2016, less any
+that a schedule gives to another. Solwezi Central and Solwezi North share six wards cut from the dataset's Rodwell
+Mwepu ward, so those two have no shape.
 """
 
 import functools
@@ -24,6 +29,7 @@ from shapely.ops import transform
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.zm import text
 
 SOURCE = "zm.ecz"
 COD = (
@@ -93,6 +99,34 @@ TERRITORY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fZMB"))
 PLAN_2016 = date(2016, 8, 11)
 WARDS_2021 = date(2021, 8, 12)
 PLAN_2026 = date(2026, 8, 13)
+UPLOADS = "https://www.elections.org.zm/wp-content/uploads"
+DELIMITATION = "https://www.elections.org.zm/?p=5529"
+PROVINCES = (
+    "Central",
+    "Copperbelt",
+    "Eastern",
+    "Luapula",
+    "Lusaka",
+    "Muchinga",
+    "North-Western",
+    "Northern",
+    "Southern",
+    "Western",
+)
+SCHEDULES = [f"{UPLOADS}/{province}-Province-1.pdf" for province in PROVINCES]
+SEATS_2026 = 226
+# a ward a 2026 schedule spells differently from the dataset, as (district letters, schedule letters): dataset letters
+SCHEDULE_SPELLINGS = {
+    ("LUFWANYAMA", "KABUNDYA"): "KABUNDIA",
+    ("NDOLA", "DAGHAMMERSKJOELD"): "DAGHAMMERSJOELD",
+    ("ZAMBEZI", "LWITADILWATEMBO"): "LWITADILWATEMBU",
+    ("MPULUNGU", "MUSENGEZI"): "MUSENGENZI",
+    ("SESHEKE", "KATIMAMULILO"): "KATIMA",
+}
+# an unscheduled constituency of 2026 that the 2021 notice names otherwise, as 2026 letters: 2021 letters
+RENAMED = {"LUANO": "MKUSHISOUTH", "MUSHINDAMO": "SOLWEZIEAST"}
+# the schedule's wards that the dataset holds as one ward, Rodwell Mwepu, which they split between two constituencies
+SPLIT = {"KYAWAMA", "KIMALE", "KAZHIBA", "KIVUKU", "KYAFUKUMA", "KIFUBWA"}
 CONSTITUENCIES = 156
 WARDS = 1853
 TOLERANCE = 0.0001  # degrees, about 11 meters
@@ -119,6 +153,10 @@ def letters(name: str) -> str:
 
 def constituency_area(number: int) -> str:
     return key("area", "zm.constituency", 2016, f"{number:03d}")
+
+
+def constituency_area_2026(number: int) -> str:
+    return key("area", "zm.constituency", 2026, f"{number:03d}")
 
 
 def ward_area(pcode: str) -> str:
@@ -284,12 +322,74 @@ def ward(district: str | None, name: str, seat: str = "") -> Place | None:
     return within[0] if len(within) == 1 else None
 
 
+@functools.cache
+def schedule() -> list[tuple[str, str, str]]:
+    """Every row of the ten provincial delimitation schedules of 2026, as (district, constituency, ward)."""
+    return [row for url in SCHEDULES for row in text.read_schedule(raw.cached(SOURCE, url).path)]
+
+
+def plan_2026(listed: dict[int, str], listed_2016: dict[int, str]) -> dict[int, shapely.Geometry]:
+    """The shapes of the 2026 plan's constituencies, `listed` by number as the 2026 notice prints them, from the
+    dataset's wards: a scheduled constituency takes the wards its schedule lists, and any other keeps the wards of the
+    2016 constituency of its number (`listed_2016`) that no schedule gives away. A constituency with a ward the dataset
+    does not hold apart is left out."""
+    by_name = {letters(name): number for number, name in listed.items()}
+    if len(by_name) != SEATS_2026 or len(listed) != SEATS_2026:
+        raise ValueError(f"the 2026 notice lists {len(listed)} constituencies, not {SEATS_2026}")
+    by_district: dict[str, list[Place]] = {}
+    for place in wards():
+        by_district.setdefault(letters(place.district_name), []).append(place)
+    members: dict[int, list[Place]] = {}
+    split: set[int] = set()
+    claimed: dict[str, int] = {}
+    for district, seat, name in schedule():
+        number = by_name.get(letters(seat))
+        if number is None:
+            raise ValueError(f"the schedule's constituency {seat!r} is not in the 2026 notice")
+        members.setdefault(number, [])
+        spelled = SCHEDULE_SPELLINGS.get((letters(district), letters(name)), letters(name))
+        if spelled in SPLIT:
+            split.add(number)
+            continue
+        found = [place for place in by_district.get(letters(district), []) if letters(place.name) == spelled]
+        if not found:
+            found = [place for place in wards() if letters(place.name) == spelled]
+        if len(found) != 1:
+            raise ValueError(f"the schedule's ward {name!r} of {seat} matches {len(found)} wards in the dataset")
+        if found[0].pcode in claimed:
+            raise ValueError(f"the schedules give ward {name!r} to two constituencies")
+        claimed[found[0].pcode] = number
+        members[number].append(found[0])
+    old = assign(listed_2016)
+    for number, name in listed.items():
+        if number in members:
+            continue
+        if number not in old:
+            raise ValueError(f"new constituency {number} {name} has no schedule")
+        if RENAMED.get(letters(name), letters(name)) != letters(listed_2016[number]):
+            raise ValueError(f"constituency {number} {name} was {listed_2016[number]} in 2016")
+        kept = [place for place in wards() if place.parent == old[number].pcode and place.pcode not in claimed]
+        if not kept:
+            raise ValueError(f"constituency {number} {name} keeps none of its 2016 wards")
+        members[number] = kept
+        claimed.update((place.pcode, number) for place in kept)
+    left = [place for place in wards() if place.pcode not in claimed]
+    shared = {old[number].pcode for number in split if number in old}
+    if any(place.parent not in shared for place in left):
+        raise ValueError(f"{len(left)} wards of the dataset fall in no 2026 constituency")
+    return {
+        number: _multi(shapely.union_all([place.shape for place in found]))
+        for number, found in sorted(members.items())
+        if number not in split
+    }
+
+
 def district_code(name: str) -> str | None:
     spelled = letters(name)
     return _district_codes().get(spelled)
 
 
-def _outline(p: Package, id: str, geometry: shapely.Geometry, source: str, start: date, end: date) -> None:
+def _outline(p: Package, id: str, geometry: shapely.Geometry, source: str, start: date, end: date | None) -> None:
     p.add(
         "area_geometry",
         area_id=id,
@@ -304,15 +404,17 @@ def _outline(p: Package, id: str, geometry: shapely.Geometry, source: str, start
     )
 
 
-def geo(listed: dict[int, str], ward_names: dict[str, str], listed_150: dict[int, str]) -> Package:
+def geo(
+    listed: dict[int, str], ward_names: dict[str, str], listed_150: dict[int, str], listed_2026: dict[int, str]
+) -> Package:
     """The constituencies, `listed` by number as a notice prints them, and the wards, named by `ward_names` by p-code
     where a notice names them and by the dataset otherwise."""
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "Zambia's 150 constituencies of 1991 to 2016, its 156 of 2016 to 2026, and its 1,853 wards of 2021 to 2026, with "
-        "their shapes from public-domain ward layers and the COD-AB dataset compiled by the Disaster Management and "
-        "Mitigation Unit",
+        "Zambia's 150 constituencies of 1991 to 2016, its 156 of 2016 to 2026, its 226 from 2026, and its 1,853 wards "
+        "of 2021 to 2026, with their shapes from public-domain ward layers, the COD-AB dataset compiled by the "
+        "Disaster Management and Mitigation Unit, and the Electoral Commission's 2026 delimitation schedules",
         depends=[f"{SOURCE}/registry"],
     )
     p.external |= {ZAMBIA, TERRITORY}
@@ -415,4 +517,41 @@ def geo(listed: dict[int, str], ward_names: dict[str, str], listed_150: dict[int
         p.add("area_parent", area_id=id, parent_id=by_pcode[place.parent], valid_from=WARDS_2021, valid_to=PLAN_2026)
         p.name(id, ward_names.get(place.pcode, place.name), "en", "official")
         _outline(p, id, place.shape, cod, WARDS_2021, PLAN_2026)
+    schedules = key("source", "delimitation-2026")
+    p.add(
+        "source",
+        id=schedules,
+        kind="official_body",
+        publisher="Electoral Commission of Zambia",
+        title="2026 Delimitation of Constituencies: Schedule of New and Reviewed Constituencies with Wards",
+        url=DELIMITATION,
+        license="No license stated; published by the electoral authority for public use",
+        attribution="Electoral Commission of Zambia",
+        notes=(
+            "Ten provincial schedules, announced on 16 April 2026, listing the wards of each new or reviewed "
+            "constituency. Each 2026 constituency here is the union of its wards' shapes in the COD-AB dataset; a "
+            "constituency the schedules leave out keeps the wards of its 2016 namesake that no schedule gives "
+            "away. Solwezi Central and Solwezi North divide six wards that the dataset holds as one, Rodwell "
+            "Mwepu, so they have no shape."
+        ),
+    )
+    for url in SCHEDULES:
+        p.artifact(raw.cached(SOURCE, url), schedules)
+    p.add(
+        "boundary_set",
+        id=key("boundary_set", "zm.constituency", "2026"),
+        scheme_code="zm.constituency",
+        vintage="2026",
+        valid_from=PLAN_2026,
+        as_of=PLAN_2026,
+    )
+    outlines = plan_2026(listed_2026, listed)
+    for number, name in sorted(listed_2026.items()):
+        id = constituency_area_2026(number)
+        p.add("area", id=id, scheme_code="zm.constituency")
+        p.add("area_code", area_id=id, code=f"{number:03d}", valid_from=PLAN_2026)
+        p.add("area_parent", area_id=id, parent_id=TERRITORY, valid_from=PLAN_2026)
+        p.name(id, name, "en", "official")
+        if number in outlines:
+            _outline(p, id, outlines[number], schedules, PLAN_2026, None)
     return p

@@ -4,9 +4,10 @@ The Commission publishes its results as PDF public notices: presidential and Nat
 constituency, mayoral and council chairperson results by district, councillor results by ward, and one notice for each
 by-election date. Each notice's text layer is read in `ea.sources.zm.text`.
 
-The `geo` package, built in `ea.sources.zm.shapes`, holds the shapes of the 156 constituencies contested from 2016 to
-2021 and of the wards of 2021. Each unit of those plans is linked to its area; the 150 constituencies before 2016,
-the 226 of 2026, and the wards before 2021 have no open shapes yet, so their units stay unlocated.
+The `geo` package, built in `ea.sources.zm.shapes`, holds the shapes of the 150 constituencies contested from 1991 to
+2015, the 156 of 2016 to 2021, the 226 of 2026, and the wards of 2021. Each unit of those plans is linked to its area;
+the wards before 2021 and the two Solwezi constituencies of 2026 have no open shapes yet, so their units stay
+unlocated.
 """
 
 import re
@@ -201,6 +202,11 @@ def fetch() -> None:
     for url in urls():
         raw.fetch(SOURCE, url, suffix=".pdf")
     raw.fetch(SOURCE, shapes.COD, suffix=".zip")
+    for base in (shapes.OLD, shapes.NEW):
+        for suffix in shapes.PARTS:
+            raw.fetch(SOURCE, base + suffix, suffix=f".{suffix}")
+    for url in shapes.SCHEDULES:
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def parse() -> None:
@@ -360,7 +366,18 @@ def ward_names() -> dict[str, str]:
 
 
 def geo() -> Package:
-    return shapes.geo(seats(), ward_names(), {n: display(v) for n, v in constituencies().items()})
+    return shapes.geo(seats(), ward_names(), {n: display(v) for n, v in constituencies().items()}, seats_2026())
+
+
+@cache
+def seats_2026() -> dict[int, str]:
+    """The 226 constituencies of the 2026 plan by number, named as the 2026 presidential notice prints them."""
+    return {int(number(u, "president", "2026")): display(u.name) for u in units("2026", "", "president")}
+
+
+@cache
+def shaped_2026() -> frozenset[int]:
+    return frozenset(shapes.plan_2026(seats_2026(), seats()))
 
 
 def alike(name: str, other: str) -> bool:
@@ -379,6 +396,11 @@ def area(day: date, part: Part, u: Unit, code: str) -> str | None:
                 f"{day}: constituency {code} {u.name!r} does not match the 2016 plan's {seats()[int(code)]}"
             )
         return shapes.constituency_area(int(code))
+    if part.kind in ("president", "assembly") and day >= shapes.PLAN_2026:
+        listed = seats_2026().get(int(code))
+        if listed is None or not alike(u.name, listed):
+            raise ValueError(f"{day}: constituency {code} {u.name!r} does not match the 2026 plan's {listed}")
+        return shapes.constituency_area_2026(int(code)) if int(code) in shaped_2026() else None
     if part.kind in ("president", "assembly") and shapes.PLAN_1991 <= day < shapes.PLAN_2016:
         listed = constituencies().get(int(code))
         if listed is None or not any(
@@ -537,7 +559,7 @@ def build(day: date) -> Package:
         SOURCE,
         f"The Zambian {'by-elections' if held_by else 'election'} of {day.day} {day:%B %Y}, by constituency, district, "
         "and ward, from the Electoral Commission of Zambia's public notices",
-        depends=[f"{SOURCE}/registry", *([f"{SOURCE}/geo"] if shapes.PLAN_1991 <= day < shapes.PLAN_2026 else [])],
+        depends=[f"{SOURCE}/registry", *([f"{SOURCE}/geo"] if day >= shapes.PLAN_1991 else [])],
     )
     p.external.add(ZAMBIA)
     id = key("election", day)
