@@ -186,20 +186,45 @@ ELECTIONS = [
 BY_DAY = {e.day: e for e in ELECTIONS}
 
 
+YEAR_FILES: dict[int, list[str]] = {
+    2005: [PDF_2005, TURNOUT],
+    2009: [XLS_2009, ABROAD_2009],
+    2013: [XLSX_2013],
+    2017: [PAGE_2017],
+}
+
+
+def fetched(url: str) -> bool:
+    try:
+        raw.cached(SOURCE, url)
+    except LookupError:
+        return False
+    return True
+
+
+def held() -> list[Election]:
+    """The elections whose files are in the raw cache. The 2017 host resets some connections, so that election is
+    built only once its page has been fetched; the others never depend on it."""
+    return [e for e in ELECTIONS if all(fetched(url) for url in YEAR_FILES[e.year])]
+
+
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{e.day}" for e in ELECTIONS)]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{e.day}" for e in held())]
 
 
 def fetch() -> None:
     for url, suffix in FILES.items():
-        raw.fetch(SOURCE, url, suffix=suffix)
+        try:
+            raw.fetch(SOURCE, url, suffix=suffix)
+        except Exception as error:  # a refused host leaves only its own election out
+            print(f"{url}: {error!r}", flush=True)
     raw.fetch(GEOBOUNDARIES, moi.ADM1, suffix=".geojson")
 
 
 def parse() -> None:
     geo().write()
     registry().write()
-    for e in ELECTIONS:
+    for e in held():
         election(e).write()
 
 
@@ -609,7 +634,7 @@ def counties(e: Election) -> list[Row]:
 
 
 def vintages() -> dict[int, list[Row]]:
-    return {e.year: counties(e) for e in ELECTIONS if e.unit != "ir.ostan"}
+    return {e.year: counties(e) for e in held() if e.unit != "ir.ostan"}
 
 
 def geo() -> Package:
@@ -617,6 +642,7 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         "Iran's provinces of 2005 and the counties and districts the presidential results of 2009 to 2017 report",
+        depends=[f"{moi.SOURCE}/geo"],
     )
     p.external |= {IRAN, COUNTRY}
     artifact = raw.cached(GEOBOUNDARIES, moi.ADM1)
@@ -735,21 +761,22 @@ def registry() -> Package:
             "portal's turnout workbook."
         ),
     )
-    p.add(
-        "source",
-        id=NEWS_SOURCE,
-        kind="news_agency",
-        publisher="Eghtesadonline (اقتصادآنلاین)",
-        title="Detailed results of the twelfth presidential election by province and county, as announced by the "
-        "Ministry of Interior",
-        url=PAGE_2017,
-        license="Published with no license stated",
-        attribution="Eghtesadonline, reproducing the Ministry of Interior's announcement",
-        notes=(
-            "The article reproduces the Ministry's announcement of the 2017 results by county and a national table "
-            "by province and abroad."
-        ),
-    )
+    if fetched(PAGE_2017):
+        p.add(
+            "source",
+            id=NEWS_SOURCE,
+            kind="news_agency",
+            publisher="Eghtesadonline (اقتصادآنلاین)",
+            title="Detailed results of the twelfth presidential election by province and county, as announced by the "
+            "Ministry of Interior",
+            url=PAGE_2017,
+            license="Published with no license stated",
+            attribution="Eghtesadonline, reproducing the Ministry of Interior's announcement",
+            notes=(
+                "The article reproduces the Ministry's announcement of the 2017 results by county and a national table "
+                "by province and abroad."
+            ),
+        )
     for url, source in (
         (TURNOUT, PORTAL_SOURCE),
         (XLS_2009, PORTAL_SOURCE),
@@ -758,7 +785,8 @@ def registry() -> Package:
         (PDF_2005, PDF_SOURCE),
         (PAGE_2017, NEWS_SOURCE),
     ):
-        p.artifact(cached(url), source)
+        if fetched(url):
+            p.artifact(cached(url), source)
     p.add("office", id=PRESIDENCY, polity_id=IRAN, kind="head_of_government")
     p.name(PRESIDENCY, "President of Iran", "en", "official")
     p.name(PRESIDENCY, "رئیس‌جمهور ایران", "fa", "native", False)
@@ -802,14 +830,16 @@ ACCEPTED = {
 def election(e: Election) -> Package:
     first = e.round == 1
     path = f"ir/{e.day}-presidential" + ("" if first else "-runoff")
-    depends = [f"{SOURCE}/geo", f"{SOURCE}/registry"]
+    depends = [f"{SOURCE}/geo", f"{SOURCE}/registry", f"{moi.SOURCE}/geo"]
     if not first:
         depends.append(f"{SOURCE}/{ELECTIONS[0].day}")
+    if e.year in (2009, 2017):
+        depends.append("ir.referendum/geo")  # the ir.nation scheme of the votes cast abroad
     p = Package(
         f"{SOURCE}/{e.day}", SOURCE, e.names[0] + ", by " + ("province" if e.unit == "ir.ostan" else "county"), depends
     )
     p.external |= {IRAN, COUNTRY}
-    for url in {2005: [PDF_2005, TURNOUT], 2009: [XLS_2009, ABROAD_2009], 2013: [XLSX_2013], 2017: [PAGE_2017]}[e.year]:
+    for url in YEAR_FILES[e.year]:
         p.uses(cached(url))
     election_id = key("election", e.day)
     p.add(
