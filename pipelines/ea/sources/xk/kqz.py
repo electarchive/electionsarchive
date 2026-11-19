@@ -9,7 +9,8 @@ polling centers, the political entities, and their candidates with their gender.
 
 The Commission's main site, kqz-ks.org, serves its result archive behind a browser challenge. Its Assembly elections
 are built from files saved in a browser, by the module `kuvendi`, into the same geo and registry packages.
-The local elections of 2017 to 2023 are built by the module `local` from the files of the same archive.
+The local elections of 2017 to 2023 are built by the module `local` from the files of the same archive, and the
+votes of 21 April 2024 on removing four mayors by the module `recall` from the Commission's press conference pages.
 """
 
 import functools
@@ -111,7 +112,7 @@ LIST_METHOD = (
 
 
 def packages() -> list[str]:
-    from ea.sources.xk import kuvendi, local
+    from ea.sources.xk import kuvendi, local, recall
 
     return [
         f"{SOURCE}/geo",
@@ -121,6 +122,7 @@ def packages() -> list[str]:
         *(f"{SOURCE}/{day}" for day in kuvendi.DAYS),
         f"{SOURCE}/local-registry",
         *(f"{SOURCE}/{day}" for day in local.DAYS),
+        recall.KEY,
     ]
 
 
@@ -130,16 +132,17 @@ def _data(path: Path) -> None:
 
 
 def fetch() -> None:
-    from ea.sources.xk import kuvendi, local
+    from ea.sources.xk import kuvendi, local, recall
 
     for url in URLS:
         raw.fetch(SOURCE, url, suffix=".json", check=_data)
     kuvendi.fetch_all()
     local.fetch()
+    recall.fetch()
 
 
 def parse() -> None:
-    from ea.sources.xk import kuvendi, local
+    from ea.sources.xk import kuvendi, local, recall
 
     geo().write()
     registry().write()
@@ -150,6 +153,7 @@ def parse() -> None:
     local.registry().write()
     for day in local.DAYS:
         local.election_package(day).write()
+    recall.election_package().write()
 
 
 def emit() -> None:
