@@ -1,0 +1,64 @@
+{
+  "notices": [
+    {"election": "2015", "area": "Balochistan", "ref": "32987", "number": "F.3(8)/2014-Cord.", "dated": "2015-03-10", "basis": "returned",
+     "seats": {
+      "general": [["Hasil Khan Bizenjo", "National Party"], ["Muhammad Usman", "PMA"], ["Mir Nematullah Zehri", "PML(N)"], ["Molana Abdul Ghafoor Haideri", "JUI(F)"], ["Mir Muhammad Yousaf Badini", "Independent"], ["Sardar Muhammad Azam Khan", "PMAP"], ["Dr. Jehanzeb Jamaldini", "BNP(M)"]],
+      "technocrat": [["Mir Kabir Ahmed", "National Party"], ["Engineer Agha Shehbaz Khan", "PML(N)"]],
+      "women": [["Gul Bashra", "PMAP"], ["Kalsoom Perveen", "PML(N)"]],
+      "non_muslim": [["Dr. Ashok Kumar", "National Party"]]}},
+    {"election": "2015", "area": "Khyber Pakhtunkhwa", "ref": "32984", "number": "F.3(7)/2014-Cord.", "dated": "2015-03-10", "basis": "returned",
+     "seats": {
+      "general": [["Sirajul Haq", "JI"], ["Syed Shibli Faraz", "PTI"], ["Atta Ur Rehman", "JUI(F)"], ["Muhsin Aziz", "PTI"], ["Liaqat Khan Tarakai", "PTI"], ["Salahuddin Tirmizi", "PML(N)"], ["Khanzada Khan", "PPPP"]],
+      "technocrat": [["Nauman Wazir", "PTI"], ["Muhammad Javed Abbasi", "PML(N)"]],
+      "women": [["Samina Abid Ali", "PTI"], ["Sitara Ayaz", "ANP"]],
+      "non_muslim": [["John Kenneth Williams", "PTI"]]}},
+    {"election": "2015", "area": "Sindh", "ref": "32986", "number": "F.3(6)/2014-Cord.", "dated": "2015-03-10", "basis": "returned",
+     "seats": {
+      "general": [["Islamuddin Shaikh", "PPPP"], ["Khushbakht Shujat", "MQM"], ["Mian Muhammad Ateeq Shaikh", "MQM"], ["Gianchand", "PPPP"], ["Saleem Mandviwalla", "PPPP"], ["Abdul Latif Ansari", "PPPP"], ["Abdul Rehman Malik", "PPPP"]]}},
+    {"election": "2015", "area": "Sindh", "ref": "L262", "number": "F.3(6)/2014-Cord.", "dated": "2015-03-06", "basis": "uncontested",
+     "seats": {
+      "technocrat": [["Farooq Hamid Naek", "PPPP"], ["Muhammad Ali Khan Saif", "MQM"]],
+      "women": [["Sassui Paljo", "PPPP"], ["Nighat Mirza", "MQM"]]}},
+    {"election": "2021", "area": "Federal Capital", "ref": "sn15", "page": 1, "number": "F.3(7)/2021-Cord.", "dated": "2021-03-10", "basis": "returned",
+     "seats": {
+      "general": [["Syed Yousuf Raza Gillani", "PPPP"]],
+      "women": [["Fawzia Arshad", "PTI"]]}},
+    {"election": "2021", "area": "Punjab", "ref": "sn15", "page": 2, "number": "F.3(2)/2021-Cord.", "dated": "2021-03-10", "basis": "uncontested",
+     "seats": {
+      "general": [["Kamil Ali Agha", "PML"], ["Saifullah Sarwar Khan Nyazee", "PTI"], ["Afnan Ullah Khan", "PML(N)"], ["Aon Abbas", "PTI"], ["Ejaz Ahmad Chaudhary", "PTI"], ["Sajid Mir", "PML(N)"], ["Irfan-ul-Haque Siddiqui", "PML(N)"]],
+      "technocrat": [["Azam Nazeer Tarar", "PML(N)"], ["Syed Ali Zafar", "PTI"]],
+      "women": [["Zarqa Suharwardy Taimur", "PTI"], ["Saadia Abbasi", "PML(N)"]]}},
+    {"election": "2021", "area": "Sindh", "ref": "sn15", "page": 3, "number": "F.3(3)/2021-Cord.", "dated": "2021-03-10", "basis": "returned",
+     "seats": {
+      "general": [["Sheher Bano Sherry Rehman", "PPPP"], ["Syed Faisal Ali Subzwari", "MQM(P)"], ["Saleem Mandviwalla", "PPPP"], ["Taj Haider", "PPPP"], ["Muhammad Faisal Vawda", "PTI"], ["Shahadat Awan", "PPPP"], ["Jam Mahtab Hussain Dahar", "PPPP"]],
+      "technocrat": [["Farooq Hamid Naek", "PPPP"], ["Saifullah Abro", "PPPP"]],
+      "women": [["Palwasha Mohammad Zai Khan", "PPPP"], ["Khalida Ateeb", "MQM(P)"]]}},
+    {"election": "2021", "area": "Khyber Pakhtunkhwa", "ref": "sn15", "page": 4, "number": "F.3(4)/2021-Cord.", "dated": "2021-03-10", "basis": "returned",
+     "seats": {
+      "general": [["Mohsin Aziz", "PTI"], ["Liaqat Khan Tarakai", "PTI"], ["Syed Shibli Faraz", "PTI"], ["Hidayatullah Khan", "ANP"], ["Faisal Saleem Rehman", "PTI"], ["Atta-ur-Rehman", "JUIP"], ["Zeeshan Khan Zada", "PTI"]],
+      "technocrat": [["Dost Muhammad Khan", "PTI"], ["Muhammad Humayun Mohmand", "PTI"]],
+      "women": [["Sania Nishtar", "PTI"], ["Falak Naz", "PTI"]],
+      "non_muslim": [["Gurdeep Singh", "PTI"]]}},
+    {"election": "2021", "area": "Balochistan", "ref": "sn15", "page": 5, "number": "F.3(5)/2021-Cord.", "dated": "2021-03-10", "basis": "returned",
+     "seats": {
+      "general": [["Muhammad Abdul Qadir", "Independent"], ["Muhammad Qasim", "BNP"], ["Molana Abdul Ghafoor Haideri", "JUIP"], ["Prince Ahmed Umer Ahmedzai", "BAP"], ["Umer Farooq", "ANP"], ["Manzoor Ahmed", "BAP"], ["Sarfraz Ahmed Bugti", "BAP"]],
+      "technocrat": [["Kamran Murtaza", "JUIP"], ["Saeed Ahmed Hashmi", "BAP"]],
+      "women": [["Samina Mumtaz Zehri", "BAP"], ["Naseema Ehsan", "Independent"]],
+      "non_muslim": [["Danesh Kumar", "BAP"]]}},
+    {"election": "2024", "area": "Federal Capital", "ref": "hKfz", "number": "F.3(6)/2024-Coord.", "dated": "2024-04-05", "basis": "returned",
+     "seats": {
+      "general": [["Rana Mahmood ul Hassan", "PPPP"]],
+      "technocrat": [["Muhammad Ishaq Dar", "PML-N"]]}},
+    {"election": "2024", "area": "Balochistan", "ref": "kVwO", "number": "F.3(5)/2024-Coord.", "dated": "2024-04-05", "basis": "uncontested",
+     "seats": {
+      "general": [["Ahmed Khan", "JUIP"], ["Anwar ul Haq", "Independent"], ["Aimal Wali Khan", "ANP"], ["Jan Muhammad", "NP"], ["Sardar Al Haj Muhammad Umer Gorgaij", "PPPP"], ["Syedaal Khan", "PML-N"], ["Shahzaib Durrani", "PML-N"]],
+      "technocrat": [["Bilal Ahmed Khan", "PPPP"], ["Abdul Wasay", "JUIP"]],
+      "women": [["Husna Bano", "PPPP"], ["Rahat Jamali", "PML-N"]]}},
+    {"election": "2024-bye", "area": "Federal Capital", "ref": "EJbw", "number": "F.9(1)/2024-Coord(M/F).", "dated": "2024-03-22", "basis": "returned",
+     "seats": {"general": [["Syed Yousaf Raza Gilani", "PPPP"]]}},
+    {"election": "2024-bye", "area": "Sindh", "ref": "EJbw", "number": "F.9(1)/2024-Coord(M/F).", "dated": "2024-03-22", "basis": "returned",
+     "seats": {"general": [["Jam Saifullah Khan", "PPPP"], ["Qaiser Khan Abro", "PPPP"]]}},
+    {"election": "2024-bye", "area": "Balochistan", "ref": "EJbw", "number": "F.9(1)/2024-Coord(M/F).", "dated": "2024-03-22", "basis": "returned",
+     "seats": {"general": [["Abdul Qudoos", "PPPP"], ["Mir Dostain Khan Domki", "PML-N"], ["Abdul Shakoor Khan", "Independent"]]}}
+  ]
+}
