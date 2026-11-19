@@ -63,12 +63,6 @@ PARTIES = {
     "up": "UP",
     "ppm": "PPM",
 }
-NEW_PARTIES = {
-    "NDP": "National Development Party",
-    "PDP": "Peoples' Development Party",
-    "MRP": "Muviwa Chilungamo Revolutionary Party",
-    "ODYA ZAKE": "Odya Zake Alibe Mlandu",
-}
 # One printed registered-voter figure has a stray comma, `3,1501`; its printed 61.42 percent turnout of 19,348 voters
 # fixes it at 31,501.
 FIXES = {"3,1501": 31501}
@@ -227,12 +221,11 @@ def place(day: date, contest: Contest) -> tuple[str, str, str]:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo-by", f"{SOURCE}/registry-by", *(f"{SOURCE}/{day}" for day in FILES)]
+    return [f"{SOURCE}/geo-by", *(f"{SOURCE}/{day}" for day in FILES)]
 
 
 def parse() -> None:
     geo().write()
-    registry().write()
     for day in FILES:
         election(day).write()
 
@@ -279,23 +272,6 @@ def geo() -> Package:
     return p
 
 
-def registry() -> Package:
-    p = Package(
-        f"{SOURCE}/registry-by",
-        SOURCE,
-        "Parties that stood in the by-elections and are not in the registry of the earlier elections",
-        depends=[f"{SOURCE}/registry"],
-    )
-    p.external |= {MALAWI}
-    for code, full in NEW_PARTIES.items():
-        id = party(code)
-        p.add("party", id=id, kind="party", polity_id=MALAWI)
-        p.add("external_id", entity_id=id, scheme="mw.mec.party", value=code)
-        p.name(id, code, "en", "abbreviation")
-        p.name(id, full, "en", "official")
-    return p
-
-
 def election(day: date) -> Package:
     contests_ = book(day)
     fresh = [c for c in contests_ if c.name == FRESH]
@@ -304,8 +280,7 @@ def election(day: date) -> Package:
         f"{SOURCE}/{day}",
         SOURCE,
         f"The {day:%-d %B %Y} by-elections" + (" and the Balaka Mulunguzi fresh election" if fresh else ""),
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/registry-by"]
-        + ([f"{SOURCE}/geo-by"] if day.year >= 2026 else []),
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"] + ([f"{SOURCE}/geo-by"] if day.year >= 2026 else []),
     )
     p.external |= {MALAWI, COUNTRY}
     p.artifact(raw.cached(SOURCE, url(day)), MEC_SOURCE)
