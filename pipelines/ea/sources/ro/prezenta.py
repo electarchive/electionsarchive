@@ -930,7 +930,8 @@ PARTIAL_NOTE = (
 ELECTED_NOTE = (
     "The mayors and county council presidents declared elected are those with the most votes in the record of the "
     "constituency's or county's electoral bureau; where two candidates tied for the most votes, no one is declared "
-    "elected in that round. The Central Electoral Bureau's national records of 2024 give the mandates won by each "
+    "elected in that round. Where the vote was held again on 7 July 2024, as in Costinești, the record of 9 June elects "
+    "no one. The Central Electoral Bureau's national records of 2024 give the mandates won by each "
     "party, and the pipeline checks the declared mayors and county presidents against them."
 )
 
@@ -941,7 +942,7 @@ def local_kind(row: Row) -> str:
 
 
 def local(day: str, parties: set[str]) -> tuple[Package, Build]:
-    name, first, kind, cutoff = LOCALS[day]
+    name, first, kind, _ = LOCALS[day]
     runoff = kind == "runoff"
     english, romanian = LOCAL_NAMES[kind]
     when = f"{first.day} {first.strftime('%B')}"
@@ -972,14 +973,7 @@ def local(day: str, parties: set[str]) -> tuple[Package, Build]:
             lang="en",
         )
     b = Build(p, day, parties)
-    rows = records(name)
-    if cutoff:
-        fresh = {(r.county, r.uat) for r in rows if r.scope == "UAT" and r.created[:10] >= cutoff}
-        rows = [
-            r for r in rows if r.scope in ("PRCNCT", "UAT") and (r.county, r.uat) in fresh and r.created[:10] >= cutoff
-        ]
-        if not rows:
-            raise ValueError(f"{day}: no records signed for the election")
+    rows = signed(day)
     for row in rows:
         if row.scope != "PRCNCT":
             continue
@@ -1030,6 +1024,10 @@ def local(day: str, parties: set[str]) -> tuple[Package, Build]:
             if votes is not None:
                 b.values.append((contest, unit, option, 0, VOTES, votes))
     declare(b, [r for r in rows if r.scope in ("UAT", "CNTY")], day)
+    if day == "2024-06-09":
+        # a vote held again on 7 July 2024 elected no one on 9 June, whatever the bureau's record of that day shows
+        again = {local_contest(day, local_kind(r), r.county or "", r.uat) for r in signed("2024-07-07")}
+        b.elected = [(contest, option) for contest, option in b.elected if contest not in again]
     if b.elected:
         for url in BEC_LOCAL:
             p.artifact(raw.cached(SOURCE, url), BEC_SOURCE)
@@ -1039,6 +1037,20 @@ def local(day: str, parties: set[str]) -> tuple[Package, Build]:
     b.stage()
     accept(p)
     return p, b
+
+
+def signed(day: str) -> list[Row]:
+    """The records of one local election; for a runoff or a partial election, only those signed for it."""
+    name, _, _, cutoff = LOCALS[day]
+    rows = records(name)
+    if cutoff:
+        fresh = {(r.county, r.uat) for r in rows if r.scope == "UAT" and r.created[:10] >= cutoff}
+        rows = [
+            r for r in rows if r.scope in ("PRCNCT", "UAT") and (r.county, r.uat) in fresh and r.created[:10] >= cutoff
+        ]
+        if not rows:
+            raise ValueError(f"{day}: no records signed for the election")
+    return rows
 
 
 def local_contest(day: str, tip: str, county: str, uat: str | None) -> str:
