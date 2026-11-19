@@ -795,7 +795,7 @@ def geo() -> Package:
         label_point=shapely.to_wkb(
             shapely.set_srid(shapely.point_on_surface(outline), 4326), hex=True, include_srid=True
         ),
-        quality="open",
+        quality="academic",
         source_id=GEO_SOURCE,
     )
     p.add(
