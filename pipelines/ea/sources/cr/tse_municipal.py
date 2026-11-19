@@ -402,6 +402,11 @@ COSTA_RICA, COUNTRY, TSE_SOURCE, key, area, party = (
     tse.area,
     tse.party,
 )
+MAYOR_OFFICE = key("office", "mayor")
+INTENDANT_OFFICE = key("office", "intendant")
+DISTRICT_COUNCIL = key("body", "district_council")
+"""The generic rows the first version of the municipal package held. No contest points at them any longer, but they
+stay until a later version drops them, after the election packages that referenced them have been reloaded."""
 MUNICIPAL_DISTRICT_COUNCIL = key("body", "municipal_district_council")
 """The body of the councilors a district with an intendency elects, which the registry holds no seat for."""
 FAMILY = {MAYOR: tse.MAYOR, COUNCIL: tse.DISTRICT_COUNCIL, INTENDANT: tse.INTENDANT}
@@ -544,6 +549,16 @@ def municipal() -> Package:
     sources(p)
     for day in DAYS:
         p.artifact(raw.cached(SOURCE, tse.zip_url(day.archive)), TSE_SOURCE)
+    for id, text, native in (
+        (MAYOR_OFFICE, "Mayor of a canton of Costa Rica", "Alcalde"),
+        (INTENDANT_OFFICE, "Intendant of a district of Costa Rica", "Intendente de distrito"),
+    ):
+        p.add("office", id=id, polity_id=COSTA_RICA, kind="mayor")
+        p.name(id, text, "en", "official")
+        p.name(id, native, "es", "native", False)
+    p.add("body", id=DISTRICT_COUNCIL, polity_id=COSTA_RICA, kind="council")
+    p.name(DISTRICT_COUNCIL, "District council of Costa Rica", "en", "official")
+    p.name(DISTRICT_COUNCIL, "Concejo de distrito", "es", "native", False)
     for (family, code), text in sorted(missing_seats().items()):
         english, native, kind = tse.AREAS[family]
         id = tse.seat(family, code)
