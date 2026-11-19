@@ -8,6 +8,7 @@ nation is loaded. The runoff joins the 2004 election and first-round contest tha
 import os
 import re
 from datetime import datetime
+from pathlib import Path
 from uuid import uuid5
 
 from ea import package, raw
@@ -89,7 +90,7 @@ def emit() -> None:
 
 
 def _figures(path: object) -> set[int]:
-    text = open(str(path), encoding="utf-8", errors="replace").read()
+    text = Path(str(path)).read_text(encoding="utf-8", errors="replace")
     return {int(m.replace(".", "")) for m in re.findall(r"\d{1,3}(?:\.\d{3})+", text)}
 
 
