@@ -155,6 +155,26 @@ ELECTIONS = [
         "pr-2026-11-01", "pres", date(2026, 11, 1), Z + "pvr202610/tur2/opendata/export.zip", "pres2026b", None, 2
     ),
 ]
+# The CIK's decisions that declare the elected president and vice president after a second round, with the final
+# results of the new election: the bulk exports of these rounds carry no flag for the winning ticket.
+DECISIONS = {
+    "pr-2021-11-21": "https://www.cik.bg/bg/decisions/1015/2021-11-23",
+    "pr-2026-11-01": "https://www.cik.bg/bg/decisions/441/2026-11-03",
+}
+MONTHS = [
+    "януари",
+    "февруари",
+    "март",
+    "април",
+    "май",
+    "юни",
+    "юли",
+    "август",
+    "септември",
+    "октомври",
+    "ноември",
+    "декември",
+]
 # Pages the 2009 build reads besides its bulk export: the national table that names the lists.
 LISTS_2009 = "https://pi2009.cik.bg/results/proportional/index.html"
 # The 2009 European Parliament results pages (the national table, the allocation of seats, and the candidate lists),
@@ -427,7 +447,9 @@ def url_of(name: str) -> str:
 def fetch() -> None:
     pages = [page_of(e) for e in ELECTIONS if e.layout == "pres2006"]
     early = [EP2007.url, EP2007_PAGE, *(b.url for b in BLOCKS), *pages]
-    for url in dict.fromkeys([*(e.url for e in ELECTIONS), RECOUNT_URL, RECOUNT_PAGE, LISTS_2009, *early, EKATTE_URL]):
+    for url in dict.fromkeys(
+        [*(e.url for e in ELECTIONS), *DECISIONS.values(), RECOUNT_URL, RECOUNT_PAGE, LISTS_2009, *early, EKATTE_URL]
+    ):
         try:
             raw.fetch(SOURCE, url, suffix=".zip" if url.endswith((".zip", "/download")) else ".html")
         except httpx.HTTPError as failure:
@@ -540,6 +562,49 @@ def cite(p: Package, e: Election) -> None:
         p.uses(artifact)  # the package this one depends on already holds the artifact row
     else:
         p.artifact(artifact, CIK_SOURCE)
+    if e.id in DECISIONS:
+        p.artifact(raw.cached(SOURCE, DECISIONS[e.id]), CIK_SOURCE)
+
+
+class Declaration(NamedTuple):
+    voters: int  # voters by the signatures in the rolls at the new election
+    votes: dict[str, int]  # final votes of each ticket, by the names of its two candidates
+    none: int  # "I do not support anyone" votes
+    president: str
+    vice: str
+
+
+def _dashes(text: str) -> str:
+    return re.sub(r"\s+", " ", text.replace("\u2013", "-").replace("\u2212", "-")).strip()
+
+
+def declaration(e: Election) -> Declaration:
+    """What the CIK's decision declares about a second round: the final votes and the elected ticket."""
+    page = raw.cached(SOURCE, DECISIONS[e.id]).path.read_text(encoding="utf-8")
+    page = re.sub(r"<script.*?</script>|<style.*?</style>", "", page, flags=re.DOTALL)
+    text = html.unescape(re.sub(r"<[^>]+>", "\n", re.sub(r"</(p|div|tr|li)>", "\n", page))).replace("\xa0", " ")
+    lines = [re.sub(r"\s+", " ", x).strip() for x in text.split("\n")]
+    lines = [x for x in lines if x]
+    day = f"{e.day.day} {MONTHS[e.day.month - 1]} {e.day.year}"
+    voters = re.search(rf"{day} г\. се произведе нов избор .*? гласуваха ([\d ]+) избиратели", " ".join(lines))
+    assert voters, "voters"
+    start = next(i for i, x in enumerate(lines) if x.startswith("2. ОБЯВЯВА окончателните резултати от новия избор"))
+    end = next(i for i, x in enumerate(lines) if x.startswith("3. ОБЯВЯВА за избран"))
+    votes: dict[str, int] = {}
+    none = 0
+    for line in lines[start + 1 : end]:
+        clean = _dashes(line).replace("„", "").replace("“", "")
+        found = re.match(r"^(?:№ ?\d+ )?(.*?) - ([\d ]+) действителни гласове?", clean)
+        assert found, line
+        label, count = found[1], int(found[2].replace(" ", ""))
+        if label.startswith("Не подкрепям никого"):
+            none = count
+        else:
+            votes[label.split(",")[0]] = count
+    president = re.search(r"ОБЯВЯВА за избран(?:а)? за президент на Република България (.+?)\.$", lines[end])
+    vice = re.search(r"ОБЯВЯВА за избран(?:а)? за вицепрезидент на Република България (.+?)\.$", lines[end + 1])
+    assert president and vice, lines[end : end + 2]
+    return Declaration(int(voters[1].replace(" ", "")), votes, none, _dashes(president[1]), _dashes(vice[1]))
 
 
 def num(row: list[str], index: int) -> int | None:
@@ -1325,6 +1390,21 @@ def build(e: Election) -> Package:
         for c in cands:
             kind = "elected" if c.elected else "lost"
             p.add("outcome", result_set_id=sets[0], option_id=options[(0, c.party)], kind=kind)
+    elif e.id in DECISIONS:
+        said = declaration(e)
+        used: set[str] = set()
+        for c in cands:
+            head, _, mate = c.name.partition(" и ")
+            head, mate = _dashes(head), _dashes(mate)
+            win = head == said.president
+            assert win == (mate == said.vice), (head, mate, said)
+            used.add(_dashes(c.name))
+            option = options[(0, c.party)]
+            p.add("outcome", result_set_id=sets[0], option_id=option, kind="elected" if win else "lost")
+            p.add("declared", result_set_id=sets[0], option_id=option, measure=VOTES, value=said.votes[_dashes(c.name)])
+        assert used == set(said.votes), (used, said)
+        p.add("declared", result_set_id=sets[0], option_id=none_option[0], measure=VOTES, value=said.none)
+        p.add("declared", result_set_id=sets[0], option_id=None, measure=VOTERS, value=said.voters)
     elif e.layout == "ep2009":
         won = {r[0]: int(r[2]) for r in ep2009_table("https://ep2009.cik.bg/mandates/index.html")}
         assert sum(won.values()) == EP2009_SEATS, won
