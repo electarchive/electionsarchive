@@ -606,6 +606,7 @@ def summary() -> dict[str, object]:
                 "state": "running" if open_ else "failed" if job["failed"] else "ended",
                 "batches": len(sent),
                 "open": len(open_),
+                "pending": [{"id": item["id"], "account": item["account"]} for item in open_],
                 "requests": sum(len(item["keys"]) for item in sent),
                 "counts": counts,
                 "failed": len(job["failed"]),
