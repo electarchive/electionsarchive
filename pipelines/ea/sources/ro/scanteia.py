@@ -792,8 +792,6 @@ def build(e: Election) -> Package:
             kind="standard",
             valid_from=e.day,
             valid_from_precision="day",
-            valid_to=e.day,
-            valid_to_precision="day",
         )
         p.name(unit, area_name(e.plan, code), "ro", "official")
         for field, (option, measure) in measures.items():
@@ -940,8 +938,6 @@ def build_referendum(r: Referendum) -> Package:
             kind="standard",
             valid_from=r.day,
             valid_from_precision="day",
-            valid_to=r.day,
-            valid_to_precision="day",
         )
         p.name(unit, area_name(r.plan, code), "ro", "official")
 
