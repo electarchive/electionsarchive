@@ -523,6 +523,7 @@ def build(plan: Plan) -> Package:
         "native",
         False,
     )
+    held = held_dossiers(plan)
     slugs: set[str] = set()
     off: list[tuple[str, dict[str, int], int]] = []
     for commune in communes:
@@ -578,7 +579,7 @@ def build(plan: Plan) -> Package:
                 ),
                 lang="en",
             )
-        result_set(p, plan, election, contest, unit, commune, folded, valid, layout.blank_in_valid)
+        result_set(p, plan, election, contest, unit, commune, folded, valid, layout.blank_in_valid, held)
         if plan.rerun_of and any(fold(c.name) == folded for c in parse_table(FIRST_OF[plan.file])):
             p.add(
                 "note",
@@ -616,6 +617,24 @@ def build(plan: Plan) -> Package:
 FIRST_OF = {"2023-december": "2023-september"}
 
 
+def held_dossiers(plan: Plan) -> dict[str, str]:
+    """Map each dossier number the first poll of a rerun already holds to the person that poll's package wrote."""
+    if not plan.rerun_of:
+        return {}
+    first = FIRST_OF[plan.file]
+    held: dict[str, str] = {}
+    for commune in parse_table(first):
+        for position, candidate in enumerate(commune.candidates, 1):
+            if candidate.dossier:
+                held[candidate.dossier] = str(
+                    uuid5(
+                        package.NAMESPACE,
+                        "\x1f".join([SOURCE, "person", str(plan.rerun_of), fold(commune.name), first, str(position)]),
+                    )
+                )
+    return held
+
+
 def result_set(
     p: Package,
     plan: Plan,
@@ -626,6 +645,7 @@ def result_set(
     folded: str,
     valid: int,
     blank_in_valid: bool,
+    held: dict[str, str],
 ) -> str:
     id = p.id("result_set", plan.day, folded, plan.file)
     p.add(
@@ -673,9 +693,13 @@ def result_set(
             ballot_position=position,
             ballot_label=candidate.list_name or candidate.name,
         )
-        person = p.id("person", plan.day, folded, plan.file, position)
-        p.add("person", id=person)
-        p.name(person, candidate.name, "fr", "official")
+        person = held.get(candidate.dossier) if candidate.dossier else None
+        if person is not None:
+            p.external.add(person)
+        else:
+            person = p.id("person", plan.day, folded, plan.file, position)
+            p.add("person", id=person)
+            p.name(person, candidate.name, "fr", "official")
         p.add(
             "candidacy",
             id=p.id("candidacy", plan.day, folded, plan.file, position),
@@ -687,7 +711,7 @@ def result_set(
             member_of_party_id=p.id("party", label) if label else None,
             is_independent=candidate.party.upper() == "INDEPENDANT",
         )
-        if candidate.dossier:
+        if candidate.dossier and candidate.dossier not in held:
             p.add("external_id", entity_id=option, scheme="ci.cei.dossier", value=candidate.dossier)
         put(p, id, unit, option, 1, candidate.score)
         if candidate.result:
