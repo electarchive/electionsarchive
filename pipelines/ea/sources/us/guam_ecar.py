@@ -5,7 +5,8 @@ from pathlib import Path
 from uuid import UUID
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.us import wikipedia_guam_governors as guam
 from ea.store import DATA, connect
 
@@ -85,7 +86,7 @@ def fetch() -> None:
 
 def emit() -> Path:
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
@@ -111,14 +112,9 @@ def emit() -> Path:
                join polity p on p.id = t.polity_id where p.iso_code = 'US-GU' and u.scheme_code = 'us.state'"""
         ).fetchone()
         polity = cs.polity("US-GU")
-        parties_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
-        known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.election'")}
-        held = {
-            value
-            for (value,) in conn.execute(
-                "select value from external_id where scheme = 'us.contest' and value like '%%:GU:governor'"
-            ).fetchall()
-        }
+        parties_known = cs.foreign("us.party")
+        known = cs.foreign("us.election")
+        held = cs.foreign("us.contest", "%:GU:governor")
         office = cs.key("us.office", "governor:GU")
         two_round = cs.key("us.electoral_system", "two_round")
         pages: dict[tuple[str, int], UUID] = {}

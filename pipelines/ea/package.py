@@ -14,15 +14,15 @@ from decimal import Decimal, InvalidOperation
 from io import BytesIO
 from pathlib import Path
 from typing import LiteralString, NamedTuple, NotRequired, TypedDict, cast
-from uuid import NAMESPACE_URL, uuid5
+from uuid import NAMESPACE_URL, UUID, uuid5
 
 import duckdb
 import polars as pl
 from psycopg import Connection, errors, sql
 
 from ea import covers, search, store, touched
-from ea.apply import MERGE_LOCK, _follow, _refuse_merged, _rollup, _survivors
-from ea.changeset import Changeset
+from ea.apply import DERIVED_IDS, MERGE_LOCK, _follow, _not_null, _refuse_merged, _rollup, _survivors
+from ea.changeset import Changeset, Snapshot
 from ea.checks import MERGE_DELETES, RULES, merged
 from ea.raw import Artifact
 from ea.store import DATA
@@ -160,6 +160,10 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
             "previous_round_id": U,
             "electoral_system_id": U,
             "default_result_kind": U,
+            "term": U,
+            "party_scope_id": U,
+            "seat_id": U,
+            "boundary_set_id": U,
         },
     ),
     "contest_option": (
@@ -316,6 +320,7 @@ JSON_COLUMNS = {"kinds", "rules", "locator"}
 # as null.
 OPTIONAL: dict[str, frozenset[str]] = {
     "candidacy": frozenset({"preference_option_id"}),
+    "contest": frozenset({"term", "party_scope_id", "seat_id", "boundary_set_id"}),
     "contest_option": frozenset({"alliance_id"}),
 }
 
@@ -610,6 +615,9 @@ def _views(con: duckdb.DuckDBPyConnection, path: Path) -> list[str]:
                 else f"select {types} where false"
             )
             con.execute(f'create or replace view "{prefix}{table}" as {body}')
+    for table in OUTSIDE:
+        for prefix in ("", "all_"):
+            con.execute(f'create or replace view "{prefix}{table}" as select null::varchar as id where false')
     con.execute(
         "create or replace table external as select unnest(?::varchar[]) as id",
         [list(manifest["external"])],
@@ -670,6 +678,9 @@ REFERENCES = [
     ("contest", "district_area_id", "area"),
     ("contest", "previous_round_id", "contest"),
     ("contest", "electoral_system_id", "electoral_system"),
+    ("contest", "party_scope_id", "party"),
+    ("contest", "seat_id", "seat"),
+    ("contest", "boundary_set_id", "boundary_set"),
     ("contest_option", "contest_id", "contest"),
     ("contest_option", "parent_option_id", "contest_option"),
     ("contest_option", "party_id", "party"),
@@ -707,6 +718,7 @@ REFERENCES = [
     ("ballot_question", "contest_id", "contest"),
 ]
 TARGET_KEY = {"scheme": "code", "polity": "id"}
+OUTSIDE = ("seat",)
 
 CHECKS = {
     "unique.fact": """with repeated as (
@@ -1780,9 +1792,13 @@ EXPORT_REASON = "published through the changeset path before this export"
 KEPT = {"changeset_id", "recorded_from", "valid"}
 
 
-def _select(schema: dict[str, pl.DataType]) -> sql.Composable:
+def _select(schema: dict[str, pl.DataType], absent: Iterable[str] = ()) -> sql.Composable:
     return sql.SQL(", ").join(
-        sql.SQL("t.{}::text").format(sql.Identifier(c)) if kind == U else sql.SQL("t.{}").format(sql.Identifier(c))
+        sql.SQL("null")
+        if c in absent
+        else sql.SQL("t.{}::text").format(sql.Identifier(c))
+        if kind == U
+        else sql.SQL("t.{}").format(sql.Identifier(c))
         for c, kind in schema.items()
     )
 
@@ -1859,6 +1875,8 @@ def _seal(
             else f"select {types} where false"
         )
         con.execute(f'create or replace view "{table}" as {body}')
+    for table in OUTSIDE:
+        con.execute(f'create or replace view "{table}" as select null::varchar as id where false')
     external: set[str] = set()
     for table, column, target in REFERENCES:
         if table not in counts:
@@ -1912,7 +1930,8 @@ def export(pipeline: str) -> Path:
         mine = sql.SQL("t.changeset_id = any({}::uuid[])").format(sql.Literal(owned))
         counts: dict[str, int] = {}
         for table, (_, schema) in TABLES.items():
-            query = sql.SQL("select {} from {} t where {}").format(_select(schema), sql.Identifier(table), mine)
+            absent = [column for column in OPTIONAL.get(table, ()) if column not in _columns(conn, table)]
+            query = sql.SQL("select {} from {} t where {}").format(_select(schema, absent), sql.Identifier(table), mine)
             counts[table] = _dump(conn, con, query, schema, out / f"{table}.parquet")
         sets = sql.SQL("r.changeset_id = any({}::uuid[])").format(sql.Literal(owned))
         found = conn.execute(
@@ -2021,10 +2040,172 @@ def _column(frame: pl.DataFrame, column: str, kind: pl.DataType, default: object
 
 
 class Draft(Changeset):
+    def __init__(
+        self,
+        conn: Connection,
+        *,
+        pipeline: str,
+        version: str,
+        summary: str,
+        polity: str | None,
+        kind: str = "import",
+        snapshot: Snapshot | None = None,
+    ) -> None:
+        super().__init__(
+            conn, pipeline=pipeline, version=version, summary=summary, polity=polity, kind=kind, snapshot=snapshot
+        )
+        self.own_entities: set[UUID] = {
+            id
+            for (id,) in conn.execute(
+                "select e.id from entity e join changeset c on c.id = e.changeset_id where c.pipeline = %s", [pipeline]
+            )
+        }
+        self.own_keys: set[tuple[str, str]] = {
+            (str(scheme), str(value))
+            for scheme, value in conn.execute(
+                """select x.scheme, x.value from external_id x join changeset c on c.id = x.changeset_id
+                   where c.pipeline = %s and c.status = 'published'""",
+                [pipeline],
+            )
+        }
+
+    def key(self, scheme: str, value: str) -> UUID:
+        pair = (scheme, value)
+        if pair not in self._keyed and pair not in self.own_keys:
+            known = self.snapshot.table(
+                self.conn,
+                f"external_id:{scheme}",
+                "select value, entity_id from external_id where scheme = %s",
+                [scheme],
+            )
+            if known.get(value) is not None:
+                self._keyed.add(pair)
+        id = super().key(scheme, value)
+        if pair not in self._keyed:
+            self._keyed.add(pair)
+            stored = self.snapshot.tables[f"external_id:{scheme}"].get(value)
+            self.add("external_id", entity_id=id if stored is None else stored, scheme=scheme, value=value)
+        if id in self.own_entities:
+            self.minted.add(id)
+        return id
+
+    def foreign(self, scheme: str, like: str = "%") -> set[str]:
+        return {
+            str(value)
+            for value, entity in self.conn.execute(
+                "select value, entity_id from external_id where scheme = %s and value like %s", [scheme, like]
+            )
+            if entity not in self.own_entities
+        }
+
+    def _settle(self, table: str, frame: pl.DataFrame) -> pl.DataFrame:
+        if frame.height == 0:
+            return frame
+        columns = [column for column in frame.columns if column != "id"]
+        frame = frame.unique(subset=columns, maintain_order=True)
+        required = _not_null(self.conn, table)
+        staged = sql.Identifier(f"draft_{table}")
+        listed = sql.SQL(", ").join(map(sql.Identifier, columns))
+        self.conn.execute(sql.SQL("drop table if exists {}").format(staged))
+        self.conn.execute(
+            sql.SQL("create temp table {} as select {} from public.{} limit 0").format(
+                staged, listed, sql.Identifier(table)
+            )
+        )
+        self.conn.execute(sql.SQL("alter table {} add column draft_row int").format(staged))
+        with (
+            self.conn.cursor() as cursor,
+            cursor.copy(sql.SQL("copy {} ({}, draft_row) from stdin").format(staged, listed)) as copy,
+        ):
+            for number, row in enumerate(frame.select(columns).iter_rows()):
+                copy.write_row(
+                    [json.dumps(value) if isinstance(value, dict | list) else value for value in row] + [number]
+                )
+        same = sql.SQL(" and ").join(
+            sql.SQL("p.{0} = s.{0}" if column in required else "p.{0} is not distinct from s.{0}").format(
+                sql.Identifier(column)
+            )
+            for column in columns
+        )
+        derived = sql.SQL(
+            "overlay(overlay(md5(concat_ws(chr(31), {}, {}, {})) placing '8' from 13 for 1) placing '8' from 17 for 1)"
+        ).format(
+            sql.Literal(table),
+            sql.Literal(str(self.manifest["pipeline"])),
+            sql.SQL(", ").join(
+                sql.SQL("{}, coalesce(s.{}::text, chr(30))").format(sql.Literal(column), sql.Identifier(column))
+                for column in sorted(columns)
+            ),
+        )
+        found = self.conn.execute(
+            sql.SQL(
+                """select s.draft_row, {id}, m.pipeline
+                   from {staged} s left join lateral (
+                     select {existing} as id, c.pipeline from public.{table} p join changeset c on c.id = p.changeset_id
+                     where {same} order by c.pipeline = %s desc limit 1) m on true
+                   order by s.draft_row"""
+            ).format(
+                id=sql.SQL("coalesce(m.id, {})").format(derived) if table in DERIVED_IDS else sql.SQL("null"),
+                existing=sql.SQL("p.id::text") if table in DERIVED_IDS else sql.SQL("null::text"),
+                staged=staged,
+                table=sql.Identifier(table),
+                same=same,
+            ),
+            [str(self.manifest["pipeline"])],
+        ).fetchall()
+        self.conn.execute(sql.SQL("drop table {}").format(staged))
+        keep = [pipeline in (None, self.manifest["pipeline"]) for _, _, pipeline in found]
+        if table in DERIVED_IDS:
+            frame = frame.with_columns(pl.Series("id", [str(id) for _, id, _ in found], dtype=pl.String))
+        return frame.filter(pl.Series(keep))
+
+    def _carry(self, table: str, schema: dict[str, pl.DataType]) -> pl.DataFrame | None:
+        if table not in TABLES:
+            return None
+        key = TABLES[table][0]
+        column = "entity_id" if "entity_id" in schema else "id" if key == ("id",) else None
+        if column is None:
+            return None
+        absent = [name for name in OPTIONAL.get(table, ()) if name not in _columns(self.conn, table)]
+        pipeline = str(self.manifest["pipeline"])
+        foreign = (
+            sql.SQL(
+                """ or not exists (select from entity e join changeset o on o.id = e.changeset_id
+                                   where e.id = t.entity_id and o.pipeline = {})"""
+            ).format(sql.Literal(pipeline))
+            if column == "entity_id"
+            else sql.SQL("")
+        )
+        rows = self.conn.execute(
+            sql.SQL(
+                """select {} from {} t join changeset c on c.id = t.changeset_id
+                   where c.pipeline = %s and c.status = 'published'
+                     and (t.{} in (select entity_id from entity_merge){})"""
+            ).format(_select(schema, absent), sql.Identifier(table), sql.Identifier(column), foreign),
+            [pipeline],
+        ).fetchall()
+        if not rows:
+            return None
+        frame = pl.DataFrame(
+            [[json.dumps(value) if isinstance(value, dict | list) else value for value in row] for row in rows],
+            schema=list(schema),
+            orient="row",
+        )
+        return frame.select(_column(frame, name, kind, None) for name, kind in schema.items()).with_columns(
+            pl.col(name).map_elements(canonical, return_dtype=pl.String) for name in schema if name in JSON_COLUMNS
+        )
+
     def write(self) -> Path:
         pipeline = str(self.manifest["pipeline"])
         key = f"{pipeline}/all"
+        scope = self.manifest.get("scope")
+        extra = sorted(set(scope) - {"polity"}) if isinstance(scope, dict) else []
+        if extra:
+            raise ValueError(f"{pipeline} sets changeset scope {extra}, which a package cannot express")
         tables = self._tables()
+        for table, frame in list(tables.items()):
+            if table in DERIVED_IDS or (table in TABLES and TABLES[table][0] is None):
+                tables[table] = self._settle(table, frame)
         out = folder(key) / "build"
         if out.exists():
             shutil.rmtree(out)
@@ -2043,16 +2224,37 @@ class Draft(Changeset):
                 frame = frame.with_columns(_numbers(frame["value"]))
                 schema = {**schema, "value": _settle([frame.lazy()], table)}
             defaults = self.defaults.get(table, {})
-            frame.select(
+            final = frame.select(
                 _column(frame, column, kind, defaults.get(column)) for column, kind in schema.items()
             ).with_columns(
                 pl.col(column).map_elements(canonical, return_dtype=pl.String)
                 for column in schema
                 if column in JSON_COLUMNS
-            ).write_parquet(out / f"{table}.parquet", statistics=False)
+            )
+            reals = [
+                column for column, kind in schema.items() if kind == F and _type(self.conn, table, column) == "real"
+            ]
+            final = final.with_columns(pl.col(column).cast(pl.Float32).cast(U).cast(F) for column in reals)
+            carried = self._carry(table, schema)
+            if carried is not None:
+                kept = TABLES[table][0]
+                final = pl.concat(
+                    [final, carried.join(final, on=list(kept), how="anti") if kept else carried],
+                    how="vertical_relaxed",
+                ).unique(maintain_order=True)
+            final.write_parquet(out / f"{table}.parquet", statistics=False)
             if table in OPTIONAL:
                 _trim(table, out / f"{table}.parquet")
-            counts[table] = frame.height
+            counts[table] = final.height
+        for table, (_, schema) in TABLES.items():
+            if table in counts:
+                continue
+            carried = self._carry(table, schema)
+            if carried is not None and carried.height:
+                carried.write_parquet(out / f"{table}.parquet", statistics=False)
+                if table in OPTIONAL:
+                    _trim(table, out / f"{table}.parquet")
+                counts[table] = carried.height
         owned, artifacts = _adopted(self.conn, pipeline)
         new = tables["source_artifact"]["storage_key"].to_list() if "source_artifact" in tables else []
         _seal(
