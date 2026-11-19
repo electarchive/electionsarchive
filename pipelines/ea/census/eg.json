@@ -252,6 +252,13 @@
       "url": "https://idsc.gov.eg/upload/DocumentLibraryIssues/AttachmentA/10194/%D9%82%D9%86%D8%A7%2016%20%D9%8A%D9%86%D8%A7%D9%8A%D8%B1%202025.pdf",
       "kind": "official_body",
       "note": "The Cabinet's information center: Egypt has 27 governorates, 189 marakiz, 228 cities, 94 districts, and 1,357 rural local units with 3,374 satellite villages (page 17, and the Egypt table of the governorate profile)."
+    },
+    "ipu_shura": {
+      "title": "PARLINE database: Egypt (Majlis Ash-Shura), election archives",
+      "publisher": "Inter-Parliamentary Union",
+      "url": "http://archive.ipu.org/parline/reports/2374_arc.htm",
+      "kind": "compendium",
+      "note": "Archive pages for the 2007, 2010, and 2012 elections, each with the polling dates; none exists for earlier years. Read 19 November 2026."
     }
   },
   "tiers": [
@@ -718,11 +725,33 @@
       "dates": [
         {
           "date": "1980-11-01",
-          "precision": "month",
-          "through": "2012-12-31",
-          "note": "First sitting on 1 November 1980 after the amendment approved in the referendum of 22 May 1980. The partial renewals of 1983-2010 and the 2012 election aren't counted yet; no official page found dates them.",
+          "note": "First sitting on 1 November 1980 after the amendment approved in the referendum of 22 May 1980. Not counted yet.",
           "source": "sis_shuyukh",
           "quote": "\"وكان أول اجتماع له في أول نوفمبر 1980\""
+        },
+        {
+          "date": "1983-01-01",
+          "precision": "year",
+          "through": "2004-12-31",
+          "note": "The partial renewals of 1983-2004 aren't counted yet; no online page found dates them."
+        },
+        {
+          "date": "2007-06-11",
+          "note": "Renewal of half of the 176 elected seats (88); first round 11 June, second round 18 June 2007. Not counted yet.",
+          "source": "ipu_shura",
+          "quote": "\"Dates of election / renewal (from/to) (from/to) 11 June 2007 18 June 2007\""
+        },
+        {
+          "date": "2010-06-01",
+          "note": "Renewal of half of the 176 elected seats (88); first round 1 June, second round 8 June 2010. Not counted yet.",
+          "source": "ipu_shura",
+          "quote": "\"Dates of election / renewal (from/to) (from/to) 1 June 2010 8 June 2010\""
+        },
+        {
+          "date": "2012-01-29",
+          "note": "Full election of 180 elected seats, from 29 January to 22 February 2012. Not counted yet.",
+          "source": "ipu_shura",
+          "quote": "\"Dates of election / renewal (from/to) (from/to) 29 January 2012 22 February 2012\""
         }
       ],
       "disposition": "blocked",
