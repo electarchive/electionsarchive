@@ -599,6 +599,8 @@ def registry() -> Package:
     for pid, spellings in sorted(names.items()):
         id = party(pid)
         p.add("party", id=id, kind="party", polity_id=GREECE)
+        # ypes_national registers its own party entities under gr.ypes.party with codes that overlap these, so
+        # this pipeline keeps a scheme of its own: one scheme and value must never name two entities.
         p.add("external_id", entity_id=id, scheme="gr.ypes.results.party", value=str(pid))
         newest = max(spellings, key=lambda text: spellings[text])
         for text in sorted(spellings):
