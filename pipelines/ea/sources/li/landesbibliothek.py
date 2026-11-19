@@ -15,6 +15,7 @@ declared figure, so a row whose municipal votes do not add up to it shows as a f
 import itertools
 import json
 import re
+import shutil
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
@@ -23,9 +24,12 @@ from statistics import median
 from uuid import uuid5
 from xml.etree import ElementTree
 
+from PIL import Image
+
 from ea import changeset, package, raw
 from ea.package import Package
 from ea.sources.li import regierung
+from ea.store import DATA as STORE
 
 SOURCE = "li.landesbibliothek"
 API = "https://www.eliechtensteinensia.li/viewer/api/v1/records"
@@ -198,14 +202,46 @@ def not_html(path: Path) -> None:
         raise ValueError(f"{path}: the library answered with an HTML page")
 
 
+def is_jpeg(path: Path) -> None:
+    if path.read_bytes()[:3] != b"\xff\xd8\xff":
+        raise ValueError(f"{path}: the library did not answer with a JPEG")
+
+
+def fetch_image(issue: str, page: str) -> None:
+    """Cache the page scan; the library sometimes answers with a bot challenge instead, and then the page stays
+    cited through its ALTO file."""
+    try:
+        raw.fetch(SOURCE, image_url(issue, page), suffix=".jpg", check=is_jpeg)
+    except ValueError, OSError:
+        pass
+
+
+def page_artifact(issue: str, page: str) -> raw.Artifact:
+    """The page image when it is cached and a JPEG of the canvas size, else the ALTO file the boxes come from."""
+    try:
+        image = raw.cached(SOURCE, image_url(issue, page))
+    except LookupError:
+        return raw.cached(SOURCE, alto_url(issue, page))
+    is_jpeg(image.path)
+    with Image.open(image.path) as scan:
+        if scan.size != canvas(issue, page):
+            raise ValueError(f"{issue} {page}: scan is {scan.size}, the manifest canvas {canvas(issue, page)}")
+    target = STORE / "pages" / SOURCE / issue / f"{page}.jpg"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(image.path, target)
+    return image
+
+
 def fetch() -> None:
     for e in elections():
         raw.fetch(SOURCE, manifest_url(e.issue), suffix=".json", check=not_html)
         for t in e.tables:
             raw.fetch(SOURCE, alto_url(e.issue, t.page), suffix=".xml", check=not_html)
+            fetch_image(e.issue, t.page)
     for issue, page in sorted({(c.issue, c.page) for m in majority() for r in m.rounds for c in r.contests}):
         raw.fetch(SOURCE, manifest_url(issue), suffix=".json", check=not_html)
         raw.fetch(SOURCE, alto_url(issue, page), suffix=".xml", check=not_html)
+        fetch_image(issue, page)
 
 
 @dataclass
@@ -467,8 +503,8 @@ def election(e: Election) -> Package:
     p.uses(raw.cached(SOURCE, manifest_url(e.issue)))
     page_ids: dict[str, str] = {}
     for t in e.tables:
-        alto = raw.cached(SOURCE, alto_url(e.issue, t.page))
-        artifact = p.artifact(alto, LB_SOURCE)
+        p.uses(raw.cached(SOURCE, alto_url(e.issue, t.page)))
+        artifact = p.artifact(page_artifact(e.issue, t.page), LB_SOURCE)
         width, height = canvas(e.issue, t.page)
         page_ids[t.page] = key("page", e.issue, t.page)
         # The ALTO file gives each word's box in the pixels of the page scan, which the IIIF service at
@@ -1042,9 +1078,9 @@ def majority_election(m: Majority) -> Package:
         for c in r.contests:
             check_majority(m, r, c)
             if (c.issue, c.page) not in pages:
-                alto = raw.cached(SOURCE, alto_url(c.issue, c.page))
+                p.uses(raw.cached(SOURCE, alto_url(c.issue, c.page)))
                 p.uses(raw.cached(SOURCE, manifest_url(c.issue)))
-                artifact = p.artifact(alto, MAJORITY_SOURCE)
+                artifact = p.artifact(page_artifact(c.issue, c.page), MAJORITY_SOURCE)
                 width, height = canvas(c.issue, c.page)
                 pages[(c.issue, c.page)] = key("page", c.issue, c.page)
                 p.add(
