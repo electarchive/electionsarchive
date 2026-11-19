@@ -1232,8 +1232,7 @@
         {
           "office_kinds": [
             "mayor"
-          ],
-          "iso_pattern": "CY*"
+          ]
         }
       ],
       "cadence": [
@@ -1389,8 +1388,7 @@
           "polity_kinds": [
             "municipality",
             "submunicipal"
-          ],
-          "iso_pattern": "CY*"
+          ]
         }
       ],
       "cadence": [
@@ -1512,8 +1510,7 @@
         {
           "office_kinds": [
             "deputy_mayor"
-          ],
-          "iso_pattern": "CY*"
+          ]
         }
       ],
       "cadence": [
@@ -1581,7 +1578,6 @@
       "effort": 2,
       "match": [
         {
-          "iso_pattern": "CY*",
           "name_pattern": "(?i)school board|σχολικ",
           "precedence": 8
         }
@@ -1666,7 +1662,6 @@
             "submunicipal",
             "municipality"
           ],
-          "iso_pattern": "CY*",
           "name_pattern": "(?i)community leader|κοινοτάρχ"
         }
       ],
@@ -1758,7 +1753,6 @@
           "body_kinds": [
             "council"
           ],
-          "iso_pattern": "CY*",
           "name_pattern": "(?i)community council|κοινοτικό συμβούλιο",
           "precedence": 2
         }
@@ -1843,7 +1837,6 @@
       "effort": 5,
       "match": [
         {
-          "iso_pattern": "CY*",
           "name_pattern": "(?i)village committee|χωριτικ",
           "precedence": 8
         }
