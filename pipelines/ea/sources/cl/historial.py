@@ -584,23 +584,57 @@ def tie(contest: Contest, found: list[Slate]) -> dict[str, str | None] | None:
 # the commune pact pages add the lists' names and votes as one more result set, which is not the default, on Servel's
 # contest. A candidate that a superseding set adds takes its list from `tie`.
 
-AREA_SCHEMES = (("cl.historial_comuna", 3, "administrative", "commune"),)
+AREA_SCHEMES = (
+    ("cl.historial_comuna", 3, "administrative", "commune"),
+    ("cl.historial_distrito", 2, "electoral_district", "electoral district (1989–2013)"),
+    ("cl.historial_circunscripcion", 2, "electoral_district", "senatorial constituency (1989–2013)"),
+)
 UNIT_SCHEME = "cl.historial_comuna_votes"
 
 
+# The first version of these packages published their own elections and contests, on this source's districts and
+# constituencies and with its own offices, bodies, and parties. The contests now sit on Servel's, but a package
+# load replaces geo and registry before the election packages that drop the old contests, so geo and registry keep
+# every row the first version wrote: the districts, constituencies, offices, bodies, and parties stay, unreferenced
+# once the election packages load.
+
+
 def geo() -> Package:
-    p = Package(f"{SOURCE}/geo", SOURCE, "Chile's communes as the historical results site lists them, 1989-2010")
+    p = Package(
+        f"{SOURCE}/geo", SOURCE, "Chile's communes, electoral districts, and senatorial constituencies, 1989-2010"
+    )
     p.external.add(CHILE)
     for code, rank, kind, noun in AREA_SCHEMES:
         p.add("scheme", code=code, polity_id=CHILE, kind=kind, rank=rank, noun=noun, code_system=None)
+
+    def place(scheme: str, code: str, label: str) -> None:
+        id = key("area", scheme, code)
+        p.add("area", id=id, scheme_code=scheme)
+        p.add("area_code", area_id=id, code=code)
+        p.name(id, label, "es", "official")
+
     for url in listings():
         p.uses(raw.cached(SOURCE, url))
     for code, name in communes().items():
-        id = key("area", "cl.historial_comuna", code)
-        p.add("area", id=id, scheme_code="cl.historial_comuna")
-        p.add("area_code", area_id=id, code=code)
-        p.name(id, name, "es", "official")
+        place("cl.historial_comuna", code, name)
+    for number in range(1, 61):
+        place("cl.historial_distrito", str(number), f"Distrito {number} (1989–2013)")
+    for number in range(1, 20):
+        place("cl.historial_circunscripcion", str(number), f"Circunscripción Senatorial {number} (1989–2013)")
     return p
+
+
+def parties() -> dict[str, str]:
+    found: dict[str, str] = {}
+    for election in ELECTIONS:
+        for part in election.parts:
+            for code in communes():
+                page = load(comuna_url(part, code))
+                for candidate in page.candidates if page else []:
+                    sigla = " ".join(candidate.party.split())
+                    if sigla and not INDEPENDENT.match(fold(sigla)):
+                        found.setdefault(fold(sigla), sigla)
+    return dict(sorted(found.items()))
 
 
 METHOD = (
@@ -620,7 +654,7 @@ def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "Servel's historical results site as a source, with its commune reporting units",
+        "Servel's historical results site as a source, with the reporting units, offices, bodies, and parties it names",
         depends=[f"{SOURCE}/geo"],
     )
     p.external.add(CHILE)
@@ -637,7 +671,7 @@ def registry() -> Package:
         attribution="Servicio Electoral de Chile (Servel)",
     )
     p.add("scheme", code=UNIT_SCHEME, polity_id=CHILE, kind="precinct", rank=4, noun="commune count", code_system=None)
-    for code in communes():
+    for code, name in communes().items():
         p.add(
             "reporting_unit",
             id=key("unit", code),
@@ -648,6 +682,27 @@ def registry() -> Package:
             area_id=key("area", "cl.historial_comuna", code),
             kind="standard",
         )
+        mayor = key("office", "mayor", code)
+        p.add("office", id=mayor, polity_id=CHILE, kind="mayor")
+        p.name(mayor, f"Alcalde de {name}", "es", "official")
+        council = key("body", "council", code)
+        p.add("body", id=council, polity_id=CHILE, kind="council")
+        p.name(council, f"Concejo Municipal de {name}", "es", "official")
+    p.add("office", id=PRESIDENCY, polity_id=CHILE, kind="head_of_state")
+    p.name(PRESIDENCY, "Presidente de la República de Chile", "es", "official")
+    p.name(PRESIDENCY, "President of Chile", "en", "official", False)
+    for id, kind, es, en in (
+        (CHAMBER, "lower_house", "Cámara de Diputados", "Chamber of Deputies"),
+        (SENATE, "upper_house", "Senado", "Senate"),
+    ):
+        p.add("body", id=id, polity_id=CHILE, kind=kind)
+        p.name(id, es, "es", "official")
+        p.name(id, en, "en", "official", False)
+    for folded, sigla in parties().items():
+        id = party(folded)
+        p.add("party", id=id, kind="party", polity_id=CHILE)
+        p.add("external_id", entity_id=id, scheme="cl.historial.party", value=folded)
+        p.name(id, sigla, "es", "official")
     return p
 
 
@@ -803,11 +858,14 @@ def _lists(
 
 def build(election: Election) -> Package:
     day = election.day
+    # The first version's runoff contests name the first round's contest as their previous round, so a first round
+    # loads after its runoff, whose new version drops that reference before the first round drops the contest.
+    runoffs = [f"{SOURCE}/{later.day}" for later in ELECTIONS if later.runoff_of == day]
     p = Package(
         f"{SOURCE}/{day}",
         SOURCE,
         f"Commune counts of the {election.en}: list votes, and counts that supersede Servel's workbooks where they differ",
-        depends=[f"{SOURCE}/registry", f"{servel.SOURCE}/{day}"],
+        depends=[f"{SOURCE}/registry", f"{servel.SOURCE}/{day}", *runoffs],
     )
     listed: dict[str, list[tuple[str, str]]] = defaultdict(list)
     for option, contest_id, label in _workbook(day, "contest_option").select("id", "contest_id", "ballot_label").rows():
