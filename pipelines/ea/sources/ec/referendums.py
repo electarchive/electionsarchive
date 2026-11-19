@@ -9,7 +9,9 @@ the areas of the Council's other parish-level files, and this source adds only t
 """
 
 import functools
+import json
 from datetime import date
+from pathlib import Path
 from typing import NamedTuple
 from uuid import uuid5
 
@@ -38,6 +40,13 @@ HELD_2025 = {"ec.parroquia": (4750, 4755, 4760, 4765, 9002)}
 NEW_AREAS = {
     "ec.canton": (242, 291, 421, 461, 471, 491, 927, 998, 999),
     "ec.parroquia": (5460, 6940, 7540, 9010, 9041, 9048, 9064, 9074, 9079, 9080, 9082, 9083, 9085, 9088, 9998, 9999),
+}
+# The days on which the Council's own pipeline already holds a parish reporting unit, by parish code, under the code
+# "<day>:<parish>". Its package for such a day loads those units, so this source references them by the id that
+# pipeline gives them and mints only the units it lacks. Only 2023-02-05, the day of the sectional elections, is shared.
+SHARED_UNITS: dict[str, frozenset[int]] = {
+    day: frozenset(codes)
+    for day, codes in json.loads(Path(__file__).with_name("cne_parish_units.json").read_text()).items()
 }
 SYSTEM_RULES = {"formula": "referendum"}
 LICENSE = "Official publication; reuse terms are not stated"
@@ -588,7 +597,12 @@ def build(day: str) -> Package:
     p.name(election, vote.english, "en", "official")
     p.name(election, vote.spanish, "es", "native", False)
     units: dict[int, str] = {}
+    shared = SHARED_UNITS.get(day, frozenset())
     for code in sorted(data.results["parish"].unique().to_list()):
+        if code in shared:
+            units[code] = cne.key("unit", day, "parish", code)
+            p.external.add(units[code])
+            continue
         unit = units[code] = key("unit", day, code)
         p.add(
             "reporting_unit",
