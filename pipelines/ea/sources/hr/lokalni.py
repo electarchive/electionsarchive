@@ -183,6 +183,9 @@ def counties(year: int) -> list[str]:
 
 
 def fetch() -> None:
+    from ea.sources.hr import lokalni_pdf
+
+    lokalni_pdf.fetch()
     raw.fetch(SOURCE, GB_COUNTIES, suffix=".geojson")
     raw.fetch(SOURCE, GB_TOWNS, suffix=".geojson")
     granice.fetch()
@@ -977,14 +980,20 @@ CAVEAT = (
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(r) for r in rounds())]
+    from ea.sources.hr import lokalni_pdf
+
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(r) for r in rounds()), *lokalni_pdf.packages()]
 
 
 def parse() -> None:
+    from ea.sources.hr import lokalni_pdf
+
     geo().write()
     registry().write()
     for r in rounds():
         election(r).write()
+    # The elections of 2001, 2005, and 2009 from the county reports.
+    lokalni_pdf.parse()
 
 
 def emit() -> None:
