@@ -8,17 +8,16 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.br import municipais, tse_history
+from ea.sources.br import municipais, tse_history, tse_results
 from ea.sources.br.identity import CANDIDACY, TITLES, identities, unambiguous
 from ea.store import DATA, connect
 
 SOURCE = "br.tse_people"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
-ROSTERS = [
-    *((municipais.SOURCE, year, municipais.FILES[(year, "roster")]) for year in municipais.YEARS),
-    *((tse_history.SOURCE, year, tse_history.FILES[(year, "roster")]) for year in tse_history.YEARS),
-]
+RESULTS = PARSED / "results.parquet"
+ROSTERS = [(year, tse_results.munzona("consulta_cand", year)) for year in tse_results.YEARS]
+MOST = 200_000
 DIGITS = r"^0*[1-9][0-9]*$"
 MISREAD = (2002, 2006)
 
@@ -38,22 +37,48 @@ def parse() -> None:
     folder = PARSED / "tmp"
     folder.mkdir(parents=True, exist_ok=True)
     frames = []
-    for source, year, url in ROSTERS:
-        with zipfile.ZipFile(raw.cached(source, url).path) as archive:
+    results = []
+    for year, url in ROSTERS:
+        with zipfile.ZipFile(raw.cached(tse_results.SOURCE, url).path) as archive:
             member = next(name for name in archive.namelist() if name.endswith("_BRASIL.csv"))
             with archive.open(member) as file, (folder / member).open("w", encoding="utf-8") as target:
                 shutil.copyfileobj(io.TextIOWrapper(file, encoding="latin-1"), target, 16 << 20)
         frame = pl.scan_csv(folder / member, separator=";", infer_schema=False)
         present = frame.collect_schema().names()
+        place = (
+            pl.when(pl.col("SG_UE").str.contains(r"^\d+$"))
+            .then(pl.col("SG_UE").str.zfill(5))
+            .otherwise(pl.col("SG_UE"))
+        )
+        office = pl.col("CD_CARGO").cast(pl.Int64)
+        results.append(
+            frame.filter(pl.col("SQ_CANDIDATO").is_not_null())
+            .select(
+                year=pl.lit(year, pl.Int32),
+                place=place,
+                candidate=pl.col("SQ_CANDIDATO"),
+                contest=pl.format(
+                    "{}:{}:{}",
+                    pl.col("CD_ELEICAO").cast(pl.Int64),
+                    office,
+                    pl.when(office == 1)
+                    .then(pl.lit("BR"))
+                    .when(office.is_in(tse_results.STATE_OFFICES))
+                    .then(pl.col("SG_UF"))
+                    .otherwise(pl.col("SG_UE").cast(pl.Int64, strict=False).cast(pl.String)),
+                ),
+                number=pl.col("NR_CANDIDATO"),
+            )
+            .unique()
+            .collect()
+        )
         if "NR_TITULO_ELEITORAL_CANDIDATO" not in present:
             continue
         cpf = pl.col("NR_CPF_CANDIDATO") if "NR_CPF_CANDIDATO" in present else pl.lit(None, pl.String)
         frames.append(
             frame.select(
                 year=pl.lit(year, pl.Int32),
-                place=pl.when(pl.col("SG_UE").str.contains(r"^\d+$"))
-                .then(pl.col("SG_UE").str.zfill(5))
-                .otherwise(pl.col("SG_UE")),
+                place=place,
                 candidate=pl.col("SQ_CANDIDATO"),
                 title=pl.col("NR_TITULO_ELEITORAL_CANDIDATO").str.strip_chars(),
                 cpf=cpf.str.strip_chars(),
@@ -74,6 +99,12 @@ def parse() -> None:
     checked = titles.select("title").unique().filter(pl.col("title").map_elements(valid, return_dtype=pl.Boolean))
     print(f"titles {titles['title'].n_unique()}, passing their check digits {checked.height}")
     titles.join(checked, on="title").write_parquet(TITLES)
+    pl.concat(results).unique().select(
+        *CANDIDACY,
+        candidacy=pl.struct("contest", "number").map_elements(
+            lambda row: tse_results.key("candidacy", row["contest"], row["number"]), return_dtype=pl.String
+        ),
+    ).write_parquet(RESULTS)
 
 
 def plan(titles: pl.DataFrame, held: pl.DataFrame) -> pl.DataFrame:
@@ -159,16 +190,40 @@ def emit() -> Path:
             misread=(pl.col("pipeline") == tse_history.SOURCE)
             & pl.col("key").str.slice(0, 4).cast(pl.Int32).is_in(MISREAD),
         )
+        results = pl.read_parquet(RESULTS)
+        found = pl.DataFrame(
+            conn.execute(
+                """select c.id::text, c.person_id::text, p.birth_date from candidacy c
+                   join changeset s on s.id = c.changeset_id join person p on p.id = c.person_id
+                   where s.pipeline = %s""",
+                [tse_results.SOURCE],
+            ).fetchall(),
+            schema={"candidacy": pl.String, "person": pl.String, "birth": pl.Date},
+            orient="row",
+        )
+        placed = results.join(found, on="candidacy").select(
+            *CANDIDACY, "person", rank=pl.lit(4, pl.Int32), birth="birth", misread=pl.lit(False)
+        )
+        print(f"{tse_results.SOURCE} candidacies {found.height}, placed on a roster row {placed['person'].n_unique()}")
+        held = pl.concat([held, placed])
         groups = plan(titles, held)
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Brazilian candidates recorded more than once merged by their voter registration and tax numbers",
+            summary=(
+                "Brazilian candidates recorded more than once, including once per race by the electoral court's "
+                "results files, merged by their voter registration and tax numbers"
+            ),
             polity="BR",
         )
+        merged = 0
         for group in groups.partition_by("identity", maintain_order=True):
+            if merged + group.height - 1 > MOST:
+                break
             survivor, *duplicates = [UUID(person) for person in group["person"]]
             for duplicate in duplicates:
                 cs.merge(duplicate, survivor)
+            merged += len(duplicates)
+        print(f"merged {merged} of {groups.height - groups['identity'].n_unique()}")
         return cs.write()
