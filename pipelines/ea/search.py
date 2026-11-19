@@ -3,7 +3,7 @@ from typing import LiteralString
 
 from psycopg import sql
 
-from ea.store import Connection, connect
+from ea.store import Connection, connect, exclusive
 
 SIZES_SQL = """
 create temporary table {size} on commit drop as
@@ -289,13 +289,7 @@ def build() -> str:
             for (changeset,) in conn.execute("select id from changeset where status = 'published'").fetchall()
         ]
         _create(conn, "search_size", "search_build", scoped=False)
-        for _ in range(240):
-            taken = conn.execute("select pg_try_advisory_xact_lock(hashtext('ea.search'))").fetchone()
-            if taken is not None and taken[0]:
-                break
-            time.sleep(5)
-        else:
-            conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
+        exclusive(conn, "select pg_advisory_xact_lock(hashtext('ea.search'))")
         since = [
             str(changeset)
             for (changeset,) in conn.execute(

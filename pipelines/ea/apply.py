@@ -1,6 +1,5 @@
 import io
 import json
-import time
 import unicodedata
 from collections import Counter
 from pathlib import Path
@@ -12,7 +11,7 @@ from psycopg.types.json import Jsonb
 
 from ea import checks, coverage_tables, covers, search, touched
 from ea.checks import FACTS, KEYS, MERGE_DELETES, UNFOLLOWED, Stage
-from ea.store import DATA, Connection, connect, provenance
+from ea.store import DATA, Connection, connect, exclusive, provenance
 
 MERGE_LOCK = 1700949316
 COUNTED = (
@@ -2047,17 +2046,9 @@ def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) ->
     with conn.transaction():
         conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
         if any(table in stage.tables for table in ("entity_merge", "entity_merge_drop", "entity_retirement")):
-            for _ in range(240):
-                taken = conn.execute(
-                    "select pg_try_advisory_xact_lock(hashtext('ea.search')) and pg_try_advisory_xact_lock(%s)",
-                    [MERGE_LOCK],
-                ).fetchone()
-                if taken is not None and taken[0]:
-                    break
-                time.sleep(5)
-            else:
-                conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
-                conn.execute("select pg_advisory_xact_lock(%s)", [MERGE_LOCK])
+            exclusive(
+                conn, "select pg_advisory_xact_lock(hashtext('ea.search')), pg_advisory_xact_lock(%s)", [MERGE_LOCK]
+            )
         else:
             conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
             conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
@@ -2338,16 +2329,7 @@ def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | Non
             f"restore (it would leave them on the units and options it deletes); fix forward with a re-emit: "
             + ", ".join(restaged[:10])
         )
-    for _ in range(240):
-        taken = conn.execute(
-            "select pg_try_advisory_xact_lock(hashtext('ea.search')) and pg_try_advisory_xact_lock(%s)", [MERGE_LOCK]
-        ).fetchone()
-        if taken is not None and taken[0]:
-            break
-        time.sleep(5)
-    else:
-        conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
-        conn.execute("select pg_advisory_xact_lock(%s)", [MERGE_LOCK])
+    exclusive(conn, "select pg_advisory_xact_lock(hashtext('ea.search')), pg_advisory_xact_lock(%s)", [MERGE_LOCK])
     logged = conn.execute(
         "select distinct relation, key_column from fact_rekey where changeset_id = %s order by 1, 2", [changeset_id]
     ).fetchall()
