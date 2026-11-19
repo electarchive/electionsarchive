@@ -59,6 +59,9 @@ def fetch() -> None:
     raw.fetch_many(SOURCE, urls, suffix=".html", workers=4)
     senate_fetch()
     raw.fetch(GEOBOUNDARIES, ADM1, suffix=".geojson")
+    raw.fetch(GEOBOUNDARIES, ADM2, suffix=".geojson")
+    raw.fetch(SOURCE, LAW_2025, suffix=".pdf")
+    raw.fetch(SOURCE, GAZETTE_2020, suffix=".pdf")
     presidential_fetch()
 
 
@@ -68,6 +71,7 @@ import json
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date
+from pathlib import Path
 from uuid import uuid5
 
 import polars as pl
@@ -84,6 +88,16 @@ ADM1 = (
     "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/EGY/ADM1/"
     "geoBoundaries-EGY-ADM1_simplified.geojson"
 )
+ADM2 = (
+    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/EGY/ADM2/"
+    "geoBoundaries-EGY-ADM2_simplified.geojson"
+)
+# Law 174 of 2020 divides the country into constituencies. The Authority's copy carries the tables as Law 85 of 2025
+# replaced them, which the 2025 election used; the Official Gazette of 3 September 2020 carries the original tables.
+LAW_2025 = "https://www.elections.eg/images/pdfs/laws/senate_2025/174-2020.pdf"
+GAZETTE_2020 = "https://manshurat.org/file/79219/download?token=e4H7FhnK"
+DISTRICTS = Path(__file__).with_name("house_districts.tsv")
+UNITS = Path(__file__).with_name("house_units.tsv")
 FIRST_DAY = {2020: date(2020, 10, 24), 2025: date(2025, 11, 10)}
 # The governorate codes the authority uses, with the ISO 3166-2 code that geoBoundaries gives the same governorate.
 GOVERNORATES = {
@@ -99,6 +113,15 @@ SECTORS = {
     "99903": "East Delta Sector",
     "99904": "West Delta Sector",
 }
+# The governorates each list district joins, from the second table of Law 174 of 2020 (the same in both versions).
+SECTOR_GOVERNORATES = {
+    "99901": ("19", "86", "61", "116", "108", "94"),
+    "99902": ("141", "167", "159", "175", "183", "231", "191", "205", "311", "213", "221"),
+    "99903": ("78", "51", "35", "132", "43", "256", "264"),
+    "99904": ("27", "124", "248"),
+}
+# A constituency that is a whole governorate takes the governorate's own shape.
+WHOLE_GOVERNORATE = {"4301": "43"}
 INDEPENDENT = "مستقل"
 METHOD = (
     "Published by the National Elections Authority as a results page for each constituency. The pages name the "
@@ -231,12 +254,115 @@ def sector_area(year: int, code: str) -> str:
     return key("area", "eg.sector", year, code)
 
 
+def _polygons(shape: shapely.Geometry) -> shapely.MultiPolygon:
+    shape = shapely.make_valid(shape)
+    parts = [
+        piece
+        for part in shapely.get_parts(shape)
+        if shapely.get_type_id(part) in (3, 6)
+        for piece in shapely.get_parts(part)
+    ]
+    return shapely.set_srid(shapely.MultiPolygon(parts), 4326)
+
+
+def _governorate_shapes(artifact: raw.Artifact) -> dict[str, shapely.Geometry]:
+    iso = {value: code for code, value in GOVERNORATES.items()}
+    return {
+        iso[str(f["properties"]["shapeISO"])]: shapely.make_valid(shapely.geometry.shape(f["geometry"]))
+        for f in json.loads(artifact.path.read_text("utf-8"))["features"]
+    }
+
+
+@dataclass
+class Unit:
+    name: str
+    governorate: str
+    shape: shapely.Geometry
+
+
+def _units(governorates: dict[str, shapely.Geometry]) -> list[Unit]:
+    """geoBoundaries' second-level units, each placed in the governorate that holds most of it."""
+    found: list[Unit] = []
+    for f in json.loads(raw.cached(GEOBOUNDARIES, ADM2).path.read_text("utf-8"))["features"]:
+        shape = shapely.make_valid(shapely.geometry.shape(f["geometry"]))
+        holder = max(governorates, key=lambda code: shape.intersection(governorates[code]).area)
+        found.append(Unit(str(f["properties"]["shapeName"]), holder, shape))
+    return found
+
+
+def _pick(units: list[Unit], token: str) -> Unit:
+    """One unit by name, as `Name`, `Name@governorate`, or `Name#M` or `Name#Q` for the larger or smaller of two."""
+    match = re.fullmatch(r"(.*?)(?:@(\d+))?(?:#([MQ]))?", token)
+    assert match is not None
+    name, governorate, size = match.groups()
+    found = [u for u in units if u.name == name and (governorate is None or u.governorate == governorate)]
+    if size:
+        if len(found) != 2:
+            raise LookupError(f"{token}: {len(found)} units, not two")
+        found.sort(key=lambda u: u.shape.area)
+        return found[0] if size == "Q" else found[1]
+    if len(found) != 1:
+        raise LookupError(f"{token}: {len(found)} units")
+    return found[0]
+
+
+def district_components() -> dict[tuple[int, str], list[str]]:
+    """The administrative units, qisms (q) and markazes (m), that the law gives each individual constituency."""
+    found: dict[tuple[int, str], list[str]] = {}
+    for line in DISTRICTS.read_text("utf-8").splitlines()[1:]:
+        year, code, components = line.split("\t")
+        found[(int(year), code)] = components.split(" | ")
+    return found
+
+
+def district_shapes(
+    governorates: dict[str, shapely.Geometry],
+) -> tuple[dict[tuple[int, str], shapely.Geometry], dict[tuple[int, str], list[str]]]:
+    """Each constituency's shape as the union of its law components' geoBoundaries units, and what is left out.
+
+    geoBoundaries has no polygon for some units the law names (it is coarser, and some units were created later). A
+    constituency whose component has none keeps no shape, unless a point inside that component is given and lies in the
+    union of the constituency's other units; the Authority and the mapping agency publish no constituency shapes.
+    """
+    units = _units(governorates)
+    mapping: dict[tuple[str, str], tuple[list[str], tuple[float, float] | None]] = {}
+    for line in UNITS.read_text("utf-8").splitlines()[1:]:
+        governorate, component, tokens, inside = line.split("\t")
+        lon, _, lat = inside.partition(",")
+        mapping[(governorate, component)] = (tokens.split("|"), (float(lon), float(lat)) if inside else None)
+    shapes: dict[tuple[int, str], shapely.Geometry] = {}
+    left: dict[tuple[int, str], list[str]] = {}
+    for (year, code), components in district_components().items():
+        governorate = code[:-2]
+        if code in WHOLE_GOVERNORATE:
+            shapes[(year, code)] = governorates[WHOLE_GOVERNORATE[code]]
+            continue
+        chosen: list[Unit] = []
+        absent: list[tuple[str, tuple[float, float] | None]] = []
+        for component in components:
+            tokens, point = mapping[(governorate, component)]
+            if tokens == ["-"]:
+                absent.append((component, point))
+            else:
+                chosen += [_pick(units, token) for token in tokens]
+        if not chosen:
+            left[(year, code)] = [component for component, _ in absent]
+            continue
+        union = shapely.union_all([u.shape for u in chosen])
+        outside = [c for c, point in absent if point is None or not union.buffer(0.005).contains(shapely.Point(point))]
+        if outside:
+            left[(year, code)] = outside
+            continue
+        shapes[(year, code)] = union
+    return shapes, left
+
+
 def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
         "Egypt's 27 governorates from geoBoundaries, with the House of Representatives constituencies and list "
-        "districts of 2020 and 2025 placed within them",
+        "districts of 2020 and 2025 placed within them and shaped from the units the law gives each",
     )
     p.external |= {EGYPT, COUNTRY}
     artifact = raw.cached(GEOBOUNDARIES, ADM1)
@@ -251,6 +377,12 @@ def geo() -> Package:
         license="ODbL 1.0 (OpenStreetMap contributors)",
         license_url="https://opendatacommons.org/licenses/odbl/1-0/",
         attribution="geoBoundaries (William & Mary geoLab), © OpenStreetMap contributors",
+        notes=(
+            "The governorates are the ADM1 units. A constituency's shape is the union of the ADM2 units (markazes and "
+            "qisms) that the law names for it, so it follows the source's units, which are coarser than the law's in "
+            "places; a constituency with a named unit that has no polygon in the source has no shape. A list "
+            "district's shape is the union of its governorates."
+        ),
     )
     p.artifact(artifact, source)
     for code, rank, kind, noun in (
@@ -295,6 +427,43 @@ def geo() -> Package:
             quality="academic",
             source_id=source,
         )
+    adm2 = raw.cached(GEOBOUNDARIES, ADM2)
+    p.artifact(adm2, source)
+    law = key("source", "law-174-2020")
+    p.add(
+        "source",
+        id=law,
+        kind="official_body",
+        publisher="الجريدة الرسمية (Official Gazette of Egypt) and the National Elections Authority",
+        title="Law 174 of 2020 dividing the electoral districts of the House of Representatives, with its tables",
+        url="https://www.elections.eg/images/pdfs/laws/senate_2025/174-2020.pdf",
+        license="Text of a law, published with no license stated",
+        license_url="https://www.elections.eg/",
+        attribution="Arab Republic of Egypt, Official Gazette no. 36 (supplement) of 3 September 2020; Law 85 of 2025",
+        notes=(
+            "The tables of 2025 are the Authority's copy of the law as Law 85 of 2025 replaced them; the tables of "
+            "2020 are the original in the Official Gazette of 3 September 2020. Each names the administrative units "
+            "(qisms and markazes) of every individual-seat constituency, and the governorates of each list district."
+        ),
+    )
+    p.artifact(raw.cached(SOURCE, LAW_2025), law)
+    p.artifact(raw.cached(SOURCE, GAZETTE_2020), law)
+    governorate_shapes = _governorate_shapes(artifact)
+    district_shape, _ = district_shapes(governorate_shapes)
+
+    def shaped(id: str, shape: shapely.Geometry) -> None:
+        shape = _polygons(shape)
+        p.add(
+            "area_geometry",
+            area_id=id,
+            geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+            label_point=shapely.to_wkb(
+                shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+            ),
+            quality="academic",
+            source_id=source,
+        )
+
     for year in YEARS:
         for stage, code in stage_codes(year):
             found = page(year, f"{stage}_round_2", code)
@@ -304,6 +473,8 @@ def geo() -> Package:
             p.add("area_code", area_id=id, code=f"{year}:{code}")
             p.add("area_parent", area_id=id, parent_id=governorate_area(governorate_of(code)))
             p.name(id, found.title, "ar", "official")
+            if (year, code) in district_shape:
+                shaped(id, district_shape[(year, code)])
         for code, title in SECTORS.items():
             sector = page(year, _sector_stage(year, code), code)
             assert sector is not None
@@ -313,6 +484,7 @@ def geo() -> Package:
             p.add("area_parent", area_id=id, parent_id=COUNTRY)
             p.name(id, sector.title, "ar", "official")
             p.name(id, title, "en", "english", False)
+            shaped(id, shapely.union_all([governorate_shapes[g] for g in SECTOR_GOVERNORATES[code]]))
     for scheme in ("eg.constituency", "eg.sector"):
         for year in YEARS:
             p.add(

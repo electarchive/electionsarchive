@@ -1,0 +1,387 @@
+governorate	component	units	inside
+19	q:الساحل	Al Sahil	
+19	q:روض الفرج	Rud Al-Farag	
+19	q:شبرا	Shubra	
+19	q:بولاق	Bulaq	
+19	q:الزاوية الحمراء	Zawiyya Al-Hamra	
+19	q:الشرابية	Al Sharabiyya	
+19	q:الزيتون	Al Zaytun	
+19	q:الأميرية	-	31.29,30.10
+19	q:حدائق القبة	Hadaiq Al-Qubba	
+19	q:أول مدينة نصر	Nasr City|Madinat Nasr-2	
+19	q:ثان مدينة نصر	Nasr City|Madinat Nasr-2	
+19	q:ثالث مدينة نصر	Nasr City|Madinat Nasr-2	
+19	q:مصر الجديدة	Misr al-Gadida	
+19	q:النزهة	Nuzha	
+19	q:القطامية	New Cairo-1|New Cairo-2|New Cairo-3	
+19	q:التجمع الخامس	New Cairo-1|New Cairo-2|New Cairo-3	
+19	q:التجمع الأول	New Cairo-1|New Cairo-2|New Cairo-3	
+19	q:الشروق	Shroq	
+19	q:بدر	Badr@19	
+19	q:أول السلام	Al Salam	
+19	q:ثان السلام	Al Salam	
+19	q:عين شمس	Ain Shams	
+19	q:المطرية	Al Matariyya	
+19	q:المرج	Marg	
+19	q:منشأة ناصر	Minshat Nasir	
+19	q:الجمالية	Gamaliyya@19	
+19	q:باب الشعرية	Bab Al-Shariyya	
+19	q:الموسكي	Muski	
+19	q:الوايلي	Al Wayli	
+19	q:الظاهر	Al Zahir	
+19	q:الأزبكية	Al Azbakiyya	
+19	q:قصر النيل	Qasr Al-Nile	
+19	q:عابدين	Abdin	
+19	q:السيدة زينب	Sayyida Zainab	
+19	q:الدرب الأحمر	Al Darb al-Ahmar	
+19	q:الخليفة	Al Khalifa	
+19	q:المقطم	-	31.31,30.01
+19	q:مصر القديمة	Misr Al-Qadima	
+19	q:البساتين	Basatin	
+19	q:دار السلام	-	
+19	q:المعادي	Maadi	
+19	q:المعصرة	-	
+19	q:حلوان	Hilwan	
+19	q:١٥ مايو	15 Mayu	
+19	q:التبين	Al Tibbin	
+27	q:أول المنتزه	Muntazah	
+27	q:ثان المنتزه	Muntazah	
+27	q:ثالث المنتزه	Muntazah	
+27	q:أول الرمل	Al Raml	
+27	q:ثان الرمل	Kesm than Al Raml	
+27	q:سيدي جابر	Sidi Gabir	
+27	q:باب شرقي	Bab Sharqi	
+27	q:العطارين	Al Attarin	
+27	q:الجمرك	Al Gumruk	
+27	q:المنشية	Al Manshiyya	
+27	q:محرم بك	Muharam Bik	
+27	q:كرموز	Karmuz	
+27	q:مينا البصل	Mina Al-Basal	
+27	q:اللبان	A L Labban	
+27	q:الدخيلة	Al Dikhila	
+27	q:أول العامرية	Al Amreia	
+27	q:ثان العامرية	Al Amreia	
+27	q:برج العرب	Burg Al-Arab City	
+35	q:أول بورفؤاد	Port Fuad	
+35	q:ثان بورفؤاد	Port Fuad 2	
+35	q:شرق التفريعة	Mubark-Sharq Tafrea	
+35	q:الشرق	Al-Sharq	
+35	q:العرب	Al-Arab	
+35	q:الضواحي	Al-Dawahy	
+35	q:المناخ	Al-Munakh	
+35	q:الزهور	Al-Zohour	
+35	q:أول الجنوب	Al-Ganoub	
+35	q:ثان الجنوب	Al-Ganoub 2	
+43	q:الأربعين	Al-Arbiin	
+43	q:فيصل	Faysal	
+43	q:الجناين	Al-Ganayin	
+43	q:السويس	Suez	
+43	q:عتاقة	Ataqa	
+51	m:دمياط	Dumyat	
+51	m:كفر البطيخ	-	
+51	q:رأس البر	Ras al-Bar	
+51	q:أول دمياط	Dumyat 1	
+51	q:ثان دمياط	Dumyat 2	
+51	q:دمياط الجديدة	Dumyat Al-Gadida	
+51	m:كفر سعد	Kafr Sad	
+51	m:فارسكور	Fariskur	
+51	m:الزرقا	Zarqa	
+51	q:السرو	-	
+61	q:أول المنصورة	El Mansora 1	
+61	q:ثان المنصورة	E Mansora 2	
+61	m:المنصورة	El Mansora	
+61	m:محلة دمنة	Mahalet Demna	
+61	m:بلقاس	Bilqas	
+61	m:الستامونى	-	
+61	q:جمصة	Gamsa	
+61	m:طلخا	Talkha	
+61	m:نبروه	Nebro	
+61	m:دكرنس	Dikirnis	
+61	m:بنى عبيد	Bany Abeed	
+61	m:شربين	Shirbin	
+61	m:منية النصر	Minya Al-Nasr	
+61	m:ميت سلسيل	MIt Salsil	
+61	m:الجمالية	Gamaliyya@61	
+61	q:الكردى	-	
+61	m:المنزلة	Manzala	
+61	m:المطرية	Matariyya	
+61	q:المنزلة	-	
+61	m:ميت غمر	Mit Ghamr#M	
+61	q:ميت غمر	Mit Ghamr#Q	
+61	m:أجا	Aga	
+61	m:السنبلاوين	Sinbillawin	
+61	m:تمى الأمديد	Tamy Al-Amdid	
+78	m:الزقازيق	Zaqaziq	
+78	q:أول الزقازيق	Zaqaziq 1	
+78	q:ثان الزقازيق	Zaqaziq 2	
+78	q:القنايات	Al-Qanayat	
+78	m:بلبيس	Bilbis	
+78	q:بلبيس	-	
+78	m:مشتول السوق	Mashtul Al-Suq	
+78	q:أول العاشر من رمضان	10 Ramadan 1|10 Ramadan 2	
+78	q:ثان العاشر من رمضان	10 Ramadan 1|10 Ramadan 2	
+78	q:ثالث العاشر من رمضان	10 Ramadan 1|10 Ramadan 2	
+78	m:منيا القمح	Minya al-Qamh	
+78	m:أبو كبير	Abu Kabir	
+78	m:ههيا	Hihya	
+78	m:ديرب نجم	Dyarb Nigm	
+78	m:الإبراهيمية	El-Ibrahimiya	
+78	m:فاقوس	Faqus#M	
+78	q:فاقوس	Faqus#Q	
+78	m:أولاد صقر	Awlad Saqr	
+78	m:كفر صقر	Kafr Saqr	
+78	m:أبو حماد	Abu Hammad	
+78	q:القرين	Qurin	
+78	m:الحسينية	Al-Husayniya	
+78	m:صان الحجر	-	
+78	m:منشأة أبو عمر	-	
+78	q:الصالحية الجديدة	Al-Salhiyya	
+86	m:بنها	Banha#M	
+86	m:كفر شكر	Kafr Shukr	
+86	q:أول بنها	Banha#Q	
+86	q:ثان بنها	Banha#Q	
+86	m:طوخ	Tukh	
+86	q:قها	Qaha	
+86	q:أول شبرا الخيمة	Shubra Al-Khayma 1	
+86	q:ثان شبرا الخيمة	Shubra Al-Khayma 2	
+86	m:قليوب	Qalyub#M	
+86	q:قليوب	Qalyub#Q	
+86	m:القناطر الخيرية	Qanatir Al-Khayriyya	
+86	m:الخانكة	Al Khanka	
+86	q:الخانكة	Al Khanka	
+86	q:الخصوص	Khsos	
+86	q:العبور	Abour	
+86	q:أول العبور	Abour	
+86	q:ثان العبور	Abour	
+86	m:شبين القناطر	Shibin al-Qanatir	
+94	m:كفر الشيخ	Kafr Al-Shaykh#M	
+94	m:قلين	Qillin	
+94	q:أول كفر الشيخ	Kafr Al-Shaykh#Q	
+94	q:ثان كفر الشيخ	Kafr Al-Shaykh#Q	
+94	m:سيدى سالم	Sidi Salim	
+94	m:الرياض	Riyad	
+94	m:الحامول	Al Hamul	
+94	m:بيلا	Biyalu	
+94	q:بيلا	-	
+94	m:البرلس	Burullus	
+94	m:دسوق	Disuq#M	
+94	q:دسوق	Disuq#Q	
+94	m:مطوبس	Mitubas	
+94	m:فوة	Fuwwa	
+108	m:طنطا	Tanta	
+108	q:أول طنطا	Tanta 1	
+108	q:ثان طنطا	Tanta 2	
+108	m:كفر الزيات	Kafr Al-Zayyat	
+108	m:بسيون	Basyun	
+108	m:قطور	Qutur	
+108	q:أول المحلة الكبرى	El Mahalla El Kobra 1	
+108	q:ثان المحلة الكبرى	El Mahalla El Kobra 2	
+108	q:ثالث المحلة الكبرى	El Mahalla El Kobra 2	
+108	m:المحلة الكبرى	El Mahalla El Kobra	
+108	m:سمنود	Samannud	
+108	m:زفتى	Zifta	
+108	q:زفتى	-	
+108	m:السنطة	Santa	
+116	m:شبين الكوم	Shibin al-Kum#M	
+116	q:شبين الكوم	Shibin al-Kum#Q	
+116	m:قويسنا	Quwisna	
+116	m:بركة السبع	Birkat Al-Sab	
+116	m:تلا	Tala	
+116	m:الشهداء	Al-Shuhada	
+116	m:أشمون	Ashmun	
+116	m:الباجور	Al-Bagur	
+116	m:منوف	Minuf	
+116	q:منوف	Minuf City	
+116	m:السادات	Sadat City	
+116	q:سرس الليان	Sirs Al-Layyana City	
+124	m:دمنهور	Damanhur#M	
+124	q:دمنهور	Damanhur#Q	
+124	m:كفر الدوار	Kafr Al-Dawwar#M	
+124	q:كفر الدوار	Kafr Al-Dawwar#Q	
+124	m:أبو حمص	Abu Hummus	
+124	m:إدكو	Idku	
+124	m:المحمودية	Al-Mahmudiyya	
+124	m:رشيد	Rashid	
+124	m:الرحمانية	Al-Rahmaniyya	
+124	m:حوش عيسى	Hush Isa	
+124	m:الدلنجات	Al-Dilingat	
+124	m:أبو المطامير	Abu-l-Matamir	
+124	m:وادي النطرون	Wadi Al-NatrUn	
+124	q:غرب النوبارية	Nubariyya West	
+124	m:إيتاي البارود	Itay Al-Barud	
+124	m:شبراخيت	Shubra Khît	
+124	m:كوم حمادة	Kum Hamada	
+124	m:بدر	Badr@124	
+132	m:الإسماعيلية	Ismailiyya	
+132	q:أول الإسماعيلية	Ismailiyya 1	
+132	q:ثان الإسماعيلية	Ismailiyya 2	
+132	q:ثالث الإسماعيلية	Ismailiyya 3	
+132	m:القنطرة غرب	Qantara Gharb, al-	
+132	m:القنطرة شرق	Qantara Sharq, al-	
+132	m:التل الكبير	Tal al-Kabir, al-	
+132	m:القصاصين الجديدة	-	
+132	m:أبو صوير	-	
+132	m:فايد	Fayid	
+141	q:الجيزة	Giza#Q	
+141	q:الدقى	DuqqI	
+141	q:العجوزة	Al-Aguza	
+141	m:أبو النمرس	-	
+141	q:الحوامدية	Hwamdeia	
+141	m:البدرشين	Badrashain	
+141	m:العياط	Ayat	
+141	m:الصف	Saf	
+141	m:أطفيح	Atfeh	
+141	q:بولاق الدكرور	Bulaq Al-DakrUr	
+141	q:العمرانية	Umraniyya	
+141	q:الطالبية	-	
+141	q:إمبابة	Imbaba#Q	
+141	q:المنيرة الغربية	-	
+141	q:الأهرام	Al-Ahram	
+141	q:حدائق أكتوبر	6 October-1|6 October-2	
+141	q:أول أكتوبر	6 October-1|6 October-2	
+141	q:ثان أكتوبر	6 October-1|6 October-2	
+141	q:ثالث أكتوبر	6 October-1|6 October-2	
+141	q:أول الشيخ زايد	Shaykh Zayed	
+141	q:ثان الشيخ زايد	Shaykh Zayed	
+141	q:الواحات البحرية	Bahariya Oasis	
+141	m:كرداسة	Kardasa	
+141	m:أوسيم	Auseem	
+141	m:منشأة القناطر	-	
+141	q:الوراق	Waraq	
+159	m:بنى سويف	Bani Swayf#M	
+159	q:بنى سويف	Bani Swayf#Q	
+159	q:بنى سويف الجديدة	Bani Swayf City	
+159	m:الواسطى	Al Wasta	
+159	m:ناصر	Nasir	
+159	m:إهناسيا	Ahnasya	
+159	m:ببا	Biba	
+159	m:سمسطا	Sumusta	
+159	m:الفشن	Al Fashn	
+167	m:الفيوم	Fayyum#M	
+167	q:أول الفيوم	Fayyum#Q	
+167	q:ثان الفيوم	Fayyum#Q	
+167	q:الفيوم الجديدة	Fayyum City	
+167	m:إطسا	Atsa	
+167	m:سنورس	Sinuras	
+167	m:سنهور القبلية	-	
+167	m:طامية	Tamya	
+167	m:أبشواى	Abshaway	
+167	m:يوسف الصديق	Yousef El sadeq	
+167	m:الشواشنة	-	
+175	m:المنيا	Markz Al Minya	
+175	q:أول المنيا	Kesm Al-minya	
+175	q:ثان المنيا	Kesm Al-minya	
+175	q:المنيا الجديدة	New Minya	
+175	m:سمالوط غرب	Markz Samalut	
+175	m:سمالوط شرق	Markz Samalut	
+175	m:مطاى	Markz Matay	
+175	m:مغاغة	Markz Maghagha	
+175	m:العدوة	Markz Al Idwa	
+175	m:بنى مزار	Markz Bani Mazar	
+175	m:أبو قرقاص	Markz Abu Qurqas	
+175	m:ملوى	Markz Mallawi	
+175	q:ملوى	Kesm Mallawi	
+175	m:ديرمواس	Markz Dir Mawas	
+183	m:أسيوط	Assuit	
+183	q:أول أسيوط	Kesm Awal Assuit	
+183	q:ثان أسيوط	Kesm Than Assuit	
+183	q:أسيوط الجديدة	Assuit City	
+183	m:ديروط	Dayrut	
+183	m:القوصية	Al-Qusia	
+183	m:منفلوط	Manfalut	
+183	m:البدارى	Al- Badari	
+183	m:ساحل سليم	Sahil Silim	
+183	m:الفتح	Alfath	
+183	m:أبنوب	Abnub	
+183	m:أبو تيج	Abu Tig	
+183	q:أبو تيج	-	
+183	m:صدفا	Sidfa	
+183	m:الغنايم	-	
+191	m:سوهاج	Suhag#M	
+191	m:جزيرة شندويل	-	
+191	q:أول سوهاج	Suhag#Q	
+191	q:ثان سوهاج	Suhag#Q	
+191	q:سوهاج الجديدة	Suhag-2	
+191	m:أخميم	Akhmim	
+191	m:ساقلتة	Saqulta	
+191	q:الكوثر	Kawther	
+191	m:المراغة	Al-Maragha	
+191	m:طما	Tama	
+191	m:طهطا	Tahta	
+191	q:طهطا	Kesm Tahta	
+191	m:جهينة	Guhayna Al-Gharbiyya	
+191	m:جرجا	Girga#M	
+191	q:جرجا	Girga#Q	
+191	m:العسيرات	Al Usayrat	
+191	m:المنشأة	Al-Minshat	
+191	m:البلينا	Al-Balyana	
+191	m:دار السلام	Dar al-Salam	
+205	m:قنا	Qina#M	
+205	q:قنا	Qina#Q	
+205	m:قوص	Qus	
+205	m:قفط	Qift	
+205	m:نقادة	Naqada	
+205	m:نجع حمادي	Nag Hammadi	
+205	m:دشنا	Dishna	
+205	m:الوقف	Al Waqf	
+205	m:أبو تشت	Abu Tisht	
+205	m:فرشوط	Farshut	
+311	m:الأقصر	Luxor#M	
+311	q:الأقصر	Luxor#Q	
+311	m:طيبة	Tiba police station	
+311	m:القرنة	-	
+311	m:أرمنت	Armant	
+311	m:إسنا	Isna	
+213	m:أسوان	Aswan#M	
+213	q:أول أسوان	Aswan#Q	
+213	q:ثان أسوان	Aswan#Q	
+213	q:أسوان الجديدة	Aswan City	
+213	m:أبو سمبل	Abu Simbel	
+213	m:دراو	Daraw	
+213	m:كوم أمبو	Kum Umbu	
+213	m:نصر النوبة	Nasr	
+213	m:إدفو	Adfu	
+221	q:رأس غارب	Ras Gharib	
+221	q:أول الغردقة	Hurghada 1	
+221	q:ثان الغردقة	Hurghada 2	
+221	q:سفاجا	Safaga	
+221	q:القصير	Qusir	
+221	q:مرسى علم	Marsa Alam	
+221	q:الشلاتين	Shallatin	
+221	q:حلايب	Halayib	
+231	q:الخارجة	Al-Kharga Oasis	
+231	m:باريس	Paris Paris	
+231	m:الداخلة	A-Dakhla Oasis	
+231	m:الفرافرة	Al Farafra Oasis	
+231	m:بلاط	-	
+248	q:مطروح	Marsa Matruh	
+248	q:سيدي براني	Sidi Barani	
+248	q:النجيلة	-	
+248	q:السلوم	Salloum	
+248	q:الحمام	Al-Hammam	
+248	q:العلمين	Alamn	
+248	q:الضبعة	Daba	
+248	q:سيوة	Siwa	
+248	q:مارينا	-	
+248	q:العلمين السياحية	-	
+256	q:أول العريش	El Arish 1	
+256	q:ثان العريش	El Arish 2	
+256	q:ثالث العريش	El Arish 3	
+256	q:رابع العريش	El Arish 4	
+256	q:رفح	Rafah	
+256	q:الشيخ زويد	Shaykh Zuwayd	
+256	q:الحسنة	Al-Hasna	
+256	q:القسيمة	Qasima	
+256	q:نخل	Nakhl	
+256	q:بئر العبد	Bir Al-Abd	
+256	q:رمانة	Rummana	
+264	q:أول شرم الشيخ	Sharm el-Sheikh	
+264	q:ثان شرم الشيخ	Sharm el-Sheikh	
+264	q:دهب	Dahab	
+264	q:نويبع	Nuweiba	
+264	q:سانت كاترين	Sant Katrin	
+264	q:طابا	Taba	
+264	q:الطور	Al-Tur	
+264	q:رأس سدر	Ras Sidr	
+264	q:أبو زنيمة	-	
+264	q:أبو رديس	Abu Radis	
