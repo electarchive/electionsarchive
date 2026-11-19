@@ -11,7 +11,7 @@ export async function rebuild(targets: Array<string> = []) {
     select coalesce(max(published_at), now())::text as upto from changeset where status = 'published'
   `);
   const upto = latest.rows[0]?.upto ?? new Date().toISOString();
-  const listed = await db.execute<{ id: string }>(sql`
+  const listed = await db.execute<{ id: string; contests: number }>(sql`
     with n as (
       select polity_id as id, count(*) as contests from (
         select b.polity_id from body b join contest x on x.body_id = b.id
@@ -19,7 +19,7 @@ export async function rebuild(targets: Array<string> = []) {
         select o.polity_id from office o join contest x on x.office_id = o.id
       ) t group by polity_id
     )
-    select n.id::text as id from n join entity e on e.id = n.id
+    select n.id::text as id, n.contests::int as contests from n join entity e on e.id = n.id
     where n.contests >= 500 and e.retired_by is null and not exists (select from entity_merge m where m.entity_id = n.id)
     order by n.contests
   `);
@@ -83,10 +83,14 @@ export async function rebuild(targets: Array<string> = []) {
   }
   const failed: Array<string> = [];
   let built = 0;
-  const pending = [...queue];
+  const contests = new Map(listed.rows.map((row) => [row.id, row.contests]));
+  const heavy = queue.filter((id) => (contests.get(id) ?? 0) >= 40_000);
+  const light = queue.filter((id) => (contests.get(id) ?? 0) < 40_000);
   await Promise.all(
-    Array.from({ length: 4 }, async () => {
-      for (let id = pending.pop(); id != null; id = pending.pop()) {
+    Array.from({ length: 4 }, async (_, worker) => {
+      const next = () =>
+        worker === 0 ? (heavy.pop() ?? light.pop()) : light.pop();
+      for (let id = next(); id != null; id = next()) {
         try {
           const found = await traced(async () => record({ id }));
           const rows = await db.execute<{ id: string }>(sql`
