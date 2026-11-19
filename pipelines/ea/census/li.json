@@ -218,6 +218,78 @@
    "publisher": "Liechtensteiner Volksblatt (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
    "url": "https://www.eliechtensteinensia.li/viewer/image/000476564_1997-02-03_19970203/",
    "kind": "official_body"
+  },
+  "vb19180315": {
+   "title": "Liechtensteiner Volksblatt, 1918-03-15: Landtag election results",
+   "publisher": "Liechtensteiner Volksblatt (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
+   "url": "https://www.eliechtensteinensia.li/viewer/image/000476564_1918-03-15_19180315/",
+   "kind": "official_body"
+  },
+  "vb19180322": {
+   "title": "Liechtensteiner Volksblatt, 1918-03-22: Landtag election results",
+   "publisher": "Liechtensteiner Volksblatt (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
+   "url": "https://www.eliechtensteinensia.li/viewer/image/000476564_1918-03-22_19180322/",
+   "kind": "official_body"
+  },
+  "vb19220208": {
+   "title": "Liechtensteiner Volksblatt, 1922-02-08: Landtag election results",
+   "publisher": "Liechtensteiner Volksblatt (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
+   "url": "https://www.eliechtensteinensia.li/viewer/image/000476564_1922-02-08_19220208/",
+   "kind": "official_body"
+  },
+  "on19220218": {
+   "title": "Oberrheinische Nachrichten, 1922-02-18: Landtag election results",
+   "publisher": "Oberrheinische Nachrichten (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
+   "url": "https://www.eliechtensteinensia.li/viewer/image/000476558_1922-02-18_19220218/",
+   "kind": "official_body"
+  },
+  "ln19260113": {
+   "title": "Liechtensteiner Nachrichten, 1926-01-13: Landtag election results",
+   "publisher": "Liechtensteiner Nachrichten (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
+   "url": "https://www.eliechtensteinensia.li/viewer/image/000476556_1926-01-13_19260113/",
+   "kind": "official_body"
+  },
+  "ln19260127": {
+   "title": "Liechtensteiner Nachrichten, 1926-01-27: Landtag election results",
+   "publisher": "Liechtensteiner Nachrichten (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
+   "url": "https://www.eliechtensteinensia.li/viewer/image/000476556_1926-01-27_19260127/",
+   "kind": "official_body"
+  },
+  "ln19260407": {
+   "title": "Liechtensteiner Nachrichten, 1926-04-07: Landtag election results",
+   "publisher": "Liechtensteiner Nachrichten (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
+   "url": "https://www.eliechtensteinensia.li/viewer/image/000476556_1926-04-07_19260407/",
+   "kind": "official_body"
+  },
+  "vb19280719": {
+   "title": "Liechtensteiner Volksblatt, 1928-07-19: Landtag election results",
+   "publisher": "Liechtensteiner Volksblatt (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
+   "url": "https://www.eliechtensteinensia.li/viewer/image/000476564_1928-07-19_19280719/",
+   "kind": "official_body"
+  },
+  "vb19280731": {
+   "title": "Liechtensteiner Volksblatt, 1928-07-31: Landtag election results",
+   "publisher": "Liechtensteiner Volksblatt (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
+   "url": "https://www.eliechtensteinensia.li/viewer/image/000476564_1928-07-31_19280731/",
+   "kind": "official_body"
+  },
+  "vb19300318": {
+   "title": "Liechtensteiner Volksblatt, 1930-03-18: Landtag election results",
+   "publisher": "Liechtensteiner Volksblatt (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
+   "url": "https://www.eliechtensteinensia.li/viewer/image/000476564_1930-03-18_19300318/",
+   "kind": "official_body"
+  },
+  "vb19320308": {
+   "title": "Liechtensteiner Volksblatt, 1932-03-08: Landtag election results",
+   "publisher": "Liechtensteiner Volksblatt (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
+   "url": "https://www.eliechtensteinensia.li/viewer/image/000476564_1932-03-08_19320308/",
+   "kind": "official_body"
+  },
+  "lv19360212": {
+   "title": "Liechtensteiner Vaterland, 1936-02-12: Landtag election results",
+   "publisher": "Liechtensteiner Vaterland (eLiechtensteinensia, Liechtensteinische Landesbibliothek)",
+   "url": "https://www.eliechtensteinensia.li/viewer/image/000469834_1936-02-12_19360212/",
+   "kind": "official_body"
   }
  },
  "tiers": [
@@ -293,7 +365,7 @@
    "source": "verfassung",
    "locator": "https://www.gesetze.li/konso/1921015000 (Art. 46-50)",
    "valid_from": "1918-01-01",
-   "earliest_record": "1945-04-29",
+   "earliest_record": "1918-03-11",
    "contests_per_unit": 2,
    "est_votes": 330000,
    "effort": 1,
@@ -340,11 +412,11 @@
      "url": "https://www.eliechtensteinensia.li/viewer/image/{issue}/{page}/",
      "format": "xml",
      "access": "open",
-     "checked_at": "2026-11-17T00:00:00Z",
-     "first_date": "1945-04-29",
+     "checked_at": "2026-11-19T00:00:00Z",
+     "first_date": "1918-03-11",
      "finest": "li.gemeinde",
      "role": "publishes",
-     "evidence": "The Liechtensteiner Volksblatt, the official publication organ, prints each Landtag result by municipality, from the 1970s as the government's own notice; the scans carry ALTO text.",
+     "evidence": "The Liechtensteiner Volksblatt, the official publication organ, and the other papers of the country print each Landtag result by municipality, from 1918 with each candidate's votes and from the 1970s as the government's own notice; the scans carry ALTO text.",
      "source": "vb19450429"
     }
    ],
@@ -352,7 +424,8 @@
     {
      "election_kinds": [
       "general",
-      "by_election"
+      "by_election",
+      "runoff"
      ],
      "body_kinds": [
       "unicameral"
@@ -363,11 +436,117 @@
    ],
    "dates": [
     {
-     "date": "1918-01-01",
+     "date": "1919-01-01",
+     "precision": "year",
+     "through": "1938-12-31",
+     "election_kind": "by_election",
+     "note": "By-elections (Ergänzungswahlen) to fill vacant seats under majority vote, other than that of March 1930; not yet counted."
+    },
+    {
+     "date": "1939-01-01",
      "precision": "year",
      "through": "1939-12-31",
      "election_kind": "general",
-     "note": "Direct Landtag elections from 1918 through 1936 by majority vote in the two districts, and the silent election of 1939 (no ballot held); not yet counted. The elections from 1945 are counted from the results the Liechtensteiner Volksblatt printed."
+     "note": "The silent election of 1939, in which the parties' agreed lists were declared elected without a ballot; not yet counted. The elections of 1918-1936 are counted from the results the country's newspapers printed, and those from 1945 from the Liechtensteiner Volksblatt."
+    },
+    {
+     "date": "1918-03-11",
+     "note": "The districts elected 12 of the 15 members (Oberland 7, Unterland 5); the prince appointed the other three.",
+     "contests": 2,
+     "seats": 12,
+     "source": "vb19180315",
+     "quote": "Kundmachung über das bisherige Ergebnis der Landtagswahlen"
+    },
+    {
+     "date": "1918-03-18",
+     "contests": 2,
+     "seats": 3,
+     "source": "vb19180322",
+     "quote": "Kundmachung über das Ergebnis der engeren Wahl und der Ersatzmännerwahl zum Landtage",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "1922-02-05",
+     "contests": 2,
+     "seats": 15,
+     "source": "vb19220208",
+     "quote": "Die Landtagswahlen vom 5. Februar 1922"
+    },
+    {
+     "date": "1922-02-16",
+     "contests": 2,
+     "seats": 4,
+     "source": "on19220218",
+     "quote": "Stichwahlen für den Landtag am 16. Februar 1922",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "1926-01-10",
+     "contests": 2,
+     "seats": 15,
+     "source": "ln19260113",
+     "quote": "Ergebnis der am 10. Jänner 1926 stattgefundenen Landtagswahlen"
+    },
+    {
+     "date": "1926-01-24",
+     "contests": 1,
+     "seats": 1,
+     "source": "ln19260127",
+     "quote": "Ergebnis der am 24. Jänner 1926 im Oberland stattgefundenen Landtags-Stichwahlen",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "1926-04-05",
+     "contests": 2,
+     "seats": 15,
+     "source": "ln19260407",
+     "quote": "Ergebnis der am 5. April 1926 stattgefundenen Landtagswahlen"
+    },
+    {
+     "date": "1928-07-15",
+     "contests": 2,
+     "seats": 15,
+     "source": "vb19280719",
+     "quote": "Nach der Revision ist im Oberland ein Landtagsmandat noch durch Stichwahl zu besetzen"
+    },
+    {
+     "date": "1928-07-29",
+     "contests": 1,
+     "seats": 1,
+     "source": "vb19280731",
+     "quote": "Gewählt ist Herr Franz Amann, zum Adler in Vaduz, mit 518 Stimmen",
+     "election_kind": "runoff"
+    },
+    {
+     "date": "1930-03-16",
+     "note": "Four Oberland seats left vacant when the Volkspartei members resigned.",
+     "contests": 1,
+     "seats": 4,
+     "source": "vb19300318",
+     "quote": "Ergebnis der Ergänzungswahlen in den Landtag 16. März 1930",
+     "election_kind": "by_election"
+    },
+    {
+     "date": "1932-03-06",
+     "deferred": [
+      "1932-03-13"
+     ],
+     "note": "Ten municipal seats on 6 March and five seats elected by the whole country on 13 March.",
+     "contests": 11,
+     "seats": 15,
+     "source": "vb19320308",
+     "quote": "Ergebnis der Landtagswahlen vom 6. März 1932"
+    },
+    {
+     "date": "1936-02-09",
+     "deferred": [
+      "1936-02-16"
+     ],
+     "note": "Ten municipal seats on 9 February and five seats elected by the whole country on 16 February.",
+     "contests": 11,
+     "seats": 15,
+     "source": "lv19360212",
+     "quote": "Landtagswahlen vom 9. Februar 1936"
     },
     {
      "date": "1945-04-29",

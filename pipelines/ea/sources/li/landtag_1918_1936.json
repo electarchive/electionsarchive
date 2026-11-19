@@ -1,0 +1,4285 @@
+[
+ {
+  "date": "1918-03-11",
+  "kind": "general",
+  "system": "1918",
+  "notes": [
+   "The Volksblatt prints the first round's votes by municipality for the Oberland, with Schaan and Planken counted together, and only district totals for the Unterland. It leaves Ludwig Beck's votes in Balzers, Triesen and Triesenberg open (\"?\"), and prints Heinrich Brunhart's municipal votes adding up to 374 against his total of 373; both are stored as printed.",
+   "The second round's votes by municipality come from the same paper's report of the runoff. The substitutes (Ersatzmänner) elected on the same day are not stored."
+  ],
+  "rounds": [
+   {
+    "date": "1918-03-11",
+    "contests": [
+     {
+      "district": "Oberland",
+      "magnitude": 7,
+      "issue": "000476564_1918-03-15_19180315",
+      "page": "00000063",
+      "box": [
+       2600,
+       2550,
+       1250,
+       1150
+      ],
+      "units": [
+       "Balzers",
+       "Triesen",
+       "Triesenberg",
+       "Vaduz",
+       "Schaan+Planken"
+      ],
+      "valid": [
+       207,
+       162,
+       204,
+       173,
+       228
+      ],
+      "candidates": [
+       {
+        "name": "Josef Gaßner",
+        "place": "Triesenberg",
+        "votes": [
+         166,
+         147,
+         198,
+         141,
+         90
+        ],
+        "total": 742,
+        "outcome": "elected"
+       },
+       {
+        "name": "Wilhelm Beck",
+        "place": "Vaduz",
+        "votes": [
+         186,
+         132,
+         179,
+         118,
+         113
+        ],
+        "total": 728,
+        "outcome": "elected"
+       },
+       {
+        "name": "Albert Wolfinger",
+        "place": "Balzers",
+        "votes": [
+         191,
+         119,
+         169,
+         105,
+         75
+        ],
+        "total": 659,
+        "outcome": "elected"
+       },
+       {
+        "name": "Josef Sprenger",
+        "place": "Triesen",
+        "votes": [
+         176,
+         130,
+         153,
+         97,
+         50
+        ],
+        "total": 606,
+        "outcome": "elected"
+       },
+       {
+        "name": "Emil Risch",
+        "place": "Triesen",
+        "votes": [
+         139,
+         104,
+         168,
+         83,
+         43
+        ],
+        "total": 537,
+        "outcome": "elected"
+       },
+       {
+        "name": "Friedrich Walser",
+        "place": "Schaan",
+        "votes": [
+         76,
+         74,
+         47,
+         123,
+         206
+        ],
+        "total": 526,
+        "outcome": "elected"
+       },
+       {
+        "name": "Johann Wanger",
+        "place": "Schaan",
+        "votes": [
+         30,
+         74,
+         74,
+         98,
+         193
+        ],
+        "total": 469,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Anton Walser",
+        "place": "Vaduz",
+        "votes": [
+         129,
+         91,
+         148,
+         61,
+         11
+        ],
+        "total": 440,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Albert Schädler",
+        "place": "Vaduz",
+        "votes": [
+         60,
+         63,
+         54,
+         107,
+         153
+        ],
+        "total": 437,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Heinrich Brunhart",
+        "place": "Balzers",
+        "votes": [
+         168,
+         53,
+         123,
+         15,
+         15
+        ],
+        "total": 373,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Emil Wolfinger",
+        "place": "Balzers",
+        "votes": [
+         36,
+         40,
+         31,
+         63,
+         114
+        ],
+        "total": 284,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Andreas Banzer",
+        "place": "Triesen",
+        "votes": [
+         29,
+         42,
+         36,
+         59,
+         117
+        ],
+        "total": 283,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Gustav Ospelt",
+        "place": "Vaduz",
+        "votes": [
+         36,
+         37,
+         36,
+         45,
+         118
+        ],
+        "total": 272,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Ludwig Beck",
+        "place": "Schaan",
+        "votes": [
+         null,
+         null,
+         null,
+         10,
+         158
+        ],
+        "total": 170,
+        "outcome": "eliminated"
+       }
+      ]
+     },
+     {
+      "district": "Unterland",
+      "magnitude": 5,
+      "issue": "000476564_1918-03-15_19180315",
+      "page": "00000063",
+      "box": [
+       2600,
+       1400,
+       1250,
+       1130
+      ],
+      "units": [
+       "Unterland"
+      ],
+      "valid": [
+       611
+      ],
+      "candidates": [
+       {
+        "name": "Johann Hasler",
+        "place": "Gamprin",
+        "votes": [
+         477
+        ],
+        "total": 477,
+        "outcome": "elected"
+       },
+       {
+        "name": "Franz Josef Hoop",
+        "place": "Ruggell",
+        "votes": [
+         459
+        ],
+        "total": 459,
+        "outcome": "elected"
+       },
+       {
+        "name": "Josef Marxer",
+        "place": "Eschen",
+        "votes": [
+         335
+        ],
+        "total": 335,
+        "outcome": "elected"
+       },
+       {
+        "name": "Emil Batliner",
+        "place": "Mauren",
+        "votes": [
+         248
+        ],
+        "total": 248,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Karl Kaiser",
+        "place": "Schellenberg",
+        "votes": [
+         243
+        ],
+        "total": 243,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Johann Wohlwend",
+        "place": "Schellenberg",
+        "votes": [
+         220
+        ],
+        "total": 220,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Peter Büchel",
+        "place": "Mauren",
+        "votes": [
+         215
+        ],
+        "total": 215,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Medard Ritter",
+        "place": "Mauren",
+        "votes": [
+         188
+        ],
+        "total": 188,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Franz Hoop",
+        "place": "Eschen",
+        "votes": [
+         166
+        ],
+        "total": 166,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Josef Hasler",
+        "place": "Eschen",
+        "votes": [
+         110
+        ],
+        "total": 110,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Josef Büchel",
+        "place": "Ruggell",
+        "votes": [
+         94
+        ],
+        "total": 94,
+        "outcome": "eliminated"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "date": "1918-03-18",
+    "contests": [
+     {
+      "district": "Oberland",
+      "magnitude": 1,
+      "issue": "000476564_1918-03-22_19180322",
+      "page": "00000067",
+      "box": [
+       2630,
+       4700,
+       1100,
+       360
+      ],
+      "units": [
+       "Vaduz",
+       "Triesen",
+       "Balzers",
+       "Triesenberg",
+       "Schaan+Planken"
+      ],
+      "candidates": [
+       {
+        "name": "Johann Wanger",
+        "place": "Schaan",
+        "votes": [
+         91,
+         64,
+         54,
+         59,
+         232
+        ],
+        "total": 500,
+        "outcome": "elected"
+       },
+       {
+        "name": "Anton Walser",
+        "place": "Vaduz",
+        "votes": [
+         70,
+         93,
+         148,
+         139,
+         7
+        ],
+        "total": 457,
+        "outcome": "lost"
+       }
+      ]
+     },
+     {
+      "district": "Unterland",
+      "magnitude": 2,
+      "issue": "000476564_1918-03-22_19180322",
+      "page": "00000067",
+      "box": [
+       2630,
+       5070,
+       1100,
+       360
+      ],
+      "units": [
+       "Mauren",
+       "Eschen",
+       "Gamprin",
+       "Ruggell",
+       "Schellenberg"
+      ],
+      "candidates": [
+       {
+        "name": "Peter Büchel",
+        "place": "Mauren",
+        "votes": [
+         139,
+         92,
+         37,
+         81,
+         30
+        ],
+        "total": 379,
+        "outcome": "elected"
+       },
+       {
+        "name": "Karl Kaiser",
+        "place": "Schellenberg",
+        "votes": [
+         75,
+         103,
+         55,
+         92,
+         48
+        ],
+        "total": 373,
+        "outcome": "elected"
+       },
+       {
+        "name": "Johann Wohlwend",
+        "place": "Schellenberg",
+        "votes": [
+         63,
+         59,
+         19,
+         13,
+         21
+        ],
+        "total": 175,
+        "outcome": "lost"
+       },
+       {
+        "name": "Emil Batliner",
+        "place": "Mauren",
+        "votes": [
+         88,
+         38,
+         9,
+         8,
+         10
+        ],
+        "total": 153,
+        "outcome": "lost"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "date": "1922-02-05",
+  "kind": "general",
+  "system": "1918",
+  "notes": [
+   "The first round's table is a compilation from the municipalities' main vote lists (Zusammenstellung aus den Hauptstimmlisten) that the Volksblatt printed as a submitted article; the second round's votes come from the Oberrheinische Nachrichten's table of the runoff (Verteilung der Stimmen). Neither paper prints the valid ballots. A dash in the table is stored as 0 votes."
+  ],
+  "rounds": [
+   {
+    "date": "1922-02-05",
+    "contests": [
+     {
+      "district": "Oberland",
+      "magnitude": 9,
+      "issue": "000476564_1922-02-08_19220208",
+      "page": "00000041",
+      "box": [
+       200,
+       1850,
+       2000,
+       1500
+      ],
+      "units": [
+       "Vaduz",
+       "Triesen",
+       "Balzers",
+       "Triesenberg",
+       "Schaan",
+       "Planken"
+      ],
+      "candidates": [
+       {
+        "name": "Josef Gaßner",
+        "place": "Triesenberg",
+        "votes": [
+         161,
+         149,
+         171,
+         199,
+         182,
+         12
+        ],
+        "total": 874,
+        "outcome": "elected"
+       },
+       {
+        "name": "Anton Walser",
+        "place": "Vaduz",
+        "votes": [
+         144,
+         105,
+         142,
+         175,
+         111,
+         8
+        ],
+        "total": 685,
+        "outcome": "elected"
+       },
+       {
+        "name": "Josef Gaßner",
+        "place": "Vaduz",
+        "votes": [
+         125,
+         57,
+         82,
+         47,
+         139,
+         14
+        ],
+        "total": 464,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Augustin Marogg",
+        "place": "Triesen",
+        "votes": [
+         112,
+         93,
+         110,
+         141,
+         99,
+         1
+        ],
+        "total": 556,
+        "outcome": "elected"
+       },
+       {
+        "name": "Stefan Wachter",
+        "place": "Schaan",
+        "votes": [
+         105,
+         104,
+         117,
+         150,
+         148,
+         11
+        ],
+        "total": 635,
+        "outcome": "elected"
+       },
+       {
+        "name": "Emil Wolfinger",
+        "place": "Balzers",
+        "votes": [
+         100,
+         48,
+         80,
+         51,
+         100,
+         3
+        ],
+        "total": 382,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Oskar Bargetze",
+        "place": "Triesen",
+        "votes": [
+         99,
+         60,
+         96,
+         53,
+         125,
+         15
+        ],
+        "total": 448,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Albert Wolfinger",
+        "place": "Balzers",
+        "votes": [
+         96,
+         57,
+         67,
+         147,
+         90,
+         2
+        ],
+        "total": 459,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Friedrich Walser",
+        "place": "Schaan",
+        "votes": [
+         95,
+         53,
+         50,
+         33,
+         142,
+         15
+        ],
+        "total": 388,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Emil Bargetze",
+        "place": "Triesen",
+        "votes": [
+         92,
+         110,
+         109,
+         157,
+         90,
+         1
+        ],
+        "total": 559,
+        "outcome": "elected"
+       },
+       {
+        "name": "Alois Frick",
+        "place": "Balzers",
+        "votes": [
+         91,
+         84,
+         64,
+         145,
+         82,
+         0
+        ],
+        "total": 466,
+        "outcome": "elected"
+       },
+       {
+        "name": "Wilhelm Beck",
+        "place": "Vaduz",
+        "votes": [
+         84,
+         92,
+         122,
+         141,
+         71,
+         2
+        ],
+        "total": 512,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Baptist Quaderer",
+        "place": "Schaan",
+        "votes": [
+         81,
+         77,
+         116,
+         143,
+         100,
+         1
+        ],
+        "total": 518,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Heinrich Brunhart",
+        "place": "Balzers",
+        "votes": [
+         74,
+         48,
+         132,
+         51,
+         89,
+         13
+        ],
+        "total": 407,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Johann Schädler",
+        "place": "Triesenberg",
+        "votes": [
+         74,
+         39,
+         64,
+         77,
+         77,
+         1
+        ],
+        "total": 332,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Franz Verling",
+        "place": "Vaduz",
+        "votes": [
+         58,
+         32,
+         44,
+         39,
+         98,
+         10
+        ],
+        "total": 281,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Ferdinand Risch",
+        "place": "Schaan",
+        "votes": [
+         47,
+         50,
+         79,
+         55,
+         42,
+         14
+        ],
+        "total": 287,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Andreas Vogt",
+        "place": "Balzers",
+        "votes": [
+         0,
+         53,
+         90,
+         0,
+         5,
+         0
+        ],
+        "total": 148,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Hermann Kindle",
+        "place": "Triesen",
+        "votes": [
+         2,
+         48,
+         0,
+         0,
+         23,
+         6
+        ],
+        "total": 79,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Johann Wanger",
+        "place": "Schaan",
+        "votes": [
+         3,
+         0,
+         0,
+         0,
+         21,
+         0
+        ],
+        "total": 24,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Josef Hilti",
+        "place": "Schaan",
+        "votes": [
+         3,
+         0,
+         0,
+         0,
+         20,
+         3
+        ],
+        "total": 26,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Georg Vogt",
+        "place": "Balzers",
+        "votes": [
+         0,
+         0,
+         13,
+         0,
+         5,
+         0
+        ],
+        "total": 18,
+        "outcome": "eliminated"
+       }
+      ]
+     },
+     {
+      "district": "Unterland",
+      "magnitude": 6,
+      "issue": "000476564_1922-02-08_19220208",
+      "page": "00000041",
+      "box": [
+       200,
+       3400,
+       2000,
+       1150
+      ],
+      "units": [
+       "Eschen",
+       "Mauren",
+       "Gamprin",
+       "Ruggell",
+       "Schellenberg"
+      ],
+      "candidates": [
+       {
+        "name": "Karl Kaiser",
+        "place": "Schellenberg",
+        "votes": [
+         87,
+         94,
+         47,
+         42,
+         34
+        ],
+        "total": 304,
+        "outcome": "elected"
+       },
+       {
+        "name": "Peter Büchel",
+        "place": "Mauren",
+        "votes": [
+         58,
+         101,
+         40,
+         34,
+         26
+        ],
+        "total": 259,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Emil Batliner",
+        "place": "Mauren",
+        "votes": [
+         4,
+         24,
+         1,
+         9,
+         4
+        ],
+        "total": 42,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Felix Gubelmann",
+        "place": "Gamprin",
+        "votes": [
+         64,
+         88,
+         44,
+         57,
+         29
+        ],
+        "total": 282,
+        "outcome": "elected"
+       },
+       {
+        "name": "Johann Büchel",
+        "place": "Ruggell",
+        "votes": [
+         69,
+         80,
+         40,
+         71,
+         28
+        ],
+        "total": 288,
+        "outcome": "elected"
+       },
+       {
+        "name": "Arnold Hoop",
+        "place": "Eschen",
+        "votes": [
+         53,
+         0,
+         1,
+         4,
+         9
+        ],
+        "total": 67,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Josef Marxer",
+        "place": "Eschen",
+        "votes": [
+         57,
+         64,
+         39,
+         26,
+         26
+        ],
+        "total": 212,
+        "outcome": "eliminated",
+        "title": "Regierungsrat"
+       },
+       {
+        "name": "Rudolf Matt",
+        "place": "Mauren",
+        "votes": [
+         83,
+         109,
+         32,
+         57,
+         35
+        ],
+        "total": 316,
+        "outcome": "elected"
+       },
+       {
+        "name": "Alois Kind",
+        "place": "Gamprin",
+        "votes": [
+         87,
+         85,
+         31,
+         50,
+         27
+        ],
+        "total": 280,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Johann Wanger",
+        "place": "Eschen",
+        "votes": [
+         52,
+         63,
+         27,
+         48,
+         9
+        ],
+        "total": 199,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Jakob Matt",
+        "place": "Mauren",
+        "votes": [
+         31,
+         62,
+         25,
+         46,
+         15
+        ],
+        "total": 179,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Johann Wohlwend",
+        "place": "Schellenberg",
+        "votes": [
+         2,
+         0,
+         1,
+         0,
+         3
+        ],
+        "total": 6,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Pius Büchel",
+        "place": "Ruggell",
+        "votes": [
+         71,
+         85,
+         33,
+         41,
+         26
+        ],
+        "total": 256,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Hermann Meier",
+        "place": "Schellenberg",
+        "votes": [
+         9,
+         0,
+         0,
+         0,
+         15
+        ],
+        "total": 24,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Josef Marxer",
+        "place": "Eschen",
+        "votes": [
+         84,
+         68,
+         41,
+         41,
+         24
+        ],
+        "total": 258,
+        "outcome": "elected",
+        "title": "Vorsteher"
+       },
+       {
+        "name": "Eduard Batliner",
+        "place": "Eschen",
+        "votes": [
+         4,
+         0,
+         0,
+         0,
+         1
+        ],
+        "total": 5,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Philipp Elkuch",
+        "place": "Schellenberg",
+        "votes": [
+         5,
+         8,
+         0,
+         9,
+         3
+        ],
+        "total": 25,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Felix Hasler",
+        "place": "Schellenberg",
+        "votes": [
+         0,
+         0,
+         0,
+         0,
+         1
+        ],
+        "total": 1,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Hasler",
+        "place": "Gamprin",
+        "votes": [
+         4,
+         0,
+         8,
+         0,
+         2
+        ],
+        "total": 14,
+        "outcome": "eliminated",
+        "title": "Abg."
+       },
+       {
+        "name": "Johann Marxer",
+        "place": "Eschen",
+        "votes": [
+         0,
+         0,
+         0,
+         0,
+         1
+        ],
+        "total": 1,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Franz Wohlwend",
+        "place": "Schellenberg",
+        "votes": [
+         34,
+         58,
+         25,
+         43,
+         7
+        ],
+        "total": 167,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Rudolf Hasler",
+        "place": "Gamprin",
+        "votes": [
+         0,
+         0,
+         0,
+         0,
+         1
+        ],
+        "total": 1,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Wilhelm Marxer",
+        "place": "Eschen",
+        "votes": [
+         25,
+         0,
+         0,
+         0,
+         0
+        ],
+        "total": 25,
+        "outcome": "eliminated"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "date": "1922-02-16",
+    "contests": [
+     {
+      "district": "Oberland",
+      "magnitude": 3,
+      "issue": "000476558_1922-02-18_19220218",
+      "page": "00000053",
+      "box": [
+       700,
+       2050,
+       1250,
+       380
+      ],
+      "units": [
+       "Vaduz",
+       "Schaan",
+       "Planken",
+       "Triesen",
+       "Triesenberg",
+       "Balzers"
+      ],
+      "candidates": [
+       {
+        "name": "Wilhelm Beck",
+        "place": "Vaduz",
+        "votes": [
+         91,
+         78,
+         3,
+         102,
+         163,
+         139
+        ],
+        "total": 576,
+        "outcome": "elected"
+       },
+       {
+        "name": "Albert Wolfinger",
+        "place": "Balzers",
+        "votes": [
+         89,
+         81,
+         3,
+         105,
+         160,
+         138
+        ],
+        "total": 576,
+        "outcome": "elected"
+       },
+       {
+        "name": "Baptist Quaderer",
+        "place": "Schaan",
+        "votes": [
+         167,
+         213,
+         16,
+         149,
+         167,
+         169
+        ],
+        "total": 881,
+        "outcome": "elected"
+       },
+       {
+        "name": "Heinrich Brunhart",
+        "place": "Balzers",
+        "votes": [
+         101,
+         131,
+         13,
+         63,
+         49,
+         108
+        ],
+        "total": 465,
+        "outcome": "lost"
+       },
+       {
+        "name": "Josef Gaßner",
+        "place": "Vaduz",
+        "votes": [
+         120,
+         151,
+         13,
+         65,
+         55,
+         76
+        ],
+        "total": 480,
+        "outcome": "lost"
+       },
+       {
+        "name": "Oskar Bargetze",
+        "place": "Triesen",
+        "votes": [
+         20,
+         13,
+         1,
+         20,
+         14,
+         19
+        ],
+        "total": 87,
+        "outcome": "lost"
+       }
+      ]
+     },
+     {
+      "district": "Unterland",
+      "magnitude": 1,
+      "issue": "000476558_1922-02-18_19220218",
+      "page": "00000053",
+      "box": [
+       700,
+       2430,
+       1250,
+       150
+      ],
+      "units": [
+       "Eschen",
+       "Mauren",
+       "Gamprin",
+       "Ruggell",
+       "Schellenberg"
+      ],
+      "candidates": [
+       {
+        "name": "Peter Büchel",
+        "place": "Mauren",
+        "votes": [
+         78,
+         103,
+         41,
+         45,
+         35
+        ],
+        "total": 302,
+        "outcome": "elected"
+       },
+       {
+        "name": "Alois Kind",
+        "place": "Gamprin",
+        "votes": [
+         83,
+         90,
+         37,
+         58,
+         26
+        ],
+        "total": 294,
+        "outcome": "lost"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "date": "1926-01-10",
+  "kind": "general",
+  "system": "1918",
+  "notes": [
+   "The government's notice (Kundmachung) lists only the elected candidates and those who went to the runoff. It prints Josef Gaßner's municipal votes adding up to 732 against a total of 782, Wilhelm Büchel's adding up to 385 against 384, and, for the runoff, Alois Frick's adding up to 606 against 676 (Triesen is printed 27); all are stored as printed."
+  ],
+  "rounds": [
+   {
+    "date": "1926-01-10",
+    "contests": [
+     {
+      "district": "Oberland",
+      "magnitude": 9,
+      "issue": "000476556_1926-01-13_19260113",
+      "page": "00000030",
+      "box": [
+       600,
+       900,
+       1650,
+       820
+      ],
+      "units": [
+       "Vaduz",
+       "Triesen",
+       "Balzers",
+       "Triesenberg",
+       "Schaan",
+       "Planken"
+      ],
+      "candidates": [
+       {
+        "name": "Josef Gaßner",
+        "place": "Triesenberg",
+        "votes": [
+         134,
+         115,
+         191,
+         193,
+         95,
+         4
+        ],
+        "total": 782,
+        "outcome": "elected"
+       },
+       {
+        "name": "Alois Jehle",
+        "place": "Schaan",
+        "votes": [
+         133,
+         112,
+         182,
+         190,
+         90,
+         3
+        ],
+        "total": 710,
+        "outcome": "elected"
+       },
+       {
+        "name": "Andreas Vogt",
+        "place": "Balzers",
+        "votes": [
+         123,
+         109,
+         191,
+         187,
+         88,
+         4
+        ],
+        "total": 702,
+        "outcome": "elected"
+       },
+       {
+        "name": "Anton Walser-Kirchthaler",
+        "place": "Vaduz",
+        "votes": [
+         135,
+         106,
+         178,
+         187,
+         84,
+         4
+        ],
+        "total": 694,
+        "outcome": "elected"
+       },
+       {
+        "name": "Baptist Quaderer",
+        "place": "Schaan",
+        "votes": [
+         128,
+         106,
+         183,
+         190,
+         85,
+         2
+        ],
+        "total": 694,
+        "outcome": "elected"
+       },
+       {
+        "name": "Emil Bargetze",
+        "place": "Triesen",
+        "votes": [
+         127,
+         106,
+         182,
+         187,
+         86,
+         3
+        ],
+        "total": 691,
+        "outcome": "elected"
+       },
+       {
+        "name": "Johann Jakob Feger",
+        "place": "Triesen",
+        "votes": [
+         120,
+         105,
+         183,
+         183,
+         81,
+         3
+        ],
+        "total": 675,
+        "outcome": "elected"
+       },
+       {
+        "name": "Wilhelm Beck",
+        "place": "Vaduz",
+        "votes": [
+         128,
+         105,
+         171,
+         185,
+         79,
+         2
+        ],
+        "total": 670,
+        "outcome": "elected"
+       },
+       {
+        "name": "Heinrich Brunhart",
+        "place": "Balzers",
+        "votes": [
+         122,
+         127,
+         111,
+         70,
+         194,
+         18
+        ],
+        "total": 642,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Alois Frick",
+        "place": "Balzers",
+        "votes": [
+         119,
+         90,
+         158,
+         182,
+         74,
+         2
+        ],
+        "total": 625,
+        "outcome": "advanced"
+       }
+      ]
+     },
+     {
+      "district": "Unterland",
+      "magnitude": 6,
+      "issue": "000476556_1926-01-13_19260113",
+      "page": "00000030",
+      "box": [
+       600,
+       1700,
+       1650,
+       560
+      ],
+      "units": [
+       "Mauren",
+       "Eschen",
+       "Gamprin",
+       "Ruggell",
+       "Schellenberg"
+      ],
+      "candidates": [
+       {
+        "name": "Karl Kaiser",
+        "place": "Schellenberg",
+        "votes": [
+         139,
+         91,
+         51,
+         76,
+         34
+        ],
+        "total": 391,
+        "outcome": "elected"
+       },
+       {
+        "name": "Peter Büchel",
+        "place": "Mauren",
+        "votes": [
+         137,
+         96,
+         52,
+         74,
+         32
+        ],
+        "total": 391,
+        "outcome": "elected"
+       },
+       {
+        "name": "Josef Marxer",
+        "place": "Eschen",
+        "votes": [
+         128,
+         101,
+         50,
+         74,
+         35
+        ],
+        "total": 388,
+        "outcome": "elected",
+        "title": "Regierungsrat"
+       },
+       {
+        "name": "Emil Batliner",
+        "place": "Mauren",
+        "votes": [
+         135,
+         88,
+         50,
+         78,
+         36
+        ],
+        "total": 387,
+        "outcome": "elected"
+       },
+       {
+        "name": "Wilhelm Büchel",
+        "place": "Gamprin",
+        "votes": [
+         135,
+         91,
+         47,
+         76,
+         36
+        ],
+        "total": 384,
+        "outcome": "elected"
+       },
+       {
+        "name": "Franz Hoop",
+        "place": "Ruggell",
+        "votes": [
+         129,
+         91,
+         50,
+         76,
+         31
+        ],
+        "total": 377,
+        "outcome": "elected"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "date": "1926-01-24",
+    "contests": [
+     {
+      "district": "Oberland",
+      "magnitude": 1,
+      "issue": "000476556_1926-01-27_19260127",
+      "page": "00000050",
+      "box": [
+       650,
+       640,
+       1150,
+       520
+      ],
+      "units": [
+       "Vaduz",
+       "Triesen",
+       "Triesenberg",
+       "Balzers",
+       "Schaan",
+       "Planken"
+      ],
+      "candidates": [
+       {
+        "name": "Alois Frick",
+        "place": "Balzers",
+        "votes": [
+         117,
+         27,
+         202,
+         156,
+         99,
+         5
+        ],
+        "total": 676,
+        "outcome": "elected"
+       },
+       {
+        "name": "Georg Vogt",
+        "place": "Balzers",
+        "votes": [
+         129,
+         132,
+         59,
+         135,
+         163,
+         16
+        ],
+        "total": 634,
+        "outcome": "lost"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "date": "1926-04-05",
+  "kind": "general",
+  "system": "1918",
+  "notes": [
+   "The government's notice lists every candidate. Josef Marxer (Vorsteher, Eschen) is printed with municipal votes adding up to 326 against a total of 336; stored as printed. Three cells whose type does not tell 3 from 8 were read so that their row adds up to its printed total (Brunhart in Vaduz 123, Franz Hoop in Eschen 89 and Schellenberg 33)."
+  ],
+  "rounds": [
+   {
+    "date": "1926-04-05",
+    "contests": [
+     {
+      "district": "Oberland",
+      "magnitude": 9,
+      "issue": "000476556_1926-04-07_19260407",
+      "page": "00000161",
+      "box": [
+       650,
+       680,
+       1680,
+       1080
+      ],
+      "units": [
+       "Vaduz",
+       "Triesen",
+       "Balzers",
+       "Triesenberg",
+       "Schaan",
+       "Planken"
+      ],
+      "candidates": [
+       {
+        "name": "Josef Gaßner",
+        "place": "Triesenberg",
+        "votes": [
+         143,
+         117,
+         186,
+         211,
+         102,
+         3
+        ],
+        "total": 762,
+        "outcome": "elected"
+       },
+       {
+        "name": "Anton Walser-Kirchthaler",
+        "place": "Vaduz",
+        "votes": [
+         140,
+         116,
+         183,
+         204,
+         97,
+         3
+        ],
+        "total": 743,
+        "outcome": "elected"
+       },
+       {
+        "name": "Alois Jehle",
+        "place": "Schaan",
+        "votes": [
+         141,
+         115,
+         181,
+         201,
+         101,
+         3
+        ],
+        "total": 742,
+        "outcome": "elected"
+       },
+       {
+        "name": "Johann Jakob Feger",
+        "place": "Triesen",
+        "votes": [
+         139,
+         116,
+         190,
+         201,
+         92,
+         3
+        ],
+        "total": 741,
+        "outcome": "elected"
+       },
+       {
+        "name": "Emil Bargetze",
+        "place": "Triesen",
+        "votes": [
+         139,
+         117,
+         179,
+         207,
+         96,
+         2
+        ],
+        "total": 740,
+        "outcome": "elected"
+       },
+       {
+        "name": "Andreas Vogt",
+        "place": "Balzers",
+        "votes": [
+         137,
+         114,
+         184,
+         201,
+         96,
+         3
+        ],
+        "total": 735,
+        "outcome": "elected"
+       },
+       {
+        "name": "Baptist Quaderer",
+        "place": "Schaan",
+        "votes": [
+         140,
+         116,
+         181,
+         204,
+         90,
+         2
+        ],
+        "total": 733,
+        "outcome": "elected"
+       },
+       {
+        "name": "Wilhelm Beck",
+        "place": "Vaduz",
+        "votes": [
+         136,
+         116,
+         184,
+         201,
+         88,
+         2
+        ],
+        "total": 727,
+        "outcome": "elected"
+       },
+       {
+        "name": "Josef Steger",
+        "place": "Balzers",
+        "votes": [
+         141,
+         111,
+         171,
+         202,
+         94,
+         2
+        ],
+        "total": 721,
+        "outcome": "elected"
+       },
+       {
+        "name": "Georg Vogt",
+        "place": "Balzers",
+        "votes": [
+         125,
+         124,
+         124,
+         63,
+         176,
+         18
+        ],
+        "total": 630,
+        "outcome": "lost"
+       },
+       {
+        "name": "Heinrich Brunhart",
+        "place": "Balzers",
+        "votes": [
+         123,
+         122,
+         116,
+         68,
+         181,
+         19
+        ],
+        "total": 629,
+        "outcome": "lost"
+       },
+       {
+        "name": "Oswald Walser",
+        "place": "Triesen",
+        "votes": [
+         125,
+         118,
+         121,
+         56,
+         180,
+         19
+        ],
+        "total": 619,
+        "outcome": "lost"
+       },
+       {
+        "name": "Johann Hilti",
+        "place": "Schaan",
+        "votes": [
+         124,
+         116,
+         120,
+         61,
+         176,
+         19
+        ],
+        "total": 616,
+        "outcome": "lost"
+       },
+       {
+        "name": "Bernhard Risch",
+        "place": "Vaduz",
+        "votes": [
+         128,
+         117,
+         120,
+         50,
+         177,
+         19
+        ],
+        "total": 611,
+        "outcome": "lost"
+       },
+       {
+        "name": "Johann Wanger",
+        "place": "Schaan",
+        "votes": [
+         126,
+         116,
+         110,
+         64,
+         177,
+         18
+        ],
+        "total": 611,
+        "outcome": "lost"
+       },
+       {
+        "name": "Josef Negele",
+        "place": "Triesenberg",
+        "votes": [
+         123,
+         116,
+         109,
+         62,
+         176,
+         18
+        ],
+        "total": 604,
+        "outcome": "lost"
+       },
+       {
+        "name": "Emil Walch",
+        "place": "Vaduz",
+        "votes": [
+         126,
+         113,
+         110,
+         59,
+         174,
+         18
+        ],
+        "total": 600,
+        "outcome": "lost"
+       },
+       {
+        "name": "Emil Risch",
+        "place": "Triesen",
+        "votes": [
+         121,
+         108,
+         106,
+         50,
+         172,
+         18
+        ],
+        "total": 575,
+        "outcome": "lost"
+       }
+      ]
+     },
+     {
+      "district": "Unterland",
+      "magnitude": 6,
+      "issue": "000476556_1926-04-07_19260407",
+      "page": "00000161",
+      "box": [
+       650,
+       1760,
+       1680,
+       900
+      ],
+      "units": [
+       "Mauren",
+       "Eschen",
+       "Gamprin",
+       "Ruggell",
+       "Schellenberg"
+      ],
+      "candidates": [
+       {
+        "name": "Josef Marxer",
+        "place": "Eschen",
+        "votes": [
+         142,
+         99,
+         56,
+         72,
+         34
+        ],
+        "total": 403,
+        "outcome": "elected",
+        "title": "Regierungsrat"
+       },
+       {
+        "name": "Peter Büchel",
+        "place": "Mauren",
+        "votes": [
+         145,
+         92,
+         57,
+         73,
+         34
+        ],
+        "total": 401,
+        "outcome": "elected"
+       },
+       {
+        "name": "Karl Kaiser",
+        "place": "Schellenberg",
+        "votes": [
+         142,
+         95,
+         58,
+         70,
+         35
+        ],
+        "total": 400,
+        "outcome": "elected"
+       },
+       {
+        "name": "Emil Batliner",
+        "place": "Mauren",
+        "votes": [
+         142,
+         88,
+         57,
+         72,
+         36
+        ],
+        "total": 395,
+        "outcome": "elected"
+       },
+       {
+        "name": "Franz Hoop",
+        "place": "Ruggell",
+        "votes": [
+         142,
+         89,
+         55,
+         72,
+         33
+        ],
+        "total": 391,
+        "outcome": "elected"
+       },
+       {
+        "name": "Wilhelm Büchel",
+        "place": "Gamprin",
+        "votes": [
+         142,
+         92,
+         53,
+         70,
+         33
+        ],
+        "total": 390,
+        "outcome": "elected"
+       },
+       {
+        "name": "Felix Gubelmann",
+        "place": "Gamprin",
+        "votes": [
+         81,
+         111,
+         45,
+         57,
+         40
+        ],
+        "total": 334,
+        "outcome": "lost"
+       },
+       {
+        "name": "Arnold Hoop",
+        "place": "Eschen",
+        "votes": [
+         83,
+         113,
+         41,
+         57,
+         40
+        ],
+        "total": 334,
+        "outcome": "lost"
+       },
+       {
+        "name": "Johann Büchel",
+        "place": "Ruggell",
+        "votes": [
+         81,
+         107,
+         43,
+         59,
+         41
+        ],
+        "total": 331,
+        "outcome": "lost"
+       },
+       {
+        "name": "Josef Marxer",
+        "place": "Eschen",
+        "votes": [
+         79,
+         109,
+         41,
+         57,
+         40
+        ],
+        "total": 336,
+        "outcome": "lost",
+        "title": "Vorsteher"
+       },
+       {
+        "name": "Adolf Goop",
+        "place": "Schellenberg",
+        "votes": [
+         81,
+         104,
+         38,
+         56,
+         38
+        ],
+        "total": 317,
+        "outcome": "lost"
+       },
+       {
+        "name": "Georg Jäger",
+        "place": "Mauren",
+        "votes": [
+         78,
+         98,
+         40,
+         57,
+         39
+        ],
+        "total": 312,
+        "outcome": "lost"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "date": "1928-07-15",
+  "kind": "general",
+  "system": "1918",
+  "notes": [
+   "The government's notice gives the revised count after the Volkspartei's complaint, with the first count in brackets; the revised count is stored. Three Oberland candidates tied on 689 votes for the runoff place and the lot sent Franz Amann and Alois Jehle to it. The Unterland table heads its last column Gamprin a second time; it is Ruggell. The runoff's protocol prints Balzers with 257 ballots against 148 valid, 8 invalid and 103 blank; stored as printed."
+  ],
+  "rounds": [
+   {
+    "date": "1928-07-15",
+    "contests": [
+     {
+      "district": "Oberland",
+      "magnitude": 9,
+      "issue": "000476564_1928-07-19_19280719",
+      "page": "00000449",
+      "box": [
+       150,
+       3100,
+       2150,
+       960
+      ],
+      "units": [
+       "Vaduz",
+       "Triesen",
+       "Balzers",
+       "Triesenberg",
+       "Schaan",
+       "Planken"
+      ],
+      "candidates": [
+       {
+        "name": "Josef Steger",
+        "place": "Balzers",
+        "votes": [
+         119,
+         137,
+         150,
+         184,
+         66,
+         0
+        ],
+        "total": 656,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Basil Vogt",
+        "place": "Balzers",
+        "votes": [
+         123,
+         145,
+         171,
+         186,
+         76,
+         0
+        ],
+        "total": 701,
+        "outcome": "elected"
+       },
+       {
+        "name": "Emil Bargetze",
+        "place": "Triesen",
+        "votes": [
+         117,
+         142,
+         163,
+         184,
+         66,
+         0
+        ],
+        "total": 672,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Adolf Frommelt",
+        "place": "Triesen",
+        "votes": [
+         121,
+         145,
+         166,
+         187,
+         70,
+         0
+        ],
+        "total": 689,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Josef Gaßner",
+        "place": "Triesenberg",
+        "votes": [
+         125,
+         141,
+         169,
+         191,
+         76,
+         0
+        ],
+        "total": 702,
+        "outcome": "elected"
+       },
+       {
+        "name": "Gustav Ospelt",
+        "place": "Vaduz",
+        "votes": [
+         122,
+         142,
+         174,
+         186,
+         75,
+         0
+        ],
+        "total": 699,
+        "outcome": "elected"
+       },
+       {
+        "name": "Franz Amann",
+        "place": "Vaduz",
+        "votes": [
+         117,
+         142,
+         166,
+         190,
+         74,
+         0
+        ],
+        "total": 689,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Alois Jehle",
+        "place": "Schaan",
+        "votes": [
+         122,
+         139,
+         164,
+         190,
+         74,
+         0
+        ],
+        "total": 689,
+        "outcome": "advanced"
+       },
+       {
+        "name": "Baptist Quaderer",
+        "place": "Schaan",
+        "votes": [
+         119,
+         141,
+         162,
+         187,
+         73,
+         0
+        ],
+        "total": 682,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Georg Vogt",
+        "place": "Balzers",
+        "votes": [
+         152,
+         104,
+         160,
+         68,
+         209,
+         21
+        ],
+        "total": 714,
+        "outcome": "elected"
+       },
+       {
+        "name": "Heinrich Brunhart",
+        "place": "Balzers",
+        "votes": [
+         152,
+         107,
+         148,
+         70,
+         210,
+         21
+        ],
+        "total": 708,
+        "outcome": "elected"
+       },
+       {
+        "name": "Anton Frommelt",
+        "place": "Triesen",
+        "votes": [
+         154,
+         102,
+         147,
+         73,
+         215,
+         21
+        ],
+        "total": 712,
+        "outcome": "elected",
+        "title": "Pfarrer"
+       },
+       {
+        "name": "Oswald Walser",
+        "place": "Triesen",
+        "votes": [
+         153,
+         99,
+         146,
+         69,
+         210,
+         21
+        ],
+        "total": 698,
+        "outcome": "elected"
+       },
+       {
+        "name": "Ludwig Marxer",
+        "place": "Vaduz",
+        "votes": [
+         150,
+         94,
+         138,
+         64,
+         204,
+         21
+        ],
+        "total": 671,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Josef Negele",
+        "place": "Triesenberg",
+        "votes": [
+         147,
+         102,
+         132,
+         69,
+         207,
+         21
+        ],
+        "total": 678,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Emil Walch",
+        "place": "Vaduz",
+        "votes": [
+         144,
+         104,
+         135,
+         67,
+         204,
+         21
+        ],
+        "total": 675,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Fritz Walser",
+        "place": "Schaan",
+        "votes": [
+         150,
+         100,
+         134,
+         63,
+         209,
+         21
+        ],
+        "total": 677,
+        "outcome": "eliminated"
+       },
+       {
+        "name": "Ferdinand Risch",
+        "place": "Schaan",
+        "votes": [
+         152,
+         105,
+         150,
+         69,
+         220,
+         21
+        ],
+        "total": 717,
+        "outcome": "elected"
+       }
+      ]
+     },
+     {
+      "district": "Unterland",
+      "magnitude": 6,
+      "issue": "000476564_1928-07-19_19280719",
+      "page": "00000449",
+      "box": [
+       150,
+       4150,
+       2150,
+       700
+      ],
+      "units": [
+       "Eschen",
+       "Mauren",
+       "Gamprin",
+       "Schellenberg",
+       "Ruggell"
+      ],
+      "candidates": [
+       {
+        "name": "Peter Büchel",
+        "place": "Mauren",
+        "votes": [
+         122,
+         148,
+         55,
+         38,
+         81
+        ],
+        "total": 444,
+        "outcome": "elected"
+       },
+       {
+        "name": "Emil Batliner",
+        "place": "Mauren",
+        "votes": [
+         116,
+         144,
+         57,
+         38,
+         81
+        ],
+        "total": 436,
+        "outcome": "elected"
+       },
+       {
+        "name": "Franz Josef Marxer",
+        "place": "Eschen",
+        "votes": [
+         119,
+         149,
+         56,
+         38,
+         80
+        ],
+        "total": 442,
+        "outcome": "elected"
+       },
+       {
+        "name": "Wilhelm Büchel",
+        "place": "Gamprin",
+        "votes": [
+         119,
+         146,
+         57,
+         38,
+         81
+        ],
+        "total": 441,
+        "outcome": "elected"
+       },
+       {
+        "name": "Franz Hoop",
+        "place": "Ruggell",
+        "votes": [
+         119,
+         146,
+         56,
+         38,
+         83
+        ],
+        "total": 442,
+        "outcome": "elected"
+       },
+       {
+        "name": "Karl Kaiser",
+        "place": "Schellenberg",
+        "votes": [
+         117,
+         144,
+         56,
+         37,
+         81
+        ],
+        "total": 435,
+        "outcome": "elected"
+       },
+       {
+        "name": "Marxer",
+        "place": "Eschen",
+        "votes": [
+         87,
+         51,
+         33,
+         29,
+         49
+        ],
+        "total": 249,
+        "outcome": "lost",
+        "title": "Wagner"
+       },
+       {
+        "name": "Franz Josef Hasler",
+        "place": "Eschen",
+        "votes": [
+         80,
+         55,
+         32,
+         30,
+         48
+        ],
+        "total": 245,
+        "outcome": "lost"
+       },
+       {
+        "name": "Georg Jäger",
+        "place": "Mauren",
+        "votes": [
+         84,
+         60,
+         32,
+         30,
+         49
+        ],
+        "total": 255,
+        "outcome": "lost"
+       },
+       {
+        "name": "Felix Büchel",
+        "place": "Gamprin",
+        "votes": [
+         82,
+         56,
+         34,
+         30,
+         50
+        ],
+        "total": 252,
+        "outcome": "lost"
+       },
+       {
+        "name": "Adolf Goop",
+        "place": "Schellenberg",
+        "votes": [
+         86,
+         57,
+         33,
+         31,
+         49
+        ],
+        "total": 256,
+        "outcome": "lost"
+       },
+       {
+        "name": "Albrecht Marxer",
+        "place": "Schellenberg",
+        "votes": [
+         84,
+         54,
+         31,
+         30,
+         49
+        ],
+        "total": 248,
+        "outcome": "lost"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "date": "1928-07-29",
+    "contests": [
+     {
+      "district": "Oberland",
+      "magnitude": 1,
+      "issue": "000476564_1928-07-31_19280731",
+      "page": "00000478",
+      "box": [
+       1880,
+       300,
+       1300,
+       700
+      ],
+      "units": [
+       "Vaduz",
+       "Triesen",
+       "Balzers",
+       "Triesenberg",
+       "Schaan",
+       "Planken"
+      ],
+      "registered": [
+       290,
+       263,
+       342,
+       273,
+       302,
+       22
+      ],
+      "cast": [
+       221,
+       216,
+       257,
+       177,
+       252,
+       19
+      ],
+      "valid": [
+       162,
+       130,
+       148,
+       145,
+       131,
+       1
+      ],
+      "invalid": [
+       6,
+       24,
+       8,
+       2,
+       7,
+       0
+      ],
+      "blank": [
+       53,
+       62,
+       103,
+       30,
+       114,
+       18
+      ],
+      "candidates": [
+       {
+        "name": "Franz Amann",
+        "place": "Vaduz",
+        "votes": [
+         120,
+         110,
+         123,
+         114,
+         50,
+         1
+        ],
+        "total": 518,
+        "outcome": "elected"
+       },
+       {
+        "name": "Alois Jehle",
+        "place": "Schaan",
+        "votes": [
+         42,
+         20,
+         25,
+         31,
+         81,
+         0
+        ],
+        "total": 199,
+        "outcome": "lost"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "date": "1930-03-16",
+  "kind": "by_election",
+  "system": "1918",
+  "notes": [
+   "The government's notice of the supplementary election of four Oberland members, after the Volkspartei members had resigned. It prints Johann Schädler's municipal votes adding up to 700 against a total of 690; stored as printed."
+  ],
+  "rounds": [
+   {
+    "date": "1930-03-16",
+    "contests": [
+     {
+      "district": "Oberland",
+      "magnitude": 4,
+      "issue": "000476564_1930-03-18_19300318",
+      "page": "00000192",
+      "box": [
+       2300,
+       750,
+       2150,
+       1150
+      ],
+      "units": [
+       "Vaduz",
+       "Triesen",
+       "Balzers",
+       "Triesenberg",
+       "Schaan",
+       "Planken"
+      ],
+      "registered": [
+       286,
+       273,
+       349,
+       281,
+       305,
+       24
+      ],
+      "cast": [
+       252,
+       245,
+       285,
+       255,
+       284,
+       22
+      ],
+      "valid": [
+       148,
+       134,
+       132,
+       94,
+       196,
+       22
+      ],
+      "invalid": [
+       50,
+       35,
+       79,
+       102,
+       31,
+       0
+      ],
+      "blank": [
+       54,
+       76,
+       74,
+       59,
+       57,
+       0
+      ],
+      "candidates": [
+       {
+        "name": "Friedrich Walser",
+        "place": "Schaan",
+        "votes": [
+         145,
+         124,
+         118,
+         69,
+         179,
+         22
+        ],
+        "total": 657,
+        "outcome": "elected"
+       },
+       {
+        "name": "Josef Ospelt",
+        "place": "Vaduz",
+        "votes": [
+         142,
+         121,
+         125,
+         81,
+         178,
+         22
+        ],
+        "total": 669,
+        "outcome": "elected"
+       },
+       {
+        "name": "Bernhard Risch",
+        "place": "Vaduz",
+        "votes": [
+         143,
+         131,
+         132,
+         87,
+         188,
+         22
+        ],
+        "total": 703,
+        "outcome": "elected"
+       },
+       {
+        "name": "Johann Schädler",
+        "place": "Triesenberg",
+        "votes": [
+         144,
+         129,
+         129,
+         80,
+         196,
+         22
+        ],
+        "total": 690,
+        "outcome": "elected"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "date": "1932-03-06",
+  "kind": "general",
+  "system": "1932",
+  "notes": [
+   "From 1932 each municipality except Planken elected one member, and the remaining five (four for the Oberland, one for the Unterland) were elected by the whole country a week later. The government's notice of the municipal round prints, for each municipality, the electoral roll, the ballots, and only the elected candidate's votes, so the other candidates' votes are not stored. In the national round it prints Peter Büchel's municipal votes adding up to 1,260 against 1,262 and Rudolf Amann's to 868 against 869; stored as printed."
+  ],
+  "rounds": [
+   {
+    "date": "1932-03-06",
+    "contests": [
+     {
+      "district": "Vaduz",
+      "magnitude": 1,
+      "issue": "000476564_1932-03-08_19320308",
+      "page": "00000172",
+      "box": [
+       600,
+       740,
+       1950,
+       620
+      ],
+      "units": [
+       "Vaduz"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       362
+      ],
+      "cast": [
+       285
+      ],
+      "valid": [
+       280
+      ],
+      "invalid": [
+       0
+      ],
+      "blank": [
+       5
+      ],
+      "winner_only": true,
+      "candidates": [
+       {
+        "name": "Ludwig Ospelt",
+        "place": "Vaduz",
+        "votes": [
+         160
+        ],
+        "total": 160,
+        "outcome": "elected"
+       }
+      ]
+     },
+     {
+      "district": "Triesen",
+      "magnitude": 1,
+      "issue": "000476564_1932-03-08_19320308",
+      "page": "00000172",
+      "box": [
+       600,
+       740,
+       1950,
+       620
+      ],
+      "units": [
+       "Triesen"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       283
+      ],
+      "cast": [
+       258
+      ],
+      "valid": [
+       253
+      ],
+      "invalid": [
+       0
+      ],
+      "blank": [
+       5
+      ],
+      "winner_only": true,
+      "candidates": [
+       {
+        "name": "Adolf Frommelt",
+        "place": "Triesen",
+        "votes": [
+         139
+        ],
+        "total": 139,
+        "outcome": "elected"
+       }
+      ]
+     },
+     {
+      "district": "Balzers",
+      "magnitude": 1,
+      "issue": "000476564_1932-03-08_19320308",
+      "page": "00000172",
+      "box": [
+       600,
+       740,
+       1950,
+       620
+      ],
+      "units": [
+       "Balzers"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       373
+      ],
+      "cast": [
+       323
+      ],
+      "valid": [
+       310
+      ],
+      "invalid": [
+       1
+      ],
+      "blank": [
+       12
+      ],
+      "winner_only": true,
+      "candidates": [
+       {
+        "name": "Basil Vogt",
+        "place": "Balzers",
+        "votes": [
+         184
+        ],
+        "total": 184,
+        "outcome": "elected"
+       }
+      ]
+     },
+     {
+      "district": "Triesenberg",
+      "magnitude": 1,
+      "issue": "000476564_1932-03-08_19320308",
+      "page": "00000172",
+      "box": [
+       600,
+       740,
+       1950,
+       620
+      ],
+      "units": [
+       "Triesenberg"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       309
+      ],
+      "cast": [
+       290
+      ],
+      "valid": [
+       282
+      ],
+      "invalid": [
+       2
+      ],
+      "blank": [
+       6
+      ],
+      "winner_only": true,
+      "candidates": [
+       {
+        "name": "Wilhelm Beck",
+        "place": "Triesenberg",
+        "votes": [
+         163
+        ],
+        "total": 163,
+        "outcome": "elected"
+       }
+      ]
+     },
+     {
+      "district": "Schaan",
+      "magnitude": 1,
+      "issue": "000476564_1932-03-08_19320308",
+      "page": "00000172",
+      "box": [
+       600,
+       740,
+       1950,
+       620
+      ],
+      "units": [
+       "Schaan"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       335
+      ],
+      "cast": [
+       310
+      ],
+      "valid": [
+       300
+      ],
+      "invalid": [
+       1
+      ],
+      "blank": [
+       9
+      ],
+      "winner_only": true,
+      "candidates": [
+       {
+        "name": "Ferdinand Risch",
+        "place": "Schaan",
+        "votes": [
+         207
+        ],
+        "total": 207,
+        "outcome": "elected"
+       }
+      ]
+     },
+     {
+      "district": "Eschen",
+      "magnitude": 1,
+      "issue": "000476564_1932-03-08_19320308",
+      "page": "00000172",
+      "box": [
+       600,
+       740,
+       1950,
+       620
+      ],
+      "units": [
+       "Eschen"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       239
+      ],
+      "cast": [
+       211
+      ],
+      "valid": [
+       195
+      ],
+      "invalid": [
+       1
+      ],
+      "blank": [
+       15
+      ],
+      "winner_only": true,
+      "candidates": [
+       {
+        "name": "Josef Marxer",
+        "place": "Eschen",
+        "votes": [
+         120
+        ],
+        "total": 120,
+        "outcome": "elected"
+       }
+      ]
+     },
+     {
+      "district": "Mauren",
+      "magnitude": 1,
+      "issue": "000476564_1932-03-08_19320308",
+      "page": "00000172",
+      "box": [
+       600,
+       740,
+       1950,
+       620
+      ],
+      "units": [
+       "Mauren"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       247
+      ],
+      "cast": [
+       226
+      ],
+      "valid": [
+       195
+      ],
+      "invalid": [
+       2
+      ],
+      "blank": [
+       29
+      ],
+      "winner_only": true,
+      "candidates": [
+       {
+        "name": "Emil Batliner",
+        "place": "Mauren",
+        "votes": [
+         186
+        ],
+        "total": 186,
+        "outcome": "elected"
+       }
+      ]
+     },
+     {
+      "district": "Gamprin",
+      "magnitude": 1,
+      "issue": "000476564_1932-03-08_19320308",
+      "page": "00000172",
+      "box": [
+       600,
+       740,
+       1950,
+       620
+      ],
+      "units": [
+       "Gamprin"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       101
+      ],
+      "cast": [
+       94
+      ],
+      "valid": [
+       93
+      ],
+      "invalid": [
+       1
+      ],
+      "blank": [
+       0
+      ],
+      "winner_only": true,
+      "candidates": [
+       {
+        "name": "Wilhelm Näscher",
+        "place": "Gamprin",
+        "votes": [
+         55
+        ],
+        "total": 55,
+        "outcome": "elected"
+       }
+      ]
+     },
+     {
+      "district": "Ruggell",
+      "magnitude": 1,
+      "issue": "000476564_1932-03-08_19320308",
+      "page": "00000172",
+      "box": [
+       600,
+       740,
+       1950,
+       620
+      ],
+      "units": [
+       "Ruggell"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       153
+      ],
+      "cast": [
+       137
+      ],
+      "valid": [
+       135
+      ],
+      "invalid": [
+       0
+      ],
+      "blank": [
+       2
+      ],
+      "winner_only": true,
+      "candidates": [
+       {
+        "name": "Franz Hoop",
+        "place": "Ruggell",
+        "votes": [
+         79
+        ],
+        "total": 79,
+        "outcome": "elected"
+       }
+      ]
+     },
+     {
+      "district": "Schellenberg",
+      "magnitude": 1,
+      "issue": "000476564_1932-03-08_19320308",
+      "page": "00000172",
+      "box": [
+       600,
+       740,
+       1950,
+       620
+      ],
+      "units": [
+       "Schellenberg"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       79
+      ],
+      "cast": [
+       77
+      ],
+      "valid": [
+       76
+      ],
+      "invalid": [
+       0
+      ],
+      "blank": [
+       1
+      ],
+      "winner_only": true,
+      "candidates": [
+       {
+        "name": "Philipp Elkuch",
+        "place": "Schellenberg",
+        "votes": [
+         44
+        ],
+        "total": 44,
+        "outcome": "elected"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "date": "1932-03-13",
+    "contests": [
+     {
+      "district": "Liechtenstein",
+      "magnitude": 5,
+      "issue": "000476564_1932-03-17_19320317",
+      "page": "00000193",
+      "box": [
+       1880,
+       2600,
+       2300,
+       1560
+      ],
+      "units": [
+       "Vaduz",
+       "Triesen",
+       "Balzers",
+       "Triesenberg",
+       "Schaan",
+       "Planken",
+       "Eschen",
+       "Mauren",
+       "Gamprin",
+       "Ruggell",
+       "Schellenberg"
+      ],
+      "registered": [
+       313,
+       282,
+       374,
+       311,
+       335,
+       32,
+       234,
+       248,
+       101,
+       153,
+       80
+      ],
+      "cast": [
+       287,
+       255,
+       334,
+       281,
+       311,
+       27,
+       209,
+       230,
+       93,
+       133,
+       78
+      ],
+      "valid": [
+       279,
+       248,
+       329,
+       277,
+       284,
+       24,
+       204,
+       228,
+       91,
+       132,
+       77
+      ],
+      "invalid": [
+       2,
+       0,
+       4,
+       0,
+       1,
+       0,
+       1,
+       2,
+       0,
+       1,
+       0
+      ],
+      "blank": [
+       6,
+       7,
+       1,
+       4,
+       26,
+       3,
+       4,
+       0,
+       2,
+       0,
+       1
+      ],
+      "candidates": [
+       {
+        "name": "Anton Frommelt",
+        "place": "Triesen",
+        "votes": [
+         160,
+         144,
+         160,
+         109,
+         200,
+         21,
+         134,
+         177,
+         63,
+         75,
+         51
+        ],
+        "total": 1294,
+        "outcome": "elected",
+        "title": "Pfarrer"
+       },
+       {
+        "name": "Gebhard Brunhart",
+        "place": "Balzers",
+        "votes": [
+         158,
+         134,
+         140,
+         105,
+         194,
+         21,
+         135,
+         173,
+         63,
+         77,
+         50
+        ],
+        "total": 1250,
+        "outcome": "elected"
+       },
+       {
+        "name": "Georg Frick",
+        "place": "Schaan",
+        "votes": [
+         157,
+         135,
+         156,
+         101,
+         154,
+         20,
+         134,
+         173,
+         63,
+         75,
+         49
+        ],
+        "total": 1217,
+        "outcome": "elected"
+       },
+       {
+        "name": "Bernhard Risch",
+        "place": "Vaduz",
+        "votes": [
+         159,
+         139,
+         155,
+         109,
+         189,
+         21,
+         134,
+         176,
+         63,
+         76,
+         50
+        ],
+        "total": 1271,
+        "outcome": "elected"
+       },
+       {
+        "name": "Peter Büchel",
+        "place": "Mauren",
+        "votes": [
+         158,
+         129,
+         150,
+         106,
+         192,
+         21,
+         134,
+         178,
+         63,
+         77,
+         52
+        ],
+        "total": 1262,
+        "outcome": "elected"
+       },
+       {
+        "name": "Heinrich Brunhart",
+        "place": "Balzers",
+        "votes": [
+         116,
+         109,
+         188,
+         166,
+         76,
+         3,
+         67,
+         47,
+         28,
+         54,
+         26
+        ],
+        "total": 880,
+        "outcome": "lost"
+       },
+       {
+        "name": "Josef Gaßner",
+        "place": "Triesenberg",
+        "votes": [
+         117,
+         109,
+         169,
+         186,
+         87,
+         3,
+         67,
+         48,
+         28,
+         55,
+         27
+        ],
+        "total": 896,
+        "outcome": "lost"
+       },
+       {
+        "name": "Ferdinand Heidegger",
+        "place": "Triesen",
+        "votes": [
+         117,
+         92,
+         160,
+         160,
+         81,
+         3,
+         67,
+         41,
+         28,
+         56,
+         25
+        ],
+        "total": 830,
+        "outcome": "lost"
+       },
+       {
+        "name": "Rudolf Amann",
+        "place": "Vaduz",
+        "votes": [
+         118,
+         107,
+         166,
+         163,
+         90,
+         3,
+         67,
+         44,
+         28,
+         56,
+         26
+        ],
+        "total": 869,
+        "outcome": "lost"
+       },
+       {
+        "name": "Julius Wanger",
+        "place": "Eschen",
+        "votes": [
+         116,
+         111,
+         171,
+         160,
+         85,
+         1,
+         69,
+         41,
+         28,
+         54,
+         24
+        ],
+        "total": 860,
+        "outcome": "lost"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "date": "1936-02-09",
+  "kind": "general",
+  "system": "1932",
+  "notes": [
+   "The municipal round's figures come from the table the Liechtensteiner Vaterland printed; in Eschen and Mauren the Union put up no candidate. The national round's figures come from the government's notice after the electoral commission's review; it prints no ballot counts."
+  ],
+  "rounds": [
+   {
+    "date": "1936-02-09",
+    "contests": [
+     {
+      "district": "Vaduz",
+      "magnitude": 1,
+      "issue": "000469834_1936-02-12_19360212",
+      "page": "00000051",
+      "box": [
+       150,
+       1550,
+       2050,
+       1150
+      ],
+      "units": [
+       "Vaduz"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       356
+      ],
+      "cast": [
+       338
+      ],
+      "valid": [
+       329
+      ],
+      "invalid": [
+       1
+      ],
+      "blank": [
+       8
+      ],
+      "candidates": [
+       {
+        "name": "Ludwig Ospelt",
+        "place": "Vaduz",
+        "votes": [
+         180
+        ],
+        "total": 180,
+        "outcome": "elected",
+        "party": "FBP"
+       },
+       {
+        "name": "Rudolf Amann",
+        "place": "Vaduz",
+        "votes": [
+         148
+        ],
+        "total": 148,
+        "outcome": "lost",
+        "party": "VU"
+       }
+      ]
+     },
+     {
+      "district": "Triesen",
+      "magnitude": 1,
+      "issue": "000469834_1936-02-12_19360212",
+      "page": "00000051",
+      "box": [
+       150,
+       1550,
+       2050,
+       1150
+      ],
+      "units": [
+       "Triesen"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       308
+      ],
+      "cast": [
+       268
+      ],
+      "valid": [
+       251
+      ],
+      "invalid": [
+       5
+      ],
+      "blank": [
+       12
+      ],
+      "candidates": [
+       {
+        "name": "Adolf Frommelt",
+        "place": "Triesen",
+        "votes": [
+         92
+        ],
+        "total": 92,
+        "outcome": "lost",
+        "party": "FBP"
+       },
+       {
+        "name": "Ferdinand Heidegger",
+        "place": "Triesen",
+        "votes": [
+         156
+        ],
+        "total": 156,
+        "outcome": "elected",
+        "party": "VU"
+       }
+      ]
+     },
+     {
+      "district": "Balzers",
+      "magnitude": 1,
+      "issue": "000469834_1936-02-12_19360212",
+      "page": "00000051",
+      "box": [
+       150,
+       1550,
+       2050,
+       1150
+      ],
+      "units": [
+       "Balzers"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       410
+      ],
+      "cast": [
+       372
+      ],
+      "valid": [
+       366
+      ],
+      "invalid": [
+       3
+      ],
+      "blank": [
+       3
+      ],
+      "candidates": [
+       {
+        "name": "Georg Vogt",
+        "place": "Balzers",
+        "votes": [
+         148
+        ],
+        "total": 148,
+        "outcome": "lost",
+        "party": "FBP"
+       },
+       {
+        "name": "Basil Vogt",
+        "place": "Balzers",
+        "votes": [
+         218
+        ],
+        "total": 218,
+        "outcome": "elected",
+        "party": "VU"
+       }
+      ]
+     },
+     {
+      "district": "Triesenberg",
+      "magnitude": 1,
+      "issue": "000469834_1936-02-12_19360212",
+      "page": "00000051",
+      "box": [
+       150,
+       1550,
+       2050,
+       1150
+      ],
+      "units": [
+       "Triesenberg"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       325
+      ],
+      "cast": [
+       308
+      ],
+      "valid": [
+       305
+      ],
+      "invalid": [
+       0
+      ],
+      "blank": [
+       3
+      ],
+      "candidates": [
+       {
+        "name": "Johann Beck",
+        "place": "Triesenberg",
+        "votes": [
+         129
+        ],
+        "total": 129,
+        "outcome": "lost",
+        "party": "FBP"
+       },
+       {
+        "name": "Josef Beck",
+        "place": "Triesenberg",
+        "votes": [
+         175
+        ],
+        "total": 175,
+        "outcome": "elected",
+        "party": "VU"
+       }
+      ]
+     },
+     {
+      "district": "Schaan",
+      "magnitude": 1,
+      "issue": "000469834_1936-02-12_19360212",
+      "page": "00000051",
+      "box": [
+       150,
+       1550,
+       2050,
+       1150
+      ],
+      "units": [
+       "Schaan"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       382
+      ],
+      "cast": [
+       349
+      ],
+      "valid": [
+       331
+      ],
+      "invalid": [
+       2
+      ],
+      "blank": [
+       16
+      ],
+      "candidates": [
+       {
+        "name": "Ferdinand Risch",
+        "place": "Schaan",
+        "votes": [
+         239
+        ],
+        "total": 239,
+        "outcome": "elected",
+        "party": "FBP"
+       },
+       {
+        "name": "Johann Wachter",
+        "place": "Schaan",
+        "votes": [
+         88
+        ],
+        "total": 88,
+        "outcome": "lost",
+        "party": "VU"
+       }
+      ]
+     },
+     {
+      "district": "Eschen",
+      "magnitude": 1,
+      "issue": "000469834_1936-02-12_19360212",
+      "page": "00000051",
+      "box": [
+       150,
+       1550,
+       2050,
+       1150
+      ],
+      "units": [
+       "Eschen"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       264
+      ],
+      "cast": [
+       235
+      ],
+      "valid": [
+       171
+      ],
+      "invalid": [
+       6
+      ],
+      "blank": [
+       58
+      ],
+      "candidates": [
+       {
+        "name": "Josef Marxer",
+        "place": "Eschen",
+        "votes": [
+         158
+        ],
+        "total": 158,
+        "outcome": "elected",
+        "party": "FBP"
+       }
+      ]
+     },
+     {
+      "district": "Mauren",
+      "magnitude": 1,
+      "issue": "000469834_1936-02-12_19360212",
+      "page": "00000051",
+      "box": [
+       150,
+       1550,
+       2050,
+       1150
+      ],
+      "units": [
+       "Mauren"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       269
+      ],
+      "cast": [
+       239
+      ],
+      "valid": [
+       192
+      ],
+      "invalid": [
+       0
+      ],
+      "blank": [
+       47
+      ],
+      "candidates": [
+       {
+        "name": "Emil Batliner",
+        "place": "Mauren",
+        "votes": [
+         168
+        ],
+        "total": 168,
+        "outcome": "elected",
+        "party": "FBP"
+       }
+      ]
+     },
+     {
+      "district": "Gamprin",
+      "magnitude": 1,
+      "issue": "000469834_1936-02-12_19360212",
+      "page": "00000051",
+      "box": [
+       150,
+       1550,
+       2050,
+       1150
+      ],
+      "units": [
+       "Gamprin"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       106
+      ],
+      "cast": [
+       96
+      ],
+      "valid": [
+       92
+      ],
+      "invalid": [
+       0
+      ],
+      "blank": [
+       4
+      ],
+      "candidates": [
+       {
+        "name": "Johann Georg Hasler",
+        "place": "Gamprin",
+        "votes": [
+         51
+        ],
+        "total": 51,
+        "outcome": "elected",
+        "party": "FBP"
+       },
+       {
+        "name": "Josef Marxer",
+        "place": "Gamprin",
+        "votes": [
+         39
+        ],
+        "total": 39,
+        "outcome": "lost",
+        "party": "VU"
+       }
+      ]
+     },
+     {
+      "district": "Ruggell",
+      "magnitude": 1,
+      "issue": "000469834_1936-02-12_19360212",
+      "page": "00000051",
+      "box": [
+       150,
+       1550,
+       2050,
+       1150
+      ],
+      "units": [
+       "Ruggell"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       171
+      ],
+      "cast": [
+       148
+      ],
+      "valid": [
+       143
+      ],
+      "invalid": [
+       1
+      ],
+      "blank": [
+       4
+      ],
+      "candidates": [
+       {
+        "name": "Franz Hoop",
+        "place": "Ruggell",
+        "votes": [
+         86
+        ],
+        "total": 86,
+        "outcome": "elected",
+        "party": "FBP"
+       },
+       {
+        "name": "Anton Biedermann",
+        "place": "Ruggell",
+        "votes": [
+         50
+        ],
+        "total": 50,
+        "outcome": "lost",
+        "party": "VU"
+       }
+      ]
+     },
+     {
+      "district": "Schellenberg",
+      "magnitude": 1,
+      "issue": "000469834_1936-02-12_19360212",
+      "page": "00000051",
+      "box": [
+       150,
+       1550,
+       2050,
+       1150
+      ],
+      "units": [
+       "Schellenberg"
+      ],
+      "scheme": "li.gemeinde",
+      "registered": [
+       88
+      ],
+      "cast": [
+       78
+      ],
+      "valid": [
+       76
+      ],
+      "invalid": [
+       0
+      ],
+      "blank": [
+       2
+      ],
+      "candidates": [
+       {
+        "name": "Philipp Elkuch",
+        "place": "Schellenberg",
+        "votes": [
+         51
+        ],
+        "total": 51,
+        "outcome": "elected",
+        "party": "FBP"
+       },
+       {
+        "name": "Alfons Goop",
+        "place": "Schellenberg",
+        "votes": [
+         22
+        ],
+        "total": 22,
+        "outcome": "lost",
+        "party": "VU"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "date": "1936-02-16",
+    "contests": [
+     {
+      "district": "Liechtenstein",
+      "magnitude": 5,
+      "issue": "000476564_1936-02-20_19360220",
+      "page": "00000124",
+      "box": [
+       900,
+       650,
+       2150,
+       950
+      ],
+      "units": [
+       "Vaduz",
+       "Triesen",
+       "Balzers",
+       "Triesenberg",
+       "Schaan",
+       "Planken",
+       "Eschen",
+       "Mauren",
+       "Gamprin",
+       "Ruggell",
+       "Schellenberg"
+      ],
+      "candidates": [
+       {
+        "name": "Anton Frommelt",
+        "place": "Vaduz",
+        "votes": [
+         194,
+         109,
+         158,
+         100,
+         178,
+         28,
+         144,
+         156,
+         58,
+         78,
+         52
+        ],
+        "total": 1255,
+        "outcome": "elected",
+        "title": "Pfarrer",
+        "party": "FBP"
+       },
+       {
+        "name": "Georg Vogt",
+        "place": "Balzers",
+        "votes": [
+         187,
+         115,
+         168,
+         102,
+         189,
+         28,
+         152,
+         163,
+         59,
+         87,
+         56
+        ],
+        "total": 1306,
+        "outcome": "elected",
+        "party": "FBP"
+       },
+       {
+        "name": "Johann Beck",
+        "place": "Triesenberg",
+        "votes": [
+         189,
+         114,
+         163,
+         146,
+         193,
+         28,
+         156,
+         169,
+         59,
+         87,
+         57
+        ],
+        "total": 1361,
+        "outcome": "elected",
+        "party": "FBP"
+       },
+       {
+        "name": "Lorenz Schierscher",
+        "place": "Schaan",
+        "votes": [
+         182,
+         105,
+         148,
+         95,
+         178,
+         27,
+         157,
+         166,
+         58,
+         80,
+         56
+        ],
+        "total": 1252,
+        "outcome": "lost",
+        "party": "FBP"
+       },
+       {
+        "name": "Peter Büchel",
+        "place": "Mauren",
+        "votes": [
+         186,
+         108,
+         156,
+         108,
+         167,
+         28,
+         158,
+         152,
+         58,
+         80,
+         57
+        ],
+        "total": 1258,
+        "outcome": "elected",
+        "party": "FBP"
+       },
+       {
+        "name": "Otto Schädler",
+        "place": "Vaduz",
+        "votes": [
+         160,
+         173,
+         233,
+         223,
+         199,
+         1,
+         113,
+         103,
+         40,
+         75,
+         28
+        ],
+        "total": 1348,
+        "outcome": "elected",
+        "party": "VU"
+       },
+       {
+        "name": "Gottfried Hilty",
+        "place": "Schaan",
+        "votes": [
+         148,
+         165,
+         210,
+         183,
+         145,
+         1,
+         91,
+         70,
+         37,
+         66,
+         26
+        ],
+        "total": 1142,
+        "outcome": "lost",
+        "party": "VU"
+       },
+       {
+        "name": "Wendelin Beck",
+        "place": "Triesenberg",
+        "votes": [
+         145,
+         163,
+         204,
+         169,
+         136,
+         1,
+         90,
+         68,
+         37,
+         63,
+         22
+        ],
+        "total": 1098,
+        "outcome": "lost",
+        "party": "VU"
+       },
+       {
+        "name": "Heinrich Brunhart",
+        "place": "Balzers",
+        "votes": [
+         145,
+         161,
+         204,
+         178,
+         144,
+         1,
+         88,
+         76,
+         37,
+         62,
+         26
+        ],
+        "total": 1122,
+        "outcome": "lost",
+        "party": "VU"
+       },
+       {
+        "name": "Rudolf Matt",
+        "place": "Mauren",
+        "votes": [
+         143,
+         166,
+         212,
+         187,
+         154,
+         1,
+         90,
+         89,
+         37,
+         70,
+         24
+        ],
+        "total": 1173,
+        "outcome": "lost",
+        "party": "VU"
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+]
