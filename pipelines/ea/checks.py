@@ -661,20 +661,24 @@ def _country_names(stage: Stage) -> list[tuple[str, sql.Composed]]:
                      where is_preferred{timeless}
                      order by entity_id, lang, {english} desc, text
                    ),
-                   current as (
-                     select entity_id, lang, text from staged
-                     union all
-                     (select distinct on (n.entity_id, n.lang) n.entity_id, n.lang, n.text from public.name n
-                      where n.is_preferred and n.valid_from is null and n.valid_to is null
-                        and not exists (select from staged s where s.entity_id = n.entity_id and s.lang = n.lang)
-                      order by n.entity_id, n.lang, n.kind = 'english' desc, n.text)
-                   ),
                    coded as (
                      select entity_id, value from public.external_id where scheme = 'iso3166'{coded}
                    ),
                    link as (
                      select p.id as polity, c.entity_id as country from public.polity p
                      join coded c on c.value = p.iso_code
+                   ),
+                   linked as (
+                     select polity as entity_id from link union select country from link
+                   ),
+                   current as (
+                     select entity_id, lang, text from staged
+                     union all
+                     (select distinct on (n.entity_id, n.lang) n.entity_id, n.lang, n.text from public.name n
+                      where n.entity_id in (select entity_id from linked)
+                        and n.is_preferred and n.valid_from is null and n.valid_to is null
+                        and not exists (select from staged s where s.entity_id = n.entity_id and s.lang = n.lang)
+                      order by n.entity_id, n.lang, n.kind = 'english' desc, n.text)
                    )
                    select l.polity, null::uuid,
                           jsonb_build_object(
