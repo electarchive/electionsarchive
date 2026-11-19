@@ -43,6 +43,7 @@ ASSEMBLY = key("source", "kuvendi")
 PRESIDENCY = key("office", "president")
 SYSTEM = key("electoral_system", "president")
 SYSTEM_KK = key("electoral_system", "president_kk")
+UNIT = key("unit", "XK")
 
 CONSTITUTION = date(2008, 6, 15)
 
@@ -377,6 +378,17 @@ def registry() -> Package:
     )
     p.external.add(KOSOVO)
     p.add("scheme", code=SCHEME, polity_id=KOSOVO, kind="administrative", rank=1, noun="nation", code_system=None)
+    p.external.add(COUNTRY)
+    p.add(
+        "reporting_unit",
+        id=UNIT,
+        polity_id=KOSOVO,
+        scheme_code=SCHEME,
+        code="XK",
+        area_relation="equals",
+        area_id=COUNTRY,
+        kind="aggregate",
+    )
     p.add("office", id=PRESIDENCY, polity_id=KOSOVO, kind="head_of_state")
     p.name(PRESIDENCY, "President of Kosovo", "en", "official")
     p.name(PRESIDENCY, "Presidenti i Kosovës", "sq", "official", False)
@@ -447,7 +459,7 @@ def election(e: Election) -> Package:
         f"The election of Kosovo's President by the Assembly on {day:%-d %B %Y}, from the Assembly's minutes",
         depends=[f"{SOURCE}/registry"],
     )
-    p.external |= {KOSOVO, COUNTRY}
+    p.external.add(KOSOVO)
     p.add(
         "source",
         id=ASSEMBLY,
@@ -473,17 +485,7 @@ def election(e: Election) -> Package:
         "native",
         False,
     )
-    unit = key("unit", day)
-    p.add(
-        "reporting_unit",
-        id=unit,
-        polity_id=KOSOVO,
-        scheme_code=SCHEME,
-        code="XK",
-        area_relation="equals",
-        area_id=COUNTRY,
-        kind="aggregate",
-    )
+    unit = UNIT
     people: dict[str, str] = {}
     boxes = locate(e) if e.rounds else {}
     pages: dict[int, str] = {}
