@@ -425,13 +425,6 @@ def geo() -> Package:
         attribution="geoBoundaries (William & Mary geoLab), from Wikimedia Commons",
     )
     p.artifact(shapes, SHAPES_ID)
-    p.add(
-        "boundary_set",
-        id=key("boundary_set", "am.marz", 2005),
-        scheme_code="am.marz",
-        vintage="2005",
-        as_of=shapes.retrieved_at.date(),
-    )
     outlines = {
         feature["properties"]["shapeName"]: shapely.geometry.shape(feature["geometry"])
         for feature in json.loads(shapes.path.read_text(encoding="utf-8"))["features"]
