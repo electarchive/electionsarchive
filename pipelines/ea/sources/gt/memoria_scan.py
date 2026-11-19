@@ -1234,7 +1234,11 @@ def read(year: int) -> dict[str, base.Contest]:
     print(f"{year}: {len(found)} columns, {first} settled by the OCR passes, {len(settled)} with the second reader")
     for what, pages in unsettled.items():
         print(f"{year} {what}: {len(pages)} columns left out, pages {', '.join(pages[:60])}", flush=True)
-    return {k: base._contest(k, k.partition(":")[0], g) for k, g in grids.items()}
+    contests = {k: base._contest(k, k.partition(":")[0], g) for k, g in grids.items()}
+    from ea.sources.gt import memoria_seats
+
+    memoria_seats.apply(year, contests)
+    return contests
 
 
 class _Shared(dict[str, Grid]):
