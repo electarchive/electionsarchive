@@ -20,7 +20,8 @@ from PIL import Image
 from scipy import ndimage
 
 from ea import batch, raw
-from ea.changeset import Changeset, slug
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.ie.dail import ALIASES as DAIL_ALIASES
 from ea.sources.ie.dail import CEANN, EXHAUSTED, PARTY_CODES, QUOTA, REGISTERED, VALID, VOTES
 from ea.sources.ie.dail_pdf import ORDINALS
@@ -241,6 +242,7 @@ def frames(year: int) -> dict[str, dict]:
     if not (folder / "frames.json").exists():
         folder.mkdir(parents=True, exist_ok=True)
         found: dict[str, dict] = {}
+        cached = raw.keys(SOURCE)
         with tempfile.TemporaryDirectory() as scratch:
             subprocess.run(
                 ["pdftoppm", "-r", "150", "-gray", "-png", str(volume(year).path), f"{scratch}/p"], check=True
@@ -254,7 +256,12 @@ def frames(year: int) -> dict[str, dict]:
                 image = image.crop(box)
                 image.thumbnail((LONGEST, LONGEST))
                 target = folder / f"p{int(path.stem.split('-')[1]):03d}.png"
-                same = target.exists() and np.array_equal(np.asarray(Image.open(target)), np.asarray(image))
+                if target.exists():
+                    same = np.array_equal(np.asarray(Image.open(target)), np.asarray(image))
+                else:
+                    # A checkout without the earlier renders keeps the render whose read the cache holds.
+                    same = f"anthropic-batch:{MODEL}/{PROMPT}.2/{year}/{target.stem}" not in cached
+                    image.save(target)
                 if not same:
                     image.save(target)
                 found[target.stem] = {"angle": angle, "box": [*box], "size": size, "render": 1 if same else 2}
@@ -271,12 +278,36 @@ def key(year: int, page: Path) -> str:
     return f"anthropic-batch:{MODEL}/{PROMPT if render == 1 else f'{PROMPT}.{render}'}/{year}/{page.stem}"
 
 
-def read(year: int, page: Path) -> dict | None:
-    try:
-        message = json.loads(raw.cached(SOURCE, key(year, page)).path.read_text())
-    except LookupError:
-        return None
+READ = re.compile(rf"^anthropic-batch:{re.escape(MODEL)}/{PROMPT}(?:\.(\d+))?/(\d+)/(p\d+)$")
+CELL = re.compile(rf"^anthropic-batch:{re.escape(MODEL)}/{CELLS}/(\d+)/(p\d+)/t(\d+)/c(\d+)-(\d+)$")
+
+
+def held(year: int) -> dict[Path, str]:
+    """The cached read of each page of a volume, from the page's latest render, so parsing needs only the cache."""
+    found: dict[str, tuple[int, str]] = {}
+    for stored in raw.keys(SOURCE):
+        if (match := READ.match(stored)) and int(match[2]) == year:
+            render = int(match[1] or 1)
+            if render > found.get(match[3], (0, ""))[0]:
+                found[match[3]] = (render, stored)
+    return {PAGES / str(year) / f"{stem}.png": stored for stem, (_, stored) in sorted(found.items())}
+
+
+def read(stored: str) -> dict:
+    message = json.loads(raw.cached(SOURCE, stored).path.read_text())
     return json.loads(next(block["text"] for block in message["content"] if block["type"] == "text"))
+
+
+def held_tiles(year: int) -> dict[str, list[dict]]:
+    """The tiles of each page whose cell reads the cache holds, in table and column order as `geometry` lists them;
+    a tile's key carries its table and columns."""
+    found: dict[str, list[dict]] = {}
+    for stored in raw.keys(SOURCE):
+        if (match := CELL.match(stored)) and int(match[1]) == year:
+            first, last = int(match[4]), int(match[5])
+            tile = {"table": int(match[3]), "first": first, "columns": [[column] for column in range(first, last + 1)]}
+            found.setdefault(match[2], []).append(tile)
+    return {stem: sorted(tiles, key=lambda tile: (tile["table"], tile["first"])) for stem, tiles in found.items()}
 
 
 def high(year: int, stem: str) -> Image.Image:
@@ -311,9 +342,9 @@ def fold(text: str) -> str:
 
 def wanted_tables(year: int) -> list[tuple[Path, int, dict]]:
     found: list[tuple[Path, int, dict]] = []
-    for page in pages(year):
-        if (got := read(year, page)) is not None:
-            found.extend((page, index, table) for index, table in enumerate(got["tables"]) if len(table["rows"]) >= 2)
+    for page, stored in held(year).items():
+        got = read(stored)
+        found.extend((page, index, table) for index, table in enumerate(got["tables"]) if len(table["rows"]) >= 2)
     complete = {fold(table["constituency"]) for _, _, table in found if table["complete"]}
     return [item for item in found if item[2]["complete"] or fold(item[2]["constituency"]) not in complete]
 
@@ -526,12 +557,11 @@ def fetch() -> None:
     cells: dict[str, batch.Want] = {}
     for year in VOLUMES:
         chosen = {(page.stem, index) for page, index, _ in wanted_tables(year)}
-        for page in pages(year):
-            got = read(year, page)
-            if got is None or not any(stem == page.stem for stem, _ in chosen):
+        for page, stored in held(year).items():
+            if not any(stem == page.stem for stem, _ in chosen):
                 continue
             image: Image.Image | None = None
-            for tile in geometry(year, page, got["tables"]):
+            for tile in geometry(year, page, read(stored)["tables"]):
                 if (page.stem, tile["table"]) not in chosen:
                     continue
                 image = image or high(year, page.stem)
@@ -911,10 +941,10 @@ def correct(year: int, page: str, merged: dict) -> dict:
 
 def tables(year: int) -> list[dict]:
     found = []
+    tiled = held_tiles(year)
     for page, index, table in wanted_tables(year):
-        target = PARSED / "tiles" / str(year) / f"{page.stem}.json"
         groups: dict[int, list[dict]] = {}
-        for tile in json.loads(target.read_text()) if target.exists() else []:
+        for tile in tiled.get(page.stem, []):
             groups.setdefault(tile["table"], []).append(tile)
         built = [cells for tiles in groups.values() if (cells := grid(year, page, tiles)) is not None]
         shaped = page_grid(table)
@@ -1093,8 +1123,8 @@ def select(year: int) -> list[dict]:
         if all(len(mine & firsts(other)) < 0.6 * len(mine) for other in kept):
             kept.append(entry)
     dated: dict[str, date] = {}
-    for page in pages(year):
-        for table in (read(year, page) or {"tables": []})["tables"]:
+    for stored in held(year).values():
+        for table in read(stored)["tables"]:
             if (day := polling_day(table)) is not None:
                 dated.setdefault(fold(table["constituency"]), day)
     for entry in kept:
@@ -1252,6 +1282,18 @@ def title(name: str) -> str:
 
 
 MARKED = re.compile(r"^[\s*]*[†‡]")
+# The reads of these tables list only some of the members the page prints as elected. The full lists are read off
+# the page's own counts: each member reached the quota or held a seat at the last count, and every one sat in the
+# 20th Dáil for that constituency.
+ELECTED = {
+    (1973, "p035", "EAST LIMERICK"): [
+        "O'MALLEY, DESMOND (F.F.)",
+        "O'DONNELL, TOM (F.G.)",
+        "COUGHLAN, STEPHEN (Lab.)",
+        "HERBERT, MICHAEL (F.F.)",
+    ],
+    (1973, "p039", "EAST MAYO"): ["CALLEARY, SEÁN (F.F.)", "FINN, MARTIN (F.G.)", "FLANAGAN, SEÁN (F.F.)"],
+}
 
 
 def given(label: str, text: str) -> float:
@@ -1317,10 +1359,9 @@ def contest(entry: dict, areas: dict[int, dict[frozenset[str], str]]) -> dict:
         ]
         spoilt[0]["box"] = [*spoilt[0]["box"][:3], extra["box"][3]]
         rows.remove(extra)
+    printed = ELECTED.get((year, entry["page"], table["constituency"]), table["elected"])
     deemed = [
-        text
-        for text in [*table["elected"], *table["footnotes"]]
-        if MARKED.match(text) or "deemed to be elected" in text.lower()
+        text for text in [*printed, *table["footnotes"]] if MARKED.match(text) or "deemed to be elected" in text.lower()
     ]
     for row in rows:
         row["speaker"] = (
@@ -1331,7 +1372,7 @@ def contest(entry: dict, areas: dict[int, dict[frozenset[str], str]]) -> dict:
         )
     candidates = [row for row in rows if row["role"] == "candidate" and not row["speaker"]]
     speakers = [row for row in rows if row["speaker"]]
-    elected = [text for text in table["elected"] if not (speakers and text in deemed)]
+    elected = [text for text in printed if not (speakers and text in deemed)]
     if len(speakers) > 1:
         raise LookupError("more than one candidate is deemed elected")
     chosen = winners(candidates, elected)
@@ -1416,7 +1457,7 @@ DIGITIZED = 8
 def emit() -> Path:
     found = json.loads((PARSED / "contests.json").read_text())
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
@@ -1425,6 +1466,12 @@ def emit() -> Path:
                 f"Stationery Office's printed results and transfers: {len(found)} constituency counts"
             ),
             polity="IE",
+        )
+        cs.accept(
+            "accounting.votes_valid",
+            "A count stores each candidate's votes in its own round from the first count on, and the valid poll in "
+            "round 0, so a single-seat by-election has no round-0 candidate votes to sum; the parse checks that every "
+            "count's candidates and non-transferable papers add up to the printed valid poll.",
         )
 
         def name(entity: UUID, text: str) -> None:
@@ -1454,6 +1501,7 @@ def emit() -> Path:
                 for options in known.values():
                     if held in options:
                         options.remove(held)
+        keyed = {entity: value for value, entity in strays.items() if entity in cs.own_entities}
         parties: dict[str, UUID] = {}
 
         def party_id(label: str) -> UUID:
@@ -1461,15 +1509,18 @@ def emit() -> Path:
                 canonical = DAIL_ALIASES.get(label, label)
                 if label in PARTY_CODES:
                     parties[label] = cs.key("ie.party", PARTY_CODES[label])
-                elif label not in DISTINCT and slug(canonical) in strays:
+                    return parties[label]
+                if label not in DISTINCT and slug(canonical) in strays:
                     parties[label] = strays[slug(canonical)]
                 elif label not in DISTINCT and len(set(known.get(fold(canonical), ()))) == 1:
                     parties[label] = known[fold(canonical)][0]
                 else:
                     parties[label] = cs.key("ie.dail.party", slug(canonical))
-                    if parties[label] in cs.minted:
-                        cs.add("party", id=parties[label], kind="party", polity_id=ireland)
-                        name(parties[label], DISTINCT.get(label, label))
+                if parties[label] in keyed:
+                    cs.key("ie.dail.party", keyed[parties[label]])
+                if parties[label] in cs.minted:
+                    cs.add("party", id=parties[label], kind="party", polity_id=ireland)
+                    name(parties[label], DISTINCT.get(label, label))
             return parties[label]
 
         sources: dict[int, UUID] = {}
@@ -1686,20 +1737,6 @@ def emit() -> Path:
                         x1=1.0,
                         y1=box[3] / 1000,
                     )
-        fresh = {(row["entity_id"], row["body_md"]) for row in cs.rows["note"]}
-        for note, entity, text in conn.execute(
-            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
-               where n.entity_id = any(%s) and n.kind = 'caveat' and c.pipeline = %s""",
-            [[row["id"] for kind in ("contest", "result_set") for row in cs.rows[kind]], SOURCE],
-        ).fetchall():
-            if (entity, text) not in fresh:
-                cs.add(
-                    "note_drop",
-                    note_id=note,
-                    entity_id=entity,
-                    body_md=text,
-                    reason="A re-emit writes the count's caveats afresh.",
-                )
         return cs.write()
 
 
