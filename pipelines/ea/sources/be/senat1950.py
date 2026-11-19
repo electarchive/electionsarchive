@@ -14,10 +14,15 @@ from pathlib import Path
 from typing import NamedTuple
 from uuid import uuid5
 
+import numpy
 import polars as pl
+import shapely
+import shapely.geometry
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.be import nis
+from ea.sources.be.vlaanderen import PLANS, SECTORS, TOLERANCE
 
 SOURCE = "be.senat1950"
 BELGIUM = str(uuid5(package.NAMESPACE, "polity\x1fBE"))
@@ -28,6 +33,12 @@ SCHEME = "be.arrondissement_1950"
 BOXES = Path(__file__).with_name("senat1950_boxes.json")
 VOTES, CAST, VALID, INVALID = 1, 3, 4, 5
 DIGITIZED = 8
+GEO = f"{SOURCE}/geo"
+STATBEL = "be.statbel"
+TERRITORY = nis.TERRITORY
+# the municipal plan whose municipalities and arrondissements are dissolved into the 1950 arrondissements
+PLAN = "2018"
+UNTIL = date(1950, 3, 13)
 
 
 class Row(NamedTuple):
@@ -97,11 +108,12 @@ def slug(text: str) -> str:
 
 
 def packages() -> list[str]:
-    return [KEY]
+    return [GEO, KEY]
 
 
 def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".pdf")
+    raw.fetch(STATBEL, SECTORS + PLANS[PLAN][0], suffix=".zip")
 
 
 def parse() -> None:
@@ -117,11 +129,156 @@ def parse() -> None:
                 )
         elif summed != KINGDOM[i]:
             raise ValueError(f"{name}: rows add up to {summed}, not the printed {KINGDOM[i]}")
+    geo().write()
     build().write()
 
 
 def emit() -> None:
     package.run("load", packages())
+
+
+# Each 1950 arrondissement is the union of the administrative arrondissements that the law of 1950 merged for the
+# Chamber, keyed by the plain French name Statbel gives them. Brussels-Capital and Halle-Vilvoorde vote as Brussels.
+MERGED = {
+    "anvers": "Antwerpen",
+    "malines": "Mechelen",
+    "turnhout": "Turnhout",
+    "bruxelles-capitale": "Brussel",
+    "hal-vilvorde": "Brussel",
+    "louvain": "Leuven",
+    "nivelles": "Nijvel",
+    "bruges": "Brugge",
+    "dixmude": "Veurne-Diksmuide-Oostende",
+    "ostende": "Veurne-Diksmuide-Oostende",
+    "furnes": "Veurne-Diksmuide-Oostende",
+    "roulers": "Roeselare-Tielt",
+    "tielt": "Roeselare-Tielt",
+    "courtrai": "Kortrijk",
+    "ypres": "Ieper",
+    "gand": "Gent-Eeklo",
+    "eeklo": "Gent-Eeklo",
+    "saint-nicolas": "Sint-Niklaas",
+    "termonde": "Dendermonde",
+    "alost": "Aalst",
+    "audenarde": "Oudenaarde",
+    "mons": "Bergen",
+    "soignies": "Zinnik",
+    "la-louviere": "Zinnik",
+    "charleroi": "Charleroi",
+    "thuin": "Thuin",
+    "tournai-mouscron": "Doornik-Aat",
+    "ath": "Doornik-Aat",
+    "liege": "Luik",
+    "huy": "Hoei-Borgworm",
+    "waremme": "Hoei-Borgworm",
+    "verviers": "Verviers",
+    "hasselt": "Hasselt",
+    "tongres": "Tongeren-Maaseik",
+    "maaseik": "Tongeren-Maaseik",
+    "arlon": "Aarlen-Marche-Bastenaken",
+    "bastogne": "Aarlen-Marche-Bastenaken",
+    "marche-en-famenne": "Aarlen-Marche-Bastenaken",
+    "neufchateau": "Neufchâteau-Virton",
+    "virton": "Neufchâteau-Virton",
+    "namur": "Namen",
+    "dinant": "Dinant-Philippeville",
+    "philippeville": "Dinant-Philippeville",
+}
+# Municipalities that lay in another arrondissement in 1950 than in the municipal plan. The language-border law of 1962
+# moved the first two from West Flanders to Hainaut and Fourons from Liège to Limburg.
+MOVED = {"Mouscron": "Kortrijk", "Comines-Warneton": "Ieper", "Fourons": "Verviers"}
+SHAPES_NOTE = (
+    "The outline is reconstructed. Statbel's statistical sectors of the 2018 municipal plan are dissolved to "
+    "municipalities, assigned to the arrondissements of the Chamber law of 1950 through the administrative "
+    "arrondissements that law merged, and dissolved again. Mouscron, Comines-Warneton, and Fourons, which the "
+    "language-border law of 1962 moved between provinces, are placed where they lay in 1950. Municipal mergers of "
+    "1977 and other small post-1950 changes to arrondissement borders are not reversed, so an edge can differ from "
+    "the 1950 one by part of a municipality."
+)
+
+
+def _arrondissements() -> dict[str, list[shapely.Geometry]]:
+    """The plan's municipalities, dissolved into the 30 arrondissements by code, in the plan's CRS."""
+    reader, _ = nis._reader(PLAN, True)
+    pieces: dict[str, list[shapely.Geometry]] = {}
+    where: dict[str, tuple[str, str]] = {}
+    for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True):
+        if record is None or shape is None:
+            continue
+        row = dict(record.as_dict())
+        code = nis._column(row, "CNIS5_")
+        pieces.setdefault(code, []).append(shapely.geometry.shape(shape.__geo_interface__))
+        where[code] = (slug(re.sub(r"^Arrondissement d[e’']\s*", "", str(row["T_ARRD_FR"]))), str(row["T_MUN_FR"]))
+    grouped: dict[str, list[shapely.Geometry]] = {}
+    for code, parts in pieces.items():
+        arrondissement, town = where[code]
+        if arrondissement not in MERGED:
+            raise ValueError(f"{town}: the arrondissement {arrondissement!r} has no 1950 arrondissement")
+        target = MOVED.get(town, MERGED[arrondissement])
+        grouped.setdefault(slug(target), []).append(shapely.make_valid(shapely.coverage_union_all(parts)))
+    if set(grouped) != {slug(row.dutch) for row in ROWS}:
+        raise ValueError("the dissolved arrondissements are not the 30 of 1950")
+    return grouped
+
+
+def geo() -> Package:
+    p = Package(
+        GEO,
+        SOURCE,
+        "The 30 electoral arrondissements of Belgium in 1950, dissolved from Statbel's municipal boundaries",
+    )
+    p.external |= {BELGIUM, TERRITORY}
+    statbel = p.id("source", "statbel")
+    p.add(
+        "source",
+        id=statbel,
+        kind="official_body",
+        publisher="Statbel (Algemene Directie Statistiek)",
+        title="Statistical sectors (Shapefile)",
+        url="https://statbel.fgov.be/en/open-data",
+        license="CC BY 4.0",
+        license_url="https://creativecommons.org/licenses/by/4.0/",
+        attribution="© Statbel (Belgium)",
+    )
+    p.artifact(raw.cached(STATBEL, SECTORS + PLANS[PLAN][0]), statbel)
+    p.add("scheme", code=SCHEME, polity_id=BELGIUM, kind="electoral_district", rank=1, noun="electoral arrondissement")
+    p.add(
+        "boundary_set",
+        id=p.id("boundary_set", SCHEME),
+        scheme_code=SCHEME,
+        vintage="1950",
+        valid_from=DAY,
+        valid_to=UNTIL,
+        as_of=DAY,
+    )
+    grouped = _arrondissements()
+    codes = sorted(grouped)
+    _, crs = nis._reader(PLAN, False)
+    merged = [shapely.make_valid(shapely.coverage_union_all(grouped[code])) for code in codes]
+    simple = shapely.make_valid(shapely.coverage_simplify(numpy.array(merged), TOLERANCE))
+    rows = {slug(row.dutch): row for row in ROWS}
+    for code, shape in zip(codes, simple, strict=True):
+        id = p.id("area", code)
+        row = rows[code]
+        p.add("area", id=id, scheme_code=SCHEME)
+        p.add("area_code", area_id=id, code=code, valid_from=DAY, valid_to=UNTIL)
+        p.add("area_parent", area_id=id, parent_id=TERRITORY, valid_from=DAY, valid_to=UNTIL)
+        p.name(id, row.dutch, "nl", "native", False)
+        p.name(id, row.french, "fr", "native", False)
+        p.name(id, f"{row.dutch} / {row.french}" if row.dutch != row.french else row.dutch, "en", "official")
+        wgs = nis._wgs(shape, crs)
+        point = shapely.set_srid(shapely.point_on_surface(wgs), 4326)
+        p.add(
+            "area_geometry",
+            area_id=id,
+            valid_from=DAY,
+            valid_to=UNTIL,
+            geom=shapely.to_wkb(wgs, hex=True, include_srid=True),
+            label_point=shapely.to_wkb(point, hex=True, include_srid=True),
+            quality="official",
+            source_id=statbel,
+        )
+    return p
 
 
 def sizes(path: Path) -> dict[int, tuple[float, float]]:
@@ -136,6 +293,7 @@ def build() -> Package:
         SOURCE,
         "The popular consultation of 12 March 1950 on the Royal Question by electoral arrondissement, digitized from "
         "the Senate's printed results",
+        depends=[GEO],
     )
     p.external.add(BELGIUM)
     source = p.id("source")
@@ -151,7 +309,6 @@ def build() -> Package:
     )
     stored = raw.cached(SOURCE, URL)
     artifact = p.artifact(stored, source)
-    p.add("scheme", code=SCHEME, polity_id=BELGIUM, kind="electoral_district", rank=1, noun="electoral arrondissement")
 
     election = p.id("election")
     p.add(
@@ -243,8 +400,8 @@ def build() -> Package:
             polity_id=BELGIUM,
             scheme_code=SCHEME,
             code=slug(row.dutch),
-            area_relation="unlocated",
-            area_id=None,
+            area_relation="equals",
+            area_id=p.id("area", slug(row.dutch)),
             kind="standard",
         )
         p.name(unit, row.dutch, "nl", "native", False)
