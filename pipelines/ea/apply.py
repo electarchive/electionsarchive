@@ -747,38 +747,33 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
             [["entity", *types]],
         ).fetchall():
             moved = sql.Identifier(column)
+
+            def clash(key: list[str], valid: bool) -> sql.Composed:
+                same = sql.SQL("").join(
+                    [
+                        *([sql.SQL(" and x.valid && t.valid")] if valid else []),
+                        *(
+                            sql.SQL(" and x.{0} is not distinct from t.{0}").format(sql.Identifier(other))
+                            for other in key
+                            if other != column
+                        ),
+                    ]
+                )
+                return sql.SQL(
+                    """(exists (select from public.{target} x where x.{moved} = s.into_id{same})
+                        or exists (select from public.{target} x join {staged} p on p.entity_id = x.{moved}
+                                   where p.into_id = s.into_id and p.entity_id < s.entity_id{same}))"""
+                ).format(target=sql.Identifier(referencing), moved=moved, staged=staged, same=same)
+
             for key in keyed.get(referencing, []):
                 if column in key:
                     conn.execute(
-                        sql.SQL(
-                            """delete from public.{target} t using {staged} s where t.{moved} = s.entity_id
-                               and exists (select from public.{target} x where x.{moved} = s.into_id and {same})"""
-                        ).format(
-                            target=sql.Identifier(referencing),
-                            moved=moved,
-                            staged=staged,
-                            same=sql.SQL(" and ").join(
-                                [
-                                    sql.SQL("true"),
-                                    *(
-                                        sql.SQL("x.{0} is not distinct from t.{0}").format(sql.Identifier(other))
-                                        for other in key
-                                        if other != column
-                                    ),
-                                ]
-                            ),
+                        sql.SQL("delete from public.{} t using {} s where t.{} = s.entity_id and {}").format(
+                            sql.Identifier(referencing), staged, moved, clash(key, False)
                         )
                     )
             dated = column in periods.get(referencing, [])
-            held = sql.SQL("exists (select from public.{} x where x.{} = s.into_id and x.valid && t.valid{})").format(
-                sql.Identifier(referencing),
-                moved,
-                sql.SQL("").join(
-                    sql.SQL(" and x.{0} is not distinct from t.{0}").format(sql.Identifier(key))
-                    for key in periods.get(referencing, [])
-                    if key != column
-                ),
-            )
+            held = clash(periods.get(referencing, []), True)
             conn.execute("select set_config('ea.repointing', 'on', true)")
             conn.execute(
                 sql.SQL(
