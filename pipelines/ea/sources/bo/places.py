@@ -45,7 +45,7 @@ JOINED = [
     ("5", "ckocas", "ckochas"),
 ]
 # Names whose municipality keeps its code from before the bulletin of 2015 spelled it differently.
-KEPT = {("2", "licoma pampa"), ("5", "chuquihuta"), ("5", "ckochas")}
+KEPT = {("2", "licoma pampa"), ("5", "chuquihuta"), ("5", "ckochas"), ("1", "san pablo de huacareta")}
 CAPITALS = {"cruz de la sierra": "santa cruz de la sierra", "nuestra senora de la paz": "la paz"}
 PREFIX = re.compile(r"^(ciudad capital|capital ciudad|ciudad de|ciudad|capital)\s+", re.IGNORECASE)
 
