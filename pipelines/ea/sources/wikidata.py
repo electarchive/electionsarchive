@@ -647,6 +647,19 @@ def _complete(countries: dict[str, tuple[str | None, str]]) -> dict[str, tuple[s
     }
 
 
+def spans() -> dict[str, tuple[int | None, int | None]]:
+    found: dict[str, tuple[int | None, int | None]] = {}
+    for country, languages in _complete(_countries()).values():
+        for row in _rows(_url(SPANS, _scope(country), languages)):
+            item = row["item"].rsplit("/", 1)[1]
+            began, ended = found.get(item, (None, None))
+            found[item] = (
+                min(filter(None, (began, _year(row.get("inception")))), default=None),
+                max(filter(None, (ended, _year(row.get("dissolved")))), default=None),
+            )
+    return found
+
+
 def fetch() -> None:
     countries = _countries()
     failed: list[str] = []
