@@ -173,11 +173,18 @@ class Board(NamedTuple):
     table: list[tuple[int, str, int]]
     figures: dict[str, int]
     won: list[tuple[str, int]]
+    council: int | None = None
+    council_won: tuple[tuple[str, int], ...] = ()
 
 
 SEATS = re.compile(
     r"^\s*(?:Correspond[ae]:? a:?\s*)?(?P<name>\S.*?)(?:\s+(?P<council>\d+)\s+Concejal(?:es|e)?)?"
     r"\s+(?P<board>\d+),?\s+Consejeros?\s*$",
+    re.IGNORECASE,
+)
+COUNCIL_SEATS = re.compile(
+    r"^\s*(?:Correspond[ae]:?\s*(?:a:?\s+)?)?(?P<name>\S.*?)\s+(?P<seats>\d+)\s+Concejal(?:es?)?"
+    r"(?:\s+\d+,?\s+Consejeros?)?\s*$",
     re.IGNORECASE,
 )
 LIST_LINE = re.compile(r"^\s*(?P<number>\d\.\d{3}|\d{1,4})(?:\s*-\s*(?=\S)|\s*(?=[^\W\d_]))(?P<rest>.+)$")
@@ -193,6 +200,9 @@ FIGURE = re.compile(r"(?<![\w.,])\d{1,3}(?:[.,]\d{3})*(?![\w.,])|(?<![\w.,])\d+(
 SEAT_ALIASES: dict[tuple[int, str, str], str] = {
     (2003, "028", ".Mov. para la Victoria de Cnel.Suarez"): "AGRUPACION MOVIMIENTO PARA LA VICTORIA DE CORONEL SUAREZ",
     (2003, "035", "Acción Federalista por Buenos Aires"): "ACCION FEDER. POR BS. AS.",
+    (2003, "024", "Agrup.Intransigencia Colonense"): "AGRUPACION MUNICIPAL DE LA INTRANSIGENCIA",
+    (2003, "052", "Agrup. Vecinal José Hernández"): "GENERAL SAN MARTIN, AGRUPACION VECINAL JOSE HERNANDEZ",
+    (2003, "107", "Agrup. Municipal del Acuerdo"): "SAN NICOLAS, AGRUPACION MUNICIPAL DEL ACUERDO",
 }
 
 
@@ -264,6 +274,7 @@ def board(year: int, did: str) -> Board:
         if int(found["board"]):
             won.append((name, int(found["board"])))
     seats = int(elige[1])
+    council = _council_seats(text, lines)
     positive = figures.get("positive")
     divisor = (positive or 0) / _count(quotient[1])
     if abs(divisor - round(divisor)) > 0.02:
@@ -278,7 +289,22 @@ def board(year: int, did: str) -> Board:
     for bad, message in problems:
         if bad:
             raise ValueError(f"{year} {did}: {message}")
-    return Board(seats, _count(quotient[1]), table, figures, won)
+    return Board(seats, _count(quotient[1]), table, figures, won, *council)
+
+
+def _council_seats(text: str, lines: list[str]) -> tuple[int | None, tuple[tuple[str, int], ...]]:
+    """The councillors a partido elects and the seats each list won, when the PDF prints both and they agree."""
+    elige = re.search(r"ELIGE:[^\n]*?(\d+),?\s+Concejal(?:es)?\b", text, re.IGNORECASE)
+    won: list[tuple[str, int]] = []
+    for line in lines:
+        found = COUNCIL_SEATS.match(line)
+        if found is None or "Concejales y" in line:
+            continue
+        if int(found["seats"]):
+            won.append((re.sub(r"\s+", " ", found["name"]).strip(), int(found["seats"])))
+    if elige is None or sum(seats for _, seats in won) != int(elige[1]):
+        return None, ()
+    return int(elige[1]), tuple(won)
 
 
 def match_list(name: str, table: list[tuple[int, str, int]], year: int, did: str) -> int:
@@ -1065,8 +1091,9 @@ def election(kind: str, year: int) -> Package:
             ""
             if primary
             else "Each partido's school board (consejo escolar) is added from the Junta's definitive-count PDF "
-            "for the partido, which prints one list table for the councillors and the school board together and "
-            "declares the school board seats each list won. "
+            "for the partido, which prints one list table for the mayor, the councillors, and the school board "
+            "together and declares the seats each list won. In a year the statistics hold only the mayor, the "
+            "partido's councillors come from the same PDF, with that table's votes and the councillor seats. "
         )
         + (
             "In the primaries each list's votes are those of its internal lines, which sit under the list."
@@ -1112,6 +1139,8 @@ def election(kind: str, year: int) -> Package:
                 p.artifact(raw.cached(SOURCE, pdf_url(year, did)), ESCRUTINIO)
                 p.artifact(raw.cached(SOURCE, results_listing_url(did)), ESCRUTINIO)
                 _school_board(p, year, election_id, path, did, data[did], units[did])
+                if "11" not in data[did].accounting:
+                    _council(p, year, election_id, path, did, data[did], units[did])
         _accept_gaps(p, year, data)
     return p
 
@@ -1326,9 +1355,21 @@ def _list_party(lista: int, name: str, held_: Held, year: int) -> tuple[Party, s
 
 def _school_board(p: Package, year: int, election_id: str, path: str, did: str, held_: Held, unit: str) -> None:
     """The partido's consejo escolar: the list votes of the Junta's definitive-count PDF, which prints one list
-    table for the councillors and the school board together, and the school board seats it declares to each
-    list. A list the PDF's table leaves out but the statistics file prints, with votes that bring the table to the
-    PDF's positive votes, is taken from the statistics file."""
+    table for the mayor, the councillors, and the school board together, and the school board seats it declares to
+    each list. A list the PDF's table leaves out but the statistics file prints, with votes that bring the table to
+    the PDF's positive votes, is taken from the statistics file."""
+    _board_contest(p, year, election_id, path, did, held_, unit, council=False)
+
+
+def _council(p: Package, year: int, election_id: str, path: str, did: str, held_: Held, unit: str) -> None:
+    """The partido's council in a year the statistics file holds only the mayor: the same list table, with the
+    councillor seats the PDF declares to each list."""
+    _board_contest(p, year, election_id, path, did, held_, unit, council=True)
+
+
+def _board_contest(
+    p: Package, year: int, election_id: str, path: str, did: str, held_: Held, unit: str, council: bool
+) -> None:
     here = board(year, did)
     listed = {row.lista for row in held_.rows}
     table = [row for row in here.table if row[2] or row[0] in listed]
@@ -1344,7 +1385,11 @@ def _school_board(p: Package, year: int, election_id: str, path: str, did: str, 
     ):
         table += [(row.lista, row.name, row.votes) for row in missing]
     name = NAMES[did]
-    contest = key("contest", "g", year, "school", did)
+    tag = "11" if council else "school"
+    seats = here.council if council else here.seats
+    if seats is None:
+        raise ValueError(f"{year} {did}: no councillor seats in the PDF")
+    contest = key("contest", "g", year, tag, did)
     p.add(
         "contest",
         id=contest,
@@ -1353,13 +1398,19 @@ def _school_board(p: Package, year: int, election_id: str, path: str, did: str, 
         round_number=1,
         default_result_kind="counted",
         kind="list_allocation",
-        body_id=body("school_board"),
-        magnitude=here.seats,
+        body_id=body("council" if council else "school_board"),
+        magnitude=seats,
     )
-    p.name(contest, f"Consejeros escolares de {name}", "es", "official")
-    p.name(contest, f"School board members (consejeros escolares) of {name}", "en", "english", False)
-    p.add("slug", path=f"{path}/school-board-{changeset.slug(name)}", entity_id=contest, is_current=True)
-    result_set = key("result_set", "g", year, "school", did)
+    if council:
+        p.name(contest, f"Concejales de {name}", "es", "official")
+        p.name(contest, f"Municipal councillors of {name}", "en", "english", False)
+        tail = f"council-{changeset.slug(name)}"
+    else:
+        p.name(contest, f"Consejeros escolares de {name}", "es", "official")
+        p.name(contest, f"School board members (consejeros escolares) of {name}", "en", "english", False)
+        tail = f"school-board-{changeset.slug(name)}"
+    p.add("slug", path=f"{path}/{tail}", entity_id=contest, is_current=True)
+    result_set = key("result_set", "g", year, tag, did)
     p.add(
         "result_set",
         id=result_set,
@@ -1375,7 +1426,7 @@ def _school_board(p: Package, year: int, election_id: str, path: str, did: str, 
     options: dict[int, str] = {}
     for lista, list_name, _ in table:
         found, label = _list_party(lista, list_name, held_, year)
-        options[lista] = key("option", "g", year, "school", did, found.id)
+        options[lista] = key("option", "g", year, tag, did, found.id)
         p.add(
             "contest_option",
             id=options[lista],
@@ -1409,9 +1460,9 @@ def _school_board(p: Package, year: int, election_id: str, path: str, did: str, 
             flags=0,
             value=votes,
         )
-    for list_name, seats in here.won:
+    for list_name, won in here.council_won if council else here.won:
         lista = table[match_list(list_name, table, year, did)][0]
-        p.add("outcome", result_set_id=result_set, option_id=options[lista], kind="won", seats=seats)
+        p.add("outcome", result_set_id=result_set, option_id=options[lista], kind="won", seats=won)
 
 
 def _reconcile(p: Package, declared: Declared, data: dict[str, Held]) -> None:
