@@ -1,5 +1,6 @@
-"""Iceland's municipal elections of 16 May 2026 from the National Electoral Commission's election reports, and the
-candidate lists of the 2024 Althing election from the commission's notice of the lists."""
+"""Iceland's municipal elections of 16 May 2026 from the National Electoral Commission's election reports, the
+municipal elections of 14 May 2022 that the ministry's copies of the committee reports leave out, and the candidate
+lists of the 2024 Althing election from the commission's notice of the lists."""
 
 import importlib
 import json
@@ -68,6 +69,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, PAGE, suffix=".html")
     raw.fetch(SOURCE, GB_URL, suffix=".geojson")
     raw.fetch_many(SOURCE, pdf_urls(), suffix=".pdf", workers=8)
+    fetch_2022()
 
 
 # ---------------------------------------------------------------- reports
@@ -688,6 +690,325 @@ def election() -> Package:
     return p
 
 
+# ---------------------------------------------------------------- 2022 municipal elections
+
+DAY_2022 = date(2022, 5, 14)
+EKEY_2022 = "local-2022-05-14"
+PACKAGE_2022 = f"{SOURCE}/{EKEY_2022}"
+STATS = "is.hagstofa"
+MINISTRY = "is.stjornarradid"
+# The 2022 reports print figures the Icelandic way: a point between thousands and a comma before decimals.
+ICELANDIC = r"\d{1,3}(?:\.\d{3})*"
+ENTRY_2022 = re.compile(
+    rf"^\s*([{LETTER}]{{1,2}})\s+[–-]\s+listi\s+(.+?)\s{{2,}}({ICELANDIC})\s+[\d,]+%\s+(\d+)\s*$", re.MULTILINE
+)
+RANKING_2022 = re.compile(r"Röðunartala listans.*?:\s+\d+\s+seðla:\s+(\d+)\s+listans:")
+TAIL_2022 = re.compile(rf"(?:^|\s)(\d+)\s+[\d,]+%\s+({ICELANDIC},\d\d)\s+(\d+)\.\s*$")
+
+
+def icelandic(text: str) -> int:
+    return int(text.replace(".", ""))
+
+
+def figure_2022(text: str, label: str) -> int:
+    found = re.search(rf"^\s*{label}\b.*?\s({ICELANDIC})(?:\s|$)", text, re.MULTILINE)
+    if found is None:
+        raise LookupError(f"no '{label}' line")
+    return icelandic(found.group(1))
+
+
+def parse_2022(url: str, text: str) -> Report | None:
+    """A 2022 report of a municipality that voted by list, or None for another file or a report by personal vote."""
+    lines = [line for line in text.splitlines() if line.strip()]
+    if not any("14. maí 2022" in line for line in lines[:4]) or any("Óbundnar kosningar" in line for line in lines[:6]):
+        return None
+    report = Report(
+        url=url,
+        name=clean(lines[3]),
+        unbound=False,
+        registered=figure_2022(text, "Tala kjósenda á kjörskrá"),
+        cast=figure_2022(text, "Greidd atkvæði alls"),
+        valid=figure_2022(text, "Gildir atkvæðaseðlar"),
+        void_blank=figure_2022(text, "Auðir seðlar og aðrir ógildir seðlar"),
+        invalid=figure_2022(text, "Þar af ógildir seðlar"),
+        blank=figure_2022(text, "Þar af auðir seðlar"),
+    )
+    for found in ENTRY_2022.finditer(text):
+        report.entries.append(
+            Entry(found.group(1), clean(found.group(2)), icelandic(found.group(3)), int(found.group(4)), 0)
+        )
+    if not report.entries:
+        return None
+    report.total_votes = sum(entry.votes for entry in report.entries)
+    report.total_seats = sum(entry.seats for entry in report.entries)
+    by_letter = {entry.letter: entry for entry in report.entries}
+    current: Entry | None = None
+    pending: tuple[int, str] | None = None
+    for line in lines:
+        block = BLOCK.match(line)
+        if block is not None and block.group(1) in by_letter and not ROW.match(line):
+            current = by_letter[block.group(1)]
+            pending = None
+            continue
+        if current is None:
+            continue
+        ranking = RANKING_2022.search(line)
+        if ranking is not None:
+            current.modified = int(ranking.group(1))
+            continue
+        row = ROW.match(line)
+        if row is None:
+            tail = TAIL_2022.search(line)
+            if pending is None or tail is None:
+                continue
+            seat, who = pending
+            pending = None
+            body = re.sub(rf"(?:\s{{2,}}{ICELANDIC})+\s*$", "", line[: tail.start()])
+            current.candidates.append(
+                Candidate(
+                    seat,
+                    who,
+                    clean(body) or None,
+                    int(tail.group(1)),
+                    Decimal(tail.group(2).replace(".", "").replace(",", ".")),
+                    int(tail.group(3)),
+                )
+            )
+            continue
+        tail = TAIL_2022.search(row.group(2))
+        if tail is None:
+            pending = (int(row.group(1)), clean(row.group(2)))
+            continue
+        pending = None
+        body = re.sub(rf"(?:\s{{2,}}{ICELANDIC})+\s*$", "", row.group(2)[: tail.start()])
+        who, address = split_person(body)
+        current.candidates.append(
+            Candidate(
+                int(row.group(1)),
+                who,
+                address,
+                int(tail.group(1)),
+                Decimal(tail.group(2).replace(".", "").replace(",", ".")),
+                int(tail.group(3)),
+            )
+        )
+    return report
+
+
+def pdf_urls_2022() -> list[str]:
+    """The 2022 reports on the page, by the year in each file's title."""
+    html = raw.cached(SOURCE, PAGE).path.read_text(encoding="utf8")
+    found = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.DOTALL)
+    if found is None:
+        raise LookupError("the page of municipal election reports holds no page data")
+    urls: set[str] = set()
+
+    def walk(node: object) -> None:
+        if isinstance(node, dict):
+            url, title = node.get("url"), node.get("title")
+            if isinstance(url, str) and isinstance(title, str) and url.endswith(".pdf") and title.endswith(" 2022"):
+                urls.add(url)
+            for child in node.values():
+                walk(child)
+        elif isinstance(node, list):
+            for child in node:
+                walk(child)
+
+    walk(json.loads(found.group(1)))
+    return sorted(urls)
+
+
+def fetch_2022() -> None:
+    raw.fetch(SOURCE, PAGE, suffix=".html")
+    raw.fetch_many(SOURCE, pdf_urls_2022(), suffix=".pdf", workers=8)
+
+
+@cache
+def reports_2022() -> tuple[Report, ...]:
+    """Every 2022 report whose text gives lists, by municipality as the report titles it."""
+    found = []
+    for url in pdf_urls_2022():
+        report = parse_2022(url, text_of(url))
+        if report is not None:
+            found.append(report)
+    return tuple(sorted(found, key=lambda r: r.name))
+
+
+# The municipalities, as Statistics Iceland names them, whose 2022 reports only the commission's page holds.
+COMMISSION_ONLY_2022 = frozenset({"Sveitarfélagið Hornafjörður", "Vesturbyggð"})
+
+
+def joint(title: str) -> frozenset[str]:
+    """The municipalities a report titles, since a joint report names its parts in either order."""
+    return frozenset(clean(part).casefold() for part in re.split(r" og (?=[A-ZÞÆÖÐÁÉÍÓÚÝ])", title))
+
+
+def ministry_titles() -> frozenset[frozenset[str]]:
+    """The municipalities whose committee reports the ministry's pipeline already loads, as the reports title them."""
+    ministry = importlib.import_module("ea.sources.is.stjornarradid")
+    return frozenset(joint(re.sub(r"^\d{4} ", "", re.sub(r" og \d{4} ", " og ", name))) for name in ministry.FILES)
+
+
+def uncovered_2022() -> tuple[Report, ...]:
+    """The reports of municipalities that the ministry's copies do not include. Its pipeline already supersedes
+    Statistics Iceland's result sets for every other municipality with the same committee figures."""
+    covered = ministry_titles()
+    found = tuple(report for report in reports_2022() if joint(report.name) not in covered)
+    if {report.name for report in found} != COMMISSION_ONLY_2022:
+        raise ValueError(f"the reports the ministry lacks are {[report.name for report in found]}")
+    return found
+
+
+def stats_ids() -> tuple[dict[str, str], dict[str, dict[str, tuple[str, str | None]]]]:
+    """Statistics Iceland's 2022 contest of each municipality, and its list options by ballot letter, with each
+    option's party, from its built package."""
+    folder = package.folder(f"{STATS}/{EKEY_2022}") / "build"
+    names = pl.read_parquet(folder / "name.parquet")
+    contests = set(pl.read_parquet(folder / "contest.parquet")["id"].to_list())
+    by_title = {row["text"]: row["entity_id"] for row in names.iter_rows(named=True) if row["entity_id"] in contests}
+    stats = importlib.import_module("ea.sources.is.hagstofa")
+    options: dict[str, dict[str, tuple[str, str | None]]] = {}
+    for row in pl.read_parquet(folder / "contest_option.parquet").iter_rows(named=True):
+        if row["kind"] == "list":
+            options.setdefault(row["contest_id"], {})[stats.letter(row["ballot_label"])] = (row["id"], row["party_id"])
+    return by_title, options
+
+
+def local_2022() -> Package:
+    p = Package(
+        PACKAGE_2022,
+        SOURCE,
+        "The 2022 municipal elections of Sveitarfélagið Hornafjörður and Vesturbyggð by candidate, from the "
+        "reports of the municipal electoral committees on the National Electoral Commission's page",
+        depends=[f"{STATS}/geo", f"{STATS}/registry", f"{STATS}/{EKEY_2022}"],
+    )
+    stats = importlib.import_module("ea.sources.is.hagstofa")
+    by_title, listed = stats_ids()
+    source = p.id("source", EKEY_2022)
+    p.add(
+        "source",
+        id=source,
+        kind="official_body",
+        publisher="Landskjörstjórn (National Electoral Commission of Iceland)",
+        title="Kosningaskýrslur sveitarfélaga: sveitarstjórnarkosningar 14. maí 2022",
+        url=PAGE,
+        license="Public reports of the National Electoral Commission",
+        license_url="https://island.is/s/landskjorstjorn",
+        attribution="Landskjörstjórn, island.is",
+    )
+    election = stats.key("election", EKEY_2022)
+    for report in uncovered_2022():
+        name = report.name
+        title = f"2022 {name} municipal election"
+        contest = by_title[title]
+        unit = stats.key("unit", "is.sveitarfelag", EKEY_2022, name)
+        p.artifact(raw.cached(SOURCE, report.url), source)
+        result_set = p.id("result_set", name)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=source,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+            supersedes_id=stats.key("result_set", EKEY_2022, f"local:{name}"),
+        )
+        p.add(
+            "note",
+            id=p.id("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=LIST_NOTE_2022,
+            lang="en",
+        )
+
+        def value(option: str | None, measure: int, amount: int | Decimal, declared: bool = False) -> None:
+            p.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=option,
+                channel=0,
+                measure=measure,
+                count_round=0,
+                flags=0,
+                value=amount,
+            )
+            if declared:
+                p.add("declared", result_set_id=result_set, option_id=option, measure=measure, value=amount)
+
+        if report.void_blank != report.invalid + report.blank or report.valid + report.void_blank != report.cast:
+            raise ValueError(f"{name}: the ballots do not add up")
+        for measure, amount in rows_of(report):
+            value(None, measure, amount, True)
+        if sum(entry.votes for entry in report.entries) != report.valid:
+            raise ValueError(f"{name}: the lists do not add up to the valid votes")
+        for entry in report.entries:
+            found = listed.get(contest, {}).get(entry.letter)
+            if found is None:
+                raise LookupError(f"{name}: Statistics Iceland has no {entry.letter} list")
+            option, party_id = found
+            value(option, 1, entry.votes, True)
+            if entry.modified is not None:
+                value(option, 23, entry.modified)
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=entry.seats)
+            if [c.seat for c in entry.candidates] != list(range(1, len(entry.candidates) + 1)) or not entry.candidates:
+                raise ValueError(f"{name} {entry.letter}: the candidates run {[c.seat for c in entry.candidates]}")
+            if sorted(c.rank for c in entry.candidates) != list(range(1, len(entry.candidates) + 1)):
+                raise ValueError(f"{name} {entry.letter}: the ranks are not a run")
+            for candidate in entry.candidates:
+                tag = f"{name}:{entry.letter}:{candidate.seat}"
+                child = p.id("option", tag)
+                p.add(
+                    "contest_option",
+                    id=child,
+                    contest_id=contest,
+                    kind="candidate",
+                    parent_option_id=option,
+                    party_id=party_id,
+                    ballot_position=candidate.seat,
+                    ballot_label=candidate.name,
+                )
+                person = p.id("person", tag)
+                p.add("person", id=person, birth_precision=None)
+                p.name(person, candidate.name, "is", "official")
+                candidacy = p.id("candidacy", tag)
+                elected = candidate.rank <= entry.seats
+                p.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=child,
+                    role="list_member" if elected else "substitute",
+                    list_position=candidate.seat,
+                    ballot_name=candidate.name,
+                    member_of_party_id=party_id,
+                    is_independent=False,
+                )
+                value(child, 10, candidate.votes)
+                if elected:
+                    p.add(
+                        "outcome",
+                        result_set_id=result_set,
+                        option_id=option,
+                        candidacy_id=candidacy,
+                        kind="elected",
+                    )
+    return p
+
+
+LIST_NOTE_2022 = (
+    "Counted by the municipal electoral committee and published by the National Electoral Commission with the "
+    "municipality's report on the votes of the lists and of the candidates (articles 116 and 117 of the Elections "
+    "Act, no. 112/2021). Statistics Iceland's result set holds the municipality's lists and seats; this set adds the "
+    "votes of each candidate and supersedes it. " + RANKING_NOTE
+)
+
+
 # ---------------------------------------------------------------- Althing candidate lists
 
 HAGSTOFA = "is.hagstofa"
@@ -860,7 +1181,7 @@ def althing() -> Package:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", PACKAGE, ALTHING_PACKAGE]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", PACKAGE, PACKAGE_2022, ALTHING_PACKAGE]
 
 
 def parse() -> None:
@@ -869,8 +1190,9 @@ def parse() -> None:
     election().write()
     hagstofa = importlib.import_module("ea.sources.is.hagstofa")
     for event in hagstofa.events():
-        if event.ekey == ALTHING_EKEY:
+        if event.ekey in (ALTHING_EKEY, EKEY_2022):
             hagstofa.build(event).write()
+    local_2022().write()
     althing().write()
 
 

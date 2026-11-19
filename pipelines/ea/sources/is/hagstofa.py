@@ -1971,7 +1971,10 @@ def authority_seats() -> dict[str, int]:
 
 
 def committee_covered() -> frozenset[str]:
-    return importlib.import_module("ea.sources.is.stjornarradid").COVERED
+    """The municipalities whose committee reports supersede this table's result sets: those the ministry's copies
+    hold, and the two that only the National Electoral Commission's page holds."""
+    commission = importlib.import_module("ea.sources.is.landskjorstjorn").COMMISSION_ONLY_2022
+    return importlib.import_module("ea.sources.is.stjornarradid").COVERED | commission
 
 
 def count(value: float | None) -> int | None:
