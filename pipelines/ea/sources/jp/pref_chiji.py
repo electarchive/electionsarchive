@@ -10,12 +10,13 @@ from typing import Any
 import fastexcel
 import polars as pl
 
-from ea import raw
-from ea.changeset import Changeset
+from ea import package, raw
+from ea.package import Draft
 from ea.sources.jp import mic_chiji
 from ea.store import DATA, connect
 
 SOURCE = "jp.pref_chiji"
+KEY = f"{SOURCE}/all"
 VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{stamp}id_/{url}"
@@ -723,18 +724,44 @@ READERS: dict[str, tuple[Any, Any]] = {
 }
 
 
+def summaries() -> tuple[dict[str, dict[str, str | None]], dict[str, pl.DataFrame]]:
+    """The ministry's prefecture totals and candidates for each governor election, as jp.mic_chiji loaded them."""
+    fields = {measure: field for field, measure in MEASURES.items()}
+    with connect() as conn:
+        totals = conn.execute(
+            """select x.value, v.measure, v.value::text from external_id x join result_set r on r.id = x.entity_id
+               cross join lateral (select * from result_value v where v.result_set_k = r.k offset 0) v
+               where x.scheme = %s and v.option_k = 0""",
+            [f"{mic_chiji.SOURCE}.result_set"],
+        ).fetchall()
+        options = conn.execute(
+            """select x.value, o.ballot_position, o.ballot_label,
+                      (select v.value::text from result_value v join result_set r on r.k = v.result_set_k
+                       where r.id = s.entity_id and v.option_k = o.k and v.measure = 1)
+               from external_id x join contest_option o on o.contest_id = x.entity_id
+               join external_id s on s.scheme = %s and s.value = x.value
+               where x.scheme = %s""",
+            [f"{mic_chiji.SOURCE}.result_set", f"{mic_chiji.SOURCE}.contest"],
+        ).fetchall()
+    official: dict[str, dict[str, str | None]] = {}
+    for key, measure, value in totals:
+        if measure in fields:
+            official.setdefault(key, dict.fromkeys(MEASURES))[fields[measure]] = value
+    people = pl.DataFrame(options, schema=["key", "order", "name", "votes"], orient="row")
+    return official, {key: frame.sort("order") for (key,), frame in people.group_by("key")}
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    elections = pl.read_parquet(mic_chiji.PARSED / f"elections-v{mic_chiji.VERSION}.parquet")
-    people = pl.read_parquet(mic_chiji.PARSED / f"candidates-v{mic_chiji.VERSION}.parquet")
+    elections, people = summaries()
     rows = []
     for key, urls in RECORDS.items():
         votes_path, turnout_path, *extra = (raw.cached(SOURCE, url).path for url in urls)
         votes_reader, turnout_reader = READERS[key.split(":")[1]]
         names, places, total = votes_reader(votes_path, *extra)
         registered = turnout_reader(turnout_path)
-        official = elections.filter(pl.col("key") == key).row(0, named=True)
-        candidates = people.filter(pl.col("key") == key).sort("order")
+        official = elections[key]
+        candidates = people[key]
         extra = [Decimal(v) for p in [*places, total] for v in p["votes"][candidates.height :]]
         if len(names) > candidates.height and not any(extra):
             names = names[: candidates.height]
@@ -770,10 +797,12 @@ def parse() -> None:
             summed = sum(Decimal(str(p[field])) for p in places)
             if field != "registered" and summed != Decimal(str(total[field])):
                 raise ValueError(f"{key}: {field} sums to {summed}, the record's total is {total[field]}")
-            if official[field] is not None and summed != Decimal(official[field]):
-                raise ValueError(f"{key}: {field} sums to {summed}, the summary prints {official[field]}")
+            printed = official[field]
+            if printed is not None and summed != Decimal(printed):
+                raise ValueError(f"{key}: {field} sums to {summed}, the summary prints {printed}")
         rows.extend({"key": key, "urls": list(urls), **p} for p in places)
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / f"municipalities-v{VERSION}.parquet")
+    print(build())
 
 
 NOTES = {
@@ -808,7 +837,13 @@ def place_code(place: str, codes: dict[str, str], wards: list[tuple[str, str]]) 
     return "jp.ward", found[0] if len(found) == 1 else None
 
 
-def emit() -> Path:
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package jp.pref_chiji/all from the parsed table. It reads the database, through Draft, so the rows
+    it rebuilds keep the ids the changeset path gave them and attach to jp.mic_chiji's contests and options."""
     frame = pl.read_parquet(PARSED / f"municipalities-v{VERSION}.parquet")
     with connect() as conn:
         prefectures = {
@@ -819,7 +854,7 @@ def emit() -> Path:
                    where p.iso_code like 'JP-__'"""
             )
         }
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
