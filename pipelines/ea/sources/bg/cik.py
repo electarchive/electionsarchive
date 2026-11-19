@@ -159,6 +159,10 @@ ELECTIONS = [
 ]
 # Pages the 2009 build reads besides its bulk export: the national table that names the lists.
 LISTS_2009 = "https://pi2009.cik.bg/results/proportional/index.html"
+# The 2009 European Parliament results pages (the national table, the allocation of seats, and the candidate lists),
+# saved from a browser as one document in which each page follows a `<!-- URL: ... -->` comment.
+EP2009_PAGES = "browser://20261119-013146-30140d/bg-ep-2009-results-pages.html"
+EP2009_SEATS = 17
 # Files the CIK publishes that this module does not read yet: the 2009 candidate registers and the 2006 results of
 # each of the 32 constituencies, which the bulk exports and national pages do not carry.
 BLOCKED = [
@@ -244,7 +248,7 @@ LAYOUTS: dict[str, Layout] = {
     "ep2009": Layout(
         None,
         0,
-        {"*": {"reg": (3,), "voters": (14,), "box": (15,), "inv": (19,), "valid": (23,)}},
+        {"*": {"reg": (2,), "voters": (14,), "box": (15,), "inv": (19,), "valid": (23,)}},
         "ep2009",
         0,
         False,
@@ -931,7 +935,41 @@ class Candidate(NamedTuple):
     party_name: str
 
 
+@functools.cache
+def ep2009_pages() -> dict[str, str]:
+    text = raw.cached(SOURCE, EP2009_PAGES).path.read_text(encoding="utf-8")
+    parts = re.split(r"<!-- URL: (.*?) -->", text)
+    return dict(zip(parts[1::2], parts[2::2], strict=True))
+
+
+def _cells(row: str) -> list[str]:
+    return [
+        html.unescape(re.sub(r"<[^>]+>", " ", c)).strip() for c in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
+    ]
+
+
+def ep2009_table(url: str, summary: str | None = None) -> list[list[str]]:
+    page = ep2009_pages()[url]
+    if summary:
+        page = page[page.index(f'summary="{summary}"') :]
+    page = page[: page.index("</table>")]
+    return [c for c in (_cells(r) for r in re.findall(r"<tr>(.*?)</tr>", page, re.DOTALL)) if c]
+
+
+def ep2009_candidates() -> list[Candidate]:
+    page = ep2009_pages()["https://ep2009.cik.bg/candidates.html"]
+    out: list[Candidate] = []
+    for head, body in re.findall(r'<p class="party">(.*?)</p>\s*<ol class="party_list">(.*?)</ol>', page, re.DOTALL):
+        number = re.match(r"\s*(\d+)\.", html.unescape(head))
+        assert number, head
+        names = [html.unescape(x).strip() for x in re.findall(r"<li>(.*?)</li>", body, re.DOTALL)]
+        out += [Candidate(0, number[1], i, n, False, "") for i, n in enumerate(names, start=1)]
+    return out
+
+
 def candidates(e: Election) -> list[Candidate]:
+    if e.layout == "ep2009":
+        return ep2009_candidates()
     out: list[Candidate] = []
     for r in rows(e, "candidates"):
         r = [c.strip() for c in r]
@@ -1035,6 +1073,8 @@ def build(e: Election) -> Package:
     )
     p.external.add(BULGARIA)
     cite(p, e)
+    if e.layout == "ep2009":
+        p.artifact(raw.cached(SOURCE, EP2009_PAGES), CIK_SOURCE)
     secs, figures, votes = sections(e), protocol_figures(e), party_votes(e)
     codes = sorted(set(secs) | set(figures) | set(votes))
     day = e.day
@@ -1287,6 +1327,25 @@ def build(e: Election) -> Package:
         for c in cands:
             kind = "elected" if c.elected else "lost"
             p.add("outcome", result_set_id=sets[0], option_id=options[(0, c.party)], kind=kind)
+    elif e.layout == "ep2009":
+        won = {r[0]: int(r[2]) for r in ep2009_table("https://ep2009.cik.bg/mandates/index.html")}
+        assert sum(won.values()) == EP2009_SEATS, won
+        for n, seats in won.items():
+            if seats:
+                p.add("outcome", result_set_id=sets[0], option_id=options[(0, n)], kind="won", seats=seats)
+        national = "https://ep2009.cik.bg/results/rik_00.html"
+        head = {r[0]: int(r[2]) for r in ep2009_table(national, "Извлечение")}
+        for point, measure in ((3, REGISTERED), (7, VOTERS), (8, BALLOTS), (12, INVALID), (16, VALID)):
+            p.add("declared", result_set_id=sets[0], option_id=None, measure=measure, value=head[str(point)])
+        for r in ep2009_table(national, "Разпределение"):
+            p.add("declared", result_set_id=sets[0], option_id=options[(0, r[0])], measure=VOTES, value=int(r[2]))
+        p.accept(
+            "accounting.declared",
+            "the national table of the CIK's results page gives 6,684,770 registered voters and 2,601,677 voters, "
+            "12,496 more of each than the sums of the section protocols (6,672,274 and 2,589,181); the envelopes in "
+            "the box, invalid ballots, valid ballots and every list's votes match the sections exactly. "
+            "Section figures are stored as printed and the page's totals as declared",
+        )
     elif e.kind == "ep":
         for (m, n), members in elected.items():
             p.add("outcome", result_set_id=sets[m], option_id=options[(m, n)], kind="won", seats=len(members))
@@ -2052,11 +2111,16 @@ def accept(
             f"in {short:,} sections the votes printed for the lists do not add up to the valid ballots printed in "
             "the protocol; stored as printed",
         )
-    if any("reg" in f and "voters" in f and f["voters"] > f["reg"] for f in figures.values()):
+    ballots = e.layout == "ep2009"  # its protocols also print more ballots in the box than the roll holds
+    if any(
+        "reg" in f and max(f.get("voters", 0), f.get("box", 0) if ballots else 0) > f["reg"] for f in figures.values()
+    ):
         p.accept(
             "accounting.turnout",
-            "some sections report more voters than the roll holds, from voters added on the day under the line of "
-            "the roll or with voting certificates; stored as printed",
+            "some sections report more voters"
+            + (" or ballots" if ballots else "")
+            + " than the roll holds, from voters added on the day under the line of the roll or with voting "
+            "certificates; stored as printed",
         )
 
 
