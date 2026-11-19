@@ -63,6 +63,15 @@ where n.entity_id = any(%s::uuid[])
   and not exists (select from entity_merge m where m.entity_id = n.entity_id)
 order by n.entity_id
 """
+SHOUTED = """
+select r.id::text, r.entity_id::text, r.text, r.lang, r.script, r.source_id::text, g.text
+from name g
+join changeset gc on gc.id = g.changeset_id and gc.pipeline = %(pipeline)s
+join name r on r.entity_id = g.entity_id and r.lang = g.lang and r.id <> g.id
+join changeset rc on rc.id = r.changeset_id and rc.pipeline <> %(pipeline)s
+where g.is_preferred and g.kind = 'official' and g.script <> 'Latn'
+  and r.is_preferred and r.kind in ('official', 'native') and r.valid_from is null and r.valid_to is null
+"""
 
 PEOPLE = {"person"}
 PLACES = {"area", "reporting_unit", "polity"}
@@ -664,6 +673,42 @@ def emit(conn: Connection, names: list[Name]) -> list[str]:
     return folders
 
 
+def shouted(conn: Connection, skip: set[str]) -> list[dict[str, object]]:
+    rows: dict[str, dict[str, object]] = {}
+    for id, entity, text, lang, script, source, cased in conn.execute(SHOUTED, {"pipeline": PIPELINE}):
+        if entity not in skip and id not in rows and text.isupper() and same(text, cased):
+            rows[id] = {
+                "id": id,
+                "entity_id": entity,
+                "text": text,
+                "lang": lang,
+                "script": script,
+                "kind": "ballot",
+                "is_preferred": False,
+                "source_id": source,
+            }
+    return list(rows.values())
+
+
+def regrade(conn: Connection, rows: list[dict[str, object]]) -> list[str]:
+    folders: list[str] = []
+    for start in range(0, len(rows), LIMIT):
+        chunk = rows[start : start + LIMIT]
+        cs = Changeset(
+            conn,
+            pipeline=PIPELINE,
+            version=VERSION,
+            summary=f"{len(chunk):,} names printed in capital letters marked as ballot forms, now that the archive "
+            "gives each one in normal capitalization",
+            polity=None,
+            kind="edit",
+        )
+        for row in chunk:
+            cs.add("name", **row)
+        folders.append(str(cs.write()))
+    return folders
+
+
 def granted(conn: Connection, id: str, folder: Path) -> list[str]:
     problems: list[str] = []
     found = conn.execute("select checks from changeset where id = %s", [id]).fetchone()
@@ -671,11 +716,23 @@ def granted(conn: Connection, id: str, folder: Path) -> list[str]:
     if checks.get("findings"):
         problems.append(f"findings {json.dumps(checks['findings'])}")
     diff = cast(dict[str, dict[str, int]], checks.get("diff", {}))
+    staged = pl.read_parquet(folder / "name.parquet")
+    if "id" in staged.columns:
+        for table, change in diff.items():
+            if (
+                table != "name"
+                or change.get("insert", 0)
+                or change.get("delete", 0)
+                or change.get("update", 0) > len(staged)
+            ):
+                problems.append(f"{table} {change}")
+        if len(staged.filter((pl.col("kind") != "ballot") | pl.col("is_preferred"))):
+            problems.append("rows other than ballot forms")
+        return problems
     for table, change in diff.items():
         inserted, updated, deleted = change.get("insert", 0), change.get("update", 0), change.get("delete", 0)
         if updated or deleted or (inserted and table not in ("name", "source")) or (table == "source" and inserted > 1):
             problems.append(f"{table} {change}")
-    staged = pl.read_parquet(folder / "name.parquet")
     ours = conn.execute(
         "select id::text from source where publisher = %s and title = %s", [PUBLISHER, TITLE]
     ).fetchone()
@@ -695,13 +752,54 @@ def granted(conn: Connection, id: str, folder: Path) -> list[str]:
     return problems
 
 
-def kept(conn: Connection, id: str) -> list[str]:
-    changed = conn.execute("select count(*) from name_history where superseded_by = %s", [id]).fetchone()
+def kept(conn: Connection, id: str, folder: Path) -> list[str]:
+    regrades = "id" in pl.read_parquet_schema(folder / "name.parquet")
+    changed = conn.execute(
+        """select count(*) from name_history h left join name n on n.id = h.id
+           where h.superseded_by = %(id)s and not coalesce(%(regrades)s and n.kind = 'ballot' and not n.is_preferred
+             and h.kind in ('official', 'native') and h.is_preferred
+             and (n.entity_id, n.text, n.lang, n.script, n.source_id, n.valid_from, n.valid_to)
+                 is not distinct from (h.entity_id, h.text, h.lang, h.script, h.source_id, h.valid_from, h.valid_to),
+             false)""",
+        {"id": id, "regrades": regrades},
+    ).fetchone()
     return [f"{changed[0]} existing names changed"] if changed is not None and changed[0] else []
 
 
-def record(published: list[tuple[str, int]], held_back: list[tuple[str, str]]) -> None:
-    lines = [f"- `{id}`: {count:,} names, applied and published" for id, count in published]
+def land(folders: list[str], published: list[tuple[str, str]], held_back: list[tuple[str, str]]) -> None:
+    for folder in folders:
+        path = Path(folder)
+        id = path.name
+        status = apply(path)
+        if status == "unchanged":
+            continue
+        with connect() as conn:
+            problems = granted(conn, id, path) if status == "pending_review" else [f"status {status}"]
+            if problems:
+                held_back.append((id, "; ".join(problems)))
+                continue
+            publish(conn, id)
+            if problems := kept(conn, id, path):
+                revert(
+                    conn,
+                    id,
+                    "names.latin may only add names and mark all-caps names as ballot forms: " + "; ".join(problems),
+                )
+                held_back.append((id, "reverted after publish: " + "; ".join(problems)))
+                continue
+        staged = pl.read_parquet(path / "name.parquet")
+        published.append(
+            (
+                id,
+                f"{len(staged):,} all-caps names marked as ballot forms"
+                if "id" in staged.columns
+                else f"{len(staged):,} names",
+            )
+        )
+
+
+def record(published: list[tuple[str, str]], held_back: list[tuple[str, str]]) -> None:
+    lines = [f"- `{id}`: {what}, applied and published" for id, what in published]
     lines += [f"- `{id}`: held in pending_review for Firat ({why})" for id, why in held_back]
     if not lines:
         return
@@ -738,32 +836,21 @@ def run() -> str:
             waiting = reviewing(conn)
             names = [name for name in names if name.entity not in waiting]
             folders = emit(conn, names) if names else []
-        published: list[tuple[str, int]] = []
+        published: list[tuple[str, str]] = []
         held_back: list[tuple[str, str]] = []
-        for folder in folders:
-            path = Path(folder)
-            id = path.name
-            status = apply(path)
-            if status == "unchanged":
-                continue
-            with connect() as conn:
-                problems = granted(conn, id, path) if status == "pending_review" else [f"status {status}"]
-                if problems:
-                    held_back.append((id, "; ".join(problems)))
-                    continue
-                publish(conn, id)
-                if problems := kept(conn, id):
-                    revert(conn, id, "names.latin may only add names: " + "; ".join(problems))
-                    held_back.append((id, "reverted after publish: " + "; ".join(problems)))
-                    continue
-            published.append((id, len(pl.read_parquet(path / "name.parquet"))))
+        land(folders, published, held_back)
+        with connect() as conn:
+            conn.execute("set statement_timeout = 0")
+            ballots = shouted(conn, reviewing(conn))
+            folders = regrade(conn, ballots) if ballots else []
+        land(folders, published, held_back)
         queue = {key: item for key, item in queue.items() if key not in answers}
         QUEUE.write_text(json.dumps(queue, ensure_ascii=False))
         box(str(QUEUE), f"{BOX}/queue.json")
         STATE.write_text(json.dumps({"since": until, "pending": sorted(pending), "at": time.time()}))
         record(published, held_back)
         notes = [f"{len(ids):,} entities without a Latin-script name, {len(names):,} names generated"]
-        notes += [f"published {id} ({count:,} names)" for id, count in published]
+        notes += [f"published {id} ({what})" for id, what in published]
         notes += [f"held {id}: {why}" for id, why in held_back]
         notes.append(f"{len(queue):,} names wait for the model step (ea names model on the Mac)")
         return "; ".join(notes)
