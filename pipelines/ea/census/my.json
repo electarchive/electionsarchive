@@ -117,6 +117,20 @@
    "publisher": "Jabatan Kerajaan Tempatan, Kementerian Perumahan dan Kerajaan Tempatan",
    "url": "https://jkt.kpkt.gov.my/en/about-lgd/faqs/general-lgd-la",
    "kind": "official_body"
+  },
+  "hids_pru1955": {
+   "title": "Hari Ini Dalam Sejarah: Pilihan Raya Persekutuan Yang Pertama (27 Julai 1955)",
+   "publisher": "Arkib Negara Malaysia (National Archives of Malaysia)",
+   "url": "https://hids.arkib.gov.my/#/site_peristiwa/6592",
+   "kind": "official_body",
+   "note": "Read through the portal's record API, https://hids.arkib.gov.my/api/site/today_event?q_id=6592"
+  },
+  "hids_johor1954": {
+   "title": "Hari Ini Dalam Sejarah: Mesyuarat Pertama Majlis Mesyuarat Negeri Johor (23 November 1954)",
+   "publisher": "Arkib Negara Malaysia (National Archives of Malaysia)",
+   "url": "https://hids.arkib.gov.my/#/site_peristiwa/6235",
+   "kind": "official_body",
+   "note": "Read through the portal's record API, https://hids.arkib.gov.my/api/site/today_event?q_id=6235"
   }
  },
  "tiers": [
@@ -1360,8 +1374,8 @@
    "measure": {
     "unit": "contest"
    },
-   "note": "The first federal election in Malaya, on 27 July 1955, filled 52 elected seats of the 98-member Federal Legislative Council by plurality; the Council gave way to Parliament under the 1957 Constitution, whose first Dewan Rakyat was elected in 1959. Date and seat count not yet read from an official text; the Election Commission was set up only in 1957 and its list of elections starts in 1959.",
-   "source": "spr_sejarah",
+   "note": "The first federal election in Malaya, held on 27 July 1955, filled the 52 elected seats of the Federal Legislative Council by plurality in single-member constituencies; the Alliance won 51 of the 52 (National Archives of Malaysia). The Council gave way to Parliament under the 1957 Constitution, whose first Dewan Rakyat was elected in 1959. The Election Commission was set up only in 1957 and its list of elections starts in 1959; no official online source publishes the 1955 constituency returns.",
+   "source": "hids_pru1955",
    "valid_from": "1955-01-01",
    "valid_to": "1959-08-19",
    "first_held": "1955-07-27",
@@ -1385,10 +1399,13 @@
    ],
    "dates": [
     {
-     "date": "1955-01-01",
-     "precision": "year",
+     "date": "1955-07-27",
      "election_kind": "general",
-     "note": "Federal Legislative Council election; not yet counted from an official report."
+     "contests": 52,
+     "seats": 52,
+     "source": "hids_pru1955",
+     "quote": "Pada hari ini dalam tahun 1955, Pilihan Raya Persekutuan pertama di Persekutuan Tanah Melayu diadakan. [...] Dalam pilihan raya ini, Parti Perikatan memenangi 51 buah kerusi daripada 52 buah yang dipertandingkan.",
+     "note": "First federal election; 52 elected seats, one per constituency. By-elections to the Council before 1959 are not yet counted from an official source."
     }
    ]
   },
@@ -1402,8 +1419,8 @@
    "measure": {
     "unit": "contest"
    },
-   "note": "Elected seats on the State Councils of the Malay states and the Settlement Councils of Penang and Malacca, first filled in 1954-1955 under the Federation of Malaya Agreement 1948; replaced by the State Legislative Assemblies elected in 1959. Not yet read from an official text.",
-   "source": "constitution",
+   "note": "Elected seats on the State Councils of the Malay states and the Settlement Councils of Penang and Malacca, first filled in 1954-1955 under the Federation of Malaya Agreement 1948; replaced by the State Legislative Assemblies elected in 1959. The Johore State Council first sat with publicly elected members on 23 November 1954, so the first of these elections was held in 1954 (National Archives of Malaysia). No official online source gives the polling days or seat counts.",
+   "source": "hids_johor1954",
    "valid_to": "1957-08-31",
    "first_held": "1954-01-01",
    "est_votes": 600000,
@@ -1427,7 +1444,9 @@
      "through": "1957-08-30",
      "precision": "year",
      "election_kind": "general",
-     "note": "State and Settlement Council elections; not yet counted."
+     "note": "State and Settlement Council elections, the first in Johore in 1954; not yet counted from an official source.",
+     "source": "hids_johor1954",
+     "quote": "Pada hari ini dalam tahun 1954, Majlis Mesyuarat Negeri Johor telah bermesyuarat buat pertama kalinya semenjak ahli-ahli mesyuaratnya yang baru, dipilih oleh orang ramai."
     }
    ]
   },
