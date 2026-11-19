@@ -23,7 +23,8 @@ stations have none and stay at the country), and each 2019 municipal unit is its
 polling-station boundaries, and the 2019 station files carry no unit, so those 21,043 stations stay at the country.
 
 The 2009 and 2014 elections are built by `ypes_national` and `ypes_results` at the unit those years publish, and the
-1999 and 2004 ones by `ypes_results` as national results; earlier elections are not on the Ministry's site.
+1999 and 2004 ones by `ypes_results` as national results; the earlier ones are in the Ministry's scanned results
+books, which `ypes_ep_archive` builds.
 
 Each election is a package, `gr.ypes_ep/ep-<year>`, built on `gr.ypes_ep/geo` (the schemes) and `gr.ypes_ep/registry`
 (the source and the parties).
