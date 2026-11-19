@@ -474,7 +474,7 @@ def geo() -> Package:
     p.add(
         "note",
         id=key("note", "geo"),
-        entity_id=key("boundary_set", "in.ac", "2008"),
+        entity_id=ids["ac"],
         kind="methodology",
         body_md=(
             f"Assembly layer: {gaps} features without a number or name dropped as gaps; {len(orphans)} seats without a "
