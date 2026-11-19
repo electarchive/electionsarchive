@@ -34,6 +34,7 @@ def key(kind: str, *parts: object) -> str:
 ASSEMBLY = key("source", "kuvendi")
 PRESIDENCY = key("office", "president")
 SYSTEM = key("electoral_system", "president")
+NATION = key("unit", "national")
 
 
 @dataclass(frozen=True)
@@ -154,7 +155,7 @@ def registry() -> Package:
         SOURCE,
         "Albania's presidency and the electoral system of its election by the Assembly",
     )
-    p.external.add(ALBANIA)
+    p.external |= {ALBANIA, COUNTRY}
     p.add("scheme", code=SCHEME, polity_id=ALBANIA, kind="administrative", rank=1, noun="nation", code_system=None)
     p.add("office", id=PRESIDENCY, polity_id=ALBANIA, kind="head_of_state")
     p.name(PRESIDENCY, "President of Albania", "en", "official")
@@ -171,6 +172,16 @@ def registry() -> Package:
         "seven days of the failure of the one before, and a ballot counts as held even when no candidate is "
         "nominated. If a fifth ballot fails, the Assembly is dissolved.",
         lang="en",
+    )
+    p.add(
+        "reporting_unit",
+        id=NATION,
+        polity_id=ALBANIA,
+        scheme_code=SCHEME,
+        code="AL",
+        area_relation="equals",
+        area_id=COUNTRY,
+        kind="aggregate",
     )
     return p
 
@@ -274,17 +285,7 @@ def election(v: Vote) -> Package:
         ballot_label="Abstention",
     )
     p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=None, kind="elected", seats=1)
-    unit = key("unit", day)
-    p.add(
-        "reporting_unit",
-        id=unit,
-        polity_id=ALBANIA,
-        scheme_code=SCHEME,
-        code="AL",
-        area_relation="equals",
-        area_id=COUNTRY,
-        kind="aggregate",
-    )
+    unit = NATION
     rows: list[tuple[str | None, int, int]] = [
         (option, VOTES, v.pro),
         (against, VOTES, v.against),
