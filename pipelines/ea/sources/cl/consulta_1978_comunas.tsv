@@ -1,0 +1,295 @@
+region	provincia	comuna	si	no	nulos_blancos	total
+10	Valdivia	Valdivia	38626	11642	4688	54956
+10	Valdivia	Los Lagos	8830	1084	161	10075
+10	Valdivia	Paillaco	7305	804	0	8109
+10	Valdivia	La Unión	14774	1955	53	16782
+10	Valdivia	Río Bueno	13889	1249	497	15635
+10	Valdivia	Máfil	3277	228	3	3508
+10	Valdivia	Lanco	7016	1122	165	8303
+10	Valdivia	Futrono	2775	472	18	3265
+10	Valdivia	Lago Ranco	4949	741	359	6049
+10	Valdivia	Corral	2099	558	110	2767
+10	Valdivia	Panguipulli	6293	464	219	6976
+10	Valdivia	San José de la Mariquina	6698	847	182	7727
+10	Osorno	Osorno	51048	6806	371	58225
+10	Osorno	Río Negro	6596	452	4	7052
+10	Osorno	Puerto Octay	4706	657	23	5386
+10	Osorno	San Pablo	4792	231	0	5023
+10	Osorno	Entre Lagos	4510	621	10	5141
+10	Osorno	Purranque	8829	773	30	9632
+10	Llanquihue	Puerto Montt	38405	8522	3396	50323
+10	Llanquihue	Puerto Varas	7482	1517	956	9955
+10	Llanquihue	Maullín	6618	525	312	7455
+10	Llanquihue	Calbuco	7536	1188	484	9208
+10	Llanquihue	Fresia	7332	1095	0	8427
+10	Llanquihue	Frutillar	4825	1109	249	6183
+10	Llanquihue	Llanquihue	3937	941	612	5490
+10	Llanquihue	Los Muermos	3986	457	189	4632
+10	Chiloé	Ancud	11379	1997	626	14002
+10	Chiloé	Castro	10680	1602	815	13097
+10	Chiloé	Quemchi	2495	383	182	3060
+10	Chiloé	Chonchi	3857	453	293	4603
+10	Chiloé	Dalcahue	3138	213	0	3351
+10	Chiloé	Quellón	2491	547	67	3105
+10	Chiloé	Achao	3763	748	135	4646
+10	Chiloé	Chaitén	1640	248	62	1950
+10	Chiloé	Queilén	1489	79	3	1571
+10	Chiloé	Futaleufú	1061	20	0	1081
+10	Chiloé	Puqueldón	1247	280	252	1779
+10	Chiloé	Palena	851	121	192	1164
+10	Chiloé	Curaco de Vélez	1259	63	232	1554
+11	Aisén	Puerto Aisén	4644	1819	559	7022
+11	Aisén	Puerto Cisnes	1524	178	77	1779
+11	Aisén	Coyhaique	14027	2460	523	17010
+11	General Carrera	General Carrera	3001	405	155	3561
+11	Capitán Prat	Cochrane	1038	106	40	1184
+12	Magallanes	Magallanes	32362	9172	5055	46589
+12	Magallanes	Río Verde	359	86	16	461
+12	Magallanes	Morro Chico	192	77	38	307
+12	Magallanes	San Gregorio	731	191	184	1106
+12	Última Esperanza	Puerto Natales	9816	1434	606	11856
+12	Última Esperanza	Cerro Castillo	460	41	48	549
+12	Tierra del Fuego	Porvenir	1821	366	328	2515
+12	Tierra del Fuego	Primavera	1058	298	174	1530
+12	Tierra del Fuego	Bahía Inútil	597	216	120	933
+12	Antártica	Puerto Williams	534	48	24	606
+13	Área N° 1	Santiago	277008	101342	23783	402133
+13	Área N° 2	Quinta Normal	57240	25508	5494	88242
+13	Área N° 2	Pudahuel	63309	28182	6161	97652
+13	Área N° 2	Colina	10302	1469	491	12262
+13	Área N° 2	Conchalí	89125	36872	8891	134888
+13	Área N° 2	Renca	33608	15748	4091	53447
+13	Área N° 2	Quilicura	14910	5861	1030	21801
+13	Área N° 2	Lampa	5659	1660	277	7596
+13	Área N° 2	Til Til	3608	1062	268	4938
+13	Área N° 3	Providencia	56529	11673	3109	71311
+13	Área N° 3	Las Condes	89401	23862	5502	118765
+13	Área N° 3	La Reina	29441	10805	1933	42179
+13	Área N° 3	La Florida	36944	16185	2527	55656
+13	Área N° 3	Ñuñoa	136385	53639	11480	201504
+13	Área N° 4 (Talagante)	Talagante	13265	3279	650	17194
+13	Área N° 4 (Talagante)	Peñaflor	17954	5373	934	24261
+13	Área N° 4 (Talagante)	Isla de Maipo	5798	1296	157	7251
+13	Área N° 4 (Talagante)	Curacaví	5839	1588	320	7747
+13	Área N° 4 (Talagante)	Maipú	60140	27899	5633	93672
+13	Pedro Aguirre Cerda	San Miguel	96621	47176	11693	155490
+13	Pedro Aguirre Cerda	La Cisterna	95310	43957	8098	147365
+13	Pedro Aguirre Cerda	La Granja	55928	27644	3742	87314
+13	Puente Alto	Puente Alto	34111	16417	2808	53336
+13	Puente Alto	Pirque	4653	855	212	5720
+13	Puente Alto	San José de Maipo	4468	1330	194	5992
+13	San Bernardo-Maipo	San Bernardo	48605	17868	3072	69545
+13	San Bernardo-Maipo	Calera de Tango	4462	890	199	5551
+13	San Bernardo-Maipo	Buin	16412	3079	475	19966
+13	San Bernardo-Maipo	Paine	11640	1726	161	13527
+13	Melipilla	El Monte	7907	1361	134	9402
+13	Melipilla	María Pinto	3029	704	108	3841
+13	Melipilla	Melipilla	24187	5753	1147	31087
+1	Arica	Arica	55506	14498	5178	75182
+1	Iquique	Pica	858	100	34	992
+1	Iquique	Pozo Almonte	3324	495	238	4057
+1	Iquique	Huara	2171	368	220	2759
+1	Iquique	Iquique	40297	7716	3331	51344
+2	Antofagasta	Antofagasta	70972	16433	7667	95072
+2	Antofagasta	Mejillones	1827	534	170	2531
+2	Antofagasta	Taltal	3456	792	185	4433
+2	El Loa	Calama	30711	11787	5063	47561
+2	Tocopilla	Tocopilla	16920	3472	1148	21540
+3	Copiapó	Copiapó	26060	6073	1439	33572
+3	Copiapó	Tierra Amarilla	2698	645	248	3591
+3	Copiapó	Caldera	2157	426	119	2702
+3	Chañaral	Chañaral	5656	1551	605	7812
+3	Chañaral	Diego de Almagro	9685	2793	1261	13739
+3	Huasco	Vallenar	17694	4837	2071	24602
+3	Huasco	Freirina	2400	320	171	2891
+3	Huasco	Huasco	3231	854	329	4414
+4	Elqui	La Higuera	1263	452	172	1887
+4	Elqui	Vicuña	6629	503	143	7275
+4	Elqui	Paihuano	2917	283	50	3250
+4	Elqui	Andacollo	4486	1565	107	6158
+4	Elqui	La Serena	37550	11088	3162	51800
+4	Elqui	Coquimbo	29799	6566	2155	38520
+4	Limarí	Ovalle	23836	5147	1587	30570
+4	Limarí	Combarbalá	7635	1384	44	9063
+4	Limarí	Monte Patria	7777	1602	0	9379
+4	Limarí	Punitaqui	4809	1474	358	6641
+4	Limarí	Samo Alto	2249	165	0	2414
+4	Choapa	Illapel	8572	3107	692	12371
+4	Choapa	Los Vilos	6170	1198	512	7880
+4	Choapa	Salamanca	7189	2388	446	10023
+4	Choapa	Mincha	3241	1434	445	5120
+5	Valparaíso	Valparaíso	121822	37760	8812	168394
+5	Valparaíso	Viña del Mar	109414	31066	4564	145044
+5	Valparaíso	Quilpué	30880	10443	3760	45083
+5	Valparaíso	Villa Alemana	19558	5730	1395	26683
+5	Valparaíso	Casablanca	6863	1026	291	8180
+5	Valparaíso	Quintero	8812	1979	665	11456
+5	Valparaíso	Puchuncaví	3432	1029	426	4887
+5	Valparaíso	Juan Fernández	243	23	3	269
+5	Quillota	Quillota	25477	4784	1474	31735
+5	Quillota	La Calera	12104	5394	1410	18908
+5	Quillota	Limache	12654	2457	543	15654
+5	Quillota	La Cruz	4251	899	1240	6390
+5	Quillota	Olmué	4996	1101	243	6340
+5	Quillota	Hijuelas	3589	704	183	4476
+5	Quillota	Nogales	7937	3362	944	12243
+5	San Felipe	San Felipe	17696	4416	1194	23306
+5	San Felipe	Catemu	4096	978	250	5324
+5	San Felipe	Panquehue	2166	289	42	2497
+5	San Felipe	Llay-Llay	7550	1243	332	9125
+5	San Felipe	Putaendo	4677	1360	336	6373
+5	San Felipe	Santa María	3420	526	123	4069
+5	Los Andes	Los Andes	18965	2903	757	22625
+5	Los Andes	San Esteban	4596	616	163	5375
+5	Los Andes	Calle Larga	3225	551	195	3971
+5	Los Andes	Rinconada	2105	352	107	2564
+5	San Antonio	San Antonio	23660	9927	2801	36388
+5	San Antonio	Cartagena	8121	1968	395	10484
+5	San Antonio	Santo Domingo	2706	484	182	3372
+5	San Antonio	El Tabo	4074	1242	232	5548
+5	San Antonio	El Quisco	3925	1215	288	5428
+5	San Antonio	Algarrobo	4861	623	58	5542
+5	Petorca	Cabildo	3758	2426	313	6497
+5	Petorca	La Ligua	7446	2013	695	10154
+5	Petorca	Papudo	2389	435	148	2972
+5	Petorca	Petorca	2821	977	875	4673
+5	Petorca	Zapallar	2468	435	85	2988
+5	Isla de Pascua	Isla de Pascua	851	100	53	1004
+6	Cachapoal	Rancagua	52740	17875	3954	74569
+6	Cachapoal	Graneros	7992	1436	301	9729
+6	Cachapoal	Mostazal	5949	571	94	6614
+6	Cachapoal	Machalí	7057	3257	639	10953
+6	Cachapoal	Doñihue	4794	1156	370	6320
+6	Cachapoal	Coltauco	4145	1014	313	5472
+6	Cachapoal	Codegua	2682	399	53	3134
+6	Cachapoal	Peumo	4849	1050	220	6119
+6	Cachapoal	Las Cabras	5883	849	141	6873
+6	Cachapoal	San Vicente	13046	2447	535	16028
+6	Cachapoal	Pichidegua	6020	928	176	7124
+6	Cachapoal	Rengo	12357	3251	1196	16804
+6	Cachapoal	Requínoa	5610	788	293	6691
+6	Cachapoal	Malloa	4096	722	197	5015
+6	Cachapoal	Quinta de Tilcoco	3441	678	140	4259
+6	Cachapoal	Coinco	2034	342	375	2751
+6	Cachapoal	Olivar	2114	493	66	2673
+6	Cachapoal	San Pedro	3216	788	120	4124
+6	Cachapoal	Alhué	2173	153	69	2395
+6	Colchagua	Chimbarongo	7841	1501	354	9696
+6	Colchagua	San Fernando	20889	4241	628	25758
+6	Colchagua	Nancagua	4676	1279	279	6234
+6	Colchagua	Placilla	3018	363	36	3417
+6	Colchagua	Santa Cruz	10287	809	188	11284
+6	Colchagua	Lolol	3145	228	5	3378
+6	Colchagua	Palmilla	5364	285	67	5716
+6	Colchagua	Peralillo	3939	446	48	4433
+6	Colchagua	Chépica	4744	1114	338	6196
+6	Colchagua	Paredones	3108	310	34	3452
+6	Colchagua	Marchigüe	2497	233	75	2805
+6	Colchagua	Rosario Lo Solís	1689	29	1	1719
+6	Colchagua	Pichilemu	4776	686	192	5654
+6	Colchagua	Pumanque	1968	60	10	2038
+6	Colchagua	La Estrella	1725	177	47	1949
+6	Colchagua	Navidad	3071	666	97	3834
+7	Talca	Talca	51424	14723	2580	68727
+7	Talca	San Clemente	9962	4020	669	14651
+7	Talca	Pelarco	6785	1243	121	8149
+7	Talca	Río Claro	3514	675	5	4194
+7	Talca	Pencahue	3221	333	20	3574
+7	Talca	Maule	4093	1015	221	5329
+7	Talca	Curepto	4566	723	134	5423
+7	Talca	San Javier	16696	732	109	17537
+7	Talca	Constitución	13483	2304	67	15854
+7	Talca	Empedrado	2785	398	66	3249
+7	Curicó	Curicó	30766	7086	1752	39604
+7	Curicó	Romeral	4373	644	113	5130
+7	Curicó	Teno	9800	1229	135	11164
+7	Curicó	Rauco	3101	661	176	3938
+7	Curicó	Licantén	2598	551	355	3504
+7	Curicó	Vichuquén	1726	302	56	2084
+7	Curicó	Hualañé	4640	1372	279	6291
+7	Curicó	Molina	14563	4004	492	19059
+7	Curicó	Sagrada Familia	6250	780	107	7137
+7	Linares	Linares	35943	4471	31	40445
+7	Linares	Villa Alegre	8176	456	14	8646
+7	Linares	Yerbas Buenas	5835	550	35	6420
+7	Linares	Colbún	5978	830	4	6812
+7	Linares	Longaví	7584	768	88	8440
+7	Linares	Parral	16657	1370	15	18042
+7	Linares	Retiro	8002	132	1	8135
+7	Linares	Cauquenes	22059	1062	229	23350
+7	Linares	Chanco	10695	464	47	11206
+8	Concepción	Concepción	100614	19236	1740	121590
+8	Concepción	Coronel	28715	14475	1485	44675
+8	Concepción	Florida	4712	572	187	5471
+8	Concepción	Hualqui	5506	1224	248	6978
+8	Concepción	Lota	16746	9978	861	27585
+8	Concepción	Penco	11677	6380	742	18799
+8	Concepción	Santa Juana	4781	424	166	5371
+8	Concepción	Talcahuano	64832	21392	4652	90876
+8	Concepción	Tomé	17073	8926	873	26872
+8	Ñuble	Bulnes	9321	795	90	10206
+8	Ñuble	Cobquecura	2801	149	0	2950
+8	Ñuble	Coelemu	6382	1260	269	7911
+8	Ñuble	Coihueco	7444	246	18	7708
+8	Ñuble	Chillán	55023	9209	2240	66472
+8	Ñuble	El Carmen	5136	247	85	5468
+8	Ñuble	Ninhue	3210	170	74	3454
+8	Ñuble	Ñiquén	4589	241	0	4830
+8	Ñuble	Pemuco	3616	47	0	3663
+8	Ñuble	Pinto	4503	269	63	4835
+8	Ñuble	Portezuelo	2988	196	16	3200
+8	Ñuble	Quillón	6581	449	175	7205
+8	Ñuble	Quirihue	5432	595	121	6148
+8	Ñuble	Ránquil	2639	488	98	3225
+8	Ñuble	San Carlos	18033	1329	304	19666
+8	Ñuble	San Fabián	4607	179	23	4809
+8	Ñuble	San Ignacio	4855	147	38	5040
+8	Ñuble	San Nicolás	3562	190	76	3828
+8	Ñuble	Trehuaco	1990	182	64	2236
+8	Ñuble	Yungay	6822	718	129	7669
+8	Bío-Bío	Cabrero	5670	629	0	6299
+8	Bío-Bío	Laja	9282	1035	247	10564
+8	Bío-Bío	Los Ángeles	46634	5417	1004	53055
+8	Bío-Bío	Mulchén	11825	816	0	12641
+8	Bío-Bío	Nacimiento	8304	1420	0	9724
+8	Bío-Bío	Negrete	2579	455	0	3034
+8	Bío-Bío	Quilaco	2138	172	64	2374
+8	Bío-Bío	Quilleco	7560	1972	373	9905
+8	Bío-Bío	Santa Bárbara	7669	241	59	7969
+8	Bío-Bío	San Rosendo	4014	927	119	5060
+8	Bío-Bío	Tucapel	4779	788	218	5785
+8	Bío-Bío	Yumbel	9019	1277	0	10296
+8	Arauco	Arauco	9464	2616	186	12266
+8	Arauco	Cañete	8876	1021	175	10072
+8	Arauco	Contulmo	2354	335	38	2727
+8	Arauco	Curanilahue	9548	3265	199	13012
+8	Arauco	Lebu	7734	2283	184	10201
+8	Arauco	Los Álamos	4509	1655	94	6258
+8	Arauco	Tirúa	2606	406	44	3056
+9	Cautín	Perquenco	2111	275	59	2445
+9	Cautín	Galvarino	3534	284	43	3861
+9	Cautín	Vilcún	6413	674	89	7176
+9	Cautín	Cunco	8645	777	307	9729
+9	Cautín	Lautaro	11862	1867	432	14161
+9	Cautín	Temuco	73503	11496	2940	87939
+9	Cautín	Toltén	6034	632	84	6750
+9	Cautín	Nueva Imperial	14400	1597	302	16299
+9	Cautín	Pitrufquén	9348	966	76	10390
+9	Cautín	Puerto Saavedra	8464	1642	94	10200
+9	Cautín	Carahue	6662	958	264	7884
+9	Cautín	Villarrica	13997	1806	662	16465
+9	Cautín	Loncoche	9113	987	142	10242
+9	Cautín	Pucón	7832	831	250	8913
+9	Cautín	Freire	8062	833	218	9113
+9	Cautín	Gorbea	7216	679	155	8050
+9	Malleco	Angol	18077	2064	395	20536
+9	Malleco	Purén	5227	472	0	5699
+9	Malleco	Los Sauces	3896	223	0	4119
+9	Malleco	Renaico	3952	618	7	4577
+9	Malleco	Collipulli	8163	1090	0	9253
+9	Malleco	Ercilla	3786	438	93	4317
+9	Malleco	Traiguén	10479	745	27	11251
+9	Malleco	Lumaco	5323	633	88	6044
+9	Malleco	Victoria	15894	990	216	17100
+9	Malleco	Curacautín	8211	803	155	9169
+9	Malleco	Lonquimay	4098	110	0	4208
