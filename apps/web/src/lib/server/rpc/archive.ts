@@ -23515,6 +23515,10 @@ export async function record(input: { id: string; body?: string }) {
       select jsonb_object_agg(a.id, a.k) as k from area a
       where a.id = any(array(select distinct coalesce(c.district_area_id, e.area_id) from picked c join held e on e.id = c.election_id))
     ),
+    fulls as materialized (
+      select distinct f.election_id from contest f
+      where f.election_id in (select id from held) and f.term = 'full'
+    ),
     roots as materialized (
       select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
         c.kind = 'list_allocation' as "isList", coalesce(c.term = 'remainder', false) as "isRemainder",
@@ -23549,7 +23553,7 @@ export async function record(input: { id: string; body?: string }) {
           select from contest pc join election pe on pe.id = pc.election_id
           where pc.id = c.previous_round_id and pe.kind in ('general', 'local')
         )
-        and not (c.term = 'remainder' and exists (
+        and not (c.term = 'remainder' and c.election_id in (select election_id from fulls) and exists (
           select from contest f where f.election_id = c.election_id and f.term = 'full'
             and f.body_id is not distinct from c.body_id and f.office_id is not distinct from c.office_id
             and f.seat_id is not distinct from c.seat_id and f.district_area_id is not distinct from c.district_area_id
@@ -23590,20 +23594,43 @@ export async function record(input: { id: string; body?: string }) {
       from contest c join tree on coalesce(c.allocation_parent_id, c.id) = tree.id
       where c.allocation_parent_id is not null
     ),
+    big as materialized (
+      select count(*) > 50000 as yes from tree
+    ),
+    bulk as materialized (
+      select rs.contest_id, x.option_id, x.seats
+      from (
+        select distinct on (rs.contest_id) rs.contest_id, rs.id from result_set rs
+        where (select yes from big) and rs.contest_id in (select id from tree)
+          and rs.is_default and rs.stage <> 'notional' and ${served("rs")}
+        order by rs.contest_id, array_position(${STAGES}, rs.stage)
+      ) rs
+      join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+    ),
     winners as materialized (
       select t.root, t.id as contest, t.nested, o.id, o.party_id, max(coalesce(o.seats, 1)) as seats
       from tree t
-      cross join lateral (
-        select o.id, o.party_id, o.kind, o.parent_option_id, x.seats, bool_or(o.kind = 'list') over () as "hasList"
-        from (
-          select rs.id from result_set rs
-          where rs.contest_id = t.id and rs.is_default and rs.stage <> 'notional' and ${served("rs")}
-          order by array_position(${STAGES}, rs.stage) limit 1
-        ) rs
-        join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-        join contest_option o on o.id = x.option_id and o.contest_id = t.id
-        offset 0
-      ) o
+      join (
+        select b.contest_id, o.id, o.party_id, o.kind, o.parent_option_id, b.seats,
+          bool_or(o.kind = 'list') over (partition by b.contest_id) as "hasList"
+        from bulk b join (
+          select o.id, o.contest_id, o.party_id, o.kind, o.parent_option_id from contest_option o
+          where o.id = any(array(select option_id from bulk))
+        ) o on o.id = b.option_id and o.contest_id = b.contest_id
+        union all
+        select t.id, o.* from (select distinct id from tree where not (select yes from big)) t
+        cross join lateral (
+          select o.id, o.party_id, o.kind, o.parent_option_id, x.seats, bool_or(o.kind = 'list') over () as "hasList"
+          from (
+            select rs.id from result_set rs
+            where rs.contest_id = t.id and rs.is_default and rs.stage <> 'notional' and ${served("rs")}
+            order by array_position(${STAGES}, rs.stage) limit 1
+          ) rs
+          join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+          join contest_option o on o.id = x.option_id and o.contest_id = t.id
+          offset 0
+        ) o
+      ) o on o.contest_id = t.id
       where not exists (select from tree k where k.parent = t.id and not k.scoped)
         and (t.id = t.root or not t.scoped)
         and not (o.kind = 'list' and ${pooled(sql`o.id`)})
@@ -23682,7 +23709,9 @@ export async function record(input: { id: string; body?: string }) {
       select r.id as root, coalesce(o.parent_option_id, o.id) as top, x.measure, x.value::float8 as value,
         x.count_round, max(x.count_round) over (partition by r.id, x.measure) as first
       from (select id, area from roots where "isOffice") r
-      join (select distinct root, contest from won) w on w.root = r.id
+      join (
+        select distinct root, contest from won where root in (select id from roots where "isOffice") offset 0
+      ) w on w.root = r.id
       join result_set rs on rs.contest_id = w.contest and ${latest("rs")}
       cross join lateral (
         select x.option_k, x.measure, x.value, x.count_round from result_rollup x
