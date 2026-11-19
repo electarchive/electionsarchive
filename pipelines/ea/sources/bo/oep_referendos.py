@@ -71,7 +71,10 @@ PROCESSES = {
     45: "2016-eta",
     37: "2017-eta",
     40: "2017-eta",
+    46: "2017-eta",  # the Huacaya statute
+    47: "2016-eta",  # the Gran Chaco regional statute
 }
+GRAN_CHACO_PROCESS = 47
 COLUMNS = {
     "yes": "SÍ",
     "no": "NO",
@@ -973,7 +976,14 @@ def district(contest: Contest, found: Places) -> str:
 
 def contest_mesas(contest: Contest, found: Places) -> list[Mesa]:
     """The polling tables of a question, from the files of its section."""
-    rows = [mesa for n, name in PROCESSES.items() if name == contest.section for mesa in mesas(n)]
+    rows = [
+        mesa
+        for n, name in PROCESSES.items()
+        if name == contest.section and (n == GRAN_CHACO_PROCESS) == (contest.where == "Gran Chaco")
+        for mesa in mesas(n)
+    ]
+    if contest.where == "Gran Chaco":
+        return rows
     if contest.where is None:
         return rows
     if contest.where in NAMES:
