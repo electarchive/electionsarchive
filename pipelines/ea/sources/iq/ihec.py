@@ -1,6 +1,8 @@
 """Iraq's Council of Representatives election of 10 October 2021, from the Independent High Electoral Commission.
 
-The 2018 election, published only as PDFs, is read by `ea.sources.iq.ihec_2018` and built here with the rest.
+The 2014 and 2018 elections, published only as PDFs, are read by `ea.sources.iq.ihec_2014` and
+`ea.sources.iq.ihec_2018` and built here with the rest. The Commission no longer serves the 2014 files, so `fetch`
+leaves them to the raw cache, which holds them under the keys of the archive copies they came from.
 
 The Commission publishes its final results as a Power BI report embedded on its results page. The report's data model
 holds a table of every candidate's final votes by electoral district, with the seat each candidate stood for and
@@ -271,6 +273,7 @@ def packages() -> list[str]:
     return [
         f"{SOURCE}/geo",
         f"{SOURCE}/registry",
+        f"{SOURCE}/cor-2014",
         f"{SOURCE}/cor-2018",
         f"{SOURCE}/cor-2021",
         f"{SOURCE}/cor-2021-stations",
@@ -278,9 +281,9 @@ def packages() -> list[str]:
 
 
 def parse() -> None:
-    from ea.sources.iq import ihec_2018
+    from ea.sources.iq import ihec_2014, ihec_2018
 
-    for build in (geo(), registry(), ihec_2018.election(), election(), stations()):
+    for build in (geo(), registry(), ihec_2014.election(), ihec_2018.election(), election(), stations()):
         build.write()
 
 
