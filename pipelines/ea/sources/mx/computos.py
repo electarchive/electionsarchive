@@ -528,8 +528,6 @@ def build(year: int) -> Package:
                     kind="coalition",
                     valid_from=day,
                     valid_from_precision="day",
-                    valid_to=day,
-                    valid_to_precision="day",
                 )
 
     unit_rows: list[dict[str, object]] = []
