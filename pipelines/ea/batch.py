@@ -232,12 +232,22 @@ def created(api: anthropic.Anthropic, account: str, requests: list[Request]) -> 
 
 def pick(projected: float) -> str:
     room: list[tuple[float, str]] = []
+    refused: list[str] = []
     for name, account in accounts().items():
+        if "error" in account:
+            refused.append(name)
+            continue
         left = account["usd"] * MARGIN - committed(name, account)
         if left >= projected:
             room.append((left, name))
     if not room:
-        raise SystemExit(f"BLOCKED: budget; no account has ${projected:.2f} left (ea batch status)")
+        skipped = (
+            f"; skipped {', '.join(refused)}, which the API refused for low credit (after a top-up, "
+            "`ea batch check` clears that)"
+            if refused
+            else ""
+        )
+        raise SystemExit(f"BLOCKED: budget; no account has ${projected:.2f} left (ea batch status){skipped}")
     return min(room)[1]
 
 
