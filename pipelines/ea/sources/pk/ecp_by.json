@@ -1,0 +1,602 @@
+[
+ {
+  "code": "NA-75",
+  "name": "Sialkot-IV",
+  "date": "2021-04-10",
+  "signed": "2021-04-11",
+  "registered": 494003,
+  "valid": 212362,
+  "invalid": 1702,
+  "registered_box": [
+   0,
+   0.821,
+   0.2125,
+   0.8951,
+   0.2328
+  ],
+  "valid_box": [
+   0,
+   0.4502,
+   0.85,
+   0.5244,
+   0.8688
+  ],
+  "invalid_box": [
+   0,
+   0.4661,
+   0.8734,
+   0.5244,
+   0.8922
+  ],
+  "folder": "1JbnPbr549lhHK095WQ3KPKiGh6CJkv0v",
+  "files": [
+   {
+    "drive": "1Vx2C9d_xiRTBZXtxjFeTB4I7uhex3aRD",
+    "suffix": ".jpg",
+    "local": "form-49.jpeg"
+   }
+  ],
+  "pages": [
+   {
+    "file": 0,
+    "page": 1
+   }
+  ],
+  "candidates": [
+   {
+    "position": 1,
+    "name": "Khawaja Atif Raza",
+    "party": "Independent",
+    "votes": 34,
+    "page": 0,
+    "box": [
+     0.6939,
+     0.3414,
+     0.9587,
+     0.3664
+    ]
+   },
+   {
+    "position": 2,
+    "name": "Sumaira alslam",
+    "party": "Independent",
+    "votes": 188,
+    "page": 0,
+    "box": [
+     0.6939,
+     0.3664,
+     0.9587,
+     0.3914
+    ]
+   },
+   {
+    "position": 3,
+    "name": "Syed Haider Jaffery",
+    "party": "Independent",
+    "votes": 40,
+    "page": 0,
+    "box": [
+     0.6939,
+     0.3922,
+     0.9587,
+     0.4172
+    ]
+   },
+   {
+    "position": 4,
+    "name": "Syed Shah Faisal",
+    "party": "Independent",
+    "votes": 221,
+    "page": 0,
+    "box": [
+     0.6939,
+     0.418,
+     0.9587,
+     0.443
+    ]
+   },
+   {
+    "position": 5,
+    "name": "Shamsa Saleem Bukhari",
+    "party": "Independent",
+    "votes": 30,
+    "page": 0,
+    "box": [
+     0.6939,
+     0.4437,
+     0.9587,
+     0.4688
+    ]
+   },
+   {
+    "position": 6,
+    "name": "Ali Asjad Malhi",
+    "party": "Pakistan Tehreek-e-Insaf",
+    "votes": 93433,
+    "page": 0,
+    "box": [
+     0.6939,
+     0.4688,
+     0.9587,
+     0.4938
+    ]
+   },
+   {
+    "position": 7,
+    "name": "Muhammad Khalil Sandhu",
+    "party": "Tehreek-e-Labbaik Pakistan",
+    "votes": 8268,
+    "page": 0,
+    "box": [
+     0.6939,
+     0.4945,
+     0.9587,
+     0.5195
+    ]
+   },
+   {
+    "position": 8,
+    "name": "Muhammad Usman Khalid",
+    "party": "Independent",
+    "votes": 72,
+    "page": 0,
+    "box": [
+     0.6939,
+     0.5203,
+     0.9587,
+     0.5453
+    ]
+   },
+   {
+    "position": 9,
+    "name": "Nosheen Iftkhar",
+    "party": "Pakistan Muslim League (N)",
+    "votes": 110076,
+    "page": 0,
+    "box": [
+     0.6939,
+     0.5453,
+     0.9587,
+     0.5703
+    ]
+   }
+  ]
+ },
+ {
+  "code": "PP-218",
+  "name": "Multan-VIII",
+  "date": "2019-03-31",
+  "signed": "2019-04-01",
+  "registered": 203188,
+  "valid": 90979,
+  "invalid": 1726,
+  "registered_box": [
+   0,
+   0.7882,
+   0.2025,
+   0.8515,
+   0.22
+  ],
+  "valid_box": [
+   0,
+   0.3378,
+   0.8075,
+   0.3906,
+   0.824
+  ],
+  "invalid_box": [
+   0,
+   0.3413,
+   0.83,
+   0.3835,
+   0.846
+  ],
+  "folder": "1YxPXY7xHLyNpBZ9LRjPIEILTtTiPdvIl",
+  "files": [
+   {
+    "drive": "1cdeHYtKhSeJKXZOtFPJO9FFHrj0kz2od",
+    "suffix": ".jpg",
+    "local": "Form 49.jpg"
+   }
+  ],
+  "pages": [
+   {
+    "file": 0,
+    "page": 1
+   }
+  ],
+  "candidates": [
+   {
+    "position": 1,
+    "name": "Muhammad Israr-ul-Haq Cheema",
+    "party": "Tehreek-e-Labbaik Pakistan",
+    "votes": 1146,
+    "page": 0,
+    "box": [
+     0.7023,
+     0.289,
+     0.9641,
+     0.3125
+    ]
+   },
+   {
+    "position": 2,
+    "name": "Muhammad Ramzan",
+    "party": "Independent",
+    "votes": 102,
+    "page": 0,
+    "box": [
+     0.7023,
+     0.3125,
+     0.9641,
+     0.3365
+    ]
+   },
+   {
+    "position": 3,
+    "name": "Muhammad Tufail",
+    "party": "Independent",
+    "votes": 230,
+    "page": 0,
+    "box": [
+     0.7023,
+     0.3365,
+     0.9641,
+     0.361
+    ]
+   },
+   {
+    "position": 4,
+    "name": "Malik Shahid Abbas Raan",
+    "party": "Independent",
+    "votes": 3571,
+    "page": 0,
+    "box": [
+     0.7023,
+     0.361,
+     0.9641,
+     0.385
+    ]
+   },
+   {
+    "position": 5,
+    "name": "Malik Muhammad Arshad",
+    "party": "Pakistan Peoples Party Parliamentarians",
+    "votes": 39260,
+    "page": 0,
+    "box": [
+     0.7023,
+     0.385,
+     0.9641,
+     0.4165
+    ]
+   },
+   {
+    "position": 6,
+    "name": "Malik Wasif Mazhar",
+    "party": "Pakistan Tehreek-e-Insaf",
+    "votes": 46670,
+    "page": 0,
+    "box": [
+     0.7023,
+     0.4165,
+     0.9641,
+     0.441
+    ]
+   }
+  ]
+ },
+ {
+  "code": "PP-38",
+  "name": "Sialkot-IV",
+  "date": "2021-07-28",
+  "signed": "2021-07-29",
+  "registered": 233422,
+  "valid": 127062,
+  "invalid": 2136,
+  "registered_box": [
+   0,
+   0.7702,
+   0.1897,
+   0.8347,
+   0.2063
+  ],
+  "valid_box": [
+   0,
+   0.3468,
+   0.8507,
+   0.4113,
+   0.8672
+  ],
+  "invalid_box": [
+   0,
+   0.3484,
+   0.8718,
+   0.3952,
+   0.8889
+  ],
+  "folder": "1-hrrTktkVmiH2pask9eXYd4yIutFh-Yq",
+  "files": [
+   {
+    "drive": "1WpfXvb3nIyrHrMwZtM8aoGbzBjoOyPnA",
+    "suffix": ".pdf",
+    "local": "Form-49.pdf"
+   }
+  ],
+  "pages": [
+   {
+    "file": 0,
+    "page": 1
+   }
+  ],
+  "candidates": [
+   {
+    "position": 1,
+    "name": "Ahsan Saleem",
+    "party": "Pakistan Tehreek-e-Insaf",
+    "votes": 62657,
+    "page": 0,
+    "box": [
+     0.6895,
+     0.2729,
+     0.9315,
+     0.2969
+    ]
+   },
+   {
+    "position": 2,
+    "name": "Bilal Aslam",
+    "party": "Independent",
+    "votes": 186,
+    "page": 0,
+    "box": [
+     0.6895,
+     0.2974,
+     0.9315,
+     0.3214
+    ]
+   },
+   {
+    "position": 3,
+    "name": "Tariq Subhani",
+    "party": "Pakistan Muslim League (N)",
+    "votes": 56353,
+    "page": 0,
+    "box": [
+     0.6895,
+     0.3214,
+     0.9315,
+     0.3453
+    ]
+   },
+   {
+    "position": 4,
+    "name": "Aqeel Qaiser",
+    "party": "Independent",
+    "votes": 83,
+    "page": 0,
+    "box": [
+     0.6895,
+     0.3453,
+     0.9315,
+     0.3692
+    ]
+   },
+   {
+    "position": 5,
+    "name": "Faheem Mushtaq",
+    "party": "Tehreek-e-Labbaik Pakistan",
+    "votes": 6660,
+    "page": 0,
+    "box": [
+     0.6895,
+     0.3692,
+     0.9315,
+     0.3932
+    ]
+   },
+   {
+    "position": 6,
+    "name": "Muhammad Sajid Saleem",
+    "party": "Independent",
+    "votes": 975,
+    "page": 0,
+    "box": [
+     0.6895,
+     0.3932,
+     0.9315,
+     0.4171
+    ]
+   },
+   {
+    "position": 7,
+    "name": "Muhammad Saif Ullah Bajwa",
+    "party": "Independent",
+    "votes": 19,
+    "page": 0,
+    "box": [
+     0.6895,
+     0.4171,
+     0.9315,
+     0.441
+    ]
+   },
+   {
+    "position": 8,
+    "name": "Najam-ul-Hassan",
+    "party": "Independent",
+    "votes": 129,
+    "page": 0,
+    "box": [
+     0.6895,
+     0.441,
+     0.9315,
+     0.465
+    ]
+   }
+  ]
+ },
+ {
+  "code": "PP-84",
+  "name": "Khushab-III",
+  "date": "2021-05-05",
+  "signed": "2021-05-06",
+  "registered": 292687,
+  "valid": 152324,
+  "invalid": 2793,
+  "registered_box": [
+   0,
+   0.8136,
+   0.2074,
+   0.8867,
+   0.2279
+  ],
+  "valid_box": [
+   0,
+   0.3581,
+   0.8638,
+   0.4263,
+   0.8826
+  ],
+  "invalid_box": [
+   0,
+   0.3605,
+   0.8877,
+   0.4093,
+   0.9057
+  ],
+  "folder": "1pd00p8-q_aWz6GyFskM4WMOE-nXSFTTf",
+  "files": [
+   {
+    "drive": "1WQasvqv_f1UiS5tMPFf4cdhylrtficJv",
+    "suffix": ".jpg",
+    "local": "FORM-49.JPG"
+   }
+  ],
+  "pages": [
+   {
+    "file": 0,
+    "page": 1
+   }
+  ],
+  "candidates": [
+   {
+    "position": 1,
+    "name": "Amjad Raza",
+    "party": "Independent",
+    "votes": 8340,
+    "page": 0,
+    "box": [
+     0.7259,
+     0.2931,
+     0.9866,
+     0.3171
+    ]
+   },
+   {
+    "position": 2,
+    "name": "Aurangzab",
+    "party": "Independent",
+    "votes": 178,
+    "page": 0,
+    "box": [
+     0.7259,
+     0.3171,
+     0.9866,
+     0.341
+    ]
+   },
+   {
+    "position": 3,
+    "name": "Hafiz Muhammad Asghar Ali",
+    "party": "Tehreek-e-Labbaik Pakistan",
+    "votes": 5782,
+    "page": 0,
+    "box": [
+     0.7259,
+     0.341,
+     0.9866,
+     0.365
+    ]
+   },
+   {
+    "position": 4,
+    "name": "Ali Hussain Khan",
+    "party": "Pakistan Tehreek-e-Insaf",
+    "votes": 62917,
+    "page": 0,
+    "box": [
+     0.7259,
+     0.365,
+     0.9866,
+     0.3899
+    ]
+   },
+   {
+    "position": 5,
+    "name": "Imran Haider Khan",
+    "party": "Independent",
+    "votes": 336,
+    "page": 0,
+    "box": [
+     0.7259,
+     0.3899,
+     0.9866,
+     0.4147
+    ]
+   },
+   {
+    "position": 6,
+    "name": "Ghulam Habib Ahmad",
+    "party": "Pakistan Peoples Party Parliamentarians",
+    "votes": 236,
+    "page": 0,
+    "box": [
+     0.7259,
+     0.4147,
+     0.9866,
+     0.4456
+    ]
+   },
+   {
+    "position": 7,
+    "name": "Muhammad Ilyas Awan",
+    "party": "Independent",
+    "votes": 94,
+    "page": 0,
+    "box": [
+     0.7259,
+     0.4456,
+     0.9866,
+     0.4696
+    ]
+   },
+   {
+    "position": 8,
+    "name": "Muhammad Moazzam Sher",
+    "party": "Pakistan Muslim League (N)",
+    "votes": 73093,
+    "page": 0,
+    "box": [
+     0.7259,
+     0.4696,
+     0.9866,
+     0.4944
+    ]
+   },
+   {
+    "position": 9,
+    "name": "Naseem Abbas Khan",
+    "party": "Independent",
+    "votes": 1348,
+    "page": 0,
+    "box": [
+     0.7259,
+     0.4944,
+     0.9866,
+     0.5184
+    ]
+   }
+  ]
+ }
+]
