@@ -1,17 +1,24 @@
 """Presidential elections of El Salvador from 1994 to 2009, from the Tribunal Supremo Electoral's consolidated tables.
 
 The 1994 tables (both rounds) are typeset PDFs with a text layer, printing every municipality. The 1999, 2004, and 2009
-national tables are scans or typeset images with no text layer; their department rows were read from the page images
-and each row is checked against its printed total, each column against the printed national total.
+department volumes (consolidado departamental) are page images with no text layer, one or two pages for each
+department, printing every municipality. Their rows were read from the page images into `presidents_tables/{year}.json`,
+with each figure's page and box. Each row is checked against its own printed valid votes, each department's columns
+against the volume's printed department total, and each department total against the department row of the printed
+national table (`SCANNED`), which is also the source of the 2009 row for residents abroad.
 """
 
+import json
 import re
+import subprocess
 from dataclasses import dataclass
 from datetime import date
+from pathlib import Path
+from uuid import uuid5
 
 import polars as pl
 
-from ea import raw
+from ea import package, raw
 from ea.package import Package
 from ea.sources.sv import assembly, tse
 
@@ -66,7 +73,7 @@ class Election:
     round_number: int
     parties: tuple[str, ...]
     files: tuple[str, ...]
-    grain: str  # "municipality" or "department"
+    grain: str  # "municipality" or "municipality-scan"
     page: int = 0
 
 
@@ -85,31 +92,33 @@ ELECTIONS = {
             date(1999, 3, 7),
             1,
             ("ARENA", "CDU", "FMLN-USC", "LIDER", "PCN", "PDC", "PUNTO"),
-            (D + "1999/consolidado_nacional_presid_1999.pdf",),
-            "department",
+            (D + "1999/consolidado_depto_presid_1999.pdf", D + "1999/consolidado_nacional_presid_1999.pdf"),
+            "municipality-scan",
         ),
         Election(
             date(2004, 3, 21),
             1,
             ("ARENA", "CDU-PDC", "FMLN", "PCN"),
-            (D + "2004/consolidadonacional_presi_2004.pdf",),
-            "department",
+            (D + "2004/consolidado_depto_presid2004.pdf", D + "2004/consolidadonacional_presi_2004.pdf"),
+            "municipality-scan",
         ),
         Election(
             date(2009, 3, 15),
             1,
             ("ARENA", "FMLN"),
-            (D + "2009/consolidadonacional_presidenciales2009.pdf",),
-            "department",
+            (D + "2009/consolidadodeppresyvicepres2009.pdf", D + "2009/consolidadonacional_presidenciales2009.pdf"),
+            "municipality-scan",
         ),
     )
 }
-SUPPORT = (
-    D + "1999/consolidado_depto_presid_1999.pdf",
-    D + "2004/consolidado_depto_presid2004.pdf",
-    D + "2009/consolidadodeppresyvicepres2009.pdf",
-    D + "2009/consolidadoresenextranj_presidenciales2009.pdf",
-)
+SUPPORT = (D + "2009/consolidadoresenextranj_presidenciales2009.pdf",)
+TABLES = Path(__file__).with_name("presidents_tables")
+DIGITIZED = 8
+# Cells where the department volume's printed department total differs from the department row of the national table:
+# {day: {department: {column: (department volume, national table)}}}, columns as in the tables (null is the last).
+DISAGREE: dict[date, dict[int, dict[int, tuple[int, int]]]] = {
+    date(1999, 3, 7): {5: {9: (2464, 2463)}, 6: {8: (206, 205), 9: (3491, 3492)}},
+}
 
 # Department rows read from the printed national tables: votes for each party in ballot order, valid votes (printed),
 # objected (impugnados) and null (nulos) ballots. Departments run in DEPARTMENT_ORDER.
@@ -202,6 +211,8 @@ class Row:
     valid: int
     objected: int
     invalid: int
+    page: int = 0
+    boxes: tuple[tuple[float, float, float, float], ...] = ()
 
 
 def read_1994(election: Election) -> list[Row]:
@@ -254,20 +265,64 @@ def read_1994(election: Election) -> list[Row]:
 
 
 def read_scanned(election: Election) -> list[Row]:
+    """Each municipality's row of a department volume, checked against its printed valid votes, the volume's printed
+    department totals, and the department rows of the national table; 2009 adds the national table's row abroad."""
+    day = election.day
     width = len(election.parties)
+    table = json.loads((TABLES / f"{day.year}.json").read_text("utf-8"))
+    _, municipalities, _ = tse.tree(1, with_centers=False)
     rows: list[Row] = []
-    table = SCANNED[election.day]
-    for index, (votes, valid, objected, invalid) in enumerate(table):
-        if len(votes) != width or sum(votes) != valid:
-            raise ValueError(f"{election.day}: department {index + 1}: parties sum to {sum(votes)}, valid {valid}")
+    for item in table["rows"]:
+        values = item["values"]
+        votes, (valid, objected, invalid) = tuple(values[:width]), values[width:]
+        name, _ = municipalities[item["code"]]
+        if len(values) != width + 3 or sum(votes) != valid:
+            raise ValueError(f"{day}: {name}: parties sum to {sum(votes)}, valid votes {valid}")
+        boxes = tuple((b[0], b[1], b[2], b[3]) for b in item["boxes"])
+        rows.append(Row(name, item["code"], votes, valid, objected, invalid, item["page"], boxes))
+    inland = {code for code, (_, parent) in municipalities.items() if int(parent[3:]) <= 14}
+    if {r.code for r in rows} != inland or len(rows) != len(inland):
+        raise ValueError(f"{day}: {len(rows)} rows for {len(inland)} municipalities, or a repeat")
+    disagree = DISAGREE.get(day, {})
+    for number in range(1, 15):
+        code = f"dep{number:02d}"
+        group = [r for r in rows if municipalities[r.code][1] == code]
+        got = [sum(r.votes[i] for r in group) for i in range(width)]
+        got += [sum(r.valid for r in group), sum(r.objected for r in group), sum(r.invalid for r in group)]
+        if got != table["departments"][code]["total"]:
+            raise ValueError(f"{day}: {code} sums {got} differ from its printed total {table['departments'][code]}")
+        votes, valid, objected, invalid = SCANNED[day][number - 1]
+        national = [*votes, valid, objected, invalid]
+        for column, (left, right) in enumerate(zip(got, national, strict=True)):
+            if left != right and disagree.get(number, {}).get(column) != (left, right):
+                raise ValueError(f"{day}: {code} column {column} is {left}, the national table prints {right}")
+    for index in range(14, len(SCANNED[day])):
+        votes, valid, objected, invalid = SCANNED[day][index]
         rows.append(Row(DEPARTMENT_ORDER[index], f"dep{index + 1:02d}", votes, valid, objected, invalid))
-    votes, valid, objected, invalid = NATIONAL[election.day]
-    got = tuple(sum(r.votes[i] for r in rows) for i in range(width))
-    if got != votes or sum(r.valid for r in rows) != valid or sum(r.objected for r in rows) != objected:
-        raise ValueError(f"{election.day}: department rows {got} do not match the printed national row {votes}")
-    if sum(r.invalid for r in rows) != invalid:
-        raise ValueError(f"{election.day}: null ballots do not match the printed national row")
     return rows
+
+
+def national(election: Election) -> tuple[tuple[int, ...], int, int, int]:
+    """The printed national row, checked against the department rows of the national table."""
+    day = election.day
+    width = len(election.parties)
+    table = SCANNED[day]
+    for index, (votes, valid, _, _) in enumerate(table):
+        if len(votes) != width or sum(votes) != valid:
+            raise ValueError(f"{day}: department {index + 1}: parties sum to {sum(votes)}, valid {valid}")
+    votes, valid, objected, invalid = NATIONAL[day]
+    got = tuple(sum(r[0][i] for r in table) for i in range(width))
+    if got != votes or sum(r[1] for r in table) != valid or sum(r[2] for r in table) != objected:
+        raise ValueError(f"{day}: department rows {got} do not match the printed national row {votes}")
+    if sum(r[3] for r in table) != invalid:
+        raise ValueError(f"{day}: null ballots do not match the printed national row")
+    return NATIONAL[day]
+
+
+def sizes(path: Path) -> dict[int, tuple[float, float]]:
+    out = subprocess.run(["pdfinfo", "-f", "1", "-l", "99", str(path)], capture_output=True, text=True, check=True)
+    found = (re.match(r"Page\s+(\d+) size:\s+([\d.]+) x ([\d.]+)", line) for line in out.stdout.splitlines())
+    return {int(m[1]): (float(m[2]), float(m[3])) for m in found if m}
 
 
 def read(election: Election) -> list[Row]:
@@ -296,6 +351,22 @@ def registry() -> Package:
     for election in ELECTIONS.values():
         for url in election.files:
             p.artifact(raw.cached(SOURCE, url), HIST_SOURCE)
+        if election.grain != "municipality-scan":
+            continue
+        stored = raw.cached(SOURCE, election.files[0])
+        artifact = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{HIST_SOURCE}\x1f{stored.storage_key}"))
+        pages = sorted({r.page for r in read(election) if r.page})
+        for number, (width, height) in sizes(stored.path).items():
+            if number in pages:
+                p.add(
+                    "source_page",
+                    id=tse.key("page", election.day, number),
+                    artifact_id=artifact,
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{stored.sha256}-{number}.png",
+                    width=round(width * 100 / 72),
+                    height=round(height * 100 / 72),
+                )
     codes = sorted({code for e in ELECTIONS.values() for code in e.parties} - set(OWN_PARTIES))
     for code in codes:
         id = tse.key("party", code)
@@ -312,13 +383,13 @@ def registry() -> Package:
 def president(election: Election) -> Package:
     day = election.day
     runoff = election.round_number == 2
-    municipal = election.grain == "municipality"
+    scanned = election.grain == "municipality-scan"
     first = date(1994, 3, 20)
     p = Package(
         f"sv.tse/pres-{day}",
         SOURCE,
         f"The {'second' if runoff else 'first'} round of the {day.year} Salvadoran presidential election, "
-        f"by {election.grain} from the Tribunal Supremo Electoral",
+        "by municipality from the Tribunal Supremo Electoral",
         depends=["sv.tse/geo", "sv.tse/registry", REGISTRY] + (["sv.tse/pres-1994-03-20"] if runoff else []),
     )
     p.external |= {EL_SALVADOR, TERRITORY}
@@ -328,6 +399,11 @@ def president(election: Election) -> Package:
     parties = election.parties
     totals = [sum(r.votes[i] for r in rows) for i in range(len(parties))]
     valid_total = sum(r.valid for r in rows)
+    objected_total, invalid_total = sum(r.objected for r in rows), sum(r.invalid for r in rows)
+    if scanned:
+        printed, valid_total, objected_total, invalid_total = national(election)
+        if list(printed) != totals:
+            raise ValueError(f"{day}: municipality rows {totals} differ from the printed national row {printed}")
     ranked = sorted(range(len(parties)), key=lambda i: -totals[i])
     won_outright = not runoff and totals[ranked[0]] * 2 > valid_total
     election_id = tse.key("election", day)
@@ -383,12 +459,26 @@ def president(election: Election) -> Package:
     )
     method = (
         f"Final scrutiny (escrutinio final) of the {day.year} presidential election as published by the Tribunal "
-        f"Supremo Electoral, one row per {election.grain}. "
+        "Supremo Electoral, one row per municipality. "
         + (
-            "The table is a typeset report with a text layer. "
-            if municipal
-            else "The department rows were read from the page image of the printed national table and agree with its "
-            "printed national row. "
+            "The rows were read from the page images of the department volume (consolidado departamental), and each "
+            "figure keeps its page and box. Every row's ticket votes sum to its printed valid votes, every "
+            "department's rows sum to the volume's printed department total, and those totals agree with the "
+            "department rows of the printed national table, whose national row gives the declared totals. "
+            if scanned
+            else "The table is a typeset report with a text layer. "
+        )
+        + (
+            "The 2009 national table also prints the votes of residents abroad, stored as their own unit. "
+            if day.year == 2009
+            else ""
+        )
+        + (
+            "In Usulután the department volume prints 2,464 null ballots where the national table prints 2,463, and in "
+            "Sonsonate 206 objected and 3,491 null ballots where it prints 205 and 3,492; the municipal rows follow the "
+            "department volume, so they sum to one objected ballot more than the declared national total. "
+            if day.year == 1999
+            else ""
         )
         + "Votes are valid votes for each ticket, nulos are invalid ballots, and impugnados are ballots objected to. "
         "The source also lists abstentions and ballot-paper counts; they are not stored."
@@ -415,11 +505,19 @@ def president(election: Election) -> Package:
         p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
         p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=totals[position - 1])
     p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=valid_total)
-    p.add("declared", result_set_id=result_set, option_id=None, measure=OBJECTED, value=sum(r.objected for r in rows))
-    p.add("declared", result_set_id=result_set, option_id=None, measure=INVALID, value=sum(r.invalid for r in rows))
+    p.add("declared", result_set_id=result_set, option_id=None, measure=OBJECTED, value=objected_total)
+    p.add("declared", result_set_id=result_set, option_id=None, measure=INVALID, value=invalid_total)
+    if day == date(1999, 3, 7):
+        p.accept(
+            "accounting.declared",
+            "The TSE's department volume prints 206 objected ballots in Sonsonate where its national table prints 205; "
+            "the municipal rows follow the department volume, the declared total the national table",
+        )
     facts: list[dict[str, object]] = []
+    locators: list[dict[str, object]] = []
 
-    def value(unit: str, option: str | None, measure: int, amount: int) -> None:
+    def value(unit: str, option: str | None, measure: int, amount: int, row: Row, index: int) -> None:
+        located = bool(row.boxes)
         facts.append(
             {
                 "result_set_id": result_set,
@@ -428,29 +526,70 @@ def president(election: Election) -> Package:
                 "channel": 0,
                 "measure": measure,
                 "count_round": 0,
-                "flags": 0,
+                "flags": DIGITIZED if located else 0,
                 "value": amount,
             }
         )
+        if located:
+            x0, y0, x1, y1 = row.boxes[index]
+            locators.append(
+                {
+                    "result_set_id": result_set,
+                    "unit_id": unit,
+                    "option_id": option,
+                    "channel": 0,
+                    "measure": measure,
+                    "count_round": 0,
+                    "page_id": tse.key("page", day, row.page),
+                    "source_id": None,
+                    "x0": x0,
+                    "y0": y0,
+                    "x1": x1,
+                    "y1": y1,
+                }
+            )
 
-    scheme = "sv.municipio" if municipal else "sv.departamento"
+    departments, _, _ = tse.tree(1, with_centers=False) if scanned else ({}, {}, {})
+    _, municipalities, _ = tse.tree(1, with_centers=False)
+    parents: dict[str, str] = {}
+    for code, label in departments.items():
+        if int(code[3:]) > 14:
+            continue
+        # The department units that carried these results before they were read by municipality.
+        parents[code] = tse.key("unit", day, code)
+        p.add(
+            "reporting_unit",
+            id=parents[code],
+            polity_id=EL_SALVADOR,
+            scheme_code="sv.departamento",
+            code=f"{day}:{code.removeprefix('dep')}",
+            area_relation="equals",
+            area_id=tse.area("sv.departamento", code),
+            kind="aggregate",
+        )
+        p.name(parents[code], label.title(), "es", "official")
     for row in rows:
         unit = tse.key("unit", day, row.code)
+        scheme = "sv.municipio" if row.code.startswith("mun") else "sv.departamento"
         p.add(
             "reporting_unit",
             id=unit,
             polity_id=EL_SALVADOR,
             scheme_code=scheme,
             code=f"{day}:{row.code.removeprefix('mun').removeprefix('dep')}",
+            parent_id=parents.get(municipalities[row.code][1]) if row.code in municipalities else None,
             area_relation="equals",
             area_id=tse.area(scheme, row.code),
             kind="aggregate",
         )
         p.name(unit, row.name.title(), "es", "official")
-        for option, amount in zip(options, row.votes, strict=True):
-            value(unit, option, VOTES, amount)
-        value(unit, None, VALID, row.valid)
-        value(unit, None, OBJECTED, row.objected)
-        value(unit, None, INVALID, row.invalid)
+        width = len(options)
+        for index, (option, amount) in enumerate(zip(options, row.votes, strict=True)):
+            value(unit, option, VOTES, amount, row, index)
+        value(unit, None, VALID, row.valid, row, width)
+        value(unit, None, OBJECTED, row.objected, row, width + 1)
+        value(unit, None, INVALID, row.invalid, row, width + 2)
     p.frame("result_value", pl.DataFrame(facts))
+    if locators:
+        p.frame("value_locator", pl.DataFrame(locators, schema=package.FACTS["value_locator"]))
     return p
