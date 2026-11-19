@@ -2356,7 +2356,7 @@ def _seal(
     counts: dict[str, int],
     adopts: list[str],
     sources: list[dict[str, str]],
-    reason: str | None,
+    reason: str | dict[str, str] | None,
 ) -> Manifest:
     con = _connect()
     for table, (_, schema) in [*TABLES.items(), *((t, (None, s)) for t, s in FACTS.items())]:
@@ -2399,10 +2399,11 @@ def _seal(
     for code, n, _ in check(out):
         if code.startswith(("unique.", "reference.")):
             raise ValueError(f"{key}: the build fails {code} ({n:,})")
-        if reason is None:
+        why = reason.get(code) if isinstance(reason, dict) else reason
+        if why is None:
             print(f"{key}: {code} {n:,} is not accepted", flush=True)
         else:
-            manifest["accepted"][code] = reason
+            manifest["accepted"][code] = why
     (out / "package.json").write_text(json.dumps(manifest, indent=1) + "\n")
     return manifest
 
@@ -2537,6 +2538,25 @@ def _column(frame: pl.DataFrame, column: str, kind: pl.DataType, default: object
     return values.cast(kind).alias(column)
 
 
+def _text(value: object) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, dict | list):
+        return json.dumps(value)
+    if isinstance(value, bool):
+        return "t" if value else "f"
+    if isinstance(value, float):
+        return repr(value)
+    isoformat = getattr(value, "isoformat", None)
+    return str(isoformat()) if callable(isoformat) else str(value)
+
+
+# Merges turn the names and slugs of the entities they fold into redirects on the survivor, so a Draft carries those
+# rows on its own survivors as they stand. It also carries the pipeline's own non-preferred names: the changeset path
+# keeps a name a later emit demoted as an alias rather than deleting it.
+REDIRECTED = ("name", "slug")
+
+
 class Draft(Changeset):
     def __init__(
         self,
@@ -2566,6 +2586,10 @@ class Draft(Changeset):
                 [pipeline],
             )
         }
+        self.accepted: dict[str, str] = {}
+
+    def accept(self, code: str, reason: str) -> None:
+        self.accepted[code] = reason
 
     def key(self, scheme: str, value: str) -> UUID:
         pair = (scheme, value)
@@ -2586,6 +2610,23 @@ class Draft(Changeset):
         if id in self.own_entities:
             self.minted.add(id)
         return id
+
+    def area(self, scheme: str, code: str, on: date | None = None) -> UUID:
+        id = super().area(scheme, code, on)
+        if id in self.own_entities:
+            self.minted.add(id)
+        return id
+
+    def unit(self, scheme: str, code: str, on: date | None = None) -> UUID:
+        id = super().unit(scheme, code, on)
+        if id in self.own_entities:
+            self.minted.add(id)
+        return id
+
+    def absorbed(self) -> list[str]:
+        """The pipeline's own entities that a merge folded others into. A merge turns the names and slugs of the
+        entities it folds into redirects on the survivor, so the survivor's rows carry over as they stand."""
+        return sorted({str(into) for into in self.survivors.values() if into in self.own_entities})
 
     def foreign(self, scheme: str, like: str = "%") -> set[str]:
         return {
@@ -2608,23 +2649,24 @@ class Draft(Changeset):
         columns = [column for column in frame.columns if column != "id" or keyed is not None]
         frame = frame.unique(subset=columns, maintain_order=True)
         required = _not_null(self.conn, table)
-        staged = sql.Identifier(f"draft_{table}")
-        listed = sql.SQL(", ").join(map(sql.Identifier, columns))
-        self.conn.execute(sql.SQL("drop table if exists {}").format(staged))
-        self.conn.execute(
-            sql.SQL("create temp table {} as select {} from public.{} limit 0").format(
-                staged, listed, sql.Identifier(table)
-            )
+        types: dict[str, str] = dict(
+            self.conn.execute(
+                """select a.attname, format_type(a.atttypid, a.atttypmod) from pg_attribute a
+                   where a.attrelid = %s::regclass and a.attnum > 0 and not a.attisdropped""",
+                [f"public.{table}"],
+            ).fetchall()
         )
-        self.conn.execute(sql.SQL("alter table {} add column draft_row int").format(staged))
-        with (
-            self.conn.cursor() as cursor,
-            cursor.copy(sql.SQL("copy {} ({}, draft_row) from stdin").format(staged, listed)) as copy,
-        ):
-            for number, row in enumerate(frame.select(columns).iter_rows()):
-                copy.write_row(
-                    [json.dumps(value) if isinstance(value, dict | list) else value for value in row] + [number]
-                )
+        staged = sql.SQL(
+            "(select r.draft_row - 1 as draft_row, {} from unnest({}) with ordinality as r({}, draft_row))"
+        ).format(
+            sql.SQL(", ").join(
+                sql.SQL("r.{0}::{1} as {0}").format(sql.Identifier(column), sql.SQL(cast(LiteralString, types[column])))
+                for column in columns
+            ),
+            sql.SQL(", ").join(sql.SQL("%s::text[]") for _ in columns),
+            sql.SQL(", ").join(map(sql.Identifier, columns)),
+        )
+        arrays: list[object] = [[_text(value) for value in frame[column].to_list()] for column in columns]
         pipeline = str(self.manifest["pipeline"])
         if keyed is not None:
             found = self.conn.execute(
@@ -2638,7 +2680,8 @@ class Draft(Changeset):
                     staged=staged,
                     table=sql.Identifier(table),
                     on=sql.SQL(" and ").join(sql.SQL("p.{0} = s.{0}").format(sql.Identifier(c)) for c in keyed),
-                )
+                ),
+                arrays,
             ).fetchall()
         else:
             same = sql.SQL(" and ").join(
@@ -2673,9 +2716,8 @@ class Draft(Changeset):
                     table=sql.Identifier(table),
                     same=same,
                 ),
-                [pipeline],
+                [*arrays, pipeline],
             ).fetchall()
-        self.conn.execute(sql.SQL("drop table {}").format(staged))
         keep = [owner in (None, pipeline) for _, _, owner in found]
         if minted:
             frame = frame.with_columns(pl.Series("id", [str(id) for _, id, _ in found], dtype=pl.String))
@@ -2698,13 +2740,20 @@ class Draft(Changeset):
             if column == "entity_id"
             else sql.SQL("")
         )
+        redirected = sql.SQL(
+            " or t.entity_id = any(%s::uuid[]) or not t.is_preferred"
+            if table == "name"
+            else " or t.entity_id = any(%s::uuid[])"
+            if table in REDIRECTED
+            else ""
+        )
         rows = self.conn.execute(
             sql.SQL(
                 """select {} from {} t join changeset c on c.id = t.changeset_id
                    where c.pipeline = %s and c.status = 'published'
-                     and (t.{} in (select entity_id from entity_merge){})"""
-            ).format(_select(schema, absent), sql.Identifier(table), sql.Identifier(column), foreign),
-            [pipeline],
+                     and (t.{} in (select entity_id from entity_merge){}{})"""
+            ).format(_select(schema, absent), sql.Identifier(table), sql.Identifier(column), foreign, redirected),
+            [pipeline, self.absorbed()] if table in REDIRECTED else [pipeline],
         ).fetchall()
         if not rows:
             return None
@@ -2757,6 +2806,8 @@ class Draft(Changeset):
                 column for column, kind in schema.items() if kind == F and _type(self.conn, table, column) == "real"
             ]
             final = final.with_columns(pl.col(column).cast(pl.Float32).cast(U).cast(F) for column in reals)
+            if table in REDIRECTED:
+                final = final.filter(~pl.col("entity_id").is_in(self.absorbed()))
             carried = self._carry(table, schema)
             if carried is not None:
                 kept = TABLES[table][0]
@@ -2787,7 +2838,7 @@ class Draft(Changeset):
             counts,
             owned,
             [{"storage_key": storage} for storage in sorted({*artifacts, *new})],
-            None,
+            self.accepted,
         )
         print(
             f"{key}: {', '.join(f'{t} {n:,}' for t, n in counts.items())}; {len(owned):,} changesets adopted",
