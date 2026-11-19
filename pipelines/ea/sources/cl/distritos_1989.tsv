@@ -1,0 +1,347 @@
+district	commune	name	basis
+1	ARICA	Arica	law
+1	CAMARONES	Camarones	law
+1	GENERAL LAGOS	General Lagos	law
+1	PUTRE	Putre	law
+2	ALTO HOSPICIO	Alto Hospicio	results
+2	CAMINA	Camiña	law
+2	COLCHANE	Colchane	law
+2	HUARA	Huara	law
+2	IQUIQUE	Iquique	law
+2	PICA	Pica	law
+2	POZO ALMONTE	Pozo Almonte	law
+3	CALAMA	Calama	law
+3	MARIA ELENA	María Elena	law
+3	OLLAGUE	Ollague	law
+3	SAN PEDRO DE ATACAMA	San Pedro de Atacama	law
+3	TOCOPILLA	Tocopilla	law
+4	ANTOFAGASTA	Antofagasta	law
+4	MEJILLONES	Mejillones	law
+4	SIERRA GORDA	Sierra Gorda	law
+4	TALTAL	Taltal	law
+5	CHANARAL	Chañaral	law
+5	COPIAPO	Copiapó	law
+5	DIEGO DE ALMAGRO	Diego de Almagro	law
+6	ALTO DEL CARMEN	Alto del Carmen	law
+6	CALDERA	Caldera	law
+6	FREIRINA	Freirina	law
+6	HUASCO	Huasco	law
+6	TIERRA AMARILLA	Tierra Amarilla	law
+6	VALLENAR	Vallenar	law
+7	ANDACOLLO	Andacollo	law
+7	LA HIGUERA	La Higuera	law
+7	LA SERENA	La Serena	law
+7	PAIHUANO	Paihuano	law
+7	VICUNA	Vicuña	law
+8	COQUIMBO	Coquimbo	law
+8	OVALLE	Ovalle	law
+8	RIO HURTADO	Río Hurtado	law
+9	CANELA	Canela	law
+9	COMBARBALA	Combarbalá	law
+9	ILLAPEL	Illapel	law
+9	LOS VILOS	Los Vilos	law
+9	MONTE PATRIA	Monte Patria	law
+9	PUNITAQUI	Punitaqui	law
+9	SALAMANCA	Salamanca	law
+10	CABILDO	Cabildo	law
+10	HIJUELAS	Hijuelas	law
+10	LA CALERA	Calera	law
+10	LA CRUZ	La Cruz	law
+10	LA LIGUA	La Ligua	law
+10	NOGALES	Nogales	law
+10	PAPUDO	Papudo	law
+10	PETORCA	Petorca	law
+10	PUCHUNCAVI	Puchuncaví	law
+10	QUILLOTA	Quillota	law
+10	QUINTERO	Quintero	law
+10	ZAPALLAR	Zapallar	law
+11	CALLE LARGA	Calle Larga	law
+11	CATEMU	Catemu	law
+11	LLAILLAY	Llaillay	law
+11	LOS ANDES	Los Andes	law
+11	PANQUEHUE	Panquehue	law
+11	PUTAENDO	Putaendo	law
+11	RINCONADA	Rinconada	law
+11	SAN ESTEBAN	San Esteban	law
+11	SAN FELIPE	San Felipe	law
+11	SANTA MARIA	Santa María	law
+12	LIMACHE	Limache	law
+12	OLMUE	Olmué	law
+12	QUILPUE	Quilpué	law
+12	VILLA ALEMANA	Villa Alemana	law
+13	ISLA DE PASCUA	Isla de Pascua	law
+13	JUAN FERNANDEZ	Juan Fernández	law
+13	VALPARAISO	Valparaíso	law
+14	CONCON	Concón	results
+14	VINA DEL MAR	Viña del Mar	law
+15	ALGARROBO	Algarrobo	law
+15	CARTAGENA	Cartagena	law
+15	CASABLANCA	Casablanca	law
+15	EL QUISCO	El Quisco	law
+15	EL TABO	El Tabo	law
+15	SAN ANTONIO	San Antonio	law
+15	SANTO DOMINGO	Santo Domingo	law
+16	COLINA	Colina	law
+16	LAMPA	Lampa	law
+16	PUDAHUEL	Pudahuel	law
+16	QUILICURA	Quilicura	law
+16	TILTIL	Tiltil	law
+17	CONCHALI	Conchalí	law
+17	HUECHURABA	Huechuraba	law
+17	RENCA	Renca	law
+18	CERRO NAVIA	Cerro Navia	law
+18	LO PRADO	Lo Prado	law
+18	QUINTA NORMAL	Quinta Normal	law
+19	INDEPENDENCIA	Independencia	law
+19	RECOLETA	Recoleta	law
+20	CERRILLOS	Cerrillos	law
+20	ESTACION CENTRAL	Estación Central	law
+20	MAIPU	Maipú	law
+21	NUNOA	Ñuñoa	law
+21	PROVIDENCIA	Providencia	law
+22	SANTIAGO	Santiago	law
+23	LAS CONDES	Las Condes	law
+23	LO BARNECHEA	Lo Barnechea	law
+23	VITACURA	Vitacura	law
+24	LA REINA	La Reina	law
+24	PENALOLEN	Peñalolén	law
+25	LA GRANJA	La Granja	law
+25	MACUL	Macul	law
+25	SAN JOAQUIN	San Joaquín	law
+26	LA FLORIDA	La Florida	law
+27	EL BOSQUE	El Bosque	law
+27	LA CISTERNA	La Cisterna	law
+27	SAN RAMON	San Ramón	law
+28	LO ESPEJO	Lo Espejo	law
+28	PEDRO AGUIRRE CERDA	Pedro Aguirre Cerda	law
+28	SAN MIGUEL	San Miguel	law
+29	LA PINTANA	La Pintana	law
+29	PIRQUE	Pirque	law
+29	PUENTE ALTO	Puente Alto	law
+29	SAN JOSE DE MAIPO	San José de Maipo	law
+30	BUIN	Buin	law
+30	CALERA DE TANGO	Calera de Tango	law
+30	PAINE	Paine	law
+30	SAN BERNARDO	San Bernardo	law
+31	ALHUE	Alhué	law
+31	CURACAVI	Curacaví	law
+31	EL MONTE	El Monte	law
+31	ISLA DE MAIPO	Isla de Maipo	law
+31	MARIA PINTO	María Pinto	law
+31	MELIPILLA	Melipilla	law
+31	PADRE HURTADO	Padre Hurtado	results
+31	PENAFLOR	Peñaflor	law
+31	SAN PEDRO	San Pedro	law
+31	TALAGANTE	Talagante	law
+32	RANCAGUA	Rancagua	law
+33	CODEGUA	Codegua	law
+33	COINCO	Coinco	law
+33	COLTAUCO	Coltauco	law
+33	DONIHUE	Doñihue	law
+33	GRANEROS	Graneros	law
+33	MACHALI	Machalí	law
+33	MALLOA	Malloa	law
+33	MOSTAZAL	Mostazal	law
+33	OLIVAR	Olivar	law
+33	QUINTA DE TILCOCO	Quinta de Tilcoco	law
+33	RENGO	Rengo	law
+33	REQUINOA	Requínoa	law
+34	CHIMBARONGO	Chimbarongo	law
+34	LAS CABRAS	Las Cabras	law
+34	PEUMO	Peumo	law
+34	PICHIDEGUA	Pichidegua	law
+34	SAN FERNANDO	San Fernando	law
+34	SAN VICENTE	San Vicente	law
+35	CHEPICA	Chépica	law
+35	LA ESTRELLA	La Estrella	law
+35	LITUECHE	Litueche	law
+35	LOLOL	Lolol	law
+35	MARCHIHUE	Marchigüe	law
+35	NANCAGUA	Nancagua	law
+35	NAVIDAD	Navidad	law
+35	PALMILLA	Palmilla	law
+35	PAREDONES	Paredones	law
+35	PERALILLO	Peralillo	law
+35	PICHILEMU	Pichilemu	law
+35	PLACILLA	Placilla	law
+35	PUMANQUE	Pumanque	law
+35	SANTA CRUZ	Santa Cruz	law
+36	CURICO	Curicó	law
+36	HUALANE	Hualañé	law
+36	LICANTEN	Licantén	law
+36	MOLINA	Molina	law
+36	RAUCO	Rauco	law
+36	ROMERAL	Romeral	law
+36	SAGRADA FAMILIA	Sagrada Familia	law
+36	TENO	Teno	law
+36	VICHUQUEN	Vichuquén	law
+37	TALCA	Talca	law
+38	CONSTITUCION	Constitución	law
+38	CUREPTO	Curepto	law
+38	EMPEDRADO	Empedrado	law
+38	MAULE	Maule	law
+38	PELARCO	Pelarco	law
+38	PENCAHUE	Pencahue	law
+38	RIO CLARO	Río Claro	law
+38	SAN CLEMENTE	San Clemente	law
+38	SAN RAFAEL	San Rafael	results
+39	COLBUN	Colbún	law
+39	LINARES	Linares	law
+39	SAN JAVIER	San Javier	law
+39	VILLA ALEGRE	Villa Alegre	law
+39	YERBAS BUENAS	Yerbas Buenas	law
+40	CAUQUENES	Cauquenes	law
+40	CHANCO	Chanco	law
+40	LONGAVI	Longaví	law
+40	PARRAL	Parral	law
+40	PELLUHUE	Pelluhue	law
+40	RETIRO	Retiro	law
+41	CHILLAN	Chillán	law
+41	CHILLAN VIEJO	Chillán Viejo	results
+41	COIHUECO	Coihueco	law
+41	EL CARMEN	El Carmen	law
+41	PEMUCO	Pemuco	law
+41	PINTO	Pinto	law
+41	SAN IGNACIO	San Ignacio	law
+41	YUNGAY	Yungay	law
+42	BULNES	Bulnes	law
+42	CABRERO	Cabrero	law
+42	COBQUECURA	Cobquecura	law
+42	COELEMU	Coelemu	law
+42	NINHUE	Ninhue	law
+42	NIQUEN	Ñiquén	law
+42	PORTEZUELO	Portezuelo	law
+42	QUILLON	Quillón	law
+42	QUIRIHUE	Quirihue	law
+42	RANQUIL	Ranquil	law
+42	SAN CARLOS	San Carlos	law
+42	SAN FABIAN	San Fabián	law
+42	SAN NICOLAS	San Nicolás	law
+42	TREGUACO	Treguaco	law
+42	YUMBEL	Yumbel	law
+43	HUALPEN	Hualpén	results
+43	TALCAHUANO	Talcahuano	law
+44	CHIGUAYANTE	Chiguayante	results
+44	CONCEPCION	Concepción	law
+44	SAN PEDRO DE LA PAZ	San Pedro de la Paz	results
+45	CORONEL	Coronel	law
+45	FLORIDA	Florida	law
+45	HUALQUI	Hualqui	law
+45	PENCO	Penco	law
+45	SANTA JUANA	Santa Juana	law
+45	TOME	Tomé	law
+46	ARAUCO	Arauco	law
+46	CANETE	Cañete	law
+46	CONTULMO	Contulmo	law
+46	CURANILAHUE	Curanilahue	law
+46	LEBU	Lebu	law
+46	LOS ALAMOS	Los Alamos	law
+46	LOTA	Lota	law
+46	TIRUA	Tirúa	law
+47	ALTO BIOBIO	Alto Biobío	results
+47	ANTUCO	Antuco	law
+47	LAJA	Laja	law
+47	LOS ANGELES	Los Angeles	law
+47	MULCHEN	Mulchén	law
+47	NACIMIENTO	Nacimiento	law
+47	NEGRETE	Negrete	law
+47	QUILACO	Quilaco	law
+47	QUILLECO	Quilleco	law
+47	SAN ROSENDO	San Rosendo	law
+47	SANTA BARBARA	Santa Bárbara	law
+47	TUCAPEL	Tucapel	law
+48	ANGOL	Angol	law
+48	COLLIPULLI	Collipulli	law
+48	ERCILLA	Ercilla	law
+48	LOS SAUCES	Los Sauces	law
+48	LUMACO	Lumaco	law
+48	PUREN	Purén	law
+48	RENAICO	Renaico	law
+48	TRAIGUEN	Traiguén	law
+49	CURACAUTIN	Curacautín	law
+49	GALVARINO	Galvarino	law
+49	LAUTARO	Lautaro	law
+49	LONQUIMAY	Lonquimay	law
+49	MELIPEUCO	Melipeuco	law
+49	PERQUENCO	Perquenco	law
+49	VICTORIA	Victoria	law
+49	VILCUN	Vilcún	law
+50	PADRE LAS CASAS	Padre Las Casas	results
+50	TEMUCO	Temuco	law
+51	CARAHUE	Carahue	law
+51	CHOLCHOL	Cholchol	results
+51	FREIRE	Freire	law
+51	NUEVA IMPERIAL	Nueva Imperial	law
+51	PITRUFQUEN	Pitrufquén	law
+51	SAAVEDRA	Saavedra	law
+51	TEODORO SCHMIDT	Teodoro Schmidt	law
+52	CUNCO	Cunco	law
+52	CURARREHUE	Curarrehue	law
+52	GORBEA	Gorbea	law
+52	LONCOCHE	Loncoche	law
+52	PUCON	Pucón	law
+52	TOLTEN	Toltén	law
+52	VILLARRICA	Villarrica	law
+53	CORRAL	Corral	law
+53	LANCO	Lanco	law
+53	MAFIL	Máfil	law
+53	MARIQUINA	Mariquina	law
+53	VALDIVIA	Valdivia	law
+54	FUTRONO	Futrono	law
+54	LA UNION	La Unión	law
+54	LAGO RANCO	Lago Ranco	law
+54	LOS LAGOS	Los Lagos	law
+54	PAILLACO	Paillaco	law
+54	PANGUIPULLI	Panguipulli	law
+54	RIO BUENO	Río Bueno	law
+55	OSORNO	Osorno	law
+55	SAN JUAN DE LA COSTA	San Juan de la Costa	law
+55	SAN PABLO	San Pablo	law
+56	FRESIA	Fresia	law
+56	FRUTILLAR	Frutillar	law
+56	LLANQUIHUE	Llanquihue	law
+56	LOS MUERMOS	Los Muermos	law
+56	PUERTO OCTAY	Puerto Octay	law
+56	PUERTO VARAS	Puerto Varas	law
+56	PURRANQUE	Purranque	law
+56	PUYEHUE	Puyehue	law
+56	RIO NEGRO	Río Negro	law
+57	CALBUCO	Calbuco	law
+57	COCHAMO	Cochamó	law
+57	MAULLIN	Maullín	law
+57	PUERTO MONTT	Puerto Montt	law
+58	ANCUD	Ancud	law
+58	CASTRO	Castro	law
+58	CHAITEN	Chaitén	law
+58	CHONCHI	Chonchi	law
+58	CURACO DE VELEZ	Curaco de Vélez	law
+58	DALCAHUE	Dalcahue	law
+58	FUTALEUFU	Futaleufú	law
+58	HUALAIHUE	Hualaihué	law
+58	PALENA	Palena	law
+58	PUQUELDON	Puqueldón	law
+58	QUEILEN	Queilén	law
+58	QUELLON	Quellón	law
+58	QUEMCHI	Quemchi	law
+58	QUINCHAO	Quinchao	law
+59	AYSEN	Aisén	law
+59	CHILE CHICO	Chile Chico	law
+59	CISNES	Cisnes	law
+59	COCHRANE	Cochrane	law
+59	COYHAIQUE	Coihaique	law
+59	GUAITECAS	Guaitecas	law
+59	LAGO VERDE	Lago Verde	law
+59	O HIGGINS	O’Higgins	law
+59	RIO IBANEZ	Río Ibáñez	law
+59	TORTEL	Tortel	law
+60	ANTARTICA	La Antártica	law
+60	CABO DE HORNOS	Navarino	law
+60	LAGUNA BLANCA	Laguna Blanca	law
+60	NATALES	Natales	law
+60	PORVENIR	Porvenir	law
+60	PRIMAVERA	Primavera	law
+60	PUNTA ARENAS	Punta Arenas	law
+60	RIO VERDE	Río Verde	law
+60	SAN GREGORIO	San Gregorio	law
+60	TIMAUKEL	Timaukel	law
+60	TORRES DEL PAINE	Torres del Paine	law
