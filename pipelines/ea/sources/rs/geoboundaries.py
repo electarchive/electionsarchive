@@ -9,10 +9,13 @@ Gračanica, Kamenica with Ranilug, Vitina with Kllokot, Gnjilane with Partesh, D
 i Elezit. The five Kosovo districts are the unions of their municipalities; the others are the layer's districts.
 
 The layer draws no outline for Belgrade's 17 city municipalities, for the five city municipalities of Niš, or for
-Kostolac, Sevojno, and Vranjska Banja; they stay without a shape. Six Kosovo municipalities that the gazetteer took
-from the 1997 tables (Podujevo, Glogovac, Kačanik, Štimlje, Dečani, and Đakovica) count toward their districts'
+Kostolac, Sevojno, and Vranjska Banja; they stay without a shape. Seven Kosovo municipalities that the gazetteer took
+from the 1997 tables (Podujevo, Glogovac, Kačanik, Štimlje, Dečani, Đakovica, and Suva Reka) count toward their districts'
 outlines but get none of their own until the gazetteer that holds them is loaded. Novi Sad appears in the gazetteer twice, as
 "Novi Sad-grad" and as "Grad Novi Sad", and both take the city's outline.
+
+`rs.lokalni/geo` already holds an outline, from the same release, for each municipality of Serbia proper that its
+list pairs with the layer; an area has one outline for a span of time, so this package draws none for those.
 """
 
 import json
@@ -25,7 +28,7 @@ import shapely.geometry
 
 from ea import package, raw
 from ea.package import Package
-from ea.sources.rs import rik
+from ea.sources.rs import lokalni, rik
 
 SOURCE = "rs.geoboundaries"
 GEO = f"{SOURCE}/geo"
@@ -218,7 +221,7 @@ def geo() -> Package:
         SOURCE,
         "Outlines of Serbia's municipalities and administrative districts, and of the municipalities and districts "
         "of Kosovo under the Serbian plan, from geoBoundaries (OpenStreetMap boundaries of 2017)",
-        depends=[f"{rik.SOURCE}/geo"],
+        depends=[f"{rik.SOURCE}/geo", f"{lokalni.SOURCE}/geo"],
     )
     sources = {
         "srb": p.id("source", "gbopen-srb"),
@@ -268,6 +271,8 @@ def geo() -> Package:
     srb2, srb1, xkx2 = _layer("srb2"), _layer("srb1"), _layer("xkx2")
     by_name = {_key(label): label for label in srb2}
     okruzi, opstine, names = rik.gazetteer()
+    held = set(lokalni.shapes())
+    p.uses(raw.cached(lokalni.GEOBOUNDARIES, lokalni.GEO_URL))
     members: dict[str, list[shapely.Geometry]] = {}
     drawn: set[str] = set()
     for code, (okrug, _) in sorted(opstine.items()):
@@ -287,6 +292,8 @@ def geo() -> Package:
             shape = srb2[label]
             source = sources["srb"]
             drawn.add(label)
+            if code in held:
+                continue
         id = rik.area(OPSTINA, code)
         p.external.add(id)
         _outline(p, id, shape, source)
