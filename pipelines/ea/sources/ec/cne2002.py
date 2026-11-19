@@ -263,6 +263,9 @@ class Builder:
         return contest
 
     def result_set(self, contest: str, token: str) -> str:
+        return self.counted(contest, token, 1.0, METHOD)
+
+    def counted(self, contest: str, token: str, completeness: float, method: str) -> str:
         result_set = key("result_set", self.day, token)
         self.p.add(
             "result_set",
@@ -274,10 +277,15 @@ class Builder:
             source_id=CNE_SOURCE,
             status="active",
             is_default=True,
-            completeness=1.0,
+            completeness=completeness,
         )
         self.p.add(
-            "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en"
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=method,
+            lang="en",
         )
         return result_set
 
@@ -519,6 +527,94 @@ def prefects(b: Builder) -> None:
         raise ValueError(f"2004: prefect tables for {len(seen)} provinces")
 
 
+MAYOR_METHOD = (
+    "Counted by the Supreme Electoral Tribunal and published by the National Electoral Council in its 2002-2007 "
+    "electoral atlas, which prints for each canton only the elected mayor, the winner's votes, and the winner's share "
+    "of the valid votes. The other candidates' votes and the canton's blank and null ballots are not published there, "
+    "so none is stored; the set's completeness is the winner's share. Cantons are the areas of the later boundary "
+    "files, which differ slightly from the 2004 limits where parishes have moved."
+)
+# the atlas's spellings that the Council's later canton names do not match, by their codes
+CANTON_ALIAS = {"STA.ISABEL": "285", "OLMEDO/PUCA": "970", "JOYA DE LOS SAGCHAS": "725"}
+
+
+def mayors(b: Builder) -> None:
+    """One contest per canton, holding only the elected mayor, as far as the atlas prints."""
+    p = b.p
+    _, cantons, _ = cne.places((cne.LOCAL_2019,))
+    index: dict[str, list[str]] = {}
+    for code, (name, _province) in cantons.items():
+        index.setdefault(book_norm(name), []).append(code)
+    shared = {name for name, codes in index.items() if len(codes) > 1}
+    seen: set[str] = set()
+    for mayor in atlas2002.mayors():
+        if mayor.canton in CANTON_ALIAS:
+            code = CANTON_ALIAS[mayor.canton]
+        else:
+            found = index[book_norm(mayor.canton)]
+            if len(found) > 1:
+                found = [c for c in found if cantons[c][1] == CODES[mayor.province]]
+            if len(found) != 1:
+                raise ValueError(f"2004 mayor of {mayor.canton}, {mayor.province}: {found}")
+            code = found[0]
+        if code in seen:
+            raise ValueError(f"2004: two mayors for canton {code}")
+        seen.add(code)
+        place = cne.title(cantons[code][0])
+        token = f"mayor/{code}"
+        contest = b.contest(
+            token,
+            f"{place} mayor, 2004",
+            f"Alcalde de {place} 2004",
+            f"{cne.slug(place)}-{cne.slug(mayor.province) + '-' if book_norm(place) in shared else ''}mayor",
+            "office",
+            office_id=cne.MAYORALTY,
+            magnitude=1,
+            electoral_system_id=cne.SYSTEM_PLURALITY,
+            district_area_id=area("ec.canton", code),
+        )
+        share = float(mayor.share.removesuffix("%").replace(",", "."))
+        result_set = b.counted(contest, token, round(share / 100, 3), MAYOR_METHOD)
+        unit = key("unit", b.day, "canton", code)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=ECUADOR,
+            scheme_code="ec.canton",
+            code=f"{b.day}:canton:{code}",
+            area_relation="equals",
+            area_id=area("ec.canton", code),
+            kind="standard",
+        )
+        p.name(unit, place, "es", "official")
+        name = cne.title(mayor.name)
+        option = key("option", b.day, token, mayor.number, mayor.name)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="candidate",
+            ballot_position=1,
+            ballot_label=f"{name} ({mayor.sigla}, list {mayor.number})",
+        )
+        person = key("person", b.day, token, mayor.name)
+        p.add("person", id=person)
+        p.name(person, name, "es", "official")
+        p.add(
+            "candidacy",
+            id=key("candidacy", b.day, token, mayor.number, mayor.name),
+            person_id=person,
+            option_id=option,
+            role="head",
+            ballot_name=name,
+        )
+        cne._put(p, result_set, unit, option, VOTES, mayor.votes)
+        p.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+        p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=mayor.votes)
+    if len(seen) != 219:
+        raise ValueError(f"2004: mayors of {len(seen)} cantons")
+
+
 def andean(b: Builder, year: int) -> None:
     table = atlas2002.andean(ANDEAN_PAGE[year])
     lists(
@@ -571,7 +667,7 @@ def build(day: str) -> Package:
             *([f"{SOURCE}/{first}"] if kind == "runoff" else []),
         ],
     )
-    p.external.update([ECUADOR, COUNTRY, "world.country", "ec.provincia"])
+    p.external.update([ECUADOR, COUNTRY, "world.country", "ec.provincia", "ec.canton"])
     p.uses(cne.artifact(atlas2002.ATLAS))
     base = f"ec/{day}-{tail}"
     b = Builder(p, day, base)
@@ -589,5 +685,6 @@ def build(day: str) -> Package:
         councillors(b, year)
     else:
         prefects(b)
+        mayors(b)
         councillors(b, year)
     return p
