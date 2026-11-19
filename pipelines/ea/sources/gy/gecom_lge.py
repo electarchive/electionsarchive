@@ -88,7 +88,7 @@ def fetch() -> None:
 NUMBER = re.compile(r"(\d[\d,]*)\s*$")
 UNOPPOSED = re.compile(r"unopposed|no contest|uncontested", re.IGNORECASE)
 HEADER = re.compile(r"^\s*constituen\w*\s*(?:no\.?|number|#)?\s*(\d+)\b[\s:.\-–]*(.*)$", re.IGNORECASE)
-NOISE = re.compile(r"^(page \d+ of \d+|created in photo|returning officer|signature|dated?\b)", re.IGNORECASE)
+NOISE = re.compile(r"^(page \d+ of\s*\d+|created in photo|returning officer|signature|dated?\b)", re.IGNORECASE)
 
 
 class Candidate(NamedTuple):
@@ -110,7 +110,25 @@ class Form(NamedTuple):
 COLUMNED = re.compile(r"^(.*?\S)\s{2,}([A-Za-z][A-Za-z./]{1,9})\s{2,}(\S.*)$")
 
 
+BROKEN_HEADER = re.compile(
+    r"^\s*C\s?O\s?N?\s?S\s?T\s?I\s?T\s?U\s?E[\s,]*N?\s?C\s?Y\s*#?\s*([0-9IlO|]+)(?:\s([0-9IlO|]))?(?=\s|$)(.*)$"
+)
+
+
+def numeral(text: str) -> str:
+    """Digits as the text layer misreads them in a constituency number: I, l, and | for 1, and O for 0."""
+    return text.translate(str.maketrans("IlO|", "1101"))
+
+
 def clean(line: str) -> str:
+    header = BROKEN_HEADER.match(line)
+    if header:
+        first, second, rest = header.group(1), header.group(2), header.group(3)
+        if second and len(first) == 1:
+            first += second  # "#I 0" is constituency 10
+        elif second:
+            rest = f" {second}{rest}"
+        line = f"CONSTITUENCY #{numeral(first)} {rest.strip()}"
     columned = COLUMNED.match(line)
     if columned and not re.search(r"\d", columned.group(2)) and not UNOPPOSED.search(line[: columned.start(3)]):
         line = f"{columned.group(1)} ({columned.group(2)}) {columned.group(3)}"  # name, party, and votes in columns
@@ -192,6 +210,11 @@ def same_person(a: str, b: str) -> bool:
         return True
     if sorted("".join(x)) == sorted("".join(y)):
         return True  # the same letters, where a space was lost or added between two names
+    if len(x) > 1 and len(y) > 1:
+        # A letter or two misread, with the names in the same order.
+        first, second = (re.sub(r"[^A-Z]", "", re.sub(r"\([^)]*\)", " ", n.upper())) for n in (a, b))
+        if difflib.SequenceMatcher(None, first, second).ratio() >= 0.9:
+            return True
     return difflib.SequenceMatcher(None, " ".join(x), " ".join(y)).ratio() >= 0.85
 
 
@@ -364,6 +387,9 @@ def parse_form(text: str) -> Form:
                 votes = int(entries[index + 1].replace(",", ""))
                 index += 1
             index += 1
+            unreadable = votes is not None and re.search(r"\)\s*\S*\d", name) is not None
+            if unreadable:
+                name, votes = name[: name.rindex(")") + 1], None  # a figure with a letter among its digits
             opposed = UNOPPOSED.search(name) is not None
             name = re.sub(r"\b(unopposed|no contest|uncontested)\b( list)?", "", name, flags=re.IGNORECASE).strip(
                 " :-–"
@@ -372,7 +398,20 @@ def parse_form(text: str) -> Form:
                 r"(no\.? of|names? of|the following)", name, re.IGNORECASE
             ):
                 continue
-            if votes is None and not opposed and candidates and candidates[-1].votes is not None:
+            printed = re.match(r"\(([^()]+)\)\s+(\S.*)$", name)
+            if printed and candidates and candidates[-1].party is None:
+                # The columns shift: a candidate's party is printed ahead of the next candidate's name.
+                candidates[-1] = candidates[-1]._replace(party=printed.group(1).strip())
+                name = printed.group(2)
+            whole = re.fullmatch(r"(?:\S+\s+){2,}\S*\([^()]+\)", name) is not None
+            if (
+                votes is None
+                and not opposed
+                and not unreadable
+                and not (whole and candidates and candidates[-1].party)
+                and candidates
+                and candidates[-1].votes is not None
+            ):
                 last = candidates[-1]  # a party or group name wrapped onto a second line
                 who, label = split_candidate(f"{last.name} {name}" if last.party is None else name)
                 candidates[-1] = Candidate(who, label or last.party, last.votes)
@@ -937,6 +976,11 @@ def party_names() -> dict[str, str]:
     return found
 
 
+# Council bodies that packages already loaded refer to, under slugs that the areas no longer produce because the same
+# area is now named alike across the election days; they stay in the registry so that those contests keep their body.
+LEGACY_COUNCILS = {"adventure-bushlot": "Adventure Bushlot"}
+
+
 def council_name(slug: str, name: str) -> str:
     return f"Municipality of {name}" if slug in MUNICIPALITIES else f"{name} Neighbourhood Democratic Council"
 
@@ -963,6 +1007,8 @@ def registry() -> Package:
     seen: dict[str, str] = {}
     for area in kinds():
         seen.setdefault(area.slug, area.name)
+    for slug, name in LEGACY_COUNCILS.items():
+        seen.setdefault(slug, name)
     for slug, name in sorted(seen.items()):
         p.add("body", id=council(slug), polity_id=COUNTRY, kind="council")
         p.name(council(slug), council_name(slug, name), "en", "official")
