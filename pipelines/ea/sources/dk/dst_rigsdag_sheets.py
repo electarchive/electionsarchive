@@ -229,8 +229,135 @@ def single_problems(found: list[Constituency]) -> list[str]:
     return problems
 
 
+@dataclass
+class District:
+    """One polling district of the capital's list election, with its turnout and each list's votes."""
+
+    page: int
+    number: str
+    name: str
+    inhabitants: int
+    stations: int
+    registered: int
+    valid: int
+    invalid: int
+    cast: int
+    votes: list[int]
+
+
+@dataclass
+class CapitalBlock:
+    page: int
+    name: str
+    districts: list[District] = field(default_factory=list)
+    subtotal: District | None = None
+
+
+@dataclass
+class Capital:
+    """A list election in the capital: lists (letter, name, seats won), blocks of districts, and the printed total."""
+
+    lists: list[tuple[str, str, int]] = field(default_factory=list)
+    blocks: list[CapitalBlock] = field(default_factory=list)
+    total: District | None = None
+
+
+def capital(path: Path) -> Capital:
+    """Read a capital list-election transcription (records: list, block, row, subtotal, total)."""
+    found = Capital()
+    for count, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip() or line.startswith("#"):
+            continue
+        parts = line.split("\t")
+        kind, page = parts[0], int(parts[1])
+        if kind == "list":
+            found.lists.append((parts[2], parts[3], int(parts[4])))
+        elif kind == "block":
+            found.blocks.append(CapitalBlock(page, parts[2]))
+        elif kind in ("row", "subtotal", "total"):
+            numbers = [int(x) for x in parts[4:]]
+            if len(numbers) != 6 + len(found.lists):
+                raise ValueError(f"{path.name}:{count}: {len(numbers)} figures")
+            row = District(page, parts[2], parts[3], *numbers[:6], numbers[6:])
+            if kind == "row":
+                found.blocks[-1].districts.append(row)
+            elif kind == "subtotal":
+                found.blocks[-1].subtotal = row
+            else:
+                found.total = row
+        else:
+            raise ValueError(f"{path.name}:{count}: unknown record {kind!r}")
+    return found
+
+
+def figures(d: District) -> list[int]:
+    return [d.inhabitants, d.stations, d.registered, d.valid, d.invalid, d.cast, *d.votes]
+
+
+def capital_problems(c: Capital) -> list[str]:
+    found: list[str] = []
+    every = [d for b in c.blocks for d in [*b.districts, *([b.subtotal] if b.subtotal else [])]]
+    for d in [*every, *([c.total] if c.total else [])]:
+        if sum(d.votes) != d.valid:
+            found.append(f"p{d.page} {d.name}: lists add to {sum(d.votes)}, valid {d.valid}")
+        if d.valid + d.invalid != d.cast:
+            found.append(f"p{d.page} {d.name}: valid and invalid add to {d.valid + d.invalid}, cast {d.cast}")
+    for b in c.blocks:
+        if b.subtotal is not None:
+            mine = [sum(x) for x in zip(*(figures(d) for d in b.districts), strict=True)]
+            for k, (a, p) in enumerate(zip(mine, figures(b.subtotal), strict=True)):
+                if a != p:
+                    found.append(f"p{b.page} block {b.name}: figure {k} adds to {a}, printed {p}")
+    if c.total is not None:
+        whole = [sum(x) for x in zip(*(figures(b.subtotal) for b in c.blocks if b.subtotal), strict=True)]
+        for k, (a, p) in enumerate(zip(whole, figures(c.total), strict=True)):
+            if a != p:
+                found.append(f"total: figure {k} adds to {a}, printed {p}")
+    return found
+
+
+@dataclass
+class Turnout:
+    """One nomination district's registered voters, ballots cast, and invalid ballots from the turnout table."""
+
+    page: int
+    storkreds: str
+    number: str
+    name: str
+    stations: int
+    inhabitants: int
+    registered: int
+    voted: int
+    invalid: int
+
+
+def turnout(path: Path) -> list[Turnout]:
+    """Read a turnout transcription (records: kreds, total)."""
+    found: list[Turnout] = []
+    for count, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip() or line.startswith("#"):
+            continue
+        parts = line.split("\t")
+        if parts[0] == "kreds":
+            if len(parts) != 10:
+                raise ValueError(f"{path.name}:{count}: kreds needs 10 fields, has {len(parts)}")
+            found.append(Turnout(int(parts[1]), parts[2], parts[3], parts[4], *(int(x) for x in parts[5:])))
+        elif parts[0] != "total":
+            raise ValueError(f"{path.name}:{count}: unknown record {parts[0]!r}")
+    return found
+
+
 if __name__ == "__main__":
     for name in sys.argv[1:]:
+        if Path(name).name.startswith("cph-"):
+            cap = capital(Path(name))
+            print(f"{name}: {len(cap.blocks)} blocks, {sum(len(b.districts) for b in cap.blocks)} districts")
+            for text in capital_problems(cap):
+                print("  " + text)
+            continue
+        if Path(name).name.startswith("tab-"):
+            print(f"{name}: {len(turnout(Path(name)))} nomination districts")
+            continue
         if Path(name).name.startswith("sm-"):
             found = constituencies(Path(name))
             general = sum(1 for c in found if c.kind == "general")

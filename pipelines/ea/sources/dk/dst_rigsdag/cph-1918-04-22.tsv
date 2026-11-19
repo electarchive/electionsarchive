@@ -1,0 +1,35 @@
+# Folketingsvalget den 22. April 1918 i Københavns og Frederiksbergs Kommuner (Statistiske Meddelelser, 4. Række, 57. Bind, 1. Hefte); Tabel 1, pages 52-53 (turnout columns on page 52, votes by list on page 53; seats from the elected lists on pages 52-54)
+# Each row: number, name, inhabitants 1916, polling-district count, registered voters, valid ballots, invalid or blank ballots, ballots cast, then the votes of lists A to I; the last list column set is followed by nothing (valid ballots are the sum of the lists)
+# Liste F was in a list alliance (Listeforbund, Valglovens § 28); Liste A and B, and D and F, shared surplus votes as printed in the table note
+list	53	A	Det socialdemokratiske Parti	12
+list	53	B	Det radikale Venstre	5
+list	53	C	Det konservative Folkeparti	6
+list	53	D	Vælgerforeningen af 1918	0
+list	53	E	Erhvervslisten	1
+list	53	F	Venstre	0
+list	53	G	Socialistisk Arbejderparti	0
+list	53	H	Det ny Højre	0
+list	53	I	Det uafhængige Socialdemokrati	0
+block	52	Staden København
+row	52	1	Vesterbro-Kredsen	31839	1	13311	9807	36	9843	4981	1844	1811	139	705	122	65	94	46
+row	52	2	Kristianshavns-Kredsen	42277	2	17487	13429	46	13475	6559	3056	2411	204	695	167	98	167	72
+row	52	3	Raadhus-Kredsen	30976	1	13772	10133	50	10183	2736	2446	3405	197	798	187	45	269	50
+row	52	4	Ravnsborg-Kredsen	30970	1	13000	9870	36	9906	4837	1870	1886	292	581	120	89	140	55
+row	52	5	Blaagaards-Kredsen	31020	1	12765	9561	51	9612	5664	1333	1366	152	620	100	125	134	67
+row	52	6	Østbane-Kredsen	30395	1	15526	11697	63	11760	2265	2972	4740	397	595	267	30	380	51
+row	52	7	Rosenborg-Kredsen	34154	1	12964	9201	51	9252	3127	1859	2680	228	843	159	39	212	54
+row	52	8	Havne-Kredsen	31700	1	12894	9712	44	9756	3541	2093	2964	112	548	150	44	237	23
+row	52	9	Sundby-Kredsen	36398	2	15064	12350	30	12380	7780	1985	1444	179	579	125	105	87	66
+row	52	10	Østerbro-Kredsen	33467	1	15568	12250	43	12293	5688	2656	2626	263	579	133	68	161	76
+row	52	11	Nørrebro-Kredsen	31995	1	13704	10596	92	10688	7248	1403	974	125	506	66	129	59	86
+row	52	12	Bispeeng-Kredsen	34947	3	15091	12223	21	12244	7731	1960	1198	235	708	109	120	89	73
+row	52	13	Enghave-Kredsen	32259	1	13800	10656	20	10676	6511	1964	1025	154	654	94	85	79	90
+row	52	14	Valby-Kredsen	36728	2	16207	12963	39	13002	7533	2235	1774	295	688	140	85	125	88
+row	52	15	Bispebjerg-Kredsen	37265	2	16144	12939	41	12980	7583	2137	1816	315	745	123	94	74	52
+subtotal	52		Tilsammen	506390	21	217297	167387	663	168050	83784	31813	32120	3287	9844	2062	1221	2307	949
+block	52	Frederiksberg Kommune
+row	52	1	Gl. Kongevej-Kredsen	32590	1	18574	13344	80	13424	1752	2880	6854	366	701	246	42	462	41
+row	52	2	Slots-Kredsen	34852	1	17586	13250	78	13328	6719	2202	2765	404	645	164	80	224	47
+row	52	3	Falkonér-Kredsen	31940	2	16623	12721	49	12770	4113	2787	4065	350	744	217	67	329	49
+subtotal	52		Tilsammen	99382	4	52783	39315	207	39522	12584	7869	13684	1120	2090	627	189	1015	137
+total	52		Ialt Hovedstaden	605772	25	270080	206702	870	207572	96368	39682	45804	4407	11934	2689	1410	3322	1086
