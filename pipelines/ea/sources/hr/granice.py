@@ -197,7 +197,8 @@ def geo() -> Package:
         SOURCE,
         "Boundaries of Croatia's 556 towns and municipalities from the State Geodetic Administration's 2021 statistical "
         "units, the 21 counties as their unions, and the seven electoral districts made of whole municipalities",
-        depends=[f"{izbori.SOURCE}/geo"],
+        # hr.lokalni/geo ends its geoBoundaries shapes of the same towns and counties where these begin.
+        depends=[f"{izbori.SOURCE}/geo", "hr.lokalni/geo"],
     )
     p.add(
         "source",
