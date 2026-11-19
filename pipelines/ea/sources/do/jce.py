@@ -568,6 +568,8 @@ def fetch() -> None:
             raw.fetch(SOURCE, WINNERS[d.key], suffix=".xlsx")
     for url in LISTS_2020:
         raw.fetch(SOURCE, url, suffix=".pdf")
+    for url in ELECTED_FILES_2020:
+        raw.fetch(SOURCE, url, suffix=".xlsx")
     from ea.sources.do import jce_parlacen
 
     jce_parlacen.fetch()
@@ -811,6 +813,9 @@ COUNCIL_TABLE = entry(16974)
 VOCALES_TABLE = entry(16973)
 SEATS_TABLE = entry(16970)
 LISTS_2020 = (COUNCIL_TABLE, VOCALES_TABLE, SEATS_TABLE)
+ELECTED_2020 = entry(16975)
+SUBSTITUTES_2020 = entry(17351)
+ELECTED_FILES_2020 = (ELECTED_2020, SUBSTITUTES_2020)
 ALLIED = re.compile(r"\s+Y\s+ALIADOS$")
 CANDIDATE_LINE = re.compile(
     r"^(?P<indent> *)(?P<number>\d\d)\s+(?P<name>[A-Z][A-Z. ]*?)\s{2,}(?P<votes>\d[\d,]*(?:\s+\d[\d,]*)*)\s*$"
@@ -2379,6 +2384,137 @@ def winners(d: Day) -> tuple[list[Winner], Counter[str]]:
     return out, left
 
 
+class LocalWinner(NamedTuple):
+    contest: str
+    party: str
+    own_party: str | None
+    name: str
+    role: str
+    sex: str | None
+    position: int | None
+    cargo: str
+
+
+LOCAL_CARGOS = {
+    "ALCALDE(SA)": "head",
+    "DIRECTOR(A)": "head",
+    "VICEALCALDE": "running_mate",
+    "SUBDIRECTOR": "running_mate",
+    "REGIDOR": "list_member",
+    "VOCAL": "list_member",
+    "SUPLENTE REGIDOR(A)": "substitute",
+}
+ELECTED_SHEETS = (
+    (ELECTED_2020, ("Todas",)),
+    (SUBSTITUTES_2020, ("VICEALCALDE y SUBDIRECTOR", "SUPLENTES REGIDORES")),
+)
+
+
+UNLISTED_NAMES = {
+    "PARTIDO MOVIMIENTO DEMOCRATICO ALTERNATIVO": "MODA",
+    "MOVIMIENTO INDEPENDIENTE UNIDAD Y PROGRESO": "MIUP",
+}
+"""Parties the elected files spell out whose full name no national summary prints."""
+
+
+@functools.cache
+def _spelled() -> dict[str, str]:
+    return {fold(name): code for code, name in party_names().items()} | UNLISTED_NAMES
+
+
+def acronym(text: str) -> str:
+    """A party's acronym from the elected files, which spell most parties out in full."""
+    lead = _alliance_lead(text)
+    code = _spelled().get(fold(lead), lead)
+    if code not in used_parties():
+        raise ValueError(f"the elected files name {text!r}, which no results file counts")
+    return code
+
+
+def local_winners(found: list[Contest]) -> tuple[list[LocalWinner], Counter[str]]:
+    """The elected mayors, directors, council members, and district members of 2020, with the vice mayors,
+    subdirectors, and substitute councillors printed beside them, and the rows left out."""
+    keys = {c.key for c in found}
+    out: list[LocalWinner] = []
+    left: Counter[str] = Counter()
+    for url, sheets in ELECTED_SHEETS:
+        book = workbook(url)
+        for sheet in sheets:
+            rows = book.load_sheet_by_name(sheet, dtypes="string", header_row=None).to_polars().rows()
+            header = [(h or "").strip() for h in rows[2]]
+            for values in rows[3:]:
+                if not values[0]:
+                    continue
+                r = {h: (v.strip() if v and v.strip() not in ("", "NULL") else None) for h, v in zip(header, values)}
+                cargo = r["CARGO"]
+                if cargo is None:
+                    left["Substitute slots printed without a candidate"] += 1
+                    continue
+                role = LOCAL_CARGOS[cargo]
+                mun, dm, circ = int(r["MUN"] or 0), int(r["DM"] or 0), int(r["CIRC"] or 0)
+                contest = {
+                    "ALCALDE(SA)": f"mayor:{mun}",
+                    "VICEALCALDE": f"mayor:{mun}",
+                    "DIRECTOR(A)": f"director:{dm}",
+                    "SUBDIRECTOR": f"director:{dm}",
+                    "VOCAL": f"vocales:{dm}",
+                }.get(cargo, f"council:{mun}:{circ}" if circ else f"council:{mun}")
+                if contest not in keys:
+                    left[f"{cargo.title()} of a contest with no results"] += 1
+                    continue
+                own = r["PARTIDO DEL CANDIDATO"]
+                position = r.get("POSICION BOLETA")
+                out.append(
+                    LocalWinner(
+                        contest,
+                        acronym(r["PARTIDO ENCABEZA"] or ""),
+                        acronym(own) if own else None,
+                        r["NOMBRE"] or "",
+                        role,
+                        _sex(r["SEXO"]),
+                        int(position) if position and int(position) else None,
+                        cargo,
+                    )
+                )
+    return out, left
+
+
+def _elected_local(
+    p: Package, c: Contest, result_set: str, options: dict[str, str], found: list[LocalWinner]
+) -> Counter[str]:
+    """Stages the elected of one local contest as people, candidacies, and declared outcomes; the seats a party won
+    on a council are stored once, from the Board's seat table. Returns the council members named for each party."""
+    count: Counter[tuple[str, str]] = Counter()
+    for w in found:
+        if w.party not in options:
+            raise ValueError(f"{DAY_2020} {c.key}: {w.cargo} {w.name} of {w.party} has no option")
+        count[w.party, w.cargo] += 1
+        tag = f"{DAY_2020}:{c.key}:{w.cargo}:{w.party}:{count[w.party, w.cargo]}"
+        person, candidacy = key("person", tag), key("candidacy", tag)
+        p.add("person", id=person, gender=w.sex)
+        p.name(person, title(w.name), "es", "official")
+        p.add(
+            "candidacy",
+            id=candidacy,
+            person_id=person,
+            option_id=options[w.party],
+            role=w.role,
+            list_position=w.position,
+            ballot_name=title(w.name),
+            member_of_party_id=party(w.own_party) if w.own_party else None,
+            is_independent=False,
+        )
+        if c.option_kind == "list" and w.role == "list_member":
+            p.add(
+                "outcome", result_set_id=result_set, option_id=options[w.party], candidacy_id=candidacy, kind="elected"
+            )
+    if c.option_kind == "ticket":
+        # The ticket of a mayor or director wins as a whole, as a presidential ticket does.
+        for code in {w.party for w in found if w.role == "head"}:
+            p.add("outcome", result_set_id=result_set, option_id=options[code], kind="elected", seats=1)
+    return Counter({code: n for (code, cargo), n in count.items() if cargo in ("REGIDOR", "VOCAL")})
+
+
 def _elected(p: Package, d: Day, c: Contest, result_set: str, options: dict[str, str], found: list[Winner]) -> None:
     """Stages the Board's winners of one contest as people, candidacies, and declared outcomes."""
     seats: Counter[str] = Counter()
@@ -2438,6 +2574,10 @@ def election(d: Day) -> Package:
         p.artifact(raw.cached(SOURCE, WINNERS[d.key]), SOURCE_ID)
         for w in winners(d)[0]:
             elected.setdefault(w.contest, []).append(w)
+    local: dict[str, list[LocalWinner]] = {}
+    if d.key == DAY_2020:
+        for url in ELECTED_FILES_2020:
+            p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
     election_id = key("election", d.key)
     p.add(
         "election",
@@ -2453,6 +2593,11 @@ def election(d: Day) -> Package:
     base = f"do/{d.key}-{d.word}"
     p.add("slug", path=base, entity_id=election_id, is_current=True)
     found = contests(d)
+    if d.key == DAY_2020:
+        listed, skipped = local_winners(found)
+        for w in listed:
+            local.setdefault(w.contest, []).append(w)
+        print(f"{d.key}: {len(listed)} elected and substitutes; left out {dict(skipped)}", flush=True)
     _units(p, d, found)
     values: list[pl.DataFrame] = []
     tallies: Counter[str] = Counter()
@@ -2521,6 +2666,10 @@ def election(d: Day) -> Package:
         for code, n in (c.seats or {}).items():
             if n:
                 p.add("outcome", result_set_id=result_set, option_id=options[code], kind="won", seats=n)
+        if c.key in local:
+            named = _elected_local(p, c, result_set, options, local.pop(c.key))
+            if c.seats and {k: v for k, v in c.seats.items() if v} != dict(named):
+                print(f"{d.key} {c.key}: elected {dict(named)} against seats {c.seats}", flush=True)
         frame, tally = _values(c, d, result_set, options)
         values.append(frame)
         tallies["ballots_sum"] += tally.ballots_sum
@@ -2561,6 +2710,8 @@ def election(d: Day) -> Package:
     if d.key in jce_parlacen.DAYS:
         _, parlacen_values = jce_parlacen.add(p, d, election_id, base)
         print(f"{d.key}: PARLACEN contest with {parlacen_values} party totals", flush=True)
+    if local:
+        print(f"{d.key}: left out, elected of contests with no results: {sorted(local)}", flush=True)
     if elected:
         # The 2016 congressional file prints no ballots cast abroad, so those deputies have no contest to join.
         print(f"{d.key}: left out, winners of contests with no results: {sorted(elected)}", flush=True)
