@@ -118,13 +118,13 @@ def main() -> None:
     crowning.add_argument("target", nargs="?", help="rebuild every child of one election, or of a polity's elections")
     crowning.add_argument("--all", action="store_true", help="rebuild every child of every such election")
     packaging = commands.add_parser("package", help="check or bulk-load file-first Parquet packages")
-    packaging.add_argument("action", choices=["check", "ready", "load", "export", "snapshot"])
+    packaging.add_argument("action", choices=["check", "ready", "load", "export", "snapshot", "reference"])
     packaging.add_argument(
         "keys",
         nargs="+",
         help="package keys, such as cz.volby/ps-2021, or cz.volby/ps-2021@v1 to reload a stored version;"
         " for export, pipelines whose changeset-path rows become the package <pipeline>/all;"
-        " for snapshot, the file to write",
+        " for snapshot, the file to write; for reference, the folder to write the reference partitions into",
     )
     packaging.add_argument(
         "--snapshot",

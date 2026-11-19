@@ -1060,6 +1060,147 @@ def _drop(conn: Connection, table: str, staged: dict[str, tuple[str, list[str]]]
     ).rowcount
 
 
+LATER = ("certified", "court_revised", "recount")
+STAGES = ("live", "preliminary", "official", *LATER)
+GRAIN: LiteralString = """coalesce((select u.scheme_code from (select distinct v.unit_k from result_value v
+                                where v.result_set_k = r.k) v join reporting_unit u on u.k = v.unit_k
+                              group by u.scheme_code order by count(*) desc, u.scheme_code limit 1), 'declared')"""
+
+
+def _grains(conn: Connection, path: Path, sets: list[str]) -> dict[str, str]:
+    grains = dict.fromkeys(sets, "declared")
+    values = path / "result_value.parquet"
+    if not values.exists():
+        return grains
+    pairs = (
+        pl.scan_parquet(values)
+        .filter(pl.col("result_set_id").is_in(sets))
+        .select("result_set_id", "unit_id")
+        .unique()
+        .collect()
+    )
+    units = path / "reporting_unit.parquet"
+    schemes = (
+        pl.read_parquet(units, columns=["id", "scheme_code"])
+        if units.exists()
+        else pl.DataFrame(schema={"id": U, "scheme_code": U})
+    )
+    outside = sorted(set(pairs["unit_id"].to_list()) - set(schemes["id"].to_list()))
+    if outside:
+        rows = conn.execute(
+            "select id::text, scheme_code from reporting_unit where id = any(%s::uuid[])", [outside]
+        ).fetchall()
+        schemes = pl.concat([schemes, pl.DataFrame(rows, schema={"id": U, "scheme_code": U}, orient="row")])
+    counted = (
+        pairs.join(schemes, left_on="unit_id", right_on="id")
+        .group_by("result_set_id", "scheme_code")
+        .len()
+        .sort(["result_set_id", "len", "scheme_code"], descending=[False, True, False])
+        .unique("result_set_id", keep="first", maintain_order=True)
+    )
+    for row in counted.iter_rows(named=True):
+        grains[str(row["result_set_id"])] = str(row["scheme_code"])
+    return grains
+
+
+def _demote(conn: Connection, path: Path, pipeline: str, owned: list[str]) -> list[str]:
+    file = path / "result_set.parquet"
+    if not file.exists():
+        return []
+    later = (
+        pl.read_parquet(file, columns=["id", "election_id", "contest_id", "stage", "is_default"])
+        .filter(pl.col("is_default") & pl.col("stage").is_in(LATER) & pl.col("contest_id").is_not_null())
+        .to_dicts()
+    )
+    if not later:
+        return []
+    grains = _grains(conn, path, [str(row["id"]) for row in later])
+    found = conn.execute(
+        f"""select r.id::text, r.election_id::text, r.contest_id::text, r.stage::text, {GRAIN}
+            from result_set r join changeset c on c.id = r.changeset_id
+            where r.is_default and c.pipeline <> %s and r.changeset_id <> all(%s::uuid[])
+              and r.stage::text = any(%s) and (r.election_id, r.contest_id) in (
+                select * from unnest(%s::uuid[], %s::uuid[]))""",
+        [
+            pipeline,
+            owned,
+            list(STAGES),
+            [str(row["election_id"]) for row in later],
+            [str(row["contest_id"]) for row in later],
+        ],
+    ).fetchall()
+    demoted = sorted(
+        {
+            str(id)
+            for id, election, contest, stage, grain in found
+            for row in later
+            if (str(row["election_id"]), str(row["contest_id"])) == (election, contest)
+            and STAGES.index(stage) <= STAGES.index(str(row["stage"]))
+            and grains[str(row["id"])] == grain
+        }
+    )
+    if demoted:
+        conn.execute("update result_set set is_default = false where id = any(%s::uuid[])", [demoted])
+    return demoted
+
+
+def _clashes(conn: Connection, path: Path, pipeline: str) -> list[str]:
+    file = path / "result_set.parquet"
+    if not file.exists():
+        return []
+    defaults = (
+        pl.read_parquet(file, columns=["id", "election_id", "contest_id", "stage", "is_default"])
+        .filter(pl.col("is_default") & pl.col("contest_id").is_not_null())
+        .to_dicts()
+    )
+    if not defaults:
+        return []
+    grains = _grains(conn, path, [str(row["id"]) for row in defaults])
+    held = conn.execute(
+        f"""select r.election_id::text, r.contest_id::text, r.stage::text, {GRAIN}, c.pipeline
+            from result_set r join changeset c on c.id = r.changeset_id
+            where r.is_default and c.pipeline <> %s and (r.election_id, r.contest_id) in (
+              select * from unnest(%s::uuid[], %s::uuid[]))""",
+        [pipeline, [str(row["election_id"]) for row in defaults], [str(row["contest_id"]) for row in defaults]],
+    ).fetchall()
+    clashing = [
+        f"{row['id']} ({row['stage']}, {grains[str(row['id'])]}) against {owner} ({grain})"
+        for row in defaults
+        for election, contest, stage, grain, owner in held
+        if (election, contest, stage) == (str(row["election_id"]), str(row["contest_id"]), str(row["stage"]))
+        and not (stage in LATER and grain == grains[str(row["id"])])
+    ]
+    if not clashing:
+        return []
+    return [
+        (
+            f"ready.default: {len(clashing)} default sets would take the default another pipeline holds for the same"
+            f" contest and stage without being a later official count at its grain; leave them non-default: {clashing[:5]}"
+        )
+    ]
+
+
+def _restore(conn: Connection, key: str, changeset_id: str, demoted: list[str]) -> list[str]:
+    earlier = {
+        str(id)
+        for (ids,) in conn.execute(
+            "select scope->'demoted' from changeset where scope->>'package' = %s and id <> %s", [key, changeset_id]
+        ).fetchall()
+        for id in ids or []
+    }
+    restored: list[str] = []
+    for id in sorted(earlier - set(demoted)):
+        if conn.execute(
+            """update result_set r set is_default = true where r.id = %s and not r.is_default
+                 and not exists (select from result_set o where o.is_default and o.election_id = r.election_id
+                                   and o.contest_id is not distinct from r.contest_id and o.stage = r.stage)
+               returning r.id""",
+            [id],
+        ).fetchone():
+            restored.append(id)
+    return restored
+
+
 def _facts(
     conn: Connection,
     path: Path,
@@ -1145,6 +1286,12 @@ def _facts(
                 sql.SQL("x.changeset_id = any({}::uuid[])").format(sql.Literal(owned)),
             )
             staged[table] = (f"pkg_{table}", columns)
+    demoted = _demote(conn, path, str(manifest["pipeline"]), owned)
+    if demoted:
+        conn.execute(
+            "update changeset set scope = scope || jsonb_build_object('demoted', %s::jsonb) where id = %s",
+            [json.dumps(demoted), changeset_id],
+        )
     moved = [
         str(id)
         for (id,) in conn.execute(
@@ -1278,11 +1425,14 @@ def _facts(
     sizes, changed = _merge(conn, "result_value", files.get("result_value"), mine, counts, referencing)
     _merge(conn, "value_locator", files.get("value_locator"), mine, counts, referencing)
     _refuse_merged(conn, changeset_id, set(files))
+    restored = _restore(conn, key, changeset_id, demoted)
+    if demoted or restored:
+        print(f"{key}: demoted {len(demoted)} default sets of other pipelines, restored {len(restored)}", flush=True)
     current = conn.execute(
         """select k from result_set where id = any(%(sets)s::uuid[]) or contest_id = any(%(contests)s::uuid[])
            or election_id = any(%(elections)s::uuid[])""",
         {
-            "sets": touched_ids.get("result_set", []),
+            "sets": [*touched_ids.get("result_set", []), *demoted, *restored],
             "contests": touched_ids.get("contest", []),
             "elections": touched_ids.get("election", []),
         },
@@ -1597,6 +1747,129 @@ union select area_id from polity_territory
 union select id from area where scheme_code like 'world.%' or scheme_code like 'eu.%'"""
 
 
+PART: LiteralString = "coalesce(nullif(upper(split_part(coalesce(scope->>'polity', ''), '-', 1)), ''), '_')"
+LABEL: LiteralString = "(select n.text from name n where n.entity_id = {}.id order by n.is_preferred desc, n.lang = 'en' desc, n.text limit 1)"
+PUBLISH: dict[str, tuple[LiteralString, dict[str, pl.DataType]]] = {
+    "polity": (
+        f"select t.id::text, t.iso_code, t.kind::text, {LABEL.format('t')}, c.pipeline from polity t",
+        {"id": U, "iso_code": U, "kind": U, "name": U, "pipeline": U},
+    ),
+    "area": (
+        f"select t.id::text, t.scheme_code, {LABEL.format('t')}, c.pipeline from area t",
+        {"id": U, "scheme_code": U, "name": U, "pipeline": U},
+    ),
+    "area_code": (
+        "select t.area_id::text, t.code, t.valid_from, t.valid_to, c.pipeline from area_code t",
+        {"area_id": U, "code": U, "valid_from": D, "valid_to": D, "pipeline": U},
+    ),
+    "body": (
+        f"select t.id::text, t.polity_id::text, t.kind::text, {LABEL.format('t')}, c.pipeline from body t",
+        {"id": U, "polity_id": U, "kind": U, "name": U, "pipeline": U},
+    ),
+    "office": (
+        f"""select t.id::text, t.polity_id::text, t.body_id::text, t.kind::text, {LABEL.format("t")}, c.pipeline
+            from office t""",
+        {"id": U, "polity_id": U, "body_id": U, "kind": U, "name": U, "pipeline": U},
+    ),
+    "party": (
+        f"select t.id::text, t.polity_id::text, t.kind::text, {LABEL.format('t')}, c.pipeline from party t",
+        {"id": U, "polity_id": U, "kind": U, "name": U, "pipeline": U},
+    ),
+    "person": (
+        f"select t.id::text, {LABEL.format('t')}, t.birth_date, c.pipeline from person t",
+        {"id": U, "name": U, "birth_date": D, "pipeline": U},
+    ),
+    "election": (
+        f"""select t.id::text, t.polity_id::text, t.kind::text, t.date_from, t.parent_id::text,
+                   {LABEL.format("t")}, c.pipeline
+            from election t""",
+        {
+            "id": U,
+            "polity_id": U,
+            "kind": U,
+            "date_from": D,
+            "parent_id": U,
+            "name": U,
+            "pipeline": U,
+        },
+    ),
+    "contest": (
+        f"""select t.id::text, t.election_id::text, t.kind::text, t.office_id::text, t.body_id::text,
+                   t.district_area_id::text, t.magnitude, t.round_number, {LABEL.format("t")}, c.pipeline
+            from contest t""",
+        {
+            "id": U,
+            "election_id": U,
+            "kind": U,
+            "office_id": U,
+            "body_id": U,
+            "district_area_id": U,
+            "magnitude": I32,
+            "round_number": I16,
+            "name": U,
+            "pipeline": U,
+        },
+    ),
+    "contest_option": (
+        """select t.id::text, t.contest_id::text, t.kind::text, t.party_id::text, t.ballot_position,
+                  t.ballot_label, c.pipeline
+           from contest_option t""",
+        {
+            "id": U,
+            "contest_id": U,
+            "kind": U,
+            "party_id": U,
+            "ballot_position": I32,
+            "ballot_label": U,
+            "pipeline": U,
+        },
+    ),
+    "candidacy": (
+        """select t.id::text, t.option_id::text, t.person_id::text, t.ballot_name, t.role::text, c.pipeline
+           from candidacy t""",
+        {"id": U, "option_id": U, "person_id": U, "ballot_name": U, "role": U, "pipeline": U},
+    ),
+    "reporting_unit": (
+        """select t.id::text, t.polity_id::text, t.scheme_code, t.code, t.parent_id::text, t.area_id::text,
+                  t.kind::text, t.valid_from, t.valid_to, c.pipeline
+           from reporting_unit t""",
+        {
+            "id": U,
+            "polity_id": U,
+            "scheme_code": U,
+            "code": U,
+            "parent_id": U,
+            "area_id": U,
+            "kind": U,
+            "valid_from": D,
+            "valid_to": D,
+            "pipeline": U,
+        },
+    ),
+    "result_set": (
+        """select t.id::text, t.election_id::text, t.contest_id::text, t.stage::text, t.kind::text,
+                  t.status::text, t.is_default, t.as_of, c.pipeline
+           from result_set t""",
+        {
+            "id": U,
+            "election_id": U,
+            "contest_id": U,
+            "stage": U,
+            "kind": U,
+            "status": U,
+            "is_default": B,
+            "as_of": pl.Datetime("us", "UTC"),
+            "pipeline": U,
+        },
+    ),
+    "external_id": (
+        "select t.entity_id::text, t.scheme, t.value, c.pipeline from external_id t",
+        {"entity_id": U, "scheme": U, "value": U, "pipeline": U},
+    ),
+}
+REFRESH = 86400
+
+
 class Reference(NamedTuple):
     ids: frozenset[str]
     packages: frozenset[str]
@@ -1644,13 +1917,82 @@ def snapshot(target: Path) -> None:
     print(f"{target}: {len(ids):,} ids, {len(packages):,} packages", flush=True)
 
 
+def _partition(conn: Connection, target: Path, part: str) -> dict[str, int]:
+    folder = target / ("other" if part == "_" else part.lower())
+    partial = target / f".{folder.name}.part"
+    shutil.rmtree(partial, ignore_errors=True)
+    partial.mkdir(parents=True)
+    conn.execute("drop table if exists ref_changeset")
+    conn.execute(
+        sql.SQL("create temp table ref_changeset as select id, pipeline from changeset where {} = %s").format(
+            sql.SQL(PART)
+        ),
+        [part],
+    )
+    conn.execute("analyze ref_changeset")
+    counts: dict[str, int] = {}
+    with _connect() as con:
+        for table, (query, schema) in PUBLISH.items():
+            joined = sql.SQL("{} join ref_changeset c on c.id = t.changeset_id").format(sql.SQL(query))
+            counts[table] = _dump(conn, con, joined, schema, partial / f"{table}.parquet")
+    if folder.exists():
+        shutil.rmtree(folder)
+    partial.replace(folder)
+    return counts
+
+
+def publish(target: Path) -> None:
+    index_file = target / "index.json"
+    index = json.loads(index_file.read_text()) if index_file.exists() else {}
+    partitions: dict[str, dict[str, object]] = index.get("partitions", {})
+    previous: str | None = index.get("full")
+    began = datetime.now(UTC)
+    full = previous is None or (began - datetime.fromisoformat(previous)).total_seconds() > REFRESH
+
+    def save(full_at: str | None) -> None:
+        partial = target / ".index.json.part"
+        partial.write_text(json.dumps({"full": full_at, "partitions": partitions}, indent=1, sort_keys=True))
+        partial.replace(index_file)
+
+    with store.connect() as conn:
+        latest = conn.execute(
+            sql.SQL("select {}, max(coalesce(published_at, created_at)) from changeset group by 1").format(
+                sql.SQL(PART)
+            )
+        ).fetchall()
+        stale = sorted(
+            str(part)
+            for part, when in latest
+            if full or part not in partitions or when > datetime.fromisoformat(str(partitions[part]["built"]))
+        )
+        for part in stale:
+            built = datetime.now(UTC)
+            counts = _partition(conn, target, part)
+            partitions[part] = {
+                "folder": "other" if part == "_" else part.lower(),
+                "built": built.isoformat(),
+                "rows": counts,
+            }
+            save(previous)
+            print(f"{part}: {sum(counts.values()):,} rows", flush=True)
+    save(began.isoformat() if full else previous)
+    print(f"{target}: {len(stale)} partitions rebuilt", flush=True)
+
+
 def _reference(path: Path) -> Reference:
     body = json.loads(gzip.decompress(path.read_bytes()))
     columns = {
         table: {name: (bool(rule[0]), bool(rule[1]), [str(label) for label in rule[2]]) for name, rule in found.items()}
         for table, found in body["columns"].items()
     }
-    return Reference(frozenset(body["ids"]), frozenset(body["packages"]), columns)
+    ids = set(body["ids"])
+    for folder in path.parent.iterdir():
+        if folder.is_dir() and not folder.name.startswith("."):
+            for table in PUBLISH:
+                file = folder / f"{table}.parquet"
+                if table not in ("area_code", "external_id") and file.exists():
+                    ids |= set(pl.read_parquet(file, columns=["id"])["id"].to_list())
+    return Reference(frozenset(ids), frozenset(body["packages"]), columns)
 
 
 def _ready(source: Connection | Reference, key: str, batch: set[str], minted: set[str]) -> list[str]:
@@ -1660,7 +2002,10 @@ def _ready(source: Connection | Reference, key: str, batch: set[str], minted: se
     external = [str(value) for value in manifest["external"] if str(value) not in minted]
     if isinstance(source, Reference):
         missing = [value for value in external if value not in source.ids]
-        where = "the reference snapshot (polities, schemes, and country areas) or this batch"
+        where = (
+            "the reference snapshot, the reference partitions downloaded beside it (reference/<cc>/, by the country"
+            " of the pipeline that wrote the rows), or this batch"
+        )
     else:
         missing = _missing(source, external)
         where = "the database and this batch"
@@ -1676,6 +2021,8 @@ def _ready(source: Connection | Reference, key: str, batch: set[str], minted: se
             found.append(
                 f"ready.depends: {depend} is neither loaded nor in this batch; build it and list it in run.json"
             )
+    if not isinstance(source, Reference):
+        found += _clashes(source, path, str(manifest["pipeline"]))
     geometry = path / "area_geometry.parquet"
     if not isinstance(source, Reference) and geometry.exists():
         rows = pl.read_parquet(geometry, columns=["area_id", "valid_from", "valid_to"])
@@ -1740,6 +2087,9 @@ def readiness(keys: list[str], reference: Path | None = None) -> None:
 def run(command: str, keys: list[str], reference: Path | None = None) -> None:
     if command == "snapshot":
         snapshot(Path(keys[0]))
+        return
+    if command == "reference":
+        publish(Path(keys[0]))
         return
     if command == "export":
         for pipeline in keys:
