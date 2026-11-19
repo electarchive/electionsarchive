@@ -3,7 +3,8 @@
 Each round is one file per county, with a row for every polling station's signed record, saved from a browser into a
 zip, and a legend that names the candidates behind the printed columns g1, g2, and so on, in ballot order. Each
 station's row prints the registered voters (a), the voters who took part (b), the valid votes (c), the null votes (d),
-the ballots received (e), and the ballots left unused (f). The files hold no votes cast by post from abroad."""
+the ballots received (e), and the ballots left unused (f). The votes cast by post from abroad come from the portal's separate file for each
+round, with a row for each postal bureau and country, and the same candidates in ballot order."""
 
 import csv
 import io
@@ -32,6 +33,11 @@ FILES = {
     "2019-11-24": f"{PREFIX}/ro-2019-11-24-presidential-r2-polling-stations-pv-csv.zip",
 }
 LEGEND = f"{PREFIX}/ro-2019-presidential-column-legend.txt"
+POSTAL_HOST = "https://prezenta.bec.ro"
+POSTAL_FILES = {
+    "2019-11-10": f"{POSTAL_HOST}/prezidentiale10112019/data/pv/csv/pv_SR_PRSD-C_FINAL.csv",
+    "2019-11-24": f"{POSTAL_HOST}/prezidentiale24112019/data/pv/csv/pv_SR_PRSD-C_FINAL.csv",
+}
 DAYS = {"2019-11-10": 1, "2019-11-24": 2}
 REGISTRY = "ro.aep/2019-presidential-registry"
 PACKAGES = [REGISTRY, *(f"ro.aep/{day}-presidential" for day in DAYS)]
@@ -42,8 +48,8 @@ METHOD = (
     "Counted per polling station and published by the Electoral Bureau on its results portal, from each station's "
     "signed record. Registered voters are the voters on the permanent lists, ballots cast are the voters who took "
     "part, valid votes are the votes for candidates, and invalid ballots are the null votes. Stations abroad print no "
-    "permanent list, so their registered voters are left empty. Votes cast by post from abroad are not in the files "
-    "and are not stored here."
+    "permanent list, so their registered voters are left empty. Votes cast by post from abroad are counted by "
+    "postal bureaus and countries apart from the stations; for them the ballots cast are the ballots counted."
 )
 
 
@@ -88,6 +94,30 @@ def stations(day: str) -> pl.DataFrame:
         pl.col("d").cast(pl.Int64).alias("invalid"),
         pl.lit(None, pl.Int64).alias("blank"),
         *(pl.col(c).cast(pl.Int64) for c in columns),
+    )
+
+
+def postal(day: str) -> pl.DataFrame:
+    """The postal bureaus and countries of a round, one row each, with the candidates under the stations' columns."""
+    text = raw.cached(SOURCE, POSTAL_FILES[day]).path.read_text(encoding="utf-8-sig")
+    rows = list(csv.DictReader(io.StringIO(text)))
+    names = legend(DAYS[day])
+    found = [c for c in rows[0] if re.fullmatch(r"e\d+", c)]
+    if len(found) != len(names):
+        raise ValueError(f"{day}: the postal file's candidate columns do not match the legend")
+    frame = pl.DataFrame(rows, infer_schema_length=None)
+    return frame.select(
+        pl.col("Cod birou electoral").cast(pl.Int64).alias("circ"),
+        pl.col("Județ").alias("cname"),
+        pl.col("Nr").str.strip_chars().alias("nr"),
+        pl.concat_str(["Uat", "Localitate", "Secție"], separator=" — ", ignore_nulls=True).alias("place"),
+        pl.lit(True).alias("postal"),
+        pl.lit(None, pl.Int64).alias("registered"),
+        pl.col("d").cast(pl.Int64).alias("cast"),
+        pl.col("d1").cast(pl.Int64).alias("valid"),
+        pl.col("d2").cast(pl.Int64).alias("invalid"),
+        pl.lit(None, pl.Int64).alias("blank"),
+        *(pl.col(f"e{number}").cast(pl.Int64).alias(f"g{number}") for number in range(1, len(names) + 1)),
     )
 
 
@@ -147,8 +177,9 @@ def build(day: str) -> Package:
     p.external.add(ROMANIA)
     p.artifact(raw.cached(SOURCE, FILES[day]), AEP_SOURCE)
     p.uses(raw.cached(SOURCE, LEGEND))
+    p.artifact(raw.cached(SOURCE, POSTAL_FILES[day]), AEP_SOURCE)
     names = legend(round_number)
-    frame = unit_rows(p, stations(day), day)
+    frame = unit_rows(p, pl.concat([stations(day), postal(day)], how="vertical_relaxed"), day)
     year = first.year
     election = key("election", f"president-{day}")
     p.add(
