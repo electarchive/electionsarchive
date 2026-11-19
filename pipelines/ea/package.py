@@ -2342,6 +2342,33 @@ def _adopted(conn: Connection, pipeline: str) -> tuple[list[str], list[str]]:
     return sorted(row[0]), sorted(row[1])
 
 
+def _cited(conn: Connection, adopted: list[str], new: pl.DataFrame | None) -> list[dict[str, str]]:
+    """Every file a Draft package cites, with its url and sha256, as the inbox verifies each one by sha256: the
+    artifacts its own rows record, then any source file its adopted changesets cite. The changesets' own parquets
+    are left out; they are not sources, the package's rows replace them, and old ones are pruned from data/."""
+    cited: dict[str, dict[str, str]] = {}
+    if new is not None:
+        for row in new.select("storage_key", "url", "sha256").unique("storage_key").iter_rows(named=True):
+            cited[str(row["storage_key"])] = {
+                "url": str(row["url"] or ""),
+                "sha256": str(row["sha256"]),
+                "storage_key": str(row["storage_key"]),
+            }
+    rest = [storage for storage in adopted if storage not in cited and not storage.startswith("changesets/")]
+    for storage, url, digest in conn.execute(
+        """select distinct on (storage_key) storage_key, url, sha256
+           from source_artifact where storage_key = any(%s) order by storage_key, retrieved_at desc""",
+        [rest],
+    ).fetchall():
+        cited[storage] = {"url": str(url or ""), "sha256": str(digest), "storage_key": storage}
+    missing = sorted(set(rest) - set(cited))
+    if missing:
+        raise ValueError(
+            f"{len(missing)} files the adopted changesets cite have no source_artifact row, such as {missing[0]}"
+        )
+    return [cited[storage] for storage in sorted(cited)]
+
+
 def _canonicalize(file: Path, columns: list[str]) -> None:
     pl.read_parquet(file).with_columns(
         pl.col(column).map_elements(canonical, return_dtype=pl.String) for column in columns
@@ -2829,7 +2856,7 @@ class Draft(Changeset):
                     _trim(table, out / f"{table}.parquet")
                 counts[table] = carried.height
         owned, artifacts = _adopted(self.conn, pipeline)
-        new = tables["source_artifact"]["storage_key"].to_list() if "source_artifact" in tables else []
+        new = tables.get("source_artifact")
         _seal(
             key,
             pipeline,
@@ -2837,7 +2864,7 @@ class Draft(Changeset):
             out,
             counts,
             owned,
-            [{"storage_key": storage} for storage in sorted({*artifacts, *new})],
+            _cited(self.conn, artifacts, new),
             self.accepted,
         )
         print(
