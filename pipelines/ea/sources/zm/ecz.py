@@ -5,9 +5,9 @@ constituency, mayoral and council chairperson results by district, councillor re
 by-election date. Each notice's text layer is read in `ea.sources.zm.text`.
 
 The `geo` package, built in `ea.sources.zm.shapes`, holds the shapes of the 150 constituencies contested from 1991 to
-2015, the 156 of 2016 to 2021, the 226 of 2026, and the wards of 2021. Each unit of those plans is linked to its area;
-the wards before 2021 and the two Solwezi constituencies of 2026 have no open shapes yet, so their units stay
-unlocated.
+2015, the 156 of 2016 to 2021, the 226 of 2026, the wards of 2021, and the 2011 notice's wards that the 2006 to 2010
+ward maps hold. Each unit of those plans is linked to its area; the 2011 wards the maps lack, the wards of 2016, and
+the two Solwezi constituencies of 2026 have no open shapes yet, so their units stay unlocated.
 """
 
 import re
@@ -365,8 +365,32 @@ def ward_names() -> dict[str, str]:
     return found
 
 
+@cache
+def wards_2011() -> dict[str, shapes.OldWard]:
+    """The 2006 to 2010 layer's ward for each ward of the 2011 councillor notice that it holds, by notice code."""
+    wanted: dict[str, tuple[str, str]] = {}
+    for u in units("2011-councillor", "", "ward"):
+        if u.code in wanted:
+            raise ValueError(f"two wards of the 2011 notice carry code {u.code}")
+        layer = shapes.ward_constituency(u.parent_name, constituencies()[int(u.parent)])
+        if layer is not None:
+            wanted[u.code] = (layer, u.name)
+    return shapes.match_wards_2006(wanted)
+
+
+def placed_2011() -> list[shapes.Ward2006]:
+    found = wards_2011()
+    return [
+        shapes.Ward2006(u.code, display(u.name), int(u.parent), found[u.code])
+        for u in units("2011-councillor", "", "ward")
+        if u.code in found
+    ]
+
+
 def geo() -> Package:
-    return shapes.geo(seats(), ward_names(), {n: display(v) for n, v in constituencies().items()}, seats_2026())
+    return shapes.geo(
+        seats(), ward_names(), {n: display(v) for n, v in constituencies().items()}, seats_2026(), placed_2011()
+    )
 
 
 @cache
@@ -413,6 +437,9 @@ def area(day: date, part: Part, u: Unit, code: str) -> str | None:
         district = _ward_district(part, u)
         found = shapes.ward(district, u.name, u.parent_name)
         return shapes.ward_area(found.pcode) if found else None
+    if part.name == "2011-councillor" and shapes.PLAN_2006 <= day < shapes.PLAN_2016:
+        old = wards_2011().get(u.code)
+        return shapes.ward_area_2006(old.constituency, shapes.letters(old.name)) if old else None
     return None
 
 
