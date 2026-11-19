@@ -227,7 +227,7 @@ def geo() -> Package:
         SOURCE,
         "The 30 electoral arrondissements of Belgium in 1950, dissolved from Statbel's municipal boundaries",
     )
-    p.external |= {BELGIUM, TERRITORY}
+    p.external |= {BELGIUM, TERRITORY, SCHEME}  # the scheme row belongs to the 1950-03-12 package
     statbel = p.id("source", "statbel")
     p.add(
         "source",
@@ -241,7 +241,6 @@ def geo() -> Package:
         attribution="© Statbel (Belgium)",
     )
     p.artifact(raw.cached(STATBEL, SECTORS + PLANS[PLAN][0]), statbel)
-    p.add("scheme", code=SCHEME, polity_id=BELGIUM, kind="electoral_district", rank=1, noun="electoral arrondissement")
     p.add(
         "boundary_set",
         id=p.id("boundary_set", SCHEME),
@@ -296,6 +295,7 @@ def build() -> Package:
         depends=[GEO],
     )
     p.external.add(BELGIUM)
+    p.add("scheme", code=SCHEME, polity_id=BELGIUM, kind="electoral_district", rank=1, noun="electoral arrondissement")
     source = p.id("source")
     p.add(
         "source",
