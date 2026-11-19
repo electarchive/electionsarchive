@@ -1,11 +1,15 @@
-"""Mendoza province (Argentina): definitive counts of the provincial and municipal elections of 2023 and 2025.
+"""Mendoza province (Argentina): definitive counts of the provincial and municipal elections of 2023 and 2025, and
+the people and seats the Junta proclaimed after the 2023 general elections.
 
 The Junta Electoral de la Provincia de Mendoza publishes each definitive count (escrutinio definitivo) as PDFs of
 signed tables, one table per contest and department (and per electoral section for the legislature). The finest unit
 it publishes is the department, so that is the reporting unit. The tables are scans with a text layer of uneven
 quality: `mendoza_tables.json` holds every table as it was read from the page, and `parse` checks each one against the
 arithmetic the Junta prints (the lists add up to the positive votes, and positive, null and blank votes add up to the
-voters) before anything is built.
+voters) before anything is built. The proclamation act of 6 November 2023 names, for each contest of the two
+general-election days, the party and the people declared elected; `mendoza_proclamation.json` holds it as it was
+read from the page, and `parse` checks that every party it names ran in its contest and that each mayor's list
+led the vote. The Junta has published no act for the 2025 election.
 """
 
 import functools
@@ -39,7 +43,14 @@ GEO_URL = (
     "geoBoundaries-ARG-ADM2_simplified.geojson"
 )
 GEO_PAGE = "https://www.geoboundaries.org/api/current/gbOpen/ARG/ADM2/"
+ACT_PAGE = f"{SITE}/actas-de-proclamacion/"
+ACT_URL = f"{SITE}/wp-content/uploads/2024/12/Acta-de-Proclamacion-de-Candidatos-03-09-2023-y-24-09-2023.pdf"
 TABLES = Path(__file__).with_name("mendoza_tables.json")
+PROCLAMATION = Path(__file__).with_name("mendoza_proclamation.json")
+# The two general-election days the act proclaims. A party's name in the act can differ from the Junta's name for
+# the list it ran under in the count.
+ACT_DAYS = ("2023-09-03", "2023-09-24")
+ACT_PARTY = {"Cambia Mendoza - Nuevos Rumbos": "Cambia Mendoza", "Partido Sembrar": "Sembrar"}
 ARGENTINA = str(uuid5(package.NAMESPACE, "polity\x1fAR"))
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fARG"))
 
@@ -172,6 +183,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, page, suffix=".html")
     for url in pdf_links():
         raw.fetch(SOURCE, url, suffix=".pdf")
+    raw.fetch(SOURCE, ACT_PAGE, suffix=".html")
+    raw.fetch(SOURCE, ACT_URL, suffix=".pdf")
     raw.fetch(GEO_SOURCE, GEO_URL, suffix=".geojson")
     raw.fetch(GEO_SOURCE, GEO_PAGE, suffix=".json")
 
@@ -186,6 +199,9 @@ def parse() -> None:
     registry().write()
     for day in ELECTIONS:
         election(day).write()
+    named = sum(len(entry["people"]) for entries in proclamation().values() for entry in entries)
+    if sum(_PROCLAIMED.values()) != named:
+        raise ValueError(f"the packages hold {sum(_PROCLAIMED.values())} of the {named} people the act names")
 
 
 def emit() -> None:
@@ -195,6 +211,16 @@ def emit() -> None:
 @functools.cache
 def tables() -> list[dict]:
     return json.loads(TABLES.read_text())
+
+
+@functools.cache
+def proclamation() -> dict[tuple[str, int], list[dict]]:
+    """The act's entries by contest (`gobernador`, `senador`, `diputado`, `intendente`, `concejal`) and unit: 0 for
+    the province, the section number for the legislature, the department number for a municipal contest."""
+    found: dict[tuple[str, int], list[dict]] = defaultdict(list)
+    for entry in json.loads(PROCLAMATION.read_text())["entries"]:
+        found[(entry["contest"], entry["unit"])].append(entry)
+    return dict(found)
 
 
 def check_tables() -> None:
@@ -443,6 +469,89 @@ def _label(text: str, via: str) -> str:
     return " ".join(text.split()).strip(" -—")
 
 
+_PROCLAIMED: dict[str, int] = {}
+
+
+def _proclaim(
+    p: Package,
+    day: str,
+    cycle: int,
+    contest: tuple[str, int],
+    result_set: str,
+    options: dict[tuple[str, str], str],
+    cells: list[dict],
+    named: list[dict],
+    url: str,
+) -> int:
+    """Add the seats the act declares for one contest and the people it names; returns the number of people.
+
+    A list contest declares each list's seats and elects its members; a governor's ticket and a mayor's list
+    each win the one seat, and their candidacies carry the head and the running mate."""
+    c, scope = contest
+    department = scope if c in ("intendente", "concejal") else None
+    by_party: dict[str, tuple[str, str]] = {}
+    for (code, list_name), option in options.items():
+        if not list_name:
+            by_party[fold(party_name(party_key(cycle, department, code)))] = (code, option)
+    totals: Counter[str] = Counter()
+    for t in cells:
+        for row in t["rows"]:
+            totals[options[(row["code"], row["list"])]] += row["votes"]
+    named_options: set[str] = set()
+    people = 0
+    for entry in named:
+        found = by_party.get(fold(ACT_PARTY.get(entry["party"], entry["party"])))
+        if found is None:
+            raise KeyError(f"{day} {c} {scope}: the act names {entry['party']!r}, which has no list in the count")
+        code, option = found
+        if option in named_options:
+            raise ValueError(f"{day} {c} {scope}: the act names {entry['party']!r} twice")
+        named_options.add(option)
+        member = party(party_key(cycle, department, code))
+        if c in ("gobernador", "intendente") and len(entry["people"]) != (2 if c == "gobernador" else 1):
+            raise ValueError(f"{day} {c} {scope}: a ticket or mayor names the wrong number of people")
+        if c in ("gobernador", "intendente") and totals[option] != max(totals.values()):
+            raise ValueError(f"{day} {c} {scope}: the proclaimed list did not lead the vote")
+        p.add(
+            "outcome",
+            result_set_id=result_set,
+            option_id=option,
+            kind="won",
+            seats=1 if c == "gobernador" else len(entry["people"]),
+        )
+        for index, printed in enumerate(entry["people"], 1):
+            tag = f"{day}:{c}:{scope}:{code}:{index}"
+            person = key("person", tag)
+            p.add("person", id=person)
+            p.name(person, printed.title(), "es", "official")
+            candidacy = key("candidacy", tag)
+            if c == "gobernador":
+                role = "head" if index == 1 else "running_mate"
+            else:
+                role = "head" if c == "intendente" else "list_member"
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=option,
+                role=role,
+                ballot_name=printed,
+                member_of_party_id=member,
+                is_independent=False,
+            )
+            if c in ("senador", "diputado", "concejal"):
+                p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
+            people += 1
+    p.add(
+        "citation",
+        id=key("citation", result_set),
+        entity_id=result_set,
+        source_id=SOURCE_ID,
+        locator={"url": url, "pages": sorted({entry["page"] for entry in named})},
+    )
+    return people
+
+
 def election(day: str) -> Package:
     kind, title = ELECTIONS[day]
     cycle = int(day[:4])
@@ -457,6 +566,10 @@ def election(day: str) -> Package:
     urls = {name: url_of(name) for name in {t["pdf"] for t in mine}}
     artifacts = {url: raw.cached(SOURCE, url) for url in set(urls.values())}
     artifact_ids = {url: p.artifact(a, SOURCE_ID) for url, a in artifacts.items()}
+    act_url = url_of(json.loads(PROCLAMATION.read_text())["pdf"])
+    if day in ACT_DAYS:
+        p.artifact(raw.cached(SOURCE, act_url), SOURCE_ID)
+    proclaimed = 0
     election_id = key("election", day)
     path = f"ar/{day}-mendoza-{kind}"
     p.add(
@@ -570,6 +683,9 @@ def election(day: str) -> Package:
                 "district_area_id": area("ar.mendoza_departamento", scope),
             }
             option_kind = "list"
+        named = proclamation().get((c, scope), []) if day in ACT_DAYS else []
+        if named and extra["kind"] == "list_allocation":
+            extra = {**extra, "magnitude": sum(len(entry["people"]) for entry in named)}
         p.add("contest", id=contest, election_id=election_id, round_number=1, default_result_kind="counted", **extra)
         p.name(contest, name_en, "en", "official")
         p.name(contest, name_es, "es", "native", False)
@@ -609,6 +725,9 @@ def election(day: str) -> Package:
                     party_id=party(pk),
                     ballot_label=label,
                 )
+
+        if named:
+            proclaimed += _proclaim(p, day, cycle, (c, scope), result_set, options, body["cells"], named, act_url)
 
         def add(unit: str | None, option: str | None, measure: int, value: int, flags: int = 8) -> None:
             values.append(
@@ -675,6 +794,8 @@ def election(day: str) -> Package:
                 )
             for measure, value in ((4, t["positivos"]), (5, t["nulos"]), (6, t["blancos"])):
                 p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+    if day in ACT_DAYS:
+        _PROCLAIMED[day] = proclaimed
     p.frame("result_value", pl.DataFrame(values, schema=_VALUE_SCHEMA, orient="row"))
     if locators:
         p.frame("value_locator", pl.DataFrame(locators, schema=_LOCATOR_SCHEMA, orient="row"))

@@ -1,0 +1,911 @@
+{
+ "pdf": "Acta-de-Proclamacion-de-Candidatos-03-09-2023-y-24-09-2023.pdf",
+ "date": "2023-11-06",
+ "entries": [
+  {
+   "contest": "gobernador",
+   "unit": 0,
+   "party": "Cambia Mendoza",
+   "people": [
+    "CORNEJO ALFREDO VICTOR",
+    "CASADO HEBE SILVINA"
+   ],
+   "page": 1
+  },
+  {
+   "contest": "senador",
+   "unit": 1,
+   "party": "Cambia Mendoza",
+   "people": [
+    "IGLESIAS MARCELINO OSCAR",
+    "EISENCHLAS NATALIA FEDERICA",
+    "SEVILLA OSCAR ALBERTO"
+   ],
+   "page": 1
+  },
+  {
+   "contest": "senador",
+   "unit": 1,
+   "party": "La Unión Mendocina",
+   "people": [
+    "QUATTRINI MARCOS ENRIQUE"
+   ],
+   "page": 1
+  },
+  {
+   "contest": "senador",
+   "unit": 1,
+   "party": "Partido Verde",
+   "people": [
+    "CHAPPEL DUGAR EDUARDO"
+   ],
+   "page": 1
+  },
+  {
+   "contest": "senador",
+   "unit": 1,
+   "party": "Elegí Mendoza",
+   "people": [
+    "GONZALEZ FELIX RODOLFO"
+   ],
+   "page": 1
+  },
+  {
+   "contest": "senador",
+   "unit": 2,
+   "party": "Cambia Mendoza",
+   "people": [
+    "RUS MARIA MERCEDES",
+    "SAEZ JORGE DAVID",
+    "GALINARES MARIA BEATRIZ"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "senador",
+   "unit": 2,
+   "party": "La Unión Mendocina",
+   "people": [
+    "MAGISTRETTI ARMANDO MARIO"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "senador",
+   "unit": 2,
+   "party": "Elegí Mendoza",
+   "people": [
+    "PEZZUTTI DUILIO ALBERTO"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "senador",
+   "unit": 3,
+   "party": "Cambia Mendoza",
+   "people": [
+    "SOTO GUSTAVO ADRIAN",
+    "ASES YAMEL JAINEN"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "senador",
+   "unit": 3,
+   "party": "La Unión Mendocina",
+   "people": [
+    "PRINGLES FARABELLI OSCAR ARIEL",
+    "MANONI FLAVIA MARIA"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "senador",
+   "unit": 4,
+   "party": "Cambia Mendoza",
+   "people": [
+    "MARCOLINI WALTHER ALBERTO",
+    "SAINZ MARIA LAURA"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "senador",
+   "unit": 4,
+   "party": "La Unión Mendocina",
+   "people": [
+    "ROSTAND MARTIN GUADALUPE"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "senador",
+   "unit": 4,
+   "party": "Elegí Mendoza",
+   "people": [
+    "SAT MAURICIO HERNAN"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "diputado",
+   "unit": 1,
+   "party": "Cambia Mendoza",
+   "people": [
+    "LOMBARDI PABLO ANDRES",
+    "MARTINEZ LEJARZA BEATRIZ EUGENIA",
+    "LOPEZ ALBERTO ESTEBAN",
+    "SALINAS SOL GUADALUPE"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "diputado",
+   "unit": 1,
+   "party": "La Unión Mendocina",
+   "people": [
+    "DIFONSO JORGE ANDRES",
+    "ORTIZ JANINA"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "diputado",
+   "unit": 1,
+   "party": "Partido Verde",
+   "people": [
+    "GIAMBASTIANI MAURO"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "diputado",
+   "unit": 1,
+   "party": "Elegí Mendoza",
+   "people": [
+    "VALVERDE VERONICA ROSANA"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "diputado",
+   "unit": 2,
+   "party": "Cambia Mendoza",
+   "people": [
+    "RONCO MIGUEL ANGEL",
+    "CRESCITELLI NELIDA ELISABETH",
+    "VILLACH RAUL JUAN"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "diputado",
+   "unit": 2,
+   "party": "La Unión Mendocina",
+   "people": [
+    "CAIRO GUSTAVO RUBEN",
+    "GOMEZ CINTIA JORGELINA"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "diputado",
+   "unit": 2,
+   "party": "Elegí Mendoza",
+   "people": [
+    "LIZANA MARIA GABRIELA"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "diputado",
+   "unit": 3,
+   "party": "Cambia Mendoza",
+   "people": [
+    "PULIDO ERICA PAOLA",
+    "CATTANEO CHAVES CESAR AUGUSTO RICARDO",
+    "DE MARCHI MARIA EUGENIA"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "diputado",
+   "unit": 3,
+   "party": "La Unión Mendocina",
+   "people": [
+    "SCANIO ROLANDO ANTONIO",
+    "HUCZAK STELLA MARIS"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "diputado",
+   "unit": 4,
+   "party": "Cambia Mendoza",
+   "people": [
+    "GOMEZ SILVINA LAURA SOLEDAD",
+    "AMBROSINI FRANCO IGNACIO"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "diputado",
+   "unit": 4,
+   "party": "La Unión Mendocina",
+   "people": [
+    "COGO JIMENA VANINA",
+    "CIVIT EDGARDO ALEJANDRO"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "diputado",
+   "unit": 4,
+   "party": "Elegí Mendoza",
+   "people": [
+    "GOMEZ GERMAN MARCOS"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "intendente",
+   "unit": 1,
+   "party": "Cambia Mendoza",
+   "people": [
+    "SUAREZ ULPIANO LEANDRO"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "concejal",
+   "unit": 1,
+   "party": "Cambia Mendoza",
+   "people": [
+    "RUBIO MARCELO PATRICIO JORGE",
+    "DAOU MARIA CIELO",
+    "GIMENEZ ERNESTO VICTOR",
+    "GONZALEZ EVA LORENA"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "concejal",
+   "unit": 1,
+   "party": "La Unión Mendocina",
+   "people": [
+    "GUTIERREZ GUSTAVO EDUARDO"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "concejal",
+   "unit": 1,
+   "party": "Partido Verde",
+   "people": [
+    "GARCIA RICARDO ARIEL"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "intendente",
+   "unit": 3,
+   "party": "Cambia Mendoza",
+   "people": [
+    "CALVENTE MARCOS EMANUEL"
+   ],
+   "page": 2
+  },
+  {
+   "contest": "concejal",
+   "unit": 3,
+   "party": "Cambia Mendoza",
+   "people": [
+    "CANCELA VERONICA SOLEDAD",
+    "GENOVESE EZEQUIEL FRANCISCO",
+    "VARGAS CRISTINA DELIA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 3,
+   "party": "La Unión Mendocina",
+   "people": [
+    "MORALES JOSE EXEQUIEL",
+    "SEDANO SONIA ELOISA VERONICA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 3,
+   "party": "Partido Verde",
+   "people": [
+    "BASTIAS PEDRO ANTONIO"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "intendente",
+   "unit": 4,
+   "party": "Cambia Mendoza",
+   "people": [
+    "LO PRESTI FRANCISCO NICOLAS"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 4,
+   "party": "Cambia Mendoza",
+   "people": [
+    "DELPIR NOELIA BELEN",
+    "VILLAVICENCIO JOSE MARIA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 4,
+   "party": "La Unión Mendocina",
+   "people": [
+    "FERNANDEZ LAURA LORENA",
+    "GONZALEZ EDUARDO HECTOR"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 4,
+   "party": "Elegí Mendoza",
+   "people": [
+    "IANNIZZOTTO MABEL ADRIANA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 4,
+   "party": "Partido Verde",
+   "people": [
+    "GARCIA PAULA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "intendente",
+   "unit": 5,
+   "party": "Elegí Gestión Lavalle",
+   "people": [
+    "GONZALEZ EDGARDO ARNALDO"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 5,
+   "party": "Elegí Gestión Lavalle",
+   "people": [
+    "SIFUENTE DIEGO BRUNO",
+    "QUIROGA MARIA BELEN",
+    "PARES MARTINO GUADALUPE"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 5,
+   "party": "Cambia Mendoza",
+   "people": [
+    "GONZALEZ WALTER JAVIER",
+    "DEL CASTILLO CAROLINA ESTEFANIA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "intendente",
+   "unit": 6,
+   "party": "Frente Elegí Maipú Crece",
+   "people": [
+    "STEVANATO JOSE MATIAS"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 6,
+   "party": "Frente Elegí Maipú Crece",
+   "people": [
+    "GUEVARA BERNARDON MARCELO ALEXIS",
+    "BANQUERI ALCARAZ ANA BELEN",
+    "DECIMA NADIA FLORENCIA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 6,
+   "party": "Cambia Mendoza",
+   "people": [
+    "FLORES MULERO MARCOS ALBERTO",
+    "GOMEZ MARIA ELISA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 6,
+   "party": "Frente Libertario Demócrata y Jubilados",
+   "people": [
+    "MANCIFESTA ALFREDO LEONARDO"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "intendente",
+   "unit": 9,
+   "party": "Cambia Mendoza",
+   "people": [
+    "RUFEIL RAUL ANTONIO"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 9,
+   "party": "Cambia Mendoza",
+   "people": [
+    "DUBE JUAN ALDO SERGIO",
+    "GIMENEZ ERICA ELIZABETH",
+    "MOHR BEATRIZ YOLANDA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 9,
+   "party": "La Unión Mendocina",
+   "people": [
+    "MILIO CRISTIAN ADRIAN",
+    "SACRE ANDREA PAOLA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 9,
+   "party": "Elegí Mendoza",
+   "people": [
+    "VILCHEZ LEONARDO RUBEN"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "intendente",
+   "unit": 10,
+   "party": "Cambia Mendoza",
+   "people": [
+    "ABED MARIO ENRIQUE NESTOR"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 10,
+   "party": "Cambia Mendoza",
+   "people": [
+    "MORCOS RICARDO",
+    "MONTIVERO ADRIANA PAOLA",
+    "DEBLASIS LUIS ALBERTO",
+    "MARAVILLA ANABEL ROMINA NATALIA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 10,
+   "party": "La Unión Mendocina",
+   "people": [
+    "GONZALEZ DARIO RUBEN"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "intendente",
+   "unit": 11,
+   "party": "Partido Sembrar",
+   "people": [
+    "MANSUR RICARDO ALFREDO"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 11,
+   "party": "Cambia Mendoza",
+   "people": [
+    "FRANCESE SILVANA RUTH",
+    "FLORES ALEJANDRO JOSE"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 11,
+   "party": "Partido Sembrar",
+   "people": [
+    "GARCIA LLAURO LUIS GONZALO",
+    "KIHN ENGELHARDT MARTHA ALICIA VIVIANA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "concejal",
+   "unit": 11,
+   "party": "Elegí Mendoza",
+   "people": [
+    "GENOVESE LAURA JOHANNA"
+   ],
+   "page": 3
+  },
+  {
+   "contest": "intendente",
+   "unit": 14,
+   "party": "Elegí Santa Rosa",
+   "people": [
+    "DESTEFANIS MARIA FLOR"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 14,
+   "party": "Elegí Santa Rosa",
+   "people": [
+    "VILCHES LUIS MARIANO",
+    "BUFFA MARIA JOSE",
+    "FOCO DIEGO FABIAN"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 14,
+   "party": "Cambia Mendoza",
+   "people": [
+    "CAMPOS HORTENSIA LILIANA",
+    "ERCOLI DIEGO MARCOS"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "intendente",
+   "unit": 15,
+   "party": "Frente Elegí Gestión La Paz",
+   "people": [
+    "UBIETA FERNANDO ALCIDES"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 15,
+   "party": "Frente Elegí Gestión La Paz",
+   "people": [
+    "ARRIGO ADRIANO GONZALO",
+    "GONZALEZ MARIA VIRGINIA",
+    "ROSALES IVANA PATRICIA"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 15,
+   "party": "Cambia Mendoza",
+   "people": [
+    "BLANCO RAUL DANIEL",
+    "PINTO ANA SOL"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "intendente",
+   "unit": 2,
+   "party": "Cambia Mendoza",
+   "people": [
+    "COSTARELLI DIEGO"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 2,
+   "party": "Cambia Mendoza",
+   "people": [
+    "SANTINO ROSA VIRGINIA NOELIA",
+    "CUARANTA ALBERTO FABRICIO",
+    "MAGNAGHI JORGE NICOLAS",
+    "MARTINEZ MALANCA MELISA ANABEL"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 2,
+   "party": "La Unión Mendocina",
+   "people": [
+    "QUIROGA JORGE VICTOR OSCAR"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 2,
+   "party": "Partido Verde",
+   "people": [
+    "CORDON FRANCISCO JAVIER"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "intendente",
+   "unit": 7,
+   "party": "La Unión Mendocina",
+   "people": [
+    "ALLASINO ANDRES ESTEBAN"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 7,
+   "party": "La Unión Mendocina",
+   "people": [
+    "BALDASSO ROLANDO DANIEL",
+    "SOULE MARIA CECILIA",
+    "SCONFIENZA ANDRES ERNESTO",
+    "DELLA BLANCA GABRIELA ALEJANDRA"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 7,
+   "party": "Cambia Mendoza",
+   "people": [
+    "GOMEZ LAURA LORENA",
+    "DEVIA ADRIAN RICARDO"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "intendente",
+   "unit": 12,
+   "party": "Elegí Gestión Tunuyán",
+   "people": [
+    "ANDRAOS JOSE EMIR"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 12,
+   "party": "Elegí Gestión Tunuyán",
+   "people": [
+    "AVEIRO MARTIN GUILLERMO",
+    "CRAMERO D'ANGELI PAULINA",
+    "RUEDA DANIEL ANTONIO ALBERTO"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 12,
+   "party": "Cambia Mendoza",
+   "people": [
+    "MARTÍN GASTON ALBERTO",
+    "ATENCIO MARIA VERONICA"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "intendente",
+   "unit": 8,
+   "party": "Cambia Mendoza",
+   "people": [
+    "AGUILERA JOSE GUSTAVO"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 8,
+   "party": "Cambia Mendoza",
+   "people": [
+    "PANTALEO DANIEL RAMON",
+    "TEJERA NATALIA EMILIA"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 8,
+   "party": "La Unión Mendocina",
+   "people": [
+    "BENITEZ MONICA MABEL"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 8,
+   "party": "Elegí Mendoza",
+   "people": [
+    "LUCERO RUTH JANET PAOLA"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "concejal",
+   "unit": 8,
+   "party": "Nuevo Tupungato",
+   "people": [
+    "LLULL JORGE MARCELO"
+   ],
+   "page": 4
+  },
+  {
+   "contest": "intendente",
+   "unit": 13,
+   "party": "Frente Encuentro por San Carlos",
+   "people": [
+    "MORILLAS MARTIN ALEJANDRO"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "concejal",
+   "unit": 13,
+   "party": "Frente Encuentro por San Carlos",
+   "people": [
+    "MARTINI REINALDO ARIEL",
+    "SANCHO DANIELA NOEMI"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "concejal",
+   "unit": 13,
+   "party": "Cambia Mendoza - Nuevos Rumbos",
+   "people": [
+    "CORDOBA SILVINA FIDELA",
+    "GALLERANI JUAN MIGUEL"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "concejal",
+   "unit": 13,
+   "party": "Partido Verde",
+   "people": [
+    "GRANADOS LUIS ARIEL"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "intendente",
+   "unit": 18,
+   "party": "Cambia Mendoza",
+   "people": [
+    "MOLERO ALEJANDRO ADRIAN"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "concejal",
+   "unit": 18,
+   "party": "Cambia Mendoza",
+   "people": [
+    "ZALAZAR CARLOS ESTEBAN",
+    "BELLO MARIA GISELA"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "concejal",
+   "unit": 18,
+   "party": "La Unión Mendocina",
+   "people": [
+    "ORTEGA NESTOR FABIAN",
+    "MARTINEZ MIRTA EDITH"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "concejal",
+   "unit": 18,
+   "party": "Elegí Mendoza",
+   "people": [
+    "ESCARTIN PAROLA MARIA FLORENCIA"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "intendente",
+   "unit": 17,
+   "party": "Elegí Mendoza",
+   "people": [
+    "JAQUE CELSO ALEJANDRO"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "concejal",
+   "unit": 17,
+   "party": "Elegí Mendoza",
+   "people": [
+    "CABRERA PABLO ANTONIO",
+    "MANSILLA EMILCE MARISA",
+    "ACOSTA MAGALI LEONELA GABRIELA"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "concejal",
+   "unit": 17,
+   "party": "Cambia Mendoza",
+   "people": [
+    "VILLARRUEL PABLO YAMIL"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "concejal",
+   "unit": 17,
+   "party": "La Unión Mendocina",
+   "people": [
+    "GONZALEZ ELISABETH MARIA"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "intendente",
+   "unit": 16,
+   "party": "Elegí San Rafael Avanza",
+   "people": [
+    "FELIX OMAR CHAFI"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "concejal",
+   "unit": 16,
+   "party": "Elegí San Rafael Avanza",
+   "people": [
+    "ARSCONE MARTIN NAHUEL",
+    "CRISTOFANELLI ANTONELA",
+    "OJEDA NESTOR OMAR"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "concejal",
+   "unit": 16,
+   "party": "Cambia Mendoza",
+   "people": [
+    "RECHE MARCOS ADRIAN",
+    "GIORDANO ROMINA CECILIA"
+   ],
+   "page": 5
+  },
+  {
+   "contest": "concejal",
+   "unit": 16,
+   "party": "Frente Libertario Demócrata y Jubilados",
+   "people": [
+    "ANTOLIN MARTIN MARIO"
+   ],
+   "page": 5
+  }
+ ]
+}
