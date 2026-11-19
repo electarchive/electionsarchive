@@ -1,15 +1,17 @@
-"""Austria's National Council elections of 1945 to 1994 and presidential elections of 1951 to 1992, by state.
+"""Austria's National Council elections of 1945 to 1994 and presidential elections of 1951 to 1992. The elections of
+1945 to 1970 are stored by constituency (Wahlkreis), the others by state.
 
 The Federal Ministry of the Interior (BMI) links the official result brochures of these elections from its historical
 pages for National Council and presidential elections: one scanned volume per election, prepared by the Austrian
 Central Statistical Office, with summary tables up front and the results of every municipality after them. The scans
 have no text layer.
 
-The summary tables by state (Bundesland) were read from the page images and transcribed into `bmi_tables/{key}.txt`,
-one file per election or round. Each row keeps its band on the page and each table the edges of its columns, so every
-stored number points at its page and box. Parsing checks every printed figure: the states of each column against the
-printed national total, the lists or candidates against the valid votes, and the votes cast less the invalid votes
-against the valid votes. A mismatch raises, unless the transcription records that the printed figures themselves
+The summary tables by constituency and state (Bundesland) were read from the page images and transcribed into
+`bmi_tables/{key}.txt`, one file per election or round. Each row keeps its band on the page and each table the edges
+of its columns, so every stored number points at its page and box. A row coded `1` to `9` is a state and a row coded
+`W1` to `W25` is a constituency. Parsing checks every printed figure: the states of each column against the printed
+national total, the constituencies of each state and of the country against the printed state and national figures,
+the lists or candidates against the valid votes, and the votes cast less the invalid votes against the valid votes. A mismatch raises, unless the transcription records that the printed figures themselves
 disagree, so a misread number never reaches a package.
 """
 
@@ -24,6 +26,7 @@ from uuid import uuid5
 from ea import changeset, package, raw
 from ea.package import Package
 from ea.sources.at.bmi import AUSTRIA, COUNTRY, NATIONAL_COUNCIL, PRESIDENCY, area, key
+from ea.sources.at.parlament import NAMES_1923
 
 SOURCE = "at.bmi"
 TABLES = Path(__file__).with_name("bmi_tables")
@@ -46,6 +49,28 @@ LANDS = {
     "8": "Vorarlberg",
     "9": "Wien",
 }
+WAHLKREIS = "at.nr_wahlkreis"
+PLAN_1945 = date(1945, 11, 25)
+"""The 25 constituencies of the National Council elections of 1945 to 1970, dated to the first election they served."""
+STATE_OF = {
+    **dict.fromkeys(range(1, 8), "9"),
+    **dict.fromkeys(range(8, 12), "3"),
+    **dict.fromkeys(range(12, 17), "4"),
+    17: "5",
+    18: "7",
+    19: "8",
+    **dict.fromkeys(range(20, 24), "6"),
+    24: "2",
+    25: "1",
+}
+"""The state each constituency lies in."""
+
+
+def wahlkreis(number: int) -> str:
+    """The area of a constituency of the plan of 1945 to 1970."""
+    return area(WAHLKREIS, f"1945:{number}")
+
+
 PARTY_LABELS = {
     "OEVP": "ÖVP",
     "SPOE": "SPÖ",
@@ -173,6 +198,7 @@ class Table:
     columns: list[str] = field(default_factory=list)
     edges: list[tuple[float, float]] = field(default_factory=list)
     rows: list[Row] = field(default_factory=list)
+    constituencies: list[Row] = field(default_factory=list)
     total: Row | None = None
 
 
@@ -214,7 +240,9 @@ def transcription(edition: str) -> Transcription:
             y0, y1 = rest[1].removeprefix("@").split(":")
             values = dict(zip(table.columns, (_number(x) for x in rest[2:]), strict=True))
             row = Row(rest[0], (float(y0), float(y1)), values)
-            if head == "row":
+            if head == "row" and row.code.startswith("W"):
+                table.constituencies.append(row)
+            elif head == "row":
                 table.rows.append(row)
             else:
                 table.total = row
@@ -242,13 +270,15 @@ def figures(edition: str) -> tuple[dict[str, dict[str, int | None]], dict[str, i
     national: dict[str, int | None] = {}
     failed: list[str] = []
     for table in t.tables:
-        if table.total is None:
+        if table.total is None and table.rows:
             raise ValueError(f"{edition} page {table.page}: no printed total")
         if len(table.edges) != len(table.columns):
             raise ValueError(f"{edition} page {table.page}: {len(table.edges)} column edges")
         for column in table.columns:
             if column not in MEASURES and column not in t.options:
                 raise ValueError(f"{edition} page {table.page}: unknown column {column}")
+            if table.total is None:
+                continue
             summed = sum(row.values[column] or 0 for row in table.rows)
             if summed != (table.total.values[column] or 0):
                 failed.append(
@@ -258,7 +288,8 @@ def figures(edition: str) -> tuple[dict[str, dict[str, int | None]], dict[str, i
             if row.code not in LANDS:
                 raise ValueError(f"{edition} page {table.page}: unknown state {row.code}")
             _merge(edition, units.setdefault(row.code, {}), row.values, f"state {row.code}")
-        _merge(edition, national, table.total.values, "Austria")
+        if table.total is not None:
+            _merge(edition, national, table.total.values, "Austria")
     if set(units) != set(LANDS):
         raise ValueError(f"{edition}: states {sorted(units)}")
     for where, values in [*sorted(units.items()), ("AT", national)]:
@@ -270,9 +301,61 @@ def figures(edition: str) -> tuple[dict[str, dict[str, int | None]], dict[str, i
         cast, invalid = values.get("cast"), values.get("invalid")
         if valid is not None and cast is not None and invalid is not None and cast - invalid != valid:
             failed.append(f"{where}: {cast} cast less {invalid} invalid is not {valid} valid")
+    wks = constituencies(edition)
+    if wks:
+        failed += _check_constituencies(wks, units, national, t)
     if failed and not t.source_errors:
         raise ValueError(f"{edition}: " + "; ".join(failed))
     return units, national, failed
+
+
+@cache
+def constituencies(edition: str) -> dict[int, dict[str, int | None]]:
+    """Each constituency's figures, merged from the tables that print it; empty when the file has none."""
+    found: dict[int, dict[str, int | None]] = {}
+    for table in transcription(edition).tables:
+        for row in table.constituencies:
+            number = int(row.code[1:])
+            if number not in STATE_OF:
+                raise ValueError(f"{edition} page {table.page}: unknown constituency {row.code}")
+            _merge(edition, found.setdefault(number, {}), row.values, f"constituency {number}")
+    if found and set(found) != set(STATE_OF):
+        raise ValueError(f"{edition}: constituencies {sorted(found)}")
+    return found
+
+
+def _check_constituencies(
+    wks: dict[int, dict[str, int | None]],
+    units: dict[str, dict[str, int | None]],
+    national: dict[str, int | None],
+    t: Transcription,
+) -> list[str]:
+    """The constituencies must add up to the printed state and national figures and to their own printed totals."""
+    failed: list[str] = []
+    columns = {column for values in wks.values() for column in values}
+    for column in sorted(columns):
+        if not any(values.get(column) is not None for values in wks.values()):
+            continue
+        for state, values in sorted(units.items()):
+            summed = sum(wks[n].get(column) or 0 for n in wks if STATE_OF[n] == state)
+            if summed != (values.get(column) or 0):
+                failed.append(
+                    f"{column}, constituencies of {LANDS[state]} add up to {summed}, state printed {values.get(column)}"
+                )
+        if column in national:
+            summed = sum(values.get(column) or 0 for values in wks.values())
+            if summed != (national[column] or 0):
+                failed.append(f"{column}, constituencies add up to {summed}, national printed {national[column]}")
+    for n, values in sorted(wks.items()):
+        valid = values.get("valid")
+        if valid is not None and any(code in values for code in t.options):
+            listed = sum(values.get(code) or 0 for code in t.options)
+            if listed != valid:
+                failed.append(f"constituency {n}: the options add up to {listed}, the valid votes are {valid}")
+        cast, invalid = values.get("cast"), values.get("invalid")
+        if valid is not None and cast is not None and invalid is not None and cast - invalid != valid:
+            failed.append(f"constituency {n}: {cast} cast less {invalid} invalid is not {valid} valid")
+    return failed
 
 
 # ---------------------------------------------------------------- registry
@@ -388,12 +471,16 @@ def _previous(e: Edition) -> Edition | None:
     return BY_KEY[f"{e.key[:-2]}-1"]
 
 
-def _method(e: Edition, pages: list[int]) -> str:
+def _method(e: Edition, pages: list[int], by_constituency: bool) -> str:
     return (
         f"Transcribed from the scanned summary tables of the official result brochure (pages {', '.join(map(str, pages))} "
         f"of {e.file}), which the Austrian Central Statistical Office prepared for the Federal Ministry of the "
-        "Interior. Every number was checked against the totals the tables print: each state column against the "
-        "national total, the "
+        "Interior. Every number was checked against the totals the tables print: "
+        + (
+            "each constituency column against the printed state and national totals, the "
+            if by_constituency
+            else "each state column against the national total, the "
+        )
         + ("lists" if e.family == NR else "candidates")
         + " against the valid votes, and the votes cast less the invalid votes against the valid votes. The brochure "
         "also prints the results of every municipality, which are not yet stored."
@@ -403,6 +490,7 @@ def _method(e: Edition, pages: list[int]) -> str:
 def election(e: Edition) -> Package:
     t = transcription(e.key)
     units, national, failed = figures(e.key)
+    wks = constituencies(e.key)
     previous = _previous(e)
     year = e.day.year
     if e.family == NR:
@@ -423,8 +511,15 @@ def election(e: Edition) -> Package:
     p = Package(
         f"{SOURCE}/{e.key}",
         SOURCE,
-        f"The {e.day} Austrian {label} by state from the Federal Ministry of the Interior's historical results",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", REGISTRY, *([f"{SOURCE}/{previous.key}"] if previous else [])],
+        f"The {e.day} Austrian {label} by {'constituency' if wks else 'state'} from the Federal Ministry of the "
+        "Interior's historical results",
+        depends=[
+            f"{SOURCE}/geo",
+            f"{SOURCE}/registry",
+            REGISTRY,
+            *(["at.parlament/geo"] if wks else []),
+            *([f"{SOURCE}/{previous.key}"] if previous else []),
+        ],
     )
     p.external |= {AUSTRIA, COUNTRY}
     link = url(e)
@@ -475,18 +570,25 @@ def election(e: Edition) -> Package:
         is_default=True,
         completeness=1.0,
     )
-    pages = sorted({table.page for table in t.tables})
+    pages = sorted({table.page for table in t.tables if table.constituencies or not wks})
     p.add(
         "note",
         id=key("note", result_set),
         entity_id=result_set,
         kind="methodology",
-        body_md=_method(e, pages),
+        body_md=_method(e, pages, bool(wks)),
         lang="en",
     )
     for index, text in enumerate([*e.notes, *t.source_errors]):
         p.add("note", id=key("note", result_set, index), entity_id=result_set, kind="caveat", body_md=text, lang="en")
-    over = [LANDS[code] for code, v in sorted(units.items()) if (v.get("cast") or 0) > (v.get("registered") or 0) > 0]
+    if wks:
+        over = [
+            NAMES_1923[n - 1] for n, v in sorted(wks.items()) if (v.get("cast") or 0) > (v.get("registered") or 0) > 0
+        ]
+    else:
+        over = [
+            LANDS[code] for code, v in sorted(units.items()) if (v.get("cast") or 0) > (v.get("registered") or 0) > 0
+        ]
     if over:
         text = (
             f"More votes were cast than voters were registered in {', '.join(over)}. The brochure counts the votes of "
@@ -496,6 +598,20 @@ def election(e: Edition) -> Package:
         p.accept("accounting.turnout", text)
         p.add(
             "note", id=key("note", result_set, "turnout"), entity_id=result_set, kind="caveat", body_md=text, lang="en"
+        )
+    if wks and national.get("registered") is not None and not any("registered" in v for v in wks.values()):
+        text = (
+            f"The brochure prints the registered voters of {year} only by state and for the whole country, not by "
+            "constituency, so the constituencies carry no registered voters and the national figure is stored as printed."
+        )
+        p.accept("accounting.declared", text)
+        p.add(
+            "note",
+            id=key("note", result_set, "registered"),
+            entity_id=result_set,
+            kind="caveat",
+            body_md=text,
+            lang="en",
         )
     if failed:
         reason = "The brochure's own printed figures disagree: " + "; ".join(t.source_errors)
@@ -576,22 +692,38 @@ def election(e: Edition) -> Package:
             height=height,
         )
     unit_ids: dict[str, str] = {}
-    for code in sorted(units):
-        unit = unit_ids[code] = key("unit", e.key, code)
-        p.add(
-            "reporting_unit",
-            id=unit,
-            polity_id=AUSTRIA,
-            scheme_code="at.land",
-            code=f"{e.day}:{code}",
-            area_relation="equals",
-            area_id=area("at.land", code),
-            kind="standard",
-        )
-        p.name(unit, LANDS[code], "de", "official")
+    if wks:
+        for number in sorted(wks):
+            code = f"W{number}"
+            unit = unit_ids[code] = key("unit", e.key, code)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=AUSTRIA,
+                scheme_code=WAHLKREIS,
+                code=f"{e.day}:{number}",
+                area_relation="equals",
+                area_id=wahlkreis(number),
+                kind="standard",
+            )
+            p.name(unit, NAMES_1923[number - 1], "de", "official")
+    else:
+        for code in sorted(units):
+            unit = unit_ids[code] = key("unit", e.key, code)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=AUSTRIA,
+                scheme_code="at.land",
+                code=f"{e.day}:{code}",
+                area_relation="equals",
+                area_id=area("at.land", code),
+                kind="standard",
+            )
+            p.name(unit, LANDS[code], "de", "official")
     stored_cells: set[tuple[str, str]] = set()
     for table in t.tables:
-        for row in table.rows:
+        for row in table.constituencies if wks else table.rows:
             for column, edges in zip(table.columns, table.edges, strict=True):
                 value = row.values[column]
                 if value is None or (row.code, column) in stored_cells:

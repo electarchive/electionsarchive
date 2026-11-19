@@ -529,7 +529,8 @@ def geo() -> Package:
         "at.bmi/geo",
         SOURCE,
         "Austria's states, political districts, and municipalities as the Federal Ministry of the Interior codes them "
-        "in its election results",
+        "in its election results, and the 25 National Council constituencies of 1945 to 1970",
+        depends=["at.parlament/geo"],
     )
     p.external |= {AUSTRIA, COUNTRY}
     for code, rank, noun in (
@@ -551,6 +552,20 @@ def geo() -> Package:
             p.add("area_parent", area_id=id, parent_id=parent)
             for index, text in enumerate(names):
                 p.name(id, text, "de", "official", index == 0)
+    from ea.sources.at import bmi_history
+    from ea.sources.at.parlament import NAMES_1923
+
+    for number, text in enumerate(NAMES_1923, start=1):
+        id = bmi_history.wahlkreis(number)
+        p.add("area", id=id, scheme_code=bmi_history.WAHLKREIS)
+        p.add("area_code", area_id=id, code=f"1945:{number}", valid_from=bmi_history.PLAN_1945)
+        p.add(
+            "area_parent",
+            area_id=id,
+            parent_id=area("at.land", bmi_history.STATE_OF[number]),
+            valid_from=bmi_history.PLAN_1945,
+        )
+        p.name(id, text, "de", "official")
     return p
 
 
