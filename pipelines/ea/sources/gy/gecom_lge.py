@@ -1065,7 +1065,27 @@ def registry() -> Package:
         p.name(party, k, "en", "abbreviation")
         if name != k:
             p.name(party, name, "en", "official", False)
+    kept(p)
     return p
+
+
+# Every row id, by table, that a registry version built before this one held: rebuilt from each earlier parser
+# version in the history of this file. The loader refuses a registry that drops a row a loaded package still uses.
+# Names are left out: no row refers to a name, and a corrected spelling replaces the name it supersedes.
+EARLIER = FORMS / "registry_ids.json"
+
+
+def kept(p: Package) -> None:
+    """Fail when the registry drops any body, party, system, scheme, source, or other row an earlier version held."""
+    earlier: dict[str, list[str]] = json.loads(EARLIER.read_text())
+    have: dict[str, set[str]] = {}
+    for table, rows in p.rows.items():
+        have[table] = {str(row["id"]) for row in rows if "id" in row}
+    have["scheme"] = {str(row["code"]) for row in p.rows.get("scheme", [])}
+    lost = {table: sorted(set(ids) - have.get(table, set())) for table, ids in earlier.items()}
+    lost = {table: ids for table, ids in lost.items() if ids}
+    if lost:
+        raise ValueError(f"the registry drops rows an earlier version held: {lost}")
 
 
 @cache
