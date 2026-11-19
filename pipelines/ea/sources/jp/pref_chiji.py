@@ -20,7 +20,7 @@ from ea.store import DATA, connect
 
 SOURCE = "jp.pref_chiji"
 KEY = f"{SOURCE}/all"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{stamp}id_/{url}"
 TOCHIGI = "https://www.pref.tochigi.lg.jp/senkyo"
@@ -45,6 +45,19 @@ OSAKA = "https://www.pref.osaka.lg.jp/documents"
 HYOGO = "https://web.pref.hyogo.lg.jp/si01/documents"
 NAGANO = "https://www.pref.nagano.lg.jp/senkan"
 TOYAMA = "https://www.pref.toyama.jp/documents/13804"
+YAMAGUCHI = "https://www.pref.yamaguchi.lg.jp/uploaded/attachment"
+KAGAWA = "https://www.pref.kagawa.lg.jp/documents"
+MIYAZAKI = "https://www.pref.miyazaki.lg.jp/documents"
+KOCHI = "https://www.pref.kochi.lg.jp/doc/2026070300077/file_contents"
+OKAYAMA = "https://www.pref.okayama.lg.jp/uploaded"
+SAGA = "https://www.pref.saga.lg.jp"
+NAGASAKI = "https://www.pref.nagasaki.jp/uploads"
+KUMAMOTO = "https://www.pref.kumamoto.jp/uploaded/attachment"
+KAGOSHIMA = "https://www.pref.kagoshima.jp/ka01/kensei/senkyo/senkyokekka"
+OKINAWA = "https://www.pref.okinawa.lg.jp/_res/projects/default_project/_page_/001"
+HIROSHIMA = "https://www.pref.hiroshima.lg.jp/uploaded/attachment"
+FUKUOKA = "https://www.pref.fukuoka.lg.jp/uploaded"
+NO_LICENSE = "No license stated: facts published with attribution, raw files not redistributed"
 
 
 def site_terms(prefecture: str, terms: str) -> tuple[str, str]:
@@ -242,6 +255,93 @@ COMMISSIONS = {
         *site_terms("Toyama Prefecture", "https://www.pref.toyama.jp/1021/kensei/kouhou/0.html"),
         "出典：富山県選挙管理委員会",
     ),
+    "岡山県": Commission(
+        "岡山県選挙管理委員会",
+        "岡山県知事選挙 開票結果・投票結果（最終）",
+        "https://www.pref.okayama.lg.jp/soshiki/156/",
+        *site_terms("Okayama Prefecture", "https://www.pref.okayama.lg.jp/page/detail-4318.html"),
+        "出典：岡山県選挙管理委員会",
+    ),
+    "広島県": Commission(
+        "広島県選挙管理委員会",
+        "広島県知事選挙 開票結果・投票結果",
+        "https://www.pref.hiroshima.lg.jp/site/sennkyokannriiinkai/list41-155.html",
+        *site_terms("Hiroshima Prefecture", "https://www.pref.hiroshima.lg.jp/soshiki/19/menseki.html"),
+        "出典：広島県選挙管理委員会",
+    ),
+    "山口県": Commission(
+        "山口県選挙管理委員会",
+        "山口県知事選挙 確定開票結果・確定投票結果",
+        "https://www.pref.yamaguchi.lg.jp/site/senkyo/25854.html",
+        *site_terms("Yamaguchi Prefecture", "https://www.pref.yamaguchi.lg.jp/soshiki/21/26951.html"),
+        "出典：山口県選挙管理委員会",
+    ),
+    "香川県": Commission(
+        "香川県選挙管理委員会",
+        "香川県知事選挙 開票結果・投票結果",
+        "https://www.pref.kagawa.lg.jp/senkyoi/senkyoseido/senkyo_kekka/kfvn.html",
+        *site_terms("Kagawa Prefecture", "https://www.pref.kagawa.lg.jp/kocho/koho/kohosonota/about.html"),
+        "出典：香川県選挙管理委員会",
+    ),
+    "高知県": Commission(
+        "高知県選挙管理委員会",
+        "高知県知事選挙 開票結果（候補者別得票数集計表）・投票結果",
+        "https://www.pref.kochi.lg.jp/doc/2026070300077/",
+        NO_LICENSE,
+        None,
+        "出典：高知県選挙管理委員会",
+    ),
+    "福岡県": Commission(
+        "福岡県選挙管理委員会",
+        "福岡県知事選挙 候補別得票数・有効無効等内訳・投票結果（建制順）",
+        "https://www.pref.fukuoka.lg.jp/contents/toukaihyou.html",
+        *site_terms("Fukuoka Prefecture", "https://www.pref.fukuoka.lg.jp/contents/this-site-mensekietc.html"),
+        "出典：福岡県選挙管理委員会",
+    ),
+    "佐賀県": Commission(
+        "佐賀県選挙管理委員会",
+        "佐賀県知事選挙 開票状況速報県計表（確定）・投票状況速報県計表（確定）",
+        "https://www.pref.saga.lg.jp/list00715.html",
+        *site_terms("Saga Prefecture", "https://www.pref.saga.lg.jp/list02271.html"),
+        "出典：佐賀県選挙管理委員会",
+    ),
+    "長崎県": Commission(
+        "長崎県選挙管理委員会",
+        "長崎県知事選挙 開票結果・投票結果",
+        "https://www.pref.nagasaki.jp/doc/page-321245.html",
+        *site_terms("Nagasaki Prefecture", "https://www.pref.nagasaki.jp/pages/site_info.html"),
+        "出典：長崎県選挙管理委員会",
+    ),
+    "熊本県": Commission(
+        "熊本県選挙管理委員会",
+        "熊本県知事選挙 開票結果・投票結果",
+        "https://www.pref.kumamoto.jp/soshiki/147/241257.html",
+        NO_LICENSE,
+        None,
+        "出典：熊本県選挙管理委員会",
+    ),
+    "宮崎県": Commission(
+        "宮崎県選挙管理委員会",
+        "宮崎県知事選挙 確定開票結果（候補者別・投票内訳）・確定投票結果",
+        "https://www.pref.miyazaki.lg.jp/senkyo/index.html",
+        *site_terms("Miyazaki Prefecture", "https://www.pref.miyazaki.lg.jp/kohosenryaku/kense/koho/index-02.html"),
+        "出典：宮崎県選挙管理委員会",
+    ),
+    "鹿児島県": Commission(
+        "鹿児島県選挙管理委員会",
+        "鹿児島県知事選挙 開票結果・開票結果得票詳細・投票結果（確定）",
+        "https://www.pref.kagoshima.jp/ka01/senkyokekka.html",
+        *site_terms("Kagoshima Prefecture", "https://www.pref.kagoshima.jp/copyright.html"),
+        "出典：鹿児島県選挙管理委員会",
+    ),
+    "沖縄県": Commission(
+        "沖縄県選挙管理委員会",
+        "沖縄県知事選挙 開票確定・投票確定",
+        "https://www.pref.okinawa.lg.jp/kensei/senkyo/1005009/1023802/index.html",
+        NO_LICENSE,
+        None,
+        "出典：沖縄県選挙管理委員会",
+    ),
 }
 RECORDS: dict[str, tuple[str, ...]] = {
     "2026-08-09:長野県": (
@@ -397,6 +497,81 @@ RECORDS: dict[str, tuple[str, ...]] = {
         f"{WAKAYAMA}/deta/kekka/tiji/22tiji/22index_d/fil/22tikai.pdf",
         f"{WAKAYAMA}/deta/kekka/tiji/22tiji/22index_d/fil/22titou.pdf",
     ),
+    "2024-10-27:岡山県": (f"{OKAYAMA}/attachment/378434.xls", f"{OKAYAMA}/attachment/378407.xls"),
+    "2020-10-25:岡山県": (f"{OKAYAMA}/life/686745_6086828_misc.xls", f"{OKAYAMA}/life/686745_6086826_misc.xls"),
+    "2016-10-23:岡山県": (f"{OKAYAMA}/attachment/215035.xls", f"{OKAYAMA}/attachment/215040.xls"),
+    "2012-10-28:岡山県": (f"{OKAYAMA}/life/735222_6710861_misc.xls", f"{OKAYAMA}/life/735222_6711212_misc.xls"),
+    "2025-11-09:広島県": (f"{HIROSHIMA}/645839.pdf", f"{HIROSHIMA}/645838.pdf"),
+    "2026-02-08:山口県": (f"{YAMAGUCHI}/231207.xlsx", f"{YAMAGUCHI}/231124.xlsx"),
+    "2022-02-06:山口県": (f"{YAMAGUCHI}/109686.xls", f"{YAMAGUCHI}/109685.xls"),
+    "2018-02-04:山口県": (f"{YAMAGUCHI}/84858.xls", f"{YAMAGUCHI}/84856.xls"),
+    "2022-08-28:香川県": (f"{KAGAWA}/33589/023_c_kaikaku.xlsx", f"{KAGAWA}/33589/023_c_toukaku_teisei.xlsx"),
+    "2018-08-26:香川県": (
+        f"{KAGAWA}/6454/wcu8qu180821160834_f03.xlsx",
+        f"{KAGAWA}/6454/wcu8qu180821160834_f01.xlsx",
+    ),
+    "2014-08-31:香川県": (
+        f"{KAGAWA}/6445/skosn5180324122337_f03.xlsx",
+        f"{KAGAWA}/6445/skosn5180324122337_f01.xlsx",
+    ),
+    "2010-08-29:香川県": (
+        f"{KAGAWA}/6438/s5yjb4180324123141_f03.xlsx",
+        f"{KAGAWA}/6438/s5yjb4180324123141_f01.xlsx",
+    ),
+    "2023-11-26:高知県": (f"{KOCHI}/file_20243251124041_1.pdf", f"{KOCHI}/file_20243251124015_1.pdf"),
+    "2025-03-23:福岡県": (
+        f"{FUKUOKA}/attachment/251247.xlsx",
+        f"{FUKUOKA}/attachment/251244.xlsx",
+        f"{FUKUOKA}/attachment/251248.xlsx",
+    ),
+    "2022-12-18:佐賀県": (
+        f"{SAGA}/kiji00389115/3_89115_262876_up_r0w6ymrt.pdf",
+        f"{SAGA}/kiji00389113/3_89113_262872_up_egyjhrqh.pdf",
+    ),
+    "2015-01-11:佐賀県": (
+        f"{SAGA}/kiji00326930/3_26930_1_201512014053.pdf",
+        f"{SAGA}/kiji00326920/3_26920_1_201512014255.pdf",
+    ),
+    "2026-02-08:長崎県": (f"{NAGASAKI}/2026/02/1770574831.xlsx", f"{NAGASAKI}/2026/02/1770565425.xlsx"),
+    "2022-02-20:長崎県": (f"{NAGASAKI}/2022/05/1653038294.pdf", f"{NAGASAKI}/2022/05/1653038267.pdf"),
+    "2018-02-04:長崎県": (f"{NAGASAKI}/2020/05/1589530516.pdf", f"{NAGASAKI}/2020/05/1589530466.pdf"),
+    "2024-03-24:熊本県": (f"{KUMAMOTO}/248495.pdf", f"{KUMAMOTO}/248494.pdf"),
+    "2016-03-27:熊本県": (f"{KUMAMOTO}/226778.pdf", f"{KUMAMOTO}/226777.pdf"),
+    "2012-03-25:熊本県": (f"{KUMAMOTO}/285154.pdf", f"{KUMAMOTO}/285153.pdf"),
+    "2022-12-25:宮崎県": (
+        f"{MIYAZAKI}/73589/73589_20221226000354-1.xls",
+        f"{MIYAZAKI}/73589/73589_20221228144735-1.xls",
+        f"{MIYAZAKI}/73589/73589_20221226000425-1.xls",
+    ),
+    "2018-12-23:宮崎県": (
+        f"{MIYAZAKI}/40706/40706_20181223232724-1.xls",
+        f"{MIYAZAKI}/40706/40706_20181223224203-1.xls",
+        f"{MIYAZAKI}/40706/40706_20181223232856-1.xls",
+    ),
+    "2024-07-07:鹿児島県": (
+        f"{KAGOSHIMA}/202406/documents/114048_20240707235632-1.xlsx",
+        f"{KAGOSHIMA}/202406/documents/114048_20240707224618-1.xlsx",
+        f"{KAGOSHIMA}/202406/documents/114048_20240708000107-1.xlsx",
+    ),
+    "2020-07-12:鹿児島県": (
+        f"{KAGOSHIMA}/20200712/documents/82243_20200713000721-1.xlsm",
+        f"{KAGOSHIMA}/20200712/documents/82243_20200712223939-1.xlsm",
+        f"{KAGOSHIMA}/20200712/documents/82243_20200713000802-1.xlsm",
+    ),
+    "2016-07-10:鹿児島県": (
+        f"{KAGOSHIMA}/20160710/documents/52884_20160711062110-1.xls",
+        f"{KAGOSHIMA}/20160710/documents/52884_20160711022514-1.xls",
+        f"{KAGOSHIMA}/20160710/documents/52884_20160711062142-1.xls",
+    ),
+    "2012-07-08:鹿児島県": (
+        f"{KAGOSHIMA}/120708/documents/26450_20120709000834-1.xls",
+        f"{KAGOSHIMA}/120708/documents/26450_20120717131912-1.xls",
+    ),
+    "2022-09-11:沖縄県": (
+        f"{OKINAWA}/025/046/r4chiji-kaihyokakutei.xls",
+        f"{OKINAWA}/025/046/touhyoukakutei-shuusei2446.xlsx",
+    ),
+    "2018-09-30:沖縄県": (f"{OKINAWA}/021/246/tijikaihyoulast.xls", f"{OKINAWA}/021/246/20190225teisei.xls"),
 }
 FIELDS = ("valid", "invalid", "cast", "unreturned", "voters")
 MEASURES = {"registered": 2, "voters": 14, "cast": 3, "valid": 4, "invalid": 5}
@@ -917,20 +1092,50 @@ def rows_of(path: Path) -> list[list[str]]:
     return book(path)
 
 
-def place_figures(path: Path) -> list[tuple[str, list[Decimal]]]:
-    """Each row's place (the words before its first figure, without spaces, parentheses, or the 結了 mark) and its
-    counts, leaving out percentages."""
+def unnumbered(tokens: list[str]) -> list[str]:
+    """A row without the number some tables print before its place, whether apart (10 香 南 市) or run into the name
+    (1高 知 市), and without a one-character label of a vertical column before the number (市 | 4 | 浦 添 市)."""
+    if len(tokens) > 2 and len(tokens[0]) == 1 and tokens[1].isdigit() and not FIGURE.match(tokens[2]):
+        return tokens[2:]
+    if len(tokens) > 1 and tokens[0].isdigit() and not FIGURE.match(tokens[1]):
+        return tokens[1:]
+    if tokens and (m := re.match(r"^\d+(\D.*)$", tokens[0])):
+        return [m[1], *tokens[1:]]
+    return tokens
+
+
+def signed(tokens: list[str]) -> list[str]:
+    """A row with the ▲ or △ that marks a negative figure (▲ 1, ▲1) folded into the figure (-1)."""
+    out: list[str] = []
+    for t in tokens:
+        if out and out[-1] in ("▲", "△") and FIGURE.match(t) and not t.startswith("-"):
+            out[-1] = f"-{t}"
+        elif re.match(r"^[▲△][\d,]+$", t):
+            out.append(f"-{t[1:]}")
+        else:
+            out.append(t)
+    return out
+
+
+def place_figures(path: Path, numbered: bool = False) -> list[tuple[str, list[Decimal]]]:
+    """Each row's place (the words before its first figure, without spaces, parentheses, or the 結了 mark, and with
+    `numbered`, without a leading row number) and its counts, leaving out percentages."""
     out = []
     for tokens in rows_of(path):
+        if numbered:
+            tokens = unnumbered(tokens)
+        tokens = signed(tokens)
         i = next((i for i, t in enumerate(tokens) if FIGURE.match(t)), len(tokens))
-        place = re.sub(r"^確(?=\S+[区市町村]$)", "", squash("".join(tokens[:i])).replace("*", "").replace("＊", ""))
+        place = re.sub(r"^確定?(?=\S+[区市町村]$)", "", re.sub(r"[*＊○●]", "", squash("".join(tokens[:i]))))
         figures = [number(t) for t in tokens[i:] if FIGURE.match(t) and not PERCENT.match(t)]
         if place and figures:
             out.append((place, figures))
     return out
 
 
-def ledger(values: list[Decimal], total: Decimal, cast: bool, n: int) -> dict[str, str | None] | None:
+def ledger(
+    values: list[Decimal], total: Decimal, cast: bool, n: int, leads: tuple[int, ...] | None = None
+) -> dict[str, str | None] | None:
     """Find valid, invalid, and cast ballots after a row's n candidate votes: valid + invalid = cast, where valid
     equals the votes' total or follows the total, 按分 truncation, and other ballots that add up to it; then voters,
     the first later figure that equals cast plus the figures between them. Without a cast column (`cast=False`),
@@ -940,7 +1145,7 @@ def ledger(values: list[Decimal], total: Decimal, cast: bool, n: int) -> dict[st
     # Valid ballots after the total, 按分 truncation, and other ballots, then after the total and 按分, then the
     # total itself, so a zero 按分 column is never taken for invalid ballots. Truncation drops less than a vote per
     # candidate, which keeps total + invalid = cast from passing for total + 按分 = valid.
-    for lead in (3, 2, 0) if cast else (0,):
+    for lead in leads or ((3, 2, 0) if cast else (0,)):
         for a in range(lead, len(v) - 1):
             if v[a - lead] != total or (lead and (sum(v[a - lead : a]) != v[a] or v[a - lead + 1] >= n)):
                 continue
@@ -983,11 +1188,22 @@ Ledger = dict[str, str | None]
 
 def standard_row(v: list[Decimal], cast: bool) -> tuple[list[Decimal], Ledger] | None:
     """The candidates' votes are the first run of figures that adds up to the figure after it, from the row's start
-    or after a count or two some totals rows lead with (the number of counting districts)."""
+    or after a count or two some totals rows lead with (the number of counting districts). 按分 truncation stays
+    below one vote for each candidate with votes, so empty candidate slots (Okinawa) don't raise that bound."""
     for s in range(3):
         for n in range(1, len(v) - s):
-            if sum(v[s : s + n]) == v[s + n] and (read := ledger(v[s + n :], v[s + n], cast, n)) is not None:
+            voted = sum(1 for x in v[s : s + n] if x)
+            if sum(v[s : s + n]) == v[s + n] and (read := ledger(v[s + n :], v[s + n], cast, voted)) is not None:
                 return v[s : s + n], read
+    return None
+
+
+def bare_row(v: list[Decimal], cast: bool) -> tuple[list[Decimal], Ledger] | None:
+    """Rows that print no 按分 truncation or other ballots, so valid ballots are the candidates' total and a small
+    invalid count is never taken for truncation (Okinawa)."""
+    for n in range(1, len(v)):
+        if sum(v[:n]) == v[n] and (read := ledger(v[n:], v[n], cast, n, leads=(0,))) is not None:
+            return v[:n], read
     return None
 
 
@@ -1015,7 +1231,7 @@ def cast_first_row(v: list[Decimal], cast: bool) -> tuple[list[Decimal], Ledger]
 def whole_cities(rows: list[tuple[str, list[Decimal]]]) -> list[tuple[str, list[Decimal]]]:
     """Read a city its commission counts in several counting districts (富山市第1開票区) from its printed total row
     (富山市計), dropping the districts, which have no area of their own."""
-    district = re.compile(r"^(.+?[市町村])第\d+開票区$")
+    district = re.compile(r"^(.+?[市町村])第\d+(開票区)?$")
     split = {m[1] for place, _ in rows if (m := district.match(place))}
     return [
         (place[:-1] if place.endswith("計") and place[:-1] in split else place, figures)
@@ -1028,10 +1244,97 @@ def toyama_votes(path: Path) -> tuple[list[str], list[dict[str, Any]], dict[str,
     return read_counts(whole_cities(place_figures(path)), True, str(path), cast_first_row)
 
 
+def district_votes(*paths: Path) -> tuple[list[str], list[dict[str, Any]], dict[str, Any]]:
+    """table_votes for records that count a city in several districts (薩摩川内市第1) and print its total."""
+    return read_counts(whole_cities([row for path in paths for row in place_figures(path)]), True, str(paths[0]))
+
+
 def toyama_turnout(path: Path) -> dict[str, tuple[str, str]]:
     return {
         place: (str(f[2]), str(f[5])) for place, f in whole_cities(place_figures(path)) if unit(place) and len(f) >= 6
     }
+
+
+def kochi_row(v: list[Decimal], cast: bool) -> tuple[list[Decimal], Ledger] | None:
+    """Kochi's rows: the candidates' votes and their total, then voters, cast ballots, 按分 truncation, other
+    ballots, valid ballots, and invalid ballots."""
+    for n in range(1, len(v) - 7):
+        total, voters, ballots, cut, other, valid, invalid = v[n : n + 7]
+        if sum(v[:n]) == total and total + cut + other == valid and valid + invalid == ballots:
+            return [whole(x) for x in v[:n]], {
+                "total": str(whole(total)),
+                "cut": str(whole(cut)),
+                "other": str(whole(other)),
+                "valid": str(whole(valid)),
+                "invalid": str(whole(invalid)),
+                "cast": str(whole(ballots)),
+                "unreturned": str(whole(voters - ballots)),
+                "voters": str(whole(voters)),
+            }
+    return None
+
+
+def whole(x: Decimal) -> Decimal:
+    """A count printed with places (84,792.000) as the whole number it is."""
+    return x.quantize(Decimal(1)) if x == x.to_integral_value() else x
+
+
+def nagasaki_row(v: list[Decimal], cast: bool) -> tuple[list[Decimal], Ledger] | None:
+    """Nagasaki's rows: the candidates' votes and their total, then (from 2026) the total again, 按分 truncation where
+    printed, and valid ballots; then invalid ballots, ballots not yet counted (zero once the count is final), cast
+    ballots, other ballots, and voters."""
+    zero = Decimal(0)
+    for n in range(1, len(v) - 5):
+        if sum(v[:n]) != v[n]:
+            continue
+        tails = [(zero, v[n], v[n + 1 :])]
+        if len(v) > n + 3 and v[n + 1] == v[n]:
+            tails = [(zero, v[n + 2], v[n + 3 :]), (v[n + 2], v[n + 3], v[n + 4 :]), *tails]
+        for cut, valid, rest in tails:
+            if len(rest) < 5:
+                continue
+            invalid, uncounted, ballots, other, voters = rest[:5]
+            if (
+                v[n] + cut == valid
+                and valid + invalid == ballots
+                and uncounted == 0
+                and ballots + other == voters
+                and cut < n
+            ):
+                return v[:n], {
+                    "total": str(v[n]),
+                    "cut": str(cut),
+                    "other": "0",
+                    "valid": str(valid),
+                    "invalid": str(invalid),
+                    "cast": str(ballots),
+                    "unreturned": str(other),
+                    "voters": str(voters),
+                }
+    return None
+
+
+def nagasaki_votes(path: Path) -> tuple[list[str], list[dict[str, Any]], dict[str, Any]]:
+    return read_counts(place_figures(path), True, str(path), nagasaki_row)
+
+
+def kochi_votes(path: Path) -> tuple[list[str], list[dict[str, Any]], dict[str, Any]]:
+    return read_counts(place_figures(path, numbered=True), True, str(path), kochi_row)
+
+
+def okinawa_votes(*paths: Path) -> tuple[list[str], list[dict[str, Any]], dict[str, Any]]:
+    """Okinawa's count tables: numbered rows, the candidates' votes (with empty slots), then valid ballots."""
+    rows = [row for path in paths for row in place_figures(path, numbered=True)]
+    return read_counts(rows, True, str(paths[0]), bare_row)
+
+
+def numbered_turnout(path: Path) -> dict[str, tuple[str, str]]:
+    """turnout for tables that number their rows."""
+    out: dict[str, tuple[str, str]] = {}
+    for place, f in place_figures(path, numbered=True):
+        if unit(place) and len(f) >= 6:
+            out.setdefault(place, (str(f[2]), str(f[5])))
+    return out
 
 
 def read_counts(
@@ -1086,8 +1389,9 @@ def turnout(path: Path) -> dict[str, tuple[str, str]]:
 
 
 # Prefectures whose tables print each county's name down a column beside its towns and villages, so the text layer
-# runs one or two of its characters into the first town names (上小布施町 for 上高井郡 小布施町).
-COUNTY_COLUMN = {"長野県"}
+# runs one or two of its characters into the first town names (上小布施町 for 上高井郡 小布施町), or before each town
+# (大島郡周防大島町).
+COUNTY_COLUMN = {"長野県", "山口県", "佐賀県"}
 
 
 def municipalities(prefecture: str) -> set[str]:
@@ -1151,6 +1455,18 @@ READERS: dict[str, tuple[Any, Any]] = {
     "兵庫県": (hyogo_votes, hyogo_turnout),
     "長野県": (table_votes, turnout),
     "富山県": (toyama_votes, toyama_turnout),
+    "岡山県": (table_votes, turnout),
+    "広島県": (table_votes, turnout),
+    "山口県": (table_votes, turnout),
+    "香川県": (table_votes, turnout),
+    "高知県": (kochi_votes, numbered_turnout),
+    "福岡県": (table_votes, turnout),
+    "佐賀県": (table_votes, turnout),
+    "長崎県": (nagasaki_votes, turnout),
+    "熊本県": (table_votes, turnout),
+    "宮崎県": (table_votes, turnout),
+    "鹿児島県": (district_votes, toyama_turnout),
+    "沖縄県": (okinawa_votes, numbered_turnout),
     # Shizuoka's 2017 and 2021 count tables print valid and invalid ballots without cast ballots or voters.
     "2021-06-20:静岡県": (ballots_votes, turnout),
     "2017-06-25:静岡県": (ballots_votes, turnout),
@@ -1194,6 +1510,20 @@ def parse() -> None:
     print(build())
 
 
+def reorder(key: str, places: list[dict[str, Any]], total: dict[str, Any], mic: list[Decimal]) -> None:
+    """Put the columns of a record that prints no names in the summary's ballot order, when it prints the candidates
+    in another order (Okayama 2020): each column goes where the summary prints its sum, which must be unique."""
+    sums = [sum(Decimal(p["votes"][k]) for p in places) for k in range(len(mic))]
+    if all(abs(s - m) < 1 for s, m in zip(sums, mic, strict=True)):
+        return
+    order = [next((k for k, s in enumerate(sums) if abs(s - m) < 1), None) for m in mic]
+    if None in order or sorted(o for o in order if o is not None) != list(range(len(mic))):
+        return
+    for p in [*places, total]:
+        p["votes"] = [p["votes"][k] for k in order if k is not None]
+    print(f"{key}: candidates reordered from the record's columns {[k + 1 for k in order if k is not None]}")
+
+
 def checked_rows(
     key: str, urls: tuple[str, ...], official: dict[str, str | None], candidates: pl.DataFrame
 ) -> list[dict[str, Any]]:
@@ -1209,6 +1539,8 @@ def checked_rows(
             p["votes"] = p["votes"][: candidates.height]
     if len(names) != candidates.height:
         raise ValueError(f"{key}: {len(names)} candidates in the record, {candidates.height} in the summary")
+    if not any(names):
+        reorder(key, places, total, [Decimal(v) for v in candidates["votes"]])
     for name, mic in zip(names, candidates["name"], strict=True):
         if name and re.sub(r"\s", "", name) != re.sub(r"\s", "", mic):
             raise ValueError(f"{key}: candidate {name} is {mic} in the summary")
@@ -1254,6 +1586,14 @@ def checked_rows(
 # Elections whose commission tables put the closing electorate above the ministry's summary, while every vote,
 # ballot, and voter count matches it: the difference, and the caveat the result set carries.
 ELECTORATE: dict[str, tuple[int, str]] = {
+    "2022-12-25:宮崎県": (
+        1,
+        (
+            "The commission's corrected turnout table (確定投票結果（訂正）) puts the electorate at 887,567, 1 more than "
+            "the 887,566 the ministry's summary and the commission's first final table print; the electorate here is "
+            "the corrected table's, by municipality. Votes, ballots, and voters match the summary."
+        ),
+    ),
     "2022-05-29:新潟県": (
         28,
         (
@@ -1293,6 +1633,26 @@ NOTES = {
     "names the text layer runs together with the county column are matched to the municipality whose name ends them.",
     "富山県": "The commission's count (候補者得票集計表) and turnout workbooks; voters come from the turnout table. In 2024 "
     "Toyama City counted in two districts, read from the city total the workbooks print.",
+    "岡山県": "The commission's final count (開票結果) and turnout (投票結果) workbooks; Okayama City by ward. The 2020 "
+    "workbook prints the candidates in another order than the ballot, so its columns are matched to the ministry's "
+    "candidates by their totals.",
+    "広島県": "The commission's count and turnout tables, read from the PDFs' text layers; Hiroshima City by ward.",
+    "山口県": "The commission's final count (確定開票結果) and turnout (確定投票結果) workbooks; county names the 2018 "
+    "and 2022 workbooks print before each town are matched to the municipality whose name ends them.",
+    "高知県": "The commission's count table (候補者別得票数集計表, which also prints voters and the ballot breakdown) and "
+    "turnout table, read from the PDFs' text layers without the row numbers they print before each name.",
+    "福岡県": "The commission's candidate (候補別得票数) and ballot (有効無効等内訳) tables and its turnout table, by "
+    "municipality and by ward in Kitakyushu and Fukuoka.",
+    "佐賀県": "The commission's final count and turnout bulletins (県計表), read from the PDFs' text layers; the "
+    "county column's characters run into the town names and are matched to the municipality that ends them.",
+    "長崎県": "The commission's count and turnout tables (2026 from the final workbooks, 2018 and 2022 from the PDFs' "
+    "text layers); the count tables print ballots not yet counted, zero in each final table.",
+    "宮崎県": "The commission's final candidate table (確定開票結果（候補者別）), ballot table (投票内訳), and turnout "
+    "table (確定投票結果, for 2022 its corrected version).",
+    "鹿児島県": "The commission's final count (開票結果), ballot (開票結果得票詳細), and turnout workbooks; Satsumasendai, "
+    "counted in two districts, is read from the city total the workbooks print.",
+    "沖縄県": "The commission's final count (開票確定) and turnout (投票確定, for 2018 the version corrected in 2019) "
+    "workbooks; the count tables print no 按分 column, so valid ballots are the candidates' total.",
 }
 METHOD = (
     "Votes by municipality, or by ward in designated cities, from the prefectural election commission's final "
