@@ -12,7 +12,8 @@ import polars as pl
 import shapefile
 
 from ea import raw
-from ea.changeset import NAMESPACE, Changeset, slug
+from ea.changeset import NAMESPACE, slug
+from ea.package import Draft
 from ea.sources.licenses import PUBLIC_RECORD
 from ea.store import DATA, connect
 
@@ -26,8 +27,11 @@ CANDIDATES = f"{API}/election-explorer/candidates"
 DISTRICTS = f"{API}/election-explorer/electoral-districts"
 COMPOSITION = f"{API}/report-groups/48/report-outputs/1092/csv"
 REFERENDUM = f"{API}/report-groups/43/report-outputs/723/csv"
+SHAPEFILES = "https://www.elections.on.ca/content/dam/NGW/sitecontent/2017/preo/shapefiles/"
+# Elections Ontario's site refuses scripted downloads, so the shapefiles come from Wayback captures; the 2022 district
+# file is byte for byte the one first loaded from the site (sha256 70fd809a...).
 BOUNDARIES = (
-    "https://www.elections.on.ca/content/dam/NGW/sitecontent/2017/preo/shapefiles/"
+    f"https://web.archive.org/web/20250824185242id_/{SHAPEFILES}"
     "Electoral%20District%20Shapefile%20-%202022%20General%20Election.zip"
 )
 LAMBERT = "+proj=lcc +lat_1=44.5 +lat_2=54.5 +lat_0=0 +lon_0=-84 +x_0=1000000 +y_0=0 +ellps=GRS80 +units=m +no_defs"
@@ -405,7 +409,7 @@ def emit() -> Path:
     shapes = pl.read_parquet(PARSED / "shapes.parquet")
     generals = sorted(contests.filter(pl.col("general"))["date"].unique().to_list())
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
@@ -414,6 +418,11 @@ def emit() -> Path:
                 "electoral system referendum, by electoral district, from Elections Ontario"
             ),
             polity="CA-ON",
+        )
+        cs.accept(
+            "result_set.empty",
+            "the contests whose candidates were acclaimed have tacit result sets with no votes, as Elections Ontario "
+            "prints none for them",
         )
 
         def name(
