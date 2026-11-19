@@ -21,7 +21,7 @@ import shapely
 from ea import package, raw
 from ea.changeset import slug
 from ea.package import Package
-from ea.sources.hr import izbori, lokalni
+from ea.sources.hr import granice, izbori, lokalni
 
 SOURCE = "hr.manjine"
 SITE = "https://www.izbori.hr/arhiva-izbora"
@@ -50,6 +50,7 @@ def fetch() -> None:
     print(f"{SOURCE}: {len(got)} of {len(urls)} reports cached", flush=True)
     for url in (lokalni.GB_COUNTIES, lokalni.GB_TOWNS):
         raw.fetch(SOURCE, url, suffix=".geojson")
+    raw.fetch(granice.SOURCE, granice.UNITS, suffix=".gml")
 
 
 def clean(text: object) -> str:
@@ -522,6 +523,7 @@ def geo() -> Package:
         depends=[f"{izbori.SOURCE}/geo"],
     )
     county_source, town_source = key("source", "geoboundaries-adm1"), key("source", "geoboundaries-adm2")
+    official_source = key("source", "dgu-statistical-units")
     for id, title_, license_, license_url, notes in (
         (
             county_source,
@@ -585,6 +587,31 @@ def geo() -> Package:
                 continue
         shapes.setdefault(f"{next(iter(homes))}:{folded}", shape)
     used = {area_of(c) for c in early}
+    # geoBoundaries draws islands as "Otok" features that cover several municipalities, so the towns on them take the
+    # Geodetic Administration's outline, which has not changed for them since 2003.
+    open_codes = {code for scheme, code in used if scheme == "hr.opcina"} - set(shapes) - {"21:zagreb"}
+    official = {
+        f"{county}:{name}": shape
+        for (county, name), shape in granice.towns().items()
+        if f"{county}:{name}" in open_codes
+    }
+    if official:
+        p.add(
+            "source",
+            id=official_source,
+            kind="official_body",
+            publisher="Državna geodetska uprava",
+            title="Statistical units of the 2021 census (INSPIRE AreaStatisticalUnit, towns and municipalities)",
+            url=granice.CATALOG,
+            license="Open license of the Republic of Croatia (Otvorena dozvola)",
+            license_url="https://data.gov.hr/otvorena-dozvola",
+            attribution="Državna geodetska uprava (DGU), Državni zavod za statistiku (DZS)",
+            notes=(
+                "Used for the towns that geoBoundaries merges into island features, whose borders are unchanged "
+                "since 2003. Simplified to about 20 meters."
+            ),
+        )
+        p.artifact(raw.cached(granice.SOURCE, granice.UNITS), official_source)
     for scheme, code in sorted(used):
         if scheme == "hr.zupanija":
             shape = counties[code]
@@ -595,6 +622,9 @@ def geo() -> Package:
         elif code in shapes:
             shape = shapes[code]
             source = town_source
+        elif code in official:
+            shape = official[code]
+            source = official_source
         else:
             continue
         p.add(
