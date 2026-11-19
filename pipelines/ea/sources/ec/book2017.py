@@ -15,6 +15,7 @@ from ea.sources.ec import cne
 
 BOOK_2017 = f"{cne.BASE}/2022/05/RESULTADOS-ELECTORALES-2017.pdf"
 NUM = re.compile(r"^\d{1,3}(?:\.\d{3})*$")
+WIDE = re.compile(r"^(?:\d{1,3}(?:\.\d{3})+|\d+)$")  # also a figure that the book leaves without its separator
 WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>')
 BROKEN = re.compile(r"^\d{1,3}(?:\.\d{3})*\.\d\d$")  # a figure missing its last digit, such as 32.27 for 32.270
 SIDEBAR = {"PROVINCIALES", "ASAMBEÍSTAS", "NACIONALES", "ANDINOS", "PARLAMENTARIOS", "ASAMBLEÍSTAS"}
@@ -49,8 +50,8 @@ def unescape(text: str) -> str:
 
 
 @functools.cache
-def pages() -> list[list[Word]]:
-    path = cne.artifact(BOOK_2017).path
+def pages(book: str = BOOK_2017) -> list[list[Word]]:
+    path = cne.artifact(book).path
     xml = subprocess.run(["pdftotext", "-bbox", str(path), "-"], check=True, capture_output=True, text=True).stdout
     result: list[list[Word]] = []
     for page in xml.split("<page ")[1:]:
@@ -81,10 +82,10 @@ def _joined(words: list[Word]) -> list[Word]:
     return result
 
 
-def lines(page: int) -> list[tuple[float, list[Word]]]:
+def lines(page: int, book: str = BOOK_2017) -> list[tuple[float, list[Word]]]:
     """A page's words grouped into lines by height, top to bottom."""
     grouped: list[tuple[float, list[Word]]] = []
-    for word in _joined(pages()[page - 1]):
+    for word in _joined(pages(book)[page - 1]):
         if word.text in SIDEBAR:
             continue
         if grouped and abs(grouped[-1][0] - word.y) <= 2.0:
@@ -110,27 +111,30 @@ class Row(NamedTuple):
     x: float  # where the row's numbers start
 
 
-def rows(page: int, width: int | None = None, below: float = 0.0, above: float = 1e9) -> list[Row]:
+def rows(
+    page: int, width: int | None = None, below: float = 0.0, above: float = 1e9, book: str = BOOK_2017
+) -> list[Row]:
     """Rows of whole numbers between two heights, each with the name words that sit nearest to it.
 
     The width is the count of numbers in a row; without one, the most common count on the page is used. A name that
     starts with a number, such as 24 DE MAYO, keeps that number in its name.
     """
+    num = NUM if book == BOOK_2017 else WIDE
     candidates: list[tuple[float, list[Word]]] = []
-    for y, words in lines(page):
+    for y, words in lines(page, book):
         if not below <= y <= above:
             continue
-        digits = [w for w in words if NUM.match(w.text)]
+        digits = [w for w in words if num.match(w.text)]
         if len(digits) >= 2:
             candidates.append((y, words))
     if not candidates:
         return []
     if width is None:
-        counts = [sum(1 for w in words if NUM.match(w.text)) for _, words in candidates]
+        counts = [sum(1 for w in words if num.match(w.text)) for _, words in candidates]
         width = max(set(counts), key=counts.count)
     found: list[tuple[float, float, list[int], list[Word]]] = []
     for y, words in candidates:
-        digits = [w for w in words if NUM.match(w.text)]
+        digits = [w for w in words if num.match(w.text)]
         if not width <= len(digits) <= width + 1:
             continue
         numbers = digits[-width:]
@@ -138,7 +142,7 @@ def rows(page: int, width: int | None = None, below: float = 0.0, above: float =
         found.append((y, start, [number(w.text) for w in numbers], [w for w in words if w.x1 <= start - 0.5]))
     owned: dict[int, list[Word]] = {i: list(own) for i, (_, _, _, own) in enumerate(found)}
     start_of = min((start for _, start, _, _ in found), default=0)
-    for y, words in lines(page):
+    for y, words in lines(page, book):
         if not below <= y <= above or any(abs(y - f[0]) <= 2.0 for f in found):
             continue
         for word in words:
