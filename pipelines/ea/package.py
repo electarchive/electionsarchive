@@ -813,6 +813,9 @@ CHECKS = {
                          where kind not in ('context', 'caveat', 'methodology', 'editorial', 'retired')""",
     "fact.scheme_code": """select code from scheme
                            where not regexp_full_match(code, '([a-z]{2,3}(-[a-z0-9]+)?|world)\\.[a-z0-9_]+')""",
+    "fact.scheme_code_system": """select code, code_system from scheme
+                                  where code_system is not null
+                                    and not regexp_full_match(code_system, '[a-z][a-z0-9_]*')""",
     "accounting.votes_valid": """with v as (
                                    select v.result_set_id, v.unit_id,
                                           sum(value) filter (where measure = 1 and option_id is not null) as votes,
