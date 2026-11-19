@@ -103,8 +103,22 @@ def fetch_tsj(pages: list[int]) -> list[str]:
         keep_cookies=False,
     )
     urls = [table.url for page in pages for table in tsj_tables(page)]
-    raw.fetch_many(SOURCE, urls, suffix=".html", workers=WORKERS, batch=500, keep_cookies=False)
+    fetch_pages(urls)
     return urls
+
+
+def fetch_pages(urls: list[str]) -> None:
+    """Fetch table pages. Under load the services sometimes answer 200 with an empty body; such an answer is dropped
+    from the cache and fetched again."""
+    for _ in range(5):
+        raw.fetch_many(SOURCE, urls, suffix=".html", workers=WORKERS, batch=500, keep_cookies=False)
+        with raw.locked(SOURCE) as index:
+            empty = [url for url in urls if url in index and index[url]["bytes"] == 0]
+            for url in empty:
+                del index[url]
+        if not empty:
+            return
+    raise RuntimeError(f"{len(empty)} table pages stay empty, such as {empty[0]}")
 
 
 def te_section_url(comuna: int) -> str:
@@ -142,7 +156,7 @@ def fetch_te() -> list[str]:
         SOURCE, [link for c in COMUNAS for link in te_establishment_links(c)], suffix=".html", workers=WORKERS
     )
     urls = [table.url for c in COMUNAS for table in te_tables(c)]
-    raw.fetch_many(SOURCE, urls, suffix=".html", workers=WORKERS, batch=500, keep_cookies=False)
+    fetch_pages(urls)
     return urls
 
 
