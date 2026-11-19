@@ -138,7 +138,7 @@ A re-emit runs the same pipeline again and writes a new changeset. Re-emits must
 
 **Published sets become immutable.** Until the archive's public launch, a re-emit can replace the facts of a set that its own pipeline last wrote. After launch, a published result set is immutable. Corrections then arrive as superseding sets.
 
-**Reverting is the fallback.** `ea revert` undoes a changeset. It deletes the result sets the changeset created, restores the rows it changed from their history, and removes the entities it minted. It refuses when a later changeset changed a row it wrote, references an entity it created, or holds facts on its units. It also refuses when the changeset replaced facts in a set it did not create. Those corrections are fixed forward with another re-emit. Use `revert` when a re-emit cannot express the fix, such as an entity that should not exist. Revert newer changesets first, and move the reverted folders to `data/retired`.
+**Reverting is the fallback.** `ea revert` undoes a changeset. It deletes the result sets the changeset created, restores the rows it changed from their history, and removes the entities it minted. A source the changeset added stays when later changesets cite it, and is handed to the earliest of them. The revert fails when a later changeset changed a row it wrote, references an entity it created, or holds facts on its units. The revert also fails when the changeset replaced facts in a set it did not create. Those corrections are fixed forward with another re-emit. Use `revert` when a re-emit cannot express the fix, such as an entity that should not exist. Revert newer changesets first, and move the reverted folders to `data/retired`.
 
 ## Withdrawal at a source's request
 

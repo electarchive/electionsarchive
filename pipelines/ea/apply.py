@@ -2454,14 +2454,18 @@ def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | Non
                 {"id": changeset_id},
             ).fetchall()
         )
-    for child, column, parent, key in conn.execute(
+    links = conn.execute(
         """select c.conrelid::regclass::text, a.attname, c.confrelid::regclass::text, p.attname from pg_constraint c
            join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
            join pg_attribute p on p.attrelid = c.confrelid and p.attnum = c.confkey[1]
            where c.contype = 'f' and c.connamespace = 'public'::regnamespace
              and c.conrelid::regclass::text = any(%s) and c.confrelid::regclass::text = any(%s)""",
         [stamped, stamped],
-    ).fetchall():
+    ).fetchall()
+    cited = [(child, column, key) for child, column, parent, key in links if parent == "source"]
+    for child, column, parent, key in links:
+        if parent == "source":
+            continue
         later.update(
             writer
             for (writer,) in conn.execute(
@@ -2535,6 +2539,25 @@ def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | Non
             [changeset_id],
         )
         conn.execute("set local session_replication_role = replica")
+        if cited:
+            conn.execute(
+                sql.SQL(
+                    """update source s set changeset_id = heir.changeset_id from (
+                         select distinct on (t.source) t.source, t.changeset_id
+                         from ({}) t join changeset c on c.id = t.changeset_id
+                         order by t.source, c.published_at) heir
+                       where s.id = heir.source and s.changeset_id = %(id)s"""
+                ).format(
+                    sql.SQL(" union all ").join(
+                        sql.SQL(
+                            """select {column} as source, changeset_id from {child} where changeset_id <> %(id)s
+                               and {column} in (select {key} from source where changeset_id = %(id)s)"""
+                        ).format(column=sql.Identifier(column), child=sql.Identifier(child), key=sql.Identifier(key))
+                        for child, column, key in cited
+                    )
+                ),
+                {"id": changeset_id},
+            )
         restored: list[str] = []
         for table in histories:
             history = sql.Identifier(f"{table}_history")
