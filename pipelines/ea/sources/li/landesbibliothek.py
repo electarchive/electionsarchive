@@ -1,10 +1,15 @@
-"""Liechtenstein's Landtag elections of 1945-1997 by municipality, digitized from the Liechtensteiner Volksblatt.
+"""Liechtenstein's Landtag elections of 1918-1997 by municipality, digitized from the country's newspapers.
 
 The paper was the principality's official publication organ, and from the 1970s it printed the government's own
 notice of each result (Amtliche Kundmachung). The national library's digital collection holds every issue with its
 OCR text in ALTO, so each number keeps the page and box it was read from. The figures were transcribed from the page
 images into `landtag_1945_1997.json`; this module checks every row against the printed totals and locates each value
 on the page through the ALTO words.
+
+The majority-vote elections of 1918-1936 come from the same collection: the Volksblatt, and where it has no issue or
+prints less, the Oberrheinische Nachrichten, the Liechtensteiner Nachrichten, and the Liechtensteiner Vaterland. Their
+candidate votes by municipality were transcribed into `landtag_1918_1936.json`; every printed total is kept as a
+declared figure, so a row whose municipal votes do not add up to it shows as a finding.
 """
 
 import itertools
@@ -198,6 +203,9 @@ def fetch() -> None:
         raw.fetch(SOURCE, manifest_url(e.issue), suffix=".json", check=not_html)
         for t in e.tables:
             raw.fetch(SOURCE, alto_url(e.issue, t.page), suffix=".xml", check=not_html)
+    for issue, page in sorted({(c.issue, c.page) for m in majority() for r in m.rounds for c in r.contests}):
+        raw.fetch(SOURCE, manifest_url(issue), suffix=".json", check=not_html)
+        raw.fetch(SOURCE, alto_url(issue, page), suffix=".xml", check=not_html)
 
 
 @dataclass
@@ -215,7 +223,10 @@ class Word:
 
 def words(issue: str, page: str) -> list[Word]:
     text = raw.cached(SOURCE, alto_url(issue, page)).path.read_text(encoding="utf-8")
-    root = ElementTree.fromstring(re.sub(r'\sxmlns(:\w+)?="[^"]+"', "", text, count=0).encode())
+    text = re.sub(r'\s[\w:]*xmlns(:\w+)?="[^"]+"', "", text)
+    # Some issues' ALTO prefixes every element and attribute with a namespace.
+    text = re.sub(r"\s\w+:(\w+=)", r" \1", re.sub(r"<(/?)\w+:", r"<\1", text))
+    root = ElementTree.fromstring(text.encode())
     found = []
     for s in root.iter("String"):
         x, y = float(s.get("HPOS") or 0), float(s.get("VPOS") or 0)
@@ -352,13 +363,21 @@ def label(e: Election) -> str:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/registry", *(f"{SOURCE}/{e.day}" for e in elections())]
+    return [
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/{e.day}" for e in elections()),
+        MAJORITY_REGISTRY,
+        *(f"{SOURCE}/{m.day}" for m in majority()),
+    ]
 
 
 def parse() -> None:
     registry().write()
     for e in elections():
         election(e).write()
+    majority_registry().write()
+    for m in majority():
+        majority_election(m).write()
 
 
 def emit() -> None:
@@ -639,3 +658,641 @@ def election(e: Election) -> Package:
             "ballots. Party votes are stored as list votes (measure 8) and valid ballots as valid (measure 4).",
         )
     return p
+
+
+# The majority-vote elections of 1918-1936.
+
+MAJORITY_DATA = Path(__file__).with_name("landtag_1918_1936.json")
+MAJORITY_REGISTRY = f"{SOURCE}/registry-1918"
+MAJORITY_SOURCE = key("source", SOURCE, "1918")
+PAPERS = {
+    "000476564": "Liechtensteiner Volksblatt",
+    "000476558": "Oberrheinische Nachrichten",
+    "000476556": "Liechtensteiner Nachrichten",
+    "000469834": "Liechtensteiner Vaterland",
+}
+# Electoral systems: (key, first day, last day, rules, note).
+MAJORITY_SYSTEMS = {
+    "1918": (
+        date(1918, 1, 1),
+        date(1931, 12, 31),
+        {"formula": "two_round", "majority": 0.5},
+        (
+            "Each district elected its members by absolute majority. Each voter wrote as many names as the district had "
+            "seats; a candidate was elected with more than half of the valid ballots. Seats left over went to a runoff "
+            "a week or so later among twice as many of the next candidates as seats remained, decided by the most "
+            "votes. The Oberland elected 7 and the Unterland 5 of the 15 members in 1918, the prince appointing the "
+            "other three; from 1922, under the constitution of 1921, the districts elected all 15, 9 and 6."
+        ),
+    ),
+    "1932-municipal": (
+        date(1932, 1, 1),
+        date(1938, 12, 31),
+        {"formula": "repeated_ballot", "majorities": [{"fromRound": 1, "share": 0.5}, {"fromRound": 3, "share": 0}]},
+        (
+            "Under the law of 1932 each municipality except Planken elected one member: a candidate with an absolute "
+            "majority was elected in the first or second ballot of the day, and the third ballot was decided by the "
+            "most votes."
+        ),
+    ),
+    "1932-national": (
+        date(1932, 1, 1),
+        date(1938, 12, 31),
+        {"formula": "block"},
+        (
+            "Under the law of 1932 the five members not elected by the municipalities, four from the Oberland and one "
+            "from the Unterland, were elected by the voters of the whole country a week after the municipal round. Each "
+            "voter wrote five names, and the candidates with the most votes were elected."
+        ),
+    ),
+}
+MAJORITY_METHOD = (
+    "Counted by the municipalities; digitized from the {paper} of {issue}, which prints {what}. A candidate's votes "
+    "are the ballots that named the candidate; each voter could name as many candidates as there were seats, so the "
+    "votes do not add up to the ballots. Each value keeps the page and the box of the printed figure."
+)
+OUTCOMES = {"elected": "elected", "advanced": "advanced", "eliminated": "eliminated", "lost": "lost"}
+
+
+@dataclass
+class Candidate:
+    name: str
+    place: str
+    votes: list[int | None]
+    total: int
+    outcome: str
+    title: str | None
+    party: str | None
+
+
+@dataclass
+class Contest:
+    district: str
+    scheme: str
+    magnitude: int
+    issue: str
+    page: str
+    box: tuple[float, float, float, float]
+    units: list[str]
+    accounting: dict[str, list[int]]
+    winner_only: bool
+    candidates: list[Candidate]
+
+
+@dataclass
+class Round:
+    day: date
+    contests: list[Contest]
+
+
+@dataclass
+class Majority:
+    day: date
+    kind: str
+    system: str
+    notes: list[str]
+    rounds: list[Round]
+
+
+def majority() -> list[Majority]:
+    loaded = json.loads(MAJORITY_DATA.read_text(encoding="utf-8"))
+    return [
+        Majority(
+            day=date.fromisoformat(m["date"]),
+            kind=m["kind"],
+            system=m["system"],
+            notes=m["notes"],
+            rounds=[
+                Round(
+                    day=date.fromisoformat(r["date"]),
+                    contests=[
+                        Contest(
+                            district=c["district"],
+                            scheme=c.get("scheme", "li.wahlkreis"),
+                            magnitude=c["magnitude"],
+                            issue=c["issue"],
+                            page=c["page"],
+                            box=tuple(c["box"]),
+                            units=c["units"],
+                            accounting={a: c[a] for a in ("registered", "cast", "valid", "invalid", "blank") if a in c},
+                            winner_only=bool(c.get("winner_only")),
+                            candidates=[
+                                Candidate(
+                                    d["name"],
+                                    d["place"],
+                                    d["votes"],
+                                    d["total"],
+                                    d["outcome"],
+                                    d.get("title"),
+                                    d.get("party"),
+                                )
+                                for d in c["candidates"]
+                            ],
+                        )
+                        for c in r["contests"]
+                    ],
+                )
+                for r in m["rounds"]
+            ],
+        )
+        for m in loaded
+    ]
+
+
+ACCOUNTING_MEASURES = {"registered": 2, "cast": 3, "valid": 4, "invalid": 5, "blank": 6}
+# Unit codes: a municipality's ISO code, a district's name, or the joint count of Schaan and Planken in 1918.
+JOINT = {"Schaan+Planken": ("Oberland", ("LI-07", "LI-05"))}
+
+
+def unit_area(name: str) -> tuple[str, str, str, str]:
+    """(scheme, code, area relation, area) of a printed unit."""
+    if name in JOINT:
+        district, codes = JOINT[name]
+        return "li.gemeinde", "+".join(codes), "within", regierung.area("li.wahlkreis", district)
+    if name in DISTRICTS:
+        return "li.wahlkreis", name, "equals", regierung.area("li.wahlkreis", name)
+    return "li.gemeinde", CODES[name], "equals", regierung.area("li.gemeinde", CODES[name])
+
+
+def contest_area(c: Contest) -> str:
+    if c.district == "Liechtenstein":
+        return regierung.NATION
+    if c.scheme == "li.gemeinde":
+        return regierung.area("li.gemeinde", CODES[c.district])
+    return regierung.area("li.wahlkreis", c.district)
+
+
+def person_key(c: Candidate) -> str:
+    return key("person", c.name, c.place, c.title or "")
+
+
+def majority_system(m: Majority, c: Contest) -> str:
+    if m.system == "1918":
+        return key("electoral_system", "majority", "1918")
+    return key("electoral_system", "majority", "1932-national" if c.district == "Liechtenstein" else "1932-municipal")
+
+
+LINE = 36.0
+
+
+def table_boxes(c: Contest) -> dict[tuple[int, int], Box]:
+    """The box of each printed candidate value as {(candidate, unit): box}, found among the ALTO words of the table.
+
+    A value printed once in the table is placed first; the rows and columns those values fix then place the others at
+    the nearest word with the same digits, or, for a dash or a misread figure, at the crossing of their row and column.
+    """
+    x0, y0, w, h = c.box
+    # Some pages' ALTO gives words no height; such a word takes the height of a line of type.
+    inside = [
+        Word(word.text, word.x0, word.y0, word.x1, max(word.y1, word.y0 + LINE))
+        for word in words(c.issue, c.page)
+        if x0 <= word.x0 <= x0 + w and y0 <= word.y0 <= y0 + h and word.digits and len(word.digits) <= 4
+    ]
+    found: dict[tuple[int, int], Box] = {}
+    used: set[int] = set()
+    cells = [
+        (i, j, value)
+        for i, cand in enumerate(c.candidates)
+        for j, value in enumerate(cand.votes)
+        if value is not None and value > 0
+    ]
+    counts: dict[str, int] = defaultdict(int)
+    for word in inside:
+        counts[word.digits] += 1
+    wanted: dict[str, int] = defaultdict(int)
+    for _, _, value in cells:
+        wanted[str(value)] += 1
+    for i, j, value in cells:
+        if counts[str(value)] == 1 and wanted[str(value)] == 1:
+            word = next(word for word in inside if word.digits == str(value))
+            used.add(id(word))
+            found[(i, j)] = (word.x0, word.y0, word.x1, word.y1)
+
+    def lines() -> tuple[dict[int, float], dict[int, float], float, float]:
+        rows: dict[int, list[float]] = defaultdict(list)
+        columns: dict[int, list[float]] = defaultdict(list)
+        heights, widths = [], []
+        for (i, j), box in found.items():
+            rows[i].append((box[1] + box[3]) / 2)
+            columns[j].append((box[0] + box[2]) / 2)
+            heights.append(box[3] - box[1])
+            widths.append(box[2] - box[0])
+        return (
+            {i: median(v) for i, v in rows.items()},
+            {j: median(v) for j, v in columns.items()},
+            median(heights) if heights else h / max(len(c.candidates), 1),
+            median(widths) if widths else w / (len(c.units) + 2),
+        )
+
+    def guess(i: int, j: int, rows: dict[int, float], columns: dict[int, float]) -> tuple[float, float] | None:
+        def between(index: int, known: dict[int, float], count: int) -> float | None:
+            if index in known:
+                return known[index]
+            before = [k for k in known if k < index]
+            after = [k for k in known if k > index]
+            if before and after:
+                a, b = max(before), min(after)
+                return known[a] + (known[b] - known[a]) * (index - a) / (b - a)
+            if len(known) >= 2:
+                a, b = sorted(known)[:2] if after else sorted(known)[-2:]
+                step = (known[b] - known[a]) / (b - a)
+                return known[a] + step * (index - a)
+            return None
+
+        y = between(i, rows, len(c.candidates))
+        x = between(j, columns, len(c.units))
+        return None if x is None or y is None else (x, y)
+
+    for _ in range(2):
+        rows, columns, height, width = lines()
+        for i, j, value in cells:
+            if (i, j) in found:
+                continue
+            at = guess(i, j, rows, columns)
+            if at is None:
+                continue
+            near = [
+                word
+                for word in inside
+                if id(word) not in used
+                and word.digits == str(value)
+                and abs((word.y0 + word.y1) / 2 - at[1]) < height * 1.5
+                and abs((word.x0 + word.x1) / 2 - at[0]) < width * 2
+            ]
+            if near:
+                ax, ay = at
+                word = min(near, key=lambda word: abs((word.y0 + word.y1) / 2 - ay) + abs(word.x0 - ax) / 4)
+                used.add(id(word))
+                found[(i, j)] = (word.x0, word.y0, word.x1, word.y1)
+    rows, columns, height, width = lines()
+    for i, cand in enumerate(c.candidates):
+        for j, value in enumerate(cand.votes):
+            if value is None or (i, j) in found:
+                continue
+            at = guess(i, j, rows, columns)
+            if at is None:
+                found[(i, j)] = (x0, y0, x0 + w, y0 + h)
+            else:
+                found[(i, j)] = (at[0] - width / 2, at[1] - height / 2, at[0] + width / 2, at[1] + height / 2)
+    return found
+
+
+def majority_registry() -> Package:
+    p = Package(
+        MAJORITY_REGISTRY,
+        SOURCE,
+        "The newspaper archive as the source of the Landtag's majority-vote elections of 1918-1936, and their "
+        "electoral systems",
+    )
+    p.external.update({LIECHTENSTEIN, *(regierung.party(a) for a in ("FBP", "VU"))})
+    p.add(
+        "source",
+        id=MAJORITY_SOURCE,
+        kind="official_body",
+        publisher="Regierung des Fürstentums Liechtenstein and the country's newspapers (eLiechtensteinensia, "
+        "Liechtensteinische Landesbibliothek)",
+        title="Liechtensteiner Volksblatt, Oberrheinische Nachrichten, Liechtensteiner Nachrichten and Liechtensteiner "
+        "Vaterland: results of the Landtag elections, 1918-1936",
+        url="https://www.eliechtensteinensia.li/",
+        license="Public record; scans by the Liechtensteinische Landesbibliothek",
+        license_url="https://www.landesbibliothek.li/",
+        attribution="eLiechtensteinensia, Liechtensteinische Landesbibliothek",
+    )
+    for name, (first, last, rules, body) in MAJORITY_SYSTEMS.items():
+        id = key("electoral_system", "majority", name)
+        p.add(
+            "electoral_system",
+            id=id,
+            polity_id=LIECHTENSTEIN,
+            valid_from=first,
+            valid_to=last,
+            rules=rules,
+            rules_version=1,
+        )
+        p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=body, lang="en")
+    return p
+
+
+def majority_label(m: Majority) -> str:
+    same = [o for o in majority() if o.day.year == m.day.year and o.kind == m.kind]
+    return f"{m.day:%B} {m.day.year}" if len(same) > 1 else str(m.day.year)
+
+
+def majority_election(m: Majority) -> Package:
+    label_ = majority_label(m)
+    noun = "by-election" if m.kind == "by_election" else "parliamentary election"
+    p = Package(
+        f"{SOURCE}/{m.day}",
+        SOURCE,
+        f"The {label_} Liechtenstein Landtag {'by-election' if m.kind == 'by_election' else 'election'} by "
+        "candidate and municipality, from the country's newspapers",
+        depends=[MAJORITY_REGISTRY],
+    )
+    p.external.update({LIECHTENSTEIN, regierung.LANDTAG_BODY, MAJORITY_SOURCE, "li.gemeinde", "li.wahlkreis"})
+    p.external.update(
+        regierung.party(cand.party) for r in m.rounds for c in r.contests for cand in c.candidates if cand.party
+    )
+    last = m.rounds[-1].day if m.system != "1918" else m.day
+    election_id = key("election", "majority", m.day)
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=LIECHTENSTEIN,
+        kind=m.kind,
+        date_from=m.day,
+        date_to=last,
+        status="held",
+    )
+    p.name(election_id, f"{label_} Liechtenstein {noun}", "en", "official")
+    german = "Landtagsersatzwahl" if m.kind == "by_election" else "Landtagswahlen"
+    p.name(election_id, f"{german} {label_}", "de", "native", False)
+    slug_kind = "by-election" if m.kind == "by_election" else "general"
+    path = f"li/{m.day}-{slug_kind}"
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    p.add(
+        "citation",
+        id=key("citation", election_id),
+        entity_id=election_id,
+        source_id=MAJORITY_SOURCE,
+        locator=json.dumps({"url": f"{VIEWER}/{m.rounds[0].contests[0].issue}/", "paper": paper(m.rounds[0])}),
+    )
+    pages: dict[tuple[str, str], str] = {}
+    units: dict[tuple[date, str], str] = {}
+    first_round: dict[str, str] = {}
+    for number, r in enumerate(m.rounds, start=1):
+        runoff = m.system == "1918" and number > 1
+        holder = election_id
+        round_path = path
+        if runoff:
+            holder = key("election", "majority", r.day)
+            round_path = f"li/{r.day}-runoff"
+            p.add(
+                "election",
+                id=holder,
+                polity_id=LIECHTENSTEIN,
+                parent_id=election_id,
+                kind="runoff",
+                date_from=r.day,
+                date_to=r.day,
+                status="held",
+            )
+            p.name(holder, f"{label_} Liechtenstein {noun}, second round", "en", "official")
+            p.name(holder, f"Landtagswahlen {label_}, Stichwahl", "de", "native", False)
+            p.add("slug", path=round_path, entity_id=holder, is_current=True)
+        for c in r.contests:
+            check_majority(m, r, c)
+            if (c.issue, c.page) not in pages:
+                alto = raw.cached(SOURCE, alto_url(c.issue, c.page))
+                p.uses(raw.cached(SOURCE, manifest_url(c.issue)))
+                artifact = p.artifact(alto, MAJORITY_SOURCE)
+                width, height = canvas(c.issue, c.page)
+                pages[(c.issue, c.page)] = key("page", c.issue, c.page)
+                p.add(
+                    "source_page",
+                    id=pages[(c.issue, c.page)],
+                    artifact_id=artifact,
+                    page_number=int(c.page),
+                    image_key=f"pages/{SOURCE}/{c.issue}/{c.page}.jpg",
+                    width=width,
+                    height=height,
+                )
+            for name in c.units:
+                if (r.day, name) in units:
+                    continue
+                scheme, code, relation, area = unit_area(name)
+                p.external.add(area)
+                units[(r.day, name)] = key("unit", r.day, code)
+                p.add(
+                    "reporting_unit",
+                    id=units[(r.day, name)],
+                    polity_id=LIECHTENSTEIN,
+                    scheme_code=scheme,
+                    code=f"{r.day}:{code}",
+                    area_relation=relation,
+                    area_id=area,
+                    kind="standard",
+                )
+            contest_id = key("contest", "majority", r.day, c.district)
+            area = contest_area(c)
+            p.external.add(area)
+            system = majority_system(m, c)
+            p.external.add(system)
+            p.add(
+                "contest",
+                id=contest_id,
+                election_id=holder,
+                kind="body_seats",
+                body_id=regierung.LANDTAG_BODY,
+                district_area_id=area,
+                magnitude=c.magnitude,
+                round_number=2 if runoff else 1,
+                previous_round_id=first_round.get(c.district) if runoff else None,
+                electoral_system_id=system,
+                default_result_kind="counted",
+            )
+            if not runoff:
+                first_round[c.district] = contest_id
+            where = {
+                "Liechtenstein": ("national seats", "Landesweite Mandate"),
+            }.get(
+                c.district,
+                (f"{c.district} municipal seat", f"Gemeindemandat {c.district}")
+                if c.scheme == "li.gemeinde"
+                else (f"{c.district} electoral district", f"Wahlkreis {c.district}"),
+            )
+            suffix = (", second round", ", Stichwahl") if runoff else ("", "")
+            p.name(contest_id, f"Landtag, {where[0]}{suffix[0]}", "en", "english")
+            p.name(contest_id, f"{where[1]}{suffix[1]}", "de", "official", False)
+            slug = "national" if c.district == "Liechtenstein" else changeset.slug(c.district)
+            p.add("slug", path=f"{round_path}/{slug}", entity_id=contest_id, is_current=True)
+            set_id = key("result_set", "majority", r.day, c.district)
+            p.add(
+                "result_set",
+                id=set_id,
+                election_id=holder,
+                contest_id=contest_id,
+                stage="official",
+                kind="counted",
+                source_id=MAJORITY_SOURCE,
+                status="active",
+                is_default=True,
+                completeness=1.0,
+            )
+            issue_day = date.fromisoformat(c.issue.split("_")[1])
+            what = (
+                "the elected candidate's votes and the ballots by municipality"
+                if c.winner_only
+                else "each candidate's votes by electoral district"
+                if c.units == [c.district]
+                else "each candidate's votes by municipality"
+            )
+            method = MAJORITY_METHOD.format(
+                paper=PAPERS[c.issue[:9]],
+                issue=f"{issue_day:%-d %B %Y}",
+                what=what,
+            )
+            p.add(
+                "note",
+                id=key("note", set_id),
+                entity_id=set_id,
+                kind="methodology",
+                body_md=" ".join([method, *m.notes]),
+                lang="en",
+            )
+            boxes = table_boxes(c)
+            for i, cand in enumerate(c.candidates):
+                option = key("option", "majority", r.day, c.district, cand.name, cand.place, cand.title or "")
+                ballot = f"{cand.name}, {cand.place}"
+                p.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest_id,
+                    kind="candidate",
+                    party_id=regierung.party(cand.party) if cand.party else None,
+                    ballot_label=ballot,
+                )
+                who = person_key(cand)
+                if not any(row["id"] == who for row in p.rows.get("person", [])):
+                    p.add("person", id=who, gender="male")
+                    p.name(who, cand.name, "de", "official")
+                p.add(
+                    "candidacy",
+                    id=key("candidacy", "majority", r.day, c.district, cand.name, cand.place, cand.title or ""),
+                    person_id=who,
+                    option_id=option,
+                    role="head",
+                    ballot_name=ballot,
+                    member_of_party_id=regierung.party(cand.party) if cand.party else None,
+                    is_independent=False,
+                )
+                p.add("outcome", result_set_id=set_id, option_id=option, kind=OUTCOMES[cand.outcome])
+                for j, value in enumerate(cand.votes):
+                    if value is None:
+                        continue
+                    stored(p, set_id, units[(r.day, c.units[j])], option, 1, value)
+                    box = boxes[(i, j)]
+                    locate_value(p, set_id, units[(r.day, c.units[j])], option, 1, pages[(c.issue, c.page)], box)
+                if len(c.units) > 1 and not c.winner_only:
+                    p.add("declared", result_set_id=set_id, option_id=option, measure=1, value=cand.total)
+            if c.accounting:
+                for column, values in c.accounting.items():
+                    for j, value in enumerate(values):
+                        unit = units[(r.day, c.units[j])]
+                        stored(p, set_id, unit, None, ACCOUNTING_MEASURES[column], value)
+                        # Accounting figures stand in their own block of the table; their box is the table's.
+                        x0, y0, w, h = c.box
+                        locate_value(
+                            p,
+                            set_id,
+                            unit,
+                            None,
+                            ACCOUNTING_MEASURES[column],
+                            pages[(c.issue, c.page)],
+                            (x0, y0, x0 + w, y0 + h),
+                        )
+    for code, reason in majority_accepted(m).items():
+        p.accept(code, reason)
+    return p
+
+
+def paper(r: Round) -> str:
+    return PAPERS[r.contests[0].issue[:9]]
+
+
+def stored(p: Package, set_id: str, unit: str, option: str | None, measure: int, value: int) -> None:
+    p.add(
+        "result_value",
+        result_set_id=set_id,
+        unit_id=unit,
+        option_id=option,
+        channel=0,
+        measure=measure,
+        count_round=0,
+        flags=0,
+        value=value,
+    )
+
+
+def locate_value(p: Package, set_id: str, unit: str, option: str | None, measure: int, page: str, box: Box) -> None:
+    p.add(
+        "value_locator",
+        result_set_id=set_id,
+        unit_id=unit,
+        option_id=option,
+        channel=0,
+        measure=measure,
+        count_round=0,
+        page_id=page,
+        source_id=MAJORITY_SOURCE,
+        x0=box[0],
+        y0=box[1],
+        x1=box[2],
+        y1=box[3],
+    )
+
+
+def check_majority(m: Majority, r: Round, c: Contest) -> None:
+    """Every row has a value per unit, the elected fill the seats, and the accounting columns add up."""
+    for cand in c.candidates:
+        if len(cand.votes) != len(c.units):
+            raise ValueError(f"{r.day} {c.district} {cand.name}: {len(cand.votes)} values for {len(c.units)} units")
+        if cand.outcome not in OUTCOMES:
+            raise ValueError(f"{r.day} {c.district} {cand.name}: unknown outcome {cand.outcome}")
+    elected = sum(1 for cand in c.candidates if cand.outcome == "elected")
+    advanced = sum(1 for cand in c.candidates if cand.outcome == "advanced")
+    if elected + (advanced // 2 if advanced else 0) != c.magnitude:
+        raise ValueError(
+            f"{r.day} {c.district}: {elected} elected and {advanced} in the runoff for {c.magnitude} seats"
+        )
+    for column, values in c.accounting.items():
+        if len(values) != len(c.units):
+            raise ValueError(f"{r.day} {c.district} {column}: {len(values)} values for {len(c.units)} units")
+
+
+def majority_accepted(m: Majority) -> dict[str, str]:
+    """Findings the printed figures cause, with the reason; each is checked against the data before it is kept."""
+    reasons: dict[str, str] = {}
+    mismatches = []
+    for r in m.rounds:
+        for c in r.contests:
+            for cand in c.candidates:
+                if len(c.units) > 1 and not c.winner_only and sum(v or 0 for v in cand.votes) != cand.total:
+                    mismatches.append(cand.name)
+    if mismatches:
+        reasons["accounting.declared"] = (
+            "The paper prints totals that differ from the municipal votes of the same row ("
+            + ", ".join(sorted(set(mismatches)))
+            + "); the methodology note lists each, and both the municipal votes and the totals are stored as printed."
+        )
+    short = [
+        c
+        for r in m.rounds
+        for c in r.contests
+        if c.magnitude == 1
+        and not c.winner_only
+        and "valid" in c.accounting
+        and any(
+            sum(cand.votes[j] or 0 for cand in c.candidates) != c.accounting["valid"][j] for j in range(len(c.units))
+        )
+    ]
+    if short:
+        reasons["accounting.votes_valid"] = (
+            "The paper prints the votes of the candidates each party put up; the valid ballots also count the "
+            "scattered votes for other persons, which it does not list, so the candidate votes fall short of them."
+        )
+    if any(c.winner_only for r in m.rounds for c in r.contests):
+        reasons["accounting.votes_valid"] = (
+            "The government's notice of the 1932 municipal round prints only the elected candidate's votes in each "
+            "municipality, so the stored candidate votes fall short of the valid ballots."
+        )
+    for r in m.rounds:
+        for c in r.contests:
+            a = c.accounting
+            if "cast" in a and any(
+                a["cast"][j] != a["valid"][j] + a["invalid"][j] + a["blank"][j] for j in range(len(c.units))
+            ):
+                reasons["accounting.ballots_sum"] = (
+                    "The runoff protocol of 29 July 1928 prints Balzers with 257 ballots against 148 valid, 8 invalid "
+                    "and 103 blank, while every column adds up to its printed total; stored as printed."
+                )
+    return reasons
