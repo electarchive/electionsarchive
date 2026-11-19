@@ -657,23 +657,31 @@ def build_scanned(day: str) -> Package:
         p.artifact(raw.cached(SOURCE, url), ECJ_SOURCE)
     boxed = scanned.stations(day)
     pages: dict[int, str] = {}
-    if boxed:
-        url = scanned.BOXFILES[day]
+    added: dict[str, str] = {}
+
+    def page_of(url: str, number: int) -> str:
+        """The id of a page of a cached file, adding the page to the package the first time it is used."""
         stored = raw.cached(SOURCE, url)
         artifact = p.artifact(stored, ECJ_SOURCE) if url not in scanned.FILES[day] else _artifact_id(stored)
-        sizes = _sizes(stored.path)
-        for number in sorted({s.page for rows in boxed.values() for s in rows}):
-            width, height = sizes[number]
-            pages[number] = key("page", stored.sha256, number)
+        page = key("page", stored.sha256, number)
+        if page not in added:
+            width, height = _sizes(stored.path)[number]
+            added[page] = artifact
             p.add(
                 "source_page",
-                id=pages[number],
+                id=page,
                 artifact_id=artifact,
                 page_number=number,
                 image_key=f"pages/{SOURCE}/{stored.sha256}-{number}.png",
                 width=round(width * 100 / 72),
                 height=round(height * 100 / 72),
             )
+        return page
+
+    if boxed:
+        for number in sorted({s.page for rows in boxed.values() for s in rows}):
+            pages[number] = page_of(scanned.BOXFILES[day], number)
+    located = scanned.locators(day)
     unknown = tags - known_parties()
     if unknown:
         raise ValueError(f"{day}: parties {sorted(unknown)} are not in a registry package")
@@ -819,12 +827,38 @@ def build_scanned(day: str) -> Package:
         )
         p.name(unit, f"{name} constituency", "en", "official")
         measures = [(REGISTERED, k.electors), (CAST, k.cast), (INVALID, k.rejected), (VALID, valid)]
-        for measure, value in measures:
+        boxes = located.get(k.number, {})
+
+        def locate(option: str | None, measure: int, figure: str) -> None:
+            box = boxes.get(figure)
+            if box is None:
+                return
+            p.add(
+                "value_locator",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=option,
+                channel=0,
+                measure=measure,
+                count_round=0,
+                page_id=page_of(scanned.FILES[day][0], int(box[0])),
+                source_id=None,
+                x0=box[1],
+                y0=box[2],
+                x1=box[3],
+                y1=box[4],
+            )
+
+        for (measure, value), figure in zip(measures, ("electors", "cast", "rejected", "accepted"), strict=True):
             _put(p, result_set, unit, None, measure, value)
             if value is not None:
                 p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
-        for option, candidate in zip(options, k.candidates, strict=True):
+                if figure != "accepted" or k.accepted is not None:
+                    locate(None, measure, figure)
+        for position, (option, candidate) in enumerate(zip(options, k.candidates, strict=True), 1):
             _put(p, result_set, unit, option, VOTES, candidate.votes)
+            if candidate.votes is not None:
+                locate(option, VOTES, f"votes:{position}")
             if candidate.votes is not None:
                 p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=candidate.votes)
         for code, bad in (
