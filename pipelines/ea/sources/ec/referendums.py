@@ -5,7 +5,7 @@ files that carry national questions: the 4 February 2018 referendum and popular 
 the sectional elections of 5 February 2023, the 21 April 2024 referendum and popular consultation, and the
 16 November 2025 referendum and popular consultation. Each file has one row per parish, sex group, and question, and the
 sex groups are added together here. Parishes keep the codes the Council gives them, so the areas have the same ids as
-the areas of the Council's other parish-level files.
+the areas of the Council's other parish-level files, and this source adds only the few areas those files do not hold.
 """
 
 import functools
@@ -29,6 +29,16 @@ BOOK_2018 = f"{cne.BASE}/2022/05/RESULTADOS-REFERENDUM-Y-CONSULTA-POPULAR-2018.p
 BULLETIN_2024 = f"{cne.BASE}/2024/05/BOLETIN_DE_RESULTADOS_REFERENDUM_Y_CONSULTA_POPULAR_2024.pdf"
 VOTES, REGISTERED, CAST, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
 SCHEMES = ("ec.provincia", "ec.canton", "ec.parroquia")
+# The Council's own pipeline already holds most of these areas, under the same ids and with its own parent links: its
+# geo package holds all but a few, and its 2025 geo package holds the parishes below that its geo package lacks. This
+# source adds only the areas in neither, and references every other area by the id those packages loaded. The two
+# packages overlap, so the election packages depend on the first and name the second's few parishes as external ids.
+HELD = "ec.cne/geo"
+HELD_2025 = {"ec.parroquia": (4750, 4755, 4760, 4765, 9002)}
+NEW_AREAS = {
+    "ec.canton": (242, 291, 421, 461, 471, 491, 927, 998, 999),
+    "ec.parroquia": (5460, 6940, 7540, 9010, 9041, 9048, 9064, 9074, 9079, 9080, 9082, 9083, 9085, 9088, 9998, 9999),
+}
 SYSTEM_RULES = {"formula": "referendum"}
 LICENSE = "Official publication; reuse terms are not stated"
 ATTRIBUTION = "Consejo Nacional Electoral del Ecuador"
@@ -484,7 +494,9 @@ def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "The provinces, cantons, parishes, and overseas units that Ecuador's referendum results files list",
+        "The cantons, parishes, and overseas units that Ecuador's referendum results files list and the Council's "
+        "other files do not",
+        depends=[HELD],
     )
     p.external.update([ECUADOR, *SCHEMES])
     p.add(
@@ -503,8 +515,9 @@ def geo() -> Package:
             p.artifact(artifact(url), CNE_SOURCE)
     found = places_all()
     parent_scheme = {"ec.canton": "ec.provincia", "ec.parroquia": "ec.canton"}
-    for scheme in SCHEMES:
-        for code, (name, parent) in sorted(found[scheme].items()):
+    for scheme, codes in NEW_AREAS.items():
+        for code in codes:
+            name, parent = found[scheme][code]
             id = area(scheme, code)
             p.add("area", id=id, scheme_code=scheme)
             p.add("area_code", area_id=id, code=str(code))
@@ -550,13 +563,15 @@ def build(day: str) -> Package:
         f"{SOURCE}/{day}",
         SOURCE,
         f"The Ecuadorian referendum questions of {DAYS[day]} by parish, from the National Electoral Council's results file",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[HELD, f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external.update([ECUADOR, COUNTRY, *SCHEMES])
+    data = read(day)
+    used = set(data.results["parish"].unique().to_list())
+    p.external.update(area(s, c) for s, codes in HELD_2025.items() for c in codes if c in used)
     p.uses(artifact(vote.url))
     for url in vote.books:
         p.uses(artifact(url))
-    data = read(day)
     names = {code: name for code, (name, _) in places_all()["ec.parroquia"].items()}
     election = key("election", day)
     base = f"ec/{day}-referendum"
