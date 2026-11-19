@@ -5,10 +5,13 @@ import type { RequestHandler } from "./$types";
 
 const ROOT = path.resolve("../../data/pages");
 
+const TYPES = { jpg: "image/jpeg", png: "image/png" } as const;
+
 export const GET: RequestHandler = async ({ params }) => {
+  const extension = /^(?:[\w-]+\/)*[\w-]+\.(png|jpg)$/u.exec(params.file)?.[1];
   if (
     !/^[a-z]{2,3}(-[a-z0-9]+)?\.[a-z0-9_]+$/u.test(params.scheme) ||
-    !/^[\w-]+\.png$/u.test(params.file)
+    (extension !== "png" && extension !== "jpg")
   ) {
     error(404);
   }
@@ -21,7 +24,7 @@ export const GET: RequestHandler = async ({ params }) => {
   return new Response(image, {
     headers: {
       "cache-control": "public, max-age=604800, immutable",
-      "content-type": "image/png",
+      "content-type": TYPES[extension],
     },
   });
 };
