@@ -7,9 +7,11 @@ import zipfile
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
+from types import ModuleType
 from uuid import uuid5
 
 import fastexcel
+import shapely
 
 from ea import changeset, package, raw
 from ea.package import Package
@@ -525,6 +527,39 @@ def places() -> dict[str, dict[str, list[str]]]:
     return found
 
 
+def _state_shapes(p: Package, wk: ModuleType, valid_from: date) -> None:
+    """One `area_geometry` row for each of the nine states, from the outlines of geoBoundaries (ISO `AT-n` is the code)."""
+    source = p.id("source", "geoboundaries-states")
+    p.add(
+        "source",
+        id=source,
+        kind="academic",
+        publisher="geoBoundaries",
+        title="geoBoundaries gbOpen Austria ADM1 (simplified), derived from the Federal Office of Metrology and Survey",
+        url="https://www.geoboundaries.org/",
+        license="CC BY-SA 2.0",
+        license_url="https://creativecommons.org/licenses/by-sa/2.0/",
+        attribution="geoBoundaries (William & Mary geoLab); original data from the Bundesamt für Eich- und Vermessungswesen",
+    )
+    artifact = raw.cached(wk.GEOBOUNDARIES, wk.STATES)
+    p.artifact(artifact, source)
+    shapes = wk._features(artifact, "shapeISO")
+    for code in sorted(places()["at.land"]):
+        shape = wk._union([shapes[f"AT-{code}"]])
+        p.add(
+            "area_geometry",
+            area_id=area("at.land", code),
+            valid_from=valid_from,
+            valid_to=None,
+            geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+            label_point=shapely.to_wkb(
+                shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+            ),
+            quality="official",
+            source_id=source,
+        )
+
+
 def geo() -> Package:
     p = Package(
         "at.bmi/geo",
@@ -554,8 +589,10 @@ def geo() -> Package:
             p.add("area_parent", area_id=id, parent_id=parent)
             for index, text in enumerate(names):
                 p.name(id, text, "de", "official", index == 0)
-    from ea.sources.at import bmi_history, wahlkreise_1994
+    from ea.sources.at import bmi_history, wahlkreise_1923, wahlkreise_1994
     from ea.sources.at.parlament import NAMES_1923
+
+    _state_shapes(p, wahlkreise_1923, bmi_history.PLAN_1945)
 
     for number, text in enumerate(NAMES_1923, start=1):
         id = bmi_history.wahlkreis(number)
