@@ -174,3 +174,19 @@ def own_totals(day: str) -> frozenset[int]:
         return frozenset()
     raw = json.loads(path.read_text(encoding="utf-8"))
     return frozenset(c["number"] for c in raw["constituencies"] if c.get("own_totals"))
+
+
+LOCATORS = Path(__file__).parent / "locators"
+
+
+@functools.cache
+def locators(day: str) -> dict[int, dict[str, list[float]]]:
+    """Where each figure of a constituency is printed, by its number: the figure's key, then page and box.
+
+    The keys are `electors`, `cast`, `accepted`, `rejected`, and `votes:<position>`; the box is normalized to the page.
+    Figures that could not be found on the page have no entry.
+    """
+    path = LOCATORS / f"{day}.json"
+    if not path.exists():
+        return {}
+    return {int(number): figures for number, figures in json.loads(path.read_text(encoding="utf-8")).items()}
