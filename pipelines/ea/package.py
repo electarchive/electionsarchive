@@ -724,6 +724,12 @@ CHECKS = {
                            from c a join c b on a.area_id = b.area_id and a.n < b.n
                            where coalesce(a.valid_from, date '0001-01-01') < coalesce(b.valid_to, date '9999-12-31')
                              and coalesce(b.valid_from, date '0001-01-01') < coalesce(a.valid_to, date '9999-12-31')""",
+    "unique.area_geometry": """with o as (select area_id, valid_from, valid_to from area_geometry)
+                               select o.area_id, o.valid_from, o.valid_to, count(*) as n
+                               from o join all_area_geometry b on b.area_id = o.area_id
+                                and coalesce(o.valid_from, date '0001-01-01') < coalesce(b.valid_to, date '9999-12-31')
+                                and coalesce(b.valid_from, date '0001-01-01') < coalesce(o.valid_to, date '9999-12-31')
+                               group by all having count(*) > 1""",
     "fact.negative": "select * from result_value where value < 0",
     "fact.option_contest": """with pairs as (select distinct result_set_id, option_id from result_value)
                               select p.result_set_id, p.option_id from pairs p
@@ -1526,6 +1532,23 @@ def _ready(source: Connection | Reference, key: str, batch: set[str], minted: se
         if depend not in batch and not loaded:
             found.append(
                 f"ready.depends: {depend} is neither loaded nor in this batch; build it and list it in run.json"
+            )
+    geometry = path / "area_geometry.parquet"
+    if not isinstance(source, Reference) and geometry.exists():
+        rows = pl.read_parquet(geometry, columns=["area_id", "valid_from", "valid_to"])
+        taken = source.execute(
+            """select g.area_id::text, g.valid_from, g.valid_to
+               from unnest(%s::uuid[], %s::date[], %s::date[]) as n(area_id, valid_from, valid_to)
+               join area_geometry g on g.area_id = n.area_id
+                and daterange(g.valid_from, g.valid_to, '[)') && daterange(n.valid_from, n.valid_to, '[)')
+               join changeset c on c.id = g.changeset_id
+               where c.scope->>'package' is distinct from %s""",
+            [rows["area_id"].to_list(), rows["valid_from"].to_list(), rows["valid_to"].to_list(), key],
+        ).fetchall()
+        if taken:
+            found.append(
+                f"ready.area_geometry: {len(taken)} outlines overlap the validity of one another package already "
+                f"loaded for the same area: {taken[:5]}"
             )
     for table, (_, schema) in TABLES.items():
         file = path / f"{table}.parquet"
