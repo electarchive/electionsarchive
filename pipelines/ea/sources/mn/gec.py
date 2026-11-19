@@ -956,9 +956,19 @@ def councils(spec: LocalElection) -> Package:
         spec.summary
         or f"The {spec.english} (capital, aimag, district, and soum councils) by polling section and constituency "
         "from the General Election Commission",
-        depends=[f"{SOURCE}/early"] if spec.summary else [f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[]
+        if spec.relation
+        else [f"{SOURCE}/early"]
+        if spec.summary
+        else [f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external |= {MONGOLIA, TERRITORY}
+    if spec.relation:
+        p.external |= {GEC_SOURCE, BLOCK_2024, *SCHEMES}
+        p.external |= {council_body(block.council) for block in blocks}
+        p.external |= {council_area(block.council) for block in blocks}
+        p.external |= {a for block in blocks for row in block.rows if (a := row_area(row))}
+        p.external |= inherited({c.party for block in blocks for c in block.candidates})
     if spec.summary:
         p.external |= {GEC_SOURCE, *SCHEMES}
         p.external |= {council_body(block.council) for block in blocks}
