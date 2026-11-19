@@ -1,5 +1,7 @@
+import functools
 import html
 import re
+import subprocess
 from dataclasses import dataclass
 from datetime import date
 from uuid import uuid5
@@ -21,12 +23,23 @@ COMUNAS = range(1, 16)
 CITY_CODE = "caba"
 
 
+DOCS = f"{TSJ}/uploads/resoluciones/"
+PASO_HEAD = "Resolucion_Escrutinio_Jefe_de_Gobierno.pdf"
+PASO_LEGISLATURE = "Resolucion_Escrutinio_Diputados.pdf"
+PASO_JUNTAS = "Resolucion_Escrutinio_Miembros_de_Juntas_Comunales.pdf"
+GENERAL_NATIONAL = "ESCRUTINIO_ELECTORES_NACIONALES..PDF"
+GENERAL_FOREIGN = "Resultados_Definitivos_por_Comunas.pdf"
+GENERAL_CITY = "Resultados_Generales_Jefe_de_Gobierno_y_Diputados_final.pdf"
+
+
 @dataclass(frozen=True)
 class Held:
     key: str
     day: date
     kind: str
     page: int | None  # the id of the election on the Tribunal Superior's results service, if it publishes one
+    docs: tuple[str, ...] = ()  # the resolutions (PDF) of the Tribunal Electoral that carry its count, if it has them
+    prison: bool = False  # whether the count lists the prisoners' tables apart from the comunas
 
 
 # The elections of the City held under the Constitution of 1996 that this pipeline builds, each by comuna.
@@ -34,8 +47,29 @@ HELD = [
     Held("2015-paso", date(2015, 4, 26), "primary", 3),
     Held("2015-general", date(2015, 7, 5), "general", 4),
     Held("2015-runoff", date(2015, 7, 19), "runoff", 7),
-    Held("2025-general", date(2025, 5, 18), "general", None),
+    Held(
+        "2023-paso",
+        date(2023, 8, 13),
+        "primary",
+        None,
+        (PASO_HEAD, PASO_LEGISLATURE, PASO_JUNTAS),
+    ),
+    Held(
+        "2023-general",
+        date(2023, 10, 22),
+        "general",
+        None,
+        (GENERAL_NATIONAL, GENERAL_FOREIGN, GENERAL_CITY),
+        True,
+    ),
+    Held("2025-general", date(2025, 5, 18), "general", None, (), True),
 ]
+
+
+def source_of(held: Held) -> str:
+    return (
+        TEC_SOURCE if held.docs and held.key.startswith("2023") else TSJ_SOURCE if held.page is not None else TE_SOURCE
+    )
 
 
 def key(kind: str, *parts: object) -> str:
@@ -60,6 +94,8 @@ PRISONS_URL = f"{TE}/mesa/?30999"
 
 
 def urls(held: Held) -> list[str]:
+    if held.docs:
+        return [DOCS + name for name in held.docs]
     if held.page is None:
         return [te_url(), *(te_url(c) for c in COMUNAS), PRISONS_URL]
     return [tsj_url(held), *(tsj_url(held, c) for c in COMUNAS)]
@@ -70,7 +106,7 @@ def fetch() -> None:
     for held in HELD:
         for url in urls(held):
             try:
-                raw.fetch(SOURCE, url, suffix=".html")
+                raw.fetch(SOURCE, url, suffix=".pdf" if held.docs else ".html")
             except httpx.HTTPStatusError as failure:
                 print(f"{url}: {failure.response.status_code}", flush=True)
 
@@ -176,7 +212,286 @@ def te_page(url: str) -> Page:
     return page
 
 
+PARTY_NAMES = {
+    "40": "Movimiento Libres del Sur",
+    "72": "Instrumento Electoral por la Unidad Popular",
+    "92": "Política Obrera",
+    "95": "Frente Patriota Federal",
+    "347": "Aptitud Renovadora",
+    "350": "Izquierda en la Ciudad",
+    "351": "Principios y Valores",
+    "801": "La Libertad Avanza",
+    "802": "Unión por la Patria",
+    "803": "Juntos por el Cambio",
+    "804": "Frente de Izquierda y de Trabajadores - Unidad",
+}
+LIST_NAMES = {
+    ("40", 1): "Alternativa Progresista",
+    ("72", 1): "El Movimiento - La Ciudad Somos Quienes la Habitamos",
+    ("92", 1): "Unidad Obrera",
+    ("95", 1): "Primero la Patria",
+    ("347", 1): "Primero los Porteños",
+    ("350", 1): "Izquierda Anticapitalista",
+    ("351", 1): "Celeste y Blanca",
+    ("801", 1): "La Ciudad Avanza",
+    ("802", 1): "Alternativa para Ganar Buenos Aires",
+    ("803", 1): "A - Evolución",
+    ("803", 2): "B - Vayamos por Más",
+    ("804", 1): "A - Unir y Fortalecer la Izquierda",
+    ("804", 2): "B - Unidad de Luchadores y la Izquierda",
+}
+ALLIANCES = ("801", "802", "803", "804")
+JUNTA_ONLY = ("351",)  # lists that ran for the Community Board of one comuna only, in the last column
+GENERAL_CARGOS = ["head", "legislature", "junta"]
+
+
+@functools.cache
+def pdf_text(name: str) -> str:
+    path = raw.cached(SOURCE, DOCS + name).path
+    return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+
+
+def whole_numbers(line: str) -> list[int]:
+    return [
+        int(token) for token in re.findall(r"(?<![\w,.])\d+(?![\w,.])", re.sub(r"%\s*\d+(?:,\d+)?|\d+,\d+%?", "", line))
+    ]
+
+
+def pdf_totals(blank: list[int], null: list[int], cast: list[int]) -> dict[str, list[int]]:
+    return {"blank": blank, "null": null, "cast": cast, "challenged": [0], "contested": [0]}
+
+
+def _positive(rows: list[Row], totals: dict[str, list[int]]) -> None:
+    totals["valid"] = [
+        cast - null - blank for cast, null, blank in zip(totals["cast"], totals["null"], totals["blank"], strict=True)
+    ]
+    for k, valid in enumerate(totals["valid"]):
+        listed = sum(row.votes[k] for row in rows)
+        if listed != valid:
+            raise ValueError(f"the lists add up to {listed}, the totals leave {valid} positive votes")
+
+
+def electors_pages(name: str) -> dict[int, Page]:
+    """One block per comuna of a definitive count of electors: the alliances 801 to 804 in the last three columns
+    (Head of Government, Legislature, Community Board), then null and blank votes and the total."""
+    text = pdf_text(name)
+    parts = re.split(r"CONSULTA DEFINITIVA - SECCION:\s*\d+ COMUNA (\d+)", text)
+    pages: dict[int, Page] = {}
+    for comuna, body in zip(parts[1::2], parts[2::2], strict=True):
+        registered = re.search(r"Total de inscriptos:\s*(\d+)", body)
+        assert registered is not None
+        rows: list[Row] = []
+        found: dict[str, list[int]] = {}
+        for line in body.splitlines():
+            figures = whole_numbers(line)
+            label = line.strip()
+            if label.startswith("VOTOS NULOS"):
+                found["null"] = figures[-3:]
+            elif label.startswith("VOTOS EN BLANCO"):
+                found["blank"] = figures[-3:]
+            elif label.startswith("TOTALES"):
+                found["cast"] = figures[-3:]
+            elif figures and str(figures[0]) in ALLIANCES:
+                rows.append(Row(str(figures[0]), PARTY_NAMES[str(figures[0])], figures[-3:], []))
+            elif len(figures) == 2 and str(figures[0]) in JUNTA_ONLY:
+                rows.append(Row(str(figures[0]), PARTY_NAMES[str(figures[0])], [0, 0, figures[1]], []))
+        if [row.number for row in rows if row.number in ALLIANCES] != list(ALLIANCES) or set(found) != {
+            "null",
+            "blank",
+            "cast",
+        }:
+            raise ValueError(f"{name}: comuna {comuna} has an unexpected shape")
+        totals = pdf_totals(found["blank"], found["null"], found["cast"])
+        _positive(rows, totals)
+        pages[int(comuna)] = Page(list(GENERAL_CARGOS), rows, totals, int(registered.group(1)))
+    if sorted(pages) != list(COMUNAS):
+        raise ValueError(f"{name}: expected the 15 comunas, found {sorted(pages)}")
+    return pages
+
+
+def _sum_pages(first: Page, second: Page) -> Page:
+    numbers = sorted({row.number for row in [*first.rows, *second.rows]}, key=int)
+    rows = []
+    for number in numbers:
+        found = [row for page in (first, second) for row in page.rows if row.number == number]
+        rows.append(
+            Row(number, found[0].name, [sum(votes) for votes in zip(*(r.votes for r in found), strict=True)], [])
+        )
+    totals = {label: [x + y for x, y in zip(v, second.totals[label], strict=True)] for label, v in first.totals.items()}
+    assert first.registered is not None and second.registered is not None
+    return Page(first.cargos, rows, totals, first.registered + second.registered)
+
+
+def city_general_pages() -> tuple[Page, Page]:
+    """The city totals by alliance and office, with each column of electors: Argentines, prisoners among them,
+    foreign residents, and prisoners among them. Returns the city's count and the prisoners' count."""
+    text = pdf_text(GENERAL_CITY)
+    offices = re.split(r"ELECCIONES GENERALES DEL 22 DE OCTUBRE DE 2023", text)[1:]
+    if len(offices) != 2:
+        raise ValueError("expected the Head of Government and the Deputies")
+    city_rows: list[list[Row]] = []
+    prison_rows: list[list[Row]] = []
+    city_totals: list[dict[str, list[int]]] = []
+    prison_totals: list[dict[str, list[int]]] = []
+    for office in offices:
+        rows, prisons = [], []
+        found: dict[str, tuple[int, int]] = {}
+        for line in office.splitlines():
+            figures = whole_numbers(line)
+            if len(figures) != 5:
+                continue
+            native, native_prison, foreign, foreign_prison, total = figures
+            if native + native_prison + foreign + foreign_prison != total:
+                raise ValueError(f"{line.strip()}: the columns do not add up")
+            label = line.strip()
+            if label.startswith("Votos Nulos"):
+                found["null"] = (total, native_prison + foreign_prison)
+            elif label.startswith("Votos Blancos"):
+                found["blank"] = (total, native_prison + foreign_prison)
+            elif label.startswith("Votos Totales"):
+                found["cast"] = (total, native_prison + foreign_prison)
+            else:
+                number = ALLIANCES[len(rows)]
+                rows.append(Row(number, PARTY_NAMES[number], [total], []))
+                prisons.append(Row(number, PARTY_NAMES[number], [native_prison + foreign_prison], []))
+        if len(rows) != 4 or set(found) != {"null", "blank", "cast"}:
+            raise ValueError("unexpected shape of the city totals")
+        city_rows.append(rows)
+        prison_rows.append(prisons)
+        city_totals.append(pdf_totals([found["blank"][0]], [found["null"][0]], [found["cast"][0]]))
+        prison_totals.append(pdf_totals([found["blank"][1]], [found["null"][1]], [found["cast"][1]]))
+    cargos = ["head", "legislature"]
+
+    def merge(rows: list[list[Row]], totals: list[dict[str, list[int]]]) -> Page:
+        merged = [Row(a.number, a.name, [a.votes[0], b.votes[0]], []) for a, b in zip(rows[0], rows[1], strict=True)]
+        combined = {label: [totals[0][label][0], totals[1][label][0]] for label in totals[0]}
+        _positive(merged, combined)
+        return Page(cargos, merged, combined, None)
+
+    return merge(city_rows, city_totals), merge(prison_rows, prison_totals)
+
+
+def _paso_rows(text: str, columns: int) -> tuple[list[Row], dict[str, list[int]], int]:
+    """The table of one office in a primary resolution: the lists by number, with their votes by kind of elector
+    (columns of them), and below them blank, null, and the totals. Returns the rows, the totals, and the registered."""
+    registered = re.search(r"Total de inscriptos:\s*(\d+)", text)
+    assert registered is not None
+    body = text[text.index("Lista n") :]
+    rows: list[Row] = []
+    lists: list[tuple[int, str]] = []
+    found: dict[str, int] = {}
+    for line in body.splitlines()[1:]:
+        label = line.strip()
+        figures = whole_numbers(line)
+        if not figures:
+            continue
+        if label.startswith("VOTOS EN BLANCO"):
+            found["blank"] = figures[-1]
+        elif label.startswith("VOTOS NULOS"):
+            found["null"] = figures[-1]
+        elif label.startswith("TOTAL VOTOS EMITIDOS"):
+            found["cast"] = figures[-1]
+        elif label.startswith("TOTAL VOTOS VALIDOS"):
+            found["valid"] = figures[-1]
+        elif len(figures) == columns + 3:
+            number = str(figures[0])
+            rows.append(
+                Row(number, PARTY_NAMES[number], [figures[-1]], [Lista("1", LIST_NAMES[(number, 1)], [figures[-1]])])
+            )
+            if sum(figures[1 : columns + 1]) != figures[columns + 1]:
+                raise ValueError(f"{line.strip()}: the columns do not add up")
+        elif len(figures) == 2:
+            number = str(figures[0])
+            rows.append(Row(number, PARTY_NAMES[number], [figures[1]], []))
+        elif len(figures) == columns + 1:
+            if sum(figures[:columns]) != figures[columns]:
+                raise ValueError(f"{line.strip()}: the columns do not add up")
+            lists.append((figures[columns], label))
+    for row in rows:
+        if row.lists:
+            continue
+        for ordinal in (1, 2):
+            if not lists:
+                raise ValueError(f"no lists left for {row.number}")
+            votes, _ = lists.pop(0)
+            row.lists.append(Lista(str(ordinal), LIST_NAMES[(row.number, ordinal)], [votes]))
+        if sum(lista.votes[0] for lista in row.lists) != row.votes[0]:
+            raise ValueError(f"the lists of {row.number} do not add up to the alliance")
+    if lists or set(found) != {"blank", "null", "cast", "valid"}:
+        raise ValueError("unexpected shape of the primary table")
+    totals = pdf_totals([found["blank"]], [found["null"]], [found["cast"]])
+    if found["cast"] - found["null"] != found["valid"]:
+        raise ValueError("the printed valid votes do not match the cast and null votes")
+    _positive(rows, totals)
+    return rows, totals, int(registered.group(1))
+
+
+@functools.cache
+def paso_city_page() -> Page:
+    cargos, rows, totals, registered = [], [], {}, []
+    for name, cargo in ((PASO_HEAD, "head"), (PASO_LEGISLATURE, "legislature")):
+        office_rows, office_totals, count = _paso_rows(pdf_text(name), 3)
+        cargos.append(cargo)
+        registered.append(count)
+        rows.append(office_rows)
+        for label, values in office_totals.items():
+            totals.setdefault(label, []).extend(values)
+    if len(set(registered)) != 1:
+        raise ValueError("the two offices disagree on the registered voters")
+    merged: list[Row] = []
+    for number in sorted({row.number for office in rows for row in office}, key=int):
+        found = [next((row for row in office if row.number == number), None) for office in rows]
+        present = [row for row in found if row is not None]
+        merged.append(
+            Row(
+                number,
+                present[0].name,
+                [row.votes[0] if row else 0 for row in found],
+                [
+                    Lista(lista.code, lista.name, [_vote(row, lista.code) for row in found])
+                    for lista in present[0].lists
+                ],
+            )
+        )
+    return Page(cargos, merged, totals, registered[0])
+
+
+def _vote(row: Row | None, code: str) -> int:
+    return next((lista.votes[0] for lista in row.lists if lista.code == code), 0) if row else 0
+
+
+@functools.cache
+def paso_junta_pages() -> dict[int, Page]:
+    parts = re.split(r"MIEMBROS DE LA JUNTA COMUNAL N° (\d+)", pdf_text(PASO_JUNTAS))
+    pages: dict[int, Page] = {}
+    for comuna, body in zip(parts[1::2], parts[2::2], strict=True):
+        rows, totals, registered = _paso_rows(body.split("TRIBUNAL ELECTORAL DE LA CIUDAD")[0], 2)
+        pages[int(comuna)] = Page(["junta"], rows, totals, registered)
+    if sorted(pages) != list(COMUNAS):
+        raise ValueError(f"expected the 15 comunas, found {sorted(pages)}")
+    return pages
+
+
+@functools.cache
+def general_pages() -> dict[int | None, Page]:
+    national = electors_pages(GENERAL_NATIONAL)
+    foreign = electors_pages(GENERAL_FOREIGN)
+    pages: dict[int | None, Page] = {c: _sum_pages(national[c], foreign[c]) for c in COMUNAS}
+    city, prison = city_general_pages()
+    pages[None] = city
+    pages[0] = prison
+    return pages
+
+
+def pdf_page(held: Held, comuna: int | None, prison: bool) -> Page:
+    if held.kind == "primary":
+        return paso_junta_pages()[comuna] if comuna else paso_city_page()
+    return general_pages()[0 if prison else comuna]
+
+
 def page_of(held: Held, comuna: int | None, prison: bool = False) -> Page:
+    if held.docs:
+        return pdf_page(held, comuna, prison)
     if held.page is None:
         return te_page(PRISONS_URL if prison else te_url(comuna))
     return tsj_page(tsj_url(held, comuna))
@@ -185,6 +500,7 @@ def page_of(held: Held, comuna: int | None, prison: bool = False) -> Page:
 CITY = area("ar.caba_ciudad", CITY_CODE)
 TSJ_SOURCE = key("source", "tsj")
 TE_SOURCE = key("source", "te")
+TEC_SOURCE = key("source", "te.resoluciones")
 GCBA_SOURCE = key("source", "gcba.comunas")
 HEAD = key("office", "jefe-de-gobierno")
 LEGISLATURE = key("body", "legislatura")
@@ -236,6 +552,19 @@ METHOD = (
 PRIMARY_METHOD = (
     " In the open primaries (PASO), the options are the lists that each party or alliance ran for the office, and "
     "the votes are stored on the lists, whose party or alliance is their parent option."
+)
+PDF_METHOD = (
+    "Counted by the electoral authority of the City of Buenos Aires and published in the resolutions of its Tribunal "
+    "Electoral, with the definitive count of electors by comuna and the totals of the City. Each comuna is one "
+    "reporting unit. Valid votes are the votes for lists (the authority's positive votes), and ballots cast are "
+    "valid, blank, and null ballots together. Where the authority prints one count of Argentine electors and another "
+    "of foreign residents by comuna, the unit is their sum. A list that received no votes in a unit is not shown "
+    "there, and is stored as zero only where it received votes elsewhere in the same contest."
+)
+PRIMARY_DOCS_METHOD = (
+    " The resolutions for the primaries give the Head of Government and the Legislature only as totals of the City, "
+    "and the Community Boards by comuna, so the first two are stored as declared totals and on one unit that is the "
+    "whole City."
 )
 PRISON_METHOD = (
     " The prisoners' tables, which the service lists apart from the comunas, are one more unit with no area."
@@ -362,6 +691,12 @@ def registry() -> Package:
             "Resultados Elecciones Legislativas 2025",
             f"{TE}/index.php",
         ),
+        (
+            TEC_SOURCE,
+            "Tribunal Electoral de la Ciudad Autónoma de Buenos Aires",
+            "Resoluciones de escrutinio de las elecciones de 2023",
+            f"{TSJ}/resultados",
+        ),
     ):
         p.add(
             "source",
@@ -375,7 +710,7 @@ def registry() -> Package:
             attribution=publisher,
         )
     for held in HELD:
-        source = TSJ_SOURCE if held.page is not None else TE_SOURCE
+        source = source_of(held)
         for url in urls(held):
             p.artifact(raw.cached(SOURCE, url), source)
     p.add("office", id=HEAD, polity_id=ARGENTINA, kind="head_of_government")
@@ -477,7 +812,7 @@ def election(name: str) -> Package:
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", *([f"{SOURCE}/{first}"] if first else [])],
     )
     p.external.add(ARGENTINA)
-    source = TSJ_SOURCE if held.page is not None else TE_SOURCE
+    source = source_of(held)
     for url in urls(held):
         p.uses(raw.cached(SOURCE, url))
     primary = held.kind == "primary"
@@ -498,7 +833,7 @@ def election(name: str) -> Package:
     p.name(election_id, spanish.format(year=year), "es", "native", False)
     city = page_of(held, None)
     pages: dict[int, Page] = {comuna: page_of(held, comuna) for comuna in COMUNAS}
-    prison = page_of(held, None, True) if held.page is None else None
+    prison = page_of(held, None, True) if held.prison else None
     units: dict[int, str] = {}
     for comuna in COMUNAS:
         unit = units[comuna] = key("unit", held.day, comuna)
@@ -510,6 +845,18 @@ def election(name: str) -> Package:
             code=f"{held.day}:{comuna}",
             area_relation="equals",
             area_id=area("ar.caba_comuna", str(comuna)),
+            kind="aggregate",
+        )
+    city_unit = key("unit", held.day, "city")
+    if any(cargo not in pages[1].cargos for cargo in city.cargos):
+        p.add(
+            "reporting_unit",
+            id=city_unit,
+            polity_id=ARGENTINA,
+            scheme_code="ar.caba_ciudad",
+            code=f"{held.day}:city",
+            area_relation="equals",
+            area_id=CITY,
             kind="aggregate",
         )
     prison_unit = key("unit", held.day, "prison")
@@ -596,20 +943,28 @@ def election(name: str) -> Package:
                 id=key("note", result_set),
                 entity_id=result_set,
                 kind="methodology",
-                body_md=METHOD + (PRIMARY_METHOD if primary else "") + (PRISON_METHOD if prison is not None else ""),
+                body_md=(PDF_METHOD if held.docs and year == 2023 else METHOD)
+                + (PRIMARY_METHOD if primary else "")
+                + (PRISON_METHOD if prison is not None else "")
+                + (PRIMARY_DOCS_METHOD if primary and year == 2023 else ""),
                 lang="en",
             )
-            here: list[tuple[str, Page, int]] = [(units[c], pages[c], pages[c].cargos.index(cargo)) for c in COMUNAS]
+            here: list[tuple[str, Page, int]] = [
+                (units[c], pages[c], pages[c].cargos.index(cargo)) for c in COMUNAS if cargo in pages[c].cargos
+            ]
             if scope:
                 here = [(units[scope], pages[scope], pages[scope].cargos.index("junta"))]
-            elif prison is not None:
-                here.append((prison_unit, prison, 0))
+            elif prison is not None and cargo in prison.cargos:
+                here.append((prison_unit, prison, prison.cargos.index(cargo)))
+            if scope == 0 and not here:
+                here = [(city_unit, city, city.cargos.index(cargo))]
+            looked = [*here, ("", city, city.cargos.index(cargo))] if scope == 0 else here
             options: dict[tuple[str, str], str] = {}
             numbers = sorted(
-                {row.number for _, page, k in here for row in page.rows if row.votes[k]}, key=lambda n: int(n)
+                {row.number for _, page, k in looked for row in page.rows if row.votes[k]}, key=lambda n: int(n)
             )
             for number in numbers:
-                label = next(row.name for _, page, _ in here for row in page.rows if row.number == number)
+                label = next(row.name for _, page, _ in looked for row in page.rows if row.number == number)
                 parent = key("option", held.key, tag, number)
                 p.add(
                     "contest_option",
@@ -626,7 +981,7 @@ def election(name: str) -> Package:
                 codes = sorted(
                     {
                         lista.code
-                        for _, page, k in here
+                        for _, page, k in looked
                         for row in page.rows
                         if row.number == number
                         for lista in row.lists
@@ -638,7 +993,7 @@ def election(name: str) -> Package:
                     child = options[(number, code)] = key("option", held.key, tag, number, code)
                     name_of = next(
                         lista.name
-                        for _, page, _ in here
+                        for _, page, _ in looked
                         for row in page.rows
                         if row.number == number
                         for lista in row.lists
