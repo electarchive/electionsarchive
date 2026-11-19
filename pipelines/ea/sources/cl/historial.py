@@ -34,6 +34,9 @@ CIRCS = range(201, 220)
 DISTRICTS = range(401, 461)
 
 
+LISTED = ("deputies", "senators", "council")
+
+
 class Part(NamedTuple):
     kind: str  # president, deputies, senators, council, mayor
     year: int  # the year folder, that of the first round
@@ -144,6 +147,10 @@ def comuna_url(part: Part, code: str) -> str:
     return f"{PAGES}/{part.year}/{part.folder}/comunas/candidatos/total/{code}.htm"
 
 
+def pact_url(part: Part, code: str) -> str:
+    return f"{PAGES}/{part.year}/{part.folder}/comunas/pactos/total/{code}.htm"
+
+
 def district_url(part: Part, code: int) -> str:
     place = "distritos" if part.kind == "deputies" else "circunscripciones"
     return f"{PAGES}/{part.year}/{part.folder}/{place}/candidatos/total/{code}.htm"
@@ -163,8 +170,8 @@ def number(cell: str) -> int:
     return int(digits) if digits else 0
 
 
-def table(content: bytes) -> list[list[str]]:
-    """The rows of the first table whose header names NOMBRE and VOTOS, as cell texts."""
+def table(content: bytes, first: str = "NOMBRE") -> list[list[str]]:
+    """The rows of the first table whose header names `first` and VOTOS, as cell texts."""
     page = content.decode("latin-1")
     for block in re.findall(r"<table.*?</table>", page, flags=re.IGNORECASE | re.DOTALL):
         rows = []
@@ -174,9 +181,52 @@ def table(content: bytes) -> list[list[str]]:
             ]
             if cells:
                 rows.append(cells)
-        if rows and {"NOMBRE", "VOTOS"} <= {fold(c) for c in rows[0]}:
+        if rows and {first, "VOTOS"} <= {fold(c) for c in rows[0]}:
             return rows
     return []
+
+
+class Pact(NamedTuple):
+    letter: str | None  # None for the independents outside any pact
+    label: str
+    votes: int
+    candidates: int
+    elected: int
+
+
+class PactPage(NamedTuple):
+    pacts: list[Pact]
+    valid: int | None
+    candidates: int | None
+    elected: int | None
+
+
+PACT_LABEL = re.compile(r"^([A-Z]{1,2})\s*\.\s*-\s*(.+)$")
+
+
+def read_pacts(content: bytes) -> PactPage | None:
+    """The lists or pacts of a commune with their votes, candidates, and elected, and the totals row."""
+    rows = table(content, "LISTA PACTO")
+    if not rows:
+        return None
+    pacts: list[Pact] = []
+    valid = candidates = elected = None
+    for cells in rows[1:]:
+        if len(cells) < 5:
+            continue
+        label = " ".join(cells[0].split())
+        counts = (number(cells[1]), number(cells[3]), number(cells[4]))
+        if fold(label).startswith("VALIDAMENTE"):
+            valid, candidates, elected = counts
+            continue
+        found = PACT_LABEL.match(label)
+        if found:
+            pacts.append(Pact(found.group(1), found.group(2).strip(), *counts))
+        elif fold(label).startswith("INDEPENDIENTES"):
+            pacts.append(Pact(None, "Independientes (Fuera de Pacto)", *counts))
+        elif label:
+            raise ValueError(f"unrecognized list row {label!r}")
+    return PactPage(pacts, valid, candidates, elected)
 
 
 class Candidate(NamedTuple):
@@ -254,6 +304,8 @@ def fetch() -> None:
     for election in ELECTIONS:
         for part in election.parts:
             raw.fetch_many(SOURCE, [comuna_url(part, code) for code in communes()], suffix=".htm")
+            if part.kind in LISTED:
+                raw.fetch_many(SOURCE, [pact_url(part, code) for code in communes()], suffix=".htm")
 
 
 # ---- reading the cache -----------------------------------------------------------------------------------------
@@ -269,6 +321,13 @@ def load(url: str) -> Page | None:
     if url not in _cached():
         return None
     return read(raw.cached(SOURCE, url).path.read_bytes())
+
+
+@cache
+def load_pacts(url: str) -> PactPage | None:
+    if url not in _cached():
+        return None
+    return read_pacts(raw.cached(SOURCE, url).path.read_bytes())
 
 
 class Contest(NamedTuple):
@@ -395,6 +454,124 @@ def contests(election: Election, part: Part) -> list[Contest]:
     return out
 
 
+# ---- lists and pacts -------------------------------------------------------------------------------------------
+#
+# A commune's pact page prints each list's votes, its number of candidates, and its number of elected, for the whole
+# district or council, and the candidate pages name each candidate's party but not the list. A candidate belongs to the
+# list whose figures the parties add up to: each list's candidate count, elected count, and votes in every commune
+# must equal the sum over its candidates. A party's candidates all stand on one list, an independent's party column
+# reads `IL` and the list's letter, and the independents outside any pact read `IND`. The assignment is kept only when
+# exactly one satisfies every one of those sums.
+
+BUDGET = 2_000_000
+IN_LIST = re.compile(r"^IL([A-Z])")
+
+
+class Slate(NamedTuple):
+    key: str | None  # the list's letter; None for the independents outside any pact
+    label: str
+    candidates: int
+    elected: int
+    votes: dict[str, int]  # by commune
+
+
+def slates(units: dict[str, PactPage]) -> list[Slate] | None:
+    """The lists of a contest, in the order of the first commune that prints each; None where the communes disagree."""
+    order: dict[str | None, Slate] = {}
+    for code, page in units.items():
+        for pact in page.pacts:
+            known = order.get(pact.letter)
+            if known is None:
+                order[pact.letter] = Slate(pact.letter, pact.label, pact.candidates, pact.elected, {code: pact.votes})
+            elif (known.label, known.candidates, known.elected) != (pact.label, pact.candidates, pact.elected):
+                return None
+            else:
+                known.votes[code] = pact.votes
+    return sorted(order.values(), key=lambda slate: (slate.key is None, len(slate.key or ""), slate.key or ""))
+
+
+def tie(contest: Contest, found: list[Slate]) -> dict[str, str | None] | None:
+    """Each candidate's list (its key, None for the independents), by folded name; None where no single assignment
+    satisfies the figures."""
+    communes_ = sorted(contest.units)
+    elected = {fold(c.name) for c in (contest.official.candidates if contest.official else []) if c.cargo}
+    votes: dict[str, list[int]] = defaultdict(lambda: [0] * len(communes_))
+    party_of: dict[str, str] = {}
+    for at, code in enumerate(communes_):
+        for candidate in contest.units[code].candidates:
+            name = fold(candidate.name)
+            votes[name][at] += candidate.votes
+            party_of[name] = fold(candidate.party)
+    keys = [slate.key for slate in found]
+    left = {
+        slate.key: [slate.candidates, slate.elected, *(slate.votes.get(code, 0) for code in communes_)]
+        for slate in found
+    }
+    groups: dict[str, list[str]] = defaultdict(list)
+    fixed: dict[str, str | None] = {}
+    for name, party_ in party_of.items():
+        inside = IN_LIST.match(party_)
+        if party_ in ("IND", ""):
+            fixed[name] = None
+        elif inside and inside.group(1) in keys:
+            fixed[name] = inside.group(1)
+        else:
+            groups[party_].append(name)
+    if any(key not in left for key in fixed.values()):
+        return None
+
+    def take(slate: str | None, names: list[str]) -> list[int] | None:
+        need = left[slate]
+        need[0] -= len(names)
+        need[1] -= sum(name in elected for name in names)
+        for at in range(len(communes_)):
+            need[2 + at] -= sum(votes[name][at] for name in names)
+        return need
+
+    def fits(need: list[int]) -> bool:
+        return all(value >= 0 for value in need)
+
+    for name, slate in fixed.items():
+        take(slate, [name])
+    if not all(fits(need) for need in left.values()):
+        return None
+    items = sorted(groups.values(), key=lambda names: (-len(names), -sum(sum(votes[n]) for n in names)))
+    solutions: list[dict[str, str | None]] = []
+    nodes = 0
+
+    def search(at: int, chosen: dict[str, str | None]) -> None:
+        nonlocal nodes
+        nodes += 1
+        if nodes > BUDGET or len(solutions) > 1:
+            return
+        if at == len(items):
+            if all(not any(need) for need in left.values()):
+                solutions.append(dict(chosen))
+            return
+        names = items[at]
+        for slate in keys:
+            need = take(slate, names)
+            if need is not None and fits(need):
+                for name in names:
+                    chosen[name] = slate
+                search(at + 1, chosen)
+                for name in names:
+                    del chosen[name]
+            take_back(slate, names)
+
+    def take_back(slate: str | None, names: list[str]) -> None:
+        need = left[slate]
+        need[0] += len(names)
+        need[1] += sum(name in elected for name in names)
+        for at in range(len(communes_)):
+            need[2 + at] += sum(votes[name][at] for name in names)
+
+    search(0, {})
+    if nodes > BUDGET or len(solutions) != 1:
+        return None
+    return {**fixed, **solutions[0]}
+
+
 # ---- packages --------------------------------------------------------------------------------------------------
 #
 # Servel's workbooks (`cl.servel`) hold every election of 1989-2010 by circunscripcion electoral, and they are finer
@@ -402,6 +579,10 @@ def contests(election: Election, part: Part) -> list[Contest]:
 # two sources agree except in a few contests, where this site's commune pages add up to the candidate totals its own
 # district and national pages print and the workbooks do not. For each of those contests (`servel.SUPERSEDED`) this
 # pipeline publishes its commune counts as the default result set, superseding the workbook's, on Servel's contest.
+#
+# The workbooks name each list by its letter and give it no votes. For every deputies, senators, and council contest
+# the commune pact pages add the lists' names and votes as one more result set, which is not the default, on Servel's
+# contest. A candidate that a superseding set adds takes its list from `tie`.
 
 AREA_SCHEMES = (("cl.historial_comuna", 3, "administrative", "commune"),)
 UNIT_SCHEME = "cl.historial_comuna_votes"
@@ -527,12 +708,105 @@ def differing(election: Election) -> set[tuple[date, str, str]]:
     return found
 
 
+def _workbook_contests(day: date) -> set[str]:
+    return set(_workbook(day, "contest")["id"].to_list())
+
+
+def _pacts(part: Part, contest: Contest) -> dict[str, PactPage]:
+    found = {code: load_pacts(pact_url(part, code)) for code in contest.units}
+    return {code: page for code, page in found.items() if page is not None and page.pacts}
+
+
+def _target(day: date, part: Part, contest: Contest) -> str:
+    """The workbook's contest for this one: a district or constituency by number, a council by its commune's name."""
+    if part.kind != "council":
+        return servel.key("contest", day, part.kind, contest.code)
+    name = comuna_name(contest.code)
+    renamed = re.search(r"\(actual ([^)]+)\)", name)
+    return servel.key("contest", day, "council", servel.comuna(renamed.group(1) if renamed else name))
+
+
+LISTS_METHOD = (
+    "Votes of each list or pact per commune as the Ministry of the Interior's historical results site, kept by the "
+    "Servicio Electoral de Chile (Servel), publishes them: one page per commune prints each list's votes, its "
+    "candidates, and how many were elected. The lists carry the letter and name the site prints. The site prints "
+    "the independents outside any pact as one row."
+)
+
+
+def _lists(
+    p: Package,
+    part: Part,
+    contest: Contest,
+    target: str,
+    found: list[Slate],
+    rows: list[dict[str, object]],
+) -> dict[str | None, str]:
+    """The list options and their votes per commune, as a result set that sits beside the workbook's own."""
+    day = date.fromisoformat(p.key.rpartition("/")[2])
+    ident = (day, part.kind, contest.code)
+    result_set = p.id("result_set", "lists", *ident)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=servel.key("election", day),
+        contest_id=target,
+        stage="certified",
+        kind="counted",
+        source_id=SOURCE_ID,
+        status="active",
+        is_default=False,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=p.id("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=LISTS_METHOD,
+        lang="en",
+    )
+    options: dict[str | None, str] = {}
+    for position, slate in enumerate(found, 1):
+        option = options[slate.key] = p.id("option", "list", *ident, slate.key or "")
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=target,
+            kind="independents" if slate.key is None else "list",
+            ballot_position=position,
+            ballot_label=slate.label if slate.key is None else f"{slate.key}. {slate.label}",
+        )
+        if slate.elected:
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=slate.elected)
+    pages = _pacts(part, contest)
+    for code in pages:
+        p.artifact(raw.cached(SOURCE, pact_url(part, code)), SOURCE_ID)
+    for code, page in pages.items():
+        unit = key("unit", code)
+        for pact in page.pacts:
+            rows.append(
+                {
+                    "result_set_id": result_set,
+                    "unit_id": unit,
+                    "option_id": options[pact.letter],
+                    "measure": 1,
+                    "value": pact.votes,
+                }
+            )
+        if page.valid is not None:
+            rows.append(
+                {"result_set_id": result_set, "unit_id": unit, "option_id": None, "measure": 4, "value": page.valid}
+            )
+    return options
+
+
 def build(election: Election) -> Package:
     day = election.day
     p = Package(
         f"{SOURCE}/{day}",
         SOURCE,
-        f"Commune counts of the {election.en} that supersede Servel's workbooks by circunscripcion electoral",
+        f"Commune counts of the {election.en}: list votes, and counts that supersede Servel's workbooks where they differ",
         depends=[f"{SOURCE}/registry", f"{servel.SOURCE}/{day}"],
     )
     listed: dict[str, list[tuple[str, str]]] = defaultdict(list)
@@ -545,12 +819,20 @@ def build(election: Election) -> Package:
         .rows()
     }
     rows: list[dict[str, object]] = []
+    known = _workbook_contests(day)
     for part in election.parts:
         for contest in contests(election, part):
             ident = (day, part.kind, contest.code)
-            if ident not in servel.SUPERSEDED:
-                continue
-            _supersede(p, part, contest, listed[servel.key("contest", *ident)], parties, rows)
+            lists: dict[str | None, str] = {}
+            tied: dict[str, str | None] | None = None
+            if part.kind in LISTED:
+                found = slates(_pacts(part, contest))
+                target = _target(day, part, contest)
+                if found and target in known:
+                    lists = _lists(p, part, contest, target, found, rows)
+                    tied = tie(contest, found)
+            if ident in servel.SUPERSEDED:
+                _supersede(p, part, contest, listed[servel.key("contest", *ident)], parties, rows, lists, tied)
     schema = {"result_set_id": pl.String, "unit_id": pl.String, "option_id": pl.String, "measure": pl.Int64}
     p.frame(
         "result_value",
@@ -568,6 +850,8 @@ def _supersede(
     options: list[tuple[str, str]],
     parties: set[str],
     rows: list[dict[str, object]],
+    lists: dict[str | None, str],
+    tied: dict[str, str | None] | None,
 ) -> None:
     day = date.fromisoformat(p.key.rpartition("/")[2])
     ident = (day, part.kind, contest.code)
@@ -616,6 +900,7 @@ def _supersede(
                 kind="candidate",
                 party_id=member,
                 ballot_label=candidate.name,
+                parent_option_id=lists.get(tied[folded]) if tied is not None and folded in tied else None,
             )
             person = p.id("person", *ident, folded)
             p.add("person", id=person)
