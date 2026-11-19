@@ -2113,8 +2113,15 @@ def _ready(source: Connection | Reference, key: str, batch: set[str], minted: se
                join area_geometry g on g.area_id = n.area_id
                 and daterange(g.valid_from, g.valid_to, '[)') && daterange(n.valid_from, n.valid_to, '[)')
                join changeset c on c.id = g.changeset_id
-               where c.scope->>'package' is distinct from %s""",
-            [rows["area_id"].to_list(), rows["valid_from"].to_list(), rows["valid_to"].to_list(), key],
+               where c.scope->>'package' is distinct from %s and c.id <> all(%s::uuid[])""",
+            [
+                rows["area_id"].to_list(),
+                rows["valid_from"].to_list(),
+                rows["valid_to"].to_list(),
+                key,
+                # An export takes over the outlines of the changesets it adopts, so those are its own.
+                manifest.get("adopts", []),
+            ],
         ).fetchall()
         if taken:
             found.append(
@@ -2289,6 +2296,16 @@ def _adopted(conn: Connection, pipeline: str) -> tuple[list[str], list[str]]:
     return sorted(row[0]), sorted(row[1])
 
 
+def cited(artifacts: pl.DataFrame | None) -> list[dict[str, str]]:
+    """The raw artifacts a build read, from the source_artifact rows it staged, as the manifest lists them: URL,
+    sha256, and the storage key in the raw cache. Rows an export carries over were read by the changesets it adopts,
+    which keep their own artifact keys, so a build cites only what it read itself."""
+    if artifacts is None or artifacts.is_empty():
+        return []
+    rows = artifacts.select("url", "sha256", "storage_key").unique("storage_key").sort("storage_key")
+    return [{"url": url, "sha256": sha, "storage_key": key} for url, sha, key in rows.iter_rows()]
+
+
 def _canonicalize(file: Path, columns: list[str]) -> None:
     pl.read_parquet(file).with_columns(
         pl.col(column).map_elements(canonical, return_dtype=pl.String) for column in columns
@@ -2364,7 +2381,7 @@ def export(pipeline: str) -> Path:
     meter = Meter()
     with store.connect() as conn:
         conn.execute("set transaction isolation level repeatable read, read only")
-        owned, artifacts = _adopted(conn, pipeline)
+        owned, _ = _adopted(conn, pipeline)
         if not owned:
             raise LookupError(f"{pipeline} has no published changesets outside packages")
         mine = sql.SQL("t.changeset_id = any({}::uuid[])").format(sql.Literal(owned))
@@ -2459,7 +2476,7 @@ def export(pipeline: str) -> Path:
         out,
         counts,
         owned,
-        [{"storage_key": artifact} for artifact in artifacts],
+        [],
         EXPORT_REASON,
     )
     print(f"{key}: {', '.join(f'{t} {n:,}' for t, n in counts.items())}; {len(owned):,} changesets adopted", flush=True)
@@ -2724,18 +2741,9 @@ class Draft(Changeset):
                 if table in OPTIONAL:
                     _trim(table, out / f"{table}.parquet")
                 counts[table] = carried.height
-        owned, artifacts = _adopted(self.conn, pipeline)
-        new = tables["source_artifact"]["storage_key"].to_list() if "source_artifact" in tables else []
-        _seal(
-            key,
-            pipeline,
-            str(self.manifest["summary"]),
-            out,
-            counts,
-            owned,
-            [{"storage_key": storage} for storage in sorted({*artifacts, *new})],
-            None,
-        )
+        owned, _ = _adopted(self.conn, pipeline)
+        read = cited(tables.get("source_artifact"))
+        _seal(key, pipeline, str(self.manifest["summary"]), out, counts, owned, read, None)
         print(
             f"{key}: {', '.join(f'{t} {n:,}' for t, n in counts.items())}; {len(owned):,} changesets adopted",
             flush=True,
