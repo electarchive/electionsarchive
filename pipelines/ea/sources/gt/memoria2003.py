@@ -19,7 +19,7 @@ from ea.sources.gt.memoria import Contest, Grid, Word, fold, is_number, label, l
 
 SOURCE = base.SOURCE
 YEAR = 2003
-INDEX = f"{base.SITE}/comunicacion/publicaciones/memorias/memorias-electorales/memoria-electoral-2003"
+INDEX = f"{base.SITE}/publicaciones/memorias/memorias-electorales/memoria-electoral-2003"
 FOLDER = f"{base.SITE}/images/memoriaselec/memoria_electoral_2003/"
 LINK = re.compile(r'href="[^"]*?(memoria_electoral_2003/[^"]+?\.pdf)"')
 
@@ -29,15 +29,50 @@ def fetch() -> None:
     raw.fetch_many(SOURCE, files(), suffix=".pdf")
 
 
+UNLINKED = [
+    f"{FOLDER}San%20Marcos/{name}.pdf"
+    for name in (
+        "AyutlaTecunUman",
+        "Catarina",
+        "Comitancillo",
+        "ConcepcionTutuapa",
+        "ElQuetzal",
+        "ElTumbador",
+        "EsquipulasPaloGordo",
+        "Ixchiguan",
+        "LaReforma",
+        "Malacatan",
+        "Ocos",
+        "Pajapita",
+        "RioBlanco",
+        "SanJoseOjetenan",
+        "SanJoseelRodeo",
+        "SanLorenzo",
+        "SanMarcos",
+        "SanMiguelIxtahuacan",
+        "SanPablo",
+        "SanPedroSacatepequezSM",
+        "Sibinal",
+        "Sipacapa",
+        "Tacana",
+        "Tajumulco",
+        "Tejutla",
+    )
+]
+"""Municipal files the Tribunal serves in the memoria's folder that its index page does not link. The index links no
+file for San Marcos; these were found by asking the folder for each missing municipality's name, spelled the way the
+linked files spell theirs. No such file answered for the other municipalities the index leaves out."""
+
+
 @cache
 def files() -> list[str]:
-    """The URL of each municipality's PDF, as the memoria's index page links them, in the order of the department
-    and municipality names."""
+    """The URL of each municipality's PDF: the files the memoria's index page links, in the order of the department
+    and municipality names, then the unlinked files its folder serves."""
     page = raw.cached(SOURCE, INDEX).path.read_text(encoding="utf-8", errors="replace")
-    found = sorted({f"{base.SITE}/images/memoriaselec/{m}" for m in LINK.findall(page)})
-    if not found:
+    linked = {f"{base.SITE}/images/memoriaselec/{m}" for m in LINK.findall(page)}
+    if not linked:
         raise ValueError("the 2003 memoria's index page links no municipality")
-    return found
+    return sorted(linked) + [url for url in UNLINKED if url not in linked]
 
 
 @cache
@@ -80,7 +115,7 @@ THOUSANDS = re.compile(r"\d{1,3}(?:,\d{3})+")
 def _repair(found: list[Word]) -> list[Word]:
     """The page's words with each number the memoria misprints read as printed digits.
 
-    Four typos recur: a number split in two words ("20," and "033", or "3" and ",436"), a period for the thousands
+    Five typos recur: a letter O for a zero ("4,14O"), a number split in two words ("20," and "033", or "3" and ",436"), a period for the thousands
     comma ("2.624"), a comma after the last digit ("9397,"), and a comma set after the wrong digit ("21,45"), which
     is read as its digits.
     """
@@ -109,6 +144,10 @@ def _repair(found: list[Word]) -> list[Word]:
     fixed: list[Word] = []
     for w in out:
         text_ = w.text
+        if "O" in text_ and re.search(r"\d", text_) and is_number(text_.replace("O", "0")):
+            PRINTED[(w.page, w.box[0], w.box[1])] = text_
+            text_ = text_.replace("O", "0")
+            w = w._replace(text=text_)
         if re.fullmatch(r"\d{4,},", text_):
             PRINTED[(w.page, w.box[0], w.box[1])] = text_
             w = w._replace(text=f"{int(text_[:-1]):,}")
@@ -211,7 +250,8 @@ def _read(path: Path, index: int, url: str, grids: dict[str, Grid]) -> str | Non
     name = (
         " ".join(w.text for w in title[1:])
         if fold(title[1].text) == "DISTRITO"
-        else " ".join(w.text for w in title[3:])
+        # "Resultados Municipio de X", or a few without the "de".
+        else " ".join(w.text for w in title[3 if fold(title[2].text) in ("DE", "DEL") else 2 :])
     )
     dep = base.department_code(department_name(url))
     code = base.match(name, base.departments_by_code()[dep])
@@ -383,8 +423,10 @@ def read() -> dict[str, Contest]:
     left = [
         f"{NAMES.get(town_name(url), town_name(url))} ({department_name(url)}) {why}" for url, why in SKIPPED.items()
     ]
+    unlinked = sum(url in UNLINKED for url in files())
     note = (
-        f"The memoria links a file for {len(files())} of the country's municipalities, and these results are read from "
+        f"The memoria holds a file for {len(files())} of the country's municipalities ({unlinked} of them, San Marcos's, "
+        f"served in its folder but not linked from its index page), and these results are read from "
         f"{len(files()) - len(SKIPPED)} of them."
     )
     if left:
