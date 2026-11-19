@@ -1299,7 +1299,7 @@ def election(year: int, day: date) -> Package:
                 f" The Tribunal annulled this municipality's elections of {m.general:%-d %B} and held them again on "
                 f"{m.runoff:%-d %B}; the memoria prints the mayoral results of the repeated election."
             )
-        if contest.seats:
+        if contest.seats and m.layout != "scan":
             note += " Seats are counted from the memoria's list of the elected, for the titular posts only."
         if contest.members:
             note += (
