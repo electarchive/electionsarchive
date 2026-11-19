@@ -12,7 +12,6 @@ from contextlib import suppress
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
-from itertools import batched
 from pathlib import Path
 from typing import LiteralString, NamedTuple, NotRequired, TypedDict, cast
 from uuid import NAMESPACE_URL, uuid5
@@ -1050,7 +1049,11 @@ def _drop(conn: Connection, table: str, staged: dict[str, tuple[str, list[str]]]
 
 
 def _facts(
-    conn: Connection, path: Path, accepted: dict[str, object], referencing: dict[tuple[str, str], list[list[str]]]
+    conn: Connection,
+    path: Path,
+    accepted: dict[str, object],
+    referencing: dict[tuple[str, str], list[list[str]]],
+    batch: frozenset[str] = frozenset(),
 ) -> Loaded | None:
     manifest = _manifest(path)
     key = str(manifest["key"])
@@ -1058,7 +1061,11 @@ def _facts(
     if missing:
         raise ValueError(f"{key} references ids missing from the database: {missing[:5]}")
     for depend in manifest["depends"]:
-        if conn.execute("select 1 from changeset where scope->>'package' = %s", [depend]).fetchone() is None:
+        # A dependency earlier in this run counts as loaded: the run takes its packages in dependency order inside
+        # one transaction, so its rows are already written when this package comes up.
+        if depend not in batch and (
+            conn.execute("select 1 from changeset where scope->>'package' = %s", [depend]).fetchone() is None
+        ):
             raise ValueError(f"{key} depends on {depend}, which is not loaded")
     prior = conn.execute(
         """select id, scope->>'digest', (scope->>'version')::int, scope->'adopts' from changeset
@@ -1197,7 +1204,9 @@ def _facts(
                     now=sql.SQL("current_setting('ea.changeset_id')::uuid"),
                 )
                 if rest
-                else sql.SQL("nothing"),
+                else sql.SQL("update set changeset_id = {now} where {claim}").format(
+                    now=sql.SQL("current_setting('ea.changeset_id')::uuid"), claim=claim
+                ),
             )
             if table in ROLLED:
                 returned = conn.execute(
@@ -1222,6 +1231,23 @@ def _facts(
                     lead=sql.Identifier(lead),
                 )
             ).rowcount
+            # Identical rows another package of the polity wrote stay out of the insert, so they would stay
+            # owned by that package and go when its next version drops them. The newest package to declare a
+            # row owns it.
+            conn.execute(
+                sql.SQL(
+                    """update {t} t set changeset_id = current_setting('ea.changeset_id')::uuid
+                       where {claim} and t.{lead} in (select {lead} from {s})
+                         and {h} in (select {sh} from {s} s)"""
+                ).format(
+                    t=sql.Identifier(table),
+                    claim=claim,
+                    lead=sql.Identifier(lead),
+                    s=sql.Identifier(name),
+                    h=_hash("t", columns),
+                    sh=_hash("s", columns),
+                )
+            )
         counts.setdefault(table, [0, 0])[0] = written
     retire: dict[str, tuple[str, list[str]]] = {}
     for table in deferred:
@@ -1268,16 +1294,30 @@ def _facts(
 
 
 def _retire(conn: Connection, loaded: list[Loaded]) -> None:
-    for item in loaded:
-        for table in item.deferred:
+    """Delete the rows whose drop a foreign key blocked, once every package of the run has written its rows.
+
+    A package's rows may be pointed at by rows of a package loaded after it (a geo package's dropped areas, still
+    used by contests until the run's election packages re-point them), so the retirements run after all inserts and
+    re-points, dependents first. A drop that still fails waits for the others to clear what blocks it; one that
+    fails with nothing left to clear means a package outside the run still uses the rows.
+    """
+    pending = [(item, table) for item in reversed(loaded) for table in item.deferred]
+    while pending:
+        failed: list[tuple[Loaded, str, errors.ForeignKeyViolation]] = []
+        for item, table in pending:
             try:
-                item.counts.setdefault(table, [0, 0])[1] = _drop(conn, table, item.retire, item.owned)
+                with conn.transaction():
+                    item.counts.setdefault(table, [0, 0])[1] = _drop(conn, table, item.retire, item.owned)
             except errors.ForeignKeyViolation as error:
-                raise ValueError(
-                    f"{item.key} v{item.version} would delete {table} rows that other packages still use "
-                    f"({error.diag.message_detail}); a package must keep every row other packages reference, "
-                    "so build it from a full parse of its pipeline"
-                ) from None
+                failed.append((item, table, error))
+        if len(failed) == len(pending):
+            item, table, error = failed[0]
+            raise ValueError(
+                f"{item.key} v{item.version} would delete {table} rows that other packages still use "
+                f"({error.diag.message_detail}); a package must keep every row other packages reference, "
+                "so build it from a full parse of its pipeline"
+            ) from None
+        pending = [(item, table) for item, table, _ in failed]
 
 
 def _merge(
@@ -1451,7 +1491,15 @@ def _minted(paths: Iterable[Path]) -> set[str]:
     return minted
 
 
-def _ordered(conn: Connection, items: list[tuple[Path, dict[str, object]]]) -> list[tuple[Path, dict[str, object]]]:
+def _ordered(
+    conn: Connection, items: list[tuple[Path, dict[str, object]]]
+) -> list[list[tuple[Path, dict[str, object]]]]:
+    """Group the packages that must load together, each group in dependency order.
+
+    Packages that depend on each other, or that use ids another package of the run mints, share a group: a group
+    loads in one transaction, so a dependency counts as loaded and a package's dropped rows are deleted only after
+    the group's other packages stop using them.
+    """
     keyed = {str(_manifest(path)["key"]): (path, accepted) for path, accepted in items}
     mints = {key: _minted([path]) for key, (path, _) in keyed.items()}
     externals = {key: {str(value) for value in _manifest(path)["external"]} for key, (path, _) in keyed.items()}
@@ -1469,18 +1517,40 @@ def _ordered(conn: Connection, items: list[tuple[Path, dict[str, object]]]) -> l
         if not ready:
             raise ValueError(f"packages depend on each other in a cycle: {sorted(set(keyed) - set(placed))}")
         placed += ready
-    return [keyed[key] for key in placed]
+    parent = {key: key for key in keyed}
+
+    def root(key: str) -> str:
+        while parent[key] != key:
+            parent[key] = parent[parent[key]]
+            key = parent[key]
+        return key
+
+    for key, wanted in needs.items():
+        for other in wanted:
+            parent[root(key)] = root(other)
+    groups: dict[str, list[tuple[Path, dict[str, object]]]] = {}
+    for key in placed:
+        groups.setdefault(root(key), []).append(keyed[key])
+    return list(groups.values())
 
 
 def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: Meter) -> list[str]:
     done: list[str] = []
-    for chunk in batched(_ordered(conn, items), LOAD_CHUNK):
+    batch = frozenset(str(_manifest(path)["key"]) for path, _ in items)
+    chunks: list[list[tuple[Path, dict[str, object]]]] = [[]]
+    for group in _ordered(conn, items):
+        if chunks[-1] and len(chunks[-1]) + len(group) > LOAD_CHUNK:
+            chunks.append([])
+        chunks[-1] += group
+    for chunk in chunks:
         with conn.transaction():
             conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
             conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
             referencing = _survivors(conn)
             loaded = [
-                item for path, accepted in chunk if (item := _facts(conn, path, accepted, referencing)) is not None
+                item
+                for path, accepted in chunk
+                if (item := _facts(conn, path, accepted, referencing, batch)) is not None
             ]
             steps = [meter.step("facts")]
             if loaded:
@@ -1688,7 +1758,7 @@ def run(command: str, keys: list[str], reference: Path | None = None) -> None:
             continue
         print(f"{key}: checks passed, {checked}", flush=True)
         ready.append((path, accepted))
-    if command == "load" and ready:
+    if command == "load" and ready and not failed:
         with store.connect(autocommit=True) as conn:
             meter = Meter(conn)
             try:
