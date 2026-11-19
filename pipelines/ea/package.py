@@ -281,6 +281,19 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
     "entity_retirement": (None, {"entity_id": U, "reason": U}),
 }
 FACT = ("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round")
+FACT_KEY: dict[str, tuple[str, ...]] = {
+    "result_value": FACT,
+    "value_locator": FACT,
+    "result_flow": ("result_set_id", "unit_id", "from_option_id", "option_id", "channel", "measure", "count_round"),
+}
+# A fact column that names a row of another table, and the integer key the database stores for it. An option left
+# empty is stored as key 0.
+FACT_REF = {
+    "result_set_id": "result_set_k",
+    "unit_id": "unit_k",
+    "option_id": "option_k",
+    "from_option_id": "from_option_k",
+}
 FACTS: dict[str, dict[str, pl.DataType]] = {
     "result_value": {
         "result_set_id": U,
@@ -306,6 +319,17 @@ FACTS: dict[str, dict[str, pl.DataType]] = {
         "x1": F,
         "y1": F,
     },
+    "result_flow": {
+        "result_set_id": U,
+        "unit_id": U,
+        "from_option_id": U,
+        "option_id": U,
+        "channel": I16,
+        "measure": I16,
+        "count_round": I16,
+        "flags": I16,
+        "value": I64,
+    },
     "declared": {"result_set_id": U, "option_id": U, "measure": I16, "value": I64},
 }
 FACT_LIKE: dict[str, LiteralString] = {
@@ -313,6 +337,8 @@ FACT_LIKE: dict[str, LiteralString] = {
     " count_round smallint, flags smallint, value numeric",
     "value_locator": "result_set_id uuid, unit_id uuid, option_id uuid, channel smallint, measure smallint,"
     " count_round smallint, page_id uuid, source_id uuid, x0 real, y0 real, x1 real, y1 real",
+    "result_flow": "result_set_id uuid, unit_id uuid, from_option_id uuid, option_id uuid, channel smallint,"
+    " measure smallint, count_round smallint, flags smallint, value numeric",
 }
 JSON_COLUMNS = {"kinds", "rules", "locator"}
 # Columns added to the format after packages were already built. A writer leaves one out of the Parquet file when
@@ -707,6 +733,10 @@ REFERENCES = [
     ("result_value", "result_set_id", "result_set"),
     ("result_value", "unit_id", "reporting_unit"),
     ("result_value", "option_id", "contest_option"),
+    ("result_flow", "result_set_id", "result_set"),
+    ("result_flow", "unit_id", "reporting_unit"),
+    ("result_flow", "option_id", "contest_option"),
+    ("result_flow", "from_option_id", "contest_option"),
     ("declared", "result_set_id", "result_set"),
     ("declared", "option_id", "contest_option"),
     ("reporting_unit", "counted_with_id", "reporting_unit"),
@@ -727,6 +757,8 @@ CHECKS = {
                       select result_set_id, unit_id, option_id, channel, measure, count_round, count(*) as n from result_value
                       where hash(result_set_id, unit_id, option_id, channel, measure, count_round) in (select h from repeated)
                       group by all having count(*) > 1""",
+    "unique.flow": """select result_set_id, unit_id, from_option_id, option_id, channel, measure, count_round, count(*) as n
+                      from result_flow group by all having count(*) > 1""",
     "unique.external_id": """select scheme, value, count(*) as n from (
                                select distinct entity_id, scheme, value from all_external_id)
                              group by all having count(*) > 1""",
@@ -742,6 +774,17 @@ CHECKS = {
                                 and coalesce(b.valid_from, date '0001-01-01') < coalesce(o.valid_to, date '9999-12-31')
                                group by all having count(*) > 1""",
     "fact.negative": "select * from result_value where value < 0",
+    "fact.flow_negative": "select * from result_flow where value < 0",
+    "fact.flow_self": "select * from result_flow where from_option_id = option_id",
+    "fact.flow_option_contest": """with pairs as (
+                                     select result_set_id, option_id from result_flow
+                                     union select result_set_id, from_option_id from result_flow
+                                     where from_option_id is not null)
+                                   select p.result_set_id, p.option_id from pairs p
+                                   join all_contest_option o on o.id = p.option_id
+                                   where exists (select 1 from all_result_set r where r.id = p.result_set_id)
+                                     and not exists (select 1 from all_result_set r
+                                                     where r.id = p.result_set_id and r.contest_id = o.contest_id)""",
     "fact.option_contest": """with pairs as (select distinct result_set_id, option_id from result_value)
                               select p.result_set_id, p.option_id from pairs p
                               join all_contest_option o on o.id = p.option_id
@@ -1423,7 +1466,8 @@ def _facts(
         }
     )
     sizes, changed = _merge(conn, "result_value", files.get("result_value"), mine, counts, referencing)
-    _merge(conn, "value_locator", files.get("value_locator"), mine, counts, referencing)
+    for table in ("value_locator", "result_flow"):
+        _merge(conn, table, files.get(table), mine, counts, referencing)
     _refuse_merged(conn, changeset_id, set(files))
     restored = _restore(conn, key, changeset_id, demoted)
     if demoted or restored:
@@ -1491,8 +1535,10 @@ def _merge(
     referencing: dict[tuple[str, str], list[list[str]]],
 ) -> tuple[dict[int, int], set[int]]:
     schema = FACTS[table]
-    rest = [c for c in schema if c not in FACT]
-    keys = ["result_set_k", "unit_k", "option_k", *FACT[3:]]
+    rest = [c for c in schema if c not in FACT_KEY[table]]
+    refs = [c for c in FACT_KEY[table] if c in FACT_REF]
+    plain = [c for c in FACT_KEY[table] if c not in FACT_REF]
+    keys = [FACT_REF[c] for c in refs] + plain
     resolved = sql.Identifier(f"pkg_{table}_k")
     conn.execute(sql.SQL("drop table if exists {}").format(resolved))
     if file is None:
@@ -1507,12 +1553,24 @@ def _merge(
         made = conn.execute(
             sql.SQL(
                 """create temp table {k} on commit drop as
-                   select r.k as result_set_k, u.k as unit_k, coalesce(o.k, 0) as option_k, {fact}, {rest}
+                   select r.k as result_set_k, u.k as unit_k, {options}, {fact}, {rest}
                    from {s} v join result_set r on r.id = v.result_set_id
-                   join reporting_unit u on u.id = v.unit_id left join contest_option o on o.id = v.option_id"""
+                   join reporting_unit u on u.id = v.unit_id {joins}"""
             ).format(
                 k=resolved,
-                fact=sql.SQL(", ").join(sql.SQL("v.{}").format(sql.Identifier(c)) for c in FACT[3:]),
+                options=sql.SQL(", ").join(
+                    sql.SQL("coalesce({a}.k, 0) as {k}").format(
+                        a=sql.Identifier(f"o_{c}"), k=sql.Identifier(FACT_REF[c])
+                    )
+                    for c in refs[2:]
+                ),
+                joins=sql.SQL(" ").join(
+                    sql.SQL("left join contest_option {a} on {a}.id = v.{c}").format(
+                        a=sql.Identifier(f"o_{c}"), c=sql.Identifier(c)
+                    )
+                    for c in refs[2:]
+                ),
+                fact=sql.SQL(", ").join(sql.SQL("v.{}").format(sql.Identifier(c)) for c in plain),
                 rest=sql.SQL(", ").join(sql.SQL("v.{}").format(sql.Identifier(c)) for c in rest),
                 s=sql.Identifier(f"pkg_{table}"),
             )
@@ -1611,6 +1669,12 @@ def _verify(conn: Connection, loaded: list[Loaded]) -> None:
                 "value",
                 """select r.id::text, count(*), coalesce(sum(v.value), 0) from result_set r
                    join result_value v on v.result_set_k = r.k where r.id = any(%s::uuid[]) group by r.id""",
+            ),
+            (
+                "result_flow",
+                "value",
+                """select r.id::text, count(*), coalesce(sum(v.value), 0) from result_set r
+                   join result_flow v on v.result_set_k = r.k where r.id = any(%s::uuid[]) group by r.id""",
             ),
             (
                 "outcome",
@@ -1742,6 +1806,9 @@ READY_COLUMNS = """select a.attname, a.attnotnull,
 
 
 Columns = dict[str, tuple[bool, bool, list[str]]]
+# Fact tables whose columns `ready` checks against the database. A snapshot written before one was listed here leaves
+# its columns unchecked.
+FLOW_TABLES = ("result_flow",)
 SNAPSHOT_IDS = """select id from polity
 union select area_id from polity_territory
 union select id from area where scheme_code like 'world.%' or scheme_code like 'eu.%'"""
@@ -1905,7 +1972,7 @@ def snapshot(target: Path) -> None:
                 "select distinct scope->>'package' from changeset where scope ? 'package'"
             ).fetchall()
         ]
-        columns = {table: _columns(conn, table) for table in TABLES}
+        columns = {table: _columns(conn, table) for table in [*TABLES, *FLOW_TABLES]}
     body = {
         "created": datetime.now(UTC).isoformat(),
         "ids": sorted(ids),
@@ -2080,6 +2147,15 @@ def _ready(source: Connection | Reference, key: str, batch: set[str], minted: se
                 ]
                 if bad:
                     found.append(f"ready.enum: {table}.{column} has values the database does not allow: {bad[:5]}")
+    for table in FLOW_TABLES:
+        known = source.columns.get(table) if isinstance(source, Reference) else _columns(source, table)
+        if (path / f"{table}.parquet").exists() and known is not None:
+            wanted = [FACT_REF.get(column, column) for column in FACTS[table]]
+            found += [
+                f"ready.column: {table}.{column} does not exist in the database"
+                for column in wanted
+                if column not in known
+            ]
     return found
 
 
@@ -2298,33 +2374,38 @@ def export(pipeline: str) -> Path:
             query = sql.SQL("select {} from {} t where {}").format(_select(schema, absent), sql.Identifier(table), mine)
             counts[table] = _dump(conn, con, query, schema, out / f"{table}.parquet")
         sets = sql.SQL("r.changeset_id = any({}::uuid[])").format(sql.Literal(owned))
-        found = conn.execute(
-            sql.SQL(
-                """select coalesce(max(min_scale(v.value)), 0) from result_set r
-                   cross join lateral (select v.value from result_value v where v.result_set_k = r.k offset 0) v
-                   where {}"""
-            ).format(sets)
-        ).fetchone()
-        places = 0 if found is None else int(found[0])
+        places = 0
+        for table in ("result_value", "result_flow"):
+            found = conn.execute(
+                sql.SQL(
+                    """select coalesce(max(min_scale(v.value)), 0) from result_set r
+                       cross join lateral (select v.value from {} v where v.result_set_k = r.k offset 0) v
+                       where {}"""
+                ).format(sql.Identifier(table), sets)
+            ).fetchone()
+            places = max(places, 0 if found is None else int(found[0]))
         if places > SCALE:
             raise ValueError(
                 f"{pipeline}: values need {places} decimal places, more than the {SCALE} the package format holds"
             )
+        value = "v.flags, v.value" if places else "v.flags, v.value::int8"
         for table, rest, schema in (
-            (
-                "result_value",
-                "v.flags, v.value" if places else "v.flags, v.value::int8",
-                {**FACTS["result_value"], "value": pl.Decimal(38, places) if places else I64},
-            ),
+            ("result_value", value, {**FACTS["result_value"], "value": pl.Decimal(38, places) if places else I64}),
+            ("result_flow", value, {**FACTS["result_flow"], "value": pl.Decimal(38, places) if places else I64}),
             ("value_locator", "v.page_id::text, v.source_id::text, v.x0, v.y0, v.x1, v.y1", FACTS["value_locator"]),
         ):
+            options = (
+                "(select o.id::text from contest_option o where o.k = v.from_option_k and v.from_option_k <> 0),"
+                if table == "result_flow"
+                else ""
+            )
             query = sql.SQL(
-                """select r.id::text, (select u.id::text from reporting_unit u where u.k = v.unit_k),
+                """select r.id::text, (select u.id::text from reporting_unit u where u.k = v.unit_k), {options}
                           (select o.id::text from contest_option o where o.k = v.option_k and v.option_k <> 0),
                           v.channel, v.measure, v.count_round, {rest}
                    from result_set r cross join lateral (select * from {t} v where v.result_set_k = r.k offset 0) v
                    where {sets}"""
-            ).format(rest=sql.SQL(rest), t=sql.Identifier(table), sets=sets)
+            ).format(options=sql.SQL(options), rest=sql.SQL(rest), t=sql.Identifier(table), sets=sets)
             counts[table] = _dump(conn, con, query, schema, out / f"{table}.parquet")
         outside = conn.execute(
             """select c.relname from pg_attribute a join pg_class c on c.oid = a.attrelid
