@@ -58,10 +58,9 @@ def _ids(pipeline: str) -> Callable[..., str]:
 
 
 _GEO = _ids("in.geo")
-_STAT = _ids("in.eci_stat")
 _OWN = _ids(SOURCE)
-BODY = _STAT("body", "lok-sabha")
-FPTP = _STAT("electoral_system", "fptp")
+BODY = _OWN("body", "lok-sabha")
+FPTP = _OWN("electoral_system", "fptp")
 SOURCE_ID = _OWN("source", "form20")
 ECI_SOURCE = _OWN("source", "eci")
 
@@ -837,6 +836,26 @@ def registry() -> Package:
         rank=3,
         noun="polling station",
     )
+    p.add("body", id=BODY, polity_id=INDIA, kind="lower_house")
+    p.name(BODY, "Lok Sabha", "en", "official")
+    p.name(BODY, "लोक सभा", "hi", "native", False)
+    p.add(
+        "electoral_system",
+        id=FPTP,
+        polity_id=INDIA,
+        valid_from=date(1951, 1, 1),
+        valid_to=None,
+        rules={"formula": "fptp"},
+        rules_version=1,
+    )
+    p.add(
+        "note",
+        id=key("note", FPTP),
+        entity_id=FPTP,
+        kind="methodology",
+        body_md="Each constituency elects one member by plurality of the votes.",
+        lang="en",
+    )
     p.add(
         "election",
         id=ELECTION,
@@ -901,9 +920,9 @@ def uttar_pradesh() -> Package:
         SOURCE,
         "The 2024 Lok Sabha election in Uttar Pradesh: declared constituency totals from the Election Commission's "
         "result pages and polling-station votes from the Form 20 sheets on the district portals",
-        depends=[f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/registry", "in.geo/geo"],
     )
-    p.external |= {INDIA, BODY, FPTP, "in.pc"}
+    p.external |= {INDIA}
     p.add(
         "source",
         id=SOURCE_ID,
