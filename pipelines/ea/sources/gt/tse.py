@@ -1,7 +1,6 @@
 import io
 import json
 import re
-import unicodedata
 import zipfile
 from collections import Counter
 from datetime import UTC, date, datetime, timedelta
@@ -12,6 +11,8 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.gt import shapes
+from ea.sources.gt.shapes import fold
 
 SOURCE = "gt.tse"
 GUATEMALA = str(uuid5(package.NAMESPACE, "polity\x1fGT"))
@@ -110,6 +111,8 @@ def fetch() -> None:
     for d in DAYS:
         raw.fetch(SOURCE, catalog_url(d), suffix=".json")
         raw.fetch(SOURCE, archive_url(d), suffix=".zip")
+    for outline in shapes.URLS:
+        raw.fetch(SOURCE, outline, suffix=".geojson")
 
 
 def title(text: str) -> str:
@@ -117,11 +120,6 @@ def title(text: str) -> str:
     return " ".join(
         word if index and word in SMALL else word[:1].upper() + word[1:] for index, word in enumerate(words) if word
     )
-
-
-def fold(text: str) -> str:
-    plain = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
-    return " ".join(re.sub(r"[^A-Za-z0-9]+", " ", plain).upper().split())
 
 
 class Sheet(NamedTuple):
@@ -337,6 +335,12 @@ def geo() -> Package:
         "Central.",
         lang="en",
     )
+    towns = {
+        municipality(dep, mun): (f"{1 if dep == CENTRAL else dep:02d}", text)
+        for (dep, mun), (_, text) in found.items()
+        if dep not in ABROAD
+    }
+    shapes.add(p, area, {f"{dep:02d}": text for dep, text in departments.items()}, towns)
     return p
 
 
