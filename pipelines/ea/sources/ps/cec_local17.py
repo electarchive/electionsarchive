@@ -1,25 +1,33 @@
 """Palestine's local elections of 2017 from the Central Elections Commission (elections.ps).
 
-The Commission publishes the 2017 local elections as spreadsheets of statistics, not as results by council: the
-winners of the 13 May 2017 elections by governorate and political affiliation, and the winners of the complementary
-elections of 29 July 2017 by political affiliation, each split between councils that voted and councils whose
-candidates were declared elected by acclamation (tazkiya). The governorate is therefore the finest unit these
-files reach. The 13 May contests are the eleven West Bank governorates, each holding the winners of its councils
-(by vote and by acclamation together, the only split by governorate the Commission publishes); the 29 July
-contests are the two national tallies, by vote and by acclamation.
+The Commission publishes the 2017 local elections twice over. Its spreadsheets of statistics give the winners of the
+13 May 2017 elections by governorate and political affiliation, and the winners of the complementary elections of
+29 July 2017 by political affiliation, each split between councils that voted and councils whose candidates were
+declared elected by acclamation (tazkiya). The 13 May contests are the eleven West Bank governorates, each holding
+the winners of its councils (by vote and by acclamation together, the only split by governorate those files give);
+the 29 July contests are the two national tallies, by vote and by acclamation.
+
+Its PDF tables give the results of each council (`councils` and `councils17`): the registered voters, ballots cast,
+and each list's votes and seats of the councils that voted, the winners' names, and the list each acclaimed council
+declared. Those packages hold one contest for each council and attach to the elections above.
 """
 
 import re
 from collections import Counter
-from datetime import date
+from dataclasses import dataclass, field
+from datetime import date, timedelta
+from difflib import SequenceMatcher
+from functools import cache
 from pathlib import Path
 from uuid import uuid5
 
 import fastexcel
+import pymupdf
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.ps import cec_local
+from ea.sources.ps import cec_local, councils17
+from ea.sources.ps.councils17 import Cell, Row, Winner
 
 SOURCE = "ps.cec_local17"
 SITE = "https://www.elections.ps"
@@ -98,11 +106,20 @@ WEST_BANK_BODY = key("body", "west_bank")
 def fetch() -> None:
     for url in FILES.values():
         raw.fetch(SOURCE, url, suffix=".aspx" if url.endswith(".aspx") else ".xlsx")
+    for url in COUNCIL_FILES.values():
+        raw.fetch(SOURCE, url, suffix=Path(url).suffix if url.endswith((".pdf", ".xlsx")) else ".aspx")
     raw.fetch(cec_local.GEOBOUNDARIES, cec_local.GEO_URL, suffix=".geojson")
 
 
 def packages() -> list[str]:
-    return [f"{cec_local.SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/{MAY}", f"{SOURCE}/{JULY}"]
+    return [
+        f"{cec_local.SOURCE}/geo",
+        f"{SOURCE}/registry",
+        f"{SOURCE}/{MAY}",
+        f"{SOURCE}/{JULY}",
+        f"{SOURCE}/{MAY}-councils",
+        f"{SOURCE}/{JULY}-councils",
+    ]
 
 
 def parse() -> None:
@@ -110,6 +127,9 @@ def parse() -> None:
     registry().write()
     may().write()
     july().write()
+    councils(MAY).write()
+    councils(JULY).write()
+    render_pages()
 
 
 def emit() -> None:
@@ -431,3 +451,631 @@ def july() -> Package:
         )
         _seats(p, contest, result_set, f"july:{tag}", seats)
     return p
+
+
+# --- the results by council -----------------------------------------------------------------------------------------
+
+COUNCIL_FILES = {
+    "may-page": f"{SITE}/tabid/735/language/ar-PS/Default.aspx",
+    "july-page": f"{SITE}/tabid/736/language/ar-PS/Default.aspx",
+    "may-results": f"{SITE}/Portals/30/pdf/LE2017/LE2017_finalResultSeats.pdf",
+    "may-winners": f"{SITE}/Portals/30/pdf/LE2017/LE2017_finalResultWinnerNames.pdf",
+    "may-acclaimed": f"{SITE}/Portals/30/pdf/LE2017/LE2017-WinnerListsByAcclamation.pdf",
+    "july-results": f"{SITE}/Portals/30/pdf/LE2017-CMP/LE2017_PreResultSeats.pdf",
+    "july-winners": f"{SITE}/Portals/30/pdf/LE2017-CMP/LE2017_PreResultWinnerNames.pdf",
+    "july-acclaimed": f"{SITE}/Portals/30/pdf/LE2017-CMP/LE2017-WinnerListsByAcclamation.pdf",
+    "report": f"{SITE}/Portals/30/pdf/FinalReport/LE2017-FinalReportAr.pdf",
+    "authorities": f"{SITE}/Portals/30/excel/LE2017/Authorities%202017-en.xlsx",
+    "turnout": f"{SITE}/Portals/30/excel/LE2017/LE2017-FinalTurnoutStatistics.xlsx",
+}
+# The files each day's package reads, and the family of page layout that reads them.
+DAY_FILES = {
+    MAY: ("may-page", "may-results", "may-winners", "may-acclaimed", "report", "authorities", "turnout"),
+    JULY: ("july-page", "july-results", "july-winners", "july-acclaimed", "authorities"),
+}
+FAMILY = {"may-results": "slides", "may-winners": "slides", "may-acclaimed": "slides", "report": "slides"}
+VOTES, REGISTERED, CAST = 1, 2, 3
+THRESHOLD = 8
+# The acclaimed table of 13 May spells one governorate wrongly.
+DISTRICT_SPELLING = {"رام والله والبيرة": "رام الله والبيرة", "رام الله": "رام الله والبيرة"}
+ENGLISH_HEADS = {
+    "Jenin": "جنين",
+    "Tubas": "طوباس",
+    "Tulkarem": "طولكرم",
+    "Tulkarm": "طولكرم",
+    "Nablus": "نابلس",
+    "Qalqilia": "قلقيلية",
+    "Salfit": "سلفيت",
+    "Ramallah": "رام الله والبيرة",
+    "Jerusalem": "القدس",
+    "Bethlehem": "بيت لحم",
+    "Hebron": "الخليل",
+    "Jericho": "أريحا",
+}
+LIST_METHOD_17 = (
+    "Counted by the Central Elections Commission for each local council. The Commission's table prints the council's "
+    "registered voters, the ballots cast, and for each list its votes and seats; it prints no valid, invalid, or "
+    "blank totals, so none is stored. Seats are stored as declared and the winners are the candidates the Commission "
+    "names; the seats of each list agree with the Sainte-Laguë method at the 8 percent threshold."
+)
+TACIT_METHOD_17 = (
+    "No vote was held for this council: the Commission declared the list that nominated elected by acclamation "
+    "(tazkiya) and prints the list and its seats, with no count of ballots."
+)
+SYSTEM_17 = (
+    "Local Elections Law no. 10 of 2005 as amended sets proportional representation from closed lists for every "
+    "local council: a list's votes are divided by the odd numbers (the Sainte-Laguë method), lists below 8 percent "
+    "of the valid votes win no seats, and a list's seats go to its candidates in list order, with the representation "
+    "of women and the Muslim-Christian quota taken into account."
+)
+
+
+def council_path(name: str) -> Path:
+    return raw.cached(SOURCE, COUNCIL_FILES[name]).path
+
+
+@dataclass
+class Authority:
+    day: date
+    district: str
+    name: str
+    seats: int
+    voted: bool
+    file: str
+    voters: Cell | None = None
+    cast: Cell | None = None
+    rows: list[Row] = field(default_factory=list)
+    winners: list[Winner] = field(default_factory=list)
+    english: str | None = None
+    unheld: bool = False
+
+    @property
+    def ident(self) -> str:
+        return f"{self.day}:{self.district}:{self.name}"
+
+    @property
+    def matching(self) -> tuple[str, str]:
+        return councils17.fold(self.district), councils17.fold(self.name)
+
+
+@cache
+def council_pages(name: str) -> list[councils17.Page]:
+    return councils17.read_pages(council_path(name), FAMILY.get(name, "ligature"))
+
+
+@cache
+def council_table(name: str) -> list[councils17.Council]:
+    return councils17.READERS[name](council_pages(name))
+
+
+def _cell_text(cell: Cell | None) -> str:
+    assert cell is not None
+    return cell.text
+
+
+def english_names() -> tuple[dict[tuple[str, str], str], dict[tuple[str, int, int], str]]:
+    """The Commission's English names of the authorities: by district and folded Arabic name (the list of every
+    authority), and by district, registered voters, and seats (the authorities that voted)."""
+    workbook = fastexcel.read_excel(str(council_path("authorities")))
+    by_name: dict[tuple[str, str], str] = {}
+    district = ""
+    for row in workbook.load_sheet_by_name("المحافظات", header_row=None, dtypes="string").to_polars().rows():
+        head = row[0]
+        if head and head.endswith("District"):
+            district = ENGLISH_HEADS.get(re.split(r"[ &]", head)[0], "")
+        elif head and head.isdigit() and row[2] and row[3] and district:
+            by_name[(district, councils17.fold(row[2]))] = re.sub(r"\s+", " ", row[3]).strip()
+    by_figures: dict[tuple[str, int, int], str] = {}
+    for row in workbook.load_sheet_by_name("Districts", header_row=None, dtypes="string").to_polars().rows():
+        head = row[0]
+        if head and head.endswith("District"):
+            district = ENGLISH_HEADS.get(re.split(r"[ &]", head)[0], "")
+        elif head and head.isdigit() and row[1] and row[3] and row[4]:
+            key_ = (district, int(row[4]), int(row[3]))
+            if key_ in by_figures:
+                raise ValueError(f"two authorities share {key_}")
+            by_figures[key_] = re.sub(r"\s+", " ", row[1]).strip()
+    return by_name, by_figures
+
+
+def turnout_table() -> dict[tuple[str, str], tuple[int, int]]:
+    """The Commission's final turnout table: registered voters and ballots cast by district and folded name."""
+    out: dict[tuple[str, str], tuple[int, int]] = {}
+    sheet = fastexcel.read_excel(str(council_path("turnout")))
+    for row in sheet.load_sheet_by_idx(0, header_row=None, dtypes="string").to_polars().rows():
+        if row[0] != "المجموع" and row[2] and row[2].isdigit() and row[3] and row[3].isdigit():
+            out[(councils17.fold(row[0] or ""), councils17.fold(row[1] or ""))] = (int(row[3]), int(row[4] or 0))
+    return out
+
+
+def _district(name: str) -> str:
+    name = DISTRICT_SPELLING.get(name, name)
+    if name not in cec_local.DISTRICTS:
+        raise ValueError(f"an unknown district {name!r}")
+    return name
+
+
+def _match(
+    authorities: list[Authority], table: list[councils17.Council], what: str
+) -> dict[tuple[str, str], councils17.Council]:
+    found = {(councils17.fold(_district(c.district)), councils17.fold(c.authority)): c for c in table}
+    wanted = {a.matching for a in authorities}
+    if set(found) != wanted:
+        raise ValueError(f"{what} names different councils: {sorted(set(found) ^ wanted)}")
+    return found
+
+
+def anata() -> Authority:
+    """Anata, whose lists the results slides leave out: its lists, votes, and seats come from the final report's table
+    of councils, its winners from the report's annex, and its registered voters and ballots from the turnout table."""
+    report = councils17.fix_ligatures(council_path("report"))
+    page = report[76]
+    words = [(w[0], w[1], w[2], w[3], councils17.clean(w[4])) for w in page.get_text("words")]
+    head = next(w for w in words if w[4] == "عناتا" and w[0] > 400)
+    rows: list[Row] = []
+    for lo, hi in ((160, 180), (180, 197)):
+        line = [w for w in words if lo <= (w[1] + w[3]) / 2 < hi and w[0] < 400 and head[1] - 12 < w[1]]
+        nums = sorted((w for w in line if re.fullmatch(r"\d+", w[4]) and w[0] < 200), key=lambda w: w[0])
+        names = [w for w in line if 240 < w[0] < 340 and not re.fullmatch(r"\d+", w[4])]
+        if len(nums) != 2 or not names:
+            raise ValueError(f"the report's row of Anata reads {[w[4] for w in line]}")
+        rows.append(
+            Row(
+                councils17.cell(77, names),
+                None,
+                councils17.cell(77, [nums[1]]),
+                councils17.cell(77, [nums[0]]),
+            )
+        )
+    winners: list[Winner] = []
+    for number_ in (107, 108):
+        for block in report[number_ - 1].get_text("blocks"):
+            text = block[4]
+            found = re.match(
+                r"(\d+)\s*(.+?)\n(العهد والوفاء|عناتا للجميع)\s*\n(فائزة?)", text.replace("\xa0", " "), re.DOTALL
+            )
+            if found:
+                winners.append(
+                    Winner(
+                        int(found.group(1)),
+                        Cell(councils17.clean(found.group(2)), None),
+                        Cell(found.group(3), None),
+                    )
+                )
+    figures = turnout_table()[(councils17.fold("القدس"), councils17.fold("عناتا"))]
+    return Authority(
+        MAY,
+        "القدس",
+        "عناتا",
+        11,
+        True,
+        "report",
+        Cell(str(figures[0]), None),
+        Cell(str(figures[1]), None),
+        rows,
+        winners,
+    )
+
+
+@cache
+def authorities_of(day: date) -> list[Authority]:
+    by_name, by_figures = english_names()
+    out: list[Authority] = []
+    key_ = "may" if day == MAY else "july"
+    voted = [
+        Authority(
+            day,
+            _district(c.district),
+            c.authority,
+            councils17.number(_cell_text(c.seats)),
+            True,
+            f"{key_}-results",
+            c.voters,
+            c.cast,
+            c.rows,
+        )
+        for c in council_table(f"{key_}-results")
+    ]
+    for a in voted:
+        a.unheld = a.cast is not None and a.cast.text == "0" and all(r.votes and r.votes.text == "0" for r in a.rows)
+    named = _match(voted, council_table(f"{key_}-winners"), "the winners table")
+    for a in voted:
+        a.winners = named[a.matching].winners
+        if a.unheld == bool(a.winners):
+            raise ValueError(f"{a.ident}: the winners table does not agree on whether the council voted")
+    acclaimed = [
+        Authority(
+            day,
+            _district(c.district),
+            c.authority,
+            councils17.number(_cell_text(c.seats)),
+            False,
+            f"{key_}-acclaimed",
+            None,
+            None,
+            c.rows,
+            c.winners,
+        )
+        for c in council_table(f"{key_}-acclaimed")
+    ]
+    out = voted + acclaimed
+    if day == MAY:
+        out.append(anata())
+    for a in out:
+        listed = by_name.get((a.district, councils17.fold(a.name)))
+        a.english = listed
+        if day == MAY and a.voted and a.voters is not None:
+            figured = by_figures.get((a.district, councils17.number(a.voters.text), a.seats))
+            if figured is None or (listed is not None and councils17.fold(listed) != councils17.fold(figured)):
+                raise ValueError(f"{a.ident}: the Commission's English lists name it {figured!r} and {listed!r}")
+            a.english = figured
+    idents = [a.ident for a in out]
+    if len(set(idents)) != len(idents):
+        raise ValueError(f"two councils share a name: {[i for i, n in Counter(idents).items() if n > 1]}")
+    return out
+
+
+def party_list(name: str, labels: dict[str, str]) -> str | None:
+    """The list of a council a winners table names: spelled the same, with the same words in another order, or nearly
+    the same."""
+    wanted = councils17.fold(name)
+    if wanted in labels:
+        return wanted
+    words = sorted(re.findall(r"[^\W_]+", name))
+    same = [label for label, printed in labels.items() if sorted(re.findall(r"[^\W_]+", printed)) == words]
+    if len(same) == 1:
+        return same[0]
+    ranked = sorted(((SequenceMatcher(None, wanted, label).ratio(), label) for label in labels), reverse=True)
+    if ranked and ranked[0][0] >= 0.8 and (len(ranked) == 1 or ranked[1][0] < ranked[0][0] - 0.1):
+        return ranked[0][1]
+    return None
+
+
+def sainte_lague(votes: list[int], seats: int) -> list[int]:
+    total = sum(votes)
+    eligible = [v if v * 100 >= THRESHOLD * total else 0 for v in votes]
+    won = [0] * len(votes)
+    for _ in range(seats):
+        best = max(range(len(votes)), key=lambda i: eligible[i] / (2 * won[i] + 1))
+        won[best] += 1
+    return won
+
+
+def verify_authority(a: Authority) -> None:
+    if a.unheld:
+        return
+    listed = sum(councils17.number(_cell_text(r.seats)) for r in a.rows)
+    if listed != a.seats:
+        raise ValueError(f"{a.ident}: the lists hold {listed} seats of {a.seats}")
+    if a.voted:
+        votes = [councils17.number(_cell_text(r.votes)) for r in a.rows]
+        if sainte_lague(votes, a.seats) != [councils17.number(_cell_text(r.seats)) for r in a.rows]:
+            raise ValueError(f"{a.ident}: the lists' seats differ from the Sainte-Laguë allocation of their votes")
+        if sum(votes) > councils17.number(_cell_text(a.cast)):
+            raise ValueError(f"{a.ident}: more votes than ballots cast")
+        if councils17.number(_cell_text(a.cast)) > councils17.number(_cell_text(a.voters)):
+            raise ValueError(f"{a.ident}: more ballots than registered voters")
+    if a.winners:
+        labels = {councils17.fold(r.list_name.text): r.list_name.text for r in a.rows}
+        won: Counter[str | None] = Counter(
+            party_list(w.list_name.text, labels) if w.list_name else next(iter(labels)) for w in a.winners
+        )
+        for r in a.rows:
+            if won[councils17.fold(r.list_name.text)] != councils17.number(_cell_text(r.seats)):
+                raise ValueError(
+                    f"{a.ident}: list {r.list_name.text!r} has {won[councils17.fold(r.list_name.text)]} winners"
+                )
+        if None in won:
+            raise ValueError(f"{a.ident}: a winner on an unknown list")
+
+
+def render_pages() -> None:
+    """Draws the pages the values cite to `data/pages/...`, the images the package's page rows name."""
+    for name in ("may-results", "july-results", "report"):
+        artifact = raw.cached(SOURCE, COUNCIL_FILES[name])
+        document = pymupdf.open(artifact.path)
+        for number_ in sorted(_cited_pages(name)):
+            image = Path(raw.DATA) / f"pages/{SOURCE}/{artifact.path.stem}/{number_}.png"
+            if not image.exists():
+                image.parent.mkdir(parents=True, exist_ok=True)
+                page = document[number_ - 1]
+                zoom = 1.0 if page.rect.width > 1000 else 2.0
+                page.get_pixmap(matrix=pymupdf.Matrix(zoom, zoom)).save(image)
+
+
+def _cited_pages(name: str) -> set[int]:
+    if name == "report":
+        return {77}
+    return {n for n in range(1, len(council_pages(name)) + 1)}
+
+
+def _unit(p: Package, a: Authority) -> str:
+    unit = p.id("unit", a.ident)
+    p.add(
+        "reporting_unit",
+        id=unit,
+        polity_id=PALESTINE,
+        scheme_code="ps.local_authority",
+        code=a.ident,
+        area_relation="within",
+        area_id=cec_local.governorate(a.district),
+        kind="standard",
+        valid_from=a.day,
+        valid_to=a.day + timedelta(days=1),
+    )
+    p.name(unit, a.name, "ar", "official")
+    if a.english:
+        p.name(unit, a.english, "en", "english", False)
+    return unit
+
+
+def councils(day: date) -> Package:
+    key_ = "may" if day == MAY else "july"
+    election_id = key("election", day)
+    p = Package(
+        f"{SOURCE}/{day}-councils",
+        SOURCE,
+        f"The Palestinian {'' if day == MAY else 'complementary '}local elections of {day:%-d %B %Y} by local council: "
+        "the registered voters, ballots, votes, and seats of each list, and the winners, from the Central Elections "
+        "Commission's tables",
+        depends=[f"{cec_local.SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/{day}"],
+    )
+    p.external |= {PALESTINE, cec_local.COUNTRY, election_id}
+    source_id = key("source", "councils", day)
+    p.add(
+        "source",
+        id=source_id,
+        kind="official_body",
+        publisher="لجنة الانتخابات المركزية - فلسطين (Central Elections Commission, Palestine)",
+        title=f"Results of the {'' if day == MAY else 'complementary '}local elections of {day:%-d %B %Y} by local "
+        "council published by the Central Elections Commission",
+        url=COUNCIL_FILES[f"{key_}-page"],
+        license="Official publication; reuse terms are not stated",
+        attribution="Central Elections Commission, Palestine",
+    )
+    artifacts = {name: p.artifact(raw.cached(SOURCE, COUNCIL_FILES[name]), source_id) for name in DAY_FILES[day]}
+    pages: dict[tuple[str, int], str] = {}
+    for name in (f"{key_}-results", "report") if day == MAY else (f"{key_}-results",):
+        artifact = raw.cached(SOURCE, COUNCIL_FILES[name])
+        document = pymupdf.open(artifact.path)
+        for number_ in sorted(_cited_pages(name)):
+            rect = document[number_ - 1].rect
+            pages[(name, number_)] = p.id("page", name, number_)
+            p.add(
+                "source_page",
+                id=pages[(name, number_)],
+                artifact_id=artifacts[name],
+                page_number=number_,
+                image_key=f"pages/{SOURCE}/{artifact.path.stem}/{number_}.png",
+                width=round(rect.width),
+                height=round(rect.height),
+            )
+    sheet = authorities_of(day)
+    totals: Counter[str] = Counter()
+    ordinal: Counter[str] = Counter()
+    prefix = f"ps/{day}-local"
+    stage = "official" if day == MAY else "preliminary"
+    for a in sorted(sheet, key=lambda a: (list(cec_local.DISTRICTS).index(a.district), a.name)):
+        verify_authority(a)
+        if a.unheld:
+            totals["unheld"] += 1
+            continue
+        ordinal[a.district] += 1
+        body = p.id("body", a.ident)
+        p.add("body", id=body, polity_id=PALESTINE, kind="council")
+        p.name(body, f"الهيئة المحلية {a.name}", "ar", "official")
+        contest = p.id("contest", a.ident)
+        result_set = p.id("result_set", a.ident)
+        kind = "counted" if a.voted else "tacit"
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="list_allocation",
+            body_id=body,
+            magnitude=a.seats,
+            round_number=1,
+            default_result_kind=kind,
+        )
+        p.name(contest, f"الهيئة المحلية {a.name}، {day.year}", "ar", "official")
+        if a.english:
+            p.name(contest, f"{a.english} local council, {day.year}", "en", "english", False)
+        p.add(
+            "slug",
+            path=f"{prefix}/{changeset.slug(cec_local.DISTRICTS[a.district][0])}-{ordinal[a.district]:03d}",
+            entity_id=contest,
+            is_current=True,
+        )
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election_id,
+            contest_id=contest,
+            stage=stage,
+            kind=kind,
+            source_id=source_id,
+            status="active",
+            is_default=True,
+            completeness=1.0 if a.voted else None,
+        )
+        p.add(
+            "note",
+            id=p.id("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=(LIST_METHOD_17 if a.voted else TACIT_METHOD_17)
+            + (
+                " The Commission's report prints the council's lists, votes, and seats and its annex the winners."
+                if a.file == "report"
+                else ""
+            ),
+            lang="en",
+        )
+        unit = _unit(p, a) if a.voted else None
+        if unit:
+            for measure, cell in ((REGISTERED, a.voters), (CAST, a.cast)):
+                totals["registered" if measure == REGISTERED else "cast"] += _put(
+                    p, result_set, unit, None, measure, cell, source_id, pages, a.file
+                )
+        options: dict[str, str] = {}
+        labels: dict[str, str] = {}
+        for position, row in enumerate(a.rows, 1):
+            label = councils17.fold(row.list_name.text)
+            if label in options:
+                raise ValueError(f"{a.ident}: two lists named {row.list_name.text!r}")
+            labels[label] = row.list_name.text
+            option = options[label] = p.id("option", a.ident, position)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                ballot_position=position,
+                ballot_label=row.list_name.text,
+            )
+            seats = councils17.number(_cell_text(row.seats))
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="won" if seats else "lost", seats=seats)
+            totals["seats"] += seats
+            if unit:
+                totals["votes"] += _put(p, result_set, unit, option, VOTES, row.votes, source_id, pages, a.file)
+        for w in a.winners:
+            label = party_list(w.list_name.text, labels) if w.list_name else next(iter(labels))
+            assert label is not None
+            tag = f"{a.ident}:{w.position}"
+            person = p.id("person", tag)
+            p.add("person", id=person)
+            p.name(person, w.name.text, "ar", "official")
+            option = p.id("option", tag)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                parent_option_id=options[label],
+                ballot_position=w.position,
+                ballot_label=w.name.text,
+            )
+            candidacy = p.id("candidacy", tag)
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=options[label],
+                role="list_member",
+                ballot_name=w.name.text,
+            )
+            p.add("outcome", result_set_id=result_set, option_id=options[label], candidacy_id=candidacy, kind="elected")
+        totals["winners"] += len(a.winners)
+        totals["voted" if a.voted else "acclaimed"] += 1
+    _verify_councils(day, sheet, totals)
+    p.add(
+        "note",
+        id=p.id("note", election_id, "councils"),
+        entity_id=election_id,
+        kind="caveat",
+        body_md=_council_note(day, sheet, totals),
+        lang="en",
+    )
+    return p
+
+
+def _put(
+    p: Package,
+    result_set: str,
+    unit: str,
+    option: str | None,
+    measure: int,
+    cell: Cell | None,
+    source_id: str,
+    pages: dict[tuple[str, int], str],
+    file: str,
+) -> int:
+    assert cell is not None
+    value = councils17.number(cell.text)
+    p.add(
+        "result_value",
+        result_set_id=result_set,
+        unit_id=unit,
+        option_id=option,
+        channel=0,
+        measure=measure,
+        count_round=0,
+        flags=0,
+        value=value,
+    )
+    if cell.box is not None:
+        p.add(
+            "value_locator",
+            result_set_id=result_set,
+            unit_id=unit,
+            option_id=option,
+            channel=0,
+            measure=measure,
+            count_round=0,
+            page_id=pages[(file, cell.box.page)],
+            source_id=source_id,
+            x0=cell.box.x0,
+            y0=cell.box.y0,
+            x1=cell.box.x1,
+            y1=cell.box.y1,
+        )
+    return value
+
+
+def _verify_councils(day: date, sheet: list[Authority], totals: Counter[str]) -> None:
+    if day == JULY:
+        if (totals["voted"], totals["acclaimed"], totals["winners"]) != (14, 18, 142 + 166):
+            raise ValueError(f"the complementary councils differ from the Commission's counts: {dict(totals)}")
+        return
+    figures = turnout_table()
+    got = Counter()
+    for a in sheet:
+        if a.voted:
+            got["voters"] += councils17.number(_cell_text(a.voters))
+    if got["voters"] != sum(v for v, _ in figures.values()):
+        raise ValueError(f"the councils' registered voters differ from the turnout table: {got['voters']}")
+    if totals["acclaimed"] != 181 or totals["voted"] + totals["unheld"] != 145:
+        raise ValueError(f"the councils differ from the Commission's counts: {dict(totals)}")
+    by_district: Counter[str] = Counter()
+    for a in sheet:
+        by_district[ENGLISH[a.district]] += len(a.winners) if a.voted else a.seats
+    expected = {ENGLISH[d]: sum(c.values()) for d, c in district_winners().items()}
+    if dict(by_district) != expected:
+        raise ValueError(
+            f"the winners by governorate differ from the Commission's table: {dict(by_district)} against {expected}"
+        )
+
+
+def _council_note(day: date, sheet: list[Authority], totals: Counter[str]) -> str:
+    if day == JULY:
+        return (
+            f"By council, {totals['voted']} councils voted ({sum(len(a.winners) for a in sheet if a.voted)} winners) "
+            f"and {totals['acclaimed']} were declared elected by acclamation "
+            f"({sum(len(a.winners) for a in sheet if not a.voted)} winners), the Commission's figures for the "
+            "complementary elections. The Commission publishes these as preliminary results."
+        )
+    text = (
+        f"By council, {totals['voted']} councils voted and {totals['acclaimed']} were declared elected by "
+        f"acclamation, {totals['voted'] + totals['acclaimed']} of the 326 localities the Commission counts. The "
+        "winners add up to the Commission's table by governorate. The lists hold "
+        f"{totals['votes']:,} votes for {totals['registered']:,} registered voters and {totals['cast']:,} ballots cast."
+    )
+    figures = turnout_table()
+    apart = [
+        a for a in sheet if a.voted and not a.unheld and figures[a.matching][1] != councils17.number(_cell_text(a.cast))
+    ]
+    if apart:
+        text += (
+            f" The Commission's separate turnout table gives {sum(c for _, c in figures.values()):,} ballots cast, "
+            f"{sum(figures[a.matching][1] - councils17.number(_cell_text(a.cast)) for a in apart):,} more than the "
+            f"results tables, and differs from them for {len(apart)} councils; the same table's registered voters "
+            f"({sum(v for v, _ in figures.values()):,}) agree. The values here are the results tables'."
+        )
+    unheld = [a for a in sheet if a.unheld]
+    for a in unheld:
+        text += (
+            f" The Commission counts {a.name} among the 145 localities that voted. The table of lists prints {a.name} ({a.district} governorate) with {a.seats} seats and "
+            f"{a.voters.text if a.voters else ''} registered voters but no ballots, votes, or winners, so this election "
+            "holds no contest for it."
+        )
+    return text
