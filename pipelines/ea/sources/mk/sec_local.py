@@ -198,9 +198,12 @@ def title(text: str) -> str:
 
 
 def area_of(name: str, year: int) -> str:
+    """The area of a municipality or the City: the 2004 plan's own, or the 2013 plan's from the Assembly pipeline."""
     if name == CITY:
         return key("area", S_CITY, "skopje")
-    if name == "Кичево" and year < 2013:
+    if year >= 2013:
+        return sec.muni_area(name)
+    if name == "Кичево":
         return key("area", S_MUNI, OLD_KICHEVO)
     return key("area", S_MUNI, name)
 
@@ -643,13 +646,18 @@ def all_rows() -> list[Row]:
 
 
 def geo() -> Package:
+    """The 2004 plan of 84 municipalities and the City of Skopje.
+
+    The 80 municipalities of the 2013 plan, their scheme, and its boundary set come from the Assembly pipeline's
+    geo package, so the elections since 2013 point at its areas and nothing here redefines them.
+    """
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "The 84 municipalities of North Macedonia's 2004 plan and the 80 of the 2013 plan, with the City of Skopje, "
-        "outlined from geoBoundaries",
+        "The 84 municipalities of North Macedonia's 2004 plan and the City of Skopje, outlined from geoBoundaries",
+        depends=[f"{sec.SOURCE}/geo"],
     )
-    p.external |= {MACEDONIA, COUNTRY}
+    p.external |= {MACEDONIA, COUNTRY, S_MUNI}
     p.add(
         "source",
         id=SHAPE_SOURCE,
@@ -661,25 +669,20 @@ def geo() -> Package:
         license_url="https://creativecommons.org/licenses/by/4.0/",
         attribution="geoBoundaries (William & Mary geoLab), from EuroGeographics and NTES data",
         notes="Boundary year 2016, built December 2023. The outlines of Drugovo, Oslomej, Vraneshtitsa, and Zajas stand "
-        "alone for the 2004 plan and are merged into Kichevo for the 2013 plan.",
+        "alone for the 2004 plan; the 2013 plan merged them into Kichevo.",
     )
     shapes = raw.cached(SOURCE, sec.SHAPES)
     p.artifact(shapes, SHAPE_SOURCE)
-    for code, rank, kind, noun in (
-        (S_CITY, 1, "administrative", "city"),
-        (S_MUNI, 2, "administrative", "municipality"),
-    ):
-        p.add("scheme", code=code, polity_id=MACEDONIA, kind=kind, rank=rank, noun=noun, code_system=None)
-    for vintage, since, until in (("2004", PLAN_2004, PLAN_2013), ("2013", PLAN_2013, None)):
-        p.add(
-            "boundary_set",
-            id=key("boundary_set", S_MUNI, vintage),
-            scheme_code=S_MUNI,
-            vintage=vintage,
-            valid_from=since,
-            valid_to=until,
-            as_of=shapes.retrieved_at.date(),
-        )
+    p.add("scheme", code=S_CITY, polity_id=MACEDONIA, kind="administrative", rank=1, noun="city", code_system=None)
+    p.add(
+        "boundary_set",
+        id=key("boundary_set", S_MUNI, "2004"),
+        scheme_code=S_MUNI,
+        vintage="2004",
+        valid_from=PLAN_2004,
+        valid_to=PLAN_2013,
+        as_of=shapes.retrieved_at.date(),
+    )
     alone: dict[str, shapely.Geometry] = {}
     for feature in json.loads(shapes.path.read_text(encoding="utf-8"))["features"]:
         alone[feature["properties"]["shapeName"]] = shapely.make_valid(shapely.geometry.shape(feature["geometry"]))
@@ -714,24 +717,15 @@ def geo() -> Package:
     members = [alone[MUNICIPALITIES[name]] for name in sorted(SKOPJE_MUNICIPALITIES)]
     outline(city, shapely.union_all(members), PLAN_2004, None)
 
-    def place(name: str, english: str, id: str, shape: shapely.Geometry, since: date, until: date | None) -> None:
+    for name, english in sorted(MUNICIPALITIES.items()):
+        id = area_of(name, 2005)
         p.add("area", id=id, scheme_code=S_MUNI)
-        p.add("area_code", area_id=id, code=slug(english), valid_from=since, valid_to=until)
+        p.add("area_code", area_id=id, code=slug(english), valid_from=PLAN_2004, valid_to=PLAN_2013)
         parent = city if name in SKOPJE_MUNICIPALITIES else COUNTRY
-        p.add("area_parent", area_id=id, parent_id=parent, valid_from=since, valid_to=until)
-        p.name(id, name.removesuffix("@2004"), "mk", "official")
+        p.add("area_parent", area_id=id, parent_id=parent, valid_from=PLAN_2004, valid_to=PLAN_2013)
+        p.name(id, name, "mk", "official")
         p.name(id, english, "en", "english", False)
-        outline(id, shape, since, until)
-
-    for name, english in sorted(sec.MUNICIPALITIES.items()):
-        if name == "Кичево":
-            merged = [alone[english], *(alone[old] for old in OLD.values())]
-            place(name, english, key("area", S_MUNI, name), shapely.union_all(merged), PLAN_2013, None)
-            place(name, english, key("area", S_MUNI, OLD_KICHEVO), alone[english], PLAN_2004, PLAN_2013)
-        else:
-            place(name, english, key("area", S_MUNI, name), alone[english], PLAN_2004, None)
-    for name, english in sorted(OLD.items()):
-        place(name, english, key("area", S_MUNI, name), alone[english], PLAN_2004, PLAN_2013)
+        outline(id, alone[english], PLAN_2004, PLAN_2013)
     return p
 
 
@@ -838,9 +832,9 @@ def build(day: date) -> Package:
         f"The {year} local elections of North Macedonia"
         + (", second round," if rnd == 2 else ", first round,")
         + " by municipality, from the State Election Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", *([f"{sec.SOURCE}/geo"] if year >= 2013 else [])],
     )
-    p.external |= {MACEDONIA, COUNTRY}
+    p.external |= {MACEDONIA, COUNTRY, S_MUNI}
     eid = key("election", day)
     p.add(
         "election",
@@ -893,6 +887,12 @@ class Context:
     def year(self) -> int:
         return self.election.year
 
+    def area(self, name: str) -> str:
+        id = area_of(name, self.year)
+        if self.year >= 2013 and name != CITY:
+            self.p.external.add(id)
+        return id
+
     def unit(self, name: str) -> str:
         if name in self.units:
             return self.units[name]
@@ -905,7 +905,7 @@ class Context:
             scheme_code=scheme,
             code=f"{self.election.day}:{slug(ENGLISH[name])}",
             area_relation="equals",
-            area_id=area_of(name, self.year),
+            area_id=self.area(name),
             kind="aggregate",
         )
         self.p.name(id, ENGLISH[name], "en", "official")
@@ -925,7 +925,7 @@ class Context:
             kind="office" if mayor else "body_seats",
             office_id=(CITY_MAYOR if city else MAYOR) if mayor else None,
             body_id=None if mayor else (CITY_COUNCIL if city else COUNCILS),
-            district_area_id=area_of(name, self.year),
+            district_area_id=self.area(name),
             magnitude=magnitude,
             round_number=self.election.round if mayor else 1,
             electoral_system_id=SYSTEM_MAYOR if mayor else SYSTEM_COUNCIL,
