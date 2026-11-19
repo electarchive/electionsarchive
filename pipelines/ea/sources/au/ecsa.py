@@ -1259,7 +1259,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".csv")
     for url in (ELECTION_2022, TCP_2022, COUNCIL_2022_PLACES):
         raw.fetch(SOURCE, url, suffix=".zip")
-    for url in (JAENSCH, COUNCIL_HISTORY):
+    for url in (JAENSCH, COUNCIL_HISTORY, STATISTICS_2010):
         raw.fetch(SOURCE, url, suffix=".pdf")
     for url in (COUNCIL_2022_GROUPED, COUNCIL_2022_UNGROUPED, COUNCIL_2022_ELECTED):
         raw.fetch(SOURCE, url, suffix=".csv")
@@ -2333,6 +2333,7 @@ COUNCIL_PARTIES = {
     "FEG": "Free Enterprise Group",
     "FLT": "Fair Land Tax - Tax Party",
     "FREE": "F.R.E.E. Australia Party",
+    "G4C": "Gamers 4 Croydon",
     "GA": "Green Alliance",
     "GP": "Grey Power",
     "GRP": "Green Party SA",
@@ -2359,6 +2360,7 @@ COUNCIL_PARTIES = {
     "OPP": "Overtaxed Pokies Party",
     "OSA": "Overtaxed Smokers Association",
     "PROG": "Progressive Labor Party",
+    "RAH": "Save RAH Party",
     "RCSA": "Real Change SA",
     "SAF": "SA First",
     "SAFL": "South Australian Fishing & Lifestyle Party",
@@ -2375,6 +2377,7 @@ COUNCIL_PARTIES = {
     "SRM": "Save the River Murray Party",
     "SSR": "Stormy Summers Reform Party",
     "UAP": "United Australia Party",
+    "UNITED": "United Party - Water, Housing, Health Care",
     "VIA": "Voters Independent Association",
     "WP": "Workers Party",
 }
@@ -2698,6 +2701,330 @@ def event_council_2022() -> CouncilEvent:
     return CouncilEvent(date(2022, 3, 19), "general", files, [contest])
 
 
+# The 2010 Legislative Council: the commission's statistical returns, which print each candidate's votes, above and
+# below the line, for every polling place and declaration vote line of the 47 divisions.
+
+STATISTICS_2010 = f"{HOST}/component/edocman/2010-state-election-statistics/download"
+# Each candidate's affiliation as the alphabetical listing prints it, beyond independents, to its party code.
+AFFILIATIONS_2010 = {
+    "Australian Labor Party": "ALP",
+    "Liberal Party": "LIB",
+    "The Greens": "GRN",
+    "Family First Party": "FFP",
+    "One Nation": "ONP",
+    "Dignity for Disability": "D4D",
+    "Save RAH Party": "RAH",
+    "Fair Land Tax - Tax Party": "FLT",
+    "Democratic Labor Party of Australia": "DLP",
+    "Australian Democrats": "DEM",
+    "United Party - Water, Housing, Health Care": "UNITED",
+    "F.R.E.E. Australia Party": "FREE",
+    "The Nationals": "NAT",
+    "Gamers 4 Croydon": "G4C",
+    "Shooters Party": "SP",
+}
+
+
+@dataclass
+class Listed:
+    surname: str
+    given: str
+    affiliation: str
+    incumbent: bool
+    elected: bool
+
+
+def statistics_2010() -> pymupdf.Document:
+    return pymupdf.open(str(raw.cached(SOURCE, STATISTICS_2010).path))
+
+
+def page_lines(page: pymupdf.Page) -> list[list[tuple[float, str]]]:
+    """A page's horizontal words as lines of (x, text), with the fragments the report splits inside a word, as
+    'Hospit al', joined again."""
+    words = sorted(
+        (w for w in page.get_text("words") if (w[3] - w[1]) < 1.5 * (w[2] - w[0]) or len(w[4]) <= 2),
+        key=lambda w: ((w[1] + w[3]) / 2, w[0]),
+    )
+    rows: list[list[Any]] = []
+    for w in words:
+        middle = (w[1] + w[3]) / 2
+        if rows and abs(middle - rows[-1][0]) <= 1.5:
+            rows[-1][1].append(w)
+        else:
+            rows.append([middle, [w]])
+    out: list[list[tuple[float, str]]] = []
+    for _, found in rows:
+        line: list[tuple[float, str, float]] = []
+        for w in sorted(found, key=lambda w: w[0]):
+            joined = line and w[0] - line[-1][2] < 0.9 and not w[4][0].isdigit() and not line[-1][1][-1].isdigit()
+            if joined:
+                x, text, _ = line[-1]
+                line[-1] = (x, text + w[4], w[2])
+            else:
+                line.append((w[0], w[4], w[2]))
+        out.append([(x, text) for x, text, _ in line])
+    return out
+
+
+def listing_2010(document: pymupdf.Document) -> list[Listed]:
+    out: list[Listed] = []
+    for line in pdf_layout(document, 41, 42).splitlines():
+        found = re.fullmatch(r"\s*(#)?\s+([A-Z][A-Z'’ -]+), ([A-Za-z() ]+?)\s{2,}(\S.*?)(?:\s{2,}(ELECTED))?\s*", line)
+        if found:
+            out.append(Listed(found[2], found[3], found[4], bool(found[1]), bool(found[5])))
+    if len(out) != 74 or sum(c.elected for c in out) != 11 or sum(c.incumbent for c in out) != 9:
+        raise ValueError(f"2010: the listing gives {len(out)} candidates, {sum(c.elected for c in out)} elected")
+    return out
+
+
+def pdf_layout(document: pymupdf.Document, first: int, last: int) -> str:
+    return subprocess.run(
+        ["pdftotext", "-layout", "-f", str(first), "-l", str(last), str(document.name), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+
+
+CANDIDATE_2010 = re.compile(r"[A-Z][A-Za-z'’ -]*[A-Z], [A-Z][A-Za-z() ]*")
+
+
+def columns_2010(document: pymupdf.Document) -> list[tuple[str, list[tuple[str, int | None, int]]]]:
+    """The ballot paper's columns in order: each column's letter and its candidates, with the ticket votes of its
+    first candidate and each candidate's own first preferences, from the report's voting details."""
+    out: list[tuple[str, list[tuple[str, int | None, int]]]] = []
+    totals: dict[str, int] = {}
+    for line in pdf_layout(document, 44, 45).splitlines():
+        fields = re.split(r"\s{2,}", line.strip())
+        at = next((i for i, f in enumerate(fields) if CANDIDATE_2010.fullmatch(f)), None)
+        if at is None:
+            continue
+        name, rest = fields[at], [f.replace(" ", "") for f in fields[at + 1 :]]
+        letter = fields[at - 1] if at and re.fullmatch(r"[A-Z]{1,2}", fields[at - 1]) else None
+        if letter is None and at and re.search(r"\s([A-Z]{1,2})$", fields[at - 1]):
+            letter = fields[at - 1].rsplit(" ", 1)[1]
+        if letter:
+            # ticket votes, their share of the candidate's, the candidate's own votes and total
+            ticket, own, whole = int(rest[0]), int(rest[2]), int(rest[3])
+            if ticket + own != whole:
+                raise ValueError(f"2010: {name}: {ticket} + {own} is not {whole}")
+            out.append((letter, [(name, ticket, own)]))
+            if len(rest) == 7:  # a group of one candidate, with the group's total
+                totals[letter] = int(rest[4])
+            elif len(rest) == 6:  # an ungrouped candidate, with the share of the formal vote and the quota
+                totals[letter] = whole
+        else:
+            if not out:
+                raise ValueError(f"2010: {name!r} has no column")
+            out[-1][1].append((name, None, int(rest[0])))
+            if len(rest) == 4:
+                totals[out[-1][0]] = int(rest[1])
+    for letter, members in out:
+        added = sum((t or 0) + v for _, t, v in members)
+        if totals.get(letter) != added:
+            raise ValueError(f"2010: column {letter} adds up to {added}, not {totals.get(letter)}")
+    if len(out) != 35 or sum(len(m) for _, m in out) != 74:
+        raise ValueError(f"2010: read {len(out)} columns of {sum(len(m) for _, m in out)} candidates")
+    return out
+
+
+def division_rows_2010(
+    document: pymupdf.Document, sizes: list[int]
+) -> tuple[dict[str, tuple[int, list[tuple[str, list[int]]]]], list[int]]:
+    """Each division's enrolment and its rows (polling places, then the ordinary, declaration and division totals),
+    each row as every column's ticket votes and then every candidate's own votes, followed by the formal, informal,
+    and total ballot papers; and the report's line of totals for all divisions."""
+    out: dict[str, tuple[int, list[tuple[str, list[int]]]]] = {}
+    rows: list[tuple[str, list[int]]] = []
+    division = ""
+    enrolled = 0
+    first = 143  # the zero-based index of Adelaide's first page; the division tables end before page 239
+    pages = list(document.pages(first, 238))
+    i = 0
+    while i < len(pages):
+        lines = page_lines(pages[i])
+        heads = [n for n, line in enumerate(lines) if [t for _, t in line][:3] == ["A", "B", "C"]]
+        if not heads:
+            i += 1
+            continue
+        letters = [t for _, t in lines[heads[0]]]
+        right = page_lines(pages[i + 1])
+        rhead = next(n for n, line in enumerate(right) if [t for _, t in line][:2] == ["O", "P"])
+        rletters = [t for _, t in right[rhead]]
+        top = " ".join(t for _, t in lines[0])
+        named = re.fullmatch(r"(.+?) No\. enrolled ([\d ]+?) % voting [\d.]+", top) or re.fullmatch(
+            r"(.+?) No\. enrolled ([\d ]+)", top
+        )
+        if not named:
+            raise ValueError(f"2010: page {first + i + 1} has no division heading: {top!r}")
+        if named[1] != division:
+            division, enrolled = named[1], int(named[2].replace(" ", ""))
+            if division in out:
+                raise ValueError(f"2010: {division} printed twice")
+            rows = []
+            out[division] = (enrolled, rows)
+        nl, nr = len(letters), len(rletters)
+        cl, cr = sum(sizes[:nl]), sum(sizes[nl : nl + nr])
+        # Place names sit left of the vote type column on the left page and right of the figures on the right
+        # page, and some hold a number, as 'Far North 1 Mobile' does.
+        edge = next(x for line in lines for x, t in line if t == "Vote") - 2
+        redge = next(x for line in right for x, t in line if t == "Polling") - 2
+        labels: list[str] = []
+        lnums: list[int] = []
+        for line in lines[heads[0] + 1 :]:
+            texts = [t for _, t in line]
+            if any(t.startswith("%") or re.fullmatch(r"\d*\.\d+", t) for t in texts) or "Election" in texts:
+                break
+            words = [t for x, t in line if x < edge]
+            lnums += [int(t) for x, t in line if x >= edge and re.fullmatch(r"\d+", t)]
+            if any(t == "Ticket" for x, t in line if x >= edge):
+                labels.append("")
+            if labels and words:
+                labels[-1] = f"{labels[-1]} {' '.join(words)}".strip()
+        rnums: list[int] = []
+        for line in right[rhead + 1 :]:
+            texts = [t for _, t in line]
+            if any(t.startswith("%") or re.fullmatch(r"\d*\.\d+", t) for t in texts) or "Election" in texts:
+                break
+            rnums += [int(t) for x, t in line if x < redge and re.fullmatch(r"\d+", t)]
+        per_left, per_right = nl + 2 * cl, (nr + 1) + (cr + 1) + (cr + 3)
+        if len(lnums) != per_left * len(labels) or len(rnums) != per_right * len(labels):
+            raise ValueError(
+                f"2010 {division}: {len(labels)} rows, but {len(lnums)} and {len(rnums)} figures on page "
+                f"{first + i + 1}"
+            )
+        for n, label in enumerate(labels):
+            a, b = lnums[n * per_left : (n + 1) * per_left], rnums[n * per_right : (n + 1) * per_right]
+            ticket = a[:nl] + b[:nr]
+            own = a[nl : nl + cl] + b[nr + 1 : nr + 1 + cr]
+            total = a[nl + cl :] + b[nr + 1 + cr + 1 : nr + 1 + cr + 1 + cr]
+            formal, informal, cast = b[-3:]
+            if sum(ticket) != b[nr] or sum(own) != b[nr + 1 + cr]:
+                raise ValueError(f"2010 {division} {label}: the ticket or preferential votes do not add up")
+            row = [*ticket, *own]
+            heads_at = [sum(sizes[:k]) for k in range(len(sizes))]
+            check = list(own)
+            for k, at in enumerate(heads_at):
+                check[at] += ticket[k]
+            if check != total or sum(row) != formal or formal + informal != cast:
+                raise ValueError(f"2010 {division} {label}: the totals do not add up")
+            rows.append((label, [*row, formal, informal, cast]))
+        i += 2
+    # The line of totals for all divisions in the State summary tables: each column, then formal, informal, total.
+    summary: list[int] = []
+    for line in pdf_layout(document, 133, 143).splitlines():
+        found = re.fullmatch(r"\s*Total All Divisions((?:\s+\d+)+)\s+Total All Divisions\s*", line)
+        if found and not summary:
+            summary = [int(t) for t in found[1].split()]
+    return out, summary
+
+
+def event_council_2010() -> CouncilEvent:
+    document = statistics_2010()
+    listed = listing_2010(document)
+    columns = columns_2010(document)
+    sizes = [len(members) for _, members in columns]
+    by_surname: dict[str, list[Listed]] = {}
+    for entry in listed:
+        by_surname.setdefault(entry.surname.upper(), []).append(entry)
+    people: list[tuple[str, Listed]] = []  # each candidate's ballot name and listing entry, in ballot order
+    for _, members in columns:
+        for name, _, _ in members:
+            surname, _, given = name.partition(", ")
+            choices = by_surname.get(surname.upper().replace("’", "'"), [])
+            taken = [entry for _, entry in people]
+            choices = [c for c in choices if c not in taken]
+            same = [c for c in choices if c.given[0] == given[0]]
+            if len(same) == 1 or len(choices) == 1:
+                people.append((name, (same or choices)[0]))
+            else:
+                raise ValueError(f"2010: {name} is not in the alphabetical listing")
+    divisions, summary = division_rows_2010(document, sizes)
+    if len(divisions) != 47:
+        raise ValueError(f"2010: read {len(divisions)} divisions, not 47")
+    options: list[Option] = []
+    order: list[int] = []  # the index into a row's ticket and candidate figures for each option
+    winners: list[int] = []
+    at = 0
+    for k, (letter, members) in enumerate(columns):
+        lead = people[at][1]
+        independent = lead.affiliation.startswith("Independent")
+        party = "" if independent else AFFILIATIONS_2010[lead.affiliation]
+        label = f"Group {letter}" if len(members) > 1 else f"Column {letter}"
+        options.append(Option(f"{label}: {lead.affiliation} (above the line)", "legend", party))
+        order.append(k)
+        for name, _, _ in members:
+            entry = people[at][1]
+            if entry.affiliation != lead.affiliation:
+                raise ValueError(f"2010: {name} is not of {lead.affiliation}")
+            surname = name.partition(", ")[0]
+            person = Candidate(name, party, entry.incumbent, f"{entry.given} {title(surname)}")
+            if entry.elected:
+                winners.append(len(options))
+            options.append(Option(name, "candidate", party, person))
+            order.append(len(columns) + at)
+            at += 1
+    places: list[Leaf] = []
+    enrolled = 0
+    sums = [0] * (len(order) + 3)
+    for division in sorted(divisions):
+        roll, rows = divisions[division]
+        enrolled += roll
+        named = [r for r in rows if r[0] not in ("Ordinary Votes", "Division Total")]
+        if [r[0] for r in rows][-3:] != ["Ordinary Votes", "Declaration Votes", "Division Total"]:
+            raise ValueError(f"2010 {division}: the rows end {[r[0] for r in rows][-3:]}")
+        for kind, check in (("Ordinary Votes", named[:-1]), ("Division Total", named)):
+            printed = next(r[1] for r in rows if r[0] == kind)
+            if [sum(r[1][n] for r in check) for n in range(len(printed))] != printed:
+                raise ValueError(f"2010 {division}: the rows do not add up to the {kind.lower()}")
+        for label, figures in named:
+            declaration = label == "Declaration Votes"
+            votes: list[int | None] = [figures[n] for n in order]
+            places.append(
+                Leaf(
+                    "Declaration votes" if declaration else label,
+                    votes,
+                    figures[-3],
+                    figures[-2],
+                    figures[-1],
+                    "aggregate" if declaration else "standard",
+                    division,
+                )
+            )
+            for n, value in enumerate([*figures[: len(order)], *figures[-3:]]):
+                sums[n] += value
+    # Every column's votes against the report's line of totals for all divisions.
+    starts = [sum(sizes[:k]) for k in range(len(sizes))]
+    column_sums = [
+        sums[k] + sum(sums[len(columns) + starts[k] + m] for m in range(sizes[k])) for k in range(len(columns))
+    ]
+    if [*column_sums, *sums[-3:]] != summary:
+        raise ValueError(f"2010: the divisions add up to {[*column_sums, *sums[-3:]]}, not {summary}")
+    for k, (_, members) in enumerate(columns):
+        for m, (name, ticket, own) in enumerate(members):
+            if sums[len(columns) + starts[k] + m] != own or (ticket is not None and sums[k] != ticket):
+                raise ValueError(f"2010: {name}'s votes do not add up to the report's voting details")
+    if enrolled != 1_093_316 or len(winners) != 11:
+        raise ValueError(f"2010: {enrolled} enrolled and {len(winners)} elected")
+    formal, informal, cast = sums[-3:]
+    declared = Leaf(
+        "State of South Australia",
+        [sum(leaf.votes[n] or 0 for leaf in places) for n in range(len(options))],
+        formal,
+        informal,
+        cast,
+    )
+    contest = CouncilContest("State of South Australia", 11, COUNCIL_STV, options, declared, enrolled, places)
+    contest.winners = winners
+    contest.notes.append(
+        "Places are the polling places of each House of Assembly district, which the commission calls divisions "
+        "for the Legislative Council, and one line of declaration votes for each division. Each column of the ballot "
+        "paper, a group or an ungrouped candidate, has its own option for the votes above the line, the ticket votes "
+        "the commission prints in its statistical returns."
+    )
+    return CouncilEvent(date(2010, 3, 20), "general", [STATISTICS_2010], [contest])
+
+
 ASSETS = "https://result.ecsa.sa.gov.au/assets"
 COUNCIL_ELECTED_2026 = f"{ASSETS}/Elected_Members_of_Parliament_2026.csv"
 COUNCIL_SEATS_2026 = f"{ASSETS}/lc_quotas_seats_won_2026.csv"
@@ -2765,6 +3092,7 @@ def event_council_2026() -> CouncilEvent:
 def council_events() -> dict[str, Callable[[], CouncilEvent]]:
     out: dict[str, Callable[[], CouncilEvent]] = {
         **history_council_events(),
+        "2010-03-20": event_council_2010,
         "2014-03-15": functools.partial(summary_event, "2014-03-15", COUNCIL_2014),
         "2018-03-17": functools.partial(summary_event, "2018-03-17", COUNCIL_2018),
         "2022-03-19": event_council_2022,
