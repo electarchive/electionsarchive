@@ -2203,8 +2203,8 @@ def _declared_twice(keys: list[str]) -> list[str]:
         .sort("scheme_code", "code", "n")
     )
     return [
-        f"{row['package']}: ready.unit_twice: reporting unit {row['scheme_code']} {row['code']} from "
-        f"{row['valid_from']} is declared again by {row['package_b']}"
+        f"{row['package']}: ready.unit_twice: reporting unit {row['scheme_code']} {row['code']} for overlapping "
+        f"validity is declared again by {row['package_b']}"
         + (" under another id" if row["id"] != row["id_b"] else "")
         + "; emit it from one package and list it as external in the others"
         for row in pairs.head(20).iter_rows(named=True)
