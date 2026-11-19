@@ -161,6 +161,12 @@
       "url": "https://electionslocales.wallonie.be/resultats/2018/fr/election%EF%B9%96el=PR.html",
       "kind": "official_body"
     },
+    "wl-prov-2024": {
+      "title": "Arrêté du Gouvernement wallon du 19 avril 2024 modifiant la répartition des conseillers provinciaux entre les districts électoraux (annexe)",
+      "publisher": "Service public de Wallonie",
+      "url": "https://electionslocales.wallonie.be/files/documents/Tout%20public/L%c3%a9gislation/agw-modif-cp-districts.pdf",
+      "kind": "official_body"
+    },
     "wl-cpas-2012": {
       "title": "Élections 2012: résultats des CPAS",
       "publisher": "Service public de Wallonie",
@@ -1949,11 +1955,11 @@
         },
         {
           "date": "2024-10-13",
-          "contests": 14,
-          "seats": 175,
+          "contests": 48,
+          "seats": 404,
           "source": "vk-prov-2024",
-          "note": "Flanders only: 14 districts and 175 seats. The Walloon provincial districts of 2024 are not counted yet.",
-          "quote": "algemeen sheet: 14 kieskringen (PR-districts), mandaten 10+20+9+11+15+20+15+11+16+16+9+7+7+9 = 175"
+          "note": "Flanders 14 districts and 175 seats, plus Wallonia 34 districts and 229 seats from the annex to the Walloon Government decree of 19 April 2024 (wl-prov-2024).",
+          "quote": "algemeen sheet: 14 kieskringen, mandaten 10+20+9+11+15+20+15+11+16+16+9+7+7+9 = 175. Wallonia annex: Brabant wallon 2 districts 37 seats, Hainaut 10 districts 56, Liège 10 districts 56, Luxembourg 6 districts 37, Namur 6 districts 43 = 34 districts, 229 seats."
         }
       ],
       "access": [
