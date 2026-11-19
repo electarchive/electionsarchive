@@ -33,6 +33,9 @@ URLS_2007 = {
     "oeste": f"{FILES}/2007-LEGISLADORES-seccion-III-OESTE.pdf",
 }
 ZIP_2011 = f"{FILES}/Resultados-ano-2011.zip"
+ELECTED_2011 = f"{FILES}/TUCUMAN-Elecciones-2011-Electos-2014-09-02.pdf"
+PAGE_2015_ACTS = f"{SITE}/elecciones-generales-2015/"
+ELECTED_2015 = f"{SITE}/wp-content/uploads/Resol955-15HJEP_Anexo_2015-CANDIDATOS-Lista-Completa2015-10-14.pdf"
 EXTRA_2015 = (
     f"{SITE}/wp-content/uploads/2015_ComComunal_LosRalos_CruzAlta_AcumuladoDefinitivo.pdf",
     f"{SITE}/wp-content/uploads/2015_ComComunal_SanIgnacio_LaCocha_Definitivo.pdf",
@@ -98,6 +101,9 @@ def fetch() -> None:
     for url in URLS_2007.values():
         raw.fetch(SOURCE, url, suffix=".pdf", check=_pdf)
     raw.fetch(SOURCE, ZIP_2011, suffix=".zip")
+    raw.fetch(SOURCE, PAGE_2015_ACTS, suffix=".html")
+    for url in (ELECTED_2011, ELECTED_2015):
+        raw.fetch(SOURCE, url, suffix=".pdf", check=_pdf)
     for url in urls_2015():
         try:
             raw.fetch(SOURCE, url, suffix=".pdf", check=_pdf)
@@ -508,6 +514,87 @@ def place_of(s: Sheet) -> Place:
 
 
 # ---------------------------------------------------------------------------------------------------------------------
+# Proclaimed authorities
+
+
+@dataclass(frozen=True)
+class Member:
+    """One proclaimed member: the order the Junta printed, the name as printed (blank when the source leaves it
+    empty), and the number and name of the list."""
+
+    order: int
+    name: str
+    number: int
+    party: str
+
+
+ELECTED_URL = {2011: ELECTED_2011, 2015: ELECTED_2015}
+# Graneros' 2015 mayoral sheet carries a governor heading, so the count is not loaded and its proclamation has no contest.
+NO_CONTEST = {(2015, ("intendente", "graneros:municipio:graneros"))}
+SEATED = ("legislador", "concejal", "comisionado")
+CATEGORY_OF = {"INTENDENTE": "intendente", "CONCEJAL": "concejal", "COMISIONADO COMUNAL": "comisionado"}
+
+
+def proclaimed_blocks(text: str) -> list[tuple[str, list[Member]]]:
+    """Each "Categoria" heading of a proclamation annex with the members printed under it."""
+    blocks: list[tuple[str, list[Member]]] = []
+    for line in text.splitlines():
+        heading = re.match(r"^\s*Categoria\s*:\s*(\S.*?)\s*$", line)
+        if heading:
+            blocks.append((heading.group(1), []))
+            continue
+        entry = re.match(r"^\s*(\d+)\s+(.*?)\s+(?:\d{6,9}\s+)?(\d+)\s+(\S.*?)\s*$", line)
+        if entry and blocks:
+            name = entry.group(2).strip()
+            blocks[-1][1].append(
+                Member(int(entry.group(1)), "" if name == "," else name, int(entry.group(3)), entry.group(4))
+            )
+        elif line.strip() and not re.search(
+            r"APELLIDO Y NOMBRE|Junta Electoral|ELECCIONES PROVINCIALES|ANEXO AUTORIDADES", line
+        ):
+            raise ValueError(f"unread line in the proclamation annex: {line!r}")
+    return blocks
+
+
+def place_named(kind: str, name: str) -> Place:
+    """The place a proclamation heading names, matching the sheets' labels, which the Junta truncates differently."""
+    wanted = label(name).replace(" ", "")
+    found = set()
+    for (_, place_kind, printed), pl in places().items():
+        for spelling in (printed, plain(pl.name)):
+            squeezed = spelling.replace(" ", "")
+            if place_kind == kind and (squeezed == wanted or (len(wanted) >= 20 and squeezed.startswith(wanted))):
+                found.add(pl)
+    if len(found) != 1:
+        raise ValueError(f"{kind} {name!r} matches {len(found)} places")
+    return found.pop()
+
+
+@functools.cache
+def proclaimed(year: int) -> dict[tuple[object, ...], list[Member]]:
+    """The proclaimed members of each contest, keyed like the contests: ("gobernador",), ("legislador", section), or
+    (category, place code). A heading with no members yet is left out."""
+    if year not in ELECTED_URL:
+        return {}
+    out: dict[tuple[object, ...], list[Member]] = {}
+    for heading, members in proclaimed_blocks(_text(raw.cached(SOURCE, ELECTED_URL[year]).path)):
+        category, _, where = (part.strip() for part in heading.partition(" - "))
+        scope: tuple[object, ...]
+        if category == "GOBERNADOR":
+            scope = ("gobernador",)
+        elif category == "LEGISLADOR":
+            scope = ("legislador", where)
+        else:
+            kind, _, name = where.partition(" ")
+            scope = (CATEGORY_OF[category], place_named(kind.lower(), name).code)
+        if scope in out:
+            raise ValueError(f"two headings for {scope}")
+        if members:
+            out[scope] = members
+    return out
+
+
+# ---------------------------------------------------------------------------------------------------------------------
 # Geography
 
 
@@ -701,7 +788,13 @@ def registry() -> Package:
         depends=[f"{SOURCE}/geo"],
     )
     p.external.add(ARGENTINA)
-    for url in (*URLS_2007.values(), ZIP_2011, *(u for u in urls_2015() if u in raw.keys(SOURCE))):
+    for url in (
+        *URLS_2007.values(),
+        ZIP_2011,
+        ELECTED_2011,
+        ELECTED_2015,
+        *(u for u in urls_2015() if u in raw.keys(SOURCE)),
+    ):
         p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
     p.add("body", id=LEGISLATURE, polity_id=ARGENTINA, kind="unicameral")
     p.name(LEGISLATURE, "Legislature of Tucumán", "en", "official")
@@ -765,8 +858,12 @@ def sources_of(year: int) -> list[str]:
     if year == 2007:
         return list(URLS_2007.values())
     if year == 2011:
-        return [ZIP_2011]
-    return [*(u for u in urls_2015() if u in raw.keys(SOURCE)), *([MESAS_2015] if mesas_2015() else [])]
+        return [ZIP_2011, ELECTED_2011]
+    return [
+        *(u for u in urls_2015() if u in raw.keys(SOURCE)),
+        *([MESAS_2015] if mesas_2015() else []),
+        ELECTED_2015,
+    ]
 
 
 def _vote(p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int) -> None:
@@ -865,6 +962,82 @@ def mesa_sets(
         row["completeness"] = round(sheet_total / official, 6)
 
 
+def outcomes(
+    p: Package,
+    tag: str,
+    year: int,
+    declared: dict[tuple[object, ...], list[Member]],
+    contests: dict[tuple[object, ...], str],
+    sets: dict[tuple[object, ...], str],
+    options: dict[tuple[object, ...], str],
+    party_of: dict[str, str],
+) -> None:
+    """Adds the Junta's proclaimed authorities to each contest's official result set: the winning list, its seats,
+    and the members named under it."""
+    for scope, members in declared.items():
+        if scope not in contests:
+            if (year, scope) in NO_CONTEST:
+                continue
+            raise ValueError(f"the annex proclaims {scope}, which has no contest")
+        by_number: dict[int, list[str]] = defaultdict(list)
+        for found, option in options.items():
+            if found[: len(scope)] == scope:
+                by_number[int(str(found[len(scope)]))].append(option)
+        seats: dict[int, int] = defaultdict(int)
+        for m in members:
+            if len(by_number[m.number]) != 1:
+                raise ValueError(f"{scope}: list {m.number} {m.party} matches {len(by_number[m.number])} options")
+            seats[m.number] += 1
+        result_set = sets[scope]
+        shared = scope[0] in SEATED
+        winners = {number for number in seats}
+        for number, (option,) in sorted(by_number.items()):
+            if number in winners:
+                p.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=option,
+                    kind="won" if shared else "elected",
+                    seats=seats[number] if shared else None,
+                )
+            else:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="lost", seats=0 if shared else None)
+        for m in members:
+            if not m.name:
+                continue
+            option = by_number[m.number][0]
+            person = key("person", tag, "proclaimed", *scope, m.order)
+            candidacy = key("candidacy", tag, "proclaimed", *scope, m.order)
+            p.add("person", id=person)
+            p.name(person, m.name, "es", "official")
+            role = "list_member"
+            if scope[0] == "gobernador":
+                role = "head" if m.order == 1 else "running_mate"
+            elif scope[0] in ("intendente", "comisionado") and m.order == 1:
+                role = "head"
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=option,
+                role=role,
+                ballot_name=m.name,
+                member_of_party_id=party_of[option],
+            )
+            if shared:
+                p.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
+        p.add(
+            "note",
+            id=key("note", result_set, "proclamation"),
+            entity_id=result_set,
+            kind="methodology",
+            body_md="Winners and seats are as the Junta Electoral Provincial proclaimed them in its annex of elected "
+            f"authorities for the {year} election. The annex lists members in the order proclaimed"
+            + (", and leaves the name of one member blank." if any(not m.name for m in members) else "."),
+            lang="en",
+        )
+
+
 def general(year: int) -> Package:
     day = DAYS[year]
     tag = str(day)
@@ -901,6 +1074,8 @@ def general(year: int) -> Package:
     sets: dict[tuple[object, ...], str] = {}
     options: dict[tuple[object, ...], str] = {}
     progress: dict[tuple[object, ...], list[int]] = defaultdict(lambda: [0, 0])
+    party_of: dict[str, str] = {}
+    declared = proclaimed(year)
 
     def unit(scheme: str, code: str, area_id: str) -> str:
         if code not in units:
@@ -928,6 +1103,8 @@ def general(year: int) -> Package:
         office_id: str | None = None,
         body_id: str | None = None,
     ) -> str:
+        if scope in declared and scope[0] in SEATED:
+            magnitude = len(declared[scope])
         id = contests[scope] = key("contest", tag, *scope)
         p.add(
             "contest",
@@ -985,6 +1162,7 @@ def general(year: int) -> Package:
                     ballot_position=number,
                     ballot_label=name,
                 )
+                party_of[option] = party(number, name)
                 if candidate:
                     person = key("person", tag, *found)
                     p.add("person", id=person)
@@ -1078,6 +1256,14 @@ def general(year: int) -> Package:
         )
         record(scope, s, unit("ar-t.jurisdiccion", place.code, place.area), True)
     mesa_sets(p, tag, contests, sets, options, units, everything)
+    outcomes(p, tag, year, declared, contests, sets, options, party_of)
+    blank = sum(not m.name for members in declared.values() for m in members)
+    if blank:
+        p.accept(
+            "outcomes.list_members",
+            f"The Junta's annex of proclaimed authorities prints {blank} members with no name, so those seats are "
+            "declared for their lists without a named member.",
+        )
     for scope, (counted, tables) in progress.items():
         rows = p.rows["result_set"]
         row = next(r for r in rows if r["id"] == sets[scope])
