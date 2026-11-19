@@ -499,6 +499,9 @@ def fetch() -> None:
             raw.fetch(SOURCE, url, suffix=suffix)
         if d.key in WINNERS:
             raw.fetch(SOURCE, WINNERS[d.key], suffix=".xlsx")
+    from ea.sources.do import jce_parlacen
+
+    jce_parlacen.fetch()
 
 
 @functools.cache
@@ -1027,6 +1030,7 @@ def geo() -> Package:
     p.artifact(raw.cached(SOURCE, GB_PROVINCES), province_source)
     p.artifact(raw.cached(SOURCE, GB_MUNICIPALITIES), municipality_source)
     for code, rank, kind, noun in (
+        ("do.nacion", 0, "administrative", "nation"),
         ("do.provincia", 1, "administrative", "province"),
         ("do.municipio", 2, "administrative", "municipality"),
         ("do.distrito_municipal", 3, "administrative", "municipal district"),
@@ -1090,7 +1094,15 @@ def geo() -> Package:
 PRESIDENCY = key("office", "president")
 SENATE = key("body", "senate")
 CHAMBER = key("body", "chamber")
+PARLACEN = key("body", "parlacen")
 SYSTEMS = {
+    "parlacen": (
+        {"formula": "dhondt"},
+        (
+            "The twenty Dominican deputies to the Central American Parliament, with their alternates, are allotted "
+            "nationally among the parties by D'Hondt from each party's national total of votes, from closed lists."
+        ),
+    ),
     "president": (
         {"formula": "two_round", "majority": 0.5, "advance": 2},
         (
@@ -1186,6 +1198,9 @@ def registry() -> Package:
         p.add("body", id=id, polity_id=DOMINICAN, kind=kind)
         p.name(id, english, "en", "official")
         p.name(id, spanish, "es", "native", False)
+    p.add("body", id=PARLACEN, polity_id=DOMINICAN, kind="council")
+    p.name(PARLACEN, "Dominican deputies to the Central American Parliament", "en", "official")
+    p.name(PARLACEN, "Diputados al Parlamento Centroamericano (PARLACEN)", "es", "native", False)
     for mun, (_, text) in sorted(found.municipalities.items()):
         p.add("body", id=council("do.municipio", str(mun)), polity_id=DOMINICAN, kind="council")
         p.name(council("do.municipio", str(mun)), f"Concejo Municipal de {text}", "es", "official")
@@ -2093,6 +2108,11 @@ def election(d: Day) -> Package:
                 p.add("declared", result_set_id=result_set, option_id=options[code], measure=VOTES, value=value)
                 if got.get((options[code], VOTES)) != value:
                     declared_diffs.append(f"{code} printed {value:,}, files {got.get((options[code], VOTES)) or 0:,}")
+    from ea.sources.do import jce_parlacen
+
+    if d.key in jce_parlacen.DAYS:
+        _, parlacen_values = jce_parlacen.add(p, d, election_id, base)
+        print(f"{d.key}: PARLACEN contest with {parlacen_values} party totals", flush=True)
     if elected:
         # The 2016 congressional file prints no ballots cast abroad, so those deputies have no contest to join.
         print(f"{d.key}: left out, winners of contests with no results: {sorted(elected)}", flush=True)
@@ -2310,6 +2330,11 @@ def parse() -> None:
         print(line, flush=True)
     for line in compare():
         print(line, flush=True)
+    from ea.sources.do import jce_parlacen
+
+    for day in jce_parlacen.DAYS:
+        for line in jce_parlacen.check(day):
+            print(line, flush=True)
     geo().write()
     parties = registry()
     held = {str(row["id"]) for row in parties.rows["party"]}
