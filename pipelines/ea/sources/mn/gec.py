@@ -194,6 +194,44 @@ def supplementary_2020() -> LocalElection:
     )
 
 
+SUPPLEMENTARY_2024 = "1c20b694"
+SUPPLEMENTARY_2024_REPORT = "https://ikon.mn/n/39b4"
+SUPPLEMENTARY_2024_NOTE = (
+    "This is a supplementary vote in constituencies of the 2024-10-11 local council election, with the same council "
+    "and constituency numbers. In the first count the two or more leading candidates of each constituency tied on "
+    "votes. This result set holds only the supplementary vote's own figures; the first count's result set is "
+    "unchanged. Under the council election law the supplementary vote's turnout and votes are added to the first "
+    "count's to settle the seat, and the workbook prints no combined figures."
+)
+
+
+def _supplementary_2024(day: date, sheet: str) -> LocalElection:
+    return LocalElection(
+        str(day),
+        day,
+        day,
+        "day",
+        f"The results workbook's tab '{sheet.strip()}' and the Commission's announcement of 12 October 2024, as reported "
+        f"that day, date this supplementary vote {day.day} October 2024.",
+        f"2024 Mongolian local council supplementary vote of {day.day} October",
+        NATIVE_LOCAL.format(year=2024) + " (нэмэлт санал хураалт)",
+        local.blocks(SUPPLEMENTARY_2024, local.section_places(PLACE_LIST_2020), sheet),
+        [sheets.url(SUPPLEMENTARY_2024), sheets.url(PLACE_LIST_2020), SUPPLEMENTARY_2024_REPORT],
+        "by_election",
+        relation=SUPPLEMENTARY_2024_NOTE,
+    )
+
+
+@functools.cache
+def supplementary_2024() -> list[LocalElection]:
+    """The council constituencies of the 2024 election whose first count tied the leading candidates: 77 voted again
+    on 2024-10-13 and 9 on 2024-10-19."""
+    return [
+        _supplementary_2024(date(2024, 10, 13), "10-13 нэмэлт "),
+        _supplementary_2024(date(2024, 10, 19), "10-19 нэмэлт"),
+    ]
+
+
 @functools.cache
 def local_elections() -> list[LocalElection]:
     locate = local.section_places(PLACE_LIST_2020)
@@ -216,10 +254,10 @@ def local_elections() -> list[LocalElection]:
         ),
         LocalElection(
             "2024-10",
-            date(2024, 10, 1),
-            date(2024, 10, 31),
-            "month",
-            "The results workbook's tabs are dated 10-11; its supplementary tabs are dated 10-13 and 10-19.",
+            date(2024, 10, 11),
+            date(2024, 10, 11),
+            "day",
+            "The results workbook's first-count tabs are dated 10-11; its supplementary tabs are dated 10-13 and 10-19.",
             "2024 Mongolian local council elections",
             NATIVE_LOCAL.format(year=2024),
             blocks_2024,
@@ -469,6 +507,7 @@ def packages() -> list[str]:
         *(f"{SOURCE}/{day}" for day in parliament_keys()),
         *(f"{SOURCE}/{election.key}" for election in local_elections()),
         f"{SOURCE}/{supplementary_2020().key}",
+        *(f"{SOURCE}/{election.key}" for election in supplementary_2024()),
         *early_packages(),
         *section_packages(),
         *local_2012_packages(),
@@ -506,6 +545,8 @@ def parse() -> None:
     for election_ in local_elections():
         councils(election_).write()
     councils(supplementary_2020()).write()
+    for election_ in supplementary_2024():
+        councils(election_).write()
     early_registry().write()
     early_legislature(early.DAY_2012).write()
     early_capital_list_2012().write()
@@ -529,6 +570,7 @@ def _places() -> dict[str, places.Place]:
     rows = [row for poll in all_polls() for row in poll.rows]
     rows += [row for contest in parliament_2024() for row in contest.rows]
     blocks = [block for election_ in local_elections() for block in election_.blocks]
+    blocks += [block for election_ in supplementary_2024() for block in election_.blocks]
     rows += [row for block in blocks for row in block.rows]
     for row in rows:
         if row.place is not None:
@@ -976,6 +1018,13 @@ def councils(spec: LocalElection) -> Package:
         p.external |= inherited({c.party for block in blocks for c in block.candidates}, spec.aliases)
     for url in spec.files:
         p.uses(raw.cached(SOURCE, url))
+    if day == "2024-10-13":
+        p.accept(
+            "accounting.declared",
+            "In Jargalant soum of Töv province, constituency 1, the one polling section 17-17-1 prints 480 and 466 "
+            "votes for the two tied candidates while the constituency's total row prints 329 and 313; both are "
+            "stored as printed, and the workbook gives nothing that settles which pair is right.",
+        )
     election_id = key("election", str(day))
     p.add(
         "election",
