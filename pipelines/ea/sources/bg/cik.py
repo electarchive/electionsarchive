@@ -112,8 +112,24 @@ ELECTIONS = [
     Election("ns-2005-06-25", "ns", date(2005, 6, 25), "http://pi2005.cik.bg/results/export.zip", "ns2005"),
     Election("pr-2011-10-23", "pres", date(2011, 10, 23), Z + "mipvr2011/el2011_t1.zip", "pres2011", None, 1),
     Election("pr-2011-10-30", "pres", date(2011, 10, 30), Z + "mipvr2011/el2011_t2.zip", "pres2011", None, 2),
-    Election("pr-2006-10-22", "pres", date(2006, 10, 22), "https://pvr2006.cik.bg/results_1/", "pres2006", None, 1),
-    Election("pr-2006-10-29", "pres", date(2006, 10, 29), "https://pvr2006.cik.bg/results_2/", "pres2006", None, 2),
+    Election(
+        "pr-2006-10-22",
+        "pres",
+        date(2006, 10, 22),
+        "https://pvr2006.cik.bg/results_1/export_t1.zip",
+        "pres2006",
+        None,
+        1,
+    ),
+    Election(
+        "pr-2006-10-29",
+        "pres",
+        date(2006, 10, 29),
+        "https://pvr2006.cik.bg/results_2/export_t2.zip",
+        "pres2006",
+        None,
+        2,
+    ),
     Election("ns-2009-07-05", "ns", date(2009, 7, 5), "https://pi2009.cik.bg/results/exports.zip", "ns2009"),
     Election("ep-2009-06-07", "ep", date(2009, 6, 7), "https://ep2009.cik.bg/exports.zip", "ep2009"),
     Election("ns-2013-05-12", "ns", date(2013, 5, 12), Z + "pi2013/export.zip", "ns2013"),
@@ -251,6 +267,17 @@ LAYOUTS: dict[str, Layout] = {
         0,
         {"*": {"reg": (2,), "voters": (10,), "box": (12,), "inv": (18,), "valid": (19,)}},
         "ns2009",
+        0,
+        False,
+        0,
+    ),
+    # The 2006 protocol lists points A, B, and C before point 1; column 5 is point 1 (the main roll) and column 6 point 2
+    # (the additional roll), which add up to the registered voters. The ticket columns follow point 12.
+    "pres2006": Layout(
+        None,
+        0,
+        {"*": {"reg": (5, 6), "voters": (7,), "box": (10,), "inv": (15,), "valid": (16,)}},
+        "pres2006",
         0,
         False,
         0,
@@ -396,7 +423,8 @@ def url_of(name: str) -> str:
 
 
 def fetch() -> None:
-    early = [EP2007.url, EP2007_PAGE, *(b.url for b in BLOCKS)]
+    pages = [page_of(e) for e in ELECTIONS if e.layout == "pres2006"]
+    early = [EP2007.url, EP2007_PAGE, *(b.url for b in BLOCKS), *pages]
     for url in dict.fromkeys([*(e.url for e in ELECTIONS), RECOUNT_URL, RECOUNT_PAGE, LISTS_2009, *early, EKATTE_URL]):
         try:
             raw.fetch(SOURCE, url, suffix=".zip" if url.endswith((".zip", "/download")) else ".html")
@@ -473,6 +501,13 @@ def _members(e: Election) -> dict[str, str]:
             "protocols": "euro2009_protocols.txt",
             "votes": "euro2009_protocols.txt",
         }
+    if e.layout == "pres2006":
+        by_name = {n.rpartition("/")[2].lower(): n for n in names}
+        return {
+            "sections": next(n for b, n in by_name.items() if b.endswith("_sections.txt")),
+            "protocols": next(n for b, n in by_name.items() if b.endswith("_protocols.txt")),
+            "readme": by_name["readme.txt"],
+        }
     if e.layout == "pres2011":
         names = [n for n in names if "_president_" in n.rpartition("/")[2]]
     folders = list(dict.fromkeys(n.rpartition("/")[0] for n in names))
@@ -528,7 +563,7 @@ def sections(e: Election) -> dict[str, Section]:
             code, place, ekatte, mobile, ship = r[1], r[4], r[5], r[0] == "П", r[0] == "К"
         elif e.layout == "ns2005":
             code, place, ekatte, mobile, ship = r[0], r[1], "", False, False
-        elif e.layout in ("ep2009", "ns2009"):
+        elif e.layout in ("ep2009", "ns2009", "pres2006"):
             code, place, ekatte, mobile, ship = r[0], r[1], r[2], False, False
         elif layout.votes in ("order_pairs",):
             code, place, ekatte = r[0], r[1], r[2]
@@ -560,7 +595,7 @@ def protocol_figures(e: Election, layout_name: str | None = None) -> dict[str, d
             if name in ("reg", "voters"):
                 if starred:
                     continue
-                figures.setdefault(name, found[0])
+                figures.setdefault(name, sum(found) if e.layout == "pres2006" else found[0])
             else:
                 figures[name] = figures.get(name, 0) + sum(found)
     return out
@@ -860,6 +895,11 @@ def mir_of(e: Election, code: str) -> int:
 
 def abroad(e: Election, code: str) -> bool:
     return code.startswith("29" if e.layout in ("ref2015", "pres2011") else "32")
+
+
+def page_of(e: Election) -> str:
+    """The CIK's national results page of a 2006 round, which sits beside its export."""
+    return e.url.rpartition("/")[0] + "/"
 
 
 def party_kind(name: str) -> str:
@@ -1793,19 +1833,45 @@ def pres2006_page(url: str) -> tuple[list[Ticket], dict[int, int]]:
     return tickets, points
 
 
+def pres2006_columns(e: Election) -> list[int]:
+    """The ticket numbers of the vote columns that follow point 12 of the protocol, in file order."""
+    text = _decode(_archive(e.url).read(_members(e)["readme"]))
+    return [int(m[1]) for m in re.finditer(r"^\s*\d+\)\s*Гласове за\s+(\d+)\.", text, re.MULTILINE)]
+
+
+def pres2006_votes(e: Election) -> dict[str, dict[int, int]]:
+    """Votes per section and ticket number; a section with no protocol has no entry."""
+    numbers = pres2006_columns(e)
+    out: dict[str, dict[int, int]] = {}
+    for r in rows(e, "protocols"):
+        cells = [c.strip() for c in r[16:] if c.strip()]
+        assert len(cells) == len(numbers), (e.id, r[0], len(cells))
+        out[r[0]] = {n: int(c) for n, c in zip(numbers, cells, strict=True)}
+    return out
+
+
 def pres2006(e: Election) -> Package:
-    """A 2006 presidential round: the national totals of the CIK's results page, as one aggregate unit."""
+    """A 2006 presidential round by polling section, with the national totals of the CIK's results page declared."""
     first = FIRST_ROUND.get(e.id)
     p = Package(
         f"{SOURCE}/{e.id}",
         SOURCE,
-        f"The {e.day:%d %B %Y} Bulgarian presidential election, national totals from the CIK's results page",
+        f"The {e.day:%d %B %Y} Bulgarian presidential election by polling section from the CIK's results export",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", *([f"{SOURCE}/{first}"] if first else [])],
     )
     p.external.add(BULGARIA)
+    page = page_of(e)
     p.artifact(raw.cached(SOURCE, e.url), CIK_SOURCE)
-    tickets, points = pres2006_page(e.url)
-    assert tickets and sum(t.votes for t in tickets) > 0, e.url
+    p.artifact(raw.cached(SOURCE, page), CIK_SOURCE)
+    tickets, points = pres2006_page(page)
+    assert tickets and sum(t.votes for t in tickets) > 0, page
+    secs, figures, votes = sections(e), protocol_figures(e), pres2006_votes(e)
+    assert set(secs) == set(figures) == set(votes), (e.id, len(secs), len(figures), len(votes))
+    assert set(pres2006_columns(e)) == {t.number for t in tickets}, e.id
+    # The page's totals of ballots, invalid votes, and valid votes are the sums of the section protocols. Its roll and
+    # voter totals are not: they count the abroad ballots as voters, which the protocols leave at zero.
+    for name, point in (("box", 8), ("inv", 13), ("valid", 14)):
+        assert sum(f[name] for f in figures.values()) == points[point], (e.id, name)
     english, native = label(e, e.day)
     election = key("election", e.id)
     p.add(
@@ -1857,40 +1923,63 @@ def pres2006(e: Election) -> Package:
         entity_id=result_set,
         kind="methodology",
         body_md=(
-            "The CIK's results page for the whole country, which counts the protocols of all 11,809 polling sections. "
-            "Registered voters are the voters on the main and additional rolls, voters are the signatures on the roll, "
-            "ballots cast are the ballots found in the boxes, and valid ballots are those marked for one ticket. The "
-            "results for each constituency and section are not stored here yet."
+            "Counted by the 11,809 polling section commissions and published by the Central Election Commission (CIK) "
+            "as section protocols and ticket votes. Registered voters are the voters on the main and additional rolls, "
+            "voters are the signatures on the roll, ballots cast are the ballots found in the box, and valid ballots "
+            "are those marked for one ticket. The national totals of the CIK's results page are stored as declared."
         ),
         lang="en",
     )
     finalists = {t.number for t in pres2006_page(SECOND_URL)[0]}
-    unit = p.id("unit", e.id, "national")
-    p.add(
-        "reporting_unit",
-        id=unit,
-        polity_id=BULGARIA,
-        scheme_code="bg.country",
-        code=f"{e.id}:national",
-        area_relation="equals",
-        area_id=NATION,
-        kind="aggregate",
-    )
-    p.name(unit, "Bulgaria, all sections", "en", "official")
+    unit_rows: list[dict[str, object]] = []
+    unit_names: list[dict[str, object]] = []
+    unit_of: dict[str, str] = {}
+    for code in sorted(secs):
+        section = secs[code]
+        unit = unit_of[code] = p.id("unit", e.id, code)
+        out = abroad(e, code)
+        unit_rows.append(
+            {
+                "id": unit,
+                "polity_id": BULGARIA,
+                "scheme_code": "bg.sik",
+                "code": f"{e.id}:{code}",
+                "area_relation": "unlocated" if out else "within",
+                "area_id": None if out else NATION,
+                "kind": "abroad_mission" if out else "standard",
+            }
+        )
+        if section.place:
+            unit_names.append(
+                {
+                    "id": p.id("name", unit),
+                    "entity_id": unit,
+                    "text": f"{section.place}, {code}",
+                    "lang": "bg",
+                    "kind": "official",
+                    "is_preferred": True,
+                }
+            )
+    p.frame("reporting_unit", pl.DataFrame(unit_rows))
+    p.frame("name", pl.DataFrame(unit_names))
+    link_units(p, e, unit_of, secs)
     cols: dict[str, list[object]] = {c: [] for c in ("result_set_id", "unit_id", "option_id", "measure", "value")}
 
-    def put(option: str | None, measure: int, value: int) -> None:
+    def put(unit: str, option: str | None, measure: int, value: int) -> None:
         cols["result_set_id"].append(result_set)
         cols["unit_id"].append(unit)
         cols["option_id"].append(option)
         cols["measure"].append(measure)
         cols["value"].append(value)
 
-    put(None, REGISTERED, points[3] + points[4])
-    put(None, VOTERS, points[5])
-    put(None, BALLOTS, points[8])
-    put(None, INVALID, points[13])
-    put(None, VALID, points[14])
+    options = {t.number: key("option", e.id, "president", t.number) for t in tickets}
+    for code in sorted(secs):
+        for name, measure in MEASURES.items():
+            if abroad(e, code) and name in ("reg", "voters") and not figures[code][name]:
+                continue  # abroad there is no roll; the protocol prints zeros that are not counts of voters
+            put(unit_of[code], None, measure, figures[code][name])
+        for number, count in votes[code].items():
+            put(unit_of[code], options[number], VOTES, count)
     for t in tickets:
         option = key("option", e.id, "president", t.number)
         p.add(
@@ -1921,7 +2010,7 @@ def pres2006(e: Election) -> Package:
                 role=role,
                 ballot_name=who,
             )
-        put(option, VOTES, t.votes)
+        p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=t.votes)
         if e.round == 2:
             kind = "elected" if t.votes == max(x.votes for x in tickets) else "lost"
         else:
@@ -1931,18 +2020,7 @@ def pres2006(e: Election) -> Package:
         channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)
     )
     p.frame("result_value", frame)
-    if points[8] != points[13] + points[14]:
-        p.accept(
-            "accounting.ballots_sum",
-            "the national protocol totals print ballots in the box that differ from invalid plus valid ballots; "
-            "stored as printed",
-        )
-    if sum(t.votes for t in tickets) != points[14]:
-        p.accept(
-            "accounting.votes_valid",
-            "the votes printed for the tickets do not add up to the valid votes printed in the national totals; "
-            "stored as printed",
-        )
+    accept(p, e, figures, {code: {str(n): c for n, c in v.items()} for code, v in votes.items()}, secs)
     return p
 
 
