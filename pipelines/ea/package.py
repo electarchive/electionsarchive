@@ -231,6 +231,25 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
         },
     ),
     "outcome": (None, {"result_set_id": U, "option_id": U, "candidacy_id": U, "kind": U, "seats": I32}),
+    "tenure": (
+        ("id",),
+        {
+            "id": U,
+            "person_id": U,
+            "office_id": U,
+            "seat_id": U,
+            "body_id": U,
+            "from_date": D,
+            "from_precision": U,
+            "to_date": D,
+            "to_precision": U,
+            "acquired_via": U,
+            "contest_id": U,
+            "ended_via": U,
+            "resumes_tenure_id": U,
+            "succeeds_tenure_id": U,
+        },
+    ),
     "name": (
         ("id",),
         {
@@ -757,6 +776,13 @@ REFERENCES = [
     ("ballot_question_text", "contest_id", "contest"),
     ("ballot_question_text", "source_id", "source"),
     ("body_size", "body_id", "body"),
+    ("tenure", "person_id", "person"),
+    ("tenure", "office_id", "office"),
+    ("tenure", "seat_id", "seat"),
+    ("tenure", "body_id", "body"),
+    ("tenure", "contest_id", "contest"),
+    ("tenure", "resumes_tenure_id", "tenure"),
+    ("tenure", "succeeds_tenure_id", "tenure"),
 ]
 TARGET_KEY = {"scheme": "code", "polity": "id"}
 OUTSIDE = ("seat",)
