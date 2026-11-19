@@ -2653,13 +2653,13 @@ def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | Non
         )
 
 
-def apply(folder: Path) -> str:
-    status = _apply(folder)
+def apply(folder: Path, publishing: bool = True) -> str:
+    status = _apply(folder, publishing)
     provenance("apply", json.loads((folder / "manifest.json").read_text())["id"], status)
     return status
 
 
-def _apply(folder: Path) -> str:
+def _apply(folder: Path, publishing: bool = True) -> str:
     manifest = json.loads((folder / "manifest.json").read_text())
     changeset_id: str = manifest["id"]
     tables: list[str] = manifest["tables"]
@@ -2917,7 +2917,8 @@ def _apply(folder: Path) -> str:
             ],
         )
         if (
-            any(finding.severity == "error" for finding in findings)
+            not publishing
+            or any(finding.severity == "error" for finding in findings)
             or manifest["author_kind"] in ("user", "agent")
             or (manifest["kind"] != "match" and (official is None or not official[0]))
         ):
