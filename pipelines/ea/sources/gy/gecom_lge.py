@@ -937,7 +937,11 @@ def party_id(label: str) -> str:
 
 # Parties that packages already loaded refer to, under keys that today's readings of the same declarations no longer
 # produce; they stay in the registry so that those packages' contest options keep their party.
-LEGACY_PARTIES = {"AGNSP": "GNS Party", "UNITEDREPUBLICANPARTYURP": "United Republican Party - Urp"}
+LEGACY_PARTIES = {
+    "AGNSP": "GNS Party",
+    "GREENWICHPARK/VERGENOEGEN": "Greenwich Park/ Vergenoegen",
+    "UNITEDREPUBLICANPARTYURP": "United Republican Party - Urp",
+}
 
 
 def legacy_party_key(label: str) -> str:
@@ -976,9 +980,25 @@ def party_names() -> dict[str, str]:
     return found
 
 
-# Council bodies that packages already loaded refer to, under slugs that the areas no longer produce because the same
-# area is now named alike across the election days; they stay in the registry so that those contests keep their body.
-LEGACY_COUNCILS = {"adventure-bushlot": "Adventure Bushlot"}
+# Council bodies that packages already loaded refer to, under slugs that the areas no longer produce because earlier
+# readings spelled an area differently or the same area is now named alike across the election days; they stay in the
+# registry so that those contests keep their body.
+LEGACY_COUNCILS = {
+    "adventure-bushlot": "Adventure Bushlot",
+    "annadale-riverstown": "Annandale Riverstown",
+    "better-hope-lbi": "Better Hope La Bonne Intention",
+    "buxton-fouls": "Buxton Foulis",
+    "charity": "Charity",
+    "gilbraltar-fyrish": "Gibraltar Fyrish",
+    "hague-blakenburg": "Hague Blankenburg",
+    "haurarunui-yarowkabra": "Hauraruni Yarowkabra",
+    "la-jalousie-novelle-flanders": "La Jalousie Nouvelle Flanders",
+    "mon-repos-la-reconnisance": "Mon Repos La Reconnaissance",
+    "ordnance-fortlands-no-28": "Ordnance Fortlands No 28",
+    "port-mourant-john": "Port Mourant John",
+    "seafield-tempe": "Seafield Tempie",
+    "the-best-klien-pouderoyen": "The Best Klien Pouderoyen",
+}
 
 
 def council_name(slug: str, name: str) -> str:
