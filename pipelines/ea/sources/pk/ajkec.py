@@ -471,7 +471,12 @@ def geo() -> Package:
         kind="administrative",
         rank=4,
         noun="local council",
-        kinds=["union_council", "municipal_corporation", "municipal_committee", "town_committee"],
+        kinds={
+            "union_council": "union council",
+            "municipal_corporation": "municipal corporation",
+            "municipal_committee": "municipal committee",
+            "town_committee": "town committee",
+        },
         code_system=None,
     )
     p.add("scheme", code=WARD_SCHEME, polity_id=AJK, kind="electoral_district", rank=5, noun="ward", code_system=None)
