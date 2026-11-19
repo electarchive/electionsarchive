@@ -1,10 +1,11 @@
 """Cyprus: outlines for the districts, municipalities, and communities of the local-election packages.
 
-The Ministry of Interior publishes no boundaries. geoBoundaries' open set (gbOpen) holds six district outlines (ADM1)
-and about 610 municipality and community outlines (ADM2) in one 2009-vintage plan. An area of the local-election
-packages takes the ADM2 outline with the same English name, when exactly one such outline lies in the area's
-district. The outlines are of the plan's own villages, so an area that the 2024 reform merged, or that the ADM2 layer
-does not name, gets no outline here. `areas.tsv` lists each area's Ministry code, district code, and English name.
+The Ministry of Interior publishes no boundaries. Eurostat's GISCO local administrative units (LAU 2024, 1:1 million)
+hold 615 municipality and community outlines of the pre-2024 plan, keyed by the Ministry's own area codes; an area
+takes the outline with its code. An area that the LAU layer lacks falls back on the geoBoundaries ADM2 outline of the
+same English name, when exactly one such outline lies in the area's district. geoBoundaries' ADM1 layer gives the six
+district outlines. The 2024 reform's municipalities (codes from 11000) span several of the plan's communities and get
+no outline here. `areas.tsv` lists each area's Ministry code, district code, and English name.
 """
 
 import csv
@@ -28,6 +29,9 @@ SHAPES = "cy.geoboundaries"
 BASE = "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/main/releaseData/gbOpen/CYP/"
 ADM1 = BASE + "ADM1/geoBoundaries-CYP-ADM1_simplified.geojson"
 ADM2 = BASE + "ADM2/geoBoundaries-CYP-ADM2_simplified.geojson"
+LAU_SOURCE_NAME = "cy.gisco"
+LAU = "https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2024_4326.geojson"
+LAU_SOURCE = str(uuid5(package.NAMESPACE, f"{SOURCE}\x1fsource\x1fgisco-lau"))
 SHAPE_SOURCE = str(uuid5(package.NAMESPACE, f"{SOURCE}\x1fsource\x1fgeoboundaries"))
 DEPENDS = [f"{moi_local.COUNCIL_PREFIX}/geo", f"{moi_local.PIPELINE}/offices/geo"]
 # The Ministry's district codes and geoBoundaries' names for the districts.
@@ -101,6 +105,7 @@ def packages() -> list[str]:
 def fetch() -> None:
     for url in (ADM1, ADM2):
         raw.fetch(SHAPES, url, suffix=".geojson")
+    raw.fetch(LAU_SOURCE_NAME, LAU, suffix=".geojson")
 
 
 def emit() -> None:
@@ -133,7 +138,18 @@ def districts() -> dict[int, shapely.Geometry]:
 
 
 @functools.cache
-def matches() -> dict[int, shapely.Geometry]:
+def lau() -> dict[int, shapely.Geometry]:
+    """The LAU layer's Cyprus outlines by Ministry area code."""
+    data = json.loads(raw.cached(LAU_SOURCE_NAME, LAU).path.read_bytes())
+    return {
+        int(f["properties"]["GISCO_ID"].removeprefix("CY_")): shapely.geometry.shape(f["geometry"])
+        for f in data["features"]
+        if f["properties"].get("CNTR_CODE") == "CY"
+    }
+
+
+@functools.cache
+def by_gb() -> dict[int, shapely.Geometry]:
     """Each listed area's outline: the one ADM2 outline of its name that lies in its district."""
     named: dict[str, list[shapely.Geometry]] = defaultdict(list)
     for name, shape in _load(ADM2):
@@ -146,6 +162,22 @@ def matches() -> dict[int, shapely.Geometry]:
         shapes = [s for s in named.get(fold(ALIASES.get(code, name)), []) if near.contains(shapely.point_on_surface(s))]
         if len(shapes) == 1:
             found[code] = shapes[0]
+    return found
+
+
+@functools.cache
+def outlines() -> dict[int, tuple[shapely.Geometry, str]]:
+    """Each listed area's outline and its source: the LAU outline by code, else the ADM2 one by name."""
+    found: dict[int, tuple[shapely.Geometry, str]] = {}
+    layer = lau()
+    named = by_gb()
+    for code, _district, _name in listed():
+        if code >= MERGED:
+            continue
+        if code in layer:
+            found[code] = (layer[code], LAU_SOURCE)
+        elif code in named:
+            found[code] = (named[code], SHAPE_SOURCE)
     return found
 
 
@@ -168,7 +200,7 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         "Outlines of Cyprus's districts, municipalities, and communities in the local-election packages, from "
-        "geoBoundaries' open ADM1 and ADM2 layers",
+        "Eurostat GISCO's LAU layer and geoBoundaries' open ADM1 and ADM2 layers",
         depends=DEPENDS,
     )
     p.external |= {moi_local.CYPRUS, moi_local.COUNTRY}
@@ -183,15 +215,28 @@ def geo() -> Package:
         license_url="https://creativecommons.org/licenses/by-sa/3.0/",
         attribution="geoBoundaries gbOpen, CC BY-SA 3.0",
     )
+    p.add(
+        "source",
+        id=LAU_SOURCE,
+        kind="academic",
+        publisher="Eurostat GISCO",
+        title="Local administrative units (LAU) 2024, 1:1 million",
+        url="https://ec.europa.eu/eurostat/web/gisco/geodata/statistical-units/local-administrative-units",
+        license="Free reuse with the source acknowledged (Eurostat GISCO, © EuroGeographics for the administrative "
+        "boundaries)",
+        license_url="https://ec.europa.eu/eurostat/web/gisco/geodata/administrative-units",
+        attribution="© EuroGeographics for the administrative boundaries; Eurostat GISCO",
+    )
     for url in (ADM1, ADM2):
         p.artifact(raw.cached(SHAPES, url), SHAPE_SOURCE)
+    p.artifact(raw.cached(LAU_SOURCE_NAME, LAU), LAU_SOURCE)
     as_of = raw.cached(SHAPES, ADM2).retrieved_at.date()
-    for scheme in ("cy.local_district", "cy.local_area"):
+    for scheme, vintage in (("cy.local_district", "gbOpen 2009"), ("cy.local_area", "LAU 2024")):
         p.add(
             "boundary_set",
-            id=p.id("boundary_set", scheme, "gbopen"),
+            id=p.id("boundary_set", scheme, "gbopen" if scheme == "cy.local_district" else "lau"),
             scheme_code=scheme,
-            vintage="gbOpen 2009",
+            vintage=vintage,
             as_of=as_of,
         )
     for code, shape in sorted(districts().items()):
@@ -203,13 +248,13 @@ def geo() -> Package:
             quality="academic",
             source_id=SHAPE_SOURCE,
         )
-    for code, shape in sorted(matches().items()):
+    for code, (shape, source) in sorted(outlines().items()):
         p.add(
             "area_geometry",
             area_id=moi_local.area(code),
             geom=_wkb(shape),
             label_point=_label(shape),
             quality="academic",
-            source_id=SHAPE_SOURCE,
+            source_id=source,
         )
     return p
