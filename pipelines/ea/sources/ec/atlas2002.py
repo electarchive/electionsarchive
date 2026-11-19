@@ -324,6 +324,24 @@ def andean(page: int) -> National:
     return National(rows, totals["valid"][0], totals["blank"][0], totals["null"][0], seats, elected)
 
 
+def congress(pages: range) -> National:
+    """The national Diputados Provinciales table, which runs over two pages, with its totals.
+
+    The atlas sums each list's votes over the provinces, where seats were allocated one province at a time.
+    """
+    lines = [line for page in pages for line in text(page).splitlines()]
+    rows = [
+        Row(m[1], m[2], "", number(m[3]), int(m[4])) for m in (LISTED.match(line) for line in lines) if m is not None
+    ]
+    totals = _totals(lines)
+    seats = next(
+        int(m[1]) for m in (re.match(rf"^\s*{TOTALS['valid']}\s+{FIGURE}\s+\S+\s+(\d+)", x) for x in lines) if m
+    )
+    if any(len(v) != 1 for v in totals.values()):
+        raise ValueError(f"pages {pages}: expected one congress table")
+    return National(rows, totals["valid"][0], totals["blank"][0], totals["null"][0], seats, [])
+
+
 SUMMARY = {2002: 20, 2004: 22, 2006: 24}
 
 
