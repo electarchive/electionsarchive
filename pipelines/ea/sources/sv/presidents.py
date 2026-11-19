@@ -1,4 +1,4 @@
-"""Presidential elections of El Salvador from 1994 to 2009, from the Tribunal Supremo Electoral's consolidated tables.
+"""Presidential elections of El Salvador from 1994 to 2009 and in 2019, from the Tribunal Supremo Electoral's tables.
 
 The 1994 tables (both rounds) are typeset PDFs with a text layer, printing every municipality. The 1999, 2004, and 2009
 department volumes (consolidado departamental) are page images with no text layer, one or two pages for each
@@ -6,8 +6,13 @@ department, printing every municipality. Their rows were read from the page imag
 with each figure's page and box. Each row is checked against its own printed valid votes, each department's columns
 against the volume's printed department total, and each department total against the department row of the printed
 national table (`SCANNED`), which is also the source of the 2009 row for residents abroad.
+
+The 2019 final scrutiny is the Tribunal's results page, a Wayback Machine copy of which is the only copy reachable; its
+tables hold the national row, the 14 departments and residents abroad, and the 262 municipalities. The 2024 election's
+results are not published at any address that answered.
 """
 
+import html
 import json
 import re
 import subprocess
@@ -25,6 +30,9 @@ from ea.sources.sv import assembly, tse
 SOURCE = tse.SOURCE
 D = "https://transparencia.tse.gob.sv/laip_tse/documentos/estadisticos/"
 LISTING = assembly.LISTING
+PAGE_2019 = (
+    "https://web.archive.org/web/20240103050753/https://www.tse.gob.sv/2019/escrutinio-final/presidencial/index.html"
+)
 REGISTRY = "sv.tse/pres-registry"
 HIST_SOURCE = tse.key("source", "tse-presidential-history")
 VOTES, VALID, INVALID, OBJECTED = tse.VOTES, tse.VALID, tse.INVALID, tse.OBJECTED
@@ -42,6 +50,9 @@ PARTY_NAMES = {
     "CD-FMLN-MNR": "Coalición Convergencia Democrática, FMLN y Movimiento Nacional Revolucionario",
     "FMLN-USC": "Coalición FMLN y Unidad Social Cristiana",
     "CDU-PDC": "Coalición Centro Democrático Unido y Partido Demócrata Cristiano",
+    "GANA": "Gran Alianza por la Unidad Nacional",
+    "VAMOS": "Vamos",
+    "ARENA-PCN-PDC-DS": "Coalición ARENA, PCN, PDC y Democracia Salvadoreña",
 }
 ALIASES = {
     **assembly.ALIASES,
@@ -108,6 +119,13 @@ ELECTIONS = {
             ("ARENA", "FMLN"),
             (D + "2009/consolidadodeppresyvicepres2009.pdf", D + "2009/consolidadonacional_presidenciales2009.pdf"),
             "municipality-scan",
+        ),
+        Election(
+            date(2019, 2, 3),
+            1,
+            ("GANA", "ARENA-PCN-PDC-DS", "FMLN", "VAMOS"),
+            (PAGE_2019,),
+            "municipality-html",
         ),
     )
 }
@@ -184,7 +202,7 @@ NATIONAL: dict[date, tuple[tuple[int, ...], int, int, int]] = {
 def fetch() -> None:
     for election in ELECTIONS.values():
         for url in election.files:
-            raw.fetch(SOURCE, url, suffix=".pdf")
+            raw.fetch(SOURCE, url, suffix=".html" if election.grain == "municipality-html" else ".pdf")
     for url in SUPPORT:
         raw.fetch(SOURCE, url, suffix=".pdf")
 
@@ -319,6 +337,61 @@ def national(election: Election) -> tuple[tuple[int, ...], int, int, int]:
     return NATIONAL[day]
 
 
+def read_2019(election: Election) -> tuple[list[Row], tuple[tuple[int, ...], int, int, int]]:
+    """The 2019 page's municipality rows and national row. Each ticket's votes are its ballot's marks: the coalition's
+    row adds the marks for ARENA, PCN, PDC, and DS on its ballot, as the page's own total line does."""
+    content = raw.cached(SOURCE, election.files[0]).path.read_text("utf-8")
+    text = re.sub(r"<script.*?</script>|<style.*?</style>", "", content, flags=re.DOTALL)
+    text = html.unescape(re.sub(r"[\s|]*\|[\s|]*", "|", re.sub(r"<[^>]+>", "|", text)))
+    head, *parts = re.split(r"\|([A-ZÑ .]+?) \(ACTAS: [\d,]+\)\|", text)
+    names, bodies = parts[0::2], parts[1::2]
+
+    def figures(body: str) -> dict[str, int]:
+        return {k: number(v) for k, v in re.findall(r"\|([A-Z\- ]+)\|([\d,]+)", body)}
+
+    national_figures = figures(head.split("|TOTAL NACIONAL|")[-1])
+    tables = [figures(body.split("|Escrutinio final 2019|")[0]) for body in bodies]
+    coalition = ("ARENA", "ARENA-PCN-PDC-DS", "PCN", "PDC", "DS")
+
+    def checked(label: str, table: dict[str, int]) -> tuple[tuple[int, ...], int, int]:
+        if sum(table[k] for k in coalition) != table["TOTAL ARENA-PCN-PDC-DS"]:
+            raise ValueError(f"2019: {label}: the coalition's parties do not sum to its total")
+        votes = tuple(table[k] for k in ("GANA", "TOTAL ARENA-PCN-PDC-DS", "FMLN", "VAMOS"))
+        return votes, table["IMPUGNADOS"], table["NULOS"]
+
+    _, municipalities, _ = tse.tree(1, with_centers=False)
+    if [assembly.plain(n) for n in names[:15]] != [assembly.plain(n) for n in DEPARTMENT_ORDER]:
+        raise ValueError(f"2019: unexpected department order {names[:15]}")
+    rows: list[Row] = []
+    at = 15
+    for number_, table in enumerate(tables[:15], 1):
+        code = f"dep{number_:02d}"
+        votes, objected, invalid = checked(code, table)
+        if code == "dep15":
+            rows.append(Row(DEPARTMENT_ORDER[14], code, votes, sum(votes), objected, invalid))
+            continue
+        children = {assembly.plain(label): c for c, (label, parent) in municipalities.items() if parent == code}
+        group: list[Row] = []
+        for name, child in zip(names[at : at + len(children)], tables[at : at + len(children)], strict=True):
+            label = assembly.plain(name)
+            label = label if label in children else ALIASES.get(label, label)
+            v, o, i = checked(name, child)
+            group.append(Row(name, children[label], v, sum(v), o, i))
+        at += len(children)
+        got = (tuple(sum(r.votes[k] for r in group) for k in range(4)), sum(r.objected for r in group))
+        if got != (votes, objected) or sum(r.invalid for r in group) != invalid:
+            raise ValueError(f"2019: {code}: municipality rows sum to {got}, the page prints {votes}")
+        rows += group
+    if at != len(names) or len({r.code for r in rows}) != len(rows) or len(rows) != 262 + 1:
+        raise ValueError(f"2019: {len(rows)} rows, or a municipality missing or repeated")
+    printed, objected, invalid = checked("national", national_figures)
+    if tuple(sum(r.votes[k] for r in rows) for k in range(4)) != printed:
+        raise ValueError("2019: rows do not sum to the printed national row")
+    if sum(r.objected for r in rows) != objected or sum(r.invalid for r in rows) != invalid:
+        raise ValueError("2019: rows do not sum to the printed national objected and null ballots")
+    return rows, (printed, sum(printed), objected, invalid)
+
+
 def sizes(path: Path) -> dict[int, tuple[float, float]]:
     out = subprocess.run(["pdfinfo", "-f", "1", "-l", "99", str(path)], capture_output=True, text=True, check=True)
     found = (re.match(r"Page\s+(\d+) size:\s+([\d.]+) x ([\d.]+)", line) for line in out.stdout.splitlines())
@@ -326,6 +399,8 @@ def sizes(path: Path) -> dict[int, tuple[float, float]]:
 
 
 def read(election: Election) -> list[Row]:
+    if election.grain == "municipality-html":
+        return read_2019(election)[0]
     return read_1994(election) if election.grain == "municipality" else read_scanned(election)
 
 
@@ -333,7 +408,8 @@ def registry() -> Package:
     p = Package(
         REGISTRY,
         SOURCE,
-        "The parties of the 1994 to 2009 Salvadoran presidential elections and the Tribunal Supremo Electoral's tables",
+        "The parties of the 1994 to 2009 and 2019 Salvadoran presidential elections and the Tribunal Supremo Electoral's "
+        "tables",
         depends=["sv.tse/geo", "sv.tse/registry"],
     )
     p.external |= {EL_SALVADOR, TERRITORY}
@@ -342,7 +418,7 @@ def registry() -> Package:
         id=HIST_SOURCE,
         kind="official_body",
         publisher="Tribunal Supremo Electoral de El Salvador",
-        title="Escrutinio final de las elecciones presidenciales 1994, 1999, 2004 y 2009",
+        title="Escrutinio final de las elecciones presidenciales 1994, 1999, 2004, 2009 y 2019",
         url=LISTING,
         license="Official public results of the Tribunal Supremo Electoral",
         license_url="https://transparencia.tse.gob.sv/",
@@ -383,7 +459,8 @@ def registry() -> Package:
 def president(election: Election) -> Package:
     day = election.day
     runoff = election.round_number == 2
-    scanned = election.grain == "municipality-scan"
+    scanned = election.grain != "municipality"
+    page_2019 = election.grain == "municipality-html"
     first = date(1994, 3, 20)
     p = Package(
         f"sv.tse/pres-{day}",
@@ -401,7 +478,9 @@ def president(election: Election) -> Package:
     valid_total = sum(r.valid for r in rows)
     objected_total, invalid_total = sum(r.objected for r in rows), sum(r.invalid for r in rows)
     if scanned:
-        printed, valid_total, objected_total, invalid_total = national(election)
+        printed, valid_total, objected_total, invalid_total = (
+            read_2019(election)[1] if page_2019 else national(election)
+        )
         if list(printed) != totals:
             raise ValueError(f"{day}: municipality rows {totals} differ from the printed national row {printed}")
     ranked = sorted(range(len(parties)), key=lambda i: -totals[i])
@@ -465,7 +544,13 @@ def president(election: Election) -> Package:
             "figure keeps its page and box. Every row's ticket votes sum to its printed valid votes, every "
             "department's rows sum to the volume's printed department total, and those totals agree with the "
             "department rows of the printed national table, whose national row gives the declared totals. "
-            if scanned
+            if scanned and not page_2019
+            else "The page prints one table for the nation, each department and residents abroad, and each "
+            "municipality; every row's coalition parties sum to the coalition's printed total, every department's "
+            "municipalities sum to the department's row, and the department rows sum to the national row. The page "
+            "prints no valid-vote total, so the valid votes are the sum of the four tickets' votes. The coalition of "
+            "ARENA, PCN, PDC, and DS is one ticket, with the marks for each of its parties counted together. "
+            if page_2019
             else "The table is a typeset report with a text layer. "
         )
         + (
