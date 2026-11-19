@@ -665,7 +665,7 @@ def _president(p: Package, day: str, first: bool) -> None:
         entity_id=contest,
         is_current=True,
     )
-    result_set = _result_set(p, election, contest, "president")
+    result_set = _result_set(p, election, contest, f"{day}/president" if first else "president")
     codes = sorted({code(v) for v in frame["OP_CODIGO"].to_list()}, key=lambda c: (c not in RUNOFF, int(c)))
     if not first:
         codes = list(RUNOFF)
