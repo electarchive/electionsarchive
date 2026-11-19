@@ -193,8 +193,8 @@ TAIWAN_UNITS = {
 }
 DISTRICT = re.compile(r"^[가-힣\d\s]+(?:선거구|제\d+|[시군구읍면동리가][갑을병정무]?)$")
 NUMBERED = re.compile(r"^\d+ - ")
-KARMA = re.compile(r"[बव]ि\.?\s?क\.")
-KARMA_LATIN = re.compile(r"(?<!\w)(?:VDC|[BV]\.?\s?K\.?|Bi\.?\s?K\.?)(?!\w)")
+KARMA = re.compile(r"(?<![\u0900-\u097f])[बव]ि[\s.]*[क\u0958]\u093c?\u0947?[\s.]*(?![\u0900-\u097f])")
+KARMA_LATIN = re.compile(r"(?<!\w)(?:VDC|[BV]i?\s?\.*\s?K[ae]?\.?|[BV]ika?)(?!\w)")
 ROMAN = {"II", "III", "IV", "VI", "VII", "VIII", "IX", "XI", "XII"}
 
 
