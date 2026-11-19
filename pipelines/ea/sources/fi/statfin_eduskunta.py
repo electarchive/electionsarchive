@@ -16,6 +16,7 @@ import csv
 import functools
 import json
 import re
+from collections import Counter
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -26,6 +27,7 @@ import polars as pl
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.fi import statfin_eduskunta_seats as seats
 from ea.sources.fi import vaalit
 
 SOURCE = "fi.statfin_eduskunta"
@@ -85,6 +87,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, f"{API}/{table}.px", suffix=".json")
     for query in queries():
         raw.fetch(SOURCE, query.url, suffix=".json", body=query.body, check=_valid)
+    seats.fetch()
 
 
 @functools.cache
@@ -216,6 +219,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 STATFIN = key("source", "statfin")
+PUBLICATIONS = key("source", "publications")
 PARLIAMENT_BODY = vaalit.PARLIAMENT
 ALAND = "AHV"
 
@@ -297,8 +301,21 @@ METHOD = (
     "constituency it voted in by the one placement under which every constituency's voters, ballots cast, and invalid "
     "ballots add up to the table's own constituency totals; the placement is in the pipeline's source. Voters living "
     "abroad are counted in the constituency of their last home municipality and have no municipality of their own, so "
-    "each constituency has one aggregate unit for them. The tables hold no seats, so none are stored. Parties are "
-    "Statistics Finland's party groups, which carry the votes of lists of predecessor parties."
+    "each constituency has one aggregate unit for them. Parties are Statistics Finland's party groups, which carry "
+    "the votes of lists of predecessor parties."
+)
+SEATS = (
+    " The tables hold no seats. The seats and the constituency's size are from Statistics Finland's own publication "
+    "of the election, and each seat is placed on the party group that holds its list's votes."
+)
+PRINTED = (
+    " The publication's table of persons elected by party and constituency is transcribed in the pipeline's source, "
+    "and a build refuses it unless each constituency's seats add up to its size and each party's seats to its "
+    "national total, as the same table prints them."
+)
+LISTED = (
+    " The elected members are the candidates marked as elected in Statistics Finland's list of candidates, whose "
+    "votes on each list add up to the list's votes in the table. The list's seats equal its elected members."
 )
 REMAINDER = (
     " The aggregate unit holds the abroad voters and voters who voted as the table prints them, and the invalid "
@@ -389,6 +406,22 @@ def registry() -> Package:
     )
     for artifact in cited(list(YEARS)):
         p.artifact(artifact, STATFIN)
+    p.add(
+        "source",
+        id=PUBLICATIONS,
+        kind="official_body",
+        publisher="Tilastokeskus",
+        title="Kansanedustajain vaalit: Statistics Finland's publications and web statistics of the parliamentary "
+        "elections of 1983, 1987, 1991, 1995, and 1999, with the seats won by party and constituency and, for 1995 and "
+        "1999, the list of candidates",
+        url="https://otos.stat.fi/",
+        license="CC BY 4.0",
+        license_url=LICENSE_URL,
+        attribution="Tilastokeskus, Suomen virallinen tilasto",
+    )
+    for year in YEARS:
+        for artifact in seats.cited(year):
+            p.artifact(artifact, PUBLICATIONS)
     for code, label in parties().items():
         if code in OTHERS:
             continue
@@ -417,6 +450,17 @@ def election(year: int) -> Package:
     p.external.add(vaalit.FINLAND)
     for artifact in cited([year]):
         p.uses(artifact)
+    for artifact in seats.cited(year):
+        p.uses(artifact)
+    seats.check_national(year)
+    won = seats.outcomes(year)
+    sizes = seats.sizes(year)
+    elected: dict[str, list[seats.Member]] = {}
+    list_votes: dict[tuple[str, str], int] = {}
+    if year in seats.LISTS:
+        members, list_votes = seats.candidates(year)
+        for member in members:
+            elected.setdefault(member.constituency, []).append(member)
     election_id = p.id("election", year)
     p.add(
         "election",
@@ -455,7 +499,7 @@ def election(year: int) -> Package:
             office_id=None,
             body_id=PARLIAMENT_BODY,
             district_area_id=vaalipiiri(code),
-            magnitude=1 if code == ALAND else None,
+            magnitude=sizes[code],
             round_number=1,
             previous_round_id=None,
             electoral_system_id=vaalit.key("electoral_system", "aland")
@@ -484,8 +528,18 @@ def election(year: int) -> Package:
             id=p.id("note", result_set),
             entity_id=result_set,
             kind="methodology",
-            body_md=METHOD + (INSIDE if inside else REMAINDER),
+            body_md=METHOD + (INSIDE if inside else REMAINDER) + SEATS + (LISTED if year in seats.LISTS else PRINTED),
             lang="en",
+        )
+        p.add(
+            "citation",
+            id=p.id("citation", result_set),
+            entity_id=result_set,
+            source_id=PUBLICATIONS,
+            locator={
+                "files": [artifact.url for artifact in seats.cited(year)],
+                "seats": seats.PAGES.get(year, "seat table"),
+            },
         )
         options: dict[str, str] = {}
         for party_code in codes:
@@ -503,6 +557,42 @@ def election(year: int) -> Package:
                 ballot_position=None,
                 ballot_label=label,
             )
+        for party_code, n in sorted(won.get(code, {}).items()):
+            if party_code not in options:
+                raise ValueError(f"{year} {code}: seats for party {party_code}, which has no votes there")
+            p.add("outcome", result_set_id=result_set, option_id=options[party_code], kind="won", seats=n)
+        for member in elected.get(code, []):
+            if member.party not in options:
+                raise ValueError(f"{year} {code}: {member.name} was elected for party {member.party}, with no votes")
+            if list_votes[(code, member.party)] != votes.get(header, member.party):
+                raise ValueError(
+                    f"{year} {code}: the list of party {member.party} has {list_votes[(code, member.party)]} votes, "
+                    f"the table {votes.get(header, member.party)}"
+                )
+            person = p.id("person", year, code, member.party, member.name)
+            p.add("person", id=person)
+            p.name(person, seats.person_name(member.name), "fi", "official")
+            candidacy = p.id("candidacy", year, code, member.party, member.name)
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=options[member.party],
+                role="list_member",
+                ballot_name=member.name,
+                is_independent=False,
+            )
+            p.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=options[member.party],
+                candidacy_id=candidacy,
+                kind="elected",
+            )
+        if year in seats.LISTS:
+            counted = Counter(member.party for member in elected.get(code, []))
+            if counted != Counter(won.get(code, {})):
+                raise ValueError(f"{year} {code}: elected {dict(counted)}, seats {won.get(code)}")
         # The constituency's printed totals
         registered = turnout.get(header, "evaa_ao")
         cast = turnout.get(header, "evaa_aanest")
