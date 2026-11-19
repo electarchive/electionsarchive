@@ -380,6 +380,127 @@ def used(day: str) -> list[tuple[str, Place | None, int, Report]]:
     return found
 
 
+# --- assigning circuits to localities -----------------------------------------------------------------------------
+def vector(item: Report) -> dict[str, int]:
+    """The vote counts of a report: its totals except the electors on the roll, and each list's votes."""
+    out = {f"t:{name}": votes for name, votes in item.totals.items() if name != "registered" and votes}
+    for code, _, votes in item.lines:
+        if votes:
+            out[f"o:{code}"] = out.get(f"o:{code}", 0) + votes
+    return out
+
+
+NODES = 300_000
+
+
+def solve(circuits: list[tuple[str, dict[str, int]]], places: list[tuple[str, dict[str, int]]]) -> list[dict[str, str]]:
+    """Every way, up to two, to give each place a set of circuits whose vote counts add up to the place's exactly.
+    A circuit that no place printed (a locality without a report of its own) stays unassigned."""
+    keys = sorted({k for _, v in circuits + places for k in v})
+    width = len(keys)
+
+    def row(v: dict[str, int]) -> list[int]:
+        return [v.get(k, 0) for k in keys]
+
+    ordered = sorted(((i, row(v)) for i, v in circuits), key=lambda a: (-sum(a[1]), a[1]))
+    left = [row(v) for _, v in places]
+    count = len(left)
+    cand = [[j for j in range(count) if all(a <= b for a, b in zip(cv, left[j]))] for _, cv in ordered]
+    avail = [[0] * width for _ in range(count)]
+    for i, (_, cv) in enumerate(ordered):
+        for j in cand[i]:
+            for k in range(width):
+                avail[j][k] += cv[k]
+    if any(a > b for j in range(count) for a, b in zip(left[j], avail[j])):
+        return []
+    solutions: list[dict[str, str]] = []
+    nodes = 0
+    chosen: dict[str, str] = {}
+    pick = [0] * len(ordered)
+
+    def search(i: int) -> None:
+        nonlocal nodes
+        if len(solutions) >= 2:
+            return
+        nodes += 1
+        if nodes > NODES:
+            raise ValueError("circuit assignment search exceeded its budget")
+        if i == len(ordered):
+            if not any(any(r) for r in left):
+                solutions.append(dict(chosen))
+            return
+        name, cv = ordered[i]
+        for j in cand[i]:
+            for k in range(width):
+                avail[j][k] -= cv[k]
+        floor = pick[i - 1] if i and ordered[i - 1][1] == cv else 0
+        for j in [j for j in cand[i] if j >= floor] + [count]:
+            if j < count:
+                for k in range(width):
+                    left[j][k] -= cv[k]
+                if any(x < 0 for x in left[j]):
+                    for k in range(width):
+                        left[j][k] += cv[k]
+                    continue
+            if all(a <= b for x in cand[i] for a, b in zip(left[x], avail[x])):
+                pick[i] = j
+                if j < count:
+                    chosen[name] = places[j][0]
+                search(i + 1)
+                chosen.pop(name, None)
+            if j < count:
+                for k in range(width):
+                    left[j][k] += cv[k]
+        for j in cand[i]:
+            for k in range(width):
+                avail[j][k] += cv[k]
+
+    search(0)
+    return solutions
+
+
+class Split(NamedTuple):
+    locality: Place
+    report: Report
+    circuits: list[tuple[Place, Report]]
+
+
+def splits(day: str, cargo: int) -> tuple[list[Split], list[str]]:
+    """The localities of a local office whose circuits are known, and why the others are not. A circuit joins a
+    locality when, section by section, the circuits' vote counts add up exactly to the localities' printed ones. The
+    menu lists no section for some localities; those are matched against the circuits left over. Where two
+    assignments fit, a locality counts only if both give it the same circuits."""
+    found: list[Split] = []
+    skipped: list[str] = []
+    everyone = circuits(day, cargo)
+    places = localities(day, cargo)
+
+    def resolve(group: list[tuple[Place, Report]], pool: dict[str, tuple[Place, Report]]) -> None:
+        solutions = solve([(code, vector(r)) for code, (_, r) in pool.items()], [(p.code, vector(r)) for p, r in group])
+        for place, item in group:
+            members = [{code for code, owner in solution.items() if owner == place.code} for solution in solutions]
+            if solutions and members[0] and all(m == members[0] for m in members):
+                found.append(Split(place, item, [pool[code] for code in sorted(members[0], key=_natural)]))
+            else:
+                skipped.append(place.name)
+
+    for section in sorted({place.section for place, _ in places if place.section}, key=int):
+        resolve(
+            [(p, r) for p, r in places if p.section == section],
+            {p.code: (p, r) for p, r in everyone if p.section == section},
+        )
+    loose = [(p, r) for p, r in places if not p.section]
+    if loose:
+        taken = {circuit.code for split in found for circuit, _ in split.circuits}
+        resolve(loose, {p.code: (p, r) for p, r in everyone if p.code not in taken})
+    return found, skipped
+
+
+def _natural(code: str) -> tuple[int, str]:
+    digits = re.match(r"\d+", code.strip())
+    return (int(digits[0]) if digits else 0, code)
+
+
 # --- geography -----------------------------------------------------------------------------------------------------
 def _outline(p: Package, id: str, shape: shapely.Geometry) -> None:
     parts = [part for part in shapely.get_parts(shapely.make_valid(shape)) if shapely.get_type_id(part) in (3, 6)]
@@ -610,6 +731,14 @@ def _declared(p: Package, result_set: str, item: Report, options: dict[str, str]
         p.add("declared", result_set_id=result_set, option_id=options[code], measure=1, value=votes)
 
 
+CIRCUIT_METHOD = (
+    "A locality's report does not list its circuits, so the circuits of its section were assigned to it where their "
+    "vote counts add up exactly to the locality's printed ones: every list's votes, and the valid, null, and blank "
+    "ballots and voters. Circuits that no locality report accounts for are left out. This set supersedes the set of "
+    "locality totals."
+)
+
+
 def election(day: str) -> Package:
     year = day[:4]
     when = day_of(day)
@@ -673,7 +802,16 @@ def election(day: str) -> Package:
         )
         return id
 
-    def contest(cargo: int, kind: str, label: str, district: str, name: str | None, wide: bool, area_id: str | None):
+    def contest(
+        cargo: int,
+        kind: str,
+        label: str,
+        district: str,
+        name: str | None,
+        wide: bool,
+        area_id: str | None,
+        finer: bool = False,
+    ):
         nonlocal made
         id = key("contest", day, cargo, district)
         english, spanish = TITLES[kind]
@@ -718,8 +856,8 @@ def election(day: str) -> Package:
             stage="official",
             kind="counted",
             source_id=JEL_SOURCE,
-            status="active",
-            is_default=True,
+            status="superseded" if finer else "active",
+            is_default=not finer,
             completeness=1.0,
         )
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
@@ -749,6 +887,7 @@ def election(day: str) -> Package:
     cited: list[str] = []
     over: list[str] = []
     short: list[str] = []
+    unlisted: list[str] = []
 
     def cite(level: str, place: Place | None, cargo: int) -> None:
         cited.append(report_url(day, level, place.code if place else "", cargo))
@@ -791,13 +930,49 @@ def election(day: str) -> Package:
                 if sum(r.totals["registered"] for _, r in rows) != top.totals["registered"]:
                     short.append("province")
         else:
+            by_locality = {split.locality.code: split for split in splits(day, cargo)[0]}
             for place, item in localities(day, cargo):
-                id, result_set = contest(cargo, kind, label, f"L{place.code}", title_case(place.name), False, None)
+                split = by_locality.get(place.code)
+                id, result_set = contest(
+                    cargo, kind, label, f"L{place.code}", title_case(place.name), False, None, split is not None
+                )
                 options = options_of(id, kind, [item])
                 _values(p, result_set, unit("L", place), item, options)
                 cite("L", place, cargo)
                 if item.totals["voters"] > item.totals["registered"]:
                     over.append(place.name)
+                if split is None:
+                    continue
+                finer = key("result_set", id, "circuits")
+                p.add(
+                    "result_set",
+                    id=finer,
+                    election_id=local_election,
+                    contest_id=id,
+                    stage="official",
+                    kind="counted",
+                    source_id=JEL_SOURCE,
+                    status="active",
+                    is_default=True,
+                    completeness=1.0,
+                    supersedes_id=result_set,
+                )
+                p.add(
+                    "note",
+                    id=key("note", finer),
+                    entity_id=finer,
+                    kind="methodology",
+                    body_md=f"{METHOD} {CIRCUIT_METHOD}",
+                    lang="en",
+                )
+                for circuit, report_of in split.circuits:
+                    _values(p, finer, unit("C", circuit), report_of, options)
+                    cite("C", circuit, cargo)
+                    if report_of.totals["voters"] > report_of.totals["registered"]:
+                        over.append(circuit.name)
+                _declared(p, finer, item, options)
+                if sum(r.totals["registered"] for _, r in split.circuits) != item.totals["registered"]:
+                    unlisted.append(title_case(place.name))
     if over:
         p.accept(
             "accounting.turnout",
@@ -818,6 +993,15 @@ def election(day: str) -> Package:
             + " exceed the sum of the circuit reports, which do not exist for the circuits "
             + ", ".join(absent)
             + "; every vote count agrees with the printed totals.",
+        )
+    if unlisted:
+        p.accept(
+            "accounting.declared",
+            (p.accepted.get("accounting.declared", "") + " " if short else "")
+            + "The registered electors printed for "
+            + ", ".join(sorted(set(unlisted)))
+            + " differ from the sum of the circuit reports assigned to them, because circuits without a report of "
+            "their own are part of the locality; every vote count agrees with the printed totals.",
         )
     seen_artifacts: set[str] = set()
     for url in cited:
