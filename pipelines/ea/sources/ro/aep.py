@@ -121,10 +121,13 @@ def fetch() -> None:
     from ea.sources.ro import aep_2012
 
     aep_2012.fetch()
+    from ea.sources.ro import aep_referendum
+
+    aep_referendum.fetch()
 
 
 def packages() -> list[str]:
-    from ea.sources.ro import aep_2012, aep_2019, aep_local2016
+    from ea.sources.ro import aep_2012, aep_2019, aep_local2016, aep_referendum
 
     return [
         "ro.aep/registry",
@@ -132,6 +135,7 @@ def packages() -> list[str]:
         *aep_local2016.PACKAGES,
         *aep_2012.PACKAGES,
         *aep_2019.PACKAGES,
+        *aep_referendum.packages(),
     ]
 
 
@@ -146,6 +150,9 @@ def parse() -> None:
     from ea.sources.ro import aep_2019
 
     aep_2019.parse()
+    from ea.sources.ro import aep_referendum
+
+    aep_referendum.parse()
 
 
 def emit() -> None:
