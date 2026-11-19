@@ -13,7 +13,9 @@ A four-page scan from the commission's certified results of November 2024 lists 
 it has no text layer and carries no votes, so it is cited and its seat counts are compared, not read.
 
 The commission reports each governorate as a whole, which is the finest unit it publishes. Outlines come from
-geoBoundaries (CC0); that vintage has no Halabja governorate, so Halabja has no shape here.
+the UN OCHA common operational dataset for Iraq's administrative boundaries (CC BY-IGO, 2019). Its governorate layer
+predates Halabja's separation from Sulaymaniyah, so Halabja's outline is the dataset's Halabcha district, which is
+the governorate's territory, and Sulaymaniyah's is its governorate outline minus that district.
 """
 
 import functools
@@ -21,10 +23,12 @@ import json
 import re
 import subprocess
 import unicodedata
+import zipfile
 from collections import Counter
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+from typing import Any
 from uuid import uuid5
 
 import polars as pl
@@ -44,10 +48,10 @@ WINNERS = (
     "%D8%B3%D8%AA%D8%A7%D9%86-%D8%A7%D9%84%D8%B9%D8%B1%D8%A7%D9%82-2024.pdf"
 )
 OUTLINES = (
-    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/IRQ/ADM1/"
-    "geoBoundaries-IRQ-ADM1.geojson"
+    "https://data.humdata.org/dataset/488bb3cd-3ce9-49d3-862a-3ce7975c63e1/resource/"
+    "a9ed4d00-1182-4fdc-a0e4-82bbd20786db/download/irq_admin_boundaries.geojson.zip"
 )
-SHAPES = "iq.geoboundaries"
+SHAPES = "iq.ocha_cod_ab"
 IRAQ = str(uuid5(package.NAMESPACE, "polity\x1fIQ"))
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fIRQ"))
 DAY = date(2024, 10, 20)
@@ -83,8 +87,10 @@ GOVERNORATES = (
     Governorate("duhok", "Dohuk", "IQ-DA", 25, "Duhok", "دهوك", "دهۆک"),
     Governorate("halabja", "Halabja", "IQ-HA", 3, "Halabja", "حلبجة", "هەڵەبجە"),
 )
-# geoBoundaries' ADM1 file is keyed by ISO 3166-2 code; Halabja was not yet a governorate in it.
-OUTLINED = {"IQ-AR", "IQ-SU", "IQ-DA"}
+# The OCHA governorate layer is keyed by its own place code. It has no Halabja, which is its Halabcha district
+# (IQG06Q05) and lies inside Sulaymaniyah (IQG06).
+PCODES = {"IQ-AR": "IQG11", "IQ-SU": "IQG06", "IQ-DA": "IQG09"}
+HALABJA_DISTRICT = "IQG06Q05"
 
 
 def pdf(g: Governorate, kind: str) -> str:
@@ -150,7 +156,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, PAGE, suffix=".html")
     for url in [*URLS, WINNERS]:
         raw.fetch(SOURCE, url, suffix=".pdf", check=_pdf)
-    raw.fetch(SHAPES, OUTLINES, suffix=".geojson")
+    raw.fetch(SHAPES, OUTLINES, suffix=".zip")
 
 
 def parse() -> None:
@@ -341,15 +347,28 @@ def area(g: Governorate) -> str:
     return key("area", SCHEME, g.code)
 
 
+def _layer(archive: zipfile.ZipFile, name: str) -> list[dict[str, Any]]:
+    return json.loads(archive.read(name))["features"]
+
+
 @functools.cache
 def outlines() -> dict[str, shapely.Geometry]:
-    shapes = raw.cached(SHAPES, OUTLINES)
-    found = {
-        f["properties"]["shapeISO"]: shapely.geometry.shape(f["geometry"])
-        for f in json.loads(shapes.path.read_text(encoding="utf-8"))["features"]
-    }
-    if not OUTLINED <= set(found):
-        raise ValueError(f"outlines for {sorted(found)}")
+    """Outlines by ISO 3166-2 code: Halabja is the Halabcha district and Sulaymaniyah is what is left around it."""
+    with zipfile.ZipFile(raw.cached(SHAPES, OUTLINES).path) as archive:
+        governorates = {
+            f["properties"]["adm1_pcode"]: shapely.make_valid(shapely.geometry.shape(f["geometry"]))
+            for f in _layer(archive, "irq_admin1.geojson")
+        }
+        districts = {
+            f["properties"]["adm2_pcode"]: shapely.make_valid(shapely.geometry.shape(f["geometry"]))
+            for f in _layer(archive, "irq_admin2.geojson")
+        }
+    halabja = districts[HALABJA_DISTRICT]
+    if not governorates[PCODES["IQ-SU"]].buffer(1e-6).covers(halabja):
+        raise ValueError("the Halabcha district is not inside Sulaymaniyah")
+    found = {code: governorates[pcode] for code, pcode in PCODES.items()}
+    found["IQ-SU"] = shapely.difference(found["IQ-SU"], halabja)
+    found["IQ-HA"] = halabja
     return found
 
 
@@ -357,7 +376,7 @@ def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "The four governorates of the Kurdistan Region of Iraq, with outlines from geoBoundaries",
+        "The four governorates of the Kurdistan Region of Iraq, with outlines from the OCHA common operational dataset",
     )
     p.external |= {IRAQ, COUNTRY}
     shapes = raw.cached(SHAPES, OUTLINES)
@@ -365,12 +384,12 @@ def geo() -> Package:
         "source",
         id=SHAPES_ID,
         kind="academic",
-        publisher="geoBoundaries",
-        title="geoBoundaries gbOpen Iraq ADM1 (governorate outlines, 2022), from Wikimedia Commons",
-        url="https://www.geoboundaries.org/",
-        license="CC0 1.0",
-        license_url="https://creativecommons.org/publicdomain/zero/1.0/",
-        attribution="geoBoundaries (William & Mary geoLab)",
+        publisher="UN OCHA",
+        title="Iraq administrative boundaries, COD-AB (governorates and districts, 2019), from the Humanitarian Data Exchange",
+        url="https://data.humdata.org/dataset/cod-ab-irq",
+        license="CC BY-IGO",
+        license_url="https://creativecommons.org/licenses/by/3.0/igo/",
+        attribution="UN OCHA, Iraq COD-AB (Central Statistical Organization and Kurdistan Region Statistics Office)",
     )
     p.artifact(shapes, SHAPES_ID)
     p.add(
@@ -384,9 +403,9 @@ def geo() -> Package:
     )
     p.add(
         "boundary_set",
-        id=key("boundary_set", SCHEME, 2022),
+        id=key("boundary_set", SCHEME, 2019),
         scheme_code=SCHEME,
-        vintage="2022",
+        vintage="2019",
         as_of=shapes.retrieved_at.date(),
     )
     for g in GOVERNORATES:
@@ -398,8 +417,6 @@ def geo() -> Package:
         p.name(id, g.en, "en", "english")
         p.name(id, g.ar, "ar", "official", False)
         p.name(id, g.ckb, "ckb", "native", False)
-        if g.code not in OUTLINED:
-            continue
         shape = shapely.make_valid(outlines()[g.code])
         parts = [part for part in shapely.get_parts(shape) if shapely.get_type_id(part) in (3, 6)]
         shape = shapely.set_srid(shapely.MultiPolygon(list(shapely.get_parts(parts))), 4326)
@@ -415,11 +432,12 @@ def geo() -> Package:
         )
     p.add(
         "note",
-        id=key("note", area(GOVERNORATES[1]), "outline"),
-        entity_id=area(GOVERNORATES[1]),
+        id=key("note", area(GOVERNORATES[3]), "outline"),
+        entity_id=area(GOVERNORATES[3]),
         kind="caveat",
-        body_md="The outline is geoBoundaries' 2022 governorate outline for Sulaymaniyah, which does not separate "
-        "Halabja governorate and so covers most of its territory too. Halabja has no outline here.",
+        body_md="The outline is the Halabcha district of the OCHA Iraq boundaries, which is Halabja governorate's "
+        "territory: its governorate layer dates from before Halabja separated from Sulaymaniyah in 2014. "
+        "Sulaymaniyah's outline here is that layer's Sulaymaniyah with the district removed.",
         lang="en",
     )
     return p
