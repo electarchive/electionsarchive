@@ -289,7 +289,7 @@ def finish(plan: Plan, days: dict[str, list[Council]]) -> Plan:
     return plan
 
 
-def _wgs(shape: shapely.Geometry) -> shapely.Geometry:
+def wgs(shape: shapely.Geometry) -> shapely.Geometry:
     project = pyproj.Transformer.from_crs(3059, 4326, always_xy=True)
     moved = shapely.transform(shape, lambda xy: numpy.column_stack(project.transform(xy[:, 0], xy[:, 1])))
     parts = [part for part in shapely.get_parts(shapely.make_valid(moved)) if shapely.get_type_id(part) in (3, 6)]
@@ -342,7 +342,7 @@ def geo(atlas: Atlas, plan: Plan) -> Package:
         p.add("area_code", area_id=id, code=place.code)
         p.add("area_parent", area_id=id, parent_id=place.parent or COUNTRY, valid_from=START, valid_to=END)
         p.name(id, place.name, "lv", "official")
-        shape = _wgs(shapely.union_all([atlas.units[u].shape for u in place.units]))
+        shape = wgs(shapely.union_all([atlas.units[u].shape for u in place.units]))
         p.add(
             "area_geometry",
             area_id=id,

@@ -12,6 +12,10 @@ for every deputy, so it is the record of the outcome; the session list supplies 
 
 Neither list prints votes. The district results appeared in the press in March and April 1990, but the national
 library's newspaper archive serves its text only to signed-in readers, so each contest holds its winner only.
+
+The district boundaries that the Presidium of the Supreme Soviet published in late 1989 are in the same archive, so the
+rural districts take approximate shapes from the State Land Service's boundaries of 2010: each parish and town of a
+district (rajons) of 1990 goes to the nearest place a Supreme Council district of that rajons is named after.
 """
 
 import difflib
@@ -19,12 +23,16 @@ import html
 import re
 from dataclasses import dataclass
 from datetime import date
+from functools import cache
 from uuid import uuid5
+
+import shapely
 
 from ea import package, raw
 from ea.package import Package
 from ea.sources.licenses import UNLICENSED
-from ea.sources.lv import cvk
+from ea.sources.lu.model import slug
+from ea.sources.lv import boundaries, cvk
 
 SOURCE = "lv.ap1990"
 LATVIA = cvk.LATVIA
@@ -56,6 +64,9 @@ FACTIONS = {"TF": "Latvian Popular Front", "L": "Līdztiesība", "N": "no factio
 def fetch() -> None:
     raw.fetch(SOURCE, HISTORY, suffix=".html")
     raw.fetch(SOURCE, SESSION, suffix=".html")
+    for url in (cvk.PV2001, cvk.PV2001_ACTIVITY):
+        raw.fetch(cvk.SOURCE, url, suffix=".html")
+    boundaries.fetch()
 
 
 def text(url: str, encoding: str) -> str:
@@ -174,13 +185,149 @@ def district_name(deputy: Deputy) -> str:
     return f"{deputy.district}. {deputy.place} vēlēšanu apgabals"
 
 
+END = date(1993, 6, 5)
+
+# The rural districts are numbered by the 26 districts (rajoni) of 1990 in alphabetical order: the first number of
+# each, with the district as the 2001 local elections name it (Stučkas rajons became Aizkraukles rajons in 1990).
+RAYONS = (
+    (104, "Alūksnes rajons"),
+    (107, "Balvu rajons"),
+    (110, "Bauskas rajons"),
+    (114, "Cēsu rajons"),
+    (118, "Daugavpils rajons"),
+    (121, "Dobeles rajons"),
+    (124, "Gulbenes rajons"),
+    (127, "Jēkabpils rajons"),
+    (132, "Jelgavas rajons"),
+    (135, "Krāslavas rajons"),
+    (138, "Kuldīgas rajons"),
+    (141, "Liepājas rajons"),
+    (145, "Limbažu rajons"),
+    (148, "Ludzas rajons"),
+    (151, "Madonas rajons"),
+    (155, "Ogres rajons"),
+    (160, "Preiļu rajons"),
+    (163, "Rēzeknes rajons"),
+    (166, "Rīgas rajons"),
+    (177, "Saldus rajons"),
+    (180, "Aizkraukles rajons"),
+    (183, "Talsu rajons"),
+    (187, "Tukuma rajons"),
+    (191, "Valkas rajons"),
+    (194, "Valmieras rajons"),
+    (199, "Ventspils rajons"),
+)
+# Districts named after a place whose name the 2010 units do not carry in the genitive: the units of the place.
+PLACES = {
+    "Pārgaujas": ("Raiskuma pagasts", "Stalbes pagasts", "Straupes pagasts"),  # the later Pārgaujas novads
+    "Piebalgas": ("Vecpiebalgas pagasts", "Jaunpiebalgas pagasts"),
+    "Vecpils": ("Naujenes pagasts",),  # the old castle of Daugavpils (Dinaburg) stands in Naujene parish
+    "Kalkūnas": ("Kalkūnes pagasts",),
+    "Dricēnu": ("Dricānu pagasts",),
+    "Jaunogres": ("Ogre",),
+    "Pārogres": ("Ogre",),
+    "Stučkas": ("Aizkraukle",),
+}
+SHAPES = (
+    "The district's shape is an approximation. The Presidium of the Supreme Soviet published the district boundaries "
+    "in late 1989, but no machine-readable copy of them is known. Each rural district is drawn as the parishes and "
+    "towns of its district (rajons) of 1990 that lie nearest the place it is named after, using the State Land "
+    "Service's generalized boundaries of 1 January 2010; districts named after the same town share one shape. The "
+    "districts within the cities have no shape."
+)
+
+
+def genitive(name: str) -> str:
+    """The genitive of a 2010 unit's name, as a district's name carries it ("Cēsis" to "Cēsu")."""
+    if name.endswith((" pagasts", " novads")):
+        return name.rsplit(" ", 1)[0]
+    if name.endswith(("pils", "us")):
+        return name
+    if name.endswith("is"):
+        return name[:-2] + "u"
+    if name.endswith("i"):
+        return name[:-1] + "u"
+    if name.endswith("s"):
+        return name[:-1] + "a"
+    return name + "s"
+
+
+@cache
+def districts() -> dict[int, shapely.Geometry]:
+    """Each rural district's shape in the State Land Service's projection (EPSG:3059).
+
+    Each unit of a district (rajons) goes to the nearest place a district of that rajons is named after.
+    """
+    atlas = boundaries.Atlas()
+    day = "2001-03-11"
+    councils = [boundaries.Council(day, c.code, c.name, c.group) for c in cvk.read_local(day).councils]
+    plan = boundaries.build(atlas, {day: councils})
+    places = {seat.deputy.district: seat.deputy.place for seat in seats()}
+    found: dict[int, shapely.Geometry] = {}
+    for (first, rayon), (last, _) in zip(RAYONS, [*RAYONS[1:], (202, "")], strict=True):
+        units = plan.places[f"rajons:{slug(rayon)}"].units
+        anchors: dict[tuple[str, ...], list[int]] = {}
+        for district in range(first, last):
+            place = places[district]
+            named = PLACES.get(place)
+            anchor = tuple(
+                code
+                for code in units
+                if (atlas.units[code].name in named if named else genitive(atlas.units[code].name) == place)
+            )
+            if not anchor:
+                raise ValueError(f"district {district}: no unit of {rayon} is named {place}")
+            anchors.setdefault(anchor, []).append(district)
+        cells: dict[tuple[str, ...], list[str]] = {anchor: list(anchor) for anchor in anchors}
+        shapes = {anchor: shapely.union_all([atlas.units[code].shape for code in anchor]) for anchor in anchors}
+        taken = {code for anchor in anchors for code in anchor}
+        for code in units:
+            if code in taken:
+                continue
+            point = shapely.point_on_surface(atlas.units[code].shape)
+            nearest = min(anchors, key=lambda anchor: (shapely.distance(point, shapes[anchor]), anchor))
+            cells[nearest].append(code)
+        for anchor, members in anchors.items():
+            shape = shapely.union_all([atlas.units[code].shape for code in cells[anchor]])
+            for district in members:
+                found[district] = shape
+    return found
+
+
 def geo() -> Package:
     p = Package(
         "lv.ap1990/geo",
         SOURCE,
-        "The 201 districts of the 1990 Supreme Council election in Latvia, from the Saeima",
+        "The 201 districts of the 1990 Supreme Council election in Latvia, from the Saeima, with approximate shapes "
+        "of the rural districts from the State Land Service's boundaries of 2010",
     )
     p.external |= {LATVIA, COUNTRY}
+    shaped = districts()
+    land = key("source", "territorial-units")
+    p.add(
+        "source",
+        id=land,
+        kind="official_body",
+        publisher="Centrālā statistikas pārvalde",
+        title="Ģeneralizētas teritoriālo vienību robežas (generalized boundaries of territorial units), 1 January 2010, "
+        "1:1 200 000, from the State Land Service's data",
+        url=boundaries.DATASET,
+        license="CC0 1.0",
+        license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+        attribution="Centrālā statistikas pārvalde, Valsts zemes dienests",
+    )
+    p.artifact(boundaries.artifact(), land)
+    for url in (cvk.PV2001, cvk.PV2001_ACTIVITY):
+        p.uses(raw.cached(cvk.SOURCE, url))
+    p.add(
+        "boundary_set",
+        id=p.id("boundary_set", SCHEME, "1990"),
+        scheme_code=SCHEME,
+        vintage="1990",
+        valid_from=DAY,
+        valid_to=END,
+        as_of=DAY,
+    )
     p.add(
         "scheme",
         code=SCHEME,
@@ -193,10 +340,33 @@ def geo() -> Package:
         deputy = seat.deputy
         id = area(deputy.district)
         p.add("area", id=id, scheme_code=SCHEME)
-        p.add("area_code", area_id=id, code=str(deputy.district), valid_from=DAY, valid_to=date(1993, 6, 5))
-        p.add("area_parent", area_id=id, parent_id=COUNTRY, valid_from=DAY, valid_to=date(1993, 6, 5))
+        p.add("area_code", area_id=id, code=str(deputy.district), valid_from=DAY, valid_to=END)
+        p.add("area_parent", area_id=id, parent_id=COUNTRY, valid_from=DAY, valid_to=END)
         p.name(id, district_name(deputy), "lv", "official")
         p.name(id, f"Supreme Council district {deputy.district} ({deputy.place})", "en", "english", False)
+        if deputy.district not in shaped:
+            continue
+        shape = boundaries.wgs(shaped[deputy.district])
+        p.add(
+            "area_geometry",
+            area_id=id,
+            valid_from=DAY,
+            valid_to=END,
+            geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+            label_point=shapely.to_wkb(
+                shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+            ),
+            quality="synthetic",
+            source_id=land,
+        )
+        p.add(
+            "note",
+            id=key("note", "shape", deputy.district),
+            entity_id=id,
+            kind="methodology",
+            body_md=SHAPES,
+            lang="en",
+        )
     return p
 
 
