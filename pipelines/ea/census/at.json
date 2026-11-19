@@ -189,6 +189,146 @@
    "publisher": "Amt der Salzburger Landesregierung",
    "url": "https://www.salzburg.gv.at/pol/wahl/wahl-landtag",
    "kind": "official_body"
+  },
+  "bgld-lt": {
+   "title": "Wahlergebnisse Landtagswahlen",
+   "publisher": "Amt der Burgenländischen Landesregierung",
+   "url": "https://wahl.bgld.gv.at/wahlen/lt.nsf/wahlergebnisse.xsp",
+   "kind": "official_body"
+  },
+  "bgld-gr": {
+   "title": "Wahlergebnisse Gemeinderats- und Bürgermeisterwahlen",
+   "publisher": "Amt der Burgenländischen Landesregierung",
+   "url": "https://wahl.bgld.gv.at/wahlen/gr.nsf/wahlergebnisse.xsp",
+   "kind": "official_body"
+  },
+  "vbg-data": {
+   "title": "Wahlergebnisse: Verzeichnis aller Wahlen (wahlen.json)",
+   "publisher": "Amt der Vorarlberger Landesregierung",
+   "url": "https://apps.vorarlberg.at/wahlen/data/wahlen.json",
+   "kind": "official_body"
+  },
+  "noe-lt": {
+   "title": "Ergebnisse der Landtagswahlen seit 1945",
+   "publisher": "Landtag von Niederösterreich",
+   "url": "https://noe-landtag.gv.at/der-landtag/wahlen/seit-1945",
+   "kind": "official_body",
+   "note": "The rows for 2003 and 2008 are headed 'Endergebnis der Landtagswahl vom 9. April 2003' and 'vom 20. März 2008', the days of the final results; the election days come from the Landtag's own records."
+  },
+  "noe-lt-1921": {
+   "title": "Landtagswahlen 1921–1932",
+   "publisher": "Landtag von Niederösterreich",
+   "url": "https://noe-landtag.gv.at/der-landtag/wahlen/1921-1932",
+   "kind": "official_body"
+  },
+  "noe-lt-2003": {
+   "title": "Sitzungsbericht, 1. Sitzung der XVI. Gesetzgebungsperiode, 24. April 2003",
+   "publisher": "Landtag von Niederösterreich",
+   "url": "https://noe-landtag.gv.at/fileadmin/sitzungen/16.GP/Sitzungsbericht_NOE_Landtag_XVI_01._Sitzung_24.04.2003.pdf",
+   "kind": "official_body"
+  },
+  "noe-lt-2008": {
+   "title": "Landtag aktuell, 10. April 2008: NÖ Landtag konstituiert",
+   "publisher": "Landtag von Niederösterreich",
+   "url": "https://noe-landtag.gv.at/fileadmin/sitzungen/17.GP/LANDTAG20080410.pdf",
+   "kind": "official_body"
+  },
+  "stmk-2005": {
+   "title": "Landtagswahl 2005 – Dokumentation (Steirische Statistiken, Heft 10/2005)",
+   "publisher": "Amt der Steiermärkischen Landesregierung, Landesstatistik",
+   "url": "https://www.landesentwicklung.steiermark.at/cms/dokumente/12658765_141979497/e29e4b0a/Publikation%2010_2005.pdf",
+   "kind": "official_body"
+  },
+  "stmk-2010": {
+   "title": "Landtagswahl 2010 (Steirische Statistiken)",
+   "publisher": "Amt der Steiermärkischen Landesregierung, Landesstatistik",
+   "url": "https://www.landesentwicklung.steiermark.at/cms/dokumente/10003178_141976103/f5b91eed/Publikation%20LTW%202010%20Internet.pdf",
+   "kind": "official_body"
+  },
+  "stmk-2015": {
+   "title": "Landtagswahl 2015 (Steirische Statistiken, Heft 4/2015)",
+   "publisher": "Amt der Steiermärkischen Landesregierung, Landesstatistik",
+   "url": "https://www.landesentwicklung.steiermark.at/cms/dokumente/12658765_142970621/152b7a40/Heft%204-2015%20Landtagswahl%202015%20Internet2.pdf",
+   "kind": "official_body"
+  },
+  "oegv-stmk-2024": {
+   "title": "Allgemeines – Steirische Landtagswahl 2024",
+   "publisher": "oesterreich.gv.at (Bundesministerium für Finanzen)",
+   "url": "https://www.oesterreich.gv.at/de/themen/transparenz_und_partizipation_in_der_demokratie/demokratie-und-wahlen/wahlen/4/Steirische-Landtagswahl-2024/Steirische-Landtagswahl-2024-Allgemeines",
+   "kind": "official_body"
+  },
+  "oegv-ktn-2023": {
+   "title": "Allgemeines – Landtagswahl in Kärnten am 5. März 2023",
+   "publisher": "oesterreich.gv.at (Bundesministerium für Finanzen)",
+   "url": "https://www.oesterreich.gv.at/de/themen/transparenz_und_partizipation_in_der_demokratie/demokratie-und-wahlen/wahlen/4/27/Ktn_Landtagswahl_2023_Allgemeines",
+   "kind": "official_body"
+  },
+  "klagenfurt-2021": {
+   "title": "Gemeinderats- und Bürgermeister(stich)wahl 2021 (with the city's results since 1945)",
+   "publisher": "Magistrat der Landeshauptstadt Klagenfurt am Wörthersee, Statistik",
+   "url": "https://www.klagenfurt.at/fileadmin/user_upload/Stadt_Klagenfurt/02-StadtVERWALTUNG/Politik/Wahlergebnisse/2021_-_Gemeinderats_-_und_Buergermeister_stich_wahl_2021.pdf",
+   "kind": "official_body",
+   "note": "Tab. 2.2 lists the Carinthian Landtag elections since 1945 with each day (Wahltermin); Tab. 2.3 the city's council elections."
+  },
+  "paternion-1997": {
+   "title": "Ergebnis der Gemeinderats- und Bürgermeisterwahl am 09. März 1997 im Vergleich zur Gemeinderats- und Bürgermeisterwahl am 10. März 1991",
+   "publisher": "Marktgemeinde Paternion",
+   "url": "https://paternion.gv.at/fileadmin/paternion/02-Amtstafel/Wahlen/Gemeinderat_und_Buergermeister_1997.pdf",
+   "kind": "official_body"
+  },
+  "wien-stat-1987": {
+   "title": "Statistisches Jahrbuch der Stadt Wien, Kapitel 24: Wahlen (Gemeinderatswahl am 8. November 1987)",
+   "publisher": "Magistrat der Stadt Wien, Statistisches Amt (via Wienbibliothek Digital)",
+   "url": "https://www.digital.wienbibliothek.at/download/pdf/2276747.pdf",
+   "kind": "official_body"
+  },
+  "wien-stat-1991": {
+   "title": "Veröffentlichungen des Statistischen Amtes der Stadt Wien (list of publications)",
+   "publisher": "Magistrat der Stadt Wien, Statistisches Amt (via Wienbibliothek Digital)",
+   "url": "https://www.digital.wienbibliothek.at/download/pdf/2285429.pdf",
+   "kind": "official_body"
+  },
+  "wien-stat-1996": {
+   "title": "Statistisches Amt der Stadt Wien: Publikationen (list of publications)",
+   "publisher": "Magistrat der Stadt Wien, Statistisches Amt (via Wienbibliothek Digital)",
+   "url": "https://www.digital.wienbibliothek.at/download/pdf/2286871.pdf",
+   "kind": "official_body"
+  },
+  "wien-gr-2001": {
+   "title": "Wiener Gemeinderats- und Bezirksvertretungswahlen 2001",
+   "publisher": "Stadt Wien",
+   "url": "https://www.wien.gv.at/politik/gemeinderats-und-bezirksvertretungswahlen-2001",
+   "kind": "official_body"
+  },
+  "wien-gr-2005": {
+   "title": "Wiener Gemeinderats- und Bezirksvertretungswahlen 2005",
+   "publisher": "Stadt Wien",
+   "url": "https://www.wien.gv.at/politik/gemeinderats-und-bezirksvertretungswahlen-2005",
+   "kind": "official_body"
+  },
+  "wien-gr-2010": {
+   "title": "Wiener Gemeinderats- und Bezirksvertretungswahlen 2010",
+   "publisher": "Stadt Wien",
+   "url": "https://www.wien.gv.at/politik/gemeinderats-und-bezirksvertretungswahlen-2010",
+   "kind": "official_body"
+  },
+  "wien-gr-2015": {
+   "title": "Wiener Gemeinderats- und Bezirksvertretungswahlen 2015",
+   "publisher": "Stadt Wien",
+   "url": "https://www.wien.gv.at/politik/gemeinderats-und-bezirksvertretungswahlen-2015",
+   "kind": "official_body"
+  },
+  "wien-gr-2020": {
+   "title": "Wiener Gemeinderats- und Bezirksvertretungswahlen 2020",
+   "publisher": "Stadt Wien",
+   "url": "https://www.wien.gv.at/politik/gemeinderats-und-bezirksvertretungswahlen-2020",
+   "kind": "official_body"
+  },
+  "wien-gr-2025": {
+   "title": "Wiener Gemeinderats- und Bezirksvertretungswahlen 2025",
+   "publisher": "Stadt Wien",
+   "url": "https://www.wien.gv.at/politik/gemeinderat-bezirksvertretungswahlen-2025",
+   "kind": "official_body"
   }
  },
  "tiers": [
@@ -1499,7 +1639,7 @@
     ]
    },
    "finest_note": "The Länder publish results by municipality; Vienna and some Länder also by polling district.",
-   "note": "Each of the nine Länder elects its Landtag by list PR (Art. 95 B-VG), for five years (six in Upper Austria). Vienna's Landtag is its Gemeinderat, elected once for both roles. Elections began in 1919 (Burgenland from 1922, Vienna as a Land from 1922) and resumed in 1945. Counted per election; the days are listed for Tyrol since 1989 (its election page) and Salzburg for 2023 (its Landtag page); the other Länder's days remain uncounted spans.",
+   "note": "Each of the nine Länder elects its Landtag by list PR (Art. 95 B-VG), for five years (six in Upper Austria). Vienna's Landtag is its Gemeinderat, elected once for both roles. Elections began in 1919 (Burgenland from 1922, Vienna as a Land from 1922) and resumed in 1945. Counted per election, one row per day with each Land's count under its ISO 3166-2:AT number: Burgenland since 1996 (its election office), Carinthia since 1945 (Klagenfurt's statistics and the federal portal), Lower Austria 1921-1932 and since 1945 (its Landtag), Salzburg for 2023, Styria since 1945 (its state statistics and the federal portal), Tyrol since 1989, Vorarlberg since 1945 (its results app), and Vienna since 1987 (the City's statistics office and election pages). Earlier days and Upper Austria remain an uncounted span.",
    "source": "bvg",
    "valid_from": "1919-01-01",
    "est_votes": 4400000,
@@ -1559,6 +1699,45 @@
      "license": "CC BY 4.0",
      "evidence": "The index page answers; the result pages under /wahlergebnis/ answered 403 to a cloud session on 2026-11-16.",
      "source": "wien-wahlen"
+    },
+    {
+     "platform": "Amt der Burgenländischen Landesregierung",
+     "url": "https://wahl.bgld.gv.at/wahlen/lt.nsf/wahlergebnisse.xsp",
+     "format": "XLS and PDF",
+     "access": "open",
+     "first_date": "1996-06-02",
+     "checked_at": "2026-11-19T00:00:00Z",
+     "finest": "at.gemeinde",
+     "source": "bgld-lt"
+    },
+    {
+     "platform": "Land Niederösterreich",
+     "url": "https://www.noe.gv.at/noe/Wahlen/Landtagswahlen.html",
+     "format": "TXT and HTML",
+     "access": "open",
+     "first_date": "1993-05-16",
+     "checked_at": "2026-11-19T00:00:00Z",
+     "finest": "at.gemeinde",
+     "evidence": "The fixed-width files https://www.noe.gv.at/wahlen/lw93.txt to lw23.txt answer with one line per municipality.",
+     "source": "noe-lt"
+    },
+    {
+     "platform": "Amt der Steiermärkischen Landesregierung",
+     "url": "https://egov.stmk.gv.at/wahlen/LT2024/index_LT2024.html",
+     "format": "HTML",
+     "access": "blocked",
+     "checked_at": "2026-11-19T00:00:00Z",
+     "evidence": "The results app answered 403 ('Sicherheitsprüfung ist fehlgeschlagen') to a cloud session on 2026-11-19; the state statistics office's PDF reports on landesentwicklung.steiermark.at answer.",
+     "source": "oegv-stmk-2024"
+    },
+    {
+     "platform": "Amt der Kärntner Landesregierung",
+     "url": "https://www.ktn.gv.at/",
+     "format": "HTML",
+     "access": "blocked",
+     "checked_at": "2026-11-19T00:00:00Z",
+     "evidence": "www.ktn.gv.at reset the connection to a cloud session on 2026-11-19.",
+     "source": "oegv-ktn-2023"
     }
    ],
    "match": [
@@ -1581,31 +1760,479 @@
      "source": "bvg"
     },
     {
-     "date": "1989-03-12",
+     "date": "1921-04-24",
      "contests": 1,
      "regions": {
+      "3": 1
+     },
+     "source": "noe-lt-1921",
+     "quote": "Endergebnis der Landtagswahl vom 24. April 1921"
+    },
+    {
+     "date": "1927-04-24",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt-1921",
+     "quote": "Endergebnis der Landtagswahl vom 24. April 1927"
+    },
+    {
+     "date": "1932-04-24",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt-1921",
+     "quote": "Endergebnis der Landtagswahl vom 24. April 1932"
+    },
+    {
+     "date": "1945-11-25",
+     "contests": 4,
+     "regions": {
+      "2": 1,
+      "3": 1,
+      "6": 1,
+      "8": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 25.11.1945",
+     "note": "Lower Austria: Landtag von Niederösterreich, Ergebnisse der Landtagswahlen seit 1945 ('Endergebnis der Landtagswahl vom 25. November 1945'). Styria: Amt der Steiermärkischen Landesregierung, Landesstatistik, Landtagswahl 2005 – Dokumentation (Steirische Statistiken, Heft 10/2005) ('Das Wahlalter der Wahlberechtigten: Wahltag 25.11.1945'). Vorarlberg: Amt der Vorarlberger Landesregierung, Wahlergebnisse: Verzeichnis aller Wahlen (wahlen.json) ('\"wahlID\": \"LT_1945-11-25\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"25.11.1945\"')."
+    },
+    {
+     "date": "1949-10-09",
+     "contests": 4,
+     "regions": {
+      "2": 1,
+      "3": 1,
+      "6": 1,
+      "8": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 09.10.1949",
+     "note": "Lower Austria: Landtag von Niederösterreich, Ergebnisse der Landtagswahlen seit 1945 ('Endergebnis der Landtagswahl vom 9. Oktober 1949'). Styria: Amt der Steiermärkischen Landesregierung, Landesstatistik, Landtagswahl 2005 – Dokumentation (Steirische Statistiken, Heft 10/2005) ('Das Wahlalter der Wahlberechtigten: Wahltag 9.9.1949'). Styria: The table prints 9.9.1949, a Friday; Styria elected its Landtag with the National Council on Sunday, 9 October 1949. Vorarlberg: Amt der Vorarlberger Landesregierung, Wahlergebnisse: Verzeichnis aller Wahlen (wahlen.json) ('\"wahlID\": \"LT_1949-10-09\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"09.10.1949\"')."
+    },
+    {
+     "date": "1953-02-22",
+     "contests": 2,
+     "regions": {
+      "2": 1,
+      "6": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 22.02.1953",
+     "note": "Styria: Amt der Steiermärkischen Landesregierung, Landesstatistik, Landtagswahl 2005 – Dokumentation (Steirische Statistiken, Heft 10/2005) ('Das Wahlalter der Wahlberechtigten: Wahltag 22.2.1953')."
+    },
+    {
+     "date": "1954-10-17",
+     "contests": 2,
+     "regions": {
+      "3": 1,
+      "8": 1
+     },
+     "source": "noe-lt",
+     "quote": "Endergebnis der Landtagswahl vom 17. Oktober 1954",
+     "note": "Vorarlberg: Amt der Vorarlberger Landesregierung, Wahlergebnisse: Verzeichnis aller Wahlen (wahlen.json) ('\"wahlID\": \"LT_1954-10-17\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"17.10.1954\"')."
+    },
+    {
+     "date": "1956-05-13",
+     "contests": 1,
+     "regions": {
+      "2": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 13.05.1956"
+    },
+    {
+     "date": "1957-03-10",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "stmk-2005",
+     "quote": "Das Wahlalter der Wahlberechtigten: Wahltag 10.3.1957"
+    },
+    {
+     "date": "1959-05-10",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt",
+     "quote": "Endergebnis der Landtagswahl vom 10. Mai 1959"
+    },
+    {
+     "date": "1959-10-18",
+     "contests": 1,
+     "regions": {
+      "8": 1
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"LT_1959-10-18\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"18.10.1959\""
+    },
+    {
+     "date": "1960-03-06",
+     "contests": 1,
+     "regions": {
+      "2": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 06.03.1960"
+    },
+    {
+     "date": "1961-03-12",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "stmk-2005",
+     "quote": "Das Wahlalter der Wahlberechtigten: Wahltag 12.3.1961"
+    },
+    {
+     "date": "1964-10-18",
+     "contests": 1,
+     "regions": {
+      "8": 1
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"LT_1964-10-18\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"18.10.1964\""
+    },
+    {
+     "date": "1964-10-25",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt",
+     "quote": "Endergebnis der Landtagswahl vom 25. Oktober 1964"
+    },
+    {
+     "date": "1965-03-14",
+     "contests": 2,
+     "regions": {
+      "2": 1,
+      "6": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 14.03.1965",
+     "note": "Styria: Amt der Steiermärkischen Landesregierung, Landesstatistik, Landtagswahl 2005 – Dokumentation (Steirische Statistiken, Heft 10/2005) ('Das Wahlalter der Wahlberechtigten: Wahltag 14.3.1965')."
+    },
+    {
+     "date": "1969-10-19",
+     "contests": 2,
+     "regions": {
+      "3": 1,
+      "8": 1
+     },
+     "source": "noe-lt",
+     "quote": "Endergebnis der Landtagswahl vom 19. Oktober 1969",
+     "note": "Vorarlberg: Amt der Vorarlberger Landesregierung, Wahlergebnisse: Verzeichnis aller Wahlen (wahlen.json) ('\"wahlID\": \"LT_1969-10-19\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"19.10.1969\"')."
+    },
+    {
+     "date": "1970-02-22",
+     "contests": 1,
+     "regions": {
+      "2": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 22.02.1970"
+    },
+    {
+     "date": "1970-03-15",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "stmk-2005",
+     "quote": "Das Wahlalter der Wahlberechtigten: Wahltag 15.3.1970"
+    },
+    {
+     "date": "1974-06-09",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt",
+     "quote": "Endergebnis der Landtagswahl vom 9. Juni 1974"
+    },
+    {
+     "date": "1974-10-20",
+     "contests": 2,
+     "regions": {
+      "6": 1,
+      "8": 1
+     },
+     "source": "stmk-2005",
+     "quote": "Das Wahlalter der Wahlberechtigten: Wahltag 20.10.1974",
+     "note": "Vorarlberg: Amt der Vorarlberger Landesregierung, Wahlergebnisse: Verzeichnis aller Wahlen (wahlen.json) ('\"wahlID\": \"LT_1974-10-20\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"20.10.1974\"')."
+    },
+    {
+     "date": "1975-03-02",
+     "contests": 1,
+     "regions": {
+      "2": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 02.03.1975"
+    },
+    {
+     "date": "1978-10-08",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "stmk-2005",
+     "quote": "Das Wahlalter der Wahlberechtigten: Wahltag 8.10.1978"
+    },
+    {
+     "date": "1979-03-25",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt",
+     "quote": "Endergebnis der Landtagswahl vom 25. März 1979"
+    },
+    {
+     "date": "1979-10-07",
+     "contests": 1,
+     "regions": {
+      "2": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 07.10.1979"
+    },
+    {
+     "date": "1979-10-21",
+     "contests": 1,
+     "regions": {
+      "8": 1
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"LT_1979-10-21\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"21.10.1979\""
+    },
+    {
+     "date": "1981-10-04",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "stmk-2005",
+     "quote": "Das Wahlalter der Wahlberechtigten: Wahltag 4.10.1981"
+    },
+    {
+     "date": "1983-10-16",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt",
+     "quote": "Endergebnis der Landtagswahl vom 16. Oktober 1983"
+    },
+    {
+     "date": "1984-09-30",
+     "contests": 1,
+     "regions": {
+      "2": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 30.09.1984"
+    },
+    {
+     "date": "1984-10-21",
+     "contests": 1,
+     "regions": {
+      "8": 1
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"LT_1984-10-21\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"21.10.1984\""
+    },
+    {
+     "date": "1986-09-21",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "stmk-2005",
+     "quote": "Das Wahlalter der Wahlberechtigten: Wahltag 21.9.1986"
+    },
+    {
+     "date": "1987-11-08",
+     "contests": 1,
+     "regions": {
+      "9": 1
+     },
+     "source": "wien-stat-1987",
+     "quote": "24.01 Gemeinderatswahl am 8. November 1987"
+    },
+    {
+     "date": "1988-10-16",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt",
+     "quote": "Endergebnis der Landtagswahl vom 16. Oktober 1988"
+    },
+    {
+     "date": "1989-03-12",
+     "contests": 2,
+     "regions": {
+      "2": 1,
       "7": 1
      },
      "source": "tirol",
-     "quote": "12.03.1989 | Landtagswahl 1989"
+     "quote": "12.03.1989 | Landtagswahl 1989",
+     "note": "Carinthia: Magistrat der Landeshauptstadt Klagenfurt am Wörthersee, Statistik, Gemeinderats- und Bürgermeister(stich)wahl 2021 (with the city's results since 1945) ('Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 12.03.1989')."
+    },
+    {
+     "date": "1989-10-28",
+     "contests": 1,
+     "regions": {
+      "8": 1
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"LT_1989-10-28\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"28.10.1989\"",
+     "note": "Vorarlberg: The app's list gives 28.10.1989, a Saturday, for this election; the archive keeps the authority's date."
+    },
+    {
+     "date": "1991-09-22",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "stmk-2005",
+     "quote": "Das Wahlalter der Wahlberechtigten: Wahltag 22.9.1991"
+    },
+    {
+     "date": "1991-11-10",
+     "contests": 1,
+     "regions": {
+      "9": 1
+     },
+     "source": "wien-stat-1991",
+     "quote": "Die Wiener Gemeinderats- und Bezirksvertretungswahlen vom 10. November 1991"
+    },
+    {
+     "date": "1993-05-16",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt",
+     "quote": "Endergebnis der Landtagswahl vom 16. Mai 1993"
     },
     {
      "date": "1994-03-13",
-     "contests": 1,
+     "contests": 2,
      "regions": {
+      "2": 1,
       "7": 1
      },
      "source": "tirol",
-     "quote": "13.03.1994 | Landtagswahl 1994"
+     "quote": "13.03.1994 | Landtagswahl 1994",
+     "note": "Carinthia: Magistrat der Landeshauptstadt Klagenfurt am Wörthersee, Statistik, Gemeinderats- und Bürgermeister(stich)wahl 2021 (with the city's results since 1945) ('Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 13.03.1994')."
+    },
+    {
+     "date": "1994-09-18",
+     "contests": 1,
+     "regions": {
+      "8": 1
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"LT_1994-09-18\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"18.09.1994\""
+    },
+    {
+     "date": "1995-12-17",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "stmk-2005",
+     "quote": "Das Wahlalter der Wahlberechtigten: Wahltag 17.12.1995"
+    },
+    {
+     "date": "1996-06-02",
+     "contests": 1,
+     "regions": {
+      "1": 1
+     },
+     "source": "bgld-lt",
+     "quote": "1996-06-02 Landtagswahl 1996"
+    },
+    {
+     "date": "1996-10-13",
+     "contests": 1,
+     "regions": {
+      "9": 1
+     },
+     "source": "wien-stat-1996",
+     "quote": "Gleichzeitig wurden in Wien auch die Wahlen zum Gemeinderat und den Bezirksvertretungen abgehalten (Die Wiener Wahlen vom 13. Oktober 1996)"
+    },
+    {
+     "date": "1998-03-22",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt",
+     "quote": "Endergebnis der Landtagswahl vom 22. März 1998"
     },
     {
      "date": "1999-03-07",
-     "contests": 1,
+     "contests": 2,
      "regions": {
+      "2": 1,
       "7": 1
      },
      "source": "tirol",
-     "quote": "07.03.1999 | Landtagswahl 1999"
+     "quote": "07.03.1999 | Landtagswahl 1999",
+     "note": "Carinthia: Magistrat der Landeshauptstadt Klagenfurt am Wörthersee, Statistik, Gemeinderats- und Bürgermeister(stich)wahl 2021 (with the city's results since 1945) ('Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 07.03.1999')."
+    },
+    {
+     "date": "1999-09-19",
+     "contests": 1,
+     "regions": {
+      "8": 1
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"LT_1999-09-19\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"19.09.1999\""
+    },
+    {
+     "date": "2000-10-15",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "stmk-2005",
+     "quote": "Das Wahlalter der Wahlberechtigten: Wahltag 15.10.2000"
+    },
+    {
+     "date": "2000-12-03",
+     "contests": 1,
+     "regions": {
+      "1": 1
+     },
+     "source": "bgld-lt",
+     "quote": "2000-12-03 Landtagswahl 2000"
+    },
+    {
+     "date": "2001-03-25",
+     "contests": 1,
+     "regions": {
+      "9": 1
+     },
+     "source": "wien-gr-2001",
+     "quote": "Am 25. März 2001 fand in Wien die Gemeinderats- und Bezirksvertretungswahlen statt."
+    },
+    {
+     "date": "2003-03-30",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt-2003",
+     "quote": "Der NÖ Landtag wurde am 30. März neu gewählt."
     },
     {
      "date": "2003-09-28",
@@ -1617,6 +2244,60 @@
      "quote": "28.09.2003 | Landtagswahl 2003"
     },
     {
+     "date": "2004-03-07",
+     "contests": 1,
+     "regions": {
+      "2": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 07.03.2004"
+    },
+    {
+     "date": "2004-09-19",
+     "contests": 1,
+     "regions": {
+      "8": 1
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"LT_2004-09-19\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"19.09.2004\""
+    },
+    {
+     "date": "2005-10-02",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "stmk-2005",
+     "quote": "Das Wahlalter der Wahlberechtigten: Wahltag 2.10.2005"
+    },
+    {
+     "date": "2005-10-09",
+     "contests": 1,
+     "regions": {
+      "1": 1
+     },
+     "source": "bgld-lt",
+     "quote": "2005-10-09 Landtagswahl 2005"
+    },
+    {
+     "date": "2005-10-23",
+     "contests": 1,
+     "regions": {
+      "9": 1
+     },
+     "source": "wien-gr-2005",
+     "quote": "Am 23. Oktober 2005 fanden in Wien die Gemeinderats- und Bezirksvertretungswahlen statt."
+    },
+    {
+     "date": "2008-03-09",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt-2008",
+     "quote": "Das klare Ergebnis vom 9. März sei auch ein klarer Auftrag gewesen"
+    },
+    {
      "date": "2008-06-08",
      "contests": 1,
      "regions": {
@@ -1624,6 +2305,62 @@
      },
      "source": "tirol",
      "quote": "08.06.2008 | Landtagswahl 2008"
+    },
+    {
+     "date": "2009-03-01",
+     "contests": 1,
+     "regions": {
+      "2": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 01.03.2009"
+    },
+    {
+     "date": "2009-09-20",
+     "contests": 1,
+     "regions": {
+      "8": 1
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"LT_2009-09-20\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"20.09.2009\""
+    },
+    {
+     "date": "2010-05-30",
+     "contests": 1,
+     "regions": {
+      "1": 1
+     },
+     "source": "bgld-lt",
+     "quote": "2010-05-30 Landtagswahl 2010"
+    },
+    {
+     "date": "2010-09-26",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "stmk-2010",
+     "quote": "Landtagswahl vom 26. September 2010"
+    },
+    {
+     "date": "2010-10-10",
+     "contests": 1,
+     "regions": {
+      "9": 1
+     },
+     "source": "wien-gr-2010",
+     "quote": "Am 10. Oktober 2010 fanden die Wiener Gemeinderats- und Bezirksvertretungswahlen statt."
+    },
+    {
+     "date": "2013-03-03",
+     "contests": 2,
+     "regions": {
+      "2": 1,
+      "3": 1
+     },
+     "source": "klagenfurt-2021",
+     "quote": "Tab. 2.2 Wahlergebnisse in Klagenfurt seit 1945 (Landtagswahlen): 03.03.2013",
+     "note": "Lower Austria: Landtag von Niederösterreich, Ergebnisse der Landtagswahlen seit 1945 ('Endergebnis der Landtagswahl vom 3. März 2013')."
     },
     {
      "date": "2013-04-28",
@@ -1635,6 +2372,44 @@
      "quote": "28.04.2013 | Landtagswahl 2013"
     },
     {
+     "date": "2014-09-21",
+     "contests": 1,
+     "regions": {
+      "8": 1
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"LT_2014-09-21\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"21.09.2014\""
+    },
+    {
+     "date": "2015-05-31",
+     "contests": 2,
+     "regions": {
+      "1": 1,
+      "6": 1
+     },
+     "source": "bgld-lt",
+     "quote": "2015-05-31 Landtagswahl 2015",
+     "note": "Styria: Amt der Steiermärkischen Landesregierung, Landesstatistik, Landtagswahl 2015 (Steirische Statistiken, Heft 4/2015) ('Landtagswahl vom 31. Mai 2015')."
+    },
+    {
+     "date": "2015-10-11",
+     "contests": 1,
+     "regions": {
+      "9": 1
+     },
+     "source": "wien-gr-2015",
+     "quote": "Am 11. Oktober 2015 fanden die Wiener Gemeinderats- und Bezirksvertretungswahlen statt."
+    },
+    {
+     "date": "2018-01-28",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt",
+     "quote": "Endergebnis der Landtagswahl vom 28. Jänner 2018"
+    },
+    {
      "date": "2018-02-25",
      "contests": 1,
      "regions": {
@@ -1642,6 +2417,51 @@
      },
      "source": "tirol",
      "quote": "25.02.2018 | Landtagswahl 2018"
+    },
+    {
+     "date": "2018-03-04",
+     "contests": 1,
+     "regions": {
+      "2": 1
+     },
+     "source": "oegv-ktn-2023",
+     "quote": "Davor fand die letzte Landtagswahl in Kärnten am 4. März 2018 statt."
+    },
+    {
+     "date": "2019-10-13",
+     "contests": 1,
+     "regions": {
+      "8": 1
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"LT_2019-10-13\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"13.10.2019\""
+    },
+    {
+     "date": "2019-11-24",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "oegv-stmk-2024",
+     "quote": "Die letzte Landtagswahl in der Steiermark fand am 24. November 2019 statt."
+    },
+    {
+     "date": "2020-01-26",
+     "contests": 1,
+     "regions": {
+      "1": 1
+     },
+     "source": "bgld-lt",
+     "quote": "2020-01-26 Landtagswahl 2020"
+    },
+    {
+     "date": "2020-10-11",
+     "contests": 1,
+     "regions": {
+      "9": 1
+     },
+     "source": "wien-gr-2020",
+     "quote": "Am 11. Oktober 2020 fanden die Wiener Gemeinderats- und Bezirksvertretungswahlen statt."
     },
     {
      "date": "2022-09-25",
@@ -1653,6 +2473,24 @@
      "quote": "25.09.2022 | Landtagswahl 2022"
     },
     {
+     "date": "2023-01-29",
+     "contests": 1,
+     "regions": {
+      "3": 1
+     },
+     "source": "noe-lt",
+     "quote": "Endergebnis der Landtagswahl vom 29. Jänner 2023"
+    },
+    {
+     "date": "2023-03-05",
+     "contests": 1,
+     "regions": {
+      "2": 1
+     },
+     "source": "oegv-ktn-2023",
+     "quote": "Am Sonntag, dem 5. März 2023 wurden die 36 Abgeordneten des Kärntner Landtags neu gewählt."
+    },
+    {
      "date": "2023-04-23",
      "contests": 1,
      "regions": {
@@ -1660,6 +2498,42 @@
      },
      "source": "sbg-landtag",
      "quote": "Am 23. April 2023 fand die Landtagswahl statt."
+    },
+    {
+     "date": "2024-10-13",
+     "contests": 1,
+     "regions": {
+      "8": 1
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"LT_2024-10-13\", \"bezeichnung\": \"Landtag\", \"wahldatum\": \"13.10.2024\""
+    },
+    {
+     "date": "2024-11-24",
+     "contests": 1,
+     "regions": {
+      "6": 1
+     },
+     "source": "oegv-stmk-2024",
+     "quote": "Am 24. November 2024 wurden die 48 Abgeordneten des Steiermärkischen Landtags neu gewählt."
+    },
+    {
+     "date": "2025-01-19",
+     "contests": 1,
+     "regions": {
+      "1": 1
+     },
+     "source": "bgld-lt",
+     "quote": "2025-01-19 Landtagswahl 2025"
+    },
+    {
+     "date": "2025-04-27",
+     "contests": 1,
+     "regions": {
+      "9": 1
+     },
+     "source": "wien-gr-2025",
+     "quote": "Am 27. April 2025 fanden die Wiener Gemeinderats- und Bezirksvertretungswahlen statt."
     }
    ]
   },
@@ -1787,11 +2661,69 @@
      "source": "bvg"
     },
     {
+     "date": "1985-04-21",
+     "election_kind": "general",
+     "contests": 96,
+     "regions": {
+      "8": 96
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"GV_1985-04-21\", \"wahldatum\": \"21.04.1985\", \"gemeindenAusgezaehlt\": \"96 / 96\"",
+     "note": "Common Vorarlberg (AT-8) election day of the municipal councils (Gemeindevertretungen) of all 96 municipalities."
+    },
+    {
+     "date": "1990-04-01",
+     "election_kind": "general",
+     "contests": 96,
+     "regions": {
+      "8": 96
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"GV_1990-04-01\", \"wahldatum\": \"01.04.1990\", \"gemeindenAusgezaehlt\": \"96 / 96\"",
+     "note": "Common Vorarlberg (AT-8) election day of the municipal councils (Gemeindevertretungen) of all 96 municipalities."
+    },
+    {
+     "date": "1991-03-10",
+     "election_kind": "general",
+     "source": "paternion-1997",
+     "quote": "zur Gemeinderats-und Bürgermeisterwahl am 10. März 1991",
+     "note": "Common Carinthia (AT-2) election day of the municipal councils and mayors, from the results of Paternion. The first direct mayoral election in Austria: Klagenfurt's 2021 report says its mayor was elected directly for the sixth time ('Zum sechsten Mal wurde der Bürgermeister von Klagenfurt direkt gewählt'), after 1991, 1997, 2003, 2009, and 2015."
+    },
+    {
+     "date": "1995-04-02",
+     "election_kind": "general",
+     "contests": 96,
+     "regions": {
+      "8": 96
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"GV_1995-04-02\", \"wahldatum\": \"02.04.1995\", \"gemeindenAusgezaehlt\": \"96 / 96\"",
+     "note": "Common Vorarlberg (AT-8) election day of the municipal councils (Gemeindevertretungen) of all 96 municipalities."
+    },
+    {
+     "date": "1997-03-09",
+     "election_kind": "general",
+     "source": "paternion-1997",
+     "quote": "Ergebnis der Gemeinderats- und Bürgermeisterwahl am 09. März. 1997",
+     "note": "Common Carinthia (AT-2) election day of the municipal councils and mayors, from the results of Paternion."
+    },
+    {
      "date": "1998-03-15",
      "election_kind": "general",
      "source": "tirol",
      "quote": "15.03.1998 | Gemeinderatswahl 1998",
      "note": "Common Tyrol (AT-7) election day; the number of municipalities that voted is not listed on the page."
+    },
+    {
+     "date": "2000-04-02",
+     "election_kind": "general",
+     "contests": 96,
+     "regions": {
+      "8": 96
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"GV_2000-04-02\", \"wahldatum\": \"02.04.2000\", \"gemeindenAusgezaehlt\": \"96 / 96\"",
+     "note": "Common Vorarlberg (AT-8) election day of the municipal councils (Gemeindevertretungen) of all 96 municipalities."
     },
     {
      "date": "2004-03-07",
@@ -1801,11 +2733,47 @@
      "note": "Common Tyrol (AT-7) election day; the number of municipalities that voted is not listed on the page."
     },
     {
+     "date": "2005-04-10",
+     "election_kind": "general",
+     "contests": 96,
+     "regions": {
+      "8": 96
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"GV_2005-04-10\", \"wahldatum\": \"10.04.2005\", \"gemeindenAusgezaehlt\": \"96 / 96\"",
+     "note": "Common Vorarlberg (AT-8) election day of the municipal councils (Gemeindevertretungen) of all 96 municipalities."
+    },
+    {
+     "date": "2007-10-07",
+     "election_kind": "general",
+     "source": "bgld-gr",
+     "quote": "2007-10-07 Gemeinderats- und Bürgermeisterwahl 07.10.2007",
+     "note": "Common Burgenland (AT-1) election day; the page does not list how many municipalities voted."
+    },
+    {
      "date": "2010-03-14",
      "election_kind": "general",
      "source": "tirol",
      "quote": "14.03.2010 | Gemeinderatswahl 2010",
-     "note": "Common Tyrol (AT-7) election day; the number of municipalities that voted is not listed on the page."
+     "note": "Common Tyrol (AT-7) election day; the number of municipalities that voted is not listed on the page. Also Amt der Vorarlberger Landesregierung, Wahlergebnisse: Verzeichnis aller Wahlen (wahlen.json) ('\"wahlID\": \"GV_2010-03-14\", \"wahldatum\": \"14.03.2010\", \"gemeindenAusgezaehlt\": \"96 / 96\"'), 96 contests: Common Vorarlberg (AT-8) election day of the municipal councils (Gemeindevertretungen) of all 96 municipalities."
+    },
+    {
+     "date": "2012-10-07",
+     "election_kind": "general",
+     "source": "bgld-gr",
+     "quote": "2012-10-07 Gemeinderats- und Bürgermeisterwahl 07.10.2012",
+     "note": "Common Burgenland (AT-1) election day; the page does not list how many municipalities voted."
+    },
+    {
+     "date": "2015-03-15",
+     "election_kind": "general",
+     "contests": 96,
+     "regions": {
+      "8": 96
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"GV_2015-03-15\", \"wahldatum\": \"15.03.2015\", \"gemeindenAusgezaehlt\": \"96 / 96\"",
+     "note": "Common Vorarlberg (AT-8) election day of the municipal councils (Gemeindevertretungen) of all 96 municipalities."
     },
     {
      "date": "2016-02-28",
@@ -1815,11 +2783,47 @@
      "note": "Common Tyrol (AT-7) election day; the number of municipalities that voted is not listed on the page."
     },
     {
+     "date": "2017-10-01",
+     "election_kind": "general",
+     "source": "bgld-gr",
+     "quote": "2017-10-01 Gemeinderats- und Bürgermeisterwahl 01.10.2017",
+     "note": "Common Burgenland (AT-1) election day; the page does not list how many municipalities voted."
+    },
+    {
+     "date": "2020-09-13",
+     "election_kind": "general",
+     "contests": 96,
+     "regions": {
+      "8": 96
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"GV_2020-09-13\", \"wahldatum\": \"13.09.2020\", \"gemeindenAusgezaehlt\": \"96 / 96\"",
+     "note": "Common Vorarlberg (AT-8) election day of the municipal councils (Gemeindevertretungen) of all 96 municipalities."
+    },
+    {
      "date": "2022-02-27",
      "election_kind": "general",
      "source": "tirol",
      "quote": "27.02.2022 | Gemeinderats- und Bürgermeisterwahlen 2022",
      "note": "Common Tyrol (AT-7) election day; the number of municipalities that voted is not listed on the page."
+    },
+    {
+     "date": "2022-10-02",
+     "election_kind": "general",
+     "source": "bgld-gr",
+     "quote": "2022-10-02 Gemeinderats- und Bürgermeisterwahl 02.10.2022",
+     "note": "Common Burgenland (AT-1) election day; the page does not list how many municipalities voted."
+    },
+    {
+     "date": "2025-03-16",
+     "election_kind": "general",
+     "contests": 96,
+     "regions": {
+      "8": 96
+     },
+     "source": "vbg-data",
+     "quote": "\"wahlID\": \"GV_2025-03-16\", \"wahldatum\": \"16.03.2025\", \"gemeindenAusgezaehlt\": \"96 / 96\"",
+     "note": "Common Vorarlberg (AT-8) election day of the municipal councils (Gemeindevertretungen) of all 96 municipalities."
     }
    ]
   },
@@ -1836,7 +2840,7 @@
      "at.gemeinde"
     ]
    },
-   "note": "Land law may provide for the people to elect the mayor (Art. 117 Abs. 6 B-VG). Burgenland, Carinthia, Upper Austria, Salzburg, Tyrol, and Vorarlberg do, on separate ballots on the council election day, with a runoff (Stichwahl, 'engere Wahl') two weeks later when no candidate wins an absolute majority (Tyrol: 13 March 2022 after 27 February 2022). Lower Austria, Styria, and Vienna have their councils elect the mayor. Those six Länder held 1,233 municipalities on 1 January 2026 (171 + 132 + 438 + 119 + 277 + 96), so the class is listed as a span rather than counted from the 2,092 municipalities.",
+   "note": "Land law may provide for the people to elect the mayor (Art. 117 Abs. 6 B-VG). Burgenland, Carinthia, Upper Austria, Salzburg, Tyrol, and Vorarlberg do, on separate ballots on the council election day, with a runoff (Stichwahl, 'engere Wahl') two weeks later when no candidate wins an absolute majority (Tyrol: 13 March 2022 after 27 February 2022). Carinthia held the first direct mayoral elections on 10 March 1991. Lower Austria, Styria, and Vienna have their councils elect the mayor. Those six Länder held 1,233 municipalities on 1 January 2026 (171 + 132 + 438 + 119 + 277 + 96), so the class is listed as a span rather than counted from the 2,092 municipalities.",
    "source": "bvg",
    "est_votes": 1900000,
    "effort": 4,
@@ -1892,6 +2896,20 @@
      "source": "bvg"
     },
     {
+     "date": "1991-03-10",
+     "election_kind": "general",
+     "source": "paternion-1997",
+     "quote": "zur Gemeinderats-und Bürgermeisterwahl am 10. März 1991",
+     "note": "Common Carinthia (AT-2) election day of the municipal councils and mayors, from the results of Paternion. The first direct mayoral election in Austria: Klagenfurt's 2021 report says its mayor was elected directly for the sixth time ('Zum sechsten Mal wurde der Bürgermeister von Klagenfurt direkt gewählt'), after 1991, 1997, 2003, 2009, and 2015."
+    },
+    {
+     "date": "1997-03-09",
+     "election_kind": "general",
+     "source": "paternion-1997",
+     "quote": "Ergebnis der Gemeinderats- und Bürgermeisterwahl am 09. März. 1997",
+     "note": "Common Carinthia (AT-2) election day of the municipal councils and mayors, from the results of Paternion."
+    },
+    {
      "date": "1998-03-29",
      "election_kind": "runoff",
      "source": "tirol",
@@ -1906,11 +2924,32 @@
      "note": "Tyrol (AT-7) runoff day; the number of municipalities that held one is not listed on the page."
     },
     {
+     "date": "2007-10-07",
+     "election_kind": "general",
+     "source": "bgld-gr",
+     "quote": "2007-10-07 Gemeinderats- und Bürgermeisterwahl 07.10.2007",
+     "note": "Common Burgenland (AT-1) election day; the page does not list how many municipalities voted."
+    },
+    {
      "date": "2010-03-28",
      "election_kind": "runoff",
      "source": "tirol",
      "quote": "28.03.2010 | Bürgermeisterstichwahl 2010",
      "note": "Tyrol (AT-7) runoff day; the number of municipalities that held one is not listed on the page."
+    },
+    {
+     "date": "2012-10-07",
+     "election_kind": "general",
+     "source": "bgld-gr",
+     "quote": "2012-10-07 Gemeinderats- und Bürgermeisterwahl 07.10.2012",
+     "note": "Common Burgenland (AT-1) election day; the page does not list how many municipalities voted."
+    },
+    {
+     "date": "2012-11-04",
+     "election_kind": "runoff",
+     "source": "bgld-gr",
+     "quote": "2012-11-04 Engere Bürgermeisterwahl 04.11.2012",
+     "note": "Burgenland (AT-1) mayoral runoff day (engere Wahl); the page does not list how many municipalities held one."
     },
     {
      "date": "2016-03-13",
@@ -1920,13 +2959,72 @@
      "note": "Tyrol (AT-7) runoff day; the number of municipalities that held one is not listed on the page."
     },
     {
+     "date": "2017-10-01",
+     "election_kind": "general",
+     "source": "bgld-gr",
+     "quote": "2017-10-01 Gemeinderats- und Bürgermeisterwahl 01.10.2017",
+     "note": "Common Burgenland (AT-1) election day; the page does not list how many municipalities voted."
+    },
+    {
+     "date": "2017-10-29",
+     "election_kind": "runoff",
+     "source": "bgld-gr",
+     "quote": "2017-10-29 Engere Bürgermeisterwahl 29.10.2017",
+     "note": "Burgenland (AT-1) mayoral runoff day (engere Wahl); the page does not list how many municipalities held one."
+    },
+    {
      "date": "2022-03-13",
      "election_kind": "runoff",
      "source": "tirol",
      "quote": "13.03.2022 | Engere Wahl des Bürgermeisters 2022",
      "note": "Tyrol (AT-7) runoff day; the number of municipalities that held one is not listed on the page."
+    },
+    {
+     "date": "2022-10-02",
+     "election_kind": "general",
+     "source": "bgld-gr",
+     "quote": "2022-10-02 Gemeinderats- und Bürgermeisterwahl 02.10.2022",
+     "note": "Common Burgenland (AT-1) election day; the page does not list how many municipalities voted."
+    },
+    {
+     "date": "2022-10-23",
+     "election_kind": "runoff",
+     "source": "bgld-gr",
+     "quote": "2022-10-23 Engere Bürgermeisterwahl 23.10.2022",
+     "note": "Burgenland (AT-1) mayoral runoff day (engere Wahl); the page does not list how many municipalities held one."
+    },
+    {
+     "date": "2024-09-08",
+     "election_kind": "by_election",
+     "contests": 1,
+     "regions": {
+      "1": 1
+     },
+     "source": "bgld-gr",
+     "quote": "Wahl des Bürgermeisters in der Gemeinde Rudersdorf am 08.09.2024"
+    },
+    {
+     "date": "2025-06-15",
+     "election_kind": "by_election",
+     "contests": 1,
+     "regions": {
+      "1": 1
+     },
+     "source": "bgld-gr",
+     "quote": "Wahl des Bürgermeisters in der Gemeinde Sankt Andrä am Zicksee am 15.06.2025"
+    },
+    {
+     "date": "2026-09-13",
+     "election_kind": "by_election",
+     "contests": 1,
+     "regions": {
+      "1": 1
+     },
+     "source": "bgld-gr",
+     "quote": "Wahl des Bürgermeisters in der Gemeinde Deutschkreutz am 13.09.2026"
     }
-   ]
+   ],
+   "first_held": "1991-03-10"
   },
   {
    "key": "buergermeister_indirekt",
