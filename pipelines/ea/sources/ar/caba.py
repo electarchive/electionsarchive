@@ -1,9 +1,11 @@
 import functools
 import html
+import json
 import re
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
+from pathlib import Path
 from uuid import uuid5
 
 import httpx
@@ -30,6 +32,18 @@ PASO_JUNTAS = "Resolucion_Escrutinio_Miembros_de_Juntas_Comunales.pdf"
 GENERAL_NATIONAL = "ESCRUTINIO_ELECTORES_NACIONALES..PDF"
 GENERAL_FOREIGN = "Resultados_Definitivos_por_Comunas.pdf"
 GENERAL_CITY = "Resultados_Generales_Jefe_de_Gobierno_y_Diputados_final.pdf"
+# The Tribunal Superior de Justicia's own resolutions for the elections held together with the national ones, when the
+# national electoral board counted the Argentine electors and the Tribunal the foreign residents.
+ACORDADA_2017 = "Reg_71_Acordada_Electoral_11.pdf"
+ANNEX_2019 = "uploads/adjuntosCajas/anexoI.pdf"
+PASO_2021_FOREIGN = "CONSULTA_DE_TOTALES_.pdf"
+PASO_2021_NATIONAL = "Escrutinios_Nacionales.pdf"
+PASO_2021_CITY = "Anexo_Acordada_12_TSJ_Totales_por_Distrito.pdf"
+GENERAL_2021_FOREIGN = "Escrutinio_Definitivo_de_Electores_Extranjeros.pdf"
+GENERAL_2021_NATIONAL = "Escrutinio_definitivo_electores_nacionales.pdf"
+GENERAL_2021_CITY = "Resultados_definitivos.pdf"
+SCANS = Path(__file__).with_name("caba_scans.json")
+DIGITIZED = 8
 
 
 @dataclass(frozen=True)
@@ -47,6 +61,23 @@ HELD = [
     Held("2015-paso", date(2015, 4, 26), "primary", 3),
     Held("2015-general", date(2015, 7, 5), "general", 4),
     Held("2015-runoff", date(2015, 7, 19), "runoff", 7),
+    Held("2017-general", date(2017, 10, 22), "general", None, (ACORDADA_2017,)),
+    Held("2019-general", date(2019, 10, 27), "general", None, (ANNEX_2019,)),
+    Held(
+        "2021-paso",
+        date(2021, 9, 12),
+        "primary",
+        None,
+        (PASO_2021_FOREIGN, PASO_2021_NATIONAL, PASO_2021_CITY),
+        True,
+    ),
+    Held(
+        "2021-general",
+        date(2021, 11, 14),
+        "general",
+        None,
+        (GENERAL_2021_FOREIGN, GENERAL_2021_NATIONAL, GENERAL_2021_CITY),
+    ),
     Held(
         "2023-paso",
         date(2023, 8, 13),
@@ -67,9 +98,13 @@ HELD = [
 
 
 def source_of(held: Held) -> str:
-    return (
-        TEC_SOURCE if held.docs and held.key.startswith("2023") else TSJ_SOURCE if held.page is not None else TE_SOURCE
-    )
+    if held.docs:
+        return TEC_SOURCE if held.key.startswith("2023") else TSJR_SOURCE
+    return TSJ_SOURCE if held.page is not None else TE_SOURCE
+
+
+def doc_url(name: str) -> str:
+    return f"{TSJ}/{name}" if name.startswith("uploads/") else DOCS + name
 
 
 def key(kind: str, *parts: object) -> str:
@@ -95,7 +130,7 @@ PRISONS_URL = f"{TE}/mesa/?30999"
 
 def urls(held: Held) -> list[str]:
     if held.docs:
-        return [DOCS + name for name in held.docs]
+        return [doc_url(name) for name in held.docs]
     if held.page is None:
         return [te_url(), *(te_url(c) for c in COMUNAS), PRISONS_URL]
     return [tsj_url(held), *(tsj_url(held, c) for c in COMUNAS)]
@@ -132,6 +167,8 @@ class Page:
     rows: list[Row]
     totals: dict[str, list[int]]
     registered: int | None
+    # where a digitized figure was read, by the row and list ("501:2") or the total ("null"): page and pixel box
+    boxes: dict[str, tuple[int, list[int]]] = field(default_factory=dict)
 
 
 CARGOS = (("JEFE", "head"), ("DIPUTAD", "legislature"), ("JUNTA", "junta"))
@@ -247,7 +284,7 @@ GENERAL_CARGOS = ["head", "legislature", "junta"]
 
 @functools.cache
 def pdf_text(name: str) -> str:
-    path = raw.cached(SOURCE, DOCS + name).path
+    path = raw.cached(SOURCE, doc_url(name)).path
     return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
 
 
@@ -483,7 +520,408 @@ def general_pages() -> dict[int | None, Page]:
     return pages
 
 
+# The elections of 2017 to 2021, from the Tribunal Superior de Justicia's resolutions.
+
+NAMES_2019 = {
+    "UNITE POR LA LIBERTAD Y LA DIGNIDAD": "Unite por la Libertad y la Dignidad",
+    "FRENTE IZQUIERDA Y DE TRABAJADORES": "Frente de Izquierda y de Trabajadores",
+    "JUNTOS POR EL CAMBIO": "Juntos por el Cambio",
+    "FRENTE DE TODOS": "Frente de Todos",
+    "CONSENSO FEDERAL": "Consenso Federal",
+}
+NAMES_2021 = {
+    "8": "Partido Federal",
+    "36": "Partido Autonomista",
+    "40": "Movimiento Libres del Sur",
+    "184": "Partido Socialista Auténtico",
+    "187": "Autodeterminación y Libertad",
+    "338": "Movimiento al Socialismo",
+    "346": "Política Obrera",
+    "501": "Juntos por el Cambio",
+    "502": "Frente de Todos",
+    "503": "Frente de Izquierda y de Trabajadores - Unidad",
+    "504": "La Libertad Avanza",
+}
+LISTS_2021 = {
+    ("8", 1): "Federalismo Puro",
+    ("36", 1): "Colorada",
+    ("40", 1): "Alternativa Ciudadana",
+    ("184", 1): "Acuerdo Verde y Social",
+    ("187", 1): "Que los Pueblos Manden",
+    ("338", 1): "Para Renovar la Izquierda",
+    ("346", 1): "Unidad de los Trabajadores",
+    ("501", 1): "A - Juntos Podemos Más",
+    ("501", 2): "B - Republicanos",
+    ("501", 3): "C - Adelante Ciudad",
+    ("502", 1): "Celeste y Blanca K",
+    ("503", 1): "1A - Unidad de la Izquierda",
+    ("503", 2): "10 R - Evolución de la Izquierda",
+    ("504", 1): "Viva la Libertad",
+}
+# The rows of each section of the scanned count of national electors, in the order the scan prints them, as the
+# party's code and the list's place within the party, or the total they carry.
+SCAN_ROWS = {
+    "8": ("8", 1),
+    "36": ("36", 1),
+    "40": ("40", 1),
+    "184": ("184", 1),
+    "187": ("187", 1),
+    "338": ("338", 1),
+    "346": ("346", 1),
+    "501A": ("501", 1),
+    "501B": ("501", 2),
+    "501C": ("501", 3),
+    "502": ("502", 1),
+    "503A": ("503", 1),
+    "503B": ("503", 2),
+    "504": ("504", 1),
+}
+SCAN_TOTALS = {
+    "nulos": "null",
+    "recurridos": "challenged",
+    "blanco": "blank",
+    "impugnados": "contested",
+    "totales": "cast",
+}
+CONSULTA_TOTALS = {
+    "VOTOS NULOS": "null",
+    "VOTOS RECURRIDOS": "challenged",
+    "VOTOS EN BLANCO": "blank",
+    "VOTOS IMPUGNADOS": "contested",
+    "TOTALES": "cast",
+}
+
+
+def _full_totals(found: dict[str, int]) -> dict[str, list[int]]:
+    return {label: [found.get(label, 0)] for label in ("blank", "null", "cast", "challenged", "contested")}
+
+
+def _check_valid(rows: list[Row], totals: dict[str, list[int]], what: str) -> None:
+    """Valid votes are what the ballots cast leave after blank, null, challenged and contested ballots."""
+    totals["valid"] = [
+        totals["cast"][k] - totals["null"][k] - totals["blank"][k] - totals["challenged"][k] - totals["contested"][k]
+        for k in range(len(totals["cast"]))
+    ]
+    for k, valid in enumerate(totals["valid"]):
+        listed = sum(row.votes[k] for row in rows)
+        if listed != valid:
+            raise ValueError(f"{what}: the lists add up to {listed}, the totals leave {valid} positive votes")
+
+
+@functools.cache
+def pages_2017() -> dict[int | None, Page]:
+    """Annex I of Acordada Electoral 11/2017: the votes of each list for the Legislature in the whole City, counted by
+    the national electoral board with the foreign residents' tables the Tribunal counted."""
+    text = pdf_text(ACORDADA_2017)
+    start = text.index("Total de votos por Lista")
+    body = text[text.index("\n", start) : text.index("Anexo II", start)]
+    rows: list[Row] = []
+    found: dict[str, int] = {}
+    for line in body.splitlines():
+        label = line.strip()
+        listed = re.match(r"(\d+)\s+(\S.*?)\s{2,}(\d+)$", label)
+        if listed:
+            rows.append(Row(listed[1], listed[2], [int(listed[3])], []))
+        elif label.startswith("Votos en Blanco"):
+            found["blank"] = whole_numbers(label)[-1]
+        elif label.startswith("Votos Nulos"):
+            found["null"] = whole_numbers(label)[-1]
+        elif label.startswith("Total de votos"):
+            found["cast"] = whole_numbers(label)[-1]
+    if len(rows) != 6 or set(found) != {"blank", "null", "cast"}:
+        raise ValueError(f"{ACORDADA_2017}: unexpected shape of Annex I")
+    totals = _full_totals(found)
+    _check_valid(rows, totals, ACORDADA_2017)
+    return {None: Page(["legislature"], rows, totals, None)}
+
+
+def _slug(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+def _annex_block(body: str) -> tuple[str, list[Row], dict[str, list[int]], int]:
+    """One table of the annex: the votes of citizens, of foreign residents, and their total for each alliance."""
+    lines = [line for line in body.splitlines() if line.strip()]
+    title = lines[0].strip()
+    registered = sum(whole_numbers(next(line for line in lines if "Inscriptos" in line)))
+    head = next(
+        k
+        for k, line in enumerate(lines)
+        if "Ciudadanas/os" in line and "Extranjeras/os" in line and not re.search(r"\d", line)
+    )
+    groups: list[tuple[str, list[int]]] = []
+    for line in lines[head + 1 :]:
+        label = line.strip()
+        figures = whole_numbers(line)
+        name = re.match(r"([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ ]*[A-ZÁÉÍÓÚÑ])", label)
+        if name:
+            groups.append((name[1].strip(), figures))
+        elif groups:
+            groups[-1][1].extend(figures)
+    rows: list[Row] = []
+    found: dict[str, int] = {}
+    for name, figures in groups:
+        if len(figures) != 3:
+            raise ValueError(f"{ANNEX_2019}: {title}: {name} has {figures}")
+        total = max(figures)
+        if sum(figures) != 2 * total:
+            raise ValueError(f"{ANNEX_2019}: {title}: {name}: citizens and foreigners do not add up to {total}")
+        if name == "VOTOS NULOS":
+            found["null"] = total
+        elif name == "VOTOS BLANCOS":
+            found["blank"] = total
+        elif name == "TOTAL VOTOS":
+            found["cast"] = total
+        else:
+            rows.append(Row(_slug(name), NAMES_2019[name], [total], []))
+    if set(found) != {"null", "blank", "cast"} or not rows:
+        raise ValueError(f"{ANNEX_2019}: {title}: unexpected shape")
+    totals = _full_totals(found)
+    _check_valid(rows, totals, f"{ANNEX_2019}: {title}")
+    return title, rows, totals, registered
+
+
+@functools.cache
+def pages_2019() -> dict[int | None, Page]:
+    """Annex I of Acordada Electoral 12/2019: the Head of Government (I.1) and the Legislature (I.2) for the whole
+    City, then each comuna's Community Board (I.3), each with the citizens' and the foreign residents' votes."""
+    blocks = re.split(r"ESCRUTINIO DEFINITIVO DE VOTOS DE CIUDADANAS/OS Y EXTRANJERAS/OS", pdf_text(ANNEX_2019))[1:]
+    tables = [_annex_block(block) for block in blocks]
+    if len(tables) != 17 or not tables[0][0].startswith("JEFE") or not tables[1][0].startswith("DIPUTAD"):
+        raise ValueError(f"{ANNEX_2019}: expected the Head of Government, the Legislature, and the 15 comunas")
+    if tables[0][3] != tables[1][3]:
+        raise ValueError(f"{ANNEX_2019}: the two offices disagree on the registered voters")
+    pages: dict[int | None, Page] = {None: _merge_offices([tables[0], tables[1]], ["head", "legislature"])}
+    for title, rows, totals, registered in tables[2:]:
+        comuna = int(title.removeprefix("COMUNA "))
+        pages[comuna] = Page(["junta"], rows, totals, registered)
+    if sorted(c for c in pages if c is not None) != list(COMUNAS):
+        raise ValueError(f"{ANNEX_2019}: expected the 15 comunas")
+    return pages
+
+
+def _merge_offices(tables: list[tuple[str, list[Row], dict[str, list[int]], int]], cargos: list[str]) -> Page:
+    codes = list(dict.fromkeys(row.number for _, rows, _, _ in tables for row in rows))
+    merged = []
+    for code in codes:
+        found = [next((row for row in rows if row.number == code), None) for _, rows, _, _ in tables]
+        name = next(row.name for row in found if row is not None)
+        merged.append(Row(code, name, [row.votes[0] if row else 0 for row in found], []))
+    totals = {label: [t[2][label][0] for t in tables] for label in tables[0][2]}
+    return Page(cargos, merged, totals, tables[0][3])
+
+
+def _consulta(name: str) -> dict[str, dict[str, object]]:
+    """A count of the Tribunal's own system ("Consulta de totales", "Consulta definitiva"), by section: the whole
+    district, each comuna, and the prisoners' table. Each section maps its party codes to their lists' votes in the
+    order printed, and its totals."""
+    sections: dict[str, dict[str, object]] = {}
+    current: dict[str, object] | None = None
+    for line in pdf_text(name).splitlines():
+        label = line.strip()
+        header = re.search(r"CONSULTA (?:DE TOTALES|DEFINITIVA)\b.*?(?:COMUNA (\d+)|DIST\.|SECCION: 0[89]000)", line)
+        if header and "DE MESAS" not in line:
+            key = header[1] or ("prison" if "08000" in line else "national" if "09000" in line else "city")
+            current = sections.setdefault(key, {"lists": {}, "totals": {}, "registered": None})
+            continue
+        if label.startswith("Sección: 08000"):
+            current = sections.setdefault("prison", {"lists": {}, "totals": {}, "registered": None})
+            continue
+        if current is None:
+            continue
+        registered = re.match(r"Total de inscriptos:\s*(\d+)", label, re.IGNORECASE)
+        if registered and current["registered"] is None:
+            current["registered"] = int(registered[1])
+        lists = _lists_of(current)
+        totals = _totals_of(current)
+        total = next((code for text, code in CONSULTA_TOTALS.items() if label.startswith(text)), None)
+        figures = whole_numbers(line)
+        if total and figures:
+            totals.setdefault(total, figures[-1])
+            continue
+        listed = re.match(r"(\d+)\s+(\S.*?)\s{2,}(\d+)$", label)
+        if listed and not label.startswith("TOTAL"):
+            lists.setdefault(listed[1], []).append((listed[2], int(listed[3])))
+    return sections
+
+
+def _lists_of(section: dict[str, object]) -> dict[str, list[tuple[str, int]]]:
+    lists = section["lists"]
+    assert isinstance(lists, dict)
+    return lists
+
+
+def _totals_of(section: dict[str, object]) -> dict[str, int]:
+    totals = section["totals"]
+    assert isinstance(totals, dict)
+    return totals
+
+
+def _section_page(section: dict[str, object], cargo: str, primary: bool, what: str) -> Page:
+    rows: list[Row] = []
+    for code, lists in _lists_of(section).items():
+        votes = sum(v for _, v in lists)
+        listas = [Lista(str(k), LISTS_2021[(code, k)], [v]) for k, (_, v) in enumerate(lists, 1)] if primary else []
+        rows.append(Row(code, NAMES_2021[code], [votes], listas))
+    totals = _full_totals(_totals_of(section))
+    _check_valid(rows, totals, what)
+    registered = section["registered"]
+    return Page([cargo], rows, totals, registered if isinstance(registered, int) else None)
+
+
+def _scan_page(section: dict[str, list[int]]) -> Page:
+    """One section of the scanned count of national electors, as a page with the box of each figure."""
+    lists: dict[str, dict[int, int]] = {}
+    found: dict[str, int] = {}
+    boxes: dict[str, tuple[int, list[int]]] = {}
+    registered = None
+    for row, (value, page, *box) in section.items():
+        if row == "registered":
+            registered = value
+            boxes[row] = (page, box)
+        elif row in SCAN_ROWS:
+            code, ordinal = SCAN_ROWS[row]
+            lists.setdefault(code, {})[ordinal] = value
+            boxes[f"{code}:{ordinal}"] = (page, box)
+        else:
+            found[SCAN_TOTALS[row]] = value
+            boxes[SCAN_TOTALS[row]] = (page, box)
+    rows = [
+        Row(
+            code,
+            NAMES_2021[code],
+            [sum(by.values())],
+            [Lista(str(k), LISTS_2021[(code, k)], [v]) for k, v in sorted(by.items())],
+        )
+        for code, by in lists.items()
+    ]
+    totals = _full_totals(found)
+    _check_valid(rows, totals, PASO_2021_NATIONAL)
+    return Page(["legislature"], rows, totals, registered, boxes)
+
+
+def _add_pages(first: Page, second: Page) -> Page:
+    """The sum of two counts of the same tables, keeping the first one's boxes."""
+    rows = []
+    for row in first.rows:
+        other = next((r for r in second.rows if r.number == row.number), None)
+        if other is None or [lista.code for lista in other.lists] != [lista.code for lista in row.lists]:
+            raise ValueError(f"the two counts disagree on the lists of {row.number}")
+        rows.append(
+            Row(
+                row.number,
+                row.name,
+                [a + b for a, b in zip(row.votes, other.votes, strict=True)],
+                [
+                    Lista(a.code, a.name, [x + y for x, y in zip(a.votes, b.votes, strict=True)])
+                    for a, b in zip(row.lists, other.lists, strict=True)
+                ],
+            )
+        )
+    if {r.number for r in second.rows} - {r.number for r in first.rows}:
+        raise ValueError("the second count has lists the first lacks")
+    totals = {label: [a + b for a, b in zip(v, second.totals[label], strict=True)] for label, v in first.totals.items()}
+    registered = None if first.registered is None or second.registered is None else first.registered + second.registered
+    return Page(first.cargos, rows, totals, registered, first.boxes)
+
+
+def _same(page: Page, other: Page, what: str) -> None:
+    def flat(p: Page) -> dict[str, int]:
+        out = {label: values[0] for label, values in p.totals.items()}
+        for row in p.rows:
+            out[row.number] = row.votes[0]
+            out |= {f"{row.number}:{lista.code}": lista.votes[0] for lista in row.lists}
+        return out
+
+    mine, theirs = flat(page), flat(other)
+    differ = {k: (mine.get(k), theirs.get(k)) for k in mine.keys() | theirs.keys() if mine.get(k) != theirs.get(k)}
+    if differ:
+        raise ValueError(f"{what}: the units do not add up to the printed totals: {differ}")
+
+
+def _total(pages: list[Page]) -> Page:
+    total = pages[0]
+    for page in pages[1:]:
+        total = _add_pages(total, page)
+    return total
+
+
+def _paso_2021_city() -> Page:
+    """The Annex of Acordada 12/2021 with the City's totals. Its text puts each list's figure after the list's name,
+    except where a long name wraps, so the figures are read as the numbers that end a word run."""
+    text = pdf_text(PASO_2021_CITY)
+    registered = re.search(r"Total de inscriptos:\s*(\d+)", text)
+    assert registered is not None
+    lists: dict[str, list[tuple[str, int]]] = {}
+    found: dict[str, int] = {}
+    for line in text[text.index("PARTIDO POLITICO") :].splitlines():
+        label = line.strip()
+        total = next((code for text, code in CONSULTA_TOTALS.items() if label.startswith(text)), None)
+        if total:
+            found[total] = whole_numbers(line)[-1]
+            continue
+        code = re.match(r"(\d+)\s", label)
+        figures = re.findall(r"\s(\d+)(?=[A-Z]|\s*$)", line)
+        if code and figures and not label.startswith("TOTAL"):
+            lists.setdefault(code[1], []).append((label, int(figures[-1])))
+    section: dict[str, object] = {"lists": lists, "totals": found, "registered": int(registered[1])}
+    return _section_page(section, "legislature", True, PASO_2021_CITY)
+
+
+@functools.cache
+def pages_2021_paso() -> dict[int | None, Page]:
+    """The 2021 primaries for the Legislature: the Tribunal's count of foreign residents by comuna, with the prisoners'
+    table, plus the national electoral board's scanned count of Argentine electors by comuna and of prisoners."""
+    foreign = _consulta(PASO_2021_FOREIGN)
+    scans = json.loads(SCANS.read_text())
+    if scans["pdf"] != PASO_2021_NATIONAL:
+        raise ValueError(f"{SCANS.name} is not a reading of {PASO_2021_NATIONAL}")
+    pages: dict[int | None, Page] = {}
+    for key in ["prison", *(str(c) for c in COMUNAS)]:
+        national = _scan_page(scans["sections"][key])
+        theirs = _section_page(foreign[key], "legislature", True, f"{PASO_2021_FOREIGN}: {key}")
+        pages[0 if key == "prison" else int(key)] = _add_pages(national, theirs)
+    _same(
+        _total([_section_page(foreign[str(c)], "legislature", True, str(c)) for c in COMUNAS]),
+        _section_page(foreign["city"], "legislature", True, "city"),
+        f"{PASO_2021_FOREIGN}: the comunas against the district",
+    )
+    city = _paso_2021_city()
+    _same(_total([pages[0], *(pages[c] for c in COMUNAS)]), city, PASO_2021_CITY)
+    pages[None] = city
+    return pages
+
+
+@functools.cache
+def pages_2021_general() -> dict[int | None, Page]:
+    """The 2021 general election for the Legislature, for the whole City: the national electoral board's count of
+    Argentine electors, the Tribunal's count of foreign residents and of the prisoners' table, and their sum."""
+    foreign = _consulta(GENERAL_2021_FOREIGN)
+    national = _consulta(GENERAL_2021_NATIONAL)["national"]
+    city = _section_page(_consulta(GENERAL_2021_CITY)["city"], "legislature", False, GENERAL_2021_CITY)
+    parts = [
+        _section_page(national, "legislature", False, GENERAL_2021_NATIONAL),
+        _section_page(foreign["city"], "legislature", False, GENERAL_2021_FOREIGN),
+        _section_page(foreign["prison"], "legislature", False, GENERAL_2021_FOREIGN),
+    ]
+    summed = _total(parts)
+    summed.registered = city.registered
+    _same(summed, city, GENERAL_2021_CITY)
+    return {None: city}
+
+
+NEW_PAGES = {
+    "2017-general": pages_2017,
+    "2019-general": pages_2019,
+    "2021-paso": pages_2021_paso,
+    "2021-general": pages_2021_general,
+}
+
+
 def pdf_page(held: Held, comuna: int | None, prison: bool) -> Page:
+    if held.key in NEW_PAGES:
+        empty = Page([], [], {}, None)
+        return NEW_PAGES[held.key]().get(0 if prison else comuna, empty)
     if held.kind == "primary":
         return paso_junta_pages()[comuna] if comuna else paso_city_page()
     return general_pages()[0 if prison else comuna]
@@ -501,6 +939,7 @@ CITY = area("ar.caba_ciudad", CITY_CODE)
 TSJ_SOURCE = key("source", "tsj")
 TE_SOURCE = key("source", "te")
 TEC_SOURCE = key("source", "te.resoluciones")
+TSJR_SOURCE = key("source", "tsj.resoluciones")
 GCBA_SOURCE = key("source", "gcba.comunas")
 HEAD = key("office", "jefe-de-gobierno")
 LEGISLATURE = key("body", "legislatura")
@@ -566,13 +1005,56 @@ PRIMARY_DOCS_METHOD = (
     "and the Community Boards by comuna, so the first two are stored as declared totals and on one unit that is the "
     "whole City."
 )
+TSJ_DOCS_METHOD = (
+    "Held together with the national elections under the simultaneity regime of Law 15.262: the national electoral "
+    "board of the Capital Federal counted the Argentine electors and the prisoners' tables, and the Tribunal Superior "
+    "de Justicia counted the tables of foreign residents and published the definitive counts in its acordadas and "
+    "resolutions. Valid votes are the votes for lists (the authority's positive votes), and ballots cast are valid, "
+    "blank, null, challenged, and contested ballots together. Challenged and contested ballots are stored as null "
+    "ballots and as the objected measure."
+)
+DOC_NOTES = {
+    "2017-general": (
+        " The Tribunal published the votes of each list for the whole City only (Annex I of Acordada Electoral "
+        "11/2017), so they are stored as declared totals and on one unit that is the whole City."
+    ),
+    "2019-general": (
+        " Annex I of Acordada Electoral 12/2019 gives the Head of Government and the Legislature for the whole City "
+        "only, stored as declared totals and on one unit that is the whole City, and each Community Board by comuna, "
+        "where the unit is the sum of the citizens' and the foreign residents' votes that the annex prints. The annex "
+        "names the alliances without their ballot numbers."
+    ),
+    "2021-paso": (
+        " Each comuna is the sum of the national electoral board's count of Argentine electors, which the Tribunal "
+        "published as a scanned document, and the Tribunal's own count of the foreign residents in that comuna. The "
+        "prisoners' tables of both counts are one more unit with no area. The scanned figures were read from the page "
+        "images, so these values are flagged as digitized and carry the box of the Argentine electors' figure on its "
+        "page. The units add up exactly to the City totals in the Annex of Acordada 12/2021, which are stored as "
+        "declared totals."
+    ),
+    "2021-general": (
+        " The Tribunal published the definitive count for the whole City only, as the Argentine electors' total, the "
+        "foreign residents' total, and their prisoners' table. Their sum, which equals the City total it printed, is "
+        "stored as declared totals and on one unit that is the whole City."
+    ),
+}
 PRISON_METHOD = (
     " The prisoners' tables, which the service lists apart from the comunas, are one more unit with no area."
 )
 
 
+def per_year(code: str, year: int) -> bool:
+    """Whether a ballot number names an alliance of one election rather than a party that keeps its number: the
+    alliances numbered from 700 (2023) or from 500 (2017 to 2021), and the alliances the 2019 count names without one."""
+    return not code.isdigit() or int(code) >= (500 if 2017 <= year <= 2021 else 700)
+
+
+def order(code: str) -> tuple[int, str]:
+    return (int(code), "") if code.isdigit() else (1 << 20, code)
+
+
 def party(code: str, year: int) -> str:
-    return key("party", code) if int(code) < 700 else key("party", year, code)
+    return key("party", year, code) if per_year(code, year) else key("party", code)
 
 
 def _names() -> dict[tuple[str, int], str]:
@@ -581,6 +1063,10 @@ def _names() -> dict[tuple[str, int], str]:
         for comuna in COMUNAS:
             for row in page_of(held, comuna).rows:
                 names.setdefault((row.number, held.day.year), row.name)
+        if held.key in NEW_PAGES:
+            for page in NEW_PAGES[held.key]().values():
+                for row in page.rows:
+                    names.setdefault((row.number, held.day.year), row.name)
     return names
 
 
@@ -697,6 +1183,12 @@ def registry() -> Package:
             "Resoluciones de escrutinio de las elecciones de 2023",
             f"{TSJ}/resultados",
         ),
+        (
+            TSJR_SOURCE,
+            "Tribunal Superior de Justicia de la Ciudad Autónoma de Buenos Aires",
+            "Acordadas electorales y escrutinios definitivos de las elecciones de 2017, 2019 y 2021",
+            f"{TSJ}/resoluciones",
+        ),
     ):
         p.add(
             "source",
@@ -728,16 +1220,17 @@ def registry() -> Package:
         p.add("electoral_system", id=id, polity_id=ARGENTINA, valid_from=since, rules=rules, rules_version=1)
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=method, lang="en")
     names = _names()
-    for (code, year), text in sorted(names.items(), key=lambda item: (int(item[0][0]), item[0][1])):
-        if int(code) < 700 and (code, year) != max((k for k in names if k[0] == code), key=lambda k: k[1]):
+    for (code, year), text in sorted(names.items(), key=lambda item: (order(item[0][0]), item[0][1])):
+        lasting = [k for k in names if k[0] == code and not per_year(*k)]
+        if not per_year(code, year) and (code, year) != max(lasting, key=lambda k: k[1]):
             continue
         id = party(code, year)
-        p.add("party", id=id, kind="party" if int(code) < 700 else "bloc", polity_id=ARGENTINA)
+        p.add("party", id=id, kind="bloc" if per_year(code, year) else "party", polity_id=ARGENTINA)
         p.add(
             "external_id",
             entity_id=id,
             scheme="ar.caba.agrupacion",
-            value=code if int(code) < 700 else f"{year}:{code}",
+            value=f"{year}:{code}" if per_year(code, year) else code,
         )
         p.name(id, text, "es", "official")
     return p
@@ -770,20 +1263,59 @@ MEASURES = {"valid": 4, "blank": 6, "cast": 3}
 
 
 def _value(
-    p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int, table: str = "result_value"
+    p: Package,
+    result_set: str,
+    unit: str,
+    option: str | None,
+    measure: int,
+    value: int,
+    table: str = "result_value",
+    flags: int = 0,
 ) -> None:
     p.add(
         table,
         result_set_id=result_set,
         **({"unit_id": unit} if table == "result_value" else {}),
         option_id=option,
-        **({"channel": 0, "count_round": 0, "flags": 0} if table == "result_value" else {}),
+        **({"channel": 0, "count_round": 0, "flags": flags} if table == "result_value" else {}),
         measure=measure,
         value=value,
     )
 
 
-def _accounting(p: Package, result_set: str, unit: str | None, totals: dict[str, int], registered: int | None) -> None:
+def _locate(
+    p: Package, result_set: str, unit: str, option: str | None, measure: int, at: tuple[int, list[int]]
+) -> None:
+    number, (x0, y0, x1, y1) = at
+    p.add(
+        "value_locator",
+        result_set_id=result_set,
+        unit_id=unit,
+        option_id=option,
+        channel=0,
+        measure=measure,
+        count_round=0,
+        page_id=scan_page(number),
+        source_id=None,
+        x0=float(x0),
+        y0=float(y0),
+        x1=float(x1),
+        y1=float(y1),
+    )
+
+
+def scan_page(number: int) -> str:
+    return key("page", PASO_2021_NATIONAL, number)
+
+
+def _accounting(
+    p: Package,
+    result_set: str,
+    unit: str | None,
+    totals: dict[str, int],
+    registered: int | None,
+    boxes: dict[str, tuple[int, list[int]]] | None = None,
+) -> None:
     invalid = totals["null"] + totals["challenged"] + totals["contested"]
     objected = totals["challenged"] + totals["contested"]
     figures = [(3, totals["cast"]), (4, totals["valid"]), (5, invalid), (6, totals["blank"]), (15, objected)]
@@ -793,7 +1325,16 @@ def _accounting(p: Package, result_set: str, unit: str | None, totals: dict[str,
         if unit is None:
             _value(p, result_set, "", None, measure, value, "declared")
         else:
-            _value(p, result_set, unit, None, measure, value)
+            _value(p, result_set, unit, None, measure, value, flags=DIGITIZED if boxes else 0)
+    if unit is not None and boxes:
+        located = {
+            3: "cast",
+            6: "blank",
+            **({5: "null"} if not objected else {}),
+            **({2: "registered"} if registered else {}),
+        }
+        for measure, label in located.items():
+            _locate(p, result_set, unit, None, measure, boxes[label])
 
 
 def _at(totals: dict[str, list[int]], k: int) -> dict[str, int]:
@@ -805,10 +1346,13 @@ def election(name: str) -> Package:
     year = held.day.year
     first = FIRST_ROUND.get(held.key)
     english, spanish = ELECTION_NAMES[held.kind]
+    city = page_of(held, None)
+    pages: dict[int, Page] = {comuna: page_of(held, comuna) for comuna in COMUNAS}
+    grain = "by comuna" if any(page.cargos for page in pages.values()) else "for the whole City"
     p = Package(
         f"{SOURCE}/{held.key}",
         SOURCE,
-        f"The City of Buenos Aires's {held.day:%-d %B %Y} {held.kind.replace('primary', 'open primaries')} by comuna",
+        f"The City of Buenos Aires's {held.day:%-d %B %Y} {held.kind.replace('primary', 'open primaries')} {grain}",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", *([f"{SOURCE}/{first}"] if first else [])],
     )
     p.external.add(ARGENTINA)
@@ -816,6 +1360,22 @@ def election(name: str) -> Package:
     for url in urls(held):
         p.uses(raw.cached(SOURCE, url))
     primary = held.kind == "primary"
+    if held.key == "2021-paso":
+        scan = raw.cached(SOURCE, doc_url(PASO_2021_NATIONAL))
+        artifact = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{source}\x1f{scan.storage_key}"))
+        sizes = subprocess.run(
+            ["pdfinfo", "-f", "1", "-l", "999", str(scan.path)], capture_output=True, text=True, check=True
+        ).stdout
+        for number, width, height in re.findall(r"Page\s+(\d+) size:\s+([\d.]+) x ([\d.]+)", sizes):
+            p.add(
+                "source_page",
+                id=scan_page(int(number)),
+                artifact_id=artifact,
+                page_number=int(number),
+                image_key=f"pages/{SOURCE}/{scan.sha256}-{number}.png",
+                width=round(float(width) * 200 / 72),
+                height=round(float(height) * 200 / 72),
+            )
     election_id = key("election", held.key)
     path = f"ar/caba/{held.day}-{held.kind}"
     p.add(
@@ -831,11 +1391,11 @@ def election(name: str) -> Package:
     p.add("slug", path=path, entity_id=election_id, is_current=True)
     p.name(election_id, english.format(year=year), "en", "official")
     p.name(election_id, spanish.format(year=year), "es", "native", False)
-    city = page_of(held, None)
-    pages: dict[int, Page] = {comuna: page_of(held, comuna) for comuna in COMUNAS}
     prison = page_of(held, None, True) if held.prison else None
     units: dict[int, str] = {}
     for comuna in COMUNAS:
+        if not pages[comuna].cargos:
+            continue
         unit = units[comuna] = key("unit", held.day, comuna)
         p.add(
             "reporting_unit",
@@ -943,7 +1503,9 @@ def election(name: str) -> Package:
                 id=key("note", result_set),
                 entity_id=result_set,
                 kind="methodology",
-                body_md=(PDF_METHOD if held.docs and year == 2023 else METHOD)
+                body_md=TSJ_DOCS_METHOD + (PRIMARY_METHOD if primary else "") + DOC_NOTES[held.key]
+                if held.key in DOC_NOTES
+                else (PDF_METHOD if held.docs and year == 2023 else METHOD)
                 + (PRIMARY_METHOD if primary else "")
                 + (PRISON_METHOD if prison is not None else "")
                 + (PRIMARY_DOCS_METHOD if primary and year == 2023 else ""),
@@ -960,9 +1522,7 @@ def election(name: str) -> Package:
                 here = [(city_unit, city, city.cargos.index(cargo))]
             looked = [*here, ("", city, city.cargos.index(cargo))] if scope == 0 else here
             options: dict[tuple[str, str], str] = {}
-            numbers = sorted(
-                {row.number for _, page, k in looked for row in page.rows if row.votes[k]}, key=lambda n: int(n)
-            )
+            numbers = sorted({row.number for _, page, k in looked for row in page.rows if row.votes[k]}, key=order)
             for number in numbers:
                 label = next(row.name for _, page, _ in looked for row in page.rows if row.number == number)
                 parent = key("option", held.key, tag, number)
@@ -972,7 +1532,7 @@ def election(name: str) -> Package:
                     contest_id=contest,
                     kind="ticket" if cargo == "head" else "list",
                     party_id=party(number, year),
-                    ballot_position=int(number),
+                    ballot_position=int(number) if number.isdigit() else None,
                     ballot_label=label,
                 )
                 options[(number, "")] = parent
@@ -1009,16 +1569,20 @@ def election(name: str) -> Package:
                         ballot_label=name_of,
                     )
             for unit, page, k in here:
-                _accounting(p, result_set, unit, _at(page.totals, k), page.registered)
+                _accounting(p, result_set, unit, _at(page.totals, k), page.registered, page.boxes)
+                flags = DIGITIZED if page.boxes else 0
                 for row in page.rows:
                     if (row.number, "") not in options:
                         continue
                     if primary:
                         for lista in row.lists:
                             if (row.number, lista.code) in options:
-                                _value(p, result_set, unit, options[(row.number, lista.code)], 1, lista.votes[k])
+                                option = options[(row.number, lista.code)]
+                                _value(p, result_set, unit, option, 1, lista.votes[k], flags=flags)
+                                if f"{row.number}:{lista.code}" in page.boxes:
+                                    _locate(p, result_set, unit, option, 1, page.boxes[f"{row.number}:{lista.code}"])
                     else:
-                        _value(p, result_set, unit, options[(row.number, "")], 1, row.votes[k])
+                        _value(p, result_set, unit, options[(row.number, "")], 1, row.votes[k], flags=flags)
             if scope == 0:
                 k = city.cargos.index(cargo)
                 _accounting(p, result_set, None, _at(city.totals, k), city.registered)
