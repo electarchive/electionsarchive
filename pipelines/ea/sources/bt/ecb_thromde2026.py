@@ -12,6 +12,8 @@ from datetime import date
 from pathlib import Path
 from uuid import uuid5
 
+import shapely
+
 from ea import package, raw
 from ea.package import Package
 from ea.sources.bt import ecb, pdfwords
@@ -24,6 +26,9 @@ FILES = {
     "declaration": f"{ecb.BASE}/wp-json/wp/v2/posts?slug=declaration-of-results-dzongkhag-thromde-tshogde-elections-2026"
     "&_fields=id,link,title,content",
 }
+# The Thimphu thromde's outline is OpenStreetMap relation 9330372 (admin_level 5, Wikidata Q9270). Nominatim serves
+# the current geometry as GeoJSON. OpenStreetMap has no outline for Phuentshogling and no demkhong boundaries.
+OSM_THIMPHU = "https://nominatim.openstreetmap.org/lookup?osm_ids=R9330372&format=geojson&polygon_geojson=1"
 DAY = date(2026, 7, 15)
 BHUTAN = ecb.BHUTAN
 COUNTRY = ecb.COUNTRY
@@ -39,6 +44,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 ECB = key("source", "ecb")
+OSM_SOURCE = key("source", "osm")
 OFFICE = key("office", "thrompon")
 SYSTEM = key("electoral_system", "fptp")
 
@@ -60,6 +66,7 @@ def packages() -> list[str]:
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, OSM_THIMPHU, suffix=".geojson")
     for name, url in FILES.items():
         raw.fetch(SOURCE, url, suffix=".json" if name == "declaration" else ".pdf")
 
@@ -182,6 +189,21 @@ def pretty(name: str) -> str:
     return name.replace("_", "-")
 
 
+def thimphu_outline() -> shapely.MultiPolygon:
+    data = json.loads(path_of(OSM_THIMPHU).read_text())
+    shape = shapely.from_geojson(json.dumps(data["features"][0]["geometry"]))
+    shape = shapely.make_valid(shape)
+    if shape.geom_type == "Polygon":
+        shape = shapely.MultiPolygon([shape])
+    if shape.geom_type != "MultiPolygon" or not 20 < shapely.area(shape) * 111.32 * 110.57 * 0.888 < 35:
+        raise ValueError("the Thimphu outline is not a polygon of about 26 square kilometers")
+    return shape
+
+
+def path_of(url: str) -> Path:
+    return raw.DATA / raw.cached(SOURCE, url).storage_key
+
+
 def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
@@ -204,6 +226,18 @@ def geo() -> Package:
     for code, rank, noun in ((SCHEME_THROMDE, 3, "thromde"), (SCHEME_DEMKHONG, 4, "demkhong")):
         kind = "administrative" if rank == 3 else "electoral_district"
         p.add("scheme", code=code, polity_id=BHUTAN, kind=kind, rank=rank, noun=noun, code_system=None)
+    p.add(
+        "source",
+        id=OSM_SOURCE,
+        kind="academic",
+        publisher="OpenStreetMap contributors",
+        title="OpenStreetMap relation 9330372, Thimphu",
+        url="https://www.openstreetmap.org/relation/9330372",
+        license="ODbL 1.0 (OpenStreetMap contributors)",
+        license_url="https://opendatacommons.org/licenses/odbl/1-0/",
+        attribution="© OpenStreetMap contributors",
+    )
+    p.artifact(raw.cached(SOURCE, OSM_THIMPHU), OSM_SOURCE)
     for thromde, names in demkhongs().items():
         area = thromde_area(thromde)
         p.add("area", id=area, scheme_code=SCHEME_THROMDE)
@@ -216,6 +250,28 @@ def geo() -> Package:
             p.add("area_code", area_id=seat, code=f"{thromde.lower()}.{name.lower()}")
             p.add("area_parent", area_id=seat, parent_id=area)
             p.name(seat, pretty(name), "en", "official")
+    outline = thimphu_outline()
+    p.add(
+        "area_geometry",
+        area_id=thromde_area("Thimphu"),
+        valid_from=None,
+        valid_to=None,
+        geom=shapely.to_wkb(shapely.set_srid(outline, 4326), hex=True, include_srid=True),
+        label_point=shapely.to_wkb(
+            shapely.set_srid(shapely.point_on_surface(outline), 4326), hex=True, include_srid=True
+        ),
+        quality="osm",
+        source_id=OSM_SOURCE,
+    )
+    p.add(
+        "boundary_set",
+        id=key("boundary_set", SCHEME_THROMDE),
+        scheme_code=SCHEME_THROMDE,
+        vintage="osm",
+        valid_from=None,
+        valid_to=None,
+        as_of=date(2026, 11, 19),
+    )
     return p
 
 
