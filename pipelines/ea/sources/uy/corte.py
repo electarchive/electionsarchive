@@ -6,6 +6,7 @@ received in each circuit, on the national open-data catalog. A circuit is the fi
 
 import functools
 import io
+import json
 import re
 import subprocess
 import unicodedata
@@ -229,6 +230,55 @@ PLEBISCITES = {
 SITE = "https://www.gub.uy/corte-electoral/sites/corte-electoral/files/"
 # The Corte's "resultados y cargos" workbook of an election: the party totals and the seats each party won.
 SUMMARY = {"2014-10-26": f"{SITE}2024-04/Nacionales%202014.xlsx"}
+# The Corte's 2019 results: the zip of its results site's JSON files (the country totals per lema and the blank and
+# annulled ballots), and the minutes in which it proclaimed the Senate and the Chamber of Representatives. The minutes
+# are scanned documents, so the seats are transcribed in SEATS_2019 and checked against their own totals.
+RESULTS_JSON = {"2019-10-27": (f"{GUB}download/node/field_documento/1141", "ResumenGeneral_D.json")}
+PROCLAMATION = {
+    "2019-10-27": {
+        "senate": f"{GUB}download/node/field_documento/135",
+        "chamber": f"{GUB}download/node/field_documento/137",
+    }
+}
+OFFICIAL = sorted([*SUMMARY, *RESULTS_JSON])
+# Seats of the 2019 Senate (Acta 10035) and, by department, of the Chamber of Representatives (Acta 10037): the seats the
+# departmental boards gave by whole quotient plus the seats given by decreasing quotients, as the Corte proclaimed them.
+FA, PN, PC, CA_, PI, PERI, PG = (
+    "FRENTE AMPLIO",
+    "NACIONAL",
+    "COLORADO",
+    "CABILDO ABIERTO",
+    "INDEPENDIENTE",
+    "ECOLOGISTA RADICAL INTRANSIGENTE",
+    "DE LA GENTE",
+)
+SEATS_2019: tuple[dict[str, int], dict[str, dict[str, int]]] = (
+    {FA: 13, PN: 10, PC: 4, CA_: 3},
+    {
+        "MO": {FA: 19, PN: 9, PC: 5, CA_: 4, PERI: 1, PI: 1},
+        "CA": {FA: 7, PN: 4, PC: 2, CA_: 2},
+        "MA": {FA: 1, PN: 2, PC: 1, CA_: 1},
+        "RO": {FA: 1, PN: 1},
+        "TT": {FA: 1, PN: 1},
+        "CL": {FA: 1, PN: 1},
+        "RV": {PN: 1, PC: 1, CA_: 1},
+        "AR": {FA: 1, PN: 1},
+        "SA": {FA: 1, PC: 2, CA_: 1},
+        "PA": {FA: 1, PN: 1, PC: 1},
+        "RN": {FA: 1, PN: 1},
+        "SO": {FA: 1, PN: 1},
+        "CO": {FA: 1, PN: 1, PC: 1, PG: 1},
+        "SJ": {FA: 1, PN: 1, CA_: 1},
+        "FS": {FA: 1, PN: 1},
+        "FD": {FA: 1, PN: 1},
+        "DU": {FA: 1, PN: 1},
+        "LA": {FA: 1, PN: 1},
+        "TA": {FA: 1, PN: 1, CA_: 1},
+    },
+)
+# The lemas' seats in the Chamber, as the minutes total them.
+CHAMBER_TOTALS_2019 = {FA: 42, PN: 30, PC: 13, CA_: 11, PI: 1, PERI: 1, PG: 1}
+CHAMBER_SIZE = {"MO": 39, "CA": 15, "MA": 5, "SA": 4, "CO": 4, "RV": 3, "PA": 3, "SJ": 3, "TA": 3}
 # The Corte's "integración de hojas" of the primaries: the precandidate and the members of every ballot sheet.
 INTEGRATION = {
     "2019-06-30": "e749ad5e-ef5a-4f56-9b16-96868cbfa460/resource/edfdec16-cf84-4b34-a59f-31615228d3c6/download/"
@@ -282,6 +332,9 @@ def documents(day: str) -> dict[str, str]:
     found = files(day)
     if day in SUMMARY:
         found["summary"] = url(SUMMARY[day])
+    if day in RESULTS_JSON:
+        found["results"] = RESULTS_JSON[day][0]
+        found.update({f"proclamation-{name}": link for name, link in PROCLAMATION[day].items()})
     if day in INTEGRATION:
         found["integration"] = url(INTEGRATION[day])
     return found
@@ -304,7 +357,8 @@ def fetch() -> None:
     for day in DAYS:
         raw.fetch(SOURCE, f"{CATALOG}{FILES[day]['dataset']}", suffix=".html")
         for link in documents(day).values():
-            raw.fetch(SOURCE, link, suffix=".xlsx" if link.endswith(".xlsx") else ".csv")
+            suffix = ".zip" if "/download/node/" in link else ".xlsx" if link.endswith(".xlsx") else ".csv"
+            raw.fetch(SOURCE, link, suffix=suffix)
     for day, link in PLEBISCITE_FILES.items():
         raw.fetch(SOURCE, link, suffix=PLEBISCITE_SUFFIX[day])
     for day in XDAYS:
@@ -506,8 +560,26 @@ def seat_row(parties: list[str], cells: list[str]) -> dict[str, int]:
     return {ABBREVIATIONS[party]: n for party, n in zip(parties, seats, strict=False)}
 
 
+def declared_json(day: str) -> tuple[dict[str, int], int, int]:
+    """The country totals of the Corte's results site: the zip inside the download holds the departmental summary."""
+    link, member = RESULTS_JSON[day]
+    with zipfile.ZipFile(io.BytesIO(raw.cached(SOURCE, link).path.read_bytes())) as outer:
+        inner = next(name for name in outer.namelist() if name.endswith(".zip"))
+        with zipfile.ZipFile(io.BytesIO(outer.read(inner))) as zf:
+            found = json.loads(zf.read(member))
+    total = found[0]
+    if total["DepId"] != "" or total["CircuitosEscrutados"] != total["CircuitosTotal"]:
+        raise ValueError(f"{day}: the results file is not the complete count of the country")
+    votes = {lema_key(row["LemaNombre"]): int(row["Total"]) for row in total["EleccionNacional"]}
+    if sum(votes.values()) != total["TotalVotosALemas"]:
+        raise ValueError(f"{day}: the declared lema votes do not add up to the declared total")
+    return votes, int(total["TotalEnBlanco"]), int(total["TotalAnulados"])
+
+
 def declared_votes(day: str) -> tuple[dict[str, int], int, int]:
     """The votes of each lema, and the blank and annulled ballots, that the Corte declares for the whole country."""
+    if day in RESULTS_JSON:
+        return declared_json(day)
     rows = section(summary(day), 4)
     header = next(row for row in rows if row[0] == "DEPARTAMENTO")
     total = next(row for row in rows if row[0] == "TOTALES")
@@ -520,6 +592,8 @@ def declared_votes(day: str) -> tuple[dict[str, int], int, int]:
 
 def declared_seats(day: str) -> tuple[dict[str, int], dict[str, dict[str, int]]]:
     """The Senate seats by lema key, and the Chamber seats by department code and lema key, as the Corte declares."""
+    if day in RESULTS_JSON:
+        return checked_seats(day, *SEATS_2019)
     rows = summary(day)
     senate = section(rows, 7)
     header = next(row for row in senate if row[0] in ABBREVIATIONS)
@@ -542,6 +616,25 @@ def declared_seats(day: str) -> tuple[dict[str, int], dict[str, dict[str, int]]]
         if sum(found.get(lema, 0) for found in districts.values()) != nation[lema]:
             raise ValueError(f"{day}: the Chamber seats of {lema} do not add up to the declared total")
     return seats, districts
+
+
+def checked_seats(
+    day: str, senate: dict[str, int], chamber: dict[str, dict[str, int]]
+) -> tuple[dict[str, int], dict[str, dict[str, int]]]:
+    """The transcribed seats, once they agree with the sizes of the bodies and with the minutes' own totals."""
+    votes = declared_votes(day)[0]
+    if sum(senate.values()) != 30 or set(chamber) != set(DEPARTMENTS):
+        raise ValueError(f"{day}: the transcribed seats do not cover the Senate's 30 seats and every department")
+    for dept, seats in chamber.items():
+        if sum(seats.values()) != CHAMBER_SIZE.get(dept, 2):
+            raise ValueError(f"{day}: the seats of {dept} do not add up to its delegation")
+    nation = {lema: sum(seats.get(lema, 0) for seats in chamber.values()) for lema in CHAMBER_TOTALS_2019}
+    if nation != CHAMBER_TOTALS_2019 or sum(nation.values()) != 99:
+        raise ValueError(f"{day}: the Chamber seats do not add up to the proclaimed totals: {nation}")
+    for lema in {*senate, *nation}:
+        if lema not in votes:
+            raise ValueError(f"{day}: {lema} won seats but has no declared votes")
+    return senate, chamber
 
 
 @functools.cache
@@ -1092,7 +1185,7 @@ def national(day: str) -> Package:
     )
     frame = breakdown(day)
     b.add_units(b.totals)
-    seats = declared_seats(day) if day in SUMMARY else None
+    seats = declared_seats(day) if day in OFFICIAL else None
     votes = sheets(frame, "HOJA_EN", "VOTO_LEMA")
     lema_votes = votes.group_by("DEPARTAMENTO", "CRV", "LEMAKEY").agg(pl.col("VOTES").sum())
     contest, result_set = b.contest(
@@ -1107,7 +1200,7 @@ def national(day: str) -> Package:
     )
     options = b.lema_totals(contest, result_set, lema_votes, "ticket")
     b.accounting_values(result_set)
-    if day in SUMMARY:
+    if day in OFFICIAL:
         b.declared(result_set, options, *declared_votes(day))
     tickets, _ = RUNOFF_TICKETS[next(d for d in RUNOFF if d[:4] == year)]
     ahead = {lema for _, _, lema in tickets}
@@ -1126,7 +1219,7 @@ def national(day: str) -> Package:
     )
     lists = b.lema_totals(contest, result_set, lema_votes, "list")
     b.accounting_values(result_set)
-    if day in SUMMARY:
+    if day in OFFICIAL:
         b.declared(result_set, lists, *declared_votes(day))
     if seats is not None:
         b.seats(result_set, lists, seats[0])
@@ -1167,9 +1260,15 @@ def national(day: str) -> Package:
         "President, so each lema's votes are the same in every contest; the Chamber contests split them by sheet, "
         "the department's list. Votes counted for a lema alone, where a voter marked several sheets of one lema, "
         "are stored as legend votes on the lema option. The seats of the Senate and of each department's delegation "
-        "are the Corte's declared distribution, where its results workbook is published.",
+        "are the Corte's declared distribution, where its results workbook or proclamation minutes are published.",
         lang="en",
     )
+    if day in RESULTS_JSON:
+        b.p.accept(
+            "accounting.declared",
+            "The Corte's declared blank votes include the envelopes holding only sheets for the plebiscite, which its "
+            "circuit file counts apart; the circuit blank ballots plus those envelopes equal the declared count",
+        )
     return b.p
 
 
