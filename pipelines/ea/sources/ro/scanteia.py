@@ -32,8 +32,9 @@ import re
 import subprocess
 import unicodedata
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date
 from functools import cache
+from itertools import pairwise
 from pathlib import Path
 from typing import NamedTuple
 from uuid import uuid5
@@ -550,7 +551,64 @@ def geo() -> Package:
                 quality="academic",
                 source_id=GEOBOUNDARIES,
             )
+    for unit in units().values():
+        p.add(
+            "reporting_unit",
+            id=unit.id,
+            polity_id=ROMANIA,
+            scheme_code=unit.scheme,
+            code=unit.code,
+            area_relation="equals",
+            area_id=area_id(unit.plan, unit.code),
+            kind="standard",
+            valid_from=unit.valid_from,
+            valid_from_precision="day",
+            valid_to=unit.valid_to,
+            valid_to_precision=None if unit.valid_to is None else "day",
+        )
+        p.name(unit.id, area_name(unit.plan, unit.code), "ro", "official")
     return p
+
+
+class Unit(NamedTuple):
+    id: str
+    scheme: str
+    code: str
+    plan: str
+    valid_from: date
+    valid_to: date | None
+
+
+@cache
+def units() -> dict[tuple[str, str], Unit]:
+    """One reporting unit per scheme, code, and area, keyed by (scheme, area key).
+
+    Each unit starts on the first election or referendum that reports it and stays open; where a later plan gives the
+    same code a different area (the regions of 1960, and Bucharest and Ialomița in 1981), the earlier unit ends on the
+    day the later one starts, so no two units of a scheme and code overlap.
+    """
+    polls = [(e.day, e.plan, [r.printed for r in table(e.day)[0]]) for e in ELECTIONS]
+    polls.append((REFERENDUM.day, REFERENDUM.plan, [r.printed for r in referendum_table(REFERENDUM.day)[0]]))
+    found: dict[tuple[str, str], Unit] = {}
+    for day, plan, printed in sorted(polls):
+        scheme = PLANS[plan][0]
+        for name in printed:
+            code = code_of(plan, name)
+            ak = area_key(plan, code)
+            if (scheme, ak) not in found:
+                found[scheme, ak] = Unit(key("unit", scheme, ak), scheme, code, plan, day, None)
+    by_code: dict[tuple[str, str], list[tuple[str, str]]] = {}
+    for k, unit in found.items():
+        by_code.setdefault((unit.scheme, unit.code), []).append(k)
+    for keys in by_code.values():
+        keys.sort(key=lambda k: found[k].valid_from)
+        for earlier, later in pairwise(keys):
+            found[earlier] = found[earlier]._replace(valid_to=found[later].valid_from)
+    return found
+
+
+def unit_id(plan: str, code: str) -> str:
+    return units()[PLANS[plan][0], area_key(plan, code)].id
 
 
 def unshaped() -> list[str]:
@@ -780,22 +838,7 @@ def build(e: Election) -> Package:
     locators: list[tuple[str, str | None, int, str, float, float, float, float]] = []
     for row, located in zip(rows, boxes, strict=True):
         code = code_of(e.plan, row.printed)
-        unit = key("unit", e.day, code)
-        p.add(
-            "reporting_unit",
-            id=unit,
-            polity_id=ROMANIA,
-            scheme_code=PLANS[e.plan][0],
-            code=code,
-            area_relation="equals",
-            area_id=area_id(e.plan, code),
-            kind="standard",
-            valid_from=e.day,
-            valid_from_precision="day",
-            valid_to=e.day + timedelta(days=1),
-            valid_to_precision="day",
-        )
-        p.name(unit, area_name(e.plan, code), "ro", "official")
+        unit = unit_id(e.plan, code)
         for field, (option, measure) in measures.items():
             value = row.values[field]
             if value is None:
@@ -924,26 +967,10 @@ def build_referendum(r: Referendum) -> Package:
     boxes = json.loads((TABLES / f"{r.day}.boxes.json").read_text())
     if [b["unit"] for b in boxes] != [row.printed for row in rows]:
         raise ValueError(f"{r.day}: the boxes do not follow the table's rows")
-    units: dict[str, str] = {}
+    reported: dict[str, str] = {}
     for row in rows:
         code = code_of(r.plan, row.printed)
-        unit = key("unit", r.day, code)
-        units[row.printed] = unit
-        p.add(
-            "reporting_unit",
-            id=unit,
-            polity_id=ROMANIA,
-            scheme_code=PLANS[r.plan][0],
-            code=code,
-            area_relation="equals",
-            area_id=area_id(r.plan, code),
-            kind="standard",
-            valid_from=r.day,
-            valid_from_precision="day",
-            valid_to=r.day + timedelta(days=1),
-            valid_to_precision="day",
-        )
-        p.name(unit, area_name(r.plan, code), "ro", "official")
+        reported[row.printed] = unit_id(r.plan, code)
 
     for number, (prefix, (english, romanian, path)) in enumerate(REFERENDUM_QUESTIONS.items(), start=1):
         contest = key("contest", r.day, number)
@@ -1012,7 +1039,7 @@ def build_referendum(r: Referendum) -> Package:
         values: list[tuple[str, str | None, int, int]] = []
         locators: list[tuple[str, str | None, int, str, float, float, float, float]] = []
         for row, located in zip(rows, boxes, strict=True):
-            unit = units[row.printed]
+            unit = reported[row.printed]
             for field, (option, measure) in measures.items():
                 value = row.values[field]
                 if value is None:
