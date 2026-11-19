@@ -8,7 +8,7 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
-from ea.sources.cl import servel
+from ea.sources.cl import plebiscitos_historicos, servel
 
 SOURCE = "cl.plebiscitos"
 CHILE = servel.CHILE
@@ -114,6 +114,11 @@ ELECTIONS: dict[date, Spec] = {
 
 def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
+
+
+def region_unit(region: int) -> str:
+    """The cl.region reporting unit that the 1978 and 1980 votes' pipeline wrote for this region."""
+    return str(uuid5(package.NAMESPACE, "\x1f".join([plebiscitos_historicos.SOURCE, "unit", str(region)])))
 
 
 def packages() -> list[str]:
@@ -226,17 +231,9 @@ def build(day: date) -> Package:
 
     rows: list[tuple[str, str | None, int, int]] = []
     for region, row in votes.items():
-        unit = p.id("unit", region)
-        p.add(
-            "reporting_unit",
-            id=unit,
-            polity_id=CHILE,
-            scheme_code="cl.region",
-            code=str(region),
-            area_relation="equals",
-            area_id=servel.area("cl.region", str(region)),
-            kind="standard",
-        )
+        # The regional units the 1978 and 1980 votes already hold; this pipeline reports into them.
+        unit = region_unit(region)
+        p.external.add(unit)
         rows += [
             (unit, options[0], 1, row.yes),
             (unit, options[1], 1, row.no),
