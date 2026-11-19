@@ -10,7 +10,7 @@ stations for 2012 and municipalities for the general elections.
 import functools
 import html
 import re
-from collections import Counter
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from html.parser import HTMLParser
@@ -18,9 +18,11 @@ from uuid import uuid5
 
 import httpx
 import polars as pl
+import shapely
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.ba import cik_1996_2000 as shapes
 
 SOURCE = "ba.cik_archive"
 BIH = str(uuid5(package.NAMESPACE, "polity\x1fBA"))
@@ -37,6 +39,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 SOURCE_ID = key("source", SOURCE)
+SHAPES_ID = key("source", shapes.SHAPES)
 
 
 # Reading HTML tables.
@@ -1168,6 +1171,73 @@ def source_row(p: Package) -> None:
         license_url="https://www.izbori.ba/",
         attribution="Central Election Commission of Bosnia and Herzegovina, izbori.ba",
     )
+    p.add(
+        "source",
+        id=SHAPES_ID,
+        kind="academic",
+        publisher="geoBoundaries",
+        title="geoBoundaries gbOpen Bosnia and Herzegovina ADM1 and ADM3 (simplified, 2013), from Wikimedia Commons",
+        url="https://www.geoboundaries.org/",
+        license="Public domain",
+        license_url="https://www.geoboundaries.org/",
+        attribution="geoBoundaries (William & Mary geoLab); original data from Wikimedia Commons",
+    )
+
+
+OUTLINE_NAMES = {  # the geoBoundaries outline of each municipality whose name differs, by the Commission's code
+    "006": "Kupra na Uni",
+    "007": "Novi Grad@west",
+    "036": "Doboj East",
+    "107": "Kupres (BiH)",
+    "108": "Kupres",
+    "133": "Novo Sarajevo",
+    "136": "Centar",
+    "137": "Stari Grad",
+    "141": "Trnovo (BiH)",
+    "142": "Trnovo (RS)",
+    "143": "Pale-Prača",
+    "144": "Pale",
+    "147": "Republika Srpska",  # the 2013 set labels Višegrad's outline by its entity
+    "165": "Foča-Ustikolina",
+    "166": "Foča",
+    "168": "Ustiprača",
+    "199": "Mostar",
+    "200": "Brcko District",
+}
+
+
+def geometry(p: Package, id: str, shape: shapely.Geometry, since: date) -> None:
+    shape = shapes.multipolygon(shape)
+    p.add(
+        "area_geometry",
+        area_id=id,
+        valid_from=since,
+        geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+        label_point=shapely.to_wkb(
+            shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+        ),
+        quality="academic",
+        source_id=SHAPES_ID,
+    )
+
+
+def municipal_outlines() -> dict[str, shapely.Geometry]:
+    """The geoBoundaries outline of each municipality, paired by name."""
+    by_name: dict[str, list[shapely.Geometry]] = defaultdict(list)
+    for name, shape in shapes.outlines("ADM3"):
+        by_name[shapes.fold_latin(name)].append(shape)
+    out: dict[str, shapely.Geometry] = {}
+    for code, text in municipality_names().items():
+        wanted, _, side = (OUTLINE_NAMES.get(code) or title(text).split(" / ")[-1]).partition("@")
+        found = by_name.get(shapes.fold_latin(wanted), [])
+        if side:
+            found = sorted(found, key=lambda g: shapely.centroid(g).x)
+            found = found[:1] if side == "west" else found[-1:]
+        if len(found) == 1:
+            out[code] = found[0]
+        else:
+            print(f"no single outline for municipality {code} {text} ({wanted}): {len(found)}")
+    return out
 
 
 def geo() -> Package:
@@ -1175,26 +1245,54 @@ def geo() -> Package:
         f"{SOURCE}/geo",
         SOURCE,
         "Bosnia and Herzegovina's entities, municipalities, and electoral districts as the Central Election "
-        "Commission's 2006-2014 result sites name them",
+        "Commission's 2006-2014 result sites name them, with outlines from geoBoundaries",
     )
     p.external |= {BIH, COUNTRY, STATIONS}
     source_row(p)
+    for url in (shapes.OUTLINES["ADM1"], shapes.OUTLINES["ADM3"]):
+        p.artifact(raw.cached(shapes.SHAPES, url), SHAPES_ID)
+    first = min(e.day for e in ELECTIONS)
+    plans = sorted({v[0] for versions in district_plans().values() for v in versions})
     for code, rank, kind, noun in SCHEMES.values():
         p.add("scheme", code=code, polity_id=BIH, kind=kind, rank=rank, noun=noun, code_system=None)
+    for kind in ("entity", "municipality"):
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", SCHEMES[kind][0], first.year),
+            scheme_code=SCHEMES[kind][0],
+            vintage=str(first.year),
+            valid_from=first,
+            as_of=first,
+        )
+    for i, since in enumerate(plans):  # each redrawing of the electoral districts is a boundary set of its own
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", SCHEMES["constituency"][0], since.year),
+            scheme_code=SCHEMES["constituency"][0],
+            vintage=str(since.year),
+            valid_from=since,
+            valid_to=plans[i + 1] - timedelta(days=1) if i + 1 < len(plans) else None,
+            as_of=since,
+        )
+    entity_shapes = dict(shapes.outlines("ADM1"))
     for code, text in ENTITY_NAMES.items():
         id = area("entity", code)
         p.add("area", id=id, scheme_code=SCHEMES["entity"][0])
         p.add("area_code", area_id=id, code=code)
         p.add("area_parent", area_id=id, parent_id=COUNTRY)
         p.name(id, text, "en", "official")
+        geometry(p, id, entity_shapes[shapes.ENTITY_OUTLINES[code]], first)
+    outlines = municipal_outlines()
     for code, text in sorted(municipality_names().items()):
         id = area("municipality", code)
         p.add("area", id=id, scheme_code=SCHEMES["municipality"][0])
         p.add("area_code", area_id=id, code=code)
         p.add("area_parent", area_id=id, parent_id=COUNTRY)
         p.name(id, title(text), "bs", "official")
+        if code in outlines:
+            geometry(p, id, outlines[code], first)
     for code, versions in sorted(district_plans().items()):
-        for i, (since, text, race, _) in enumerate(versions):
+        for i, (since, text, race, members) in enumerate(versions):
             id = district_id(code, since if len(versions) > 1 else None)
             until = versions[i + 1][0] - timedelta(days=1) if i + 1 < len(versions) else None
             p.add("area", id=id, scheme_code=SCHEMES["constituency"][0])
@@ -1205,6 +1303,9 @@ def geo() -> Package:
             p.add("area_parent", area_id=id, parent_id=area("entity", district_entity(race, code)))
             p.name(id, f"{title(text)} ({RACES[race][0]})", "en", "official")
             p.name(id, title(text), "bs", "native", False)
+            parts = [shapes.multipolygon(outlines[m]) for m in sorted(members) if m in outlines]
+            if parts:
+                geometry(p, id, shapely.union_all(parts), since)
     return p
 
 
@@ -1624,6 +1725,8 @@ def fetch() -> None:
     fetch_2012()
     fetch_apps()
     fetch_2006()
+    for level in ("ADM1", "ADM3"):
+        raw.fetch(shapes.SHAPES, shapes.OUTLINES[level], suffix=".geojson")
 
 
 def emit() -> None:
