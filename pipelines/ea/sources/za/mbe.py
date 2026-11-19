@@ -9,6 +9,7 @@ by-election (a dissolved council) has a results report and a seat report per mun
 import functools
 import json
 import re
+import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
@@ -82,6 +83,7 @@ class Session:
             except httpx.HTTPError:
                 if attempt == 3:
                     raise
+                time.sleep(5 * (attempt + 1))
                 continue
             if response.status_code == 200 and "Error 500" not in response.text:
                 self.page = response.text
@@ -105,7 +107,11 @@ class Session:
         if link is None:
             raise RuntimeError(f"no {button} link")
         for attempt in range(4):
-            response = self.client.get(HOST + link)
+            try:
+                response = self.client.get(HOST + link)
+            except httpx.HTTPError:  # the portal sometimes drops the connection; the link stays valid
+                time.sleep(5 * (attempt + 1))
+                continue
             if response.status_code == 200 and response.headers.get("content-type", "").startswith("application/"):
                 return response.content
         raise RuntimeError(f"{button} did not download")
