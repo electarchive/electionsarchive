@@ -874,7 +874,7 @@ CHECKS = {
                                            and l.unit_id = p.unit_id and l.option_id = k.option_id
                                            and l.channel = p.channel and l.count_round = p.count_round and l.measure = 1
                                           where p.measure = 7 and p.value > l.value * coalesce(k.ballot_lines, 1)""",
-    "result_set.default": """select contest_id, stage, count(*) as n from all_result_set where is_default
+    "result_set.default": """select election_id, contest_id, stage, count(*) as n from all_result_set where is_default
                              group by all having count(*) > 1""",
     "result_set.empty": """select r.id from result_set r where r.completeness > 0
                            and not exists (select 1 from result_value v where v.result_set_id = r.id)""",
@@ -2303,8 +2303,9 @@ def _seal(
     counts: dict[str, int],
     adopts: list[str],
     sources: list[dict[str, str]],
-    reason: str | None,
+    reason: str | dict[str, str] | None,
 ) -> Manifest:
+    """Write the manifest and check the build; reason accepts every finding, or, as a mapping, the codes it names."""
     con = _connect()
     for table, (_, schema) in [*TABLES.items(), *((t, (None, s)) for t, s in FACTS.items())]:
         file = out / f"{table}.parquet"
@@ -2346,10 +2347,11 @@ def _seal(
     for code, n, _ in check(out):
         if code.startswith(("unique.", "reference.")):
             raise ValueError(f"{key}: the build fails {code} ({n:,})")
-        if reason is None:
+        because = reason.get(code) if isinstance(reason, dict) else reason
+        if because is None:
             print(f"{key}: {code} {n:,} is not accepted", flush=True)
         else:
-            manifest["accepted"][code] = reason
+            manifest["accepted"][code] = because
     (out / "package.json").write_text(json.dumps(manifest, indent=1) + "\n")
     return manifest
 
@@ -2499,6 +2501,7 @@ class Draft(Changeset):
         super().__init__(
             conn, pipeline=pipeline, version=version, summary=summary, polity=polity, kind=kind, snapshot=snapshot
         )
+        self.accepted: dict[str, str] = {}
         self.own_entities: set[UUID] = {
             id
             for (id,) in conn.execute(
@@ -2513,6 +2516,9 @@ class Draft(Changeset):
                 [pipeline],
             )
         }
+
+    def accept(self, code: str, reason: str) -> None:
+        self.accepted[code] = reason
 
     def key(self, scheme: str, value: str) -> UUID:
         pair = (scheme, value)
@@ -2555,23 +2561,35 @@ class Draft(Changeset):
         columns = [column for column in frame.columns if column != "id" or keyed is not None]
         frame = frame.unique(subset=columns, maintain_order=True)
         required = _not_null(self.conn, table)
-        staged = sql.Identifier(f"draft_{table}")
-        listed = sql.SQL(", ").join(map(sql.Identifier, columns))
-        self.conn.execute(sql.SQL("drop table if exists {}").format(staged))
-        self.conn.execute(
-            sql.SQL("create temp table {} as select {} from public.{} limit 0").format(
-                staged, listed, sql.Identifier(table)
+        # The rows travel as one jsonb parameter and take the table's own column types through
+        # jsonb_populate_record, so a build runs on a read-only connection, where a temp table is refused.
+        documents = {
+            str(column)
+            for (column,) in self.conn.execute(
+                """select attname from pg_attribute where attrelid = %s::regclass and attnum > 0
+                     and not attisdropped and atttypid in ('json'::regtype, 'jsonb'::regtype)""",
+                [f"public.{table}"],
             )
+        }
+        payload = json.dumps(
+            [
+                {
+                    column: json.loads(value) if column in documents and isinstance(value, str) else value
+                    for column, value in zip(columns, row, strict=True)
+                }
+                for row in frame.select(columns).iter_rows()
+            ],
+            default=str,
         )
-        self.conn.execute(sql.SQL("alter table {} add column draft_row int").format(staged))
-        with (
-            self.conn.cursor() as cursor,
-            cursor.copy(sql.SQL("copy {} ({}, draft_row) from stdin").format(staged, listed)) as copy,
-        ):
-            for number, row in enumerate(frame.select(columns).iter_rows()):
-                copy.write_row(
-                    [json.dumps(value) if isinstance(value, dict | list) else value for value in row] + [number]
-                )
+        staged = sql.SQL(
+            """(select {r}, (x.n - 1)::int as draft_row
+                from jsonb_array_elements({payload}::jsonb) with ordinality x(e, n)
+                cross join lateral jsonb_populate_record(null::public.{table}, x.e) r)"""
+        ).format(
+            r=sql.SQL(", ").join(sql.SQL("r.{}").format(sql.Identifier(column)) for column in columns),
+            payload=sql.Placeholder(),
+            table=sql.Identifier(table),
+        )
         pipeline = str(self.manifest["pipeline"])
         if keyed is not None:
             found = self.conn.execute(
@@ -2585,7 +2603,8 @@ class Draft(Changeset):
                     staged=staged,
                     table=sql.Identifier(table),
                     on=sql.SQL(" and ").join(sql.SQL("p.{0} = s.{0}").format(sql.Identifier(c)) for c in keyed),
-                )
+                ),
+                [payload],
             ).fetchall()
         else:
             same = sql.SQL(" and ").join(
@@ -2620,9 +2639,8 @@ class Draft(Changeset):
                     table=sql.Identifier(table),
                     same=same,
                 ),
-                [pipeline],
+                [payload, pipeline],
             ).fetchall()
-        self.conn.execute(sql.SQL("drop table {}").format(staged))
         keep = [owner in (None, pipeline) for _, _, owner in found]
         if minted:
             frame = frame.with_columns(pl.Series("id", [str(id) for _, id, _ in found], dtype=pl.String))
@@ -2734,7 +2752,7 @@ class Draft(Changeset):
             counts,
             owned,
             [{"storage_key": storage} for storage in sorted({*artifacts, *new})],
-            None,
+            self.accepted,
         )
         print(
             f"{key}: {', '.join(f'{t} {n:,}' for t, n in counts.items())}; {len(owned):,} changesets adopted",
