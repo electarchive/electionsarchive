@@ -2,11 +2,12 @@
 
 The workbooks hold the results of the municipal, provincial, Antwerp district, and (in the facility municipalities)
 OCMW council elections, one workbook per body and year, and for 2024 the finer counts by polling station and counting
-office. Statbel's statistical sectors supply the municipal and provincial boundaries for each municipal plan.
+office. Statbel's statistical sectors supply the municipal and provincial boundaries for each municipal plan, and the city of Antwerp's district layer the district outlines.
 """
 
 import functools
 import io
+import json
 import re
 import zipfile
 from collections import Counter, defaultdict
@@ -28,6 +29,11 @@ from ea.sources.be import kieskring
 
 SOURCE = "be.vlaanderen"
 STATBEL = "be.statbel"
+ANTWERP = "be.antwerpen"
+DISTRICTS = (
+    "https://geodata.antwerpen.be/arcgissql/rest/services/P_Portal/portal_publiek2/MapServer/109/query"
+    "?where=1%3D1&outFields=districtcode%2Cdistrictnaam%2Cafkorting&outSR=31370&f=geojson"
+)
 UP = "https://assets.vlaanderen.be/raw/upload/"
 BELGIUM = str(uuid5(package.NAMESPACE, "polity\x1fBE"))
 TOLERANCE = 10.0
@@ -46,6 +52,8 @@ ELECTION_PLAN = {
     "2019-06-16": "2019",
     "2024-10-13": "2025",
 }
+# Borsbeek joined Antwerp as its tenth district on 2025-01-01
+BORSBEEK = "11247"
 FLEMISH = {"10000", "20001", "30000", "40000", "70000"}
 
 FILES: dict[str, dict[str, str]] = {
@@ -109,6 +117,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".xlsx")
     for name, _, _ in PLANS.values():
         raw.fetch(STATBEL, SECTORS + name, suffix=".zip")
+    raw.fetch(ANTWERP, DISTRICTS, suffix=".geojson")
     kieskring.fetch(SOURCE)
 
 
@@ -202,7 +211,27 @@ def plan(vintage: str) -> Plan:
     return Plan(municipalities, provinces, crs)
 
 
+@functools.cache
+def antwerp_districts() -> dict[str, shapely.Geometry]:
+    """The outlines of the Antwerp districts in Belgian Lambert 72, by the NIS code the results workbooks give each
+    district. The city publishes one outline per district as it stands today, Borsbeek included."""
+    names = {}
+    for found in districts("DI").values():
+        names.update({name.upper().replace("-", " "): nis for nis, name in found.items()})
+    collection = json.loads(raw.cached(ANTWERP, DISTRICTS).path.read_bytes())
+    codes: list[str] = []
+    shapes: list[shapely.Geometry] = []
+    for feature in collection["features"]:
+        codes.append(names[str(feature["properties"]["districtnaam"]).strip().replace("-", " ")])
+        shapes.append(shapely.make_valid(shapely.geometry.shape(feature["geometry"])))
+    if sorted(codes) != sorted(set(names.values())):
+        raise ValueError("the city's districts are not the workbooks' districts")
+    simple = shapely.make_valid(shapely.coverage_simplify(numpy.array(shapes), TOLERANCE))
+    return dict(zip(codes, simple, strict=True))
+
+
 STATBEL_SOURCE = key("source", "statbel")
+ANTWERP_SOURCE = key("source", ANTWERP)
 DECREE_SOURCE = key("source", "kieskring")
 VLAANDEREN_SOURCE = key("source", SOURCE)
 
@@ -321,15 +350,55 @@ def geo() -> Package:
                 quality="official",
                 source_id=STATBEL_SOURCE,
             )
+    p.add(
+        "source",
+        id=ANTWERP_SOURCE,
+        kind="official_body",
+        publisher="Stad Antwerpen",
+        title="District (Antwerp city GIS layer)",
+        url="https://portaal-stadantwerpen.opendata.arcgis.com",
+        license="Gratis open data licentie Stad Antwerpen",
+        license_url="http://opendata.antwerpen.be/gratis-open-data-licentie",
+        attribution="© Stad Antwerpen",
+    )
+    p.artifact(raw.cached(ANTWERP, DISTRICTS), ANTWERP_SOURCE)
     latest: dict[str, str] = {}
     for names in districts("DI").values():
         latest.update(names)
+    shapes = antwerp_districts()
+    crs = plan("2019").crs
     for nis, name in sorted(latest.items()):
         id = area("be.district", nis)
         p.add("area", id=id, scheme_code="be.district")
         p.add("area_code", area_id=id, code=nis)
         p.add("area_parent", area_id=id, parent_id=area("be.gemeente", "11002"))
         p.name(id, name, "nl", "official")
+    for vintage, (_, since, until) in PLANS.items():
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", "be.district", vintage),
+            scheme_code="be.district",
+            vintage=vintage,
+            valid_from=since,
+            valid_to=until,
+            as_of=since,
+        )
+        for nis in sorted(latest):
+            if nis == BORSBEEK and vintage != "2025":
+                continue
+            wgs = _wgs(shapes[nis], crs)
+            p.add(
+                "area_geometry",
+                area_id=area("be.district", nis),
+                valid_from=since,
+                valid_to=until,
+                geom=shapely.to_wkb(wgs, hex=True, include_srid=True),
+                label_point=shapely.to_wkb(
+                    shapely.set_srid(shapely.point_on_surface(wgs), 4326), hex=True, include_srid=True
+                ),
+                quality="official",
+                source_id=ANTWERP_SOURCE,
+            )
     return p
 
 
