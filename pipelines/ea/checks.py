@@ -949,7 +949,7 @@ def overlaps(stage: Stage, limit: int | None = None) -> list[tuple[str, sql.Comp
                                                              'pipeline', c.pipeline, 'changeset_id', c.id)
                                           order by p.valid) as rows
                          from public.{target} p join changeset c on c.id = p.changeset_id
-                         where {overlaps} and not c.pipeline = any({writers})
+                         where {overlaps} and not c.pipeline = any({writers}){undropped}
                        ) o
                        where o.rows is not null
                        order by 3{limit}"""
@@ -972,6 +972,21 @@ def overlaps(stage: Stage, limit: int | None = None) -> list[tuple[str, sql.Comp
                     target=sql.Identifier(table),
                     overlaps=stage.overlaps(table),
                     writers=stage.writers(table),
+                    undropped=sql.SQL(
+                        """ and not exists (select from {} d where d.relation = {} and {}
+                                            and daterange((d.key ->> 'valid_from')::date, (d.key ->> 'valid_to')::date, '[)') = p.valid)"""
+                    ).format(
+                        stage.staged("row_drop"),
+                        sql.Literal(table),
+                        sql.SQL(" and ").join(
+                            sql.SQL("d.key ->> {} is not distinct from p.{}::text").format(
+                                sql.Literal(key), sql.Identifier(key)
+                            )
+                            for key in keys
+                        ),
+                    )
+                    if "row_drop" in stage.tables
+                    else sql.SQL(""),
                     limit=sql.SQL("") if limit is None else sql.SQL(" limit {}").format(sql.Literal(limit)),
                 ),
             )
