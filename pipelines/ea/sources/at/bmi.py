@@ -124,9 +124,10 @@ def url(edition: Edition) -> str:
 
 
 def fetch() -> None:
-    from ea.sources.at import bmi_history
+    from ea.sources.at import bmi_history, wahlkreise_1994
 
     bmi_history.fetch()
+    wahlkreise_1994.fetch()
     for edition in EDITIONS:
         raw.fetch(
             SOURCE,
@@ -529,7 +530,8 @@ def geo() -> Package:
         "at.bmi/geo",
         SOURCE,
         "Austria's states, political districts, and municipalities as the Federal Ministry of the Interior codes them "
-        "in its election results, and the 25 National Council constituencies of 1945 to 1970",
+        "in its election results, the 25 National Council constituencies of 1945 to 1970, and the 43 regional constituencies "
+        "of 1994",
         depends=["at.parlament/geo"],
     )
     p.external |= {AUSTRIA, COUNTRY}
@@ -552,7 +554,7 @@ def geo() -> Package:
             p.add("area_parent", area_id=id, parent_id=parent)
             for index, text in enumerate(names):
                 p.name(id, text, "de", "official", index == 0)
-    from ea.sources.at import bmi_history
+    from ea.sources.at import bmi_history, wahlkreise_1994
     from ea.sources.at.parlament import NAMES_1923
 
     for number, text in enumerate(NAMES_1923, start=1):
@@ -566,6 +568,23 @@ def geo() -> Package:
             valid_from=bmi_history.PLAN_1945,
         )
         p.name(id, text, "de", "official")
+    p.add(
+        "scheme",
+        code=bmi_history.REGIONALWAHLKREIS,
+        polity_id=AUSTRIA,
+        kind="electoral_district",
+        rank=2,
+        noun="regional constituency",
+        code_system=None,
+    )
+    regional = {}
+    for code, text in bmi_history.NAMES_1994.items():
+        id = regional[code] = bmi_history.regionalwahlkreis(code)
+        p.add("area", id=id, scheme_code=bmi_history.REGIONALWAHLKREIS)
+        p.add("area_code", area_id=id, code=f"1994:{code}", valid_from=bmi_history.PLAN_1994)
+        p.add("area_parent", area_id=id, parent_id=area("at.land", code[0]), valid_from=bmi_history.PLAN_1994)
+        p.name(id, text, "de", "official")
+    wahlkreise_1994.add(p, regional)
     return p
 
 
