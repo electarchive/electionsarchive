@@ -1527,8 +1527,8 @@ def election(d: Day) -> Package:
             stage="official",
             kind="counted",
             source_id=SOURCE_ID,
-            status="active",
-            is_default=True,
+            status="superseded" if eu is not None else "active",
+            is_default=eu is None,
             completeness=1.0,
             supersedes_id=eu.result_set if eu is not None else None,
         )
@@ -1562,7 +1562,10 @@ def election(d: Day) -> Package:
 
 
 def _supersede(p: Package, d: Day, eu: National, result_set: str) -> None:
-    """Hand the contest's default to the polling-station set and keep the national totals as a superseded set.
+    """Stage the national totals beside the polling-station set, neither as a default.
+
+    Production holds the national set as an official default, and the loader's defaults step flips the default to
+    the polling-station set, so no staged row is a second default.
 
     The national set is re-staged with its own election, contest, and source. Its completeness is left open: the
     package holds none of its facts, and a set with facts missing from the package fails the empty-set check.
