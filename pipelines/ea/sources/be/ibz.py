@@ -21,7 +21,7 @@ from xml.etree import ElementTree
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.be import districts, nis
+from ea.sources.be import constituency, districts, nis
 
 SOURCE = "be.ibz"
 BASE = "https://resultatselection.belgium.be"
@@ -228,7 +228,7 @@ def dated() -> dict[date, list[str]]:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in dated())]
+    return [f"{SOURCE}/geo", constituency.KEY, f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in dated())]
 
 
 def parse() -> None:
@@ -236,6 +236,7 @@ def parse() -> None:
     registry().write()
     for day, files in dated().items():
         election(day, files).write()
+    constituency.geo().write()
 
 
 def emit() -> None:
@@ -363,6 +364,7 @@ class Builder:
         self.towns: dict[str, str] = {}
         self.declared_gap = 0
         self.unplaced: Counter[str] = Counter()
+        self.own = False  # whether a contest stands in an area of the constituencies package
 
     def slug(self, path: str) -> str:
         self.paths[path] += 1
@@ -644,6 +646,8 @@ def election(day: date, files: list[str]) -> Package:
             one_contest(build, kind, name, slug, title_map, single[0], levels)
         else:
             per_unit(build, kind, name, slug, levels)
+    if build.own and constituency.KEY not in p.depends:
+        p.depends.append(constituency.KEY)
     for tag, n in sorted(build.valid_mismatch.items()):
         build.notes.append(f"{tag}: {n} units print a valid-vote figure that differs from the sum of their lists")
     if any(build.valid_mismatch.values()):
@@ -693,7 +697,11 @@ def one_contest(
     extras = [entry for entry in ranked if entry[0] == "Municipality" and entry[0] != primary[0]]
     pool = [top, *chosen, *(level for entry in extras for level in entry[1])]
     resolve = min((resolver(top, by_number) for by_number in (False, True)), key=lambda r: mismatched(top, chosen, r))
-    contest, options = build.contest(slug, kind, title, top.seats, f"{build.base}/{slug}", order_of(pool, resolve))
+    area = constituency.single(day, kind)
+    build.own = build.own or area is not None and constituency.is_own(area)
+    contest, options = build.contest(
+        slug, kind, title, top.seats, f"{build.base}/{slug}", order_of(pool, resolve), area
+    )
     tag = f"{kind}"
     result_set = build.result_set(f"{slug}:{primary[0]}", contest, True, best)
     for index, level in enumerate(chosen, 1):
@@ -897,6 +905,9 @@ def per_district(
             ),
             None,
         )
+        if area is None:
+            area = constituency.district(day, kind, district.labels, label)
+            build.own = build.own or area is not None and constituency.is_own(area)
         contest, options = build.contest(
             tag,
             kind,
