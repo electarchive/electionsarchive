@@ -6,7 +6,7 @@ from psycopg import sql
 
 from ea.apply import _survivors
 from ea.changeset import Changeset
-from ea.checks import MERGE_DELETES, merged, references
+from ea.checks import MERGE_DELETES, references
 from ea.store import Connection, connect
 
 SOURCE = "merged_strays"
@@ -91,31 +91,51 @@ def _duplicates(conn: Connection, table: str, column: str) -> list[dict[str, obj
 
 
 def _orphans(conn: Connection, table: str) -> list[dict[str, object]]:
-    unreferenced = [
-        sql.SQL("not exists (select from public.{} r where r.{} = t.id)").format(
-            sql.Identifier(relation), sql.Identifier(column)
+    columns = _columns(conn, table)
+    keyed = "k" in columns
+    found = conn.execute(
+        sql.SQL("select t.id, {} from public.{} t join survivor s on s.entity_id = t.id").format(
+            sql.SQL("t.k" if keyed else "null::int"), sql.Identifier(table)
         )
-        for relation, column in conn.execute(
-            """select c.conrelid::regclass::text, a.attname from pg_constraint c
-               join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
-               where c.contype = 'f' and c.confrelid = %s::regclass and c.conrelid <> c.confrelid""",
-            [f"public.{table}"],
-        ).fetchall()
-    ] + [
-        sql.SQL("not exists (select from public.{} r where r.{} = t.k)").format(
-            sql.Identifier(relation), sql.Identifier(column)
-        )
-        for relation, column, parent in references(conn)
-        if parent == table
-    ]
+    ).fetchall()
+    if not found:
+        return []
+    ids = [id for id, _ in found]
+    ks = [k for _, k in found if k is not None]
+    held: set[object] = set()
+    for relation, column in conn.execute(
+        """select c.conrelid::regclass::text, a.attname from pg_constraint c
+           join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+           where c.contype = 'f' and c.confrelid = %s::regclass and c.conrelid <> c.confrelid""",
+        [f"public.{table}"],
+    ).fetchall():
+        held |= {
+            id
+            for (id,) in conn.execute(
+                sql.SQL("select distinct {0} from public.{1} where {0} = any(%s)").format(
+                    sql.Identifier(column), sql.Identifier(relation)
+                ),
+                [ids],
+            ).fetchall()
+        }
+    for relation, column, parent in references(conn) if keyed else []:
+        if parent == table:
+            used = {
+                k
+                for (k,) in conn.execute(
+                    sql.SQL("select distinct {0} from public.{1} where {0} = any(%s)").format(
+                        sql.Identifier(column), sql.Identifier(relation)
+                    ),
+                    [ks],
+                ).fetchall()
+            }
+            held |= {id for id, k in found if k in used}
+    free = [id for id in ids if id not in held]
     return [
         key
         for (key,) in conn.execute(
-            sql.SQL("select {} from public.{} t join survivor s on s.entity_id = t.id where {}").format(
-                _key(_columns(conn, table)),
-                sql.Identifier(table),
-                sql.SQL(" and ").join([sql.SQL("true"), *unreferenced]),
-            )
+            sql.SQL("select {} from public.{} t where t.id = any(%s)").format(_key(columns), sql.Identifier(table)),
+            [free],
         ).fetchall()
     ]
 
@@ -146,6 +166,7 @@ def emit() -> Path | None:
             """select t.unit_id, s.into_id, t.reason, to_jsonb(t) - 'changeset_id' - 'recorded_from'
                from unit_area_drop t join survivor s on s.entity_id = t.area_id"""
         ).fetchall()
+        named: set[tuple[object, object]] = set()
         for unit, into, reason, key in moved:
             cs.add(
                 "row_drop",
@@ -154,11 +175,12 @@ def emit() -> Path | None:
                 relation="unit_area_drop",
                 key=key,
             )
-            if (
+            if (unit, into) not in named and (
                 conn.execute("select from unit_area_drop where unit_id = %s and area_id = %s", [unit, into]).fetchone()
                 is None
             ):
                 cs.add("unit_area_drop", unit_id=unit, area_id=into, reason=reason)
+                named.add((unit, into))
             dropped["unit_area_drop"] += 1
         for (key,) in conn.execute(
             sql.SQL(
@@ -187,9 +209,4 @@ def emit() -> Path | None:
                 dropped[table] += 1
         for table, count in sorted(dropped.items()):
             print(f"{table}: {count:,} rows")
-        left: Counter[str] = Counter()
-        for relation, column, _, _, _, rows in merged(conn):
-            left[f"{relation}.{column}"] += rows
-        for reference, rows in sorted(left.items()):
-            print(f"still referencing merged entities before this changeset: {reference} {rows:,}")
         return cs.write() if dropped else None
