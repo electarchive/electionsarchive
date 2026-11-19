@@ -15,8 +15,11 @@ from functools import cache
 from uuid import uuid5
 from xml.etree import ElementTree
 
+import shapely
+
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.ee import plans
 
 SOURCE = "ee.valimised"
 SITE = "https://www.valimised.ee/sites/default/files/uploads/misc"
@@ -162,6 +165,8 @@ def packages() -> list[str]:
 
 
 def fetch() -> None:
+    for file in plans.urls():
+        raw.fetch(SOURCE, file, suffix=".zip")
     for spec in ELECTIONS.values():
         if spec.html and spec.kind == "rk" and spec.day.year == 2011:
             for file in layout(spec).pages:
@@ -1345,6 +1350,69 @@ def source_rows(p: Package) -> None:
 
 SOURCE_ID = key("source", "valimised")
 HTML_SOURCE_ID = key("source", "vvk")
+SHAPES_ID = key("source", "maaruum")
+
+
+def shape_source(p: Package) -> None:
+    p.add(
+        "source",
+        id=SHAPES_ID,
+        kind="official_body",
+        publisher="Maa- ja Ruumiamet",
+        title="Administrative and settlement division of Estonia: municipalities (omavalitsused) and city districts, "
+        "by date",
+        url="https://geoportaal.maaruum.ee/est/ruumiandmed/haldus-ja-asustusjaotus/ajalooline-haldusjaotus-p827.html",
+        license="Open data of the Land and Spatial Development Board, reuse with the source cited",
+        attribution="Maa- ja Ruumiamet",
+    )
+
+
+def put_shape(p: Package, area_id: str, shape: shapely.Geometry, start: date | None, end: date | None) -> None:
+    p.add(
+        "area_geometry",
+        area_id=area_id,
+        valid_from=start,
+        valid_to=end,
+        geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+        label_point=shapely.to_wkb(
+            shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+        ),
+        quality="official",
+        source_id=SHAPES_ID,
+    )
+
+
+def shapes(p: Package, names: dict[str, dict[str, int]]) -> None:
+    """Each municipality and city district with the outlines the Land Board's dated files give it.
+
+    A code joins a file's unit when the unit has the same name, since the office's old codes were reissued. The
+    board's municipal files go back to 1994; its files of settlement units hold the city districts."""
+    shape_source(p)
+    municipal = plans.municipal_plans(SOURCE)
+    settled = plans.settlement_plans(SOURCE)
+    for plan in (*municipal, *settled):
+        p.artifact(raw.cached(SOURCE, plan.url), SHAPES_ID)
+    for i, plan in enumerate(municipal):
+        p.add(
+            "boundary_set",
+            id=key("boundary_set", "ee.vald", plan.day),
+            scheme_code="ee.vald",
+            vintage=f"Land Board plan of {plan.day}",
+            valid_from=None if i == 0 else plan.day,
+            valid_to=municipal[i + 1].day if i + 1 < len(municipal) else None,
+            as_of=plan.day,
+        )
+    by_municipality = [plans.municipalities(SOURCE, plan.url) for plan in municipal]
+    by_district = [plans.city_districts(SOURCE, plan.url) for plan in settled]
+    for code, found in sorted(names.items()):
+        district = any(name.endswith("linnaosa") for name in found)
+        series, features = (settled, by_district) if district else (municipal, by_municipality)
+        rows = plans.runs(series, features, code, set(found), set(names))
+        if not rows:
+            continue
+        for run in rows:
+            shape = plans.outlines(SOURCE, series[run.plan].url, district)[run.code]
+            put_shape(p, area("ee.vald", code), shape, run.start, run.end)
 
 
 def district_names() -> dict[str, str]:
@@ -1396,6 +1464,7 @@ def geo() -> Package:
         latest = max(found.values())
         for name, year in sorted(found.items()):
             p.name(id, name, "et", "official", year == latest)
+    shapes(p, names)
     return p
 
 
