@@ -2329,17 +2329,26 @@ def _connect() -> duckdb.DuckDBPyConnection:
     return duckdb.connect(config={"memory_limit": CHECK_MEMORY, "threads": 4, "temp_directory": str(spill)})
 
 
-def _adopted(conn: Connection, pipeline: str) -> tuple[list[str], list[str]]:
+def _adopted(conn: Connection, pipeline: str) -> list[str]:
     row = conn.execute(
-        """select coalesce(array_agg(distinct c.id::text), '{}'),
-                  coalesce(array_agg(distinct k) filter (where k is not null), '{}')
-           from changeset c left join lateral unnest(c.artifact_keys) k on true
+        """select coalesce(array_agg(c.id::text), '{}') from changeset c
            where c.pipeline = %s and c.status = 'published' and not c.scope ? 'package'""",
         [pipeline],
     ).fetchone()
-    if row is None:
-        return [], []
-    return sorted(row[0]), sorted(row[1])
+    return [] if row is None else sorted(row[0])
+
+
+def _cited(out: Path) -> list[dict[str, str]]:
+    """The raw files a rebuilt or exported package cites: its own source_artifact rows, with the url and sha256 a
+    package built the usual way records (the adopted changesets' own files are not sources)."""
+    file = out / "source_artifact.parquet"
+    if not file.exists():
+        return []
+    rows = pl.read_parquet(file, columns=["url", "sha256", "storage_key"]).unique("storage_key").sort("storage_key")
+    return [
+        {"url": str(row["url"]), "sha256": str(row["sha256"]), "storage_key": str(row["storage_key"])}
+        for row in rows.iter_rows(named=True)
+    ]
 
 
 def _canonicalize(file: Path, columns: list[str]) -> None:
@@ -2417,7 +2426,7 @@ def export(pipeline: str) -> Path:
     meter = Meter()
     with store.connect() as conn:
         conn.execute("set transaction isolation level repeatable read, read only")
-        owned, artifacts = _adopted(conn, pipeline)
+        owned = _adopted(conn, pipeline)
         if not owned:
             raise LookupError(f"{pipeline} has no published changesets outside packages")
         mine = sql.SQL("t.changeset_id = any({}::uuid[])").format(sql.Literal(owned))
@@ -2512,7 +2521,7 @@ def export(pipeline: str) -> Path:
         out,
         counts,
         owned,
-        [{"storage_key": artifact} for artifact in artifacts],
+        _cited(out),
         EXPORT_REASON,
     )
     print(f"{key}: {', '.join(f'{t} {n:,}' for t, n in counts.items())}; {len(owned):,} changesets adopted", flush=True)
@@ -2776,8 +2785,7 @@ class Draft(Changeset):
                 if table in OPTIONAL:
                     _trim(table, out / f"{table}.parquet")
                 counts[table] = carried.height
-        owned, artifacts = _adopted(self.conn, pipeline)
-        new = tables["source_artifact"]["storage_key"].to_list() if "source_artifact" in tables else []
+        owned = _adopted(self.conn, pipeline)
         _seal(
             key,
             pipeline,
@@ -2785,7 +2793,7 @@ class Draft(Changeset):
             out,
             counts,
             owned,
-            [{"storage_key": storage} for storage in sorted({*artifacts, *new})],
+            _cited(out),
             None,
         )
         print(
