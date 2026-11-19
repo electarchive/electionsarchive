@@ -1,0 +1,8665 @@
+{
+ "day": "1981-03-02",
+ "file": "1981ParishCouncilElectionBoxbyBox.pdf",
+ "left_out": [],
+ "divisions": [
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 1,
+   "name": "Tivoli Gardens",
+   "pages": [
+    39
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Dreckette, Samuel",
+     "occupation": "Minister of Religion",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 2,
+   "name": "Denham Town",
+   "pages": [
+    39
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Leslie, Lorna",
+     "occupation": "Clerk",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 3,
+   "name": "Fletchers Land",
+   "pages": [
+    39
+   ],
+   "unopposed": false,
+   "total": 4929,
+   "rejected": 69,
+   "electors": 6528,
+   "candidates": [
+    {
+     "name": "Ho, Dennis",
+     "occupation": "Draughtman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 2517,
+     "withdrew": false
+    },
+    {
+     "name": "Neita, Kenneth",
+     "occupation": "Attorney-At-Law",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2343,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 4,
+   "name": "Parade Gardens",
+   "pages": [
+    39
+   ],
+   "unopposed": false,
+   "total": 2674,
+   "rejected": 17,
+   "electors": 4332,
+   "candidates": [
+    {
+     "name": "Johnson, Beresford",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1587,
+     "withdrew": false
+    },
+    {
+     "name": "Moore, Albert Ivan",
+     "occupation": "Manufacturer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1070,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 5,
+   "name": "Rae Town",
+   "pages": [
+    39
+   ],
+   "unopposed": false,
+   "total": 4884,
+   "rejected": 40,
+   "electors": 6733,
+   "candidates": [
+    {
+     "name": "Peralto, Ryan",
+     "occupation": "Company Director",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2883,
+     "withdrew": false
+    },
+    {
+     "name": "Tulloch, Neville",
+     "occupation": "Pipe Fitter",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1961,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 6,
+   "name": "Franklyn Town",
+   "pages": [
+    39
+   ],
+   "unopposed": false,
+   "total": 4487,
+   "rejected": 93,
+   "electors": 7503,
+   "candidates": [
+    {
+     "name": "DaCosta, Clinton",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1055,
+     "withdrew": false
+    },
+    {
+     "name": "Taylor, Marjorie",
+     "occupation": "Building Surveyor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 3339,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 7,
+   "name": "Rollington Town",
+   "pages": [
+    39
+   ],
+   "unopposed": false,
+   "total": 2563,
+   "rejected": 30,
+   "electors": 6354,
+   "candidates": [
+    {
+     "name": "Ellington, Gladys",
+     "occupation": "Trade Unionist",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1004,
+     "withdrew": false
+    },
+    {
+     "name": "Ffrench, Danny",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1529,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 8,
+   "name": "Rennock Lodge",
+   "pages": [
+    40
+   ],
+   "unopposed": false,
+   "total": 3633,
+   "rejected": 30,
+   "electors": 7124,
+   "candidates": [
+    {
+     "name": "Cadienhead, Granclett",
+     "occupation": "Office Manager",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1673,
+     "withdrew": false
+    },
+    {
+     "name": "Witter, Sonia Mae",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1930,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 9,
+   "name": "Lawrence Tavern",
+   "pages": [
+    40
+   ],
+   "unopposed": false,
+   "total": 2897,
+   "rejected": 8,
+   "electors": 6340,
+   "candidates": [
+    {
+     "name": "Davidson, Franklin",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 679,
+     "withdrew": false
+    },
+    {
+     "name": "Harty, Pauline A.",
+     "occupation": "Secretary",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2210,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 10,
+   "name": "Brandon Hill",
+   "pages": [
+    40
+   ],
+   "unopposed": false,
+   "total": 3732,
+   "rejected": 13,
+   "electors": 8001,
+   "candidates": [
+    {
+     "name": "Maxwell, John",
+     "occupation": "Journalist",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 880,
+     "withdrew": false
+    },
+    {
+     "name": "Williams, George",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2839,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 11,
+   "name": "Red Hills",
+   "pages": [
+    40
+   ],
+   "unopposed": false,
+   "total": 4109,
+   "rejected": 17,
+   "electors": 9677,
+   "candidates": [
+    {
+     "name": "Matthews, Herbert",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 943,
+     "withdrew": false
+    },
+    {
+     "name": "Redwood, Anthony",
+     "occupation": "Accountant",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3149,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 12,
+   "name": "Duhaney Park",
+   "pages": [
+    40
+   ],
+   "unopposed": false,
+   "total": 4378,
+   "rejected": 26,
+   "electors": 10211,
+   "candidates": [
+    {
+     "name": "Hannan, Donald",
+     "occupation": "Company Director",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3598,
+     "withdrew": false
+    },
+    {
+     "name": "Headlam, George",
+     "occupation": "Manufacturer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 754,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 13,
+   "name": "Washington Gardens",
+   "pages": [
+    40
+   ],
+   "unopposed": false,
+   "total": 4658,
+   "rejected": 717,
+   "electors": 7199,
+   "candidates": [
+    {
+     "name": "Atkins, Marie",
+     "occupation": "Nurse",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 2875,
+     "withdrew": false
+    },
+    {
+     "name": "Johnson, Milton",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1066,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 14,
+   "name": "Water House",
+   "pages": [
+    40
+   ],
+   "unopposed": false,
+   "total": 3067,
+   "rejected": 25,
+   "electors": 5203,
+   "candidates": [
+    {
+     "name": "Brown, Bradley",
+     "occupation": "Supervisor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 346,
+     "withdrew": false
+    },
+    {
+     "name": "Ellis, Joslyn",
+     "occupation": "Contractor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 2696,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 15,
+   "name": "Waltham Gardens",
+   "pages": [
+    41
+   ],
+   "unopposed": false,
+   "total": 4379,
+   "rejected": 302,
+   "electors": 6452,
+   "candidates": [
+    {
+     "name": "Francis, Rupert",
+     "occupation": "Life Underwriter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1484,
+     "withdrew": false
+    },
+    {
+     "name": "Smith, Dudley",
+     "occupation": "Businessman",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 85,
+     "withdrew": false
+    },
+    {
+     "name": "Thompson, Neville",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 2508,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 16,
+   "name": "Molynes Garden",
+   "pages": [
+    41
+   ],
+   "unopposed": false,
+   "total": 5030,
+   "rejected": 168,
+   "electors": 6426,
+   "candidates": [
+    {
+     "name": "Francis, Trevor",
+     "occupation": "Life Underwriter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2170,
+     "withdrew": false
+    },
+    {
+     "name": "Wilmot, Minna",
+     "occupation": "Beautician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 2692,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 17,
+   "name": "Seivwright Garden",
+   "pages": [
+    41
+   ],
+   "unopposed": false,
+   "total": 7202,
+   "rejected": 99,
+   "electors": 7814,
+   "candidates": [
+    {
+     "name": "Budhai, Donald",
+     "occupation": "Mason",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1693,
+     "withdrew": false
+    },
+    {
+     "name": "Yap, Colleen",
+     "occupation": "Businesswoman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 5410,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 18,
+   "name": "Hagley Park",
+   "pages": [
+    41
+   ],
+   "unopposed": false,
+   "total": 3733,
+   "rejected": 18,
+   "electors": 7059,
+   "candidates": [
+    {
+     "name": "Banton, Merline",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1512,
+     "withdrew": false
+    },
+    {
+     "name": "Mason, Eric",
+     "occupation": "Transport Operator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2203,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 19,
+   "name": "Maxfield Park",
+   "pages": [
+    41
+   ],
+   "unopposed": false,
+   "total": 6865,
+   "rejected": 23,
+   "electors": 8017,
+   "candidates": [
+    {
+     "name": "Heholt, Merlene",
+     "occupation": "Company Director",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 664,
+     "withdrew": false
+    },
+    {
+     "name": "Jones, Arthur",
+     "occupation": "Politician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 6178,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 20,
+   "name": "Lyndhurst Park",
+   "pages": [
+    41
+   ],
+   "unopposed": false,
+   "total": 3431,
+   "rejected": 29,
+   "electors": 6283,
+   "candidates": [
+    {
+     "name": "Martin, Egbert",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 613,
+     "withdrew": false
+    },
+    {
+     "name": "Williams, Dennis",
+     "occupation": "Economist",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 2789,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 21,
+   "name": "Majesty Garden",
+   "pages": [
+    42
+   ],
+   "unopposed": false,
+   "total": 4654,
+   "rejected": 66,
+   "electors": 4814,
+   "candidates": [
+    {
+     "name": "Creary, Pearl",
+     "occupation": "Dressmaker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4447,
+     "withdrew": false
+    },
+    {
+     "name": "Ferry, Alfred",
+     "occupation": "Jeweller",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 141,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 22,
+   "name": "Tinson Town",
+   "pages": [
+    42,
+    14
+   ],
+   "unopposed": false,
+   "total": 3420,
+   "rejected": 43,
+   "electors": 3847,
+   "candidates": [
+    {
+     "name": "Bennett, Daisy",
+     "occupation": "Businesswoman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 90,
+     "withdrew": false
+    },
+    {
+     "name": "Smith, Chester",
+     "occupation": "Youth Organiser",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3287,
+     "withdrew": false
+    }
+   ],
+   "note": "Table V prints 90 votes for Bennett, Daisy (P.N.P.) and 3,287 for Smith, Chester (J.L.P.), but the report's list of councillors elected (page 14 of the scanned file) names Bennett, Daisy (P.N.P.) as the councillor elected, and its count of members elected for Kingston and St. Andrew (25 JLP and 18 PNP) agrees with that list. The votes are stored as Table V prints them and the outcome as the report declares it.",
+   "elected": 1
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 23,
+   "name": "Greenwich Town",
+   "pages": [
+    42,
+    14
+   ],
+   "unopposed": false,
+   "total": 5501,
+   "rejected": 110,
+   "electors": 5869,
+   "candidates": [
+    {
+     "name": "Beckford, David",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 159,
+     "withdrew": false
+    },
+    {
+     "name": "Rerrie, Edward",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 5232,
+     "withdrew": false
+    }
+   ],
+   "note": "Table V prints 159 votes for Beckford, David (P.N.P.) and 5,232 for Rerrie, Edward (J.L.P.), but the report's list of councillors elected (page 14 of the scanned file) names Beckford, David (P.N.P.) as the councillor elected, and its count of members elected for Kingston and St. Andrew (25 JLP and 18 PNP) agrees with that list. The votes are stored as Table V prints them and the outcome as the report declares it.",
+   "elected": 1
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 24,
+   "name": "Rose Town",
+   "pages": [
+    42
+   ],
+   "unopposed": false,
+   "total": 6521,
+   "rejected": 47,
+   "electors": 6462,
+   "candidates": [
+    {
+     "name": "Gordon, Basil",
+     "occupation": "Machine Operator",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 3830,
+     "withdrew": false
+    },
+    {
+     "name": "Anderson, James",
+     "occupation": "Engineer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2644,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 25,
+   "name": "Trench Town",
+   "pages": [
+    42
+   ],
+   "unopposed": false,
+   "total": 6075,
+   "rejected": null,
+   "electors": 5733,
+   "candidates": [
+    {
+     "name": "Oliver, Oswald",
+     "occupation": "Journalist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1929,
+     "withdrew": false
+    },
+    {
+     "name": "Pickersgill, Alton",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4146,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 26,
+   "name": "Cross Roads",
+   "pages": [
+    42
+   ],
+   "unopposed": false,
+   "total": 4574,
+   "rejected": null,
+   "electors": 5579,
+   "candidates": [
+    {
+     "name": "Gelly, Iris McKoy",
+     "occupation": "Housewife",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4388,
+     "withdrew": false
+    },
+    {
+     "name": "Higgin, Louis",
+     "occupation": "Contractor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 186,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 27,
+   "name": "Admiral Town",
+   "pages": [
+    42
+   ],
+   "unopposed": false,
+   "total": 4917,
+   "rejected": 21,
+   "electors": 5022,
+   "candidates": [
+    {
+     "name": "Anglin, Enid",
+     "occupation": "Beautician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4867,
+     "withdrew": false
+    },
+    {
+     "name": "Fagan, Ralford",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 29,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 28,
+   "name": "Jones Town",
+   "pages": [
+    43
+   ],
+   "unopposed": false,
+   "total": 4218,
+   "rejected": 10,
+   "electors": 4116,
+   "candidates": [
+    {
+     "name": "Burton, Benjamin",
+     "occupation": "Contractor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 4205,
+     "withdrew": false
+    },
+    {
+     "name": "Williams, Richard",
+     "occupation": "Real Estate Agent",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 29,
+   "name": "Vineyard Town",
+   "pages": [
+    43
+   ],
+   "unopposed": false,
+   "total": 3176,
+   "rejected": 19,
+   "electors": 6937,
+   "candidates": [
+    {
+     "name": "Murray, Allan",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 671,
+     "withdrew": false
+    },
+    {
+     "name": "Dabdoub, Abraham",
+     "occupation": "Attorney-At-Law",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2486,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 30,
+   "name": "Trafalgar Park",
+   "pages": [
+    43
+   ],
+   "unopposed": false,
+   "total": 2861,
+   "rejected": 12,
+   "electors": 6779,
+   "candidates": [
+    {
+     "name": "Ashman, Neville",
+     "occupation": "Supervisor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 853,
+     "withdrew": false
+    },
+    {
+     "name": "Pennicott, Maurice",
+     "occupation": "Teacher, Politician",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1996,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 31,
+   "name": "Stadium Gardens",
+   "pages": [
+    43
+   ],
+   "unopposed": false,
+   "total": 3239,
+   "rejected": 19,
+   "electors": 7266,
+   "candidates": [
+    {
+     "name": "Maxwell, Lloyd",
+     "occupation": "Accountant",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1594,
+     "withdrew": false
+    },
+    {
+     "name": "Steele, Keith",
+     "occupation": "Industrial Relation Manager",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1626,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 32,
+   "name": "Harbour View",
+   "pages": [
+    43
+   ],
+   "unopposed": false,
+   "total": 1588,
+   "rejected": 22,
+   "electors": 4040,
+   "candidates": [
+    {
+     "name": "Garvey, Winston",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 401,
+     "withdrew": false
+    },
+    {
+     "name": "Mockyen, Alma",
+     "occupation": "Media Specialist Educator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1165,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 33,
+   "name": "Mountain View",
+   "pages": [
+    43
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Chin, Leonard",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 34,
+   "name": "Mona",
+   "pages": [
+    43
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Sasso, Richard",
+     "occupation": "Insurance",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 35,
+   "name": "Constant Spring",
+   "pages": [
+    44
+   ],
+   "unopposed": false,
+   "total": 2899,
+   "rejected": 17,
+   "electors": 6880,
+   "candidates": [
+    {
+     "name": "Collington, Cecil",
+     "occupation": "Political Organiser",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 578,
+     "withdrew": false
+    },
+    {
+     "name": "Stephenson, Errol",
+     "occupation": "Salesman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2304,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 36,
+   "name": "Half-Way-Tree",
+   "pages": [
+    44
+   ],
+   "unopposed": false,
+   "total": 2712,
+   "rejected": 14,
+   "electors": 6458,
+   "candidates": [
+    {
+     "name": "Blake, Rita",
+     "occupation": "Dressmaker",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1999,
+     "withdrew": false
+    },
+    {
+     "name": "Smith, Don",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 699,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 37,
+   "name": "Barbican",
+   "pages": [
+    44
+   ],
+   "unopposed": false,
+   "total": 2979,
+   "rejected": 21,
+   "electors": 6968,
+   "candidates": [
+    {
+     "name": "Ashman, Ira",
+     "occupation": "Marketing Consultant",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2321,
+     "withdrew": false
+    },
+    {
+     "name": "Levy, Hugh",
+     "occupation": "Electrician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 637,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 38,
+   "name": "Ziadie Gardens",
+   "pages": [
+    44
+   ],
+   "unopposed": false,
+   "total": 2537,
+   "rejected": 17,
+   "electors": 6500,
+   "candidates": [
+    {
+     "name": "Chung, Robert",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 670,
+     "withdrew": false
+    },
+    {
+     "name": "Harty, Emeline",
+     "occupation": "Secretary",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1850,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 39,
+   "name": "Pembroke Hall",
+   "pages": [
+    44
+   ],
+   "unopposed": false,
+   "total": 3314,
+   "rejected": 15,
+   "electors": 8788,
+   "candidates": [
+    {
+     "name": "Francis, Lorenzo",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 906,
+     "withdrew": false
+    },
+    {
+     "name": "Kandekore, Monty",
+     "occupation": "Attorney-At-Law",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2393,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 40,
+   "name": "Hughenden",
+   "pages": [
+    44
+   ],
+   "unopposed": false,
+   "total": 3923,
+   "rejected": 6,
+   "electors": 9758,
+   "candidates": [
+    {
+     "name": "Clarke-Lee, Roy",
+     "occupation": "Racehorse Trainer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2850,
+     "withdrew": false
+    },
+    {
+     "name": "Dobson, Allan",
+     "occupation": "Auto Mechanic",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1067,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 41,
+   "name": "Papine",
+   "pages": [
+    44
+   ],
+   "unopposed": false,
+   "total": 3808,
+   "rejected": 12,
+   "electors": 8650,
+   "candidates": [
+    {
+     "name": "Smith, George",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1053,
+     "withdrew": false
+    },
+    {
+     "name": "Williams, Clive",
+     "occupation": "Administrative Officer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2743,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 42,
+   "name": "Dallas",
+   "pages": [
+    45
+   ],
+   "unopposed": false,
+   "total": 2935,
+   "rejected": 12,
+   "electors": 5433,
+   "candidates": [
+    {
+     "name": "Jackson, Gloria",
+     "occupation": "Administrative Assistant",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2260,
+     "withdrew": false
+    },
+    {
+     "name": "Stultz, Lloyd",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 663,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Kingston and St. Andrew",
+   "number": 43,
+   "name": "Gordon Town",
+   "pages": [
+    45
+   ],
+   "unopposed": false,
+   "total": 3087,
+   "rejected": 80,
+   "electors": 5927,
+   "candidates": [
+    {
+     "name": "Francis, Alvin",
+     "occupation": "Contractor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2602,
+     "withdrew": false
+    },
+    {
+     "name": "Hasfal, William",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 405,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 1,
+   "name": "Hagley Gap",
+   "pages": [
+    46
+   ],
+   "unopposed": false,
+   "total": 660,
+   "rejected": 1,
+   "electors": 1056,
+   "candidates": [
+    {
+     "name": "Dawkins, Gloria",
+     "occupation": "B/S Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 599,
+     "withdrew": false
+    },
+    {
+     "name": "McGowan, Rudolph",
+     "occupation": "Mason",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 60,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 2,
+   "name": "Cedar Valley",
+   "pages": [
+    46
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Murray, Kenneth",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 3,
+   "name": "Llandewey",
+   "pages": [
+    46
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Whitton, George",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 4,
+   "name": "Yallahs East",
+   "pages": [
+    46
+   ],
+   "unopposed": false,
+   "total": 1266,
+   "rejected": 12,
+   "electors": 2349,
+   "candidates": [
+    {
+     "name": "Erskine, Relva",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 212,
+     "withdrew": false
+    },
+    {
+     "name": "Marvelley, Henry",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1042,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 5,
+   "name": "Trinityville",
+   "pages": [
+    46
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Brown, Anderson",
+     "occupation": "Accounting Clerk",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 6,
+   "name": "Whitehall",
+   "pages": [
+    46
+   ],
+   "unopposed": false,
+   "total": 1069,
+   "rejected": 8,
+   "electors": 1824,
+   "candidates": [
+    {
+     "name": "Barclay, Dudley",
+     "occupation": "Butcher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 930,
+     "withdrew": false
+    },
+    {
+     "name": "Gayle, Ricardo",
+     "occupation": "Upholsterer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 131,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 7,
+   "name": "York",
+   "pages": [
+    46
+   ],
+   "unopposed": false,
+   "total": 1266,
+   "rejected": 10,
+   "electors": 2126,
+   "candidates": [
+    {
+     "name": "Crawford, Winston",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1155,
+     "withdrew": false
+    },
+    {
+     "name": "Edwards, Norbert",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 101,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 8,
+   "name": "Whitehorses",
+   "pages": [
+    46
+   ],
+   "unopposed": false,
+   "total": 1183,
+   "rejected": 7,
+   "electors": 2039,
+   "candidates": [
+    {
+     "name": "Besay, Egbert",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 255,
+     "withdrew": false
+    },
+    {
+     "name": "Williams, Fredrick",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 921,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 9,
+   "name": "Yallahs West",
+   "pages": [
+    47
+   ],
+   "unopposed": false,
+   "total": 1055,
+   "rejected": 6,
+   "electors": 2384,
+   "candidates": [
+    {
+     "name": "Bogle, Reginald",
+     "occupation": "Carpenter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 922,
+     "withdrew": false
+    },
+    {
+     "name": "Evans, Leslie",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 127,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 10,
+   "name": "Spring Garden",
+   "pages": [
+    47
+   ],
+   "unopposed": false,
+   "total": 1252,
+   "rejected": 4,
+   "electors": 2139,
+   "candidates": [
+    {
+     "name": "Morris, E. Phillip",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 246,
+     "withdrew": false
+    },
+    {
+     "name": "Russell, Claudius",
+     "occupation": "Foreman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1002,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 11,
+   "name": "Bath",
+   "pages": [
+    47
+   ],
+   "unopposed": false,
+   "total": 1466,
+   "rejected": 8,
+   "electors": 2332,
+   "candidates": [
+    {
+     "name": "Brown, Webster",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 348,
+     "withdrew": false
+    },
+    {
+     "name": "Palmer, Pearline",
+     "occupation": "Dressmaker",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1110,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 12,
+   "name": "Morant Bay West",
+   "pages": [
+    47
+   ],
+   "unopposed": false,
+   "total": 1502,
+   "rejected": 6,
+   "electors": 2461,
+   "candidates": [
+    {
+     "name": "Cameron, Clifford",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1202,
+     "withdrew": false
+    },
+    {
+     "name": "Gordon, Frank",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 294,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 13,
+   "name": "Morant Bay East",
+   "pages": [
+    47
+   ],
+   "unopposed": false,
+   "total": 2022,
+   "rejected": 14,
+   "electors": 3212,
+   "candidates": [
+    {
+     "name": "James, Pearline",
+     "occupation": "Housewife",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 349,
+     "withdrew": false
+    },
+    {
+     "name": "Shaw, Rosemarie",
+     "occupation": "Social Worker",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1659,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 14,
+   "name": "Port Morant West",
+   "pages": [
+    47
+   ],
+   "unopposed": false,
+   "total": 1288,
+   "rejected": 4,
+   "electors": 2201,
+   "candidates": [
+    {
+     "name": "Hunter, Vincent",
+     "occupation": "Accountant",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1011,
+     "withdrew": false
+    },
+    {
+     "name": "Kelly, Vida",
+     "occupation": "Housewife",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 273,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 15,
+   "name": "Dalvey",
+   "pages": [
+    47
+   ],
+   "unopposed": false,
+   "total": 1241,
+   "rejected": 5,
+   "electors": 2218,
+   "candidates": [
+    {
+     "name": "Flemmings, Noel",
+     "occupation": "Chemical Technologist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1129,
+     "withdrew": false
+    },
+    {
+     "name": "Reid, Alfredo",
+     "occupation": "Mason",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 107,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 16,
+   "name": "Golden Grove",
+   "pages": [
+    47
+   ],
+   "unopposed": false,
+   "total": 1524,
+   "rejected": 5,
+   "electors": 2685,
+   "candidates": [
+    {
+     "name": "Madhoo, Albert",
+     "occupation": "Tailor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1254,
+     "withdrew": false
+    },
+    {
+     "name": "Reid, Alston",
+     "occupation": "Clerk",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 265,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Thomas",
+   "number": 17,
+   "name": "Port Morant East",
+   "pages": [
+    48
+   ],
+   "unopposed": false,
+   "total": 1356,
+   "rejected": 3,
+   "electors": 2112,
+   "candidates": [
+    {
+     "name": "Barrant, Roosevelt",
+     "occupation": "Building Contractor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1041,
+     "withdrew": false
+    },
+    {
+     "name": "Wynter, Christiana",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 312,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 1,
+   "name": "Hectors River",
+   "pages": [
+    49
+   ],
+   "unopposed": false,
+   "total": 1349,
+   "rejected": 7,
+   "electors": 1910,
+   "candidates": [
+    {
+     "name": "Cargill, Patrick",
+     "occupation": "Book-Keeper",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 306,
+     "withdrew": false
+    },
+    {
+     "name": "Lodwidge, Andrew",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1036,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 2,
+   "name": "Manchioneal",
+   "pages": [
+    49
+   ],
+   "unopposed": false,
+   "total": 996,
+   "rejected": 10,
+   "electors": 1548,
+   "candidates": [
+    {
+     "name": "Dixon, Ivy",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 773,
+     "withdrew": false
+    },
+    {
+     "name": "Robertson, Lawrence",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 213,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 3,
+   "name": "Long Bay",
+   "pages": [
+    49
+   ],
+   "unopposed": false,
+   "total": 1483,
+   "rejected": 4,
+   "electors": 2016,
+   "candidates": [
+    {
+     "name": "Green, Leon",
+     "occupation": "Attorney-At-Law",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 432,
+     "withdrew": false
+    },
+    {
+     "name": "Tucker, Gerald",
+     "occupation": "Clerk",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1047,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 4,
+   "name": "Fairy Hill",
+   "pages": [
+    49
+   ],
+   "unopposed": false,
+   "total": 1632,
+   "rejected": 6,
+   "electors": 2501,
+   "candidates": [
+    {
+     "name": "Beckford, Calvin",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1077,
+     "withdrew": false
+    },
+    {
+     "name": "Fairweather, Leonard",
+     "occupation": "Business Proprietor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 549,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 5,
+   "name": "Port Antonio East",
+   "pages": [
+    49
+   ],
+   "unopposed": false,
+   "total": 1564,
+   "rejected": 4,
+   "electors": 2727,
+   "candidates": [
+    {
+     "name": "Bailey, Gloria",
+     "occupation": "Businesswoman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 475,
+     "withdrew": false
+    },
+    {
+     "name": "Chung, Roy",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1085,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 6,
+   "name": "Port Antonio Central",
+   "pages": [
+    49
+   ],
+   "unopposed": false,
+   "total": 1335,
+   "rejected": 3,
+   "electors": 2083,
+   "candidates": [
+    {
+     "name": "Perry, Hugh",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 821,
+     "withdrew": false
+    },
+    {
+     "name": "Rhoden, Charles",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 511,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 7,
+   "name": "Port Antonio Western",
+   "pages": [
+    49
+   ],
+   "unopposed": false,
+   "total": 1492,
+   "rejected": 4,
+   "electors": 2510,
+   "candidates": [
+    {
+     "name": "Dixon, Norcliffe",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 454,
+     "withdrew": false
+    },
+    {
+     "name": "Miller, Basil",
+     "occupation": "Waiter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1034,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 8,
+   "name": "St. Margarets Bay",
+   "pages": [
+    50
+   ],
+   "unopposed": false,
+   "total": 1672,
+   "rejected": 3,
+   "electors": 2534,
+   "candidates": [
+    {
+     "name": "Watson, Glendon",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 516,
+     "withdrew": false
+    },
+    {
+     "name": "Knox, Dorcas",
+     "occupation": "Businesswoman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1153,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 9,
+   "name": "Fellowship",
+   "pages": [
+    50
+   ],
+   "unopposed": false,
+   "total": 1155,
+   "rejected": 5,
+   "electors": 2208,
+   "candidates": [
+    {
+     "name": "Davis, Henry",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 140,
+     "withdrew": false
+    },
+    {
+     "name": "Lindsay, Leroy",
+     "occupation": "Airline Flight Dispatcher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1010,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 10,
+   "name": "Comfort Castle",
+   "pages": [
+    50
+   ],
+   "unopposed": false,
+   "total": 1429,
+   "rejected": 8,
+   "electors": 2145,
+   "candidates": [
+    {
+     "name": "Harris, Collin",
+     "occupation": "Teacher",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 103,
+     "withdrew": false
+    },
+    {
+     "name": "Harris, Eli",
+     "occupation": "Farmer",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 13,
+     "withdrew": false
+    },
+    {
+     "name": "Lee, Patrick",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1168,
+     "withdrew": false
+    },
+    {
+     "name": "Sterling, Wallace",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 137,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 11,
+   "name": "Hope Bay",
+   "pages": [
+    50
+   ],
+   "unopposed": false,
+   "total": 1228,
+   "rejected": 3,
+   "electors": 1645,
+   "candidates": [
+    {
+     "name": "Kirkland, Walcott",
+     "occupation": "Transport Operator",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 370,
+     "withdrew": false
+    },
+    {
+     "name": "Manahan, Bertram",
+     "occupation": "Truck Operator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 855,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 12,
+   "name": "Dumfries",
+   "pages": [
+    50
+   ],
+   "unopposed": false,
+   "total": 1022,
+   "rejected": 4,
+   "electors": 1429,
+   "candidates": [
+    {
+     "name": "Bell, Maurice",
+     "occupation": "Plumber",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 733,
+     "withdrew": false
+    },
+    {
+     "name": "Cousins, Orville",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 285,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 13,
+   "name": "Mount Hermon",
+   "pages": [
+    50
+   ],
+   "unopposed": false,
+   "total": 996,
+   "rejected": null,
+   "electors": 1267,
+   "candidates": [
+    {
+     "name": "Manahan, Daphne",
+     "occupation": "Social Worker",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 652,
+     "withdrew": false
+    },
+    {
+     "name": "Shirley, Evadney",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 344,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 14,
+   "name": "Skibo",
+   "pages": [
+    51
+   ],
+   "unopposed": false,
+   "total": 844,
+   "rejected": 4,
+   "electors": 1111,
+   "candidates": [
+    {
+     "name": "Afflick, Sydney",
+     "occupation": "Contractor & Builder",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 274,
+     "withdrew": false
+    },
+    {
+     "name": "Richards, Bertel",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 566,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 15,
+   "name": "Buff Bay East",
+   "pages": [
+    51
+   ],
+   "unopposed": false,
+   "total": 1225,
+   "rejected": 3,
+   "electors": 1754,
+   "candidates": [
+    {
+     "name": "Bygrave, Ainsworth",
+     "occupation": "Accountant",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 832,
+     "withdrew": false
+    },
+    {
+     "name": "McFarquhar, Olive",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 390,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 16,
+   "name": "Buff Bay West",
+   "pages": [
+    51
+   ],
+   "unopposed": false,
+   "total": 1438,
+   "rejected": 6,
+   "electors": 2251,
+   "candidates": [
+    {
+     "name": "Barker, Danavan",
+     "occupation": "Salesman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 362,
+     "withdrew": false
+    },
+    {
+     "name": "Rodger, Christie",
+     "occupation": "Mason",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1070,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 17,
+   "name": "Balcarres",
+   "pages": [
+    51
+   ],
+   "unopposed": false,
+   "total": 1140,
+   "rejected": null,
+   "electors": 1696,
+   "candidates": [
+    {
+     "name": "Dumbar, Gerald",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 279,
+     "withdrew": false
+    },
+    {
+     "name": "Young, Vincent",
+     "occupation": "Salesman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 861,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Portland",
+   "number": 18,
+   "name": "Spring Hill",
+   "pages": [
+    51
+   ],
+   "unopposed": false,
+   "total": 1098,
+   "rejected": 3,
+   "electors": 1332,
+   "candidates": [
+    {
+     "name": "Molloy, Hezekiah",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 424,
+     "withdrew": false
+    },
+    {
+     "name": "Scott, Berchel",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 671,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 1,
+   "name": "Richmond",
+   "pages": [
+    52
+   ],
+   "unopposed": false,
+   "total": 2060,
+   "rejected": 6,
+   "electors": 3562,
+   "candidates": [
+    {
+     "name": "Henry, Lloyd",
+     "occupation": "Company Director",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1475,
+     "withdrew": false
+    },
+    {
+     "name": "Smellie, Eucaster",
+     "occupation": "Shopkeeper",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 579,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 2,
+   "name": "Castleton",
+   "pages": [
+    52
+   ],
+   "unopposed": false,
+   "total": 1698,
+   "rejected": 10,
+   "electors": 2899,
+   "candidates": [
+    {
+     "name": "Gutzmore, Antony",
+     "occupation": "Security Clerk",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 92,
+     "withdrew": false
+    },
+    {
+     "name": "Nugent, Luleta",
+     "occupation": "Clerk",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1596,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 3,
+   "name": "Annotto Bay West",
+   "pages": [
+    52
+   ],
+   "unopposed": false,
+   "total": 2548,
+   "rejected": 10,
+   "electors": 3575,
+   "candidates": [
+    {
+     "name": "Hardie, Rosemay",
+     "occupation": "Businesswoman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 853,
+     "withdrew": false
+    },
+    {
+     "name": "Newland, Basil",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1685,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 4,
+   "name": "Annotto Bay East",
+   "pages": [
+    52
+   ],
+   "unopposed": false,
+   "total": 1716,
+   "rejected": 17,
+   "electors": 2475,
+   "candidates": [
+    {
+     "name": "Haughton, Maurice",
+     "occupation": "Engineer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1130,
+     "withdrew": false
+    },
+    {
+     "name": "Pickergill, Levi",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 569,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 5,
+   "name": "Belfield",
+   "pages": [
+    52
+   ],
+   "unopposed": false,
+   "total": 2307,
+   "rejected": 8,
+   "electors": 3106,
+   "candidates": [
+    {
+     "name": "Campbell, Cislon",
+     "occupation": "Builder",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1073,
+     "withdrew": false
+    },
+    {
+     "name": "Robinson, Joseph",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1226,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 6,
+   "name": "Islington",
+   "pages": [
+    52
+   ],
+   "unopposed": false,
+   "total": 2422,
+   "rejected": 7,
+   "electors": 3241,
+   "candidates": [
+    {
+     "name": "Powell, Hugh",
+     "occupation": "N.H.T. Officer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 954,
+     "withdrew": false
+    },
+    {
+     "name": "Ramcharran, Ronald",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1461,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 7,
+   "name": "Highgate",
+   "pages": [
+    52
+   ],
+   "unopposed": false,
+   "total": 1641,
+   "rejected": 5,
+   "electors": 2301,
+   "candidates": [
+    {
+     "name": "Francis, Leslie",
+     "occupation": "Pharmacist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 804,
+     "withdrew": false
+    },
+    {
+     "name": "Walker, Noel",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 832,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 8,
+   "name": "Flint River",
+   "pages": [
+    52
+   ],
+   "unopposed": false,
+   "total": 1922,
+   "rejected": 3,
+   "electors": 2951,
+   "candidates": [
+    {
+     "name": "Daly, Victor, R.B.",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 852,
+     "withdrew": false
+    },
+    {
+     "name": "Williams, Percival",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1067,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 9,
+   "name": "Port Maria East",
+   "pages": [
+    53
+   ],
+   "unopposed": false,
+   "total": 2417,
+   "rejected": 20,
+   "electors": 3321,
+   "candidates": [
+    {
+     "name": "Young, Mera",
+     "occupation": "Beautician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1008,
+     "withdrew": false
+    },
+    {
+     "name": "Nugent, Hartley",
+     "occupation": "Salesman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1389,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 10,
+   "name": "Port Maria West",
+   "pages": [
+    53
+   ],
+   "unopposed": false,
+   "total": 2965,
+   "rejected": 26,
+   "electors": 3968,
+   "candidates": [
+    {
+     "name": "Brady, Walter",
+     "occupation": "Planter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1723,
+     "withdrew": false
+    },
+    {
+     "name": "Henry, Leroy",
+     "occupation": "Fisherman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1216,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 11,
+   "name": "Hampstead",
+   "pages": [
+    53
+   ],
+   "unopposed": false,
+   "total": 2135,
+   "rejected": 25,
+   "electors": 2786,
+   "candidates": [
+    {
+     "name": "Peddlar, Lillith",
+     "occupation": "Housewife",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 843,
+     "withdrew": false
+    },
+    {
+     "name": "Edwards, Vermont Roy",
+     "occupation": "Accounting Clerk",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1267,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 12,
+   "name": "Oracabessa",
+   "pages": [
+    53
+   ],
+   "unopposed": false,
+   "total": 2039,
+   "rejected": 8,
+   "electors": 3243,
+   "candidates": [
+    {
+     "name": "Capleton, Roy",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1000,
+     "withdrew": false
+    },
+    {
+     "name": "Dixon, Julius",
+     "occupation": "Sales Supervisor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1031,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 13,
+   "name": "Carron Hall",
+   "pages": [
+    53
+   ],
+   "unopposed": false,
+   "total": 1683,
+   "rejected": 7,
+   "electors": 2765,
+   "candidates": [
+    {
+     "name": "Davis, Ruel",
+     "occupation": "Planter",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 342,
+     "withdrew": false
+    },
+    {
+     "name": "Francis, Charles",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1334,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 14,
+   "name": "Pembroke Hall",
+   "pages": [
+    53
+   ],
+   "unopposed": false,
+   "total": 2136,
+   "rejected": 13,
+   "electors": 3391,
+   "candidates": [
+    {
+     "name": "Champagnie, Dudley",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1481,
+     "withdrew": false
+    },
+    {
+     "name": "Ramsay, Clement",
+     "occupation": "Construction Technician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 642,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 15,
+   "name": "Gayle",
+   "pages": [
+    53
+   ],
+   "unopposed": false,
+   "total": 2242,
+   "rejected": 5,
+   "electors": 3213,
+   "candidates": [
+    {
+     "name": "DaCosta, Micheal",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 696,
+     "withdrew": false
+    },
+    {
+     "name": "Knight, Hyacinth",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1541,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 16,
+   "name": "Retreat",
+   "pages": [
+    54
+   ],
+   "unopposed": false,
+   "total": 1276,
+   "rejected": 2,
+   "electors": 2391,
+   "candidates": [
+    {
+     "name": "Bennett, Carlton",
+     "occupation": "Tailor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 539,
+     "withdrew": false
+    },
+    {
+     "name": "Townend, Authur",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 735,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Mary",
+   "number": 17,
+   "name": "Boscobel",
+   "pages": [
+    54
+   ],
+   "unopposed": false,
+   "total": 1682,
+   "rejected": 11,
+   "electors": 2443,
+   "candidates": [
+    {
+     "name": "Edward, Vincent",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 776,
+     "withdrew": false
+    },
+    {
+     "name": "Moxon, Oliver",
+     "occupation": "Company Director",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 895,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 1,
+   "name": "Walkerswood",
+   "pages": [
+    55
+   ],
+   "unopposed": false,
+   "total": 1837,
+   "rejected": 14,
+   "electors": 3333,
+   "candidates": [
+    {
+     "name": "Goldsmith, Oswald",
+     "occupation": "Mines Supt.",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1125,
+     "withdrew": false
+    },
+    {
+     "name": "Lynch, Trevor",
+     "occupation": "Electrician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 698,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 2,
+   "name": "Claremont",
+   "pages": [
+    55
+   ],
+   "unopposed": false,
+   "total": 2395,
+   "rejected": 8,
+   "electors": 3909,
+   "candidates": [
+    {
+     "name": "Shirley, Edwin",
+     "occupation": "Butcher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1086,
+     "withdrew": false
+    },
+    {
+     "name": "Spence, Luther",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1301,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 3,
+   "name": "Moneague",
+   "pages": [
+    55
+   ],
+   "unopposed": false,
+   "total": 1321,
+   "rejected": 8,
+   "electors": 2450,
+   "candidates": [
+    {
+     "name": "Anderson, Rupert",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 736,
+     "withdrew": false
+    },
+    {
+     "name": "Long, James Barrington",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 577,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 4,
+   "name": "Bensonton",
+   "pages": [
+    55
+   ],
+   "unopposed": false,
+   "total": 1131,
+   "rejected": 5,
+   "electors": 2222,
+   "candidates": [
+    {
+     "name": "Douglas, Amy",
+     "occupation": "Pastor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 656,
+     "withdrew": false
+    },
+    {
+     "name": "Williams, Leslie",
+     "occupation": "Builder",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 470,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 5,
+   "name": "Calderwood",
+   "pages": [
+    55
+   ],
+   "unopposed": false,
+   "total": 1460,
+   "rejected": 18,
+   "electors": 2505,
+   "candidates": [
+    {
+     "name": "Anson, Japheth",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 759,
+     "withdrew": false
+    },
+    {
+     "name": "Edwards, Elkanah",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 683,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 6,
+   "name": "Bamboo",
+   "pages": [
+    55
+   ],
+   "unopposed": false,
+   "total": 1997,
+   "rejected": 32,
+   "electors": 2911,
+   "candidates": [
+    {
+     "name": "Lowe, Lucius",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1200,
+     "withdrew": false
+    },
+    {
+     "name": "Watson, Rudolph",
+     "occupation": "Transport Operator",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 765,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 7,
+   "name": "St. Ann's Bay",
+   "pages": [
+    55
+   ],
+   "unopposed": false,
+   "total": 3030,
+   "rejected": 33,
+   "electors": 4786,
+   "candidates": [
+    {
+     "name": "McKenzie, Henry",
+     "occupation": "Trade Unionist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2045,
+     "withdrew": false
+    },
+    {
+     "name": "White, Lipton",
+     "occupation": "Miner",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 952,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 8,
+   "name": "Lime Hall",
+   "pages": [
+    56
+   ],
+   "unopposed": false,
+   "total": 2114,
+   "rejected": 33,
+   "electors": 3016,
+   "candidates": [
+    {
+     "name": "Bascoe, Roy",
+     "occupation": "Transport Operator",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 992,
+     "withdrew": false
+    },
+    {
+     "name": "Walter, Fenton",
+     "occupation": "Maitre-D",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1089,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 9,
+   "name": "Ocho Rios",
+   "pages": [
+    56
+   ],
+   "unopposed": false,
+   "total": 3083,
+   "rejected": 51,
+   "electors": 5945,
+   "candidates": [
+    {
+     "name": "Hibbert, Leonard",
+     "occupation": "Musician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 872,
+     "withdrew": false
+    },
+    {
+     "name": "Mills, Collin",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2160,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 10,
+   "name": "Beecher Town",
+   "pages": [
+    56
+   ],
+   "unopposed": false,
+   "total": 1584,
+   "rejected": 9,
+   "electors": 2782,
+   "candidates": [
+    {
+     "name": "Haye, Stanley",
+     "occupation": "Tour Operator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 957,
+     "withdrew": false
+    },
+    {
+     "name": "James, Sydney",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 618,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 11,
+   "name": "Dry Harbour",
+   "pages": [
+    56
+   ],
+   "unopposed": false,
+   "total": 2486,
+   "rejected": 3,
+   "electors": 4044,
+   "candidates": [
+    {
+     "name": "Brown, Oswald",
+     "occupation": "Mason",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1812,
+     "withdrew": false
+    },
+    {
+     "name": "Chin, Lloyd W.",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 671,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 12,
+   "name": "Sturge Town",
+   "pages": [
+    56
+   ],
+   "unopposed": false,
+   "total": 1915,
+   "rejected": 7,
+   "electors": 3646,
+   "candidates": [
+    {
+     "name": "Bailey, Wesley",
+     "occupation": "Teacher",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 250,
+     "withdrew": false
+    },
+    {
+     "name": "Brown, Egbert",
+     "occupation": "Builder",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1331,
+     "withdrew": false
+    },
+    {
+     "name": "Lamm, Mansang",
+     "occupation": "Trade Unionist",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 327,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 13,
+   "name": "Muir Town",
+   "pages": [
+    56
+   ],
+   "unopposed": false,
+   "total": 1248,
+   "rejected": 8,
+   "electors": 2168,
+   "candidates": [
+    {
+     "name": "Brown, Astley",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 885,
+     "withdrew": false
+    },
+    {
+     "name": "Campbell, Samuel",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 355,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 14,
+   "name": "Gibraltar",
+   "pages": [
+    56
+   ],
+   "unopposed": false,
+   "total": 1737,
+   "rejected": 10,
+   "electors": 2475,
+   "candidates": [
+    {
+     "name": "Parchment, Ronald",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1262,
+     "withdrew": false
+    },
+    {
+     "name": "Smith, Wentworth",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 465,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 15,
+   "name": "Brown's Town",
+   "pages": [
+    57
+   ],
+   "unopposed": false,
+   "total": 1731,
+   "rejected": 5,
+   "electors": 3449,
+   "candidates": [
+    {
+     "name": "Ashman, Rudolph",
+     "occupation": "Production Supervisor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1022,
+     "withdrew": false
+    },
+    {
+     "name": "Clarke, Stanford",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 704,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 16,
+   "name": "Alexandria",
+   "pages": [
+    57
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Frater, Derrick",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 17,
+   "name": "Cave Valley",
+   "pages": [
+    57
+   ],
+   "unopposed": false,
+   "total": 1394,
+   "rejected": 6,
+   "electors": 2885,
+   "candidates": [
+    {
+     "name": "Waugh, Cornelius",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 195,
+     "withdrew": false
+    },
+    {
+     "name": "Wray, Leando",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1193,
+     "withdrew": false
+    }
+   ],
+   "note": "Table V prints 2,885 electors for this division; Table III of the report prints 2,855, the figure the summary of the poll by council adds up. The figure of Table V is stored."
+  },
+  {
+   "parish": "St. Ann",
+   "number": 18,
+   "name": "Watt Town",
+   "pages": [
+    57
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Green, Henry John",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Ann",
+   "number": 19,
+   "name": "Borobridge",
+   "pages": [
+    57
+   ],
+   "unopposed": false,
+   "total": 1397,
+   "rejected": 6,
+   "electors": 2986,
+   "candidates": [
+    {
+     "name": "Jenkins, Veta Eunice",
+     "occupation": "Housewife",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 161,
+     "withdrew": false
+    },
+    {
+     "name": "Mattison, Stephen",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1230,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 1,
+   "name": "Hampden",
+   "pages": [
+    58
+   ],
+   "unopposed": false,
+   "total": 2404,
+   "rejected": 8,
+   "electors": 3525,
+   "candidates": [
+    {
+     "name": "Ho Shing, Charles",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1238,
+     "withdrew": false
+    },
+    {
+     "name": "Johnson, Issac",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1158,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 2,
+   "name": "Falmouth",
+   "pages": [
+    58
+   ],
+   "unopposed": false,
+   "total": 1859,
+   "rejected": 5,
+   "electors": 2690,
+   "candidates": [
+    {
+     "name": "Stephens, Errol",
+     "occupation": "Engineer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 704,
+     "withdrew": false
+    },
+    {
+     "name": "Wright, Joseph",
+     "occupation": "Welder",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1150,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 3,
+   "name": "Wakefield",
+   "pages": [
+    58
+   ],
+   "unopposed": false,
+   "total": 2138,
+   "rejected": 34,
+   "electors": 2945,
+   "candidates": [
+    {
+     "name": "Dale, Bruce",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1465,
+     "withdrew": false
+    },
+    {
+     "name": "Thorpe, Anulfo",
+     "occupation": "Carpenter",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 639,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 4,
+   "name": "Bunkers Hill",
+   "pages": [
+    58
+   ],
+   "unopposed": false,
+   "total": 1030,
+   "rejected": 7,
+   "electors": 1360,
+   "candidates": [
+    {
+     "name": "Fray, George",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 382,
+     "withdrew": false
+    },
+    {
+     "name": "Tenison, Patrick",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 641,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 5,
+   "name": "Sherwood Content",
+   "pages": [
+    58
+   ],
+   "unopposed": false,
+   "total": 953,
+   "rejected": null,
+   "electors": 1123,
+   "candidates": [
+    {
+     "name": "Henlon, Beriah",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 365,
+     "withdrew": false
+    },
+    {
+     "name": "Hillock, Osmond",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 588,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 6,
+   "name": "Duanvale",
+   "pages": [
+    58
+   ],
+   "unopposed": false,
+   "total": 1280,
+   "rejected": null,
+   "electors": 1555,
+   "candidates": [
+    {
+     "name": "Hines, Hernel Philbert",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 494,
+     "withdrew": false
+    },
+    {
+     "name": "Palmer, Calvin G.",
+     "occupation": "Electrician",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 786,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 7,
+   "name": "Duncans",
+   "pages": [
+    58
+   ],
+   "unopposed": false,
+   "total": 1467,
+   "rejected": 13,
+   "electors": 1881,
+   "candidates": [
+    {
+     "name": "Falconer, George",
+     "occupation": "Contractor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 845,
+     "withdrew": false
+    },
+    {
+     "name": "McLean, Linnel",
+     "occupation": "Builder & Contractor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 598,
+     "withdrew": false
+    },
+    {
+     "name": "Melbourne, Leford",
+     "occupation": "Builder",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 11,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 8,
+   "name": "Clarks Town",
+   "pages": [
+    59
+   ],
+   "unopposed": false,
+   "total": 1439,
+   "rejected": 13,
+   "electors": 1994,
+   "candidates": [
+    {
+     "name": "Gordon, Bryon",
+     "occupation": "Mechanic",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1022,
+     "withdrew": false
+    },
+    {
+     "name": "Murray, Ranford",
+     "occupation": "Factory Overseer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 404,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 9,
+   "name": "Rio Bueno",
+   "pages": [
+    59
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Lawrence, Percival",
+     "occupation": "Trade Unionist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 10,
+   "name": "Stewart Town",
+   "pages": [
+    59
+   ],
+   "unopposed": false,
+   "total": 938,
+   "rejected": 9,
+   "electors": 1353,
+   "candidates": [
+    {
+     "name": "Nelson, Linziroy",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 631,
+     "withdrew": false
+    },
+    {
+     "name": "Pottinger, Vincent",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 298,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 11,
+   "name": "Ulster Spring",
+   "pages": [
+    59
+   ],
+   "unopposed": false,
+   "total": 1104,
+   "rejected": null,
+   "electors": 1569,
+   "candidates": [
+    {
+     "name": "Dawkins, Estriana",
+     "occupation": "Hairdresser",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 542,
+     "withdrew": false
+    },
+    {
+     "name": "Reid, Jonathan",
+     "occupation": "Tailor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 562,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 12,
+   "name": "Albert Town",
+   "pages": [
+    59
+   ],
+   "unopposed": false,
+   "total": 1601,
+   "rejected": 9,
+   "electors": 2156,
+   "candidates": [
+    {
+     "name": "Codling, Adolph",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 997,
+     "withdrew": false
+    },
+    {
+     "name": "Dixon, Devon Micheal",
+     "occupation": "Public Health Inspector",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 595,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 13,
+   "name": "Troy",
+   "pages": [
+    59
+   ],
+   "unopposed": false,
+   "total": 948,
+   "rejected": 3,
+   "electors": 1224,
+   "candidates": [
+    {
+     "name": "Bromfield, George",
+     "occupation": "Mason",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 369,
+     "withdrew": false
+    },
+    {
+     "name": "Smith, Vincent, Loretta (Mrs.)",
+     "occupation": "Housewife",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 576,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 14,
+   "name": "Warsop",
+   "pages": [
+    59
+   ],
+   "unopposed": false,
+   "total": 1403,
+   "rejected": 7,
+   "electors": 1952,
+   "candidates": [
+    {
+     "name": "Gordon, Aston",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 977,
+     "withdrew": false
+    },
+    {
+     "name": "Rattary, Neville",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 419,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 15,
+   "name": "Wait-A-Bit",
+   "pages": [
+    60
+   ],
+   "unopposed": false,
+   "total": 1664,
+   "rejected": 8,
+   "electors": 2489,
+   "candidates": [
+    {
+     "name": "Blake, Dorothy",
+     "occupation": "Clerk",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1089,
+     "withdrew": false
+    },
+    {
+     "name": "Guy, Roland, George",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 567,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Trelawny",
+   "number": 16,
+   "name": "Lorrimers",
+   "pages": [
+    60
+   ],
+   "unopposed": false,
+   "total": 1192,
+   "rejected": 1,
+   "electors": 1839,
+   "candidates": [
+    {
+     "name": "Hill, Alexander, Kenneth",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 218,
+     "withdrew": false
+    },
+    {
+     "name": "Williams, Mavis",
+     "occupation": "Shopkeeper",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 973,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 1,
+   "name": "Rose Hall",
+   "pages": [
+    61
+   ],
+   "unopposed": false,
+   "total": 1858,
+   "rejected": 11,
+   "electors": 2844,
+   "candidates": [
+    {
+     "name": "Scott, Shalmanezer",
+     "occupation": "Trade Unionist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1402,
+     "withdrew": false
+    },
+    {
+     "name": "Stephenson, Beulah",
+     "occupation": "Accountant",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 445,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 2,
+   "name": "Somerton",
+   "pages": [
+    61
+   ],
+   "unopposed": false,
+   "total": 2589,
+   "rejected": 13,
+   "electors": 3607,
+   "candidates": [
+    {
+     "name": "Barnett, Ruel, Aldane",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 839,
+     "withdrew": false
+    },
+    {
+     "name": "Cousley, Rupert McLean",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1737,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 3,
+   "name": "Spring Mount",
+   "pages": [
+    61
+   ],
+   "unopposed": false,
+   "total": 1682,
+   "rejected": 8,
+   "electors": 2416,
+   "candidates": [
+    {
+     "name": "Vernon, Princess E.",
+     "occupation": "Secretary",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1087,
+     "withdrew": false
+    },
+    {
+     "name": "Watson, Edgar J.",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 587,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 4,
+   "name": "Johns Hall",
+   "pages": [
+    61
+   ],
+   "unopposed": false,
+   "total": 1666,
+   "rejected": 6,
+   "electors": 2746,
+   "candidates": [
+    {
+     "name": "Bell, Ian",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1357,
+     "withdrew": false
+    },
+    {
+     "name": "Colomathi, Donald",
+     "occupation": "Businessman & Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 303,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 5,
+   "name": "Montego Bay North West",
+   "pages": [
+    61
+   ],
+   "unopposed": false,
+   "total": 2118,
+   "rejected": 19,
+   "electors": 4396,
+   "candidates": [
+    {
+     "name": "Bourne, Humphrey E.",
+     "occupation": "Businessman",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 74,
+     "withdrew": false
+    },
+    {
+     "name": "Haughton, Danny H.",
+     "occupation": "Contractor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 392,
+     "withdrew": false
+    },
+    {
+     "name": "Malcolm, Danny M.",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1633,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 6,
+   "name": "Montego Bay North Central",
+   "pages": [
+    61
+   ],
+   "unopposed": false,
+   "total": 1213,
+   "rejected": 13,
+   "electors": 2649,
+   "candidates": [
+    {
+     "name": "King, Raynor Arnim",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 788,
+     "withdrew": false
+    },
+    {
+     "name": "Sawers, Kenneth",
+     "occupation": "Radio Technician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 412,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 7,
+   "name": "Montego Bay North Eastern",
+   "pages": [
+    62
+   ],
+   "unopposed": false,
+   "total": 2440,
+   "rejected": 12,
+   "electors": 4673,
+   "candidates": [
+    {
+     "name": "Allen, Dudley Mario",
+     "occupation": "Engineer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1710,
+     "withdrew": false
+    },
+    {
+     "name": "Campbell, Errol",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 718,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 8,
+   "name": "Montego Bay South Eastern",
+   "pages": [
+    62
+   ],
+   "unopposed": false,
+   "total": 2810,
+   "rejected": 12,
+   "electors": 4934,
+   "candidates": [
+    {
+     "name": "Dehaney, Glaister",
+     "occupation": "Auto Mechanic",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1916,
+     "withdrew": false
+    },
+    {
+     "name": "Donaldson, Cecil",
+     "occupation": "Trade Unionist",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 882,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 9,
+   "name": "Montego Bay Southern",
+   "pages": [
+    62
+   ],
+   "unopposed": false,
+   "total": 1385,
+   "rejected": 7,
+   "electors": 2461,
+   "candidates": [
+    {
+     "name": "Christie, Delbert",
+     "occupation": "Auto Painter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 870,
+     "withdrew": false
+    },
+    {
+     "name": "Leslie, Byron",
+     "occupation": "Insurance Executive",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 508,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 10,
+   "name": "Salt Spring",
+   "pages": [
+    62
+   ],
+   "unopposed": false,
+   "total": 1874,
+   "rejected": null,
+   "electors": 3115,
+   "candidates": [
+    {
+     "name": "Parkinson, Trevor",
+     "occupation": "Bar Tender & Social Worker",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1233,
+     "withdrew": false
+    },
+    {
+     "name": "Pugh, Evelyn",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 641,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 11,
+   "name": "Mount Salem",
+   "pages": [
+    62
+   ],
+   "unopposed": false,
+   "total": 2303,
+   "rejected": 2,
+   "electors": 4345,
+   "candidates": [
+    {
+     "name": "Thompson, Berlyn",
+     "occupation": "Accountant",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1281,
+     "withdrew": false
+    },
+    {
+     "name": "Kassin, Dudley",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1020,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 12,
+   "name": "Granville",
+   "pages": [
+    62,
+    33
+   ],
+   "unopposed": false,
+   "total": 2179,
+   "rejected": 3,
+   "electors": 3635,
+   "candidates": [
+    {
+     "name": "Allen, Owen Dave",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 681,
+     "withdrew": false
+    },
+    {
+     "name": "Cunningham, Clifford",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1495,
+     "withdrew": false
+    }
+   ],
+   "note": "Table V prints 4,345 electors and a turnout of 53.00% for this division, the figures of Mount Salem on the line above. Table III of the report (page 33 of the scanned file) prints 3,635 electors and 59.94%, which agree with the 2,179 total votes; those electors are stored."
+  },
+  {
+   "parish": "St. James",
+   "number": 13,
+   "name": "Spring Garden",
+   "pages": [
+    62
+   ],
+   "unopposed": false,
+   "total": 2125,
+   "rejected": null,
+   "electors": 4131,
+   "candidates": [
+    {
+     "name": "Cooke, Merton",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1504,
+     "withdrew": false
+    },
+    {
+     "name": "Neathly, Garnett",
+     "occupation": "Transport Supervisor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 621,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 14,
+   "name": "Anchovy",
+   "pages": [
+    63
+   ],
+   "unopposed": false,
+   "total": 1839,
+   "rejected": 5,
+   "electors": 2917,
+   "candidates": [
+    {
+     "name": "Bigby, Alfred",
+     "occupation": "Bus Operator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1115,
+     "withdrew": false
+    },
+    {
+     "name": "Stewart, Milton L.",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 719,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 15,
+   "name": "Cambridge",
+   "pages": [
+    63
+   ],
+   "unopposed": false,
+   "total": 2098,
+   "rejected": 8,
+   "electors": 3012,
+   "candidates": [
+    {
+     "name": "Scarlett, Rudolph",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 740,
+     "withdrew": false
+    },
+    {
+     "name": "Ramsay, Wilmot M.",
+     "occupation": "Accountant",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1350,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 16,
+   "name": "Welcome Hall",
+   "pages": [
+    63
+   ],
+   "unopposed": false,
+   "total": 1853,
+   "rejected": 17,
+   "electors": 3034,
+   "candidates": [
+    {
+     "name": "Brown, Authur E.",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 716,
+     "withdrew": false
+    },
+    {
+     "name": "Nelson, Edwin Lewis",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1120,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 17,
+   "name": "Maroon Town",
+   "pages": [
+    63
+   ],
+   "unopposed": false,
+   "total": 1599,
+   "rejected": 4,
+   "electors": 2492,
+   "candidates": [
+    {
+     "name": "Dunstan, Jonathan E.",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1042,
+     "withdrew": false
+    },
+    {
+     "name": "Reid, Mortimer Sergeant",
+     "occupation": "Tailor & Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 553,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. James",
+   "number": 18,
+   "name": "Catadupa",
+   "pages": [
+    63
+   ],
+   "unopposed": false,
+   "total": 1948,
+   "rejected": 19,
+   "electors": 2870,
+   "candidates": [
+    {
+     "name": "Chambers, Victor",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 641,
+     "withdrew": false
+    },
+    {
+     "name": "Morant, Samuel A.",
+     "occupation": "Mechanic",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1288,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 1,
+   "name": "Chester Castle",
+   "pages": [
+    64
+   ],
+   "unopposed": false,
+   "total": 1229,
+   "rejected": 7,
+   "electors": 1932,
+   "candidates": [
+    {
+     "name": "Miles, Ruel A.",
+     "occupation": "Property Overseer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 256,
+     "withdrew": false
+    },
+    {
+     "name": "Needham, Balwin",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 966,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 2,
+   "name": "Hopewell",
+   "pages": [
+    64
+   ],
+   "unopposed": false,
+   "total": 1763,
+   "rejected": 7,
+   "electors": 2481,
+   "candidates": [
+    {
+     "name": "Bowen, Charles",
+     "occupation": "Waiter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1086,
+     "withdrew": false
+    },
+    {
+     "name": "Wright, Cleveland",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 670,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 3,
+   "name": "Alexandria",
+   "pages": [
+    64
+   ],
+   "unopposed": false,
+   "total": 1099,
+   "rejected": 4,
+   "electors": 1483,
+   "candidates": [
+    {
+     "name": "Holt, Darius",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 946,
+     "withdrew": false
+    },
+    {
+     "name": "Waite, Aston",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 149,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 4,
+   "name": "Cacoon Castle",
+   "pages": [
+    64
+   ],
+   "unopposed": false,
+   "total": 1021,
+   "rejected": 7,
+   "electors": 1588,
+   "candidates": [
+    {
+     "name": "Gillies, Wesley",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 939,
+     "withdrew": false
+    },
+    {
+     "name": "Moore, Horace",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 75,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 5,
+   "name": "Great Valley",
+   "pages": [
+    64
+   ],
+   "unopposed": false,
+   "total": 691,
+   "rejected": 1,
+   "electors": 1217,
+   "candidates": [
+    {
+     "name": "Hamm, Winston",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 70,
+     "withdrew": false
+    },
+    {
+     "name": "Nicholson, Leon",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 620,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 6,
+   "name": "Cascade",
+   "pages": [
+    64
+   ],
+   "unopposed": false,
+   "total": 1178,
+   "rejected": 13,
+   "electors": 1946,
+   "candidates": [
+    {
+     "name": "Brown, Keith",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 907,
+     "withdrew": false
+    },
+    {
+     "name": "Duncan, Reginald",
+     "occupation": "Contractor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 258,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 7,
+   "name": "Sandy Bar",
+   "pages": [
+    64
+   ],
+   "unopposed": false,
+   "total": 1738,
+   "rejected": 14,
+   "electors": 2561,
+   "candidates": [
+    {
+     "name": "Crooks, Curniff",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1011,
+     "withdrew": false
+    },
+    {
+     "name": "Parkin, Bertram",
+     "occupation": "Accountant",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 713,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 8,
+   "name": "Lucea",
+   "pages": [
+    65
+   ],
+   "unopposed": false,
+   "total": 2109,
+   "rejected": 19,
+   "electors": 3044,
+   "candidates": [
+    {
+     "name": "Bauldie, Ivan",
+     "occupation": "Clerk",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 396,
+     "withdrew": false
+    },
+    {
+     "name": "Grant, Lloyd B.",
+     "occupation": "Machine Operator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1365,
+     "withdrew": false
+    },
+    {
+     "name": "Kelly, Michael",
+     "occupation": "Teacher",
+     "party_printed": "W.P.J.",
+     "party": "WPJ",
+     "votes": 329,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 9,
+   "name": "Askenish",
+   "pages": [
+    65
+   ],
+   "unopposed": false,
+   "total": 1023,
+   "rejected": 13,
+   "electors": 1564,
+   "candidates": [
+    {
+     "name": "Jarrett, John",
+     "occupation": "Minister of Religion",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 262,
+     "withdrew": false
+    },
+    {
+     "name": "Thelwell, Beresford",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 748,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 10,
+   "name": "St. Simon",
+   "pages": [
+    65
+   ],
+   "unopposed": false,
+   "total": 918,
+   "rejected": 8,
+   "electors": 1228,
+   "candidates": [
+    {
+     "name": "Roach, Vincent",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 562,
+     "withdrew": false
+    },
+    {
+     "name": "Stair, Winston",
+     "occupation": "Accountant",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 348,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 11,
+   "name": "Riverside",
+   "pages": [
+    65
+   ],
+   "unopposed": false,
+   "total": 1326,
+   "rejected": 6,
+   "electors": 1886,
+   "candidates": [
+    {
+     "name": "McIntyre, Hubert",
+     "occupation": "Insurance Salesman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 452,
+     "withdrew": false
+    },
+    {
+     "name": "Stanhope, Zena",
+     "occupation": "Housewife",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 868,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 12,
+   "name": "Cacoon",
+   "pages": [
+    65
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Kerr, John, A.",
+     "occupation": "Teacher Pensioner",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 13,
+   "name": "Pell River",
+   "pages": [
+    65
+   ],
+   "unopposed": false,
+   "total": 1214,
+   "rejected": 6,
+   "electors": 1563,
+   "candidates": [
+    {
+     "name": "Miller, Fredrick",
+     "occupation": "Electrician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 495,
+     "withdrew": false
+    },
+    {
+     "name": "Mosely, Vaccianna",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 713,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 14,
+   "name": "Green Island",
+   "pages": [
+    65
+   ],
+   "unopposed": false,
+   "total": 1613,
+   "rejected": 9,
+   "electors": 2264,
+   "candidates": [
+    {
+     "name": "Barnes, Kenneth",
+     "occupation": "Trade Unionist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1082,
+     "withdrew": false
+    },
+    {
+     "name": "Murray, Lascelles",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 522,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Hanover",
+   "number": 15,
+   "name": "Cave Valley",
+   "pages": [
+    66
+   ],
+   "unopposed": false,
+   "total": 1652,
+   "rejected": 11,
+   "electors": 2064,
+   "candidates": [
+    {
+     "name": "Williams, Lascelles",
+     "occupation": "Bus Operator",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 679,
+     "withdrew": false
+    },
+    {
+     "name": "Davis, Henley",
+     "occupation": "Carpenter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 962,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 1,
+   "name": "Sheffield",
+   "pages": [
+    67
+   ],
+   "unopposed": false,
+   "total": 1935,
+   "rejected": 9,
+   "electors": 3731,
+   "candidates": [
+    {
+     "name": "Johnson, Marcus",
+     "occupation": "Bus Operator",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 363,
+     "withdrew": false
+    },
+    {
+     "name": "Moore, Bertel",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 645,
+     "withdrew": false
+    },
+    {
+     "name": "McKenzie, Olga",
+     "occupation": "Social Worker",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 918,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 2,
+   "name": "Little London",
+   "pages": [
+    67
+   ],
+   "unopposed": false,
+   "total": 2095,
+   "rejected": 8,
+   "electors": 3507,
+   "candidates": [
+    {
+     "name": "Brooks, Earl N.",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 517,
+     "withdrew": false
+    },
+    {
+     "name": "Pringle, Clarence",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1570,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 3,
+   "name": "Paul Island",
+   "pages": [
+    67
+   ],
+   "unopposed": false,
+   "total": 1271,
+   "rejected": 8,
+   "electors": 1780,
+   "candidates": [
+    {
+     "name": "Knott, Lloyd",
+     "occupation": "Machine Operator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 740,
+     "withdrew": false
+    },
+    {
+     "name": "Lawson, Authur",
+     "occupation": "Farmer",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 56,
+     "withdrew": false
+    },
+    {
+     "name": "Tomlinson, Leila",
+     "occupation": "Clerk",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 362,
+     "withdrew": false
+    },
+    {
+     "name": "Tingling, Lyle",
+     "occupation": "Clerk",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 105,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 4,
+   "name": "Grange Hill",
+   "pages": [
+    67
+   ],
+   "unopposed": false,
+   "total": 2668,
+   "rejected": 18,
+   "electors": 4102,
+   "candidates": [
+    {
+     "name": "Cameron, Neville",
+     "occupation": "Technician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 826,
+     "withdrew": false
+    },
+    {
+     "name": "Davis, Sebert",
+     "occupation": "Trade Unionist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1628,
+     "withdrew": false
+    },
+    {
+     "name": "McDonald, Rupert",
+     "occupation": "Attorney-At-Law",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 196,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 5,
+   "name": "Georges Plain",
+   "pages": [
+    67
+   ],
+   "unopposed": false,
+   "total": 2190,
+   "rejected": 4,
+   "electors": 3319,
+   "candidates": [
+    {
+     "name": "McKenzie, Evan W.",
+     "occupation": "Millwright",
+     "party_printed": "W.P.J.",
+     "party": "WPJ",
+     "votes": 268,
+     "withdrew": false
+    },
+    {
+     "name": "Miller, Theresa",
+     "occupation": "Hair Dresser",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 332,
+     "withdrew": false
+    },
+    {
+     "name": "Turner, Leonard",
+     "occupation": "Machine Operator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1586,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 6,
+   "name": "Sav-La-Mar North",
+   "pages": [
+    68
+   ],
+   "unopposed": false,
+   "total": 2456,
+   "rejected": 4,
+   "electors": 3949,
+   "candidates": [
+    {
+     "name": "Campbell, Joseph",
+     "occupation": "Life Underwriter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1593,
+     "withdrew": false
+    },
+    {
+     "name": "Dennis, Radcliffe",
+     "occupation": "Life Underwriter",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 859,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 7,
+   "name": "Sav-La-Mar South",
+   "pages": [
+    68
+   ],
+   "unopposed": false,
+   "total": 2869,
+   "rejected": 11,
+   "electors": 4170,
+   "candidates": [
+    {
+     "name": "Hammond, Russell",
+     "occupation": "Business Executive",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1607,
+     "withdrew": false
+    },
+    {
+     "name": "McKoy, Pearl",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1251,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 8,
+   "name": "Bluefields",
+   "pages": [
+    68
+   ],
+   "unopposed": false,
+   "total": 2066,
+   "rejected": 12,
+   "electors": 3086,
+   "candidates": [
+    {
+     "name": "Meyler, John",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 743,
+     "withdrew": false
+    },
+    {
+     "name": "Sirjue, Wilbert",
+     "occupation": "Chemist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1311,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 9,
+   "name": "Friendship",
+   "pages": [
+    68
+   ],
+   "unopposed": false,
+   "total": 1942,
+   "rejected": 14,
+   "electors": 3124,
+   "candidates": [
+    {
+     "name": "Nembhard, Ashter",
+     "occupation": "Social Worker",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1601,
+     "withdrew": false
+    },
+    {
+     "name": "Stewart, Lyle B.",
+     "occupation": "Mechanic & Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 327,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 10,
+   "name": "Petersfield",
+   "pages": [
+    68
+   ],
+   "unopposed": false,
+   "total": 2059,
+   "rejected": 19,
+   "electors": 3256,
+   "candidates": [
+    {
+     "name": "Davis, Joan Rose",
+     "occupation": "Teacher & Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 552,
+     "withdrew": false
+    },
+    {
+     "name": "Fenton, Guilford",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1488,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 11,
+   "name": "Glenislay",
+   "pages": [
+    68
+   ],
+   "unopposed": false,
+   "total": 1585,
+   "rejected": 11,
+   "electors": 2196,
+   "candidates": [
+    {
+     "name": "Beckford, Naboth",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1041,
+     "withdrew": false
+    },
+    {
+     "name": "Clarke, David",
+     "occupation": "Builder",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 533,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 12,
+   "name": "Cornwall Mtn.",
+   "pages": [
+    69
+   ],
+   "unopposed": false,
+   "total": 1841,
+   "rejected": 15,
+   "electors": 2635,
+   "candidates": [
+    {
+     "name": "Bryant, Evadne",
+     "occupation": "Businesswoman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1257,
+     "withdrew": false
+    },
+    {
+     "name": "Vanriel, Bernard",
+     "occupation": "Auto-Mechanic",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 569,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 13,
+   "name": "Bethel Town",
+   "pages": [
+    69
+   ],
+   "unopposed": false,
+   "total": 1751,
+   "rejected": 12,
+   "electors": 2624,
+   "candidates": [
+    {
+     "name": "Brown, Cleveland",
+     "occupation": "Salesman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 614,
+     "withdrew": false
+    },
+    {
+     "name": "Smith, Stella",
+     "occupation": "Businesswoman & Social Worker",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1125,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 14,
+   "name": "Lambs River",
+   "pages": [
+    69
+   ],
+   "unopposed": false,
+   "total": 1802,
+   "rejected": 15,
+   "electors": 2531,
+   "candidates": [
+    {
+     "name": "Chang, Albert",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1247,
+     "withdrew": false
+    },
+    {
+     "name": "Kameka, Patrick",
+     "occupation": "Carpenter",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 540,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 15,
+   "name": "Darliston",
+   "pages": [
+    69
+   ],
+   "unopposed": false,
+   "total": 2050,
+   "rejected": 15,
+   "electors": 2998,
+   "candidates": [
+    {
+     "name": "Jones, Keith",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1207,
+     "withdrew": false
+    },
+    {
+     "name": "Spence, Richard",
+     "occupation": "Bus Operator",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 828,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 16,
+   "name": "Leamington",
+   "pages": [
+    69
+   ],
+   "unopposed": false,
+   "total": 1582,
+   "rejected": 19,
+   "electors": 2120,
+   "candidates": [
+    {
+     "name": "Anglin, Ralph",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 680,
+     "withdrew": false
+    },
+    {
+     "name": "Davis, Granville",
+     "occupation": "Minister of Religion",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 883,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 17,
+   "name": "New Works",
+   "pages": [
+    69
+   ],
+   "unopposed": false,
+   "total": 1367,
+   "rejected": 5,
+   "electors": 2244,
+   "candidates": [
+    {
+     "name": "Palmer, Alvin",
+     "occupation": "Truck Operator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 898,
+     "withdrew": false
+    },
+    {
+     "name": "Stone, L. A.",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 464,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Westmoreland",
+   "number": 18,
+   "name": "Whitehouse",
+   "pages": [
+    69
+   ],
+   "unopposed": false,
+   "total": 2000,
+   "rejected": 16,
+   "electors": 2937,
+   "candidates": [
+    {
+     "name": "Foster, George",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1289,
+     "withdrew": false
+    },
+    {
+     "name": "Pinnock, Ivan",
+     "occupation": "Fisherman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 695,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 1,
+   "name": "New Market",
+   "pages": [
+    70
+   ],
+   "unopposed": false,
+   "total": 1506,
+   "rejected": 6,
+   "electors": 2996,
+   "candidates": [
+    {
+     "name": "Foster, Eric L.",
+     "occupation": "Contractor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1275,
+     "withdrew": false
+    },
+    {
+     "name": "Smith, Dalton",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 225,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 2,
+   "name": "Springfield",
+   "pages": [
+    70
+   ],
+   "unopposed": false,
+   "total": 1724,
+   "rejected": 3,
+   "electors": 2706,
+   "candidates": [
+    {
+     "name": "Brown, Eric C.",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 625,
+     "withdrew": false
+    },
+    {
+     "name": "Herron, Austin L.",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1096,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 3,
+   "name": "Ipswich",
+   "pages": [
+    70
+   ],
+   "unopposed": false,
+   "total": 1012,
+   "rejected": 5,
+   "electors": 1592,
+   "candidates": [
+    {
+     "name": "Mais, Clovis",
+     "occupation": "Truck Operator",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 339,
+     "withdrew": false
+    },
+    {
+     "name": "Wright, Egerton",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 668,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 4,
+   "name": "Maggotty",
+   "pages": [
+    70
+   ],
+   "unopposed": false,
+   "total": 1334,
+   "rejected": 5,
+   "electors": 2274,
+   "candidates": [
+    {
+     "name": "Chambers, Lloyd A.",
+     "occupation": "Insurance Underwriter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 982,
+     "withdrew": false
+    },
+    {
+     "name": "Walker, Stanley",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 347,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 5,
+   "name": "Lacovia",
+   "pages": [
+    70
+   ],
+   "unopposed": false,
+   "total": 1981,
+   "rejected": 5,
+   "electors": 3505,
+   "candidates": [
+    {
+     "name": "Bennett, Ernest",
+     "occupation": "Trade Unionist",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 182,
+     "withdrew": false
+    },
+    {
+     "name": "Ricketts, Artis G.",
+     "occupation": "H. D. Operator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1794,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 6,
+   "name": "Santa Cruz",
+   "pages": [
+    70
+   ],
+   "unopposed": false,
+   "total": 3246,
+   "rejected": 15,
+   "electors": 5732,
+   "candidates": [
+    {
+     "name": "Stubbs, Hyacinth",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 659,
+     "withdrew": false
+    },
+    {
+     "name": "Lewis, Winston",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2572,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 7,
+   "name": "Braes River",
+   "pages": [
+    70
+   ],
+   "unopposed": false,
+   "total": 2319,
+   "rejected": 13,
+   "electors": 4267,
+   "candidates": [
+    {
+     "name": "Blake, Sylburn",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1250,
+     "withdrew": false
+    },
+    {
+     "name": "Blackwood, Moses",
+     "occupation": "Welder",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1056,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 8,
+   "name": "Retirement",
+   "pages": [
+    71
+   ],
+   "unopposed": false,
+   "total": 1260,
+   "rejected": 2,
+   "electors": 1753,
+   "candidates": [
+    {
+     "name": "Smith, Hezekiah",
+     "occupation": "Shopkeeper",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 902,
+     "withdrew": false
+    },
+    {
+     "name": "Goodlett, Levi",
+     "occupation": "Builder",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 356,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 9,
+   "name": "Siloah",
+   "pages": [
+    71
+   ],
+   "unopposed": false,
+   "total": 1799,
+   "rejected": 17,
+   "electors": 3319,
+   "candidates": [
+    {
+     "name": "Solomon, Kendrick",
+     "occupation": "Chemist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1064,
+     "withdrew": false
+    },
+    {
+     "name": "Martley, Albert",
+     "occupation": "Trade Unionist",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 718,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 10,
+   "name": "Balaclava",
+   "pages": [
+    71
+   ],
+   "unopposed": false,
+   "total": 1990,
+   "rejected": 17,
+   "electors": 3244,
+   "candidates": [
+    {
+     "name": "Longmore, Lonsdale",
+     "occupation": "Mini-Bus Operator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1188,
+     "withdrew": false
+    },
+    {
+     "name": "Salmon, Richard",
+     "occupation": "Electrician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 785,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 11,
+   "name": "Black River",
+   "pages": [
+    71
+   ],
+   "unopposed": false,
+   "total": 2688,
+   "rejected": 6,
+   "electors": 3904,
+   "candidates": [
+    {
+     "name": "Williams, Bernel",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1636,
+     "withdrew": false
+    },
+    {
+     "name": "Gayle, Ricardo A.",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1046,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 12,
+   "name": "Brompton",
+   "pages": [
+    71
+   ],
+   "unopposed": false,
+   "total": 1638,
+   "rejected": 8,
+   "electors": 2318,
+   "candidates": [
+    {
+     "name": "Myers, Josiah A.",
+     "occupation": "Trade Unionist",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 676,
+     "withdrew": false
+    },
+    {
+     "name": "Simpson, Eustace",
+     "occupation": "Shopkeeper",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 954,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 13,
+   "name": "Parottee",
+   "pages": [
+    71
+   ],
+   "unopposed": false,
+   "total": 1899,
+   "rejected": 5,
+   "electors": 2441,
+   "candidates": [
+    {
+     "name": "Bennett, Alphanso",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 650,
+     "withdrew": false
+    },
+    {
+     "name": "Porter, Antonio",
+     "occupation": "Dairy Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1244,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 14,
+   "name": "Mountainside",
+   "pages": [
+    71
+   ],
+   "unopposed": false,
+   "total": 2314,
+   "rejected": 6,
+   "electors": 3083,
+   "candidates": [
+    {
+     "name": "McIntosh, Villmore",
+     "occupation": "Housewife",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1717,
+     "withdrew": false
+    },
+    {
+     "name": "Smalling, Amos",
+     "occupation": "Trade Unionist",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 591,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 15,
+   "name": "Pedro Plains",
+   "pages": [
+    72
+   ],
+   "unopposed": false,
+   "total": 2975,
+   "rejected": 4,
+   "electors": 3904,
+   "candidates": [
+    {
+     "name": "Buchanan, Donald",
+     "occupation": "Trade Unionist",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1320,
+     "withdrew": false
+    },
+    {
+     "name": "Whyte, Alvin",
+     "occupation": "Driver",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1651,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 16,
+   "name": "Southfield",
+   "pages": [
+    72
+   ],
+   "unopposed": false,
+   "total": 2286,
+   "rejected": 13,
+   "electors": 3635,
+   "candidates": [
+    {
+     "name": "Anderson, Lloyd",
+     "occupation": "Port & Rail Road Operator Sup.",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 731,
+     "withdrew": false
+    },
+    {
+     "name": "Bent, Winston",
+     "occupation": "Supervisor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1542,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 17,
+   "name": "Malvern",
+   "pages": [
+    72
+   ],
+   "unopposed": false,
+   "total": 1436,
+   "rejected": 32,
+   "electors": 2209,
+   "candidates": [
+    {
+     "name": "Daley, Gerald",
+     "occupation": "Lecturer & Supervisor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 490,
+     "withdrew": false
+    },
+    {
+     "name": "Lewis, Raphael",
+     "occupation": "Production Supervisor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 914,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 18,
+   "name": "Rose Hall",
+   "pages": [
+    72
+   ],
+   "unopposed": false,
+   "total": 1736,
+   "rejected": 25,
+   "electors": 2585,
+   "candidates": [
+    {
+     "name": "Spencer, Kernan D.",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 740,
+     "withdrew": false
+    },
+    {
+     "name": "Whitely, Leroy D.",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 971,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 19,
+   "name": "Junction",
+   "pages": [
+    72
+   ],
+   "unopposed": false,
+   "total": 3296,
+   "rejected": 65,
+   "electors": 4945,
+   "candidates": [
+    {
+     "name": "Dyer, Louis",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1891,
+     "withdrew": false
+    },
+    {
+     "name": "Horne, Donald W.",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1340,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Elizabeth",
+   "number": 20,
+   "name": "Myersville",
+   "pages": [
+    72
+   ],
+   "unopposed": false,
+   "total": 1564,
+   "rejected": 37,
+   "electors": 2324,
+   "candidates": [
+    {
+     "name": "Russells, Brandon",
+     "occupation": "Electrician & Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 821,
+     "withdrew": false
+    },
+    {
+     "name": "Whitely, Maxwell",
+     "occupation": "Tailor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 706,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 1,
+   "name": "Porus",
+   "pages": [
+    73
+   ],
+   "unopposed": false,
+   "total": 1675,
+   "rejected": 10,
+   "electors": 2354,
+   "candidates": [
+    {
+     "name": "Bailey, Samuel",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 774,
+     "withdrew": false
+    },
+    {
+     "name": "Davis, Godfrey G.",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 891,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 2,
+   "name": "Farm",
+   "pages": [
+    73
+   ],
+   "unopposed": false,
+   "total": 1399,
+   "rejected": 10,
+   "electors": 2041,
+   "candidates": [
+    {
+     "name": "Green, Samuel",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 635,
+     "withdrew": false
+    },
+    {
+     "name": "Simpson, Noel",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 754,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 3,
+   "name": "Grove Town",
+   "pages": [
+    73
+   ],
+   "unopposed": false,
+   "total": 2152,
+   "rejected": 11,
+   "electors": 3287,
+   "candidates": [
+    {
+     "name": "Marshall, George",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1169,
+     "withdrew": false
+    },
+    {
+     "name": "Freddie, Edrick U.",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 972,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 4,
+   "name": "Cross Keys",
+   "pages": [
+    73
+   ],
+   "unopposed": false,
+   "total": 2773,
+   "rejected": 21,
+   "electors": 4472,
+   "candidates": [
+    {
+     "name": "Bent, Lloyd George",
+     "occupation": "Life Underwriter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1747,
+     "withdrew": false
+    },
+    {
+     "name": "Pitter, Glen H.",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1005,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 5,
+   "name": "Alligator Pond",
+   "pages": [
+    73
+   ],
+   "unopposed": false,
+   "total": 2734,
+   "rejected": 19,
+   "electors": 4726,
+   "candidates": [
+    {
+     "name": "Henry, Kenneth D.",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1674,
+     "withdrew": false
+    },
+    {
+     "name": "Reid, Noel Patrick",
+     "occupation": "Electrician",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1041,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 6,
+   "name": "Knockpatrick",
+   "pages": [
+    73
+   ],
+   "unopposed": false,
+   "total": 2363,
+   "rejected": 10,
+   "electors": 4494,
+   "candidates": [
+    {
+     "name": "Ramocan, Seth G.",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1751,
+     "withdrew": false
+    },
+    {
+     "name": "Sanderman, Eric",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 602,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 7,
+   "name": "Mandeville",
+   "pages": [
+    73
+   ],
+   "unopposed": false,
+   "total": 3254,
+   "rejected": 14,
+   "electors": 6572,
+   "candidates": [
+    {
+     "name": "Charlton, Cecil",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2458,
+     "withdrew": false
+    },
+    {
+     "name": "Newman, Lennox",
+     "occupation": "Underwriter",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 782,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 8,
+   "name": "Royal Flat",
+   "pages": [
+    74
+   ],
+   "unopposed": false,
+   "total": 2691,
+   "rejected": 15,
+   "electors": 4490,
+   "candidates": [
+    {
+     "name": "Mitchell, Aubrey",
+     "occupation": "Businessman & Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1863,
+     "withdrew": false
+    },
+    {
+     "name": "Melhado, Ripton",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 813,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 9,
+   "name": "Bellefield",
+   "pages": [
+    74
+   ],
+   "unopposed": false,
+   "total": 1701,
+   "rejected": 6,
+   "electors": 2650,
+   "candidates": [
+    {
+     "name": "Muschamp, Epifano",
+     "occupation": "Electrical Engineer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1118,
+     "withdrew": false
+    },
+    {
+     "name": "Pommells, Daniel",
+     "occupation": "Millwright",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 577,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 10,
+   "name": "Shooters Hill",
+   "pages": [
+    74
+   ],
+   "unopposed": false,
+   "total": 2173,
+   "rejected": 6,
+   "electors": 3700,
+   "candidates": [
+    {
+     "name": "Haughton, Lloyd",
+     "occupation": "Life Underwriter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 909,
+     "withdrew": false
+    },
+    {
+     "name": "Peart, Dean A.",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 672,
+     "withdrew": false
+    },
+    {
+     "name": "Robinson, Everette",
+     "occupation": "Technician",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 586,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 11,
+   "name": "Spur Tree",
+   "pages": [
+    74
+   ],
+   "unopposed": false,
+   "total": 1626,
+   "rejected": 5,
+   "electors": 3199,
+   "candidates": [
+    {
+     "name": "Cowan, Aston H.",
+     "occupation": "Auto Mechanic",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 869,
+     "withdrew": false
+    },
+    {
+     "name": "Wilson, Cedric S.",
+     "occupation": "Construction Supervisor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 752,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 12,
+   "name": "John's Hall",
+   "pages": [
+    74
+   ],
+   "unopposed": false,
+   "total": 1886,
+   "rejected": 7,
+   "electors": 3033,
+   "candidates": [
+    {
+     "name": "Adlam, James A.",
+     "occupation": "Auto Spare Parts Dealer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 982,
+     "withdrew": false
+    },
+    {
+     "name": "Robinson, William",
+     "occupation": "Draughtsman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 897,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 13,
+   "name": "Mile Gully",
+   "pages": [
+    74
+   ],
+   "unopposed": false,
+   "total": 1173,
+   "rejected": 3,
+   "electors": 1814,
+   "candidates": [
+    {
+     "name": "Evans, Oscar",
+     "occupation": "Supervisor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 746,
+     "withdrew": false
+    },
+    {
+     "name": "White, Selvin",
+     "occupation": "Farmer & Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 424,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 14,
+   "name": "Comfort Hall",
+   "pages": [
+    75
+   ],
+   "unopposed": false,
+   "total": 1892,
+   "rejected": 12,
+   "electors": 2773,
+   "candidates": [
+    {
+     "name": "Porter, Percival",
+     "occupation": "Mechanic",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 690,
+     "withdrew": false
+    },
+    {
+     "name": "Salmon, Darius",
+     "occupation": "Chauffeur",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1190,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 15,
+   "name": "Craighead",
+   "pages": [
+    75
+   ],
+   "unopposed": false,
+   "total": 2139,
+   "rejected": 8,
+   "electors": 3582,
+   "candidates": [
+    {
+     "name": "Hall, Newton",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1450,
+     "withdrew": false
+    },
+    {
+     "name": "Powell, Edward",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 681,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 16,
+   "name": "Devon",
+   "pages": [
+    75
+   ],
+   "unopposed": false,
+   "total": 2270,
+   "rejected": 11,
+   "electors": 3853,
+   "candidates": [
+    {
+     "name": "Channer, Albert",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1915,
+     "withdrew": false
+    },
+    {
+     "name": "Johnson, Headley",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 344,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 17,
+   "name": "Christiana",
+   "pages": [
+    75
+   ],
+   "unopposed": false,
+   "total": 2403,
+   "rejected": 5,
+   "electors": 3790,
+   "candidates": [
+    {
+     "name": "Elliott, Michael",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1416,
+     "withdrew": false
+    },
+    {
+     "name": "Lyn, Calvin S.",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 982,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Manchester",
+   "number": 18,
+   "name": "Walderston",
+   "pages": [
+    75
+   ],
+   "unopposed": false,
+   "total": 2751,
+   "rejected": 8,
+   "electors": 4590,
+   "candidates": [
+    {
+     "name": "Reid, Derrick S.",
+     "occupation": "Pig Procurement Officer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1814,
+     "withdrew": false
+    },
+    {
+     "name": "Reid, Wilfred",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 929,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 1,
+   "name": "Spaulding",
+   "pages": [
+    76
+   ],
+   "unopposed": false,
+   "total": 2821,
+   "rejected": 12,
+   "electors": 4271,
+   "candidates": [
+    {
+     "name": "Clarke, Minnie",
+     "occupation": "Housewife",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1094,
+     "withdrew": false
+    },
+    {
+     "name": "Wiltshire, Karl",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1715,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 2,
+   "name": "Ritchies",
+   "pages": [
+    76
+   ],
+   "unopposed": false,
+   "total": 1512,
+   "rejected": 16,
+   "electors": 2886,
+   "candidates": [
+    {
+     "name": "Davy, Herbert",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 484,
+     "withdrew": false
+    },
+    {
+     "name": "Morris, Evan A.",
+     "occupation": "Motor Operator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1012,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 3,
+   "name": "Frankfield",
+   "pages": [
+    76
+   ],
+   "unopposed": false,
+   "total": 1698,
+   "rejected": 8,
+   "electors": 2651,
+   "candidates": [
+    {
+     "name": "Lewinson, Bonitto",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 611,
+     "withdrew": false
+    },
+    {
+     "name": "Dunkley, Gladstone",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1079,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 4,
+   "name": "Smithville",
+   "pages": [
+    76
+   ],
+   "unopposed": false,
+   "total": 1318,
+   "rejected": 3,
+   "electors": 2234,
+   "candidates": [
+    {
+     "name": "McLeod, Canute",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1185,
+     "withdrew": false
+    },
+    {
+     "name": "Williams, Leroy",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 130,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 5,
+   "name": "Mainridge",
+   "pages": [
+    76
+   ],
+   "unopposed": false,
+   "total": 1572,
+   "rejected": 6,
+   "electors": 2686,
+   "candidates": [
+    {
+     "name": "Henningham, Huss",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 526,
+     "withdrew": false
+    },
+    {
+     "name": "Richards, Winston",
+     "occupation": "Driver",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1040,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 6,
+   "name": "Thompson Town",
+   "pages": [
+    76
+   ],
+   "unopposed": false,
+   "total": 1218,
+   "rejected": 1,
+   "electors": 2014,
+   "candidates": [
+    {
+     "name": "Bryan, Hylton A.",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 920,
+     "withdrew": false
+    },
+    {
+     "name": "Thompson, John",
+     "occupation": "Tailor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 297,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 7,
+   "name": "Aenon Town",
+   "pages": [
+    76
+   ],
+   "unopposed": false,
+   "total": 2082,
+   "rejected": 12,
+   "electors": 3241,
+   "candidates": [
+    {
+     "name": "Francis, Irvin",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 643,
+     "withdrew": false
+    },
+    {
+     "name": "Latty, Lester",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1427,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 8,
+   "name": "Crooked River",
+   "pages": [
+    76
+   ],
+   "unopposed": false,
+   "total": 2282,
+   "rejected": 19,
+   "electors": 4166,
+   "candidates": [
+    {
+     "name": "Binger, Rupert",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 548,
+     "withdrew": false
+    },
+    {
+     "name": "Lindsay, Norris S.",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1715,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 9,
+   "name": "Colonels Ridge",
+   "pages": [
+    77
+   ],
+   "unopposed": false,
+   "total": 1471,
+   "rejected": null,
+   "electors": 2282,
+   "candidates": [
+    {
+     "name": "Bryson, Manley A.",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 338,
+     "withdrew": false
+    },
+    {
+     "name": "Henry, Vincent",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1133,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 10,
+   "name": "Kellits",
+   "pages": [
+    77
+   ],
+   "unopposed": false,
+   "total": 2351,
+   "rejected": 14,
+   "electors": 3530,
+   "candidates": [
+    {
+     "name": "Leslie, Henry",
+     "occupation": "Mechanic",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 777,
+     "withdrew": false
+    },
+    {
+     "name": "Mair, Junior",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1560,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 11,
+   "name": "Mocho",
+   "pages": [
+    77
+   ],
+   "unopposed": false,
+   "total": 2125,
+   "rejected": 4,
+   "electors": 4398,
+   "candidates": [
+    {
+     "name": "Francis, Alford",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1979,
+     "withdrew": false
+    },
+    {
+     "name": "Lawrence, Ruth",
+     "occupation": "Housewife",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 142,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 12,
+   "name": "Beckford Kraal",
+   "pages": [
+    77
+   ],
+   "unopposed": false,
+   "total": 1741,
+   "rejected": 6,
+   "electors": 3344,
+   "candidates": [
+    {
+     "name": "Bailey, Zephaniah",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 77,
+     "withdrew": false
+    },
+    {
+     "name": "Williams, Winston",
+     "occupation": "Truck Operator",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1658,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 13,
+   "name": "Chapelton",
+   "pages": [
+    77
+   ],
+   "unopposed": false,
+   "total": 2323,
+   "rejected": 8,
+   "electors": 4198,
+   "candidates": [
+    {
+     "name": "Diah, Maxmillan",
+     "occupation": "Lab. Technician",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2105,
+     "withdrew": false
+    },
+    {
+     "name": "Clarke-Lopez, Natalie",
+     "occupation": "Housewife",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 210,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 14,
+   "name": "Rock River",
+   "pages": [
+    77
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Salmon, Albert",
+     "occupation": "Social Worker",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 15,
+   "name": "Denbigh",
+   "pages": [
+    77
+   ],
+   "unopposed": false,
+   "total": 2223,
+   "rejected": 90,
+   "electors": 3969,
+   "candidates": [
+    {
+     "name": "Spencer, Cecil",
+     "occupation": "Cabinet Maker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 402,
+     "withdrew": false
+    },
+    {
+     "name": "Williams, Joel",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1731,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 16,
+   "name": "May Pen East",
+   "pages": [
+    77
+   ],
+   "unopposed": false,
+   "total": 3207,
+   "rejected": 129,
+   "electors": 5630,
+   "candidates": [
+    {
+     "name": "Bartley, Wesley",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 915,
+     "withdrew": false
+    },
+    {
+     "name": "Lindsay, Basil",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2163,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 17,
+   "name": "May Pen West",
+   "pages": [
+    78
+   ],
+   "unopposed": false,
+   "total": 3014,
+   "rejected": 102,
+   "electors": 5475,
+   "candidates": [
+    {
+     "name": "German, Almena",
+     "occupation": "Price Investigator",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 571,
+     "withdrew": false
+    },
+    {
+     "name": "Johnston, Allan",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2341,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 18,
+   "name": "Toll Gate",
+   "pages": [
+    78
+   ],
+   "unopposed": false,
+   "total": 1781,
+   "rejected": 6,
+   "electors": 3474,
+   "candidates": [
+    {
+     "name": "Morris, Carrington",
+     "occupation": "Youth & Comm. Dev. Officer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1121,
+     "withdrew": false
+    },
+    {
+     "name": "Shim-Hue, Derrick",
+     "occupation": "Operator",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 654,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 19,
+   "name": "York Town",
+   "pages": [
+    78
+   ],
+   "unopposed": false,
+   "total": 2244,
+   "rejected": 18,
+   "electors": 3480,
+   "candidates": [
+    {
+     "name": "Francis, Emelius H.",
+     "occupation": "Clerk",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1205,
+     "withdrew": false
+    },
+    {
+     "name": "Learmond, Charles",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1021,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 20,
+   "name": "Milk River",
+   "pages": [
+    78
+   ],
+   "unopposed": false,
+   "total": 2082,
+   "rejected": 7,
+   "electors": 3332,
+   "candidates": [
+    {
+     "name": "Bisasor, Henry",
+     "occupation": "Accountant",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1390,
+     "withdrew": false
+    },
+    {
+     "name": "Hudson, Margaret",
+     "occupation": "Housewife",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 685,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 21,
+   "name": "Monymusk",
+   "pages": [
+    78
+   ],
+   "unopposed": false,
+   "total": 2459,
+   "rejected": 14,
+   "electors": 4071,
+   "candidates": [
+    {
+     "name": "Chin-Fatt, Authur",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1537,
+     "withdrew": false
+    },
+    {
+     "name": "Sealy, Vernon",
+     "occupation": "Supervisor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 908,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 22,
+   "name": "Rocky Point",
+   "pages": [
+    78
+   ],
+   "unopposed": true,
+   "total": null,
+   "rejected": null,
+   "electors": null,
+   "candidates": [
+    {
+     "name": "Maxwell, Vincent G.",
+     "occupation": "Chemist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": null,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 23,
+   "name": "Hayes",
+   "pages": [
+    78
+   ],
+   "unopposed": false,
+   "total": 2706,
+   "rejected": 35,
+   "electors": 5207,
+   "candidates": [
+    {
+     "name": "Allan, Roxy F.",
+     "occupation": "Mechanic",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 192,
+     "withdrew": false
+    },
+    {
+     "name": "Phillips, Stanford",
+     "occupation": "Mason",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 477,
+     "withdrew": false
+    },
+    {
+     "name": "Williamson, Alzia",
+     "occupation": "Housewife",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2002,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "Clarendon",
+   "number": 24,
+   "name": "Sandy Bay",
+   "pages": [
+    79
+   ],
+   "unopposed": false,
+   "total": 2197,
+   "rejected": 31,
+   "electors": 4620,
+   "candidates": [
+    {
+     "name": "Bartley, Valney A.",
+     "occupation": "Businessman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2015,
+     "withdrew": false
+    },
+    {
+     "name": "Hutchinson, Kenneth",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 151,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 1,
+   "name": "Lluidas Vale",
+   "pages": [
+    80
+   ],
+   "unopposed": false,
+   "total": 1707,
+   "rejected": 28,
+   "electors": 3142,
+   "candidates": [
+    {
+     "name": "Henry, Horace S.",
+     "occupation": "Production Supervisor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 862,
+     "withdrew": false
+    },
+    {
+     "name": "McLean, Glenmore",
+     "occupation": "Clerk",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 817,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 2,
+   "name": "Ewarton",
+   "pages": [
+    80
+   ],
+   "unopposed": false,
+   "total": 1740,
+   "rejected": 13,
+   "electors": 3005,
+   "candidates": [
+    {
+     "name": "Simpson, Derrick",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 742,
+     "withdrew": false
+    },
+    {
+     "name": "Thompson, Edris C.",
+     "occupation": "Housewife & Social Worker",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 985,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 3,
+   "name": "Treadways",
+   "pages": [
+    80
+   ],
+   "unopposed": false,
+   "total": 1906,
+   "rejected": 7,
+   "electors": 3652,
+   "candidates": [
+    {
+     "name": "Hyatt, Mena Gloria",
+     "occupation": "Businesswoman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1303,
+     "withdrew": false
+    },
+    {
+     "name": "Ritchie, Daphne",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 596,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 4,
+   "name": "Linstead",
+   "pages": [
+    80
+   ],
+   "unopposed": false,
+   "total": 1903,
+   "rejected": 26,
+   "electors": 4103,
+   "candidates": [
+    {
+     "name": "Hemmings, Vincent",
+     "occupation": "Clerk",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1152,
+     "withdrew": false
+    },
+    {
+     "name": "Minott, Everard",
+     "occupation": "Tractor Scraper Operator",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 725,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 5,
+   "name": "Brown's Hall",
+   "pages": [
+    80
+   ],
+   "unopposed": false,
+   "total": 2050,
+   "rejected": 28,
+   "electors": 2782,
+   "candidates": [
+    {
+     "name": "Palmer, Errol A.",
+     "occupation": "Electrician",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1149,
+     "withdrew": false
+    },
+    {
+     "name": "Wilson, Ralston",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 873,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 6,
+   "name": "Old Harbour North",
+   "pages": [
+    80
+   ],
+   "unopposed": false,
+   "total": 2973,
+   "rejected": 11,
+   "electors": 5370,
+   "candidates": [
+    {
+     "name": "Spence, Ernest",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2404,
+     "withdrew": false
+    },
+    {
+     "name": "Wright, Clifford",
+     "occupation": "Inventory Clerk",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 558,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 7,
+   "name": "Old Harbour South",
+   "pages": [
+    80
+   ],
+   "unopposed": false,
+   "total": 1909,
+   "rejected": 6,
+   "electors": 2808,
+   "candidates": [
+    {
+     "name": "Bryan, Stainton",
+     "occupation": "Textile Engineer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1333,
+     "withdrew": false
+    },
+    {
+     "name": "Waul, Carlos C.",
+     "occupation": "Electrical Contractor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 570,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 8,
+   "name": "Hartland",
+   "pages": [
+    81
+   ],
+   "unopposed": false,
+   "total": 3439,
+   "rejected": 11,
+   "electors": 7156,
+   "candidates": [
+    {
+     "name": "Beeston, Lloyd G.",
+     "occupation": "Accounts Clerk",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 762,
+     "withdrew": false
+    },
+    {
+     "name": "Dixon, Mary Daisy",
+     "occupation": "Garment Instructor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2666,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 9,
+   "name": "Hampton Green",
+   "pages": [
+    81
+   ],
+   "unopposed": false,
+   "total": 2656,
+   "rejected": 46,
+   "electors": 5765,
+   "candidates": [
+    {
+     "name": "Gray, Maureen",
+     "occupation": "Clerk",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 208,
+     "withdrew": false
+    },
+    {
+     "name": "McKessay, Joseph",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2402,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 10,
+   "name": "Ensom City",
+   "pages": [
+    81
+   ],
+   "unopposed": false,
+   "total": 1968,
+   "rejected": 9,
+   "electors": 4785,
+   "candidates": [
+    {
+     "name": "Brown, Orville",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1659,
+     "withdrew": false
+    },
+    {
+     "name": "Johnson, Robert",
+     "occupation": "Accounting Clerk",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 300,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 11,
+   "name": "Homestead",
+   "pages": [
+    81
+   ],
+   "unopposed": false,
+   "total": 2311,
+   "rejected": 36,
+   "electors": 4781,
+   "candidates": [
+    {
+     "name": "Brown, Derma E.",
+     "occupation": "Clerk",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 198,
+     "withdrew": false
+    },
+    {
+     "name": "Scully, Winston",
+     "occupation": "Accountant",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2077,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 12,
+   "name": "Spanish Town South",
+   "pages": [
+    81
+   ],
+   "unopposed": false,
+   "total": 1241,
+   "rejected": 39,
+   "electors": 2286,
+   "candidates": [
+    {
+     "name": "Brown, Albert L.",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 270,
+     "withdrew": false
+    },
+    {
+     "name": "Johnson, Knox",
+     "occupation": "Businessman",
+     "party_printed": "IND.",
+     "party": "IND",
+     "votes": 116,
+     "withdrew": false
+    },
+    {
+     "name": "Stephenson, Beverly",
+     "occupation": "Executive Secretary",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 816,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 13,
+   "name": "Spanish Town North",
+   "pages": [
+    81
+   ],
+   "unopposed": false,
+   "total": 3183,
+   "rejected": 16,
+   "electors": 5575,
+   "candidates": [
+    {
+     "name": "Francis, Lloyd",
+     "occupation": "Trade Unionist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1779,
+     "withdrew": false
+    },
+    {
+     "name": "Medley, Errol",
+     "occupation": "Insurance Agent",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1388,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 14,
+   "name": "Gregory Park",
+   "pages": [
+    82
+   ],
+   "unopposed": false,
+   "total": 3522,
+   "rejected": 33,
+   "electors": 5195,
+   "candidates": [
+    {
+     "name": "William, Everrod",
+     "occupation": "Trade Unionist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 3257,
+     "withdrew": false
+    },
+    {
+     "name": "Grey, Lloyd",
+     "occupation": "Contractor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 232,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 15,
+   "name": "Independence City",
+   "pages": [
+    82
+   ],
+   "unopposed": false,
+   "total": 1745,
+   "rejected": 9,
+   "electors": 5244,
+   "candidates": [
+    {
+     "name": "Ebanks, Reginald",
+     "occupation": "Life Underwriter",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1194,
+     "withdrew": false
+    },
+    {
+     "name": "Bloomfield, James",
+     "occupation": "Contractor & Builder",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 542,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 16,
+   "name": "Edgewater",
+   "pages": [
+    82
+   ],
+   "unopposed": false,
+   "total": 1788,
+   "rejected": 8,
+   "electors": 5947,
+   "candidates": [
+    {
+     "name": "Spencer, Vernon",
+     "occupation": "Planning Engineer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1362,
+     "withdrew": false
+    },
+    {
+     "name": "Brook, Michael",
+     "occupation": "Clerk",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 418,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 17,
+   "name": "Braeton",
+   "pages": [
+    82
+   ],
+   "unopposed": false,
+   "total": 2166,
+   "rejected": 7,
+   "electors": 5066,
+   "candidates": [
+    {
+     "name": "Williams, Magnus",
+     "occupation": "Supervisor",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1669,
+     "withdrew": false
+    },
+    {
+     "name": "Hall, Mario A.",
+     "occupation": "Student",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 490,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 18,
+   "name": "Waterford",
+   "pages": [
+    82
+   ],
+   "unopposed": false,
+   "total": 2320,
+   "rejected": 43,
+   "electors": 6460,
+   "candidates": [
+    {
+     "name": "Williams, Michael",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1289,
+     "withdrew": false
+    },
+    {
+     "name": "William, Franklyn (\"Whyno\")",
+     "occupation": "Journalist",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 988,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 19,
+   "name": "Naggo Head",
+   "pages": [
+    82
+   ],
+   "unopposed": false,
+   "total": 1769,
+   "rejected": 7,
+   "electors": 4541,
+   "candidates": [
+    {
+     "name": "McIntosh, Ray Carl",
+     "occupation": "Youth Organiser",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1374,
+     "withdrew": false
+    },
+    {
+     "name": "Brown, Errol",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 388,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 20,
+   "name": "Michelton",
+   "pages": [
+    83
+   ],
+   "unopposed": false,
+   "total": 1442,
+   "rejected": 45,
+   "electors": 2890,
+   "candidates": [
+    {
+     "name": "Fisher, Herbert",
+     "occupation": "Haulage Contractor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 310,
+     "withdrew": false
+    },
+    {
+     "name": "Nicholas, George",
+     "occupation": "Trade Unionist",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1087,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 21,
+   "name": "Bog Walk",
+   "pages": [
+    83
+   ],
+   "unopposed": false,
+   "total": 1611,
+   "rejected": 69,
+   "electors": 3054,
+   "candidates": [
+    {
+     "name": "Foga, Noel Roy",
+     "occupation": "Supervisor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 407,
+     "withdrew": false
+    },
+    {
+     "name": "Young, Naman",
+     "occupation": "Headman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1135,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 22,
+   "name": "Above Rocks",
+   "pages": [
+    83
+   ],
+   "unopposed": false,
+   "total": 1545,
+   "rejected": 41,
+   "electors": 2795,
+   "candidates": [
+    {
+     "name": "Aarons, Dorrett",
+     "occupation": "Social Worker",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 637,
+     "withdrew": false
+    },
+    {
+     "name": "Robinson, Louis",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 867,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 23,
+   "name": "Sligoville",
+   "pages": [
+    83
+   ],
+   "unopposed": false,
+   "total": 1345,
+   "rejected": 61,
+   "electors": 2866,
+   "candidates": [
+    {
+     "name": "Lemmie, Eugene",
+     "occupation": "Sales Executive",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 428,
+     "withdrew": false
+    },
+    {
+     "name": "Thomas, Ashwell",
+     "occupation": "Business Executive",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 856,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 24,
+   "name": "Greendale",
+   "pages": [
+    83
+   ],
+   "unopposed": false,
+   "total": 3122,
+   "rejected": 105,
+   "electors": 7163,
+   "candidates": [
+    {
+     "name": "Brown, Horace E.",
+     "occupation": "Sales Supervisor",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 1329,
+     "withdrew": false
+    },
+    {
+     "name": "Daley, Joseph E.",
+     "occupation": "Senior Aviation Crewman",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1688,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 25,
+   "name": "Ginger Ridge",
+   "pages": [
+    83
+   ],
+   "unopposed": false,
+   "total": 1048,
+   "rejected": 7,
+   "electors": 2165,
+   "candidates": [
+    {
+     "name": "Coleman, Percival",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 964,
+     "withdrew": false
+    },
+    {
+     "name": "Ellis, Doris",
+     "occupation": "Clerk",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 77,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 26,
+   "name": "Point Hill",
+   "pages": [
+    83,
+    37
+   ],
+   "unopposed": false,
+   "total": 1604,
+   "rejected": 9,
+   "electors": 3039,
+   "candidates": [
+    {
+     "name": "Green, Seymour",
+     "occupation": "Businessman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 300,
+     "withdrew": false
+    },
+    {
+     "name": "Rhule, Elkanah",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1295,
+     "withdrew": false
+    }
+   ],
+   "note": "Table V prints 3,982 electors for this division, the figure of Red Hills on the line below. Table III of the report (page 37 of the scanned file) prints 3,039 electors, which agree with the turnout of 52.78% both tables print; those electors are stored."
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 27,
+   "name": "Red Hills",
+   "pages": [
+    84
+   ],
+   "unopposed": false,
+   "total": 2074,
+   "rejected": 16,
+   "electors": 3982,
+   "candidates": [
+    {
+     "name": "Harris, Melva",
+     "occupation": "Housewife",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1902,
+     "withdrew": false
+    },
+    {
+     "name": "Parker, Simeon",
+     "occupation": "Road Foreman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 156,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 28,
+   "name": "Bellevue",
+   "pages": [
+    84
+   ],
+   "unopposed": false,
+   "total": 1930,
+   "rejected": 5,
+   "electors": 4081,
+   "candidates": [
+    {
+     "name": "Minott, Hyacinth",
+     "occupation": "Secretary",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1634,
+     "withdrew": false
+    },
+    {
+     "name": "Woodfine, Melvin",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 291,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 29,
+   "name": "Guys Hill",
+   "pages": [
+    84
+   ],
+   "unopposed": false,
+   "total": 2630,
+   "rejected": 29,
+   "electors": 4496,
+   "candidates": [
+    {
+     "name": "Clarke, Euperd",
+     "occupation": "Teacher",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 2324,
+     "withdrew": false
+    },
+    {
+     "name": "Mitchell, Phyllis",
+     "occupation": "Teacher",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 277,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 30,
+   "name": "Troja",
+   "pages": [
+    84
+   ],
+   "unopposed": false,
+   "total": 1497,
+   "rejected": 6,
+   "electors": 2596,
+   "candidates": [
+    {
+     "name": "Lekie, Lascelles",
+     "occupation": "Farmer",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 356,
+     "withdrew": false
+    },
+    {
+     "name": "Tinker, Henry A.",
+     "occupation": "Farmer",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1135,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 31,
+   "name": "Riversdale",
+   "pages": [
+    84
+   ],
+   "unopposed": false,
+   "total": 1653,
+   "rejected": 8,
+   "electors": 2673,
+   "candidates": [
+    {
+     "name": "Grant, Basil",
+     "occupation": "Builder",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1253,
+     "withdrew": false
+    },
+    {
+     "name": "Tenn, Colin",
+     "occupation": "Salesman",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 392,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  },
+  {
+   "parish": "St. Catherine",
+   "number": 32,
+   "name": "Mt. Industry",
+   "pages": [
+    84
+   ],
+   "unopposed": false,
+   "total": 1388,
+   "rejected": 4,
+   "electors": 2638,
+   "candidates": [
+    {
+     "name": "Hamilton, Franklyn",
+     "occupation": "Builder",
+     "party_printed": "J.L.P.",
+     "party": "JLP",
+     "votes": 1213,
+     "withdrew": false
+    },
+    {
+     "name": "Latore, Norton",
+     "occupation": "Student",
+     "party_printed": "P.N.P.",
+     "party": "PNP",
+     "votes": 171,
+     "withdrew": false
+    }
+   ],
+   "note": ""
+  }
+ ],
+ "summary": {
+  "Kingston and St. Andrew": [
+   259090,
+   155588,
+   2287,
+   74866,
+   78351,
+   85
+  ],
+  "St. Thomas": [
+   31138,
+   18150,
+   93,
+   3080,
+   14977,
+   0
+  ],
+  "Portland": [
+   34667,
+   23098,
+   77,
+   6461,
+   16444,
+   116
+  ],
+  "St. Mary": [
+   51631,
+   34889,
+   183,
+   12866,
+   21840,
+   0
+  ],
+  "St. Ann": [
+   55482,
+   31860,
+   256,
+   10806,
+   20548,
+   250
+  ],
+  "Trelawny": [
+   29655,
+   21420,
+   117,
+   8218,
+   13074,
+   11
+  ],
+  "St. James": [
+   60277,
+   35579,
+   159,
+   11418,
+   23928,
+   74
+  ],
+  "Hanover": [
+   26821,
+   18574,
+   125,
+   5345,
+   12775,
+   329
+  ],
+  "Westmoreland": [
+   54309,
+   35529,
+   215,
+   11337,
+   22989,
+   988
+  ],
+  "St. Elizabeth": [
+   62736,
+   40003,
+   289,
+   13776,
+   25938,
+   0
+  ],
+  "Manchester": [
+   65420,
+   39055,
+   181,
+   13572,
+   24716,
+   586
+  ],
+  "Clarendon": [
+   81159,
+   46427,
+   541,
+   11661,
+   34033,
+   192
+  ],
+  "St. Catherine": [
+   132101,
+   65185,
+   788,
+   16196,
+   48085,
+   116
+  ]
+ },
+ "differences": [
+  "Kingston and St. Andrew: electors 259,090 in the summary and 259,082 in the division table",
+  "Kingston and St. Andrew: ballots cast 155,588 in the summary and 155,589 in the division table",
+  "St. Ann: electors 55,482 in the summary and 55,512 in the division table"
+ ]
+}
