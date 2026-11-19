@@ -473,11 +473,8 @@ def registry() -> Package:
     ):
         for number, name in enumerate(names, 1):
             id = wilaya_unit(scheme, number)
-            if scheme == "dz.wilaya_1974":
-                shape = boundaries.area(scheme, f"{number:02d}")
-                unit(id, scheme, f"{number:02d}", "standard", "equals", shape, NATION, since, until)
-            else:
-                unit(id, scheme, f"{number:02d}", "standard", "unlocated", None, NATION, since, until)
+            shape = boundaries.area(scheme, f"{number:02d}")
+            unit(id, scheme, f"{number:02d}", "standard", "equals", shape, NATION, since, until)
             p.name(id, name, "fr", "official")
     return p
 
