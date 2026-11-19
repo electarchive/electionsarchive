@@ -8,7 +8,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.mn import early, local, parliament, places, polls, sheets, soums, translit
+from ea.sources.mn import early, local, local2012, parliament, places, polls, sheets, soums, translit
 
 SOURCE = "mn.gec"
 MONGOLIA = str(uuid5(package.NAMESPACE, "polity\x1fMN"))
@@ -269,6 +269,68 @@ def section_party(abbreviation: str | None) -> str | None:
     return early_party(abbreviation)
 
 
+LOCAL_2012 = {
+    "f70dc429": (
+        "2012-local-by-constituency",
+        "2012 Mongolian local council elections, results by constituency",
+        " (үр дүн тойргоор)",
+    ),
+    "1a27c1a1": (
+        "2012-local-by-district",
+        "2012 Mongolian local council elections, results by district",
+        " (үр дүн дүүргээр)",
+    ),
+}
+PARLIAMENT_22_2012 = "2012-constituency-22"
+MUAN_2012 = "МҮАН-2012"
+YEAR_2012 = (
+    "The Commission's workbook is titled \u201c2012\u201d and prints no day. It lists only the council "
+    "constituencies and polling sections shown here."
+)
+WORKBOOK_NOTE_2012 = {
+    "f70dc429": " The by-district workbook lists some of the same sections with different figures.",
+    "1a27c1a1": " The by-constituency workbook lists some of the same sections with different figures.",
+}
+
+
+def party_2012(abbreviation: str | None) -> str | None:
+    if abbreviation == "МҮАН":
+        return key("party", MUAN_2012)
+    return early_party(abbreviation)
+
+
+@functools.cache
+def local_2012() -> list[LocalElection]:
+    out: list[LocalElection] = []
+    for name, (tag, english, suffix) in LOCAL_2012.items():
+        blocks, _ = local2012.read(name)
+        out.append(
+            LocalElection(
+                tag,
+                date(2012, 1, 1),
+                date(2012, 12, 31),
+                "year",
+                YEAR_2012 + WORKBOOK_NOTE_2012[name],
+                english,
+                NATIVE_LOCAL.format(year=2012) + suffix,
+                blocks,
+                [sheets.url(name)],
+                aliases={},
+                summary=f"The {english[0].lower()}{english[1:]}, with each council's party-list ballot and its "
+                "constituencies by polling section, from the General Election Commission",
+                path=f"mn/{tag}",
+            )
+        )
+    return out
+
+
+@functools.cache
+def parliament_22_2012() -> parliament.Contest:
+    _, contest = local2012.read("f70dc429")
+    assert contest is not None
+    return contest
+
+
 @functools.cache
 def section_elections_2016() -> list[LocalElection]:
     """The 2016 soum and district council elections and the re-votes that followed, by polling section."""
@@ -364,6 +426,10 @@ def council_area(council: local.Council) -> str:
     return area("mn.soum", place.code)
 
 
+def local_2012_packages() -> list[str]:
+    return [*(f"{SOURCE}/{e.key}" for e in local_2012()), f"{SOURCE}/{PARLIAMENT_22_2012}"]
+
+
 def section_packages() -> list[str]:
     return [f"{SOURCE}/{election_.key}" for election_ in section_elections_2016()]
 
@@ -377,6 +443,7 @@ def packages() -> list[str]:
         *(f"{SOURCE}/{election.key}" for election in local_elections()),
         *early_packages(),
         *section_packages(),
+        *local_2012_packages(),
     ]
 
 
@@ -419,6 +486,9 @@ def parse() -> None:
     councils(early_local_2016()).write()
     for election_ in section_elections_2016():
         section_councils(election_).write()
+    for election_ in local_2012():
+        councils_2012(election_).write()
+    parliament_22().write()
 
 
 def emit() -> None:
@@ -1070,6 +1140,215 @@ def section_councils(spec: LocalElection) -> Package:
                     _value(p, result_set, units[row.code], option, 1, value)
             for measure, value in row.extra.items():
                 _value(p, result_set, units[row.code], None, measure, value)
+    return p
+
+
+LIST_NOTE_2012 = (
+    "Votes are stored per party and polling section, as the Commission counted them, with the invalid and unmarked "
+    "ballots of each section kept as unit-level figures. The workbook prints no seat allocation and lists only the "
+    "sections shown here."
+)
+SEATS_NOTE_2012 = (
+    "The workbook lists only the sections shown here, so the constituency's votes are those of its listed sections."
+)
+
+
+def councils_2012(spec: LocalElection) -> Package:
+    """A 2012 council election: each council's party-list ballot and its constituencies, by polling section."""
+    day = spec.key
+    blocks = spec.blocks
+    p = Package(f"{SOURCE}/{day}", SOURCE, spec.summary or spec.english)
+    p.external |= {MONGOLIA, TERRITORY, GEC_SOURCE, *SCHEMES}
+    p.external |= {council_body(block.council) for block in blocks}
+    p.external |= {council_area(block.council) for block in blocks}
+    p.external |= {area("mn.soum", row.place.code) for block in blocks for row in block.rows if row.place}
+    used: set[str | None] = {c.party for block in blocks for c in block.candidates if c.party}
+    p.external |= inherited({a for a in used if a != "МҮАН"})
+    p.external |= {id for a in used if a in EARLY_PARTIES and (id := early_party(a))}
+    for url in spec.files:
+        p.artifact(raw.cached(SOURCE, url), GEC_SOURCE)
+    election_id = key("election", day)
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=MONGOLIA,
+        kind=spec.kind,
+        date_from=spec.date_from,
+        date_to=spec.date_to,
+        date_precision=spec.precision,
+        original_text=spec.original_text,
+        status="held",
+    )
+    p.name(election_id, spec.english, "en", "official")
+    p.name(election_id, spec.native, "mn", "native", False)
+    path = spec.path or f"mn/{day}"
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    if "МҮАН" in used:
+        id = party_2012("МҮАН")
+        assert id is not None
+        p.add("party", id=id, kind="party", polity_id=MONGOLIA)
+        p.add("external_id", entity_id=id, scheme="mn.gec.party", value=MUAN_2012)
+        p.name(id, "Монгол Үндэсний Ардчилсан Нам", "mn", "official")
+        p.name(id, "МҮАН", "mn", "abbreviation", False)
+    units = _units_2012(p, day, blocks)
+    for block in blocks:
+        listing = isinstance(block, local2012.ListBlock)
+        tag = f"{block.council.key}:list" if listing else f"{block.council.key}:{block.number}"
+        native, _ = council_name(block.council)
+        contest = key("contest", day, tag)
+        if listing:
+            district = council_area(block.council)
+            name = f"{native}, нам, эвслийн жагсаалт"
+            slug = f"{path}/{council_slug(block.council)}-list"
+            note = LIST_NOTE_2012
+        else:
+            district = area("mn.council_constituency", f"{day}:{tag}")
+            p.add("area", id=district, scheme_code="mn.council_constituency")
+            p.add("area_code", area_id=district, code=f"{day}:{tag}")
+            p.add("area_parent", area_id=district, parent_id=council_area(block.council))
+            name = f"{native}, {block.label}"
+            p.name(district, name, "mn", "native")
+            slug = f"{path}/{council_slug(block.council)}-{block.number}"
+            note = BLOCK_METHOD + " " + SECTION_ACCOUNTING + " " + SEATS_NOTE_2012
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="list_allocation" if listing else "body_seats",
+            body_id=council_body(block.council),
+            district_area_id=district,
+            magnitude=None if listing else block.seats,
+            round_number=1,
+            default_result_kind="counted",
+        )
+        p.name(contest, name, "mn", "native")
+        p.add("slug", path=slug, entity_id=contest, is_current=True)
+        result_set = _early_result_set(p, election_id, contest, tag, day, note)
+        if listing:
+            options = _list_options_2012(p, day, tag, contest, result_set, block)
+        else:
+            options = _early_candidates(
+                p, day, tag, contest, result_set, block.candidates, block.declared, None, True, party_2012
+            )
+        for measure, value in (block.declared_extra or {}).items():
+            p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+        for row in block.rows:
+            for option, value in zip(options, row.votes, strict=True):
+                if value is not None:
+                    _value(p, result_set, units[row.code], option, 1, value)
+            for measure, value in row.extra.items():
+                _value(p, result_set, units[row.code], None, measure, value)
+    return p
+
+
+def _units_2012(p: Package, day: str, blocks: list[local.Block]) -> dict[str, str]:
+    units: dict[str, str] = {}
+    for block in blocks:
+        for row in block.rows:
+            if row.code in units:
+                continue
+            unit = units[row.code] = key("unit", day, row.code)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=MONGOLIA,
+                scheme_code="mn.hesg",
+                code=f"{day}:{row.code}",
+                area_relation="within" if row_area(row) else "unlocated",
+                area_id=row_area(row),
+                kind="standard",
+            )
+            p.name(unit, row.label, "mn", "official")
+    return units
+
+
+def _list_options_2012(p: Package, day: str, tag: str, contest: str, result_set: str, block: local.Block) -> list[str]:
+    options: list[str] = []
+    for index, entry in enumerate(block.candidates):
+        option = key("option", day, tag, index)
+        options.append(option)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="list",
+            party_id=party_2012(entry.party),
+            ballot_position=index + 1,
+            ballot_label=entry.label,
+        )
+        assert block.declared is not None
+        p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=block.declared[index])
+    return options
+
+
+def parliament_22() -> Package:
+    """The parliamentary vote in constituency 22 that the by-constituency workbook lists, by polling section."""
+    tag = PARLIAMENT_22_2012
+    contest = parliament_22_2012()
+    p = Package(
+        f"{SOURCE}/{tag}",
+        SOURCE,
+        "The 2012 parliamentary vote in constituency 22 (Nalaikh), as the General Election Commission's "
+        "by-constituency council workbook lists it, by polling section",
+    )
+    p.external |= {MONGOLIA, TERRITORY, GEC_SOURCE, KHURAL, area("mn.constituency", "2012-22"), *SCHEMES}
+    p.external |= {area("mn.soum", row.place.code) for row in contest.rows if row.place}
+    p.external |= inherited({c.party for c in contest.candidates})
+    p.artifact(raw.cached(SOURCE, contest.files[0]), GEC_SOURCE)
+    election_id = key("election", tag)
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=MONGOLIA,
+        kind="by_election",
+        date_from=date(2012, 1, 1),
+        date_to=date(2012, 12, 31),
+        date_precision="year",
+        original_text=YEAR_2012
+        + " It gives this vote beside the council results, for one seat of constituency 22 and for the 11 polling "
+        "sections of Nalaikh district.",
+        status="held",
+    )
+    p.name(election_id, "2012 Mongolian parliamentary vote, constituency 22 (Nalaikh)", "en", "official")
+    p.name(election_id, "Улсын Их Хурлын 22 дугаар тойргийн 2012 оны санал хураалт (Налайх)", "mn", "native", False)
+    path = f"mn/{tag}"
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    contest_id = key("contest", tag, "22")
+    p.add(
+        "contest",
+        id=contest_id,
+        election_id=election_id,
+        kind="body_seats",
+        body_id=KHURAL,
+        district_area_id=area("mn.constituency", "2012-22"),
+        magnitude=contest.seats,
+        round_number=1,
+        default_result_kind="counted",
+    )
+    p.name(contest_id, "2012 Mongolian parliamentary vote, constituency 22 (Nalaikh)", "en", "official")
+    p.add("slug", path=f"{path}/constituency-22", entity_id=contest_id, is_current=True)
+    result_set = _early_result_set(
+        p,
+        election_id,
+        contest_id,
+        "22",
+        tag,
+        "One seat, filled by the candidate with the most votes. Votes are stored per candidate for each polling "
+        "section as the Commission published them; the workbook lists only the sections of Nalaikh district. The "
+        "workbook's valid ballots read, the last column of each row, are not stored: they do not equal the "
+        "candidates' votes plus the unmarked ballots.",
+    )
+    options = _early_candidates(p, tag, "22", contest_id, result_set, contest.candidates, contest.declared, None, True)
+    for measure, value in contest.declared_extra.items():
+        p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
+    units: dict[str, str] = {}
+    for row in contest.rows:
+        _early_unit(p, tag, row, units)
+        for option, value in zip(options, row.votes, strict=True):
+            if value is not None:
+                _value(p, result_set, units[row.code], option, 1, value)
+        for measure, value in row.extra.items():
+            _value(p, result_set, units[row.code], None, measure, value)
     return p
 
 
