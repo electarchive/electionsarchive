@@ -677,7 +677,7 @@ def stations() -> Package:
                 parent_id=key("unit", edno),
                 area_relation="within",
                 area_id=district_area(edno),
-                kind="precinct",
+                kind="standard",
             )
             p.name(
                 unit, f"{names[station]} - {row['PS_NO']}" if names[station] else str(station), "ar", "native", False
