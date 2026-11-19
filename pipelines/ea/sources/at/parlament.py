@@ -14,7 +14,9 @@ Council gives each election day and the seats.
   valid votes of four groups of parties (the Christian Social, German nationalist, and Social Democratic groups, and
   the other parties). It labels them preliminary; their national sums equal the final national totals.
 - 1927: Tabelle 10 of the 1927 publication gives every list's votes by constituency from the returns of each polling
-  place (Einzelausweise fuer Wahlorte). Its national totals equal the BMI summary.
+  place (Einzelausweise fuer Wahlorte). Its national totals equal the BMI summary. Tabelle 13 gives the same
+  figures by political district, Vienna by municipal district; they are stored as a second result set that
+  supersedes the one by constituency (`parlament_tables/1927-bezirke.txt`).
 - 1930: Tabelle 30 of the 1930 special issue of the Statistische Nachrichten gives every list's votes by constituency,
   again from the returns of each polling place, Tabelle 9 the voters, and Tabelle 3 the registered voters.
 
@@ -29,7 +31,7 @@ misread number never reaches a package.
 import re
 import subprocess
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, timedelta
 from functools import cache
 from pathlib import Path
 from uuid import uuid5
@@ -792,8 +794,14 @@ def election(e: Election) -> Package:
         SOURCE,
         f"The {e.year} Austrian {noun} "
         + ("by constituency" if scanned else "nationally")
+        + (" and political district" if e.year in DISTRICT_YEARS else "")
         + " from the Federal Ministry of the Interior's historical results",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", *([] if assembly else ["at.bmi/registry"])],
+        depends=[
+            f"{SOURCE}/geo",
+            f"{SOURCE}/registry",
+            *([] if assembly else ["at.bmi/registry"]),
+            *(["at.bmi/geo"] if e.year in DISTRICT_YEARS else []),
+        ],
     )
     p.external |= {AUSTRIA, COUNTRY}
     url = FILES[e.year] if scanned else (FILES[1920] if e.year == 1920 else SUMMARY)
@@ -842,7 +850,7 @@ def election(e: Election) -> Package:
         kind="counted",
         source_id=BMI_SOURCE,
         status="active",
-        is_default=True,
+        is_default=e.year not in DISTRICT_YEARS,
         completeness=1.0,
     )
     file = url.rsplit("/", 1)[1]
@@ -1002,6 +1010,8 @@ def election(e: Election) -> Package:
                         x1=x1,
                         y1=row.band[1],
                     )
+    if e.year in DISTRICT_YEARS:
+        districts(p, e, election_id, contest, result_set, options, won, national, page_ids, stored)
     return p
 
 
@@ -1017,3 +1027,371 @@ def _value(p: Package, result_set: str, unit: str, option: str | None, measure: 
         flags=0,
         value=value,
     )
+
+
+# ---------------------------------------------------------------- political districts
+
+DISTRICT_YEARS = (1927,)
+DISTRICT_PAGES = {1927: "Tabelle 13"}
+
+
+@dataclass(frozen=True)
+class District:
+    name: str
+    land: str
+    """The state's digit in the BMI's codes (1 Burgenland to 9 Vienna)."""
+    successors: tuple[str, ...]
+    """The present political districts (BMI codes) that cover most of the district's territory."""
+
+
+def _d(name: str, land: str, *successors: str) -> District:
+    return District(name, land, successors)
+
+
+# Vienna's 21 municipal districts of 1927 and the present districts that cover them: Hietzing then included most of
+# Penzing (14), Rudolfsheim and Fünfhaus now form Rudolfsheim-Fünfhaus (15), and Floridsdorf included part of
+# Donaustadt (22).
+VIENNA_1927 = [
+    ("I", "Innere Stadt", ("901",)), ("II", "Leopoldstadt", ("902",)), ("III", "Landstraße", ("903",)),
+    ("IV", "Wieden", ("904",)), ("V", "Margareten", ("905",)), ("VI", "Mariahilf", ("906",)),
+    ("VII", "Neubau", ("907",)), ("VIII", "Josefstadt", ("908",)), ("IX", "Alsergrund", ("909",)),
+    ("X", "Favoriten", ("910",)), ("XI", "Simmering", ("911",)), ("XII", "Meidling", ("912",)),
+    ("XIII", "Hietzing", ("913", "914")), ("XIV", "Rudolfsheim", ("915",)), ("XV", "Fünfhaus", ("915",)),
+    ("XVI", "Ottakring", ("916",)), ("XVII", "Hernals", ("917",)), ("XVIII", "Währing", ("918",)),
+    ("XIX", "Döbling", ("919",)), ("XX", "Brigittenau", ("920",)), ("XXI", "Floridsdorf", ("921", "922")),
+]  # fmt: skip
+
+DISTRICTS_1927: dict[str, District] = {
+    **{
+        f"wien-{n:02d}": District(f"{roman}. {text}", "9", successors)
+        for n, (roman, text, successors) in enumerate(VIENNA_1927, start=1)
+    },
+    "wiener-neustadt-stadt": _d("Wiener Neustadt (Stadt)", "3", "304"),
+    "st-poelten-stadt": _d("St. Pölten (Stadt)", "3", "302"),
+    "waidhofen-ybbs": _d("Waidhofen an der Ybbs (Stadt)", "3", "303"),
+    "amstetten": _d("Amstetten", "3", "305"),
+    "baden": _d("Baden", "3", "306"),
+    "bruck-leitha": _d("Bruck an der Leitha", "3", "307"),
+    "floridsdorf-umgebung": _d("Floridsdorf Umgebung", "3", "922", "324"),
+    "gaenserndorf": _d("Gänserndorf", "3", "308"),
+    "gmuend": _d("Gmünd", "3", "309"),
+    "hietzing-umgebung": _d("Hietzing Umgebung", "3", "923", "324"),
+    "horn": _d("Horn", "3", "311"),
+    "korneuburg": _d("Korneuburg", "3", "312"),
+    "krems": _d("Krems", "3", "301", "313"),
+    "lilienfeld": _d("Lilienfeld", "3", "314"),
+    "melk": _d("Melk", "3", "315"),
+    "mistelbach": _d("Mistelbach", "3", "316"),
+    "moedling": _d("Mödling", "3", "317"),
+    "neunkirchen": _d("Neunkirchen", "3", "318"),
+    "oberhollabrunn": _d("Ober-Hollabrunn", "3", "310"),
+    "poeggstall": _d("Pöggstall", "3", "315", "313"),
+    "st-poelten-land": _d("St. Pölten", "3", "319"),
+    "scheibbs": _d("Scheibbs", "3", "320"),
+    "tulln": _d("Tulln", "3", "321", "324"),
+    "waidhofen-thaya": _d("Waidhofen an der Thaya", "3", "322"),
+    "wiener-neustadt-land": _d("Wiener Neustadt", "3", "323"),
+    "zwettl": _d("Zwettl", "3", "325"),
+    "linz-stadt": _d("Linz (Stadt)", "4", "401"),
+    "steyr-stadt": _d("Steyr (Stadt)", "4", "402"),
+    "braunau": _d("Braunau am Inn", "4", "404"),
+    "eferding": _d("Eferding", "4", "405"),
+    "freistadt": _d("Freistadt", "4", "406"),
+    "gmunden": _d("Gmunden", "4", "407"),
+    "grieskirchen": _d("Grieskirchen", "4", "408"),
+    "kirchdorf": _d("Kirchdorf an der Krems", "4", "409"),
+    "linz-land": _d("Linz", "4", "410"),
+    "perg": _d("Perg", "4", "411"),
+    "ried": _d("Ried im Innkreis", "4", "412"),
+    "rohrbach": _d("Rohrbach", "4", "413"),
+    "schaerding": _d("Schärding", "4", "414"),
+    "steyr-umgebung": _d("Steyr Umgebung", "4", "415"),
+    "urfahr-umgebung": _d("Urfahr Umgebung", "4", "416"),
+    "voecklabruck": _d("Vöcklabruck", "4", "417"),
+    "wels": _d("Wels", "4", "403", "418"),
+    "salzburg-stadt": _d("Salzburg (Stadt)", "5", "501"),
+    "hallein": _d("Hallein", "5", "502"),
+    "salzburg-umgebung": _d("Salzburg", "5", "503"),
+    "st-johann-pongau": _d("St. Johann", "5", "504"),
+    "tamsweg": _d("Tamsweg", "5", "505"),
+    "zell-am-see": _d("Zell am See", "5", "506"),
+    "innsbruck-stadt": _d("Innsbruck (Stadt)", "7", "701"),
+    "imst": _d("Imst", "7", "702"),
+    "innsbruck-land": _d("Innsbruck", "7", "703"),
+    "kitzbuehel": _d("Kitzbühel", "7", "704"),
+    "kufstein": _d("Kufstein", "7", "705"),
+    "landeck": _d("Landeck", "7", "706"),
+    "lienz": _d("Lienz", "7", "707"),
+    "reutte": _d("Reutte", "7", "708"),
+    "schwaz": _d("Schwaz", "7", "709"),
+    "bludenz": _d("Bludenz", "8", "801"),
+    "bregenz": _d("Bregenz", "8", "802", "803"),
+    "feldkirch": _d("Feldkirch", "8", "804", "803"),
+    "graz-stadt": _d("Graz (Stadt)", "6", "601"),
+    "bruck-mur": _d("Bruck an der Mur", "6", "602"),
+    "deutschlandsberg": _d("Deutschlandsberg", "6", "603"),
+    "feldbach": _d("Feldbach", "6", "604", "605"),
+    "graz-umgebung": _d("Graz", "6", "606"),
+    "groebming": _d("Gröbming", "6", "612"),
+    "hartberg": _d("Hartberg", "6", "607", "605"),
+    "judenburg": _d("Judenburg", "6", "608", "609"),
+    "leibnitz": _d("Leibnitz", "6", "610"),
+    "leoben": _d("Leoben", "6", "611"),
+    "liezen": _d("Liezen", "6", "612"),
+    "muerzzuschlag": _d("Mürzzuschlag", "6", "613"),
+    "murau": _d("Murau", "6", "614"),
+    "radkersburg": _d("Radkersburg", "6", "615"),
+    "voitsberg": _d("Voitsberg", "6", "616"),
+    "weiz": _d("Weiz", "6", "617"),
+    "klagenfurt-stadt": _d("Klagenfurt (Stadt)", "2", "201"),
+    "hermagor": _d("Hermagor", "2", "203"),
+    "klagenfurt-land": _d("Klagenfurt", "2", "204", "210"),
+    "st-veit-glan": _d("St. Veit an der Glan", "2", "205", "210"),
+    "spittal-drau": _d("Spittal an der Drau", "2", "206"),
+    "villach": _d("Villach", "2", "202", "207"),
+    "voelkermarkt": _d("Völkermarkt", "2", "208"),
+    "wolfsberg": _d("Wolfsberg", "2", "209"),
+    "eisenstadt-stadt": _d("Eisenstadt (Stadt)", "1", "101"),
+    "rust": _d("Rust (Stadt)", "1", "102"),
+    "eisenstadt-land": _d("Eisenstadt", "1", "103"),
+    "guessing": _d("Güssing", "1", "104"),
+    "jennersdorf": _d("Jennersdorf", "1", "105"),
+    "mattersburg": _d("Mattersburg", "1", "106"),
+    "neusiedl-see": _d("Neusiedl am See", "1", "107"),
+    "oberpullendorf": _d("Oberpullendorf", "1", "108"),
+    "oberwart": _d("Oberwart", "1", "109"),
+}
+CONSTITUENCIES_1927 = {
+    1: ("wien-01", "wien-03", "wien-04"),
+    2: ("wien-06", "wien-07", "wien-08"),
+    3: ("wien-09", "wien-18", "wien-19"),
+    4: ("wien-02", "wien-20", "wien-21"),
+    5: ("wien-05", "wien-10", "wien-11"),
+    6: ("wien-12", "wien-13", "wien-15"),
+    7: ("wien-14", "wien-16", "wien-17"),
+    13: ("braunau", "ried", "schaerding"),
+    14: ("eferding", "grieskirchen", "voecklabruck", "wels"),
+    17: ("salzburg-stadt", "hallein", "salzburg-umgebung", "st-johann-pongau", "tamsweg", "zell-am-see"),
+    18: (
+        "innsbruck-stadt", "imst", "innsbruck-land", "kitzbuehel", "kufstein", "landeck", "lienz", "reutte", "schwaz",
+    ),
+    19: ("bludenz", "bregenz", "feldkirch"),
+    22: ("feldbach", "hartberg", "weiz"),
+    23: ("bruck-mur", "groebming", "judenburg", "leoben", "liezen", "muerzzuschlag", "murau"),
+    24: (
+        "klagenfurt-stadt", "hermagor", "klagenfurt-land", "st-veit-glan", "spittal-drau", "villach", "voelkermarkt",
+        "wolfsberg",
+    ),
+    25: (
+        "eisenstadt-stadt", "rust", "eisenstadt-land", "guessing", "jennersdorf", "mattersburg", "neusiedl-see",
+        "oberpullendorf", "oberwart",
+    ),
+}  # fmt: skip
+"""The constituencies made up only of whole political districts, which the district rows must add up to."""
+DISTRICT_NOTES = {
+    1927: (
+        "Lower Austria: the district rows, as read from the scan, add up to 498 more registered voters, 2 fewer "
+        "Social Democratic votes, 3 fewer Landbund votes, and 5 more Communist votes than the sum the table prints "
+        "for the rural districts (Landbezirke) and for the state. Every row agrees with itself (the lists add up to "
+        "the valid votes, and the votes cast less the invalid votes are the valid votes), and the printed state "
+        "totals agree with the constituency table, so the rows are stored as read and the state totals are declared "
+        "as printed."
+    ),
+}
+
+
+@dataclass
+class DistrictTable:
+    page: int
+    columns: list[str]
+    edges: list[tuple[float, float]]
+    rows: list[Row] = field(default_factory=list)
+
+
+@cache
+def district_tables(year: int) -> tuple[list[DistrictTable], dict[str, dict[str, int | None]]]:
+    """The district tables of a year and each district's figures, checked against every total the tables print."""
+    found: list[DistrictTable] = []
+    order: dict[tuple[str, ...], list[str]] = {}
+    units: dict[str, dict[str, int | None]] = {}
+    totals: list[tuple[str, tuple[str, ...], str, str, dict[str, int | None]]] = []
+    differs: dict[tuple[str, str], int] = {}
+    for line in (TABLES / f"{year}-bezirke.txt").read_text().splitlines():
+        words = line.split("#", 1)[0].split()
+        if not words:
+            continue
+        head, rest = words[0], words[1:]
+        if head == "table":
+            found.append(DistrictTable(int(rest[0].removeprefix("page=")), [], []))
+        elif head == "columns":
+            found[-1].columns = rest
+        elif head == "x":
+            edges = [float(x) for x in rest]
+            found[-1].edges = list(zip(edges[::2], edges[1::2], strict=True))
+        elif head == "row":
+            y0, y1 = rest[1].removeprefix("@").split(":")
+            values, splits = _cells(found[-1].columns, rest[2:])
+            found[-1].rows.append(Row(rest[0], (float(y0), float(y1)), values, splits))
+            order.setdefault(tuple(found[-1].columns), []).append(rest[0])
+            units.setdefault(rest[0], {}).update(values)
+        elif head == "total":
+            first, last = rest[1].split("..")
+            values = dict(zip(found[-1].columns, (_number(x) for x in rest[3:]), strict=True))
+            totals.append((rest[0], tuple(found[-1].columns), first, last, values))
+        elif head == "differs":
+            differs[(rest[0], rest[1])] = int(rest[2])
+        else:
+            raise ValueError(f"{year}-bezirke.txt: unknown line {line!r}")
+    if set(units) != set(DISTRICTS_1927):
+        raise ValueError(f"{year}: districts {sorted(set(units) ^ set(DISTRICTS_1927))} are not both listed and read")
+    for name, columns, first, last, printed in totals:
+        codes = order[columns]
+        span = codes[codes.index(first) : codes.index(last) + 1]
+        for column in columns:
+            summed = sum(units[code][column] or 0 for code in span)
+            if summed - (printed[column] or 0) != differs.pop((name, column), 0):
+                raise ValueError(f"{year} total {name}, {column}: rows add up to {summed}, printed {printed[column]}")
+    if differs:
+        raise ValueError(f"{year}: recorded differences {sorted(differs)} match no printed total")
+    e = ELECTIONS[year]
+    for code, values in units.items():
+        _check(year, f"district {code}", values, list(e.columns))
+    rows, _ = constituencies(year)
+    for number, codes in CONSTITUENCIES_1927.items():
+        for column, value in rows[str(number)].items():
+            summed = sum(units[code].get(column) or 0 for code in codes)
+            if summed != (value or 0):
+                raise ValueError(f"{year} constituency {number}, {column}: districts add up to {summed}, not {value}")
+    return found, units
+
+
+METHOD_DISTRICTS = (
+    "Transcribed from {table} of the Federal Ministry of the Interior's publication on this election (pages {pages} "
+    "of {file}), which gives the results by political district, Vienna by municipal district (Gemeindebezirk), from "
+    "the returns of each polling place. Every number was checked against the totals the table prints: the lists "
+    "against the valid votes, the votes cast less the invalid votes against the valid votes, and the districts "
+    "against the printed sums of each state's statutory cities and rural districts and the state totals; the "
+    "constituencies made up of whole districts were checked against the constituency table. The state totals equal "
+    "those of the constituency table, so the national totals are the same. A district of 1927 is linked, as an "
+    "approximation, to the present political districts that cover most of its territory; the boundaries have "
+    "changed since (Vienna gained its 22nd and 23rd districts, and Lower Austria, Upper Austria, Styria, "
+    "Carinthia, and Vorarlberg have districts formed later). The set supersedes the one by constituency."
+)
+
+
+def districts(
+    p: Package,
+    e: Election,
+    election_id: str,
+    contest: str,
+    below: str,
+    options: dict[str, str],
+    won: dict[str, int],
+    national: dict[str, int | None],
+    page_ids: dict[int, str],
+    stored: raw.Artifact,
+) -> None:
+    """Add the result set by political district, which supersedes the one by constituency and takes the default."""
+    from ea.sources.at import bmi
+
+    found, _ = district_tables(e.year)
+    result_set = key("result_set", e.year, "bezirke")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election_id,
+        contest_id=contest,
+        stage=e.stage,
+        kind="counted",
+        source_id=BMI_SOURCE,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+        supersedes_id=below,
+    )
+    file = FILES[e.year].rsplit("/", 1)[1]
+    pages = sorted({table.page for table in found})
+    method = METHOD_DISTRICTS.format(table=DISTRICT_PAGES[e.year], pages=f"{pages[0]} to {pages[-1]}", file=file)
+    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
+    for index, text in enumerate((*e.notes, DISTRICT_NOTES[e.year])):
+        p.add("note", id=key("note", result_set, index), entity_id=result_set, kind="caveat", body_md=text, lang="en")
+    for column, n in won.items():
+        p.add("outcome", result_set_id=result_set, option_id=options[column], kind="won", seats=n)
+    for column, value in national.items():
+        if value is None or (column not in MEASURES and column not in e.columns):
+            continue
+        option = None if column in MEASURES else options[column]
+        measure = MEASURES.get(column, VOTES)
+        p.add("declared", result_set_id=result_set, option_id=option, measure=measure, value=value)
+    p.accept(
+        "accounting.declared",
+        "the Lower Austrian district rows of Tabelle 13 do not add up to the state totals it prints (498 registered "
+        "voters, 2 Social Democratic, 3 Landbund, and 5 Communist votes); the printed totals are declared",
+    )
+    sizes = _pages(stored)
+    for number in pages:
+        if number in page_ids:
+            continue
+        width, height = sizes[number]
+        page_ids[number] = key("page", file, number)
+        p.add(
+            "source_page",
+            id=page_ids[number],
+            artifact_id=artifact_id(FILES[e.year]),
+            page_number=number,
+            image_key=f"pages/{SOURCE}/{stored.sha256}/{number}.png",
+            width=width,
+            height=height,
+        )
+    shared: dict[str, int] = {}
+    for spec in DISTRICTS_1927.values():
+        for code in spec.successors:
+            shared[code] = shared.get(code, 0) + 1
+    unit_ids: dict[str, str] = {}
+    for code, spec in DISTRICTS_1927.items():
+        unit = unit_ids[code] = key("unit", e.year, "bezirk", code)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=AUSTRIA,
+            scheme_code="at.bezirk",
+            code=f"{e.day}:{code}",
+            area_relation="within",
+            area_id=bmi.area("at.land", spec.land),
+            kind="standard",
+        )
+        p.name(unit, spec.name, "de", "official")
+        for successor in spec.successors:
+            p.add(
+                "reporting_unit_area",
+                unit_id=unit,
+                area_id=bmi.area("at.bezirk", successor),
+                valid_from=e.day,
+                valid_to=e.day + timedelta(days=1),
+                approximate=True,
+                partial=shared[successor] > 1,
+                method="official_list",
+            )
+    for table in found:
+        for row in table.rows:
+            for column, (x0, x1) in zip(table.columns, table.edges, strict=True):
+                value = row.values[column]
+                if value is None:
+                    continue
+                option_id, measure = (None, MEASURES[column]) if column in MEASURES else (options[column], VOTES)
+                _value(p, result_set, unit_ids[row.code], option_id, measure, value)
+                p.add(
+                    "value_locator",
+                    result_set_id=result_set,
+                    unit_id=unit_ids[row.code],
+                    option_id=option_id,
+                    channel=0,
+                    measure=measure,
+                    count_round=0,
+                    page_id=page_ids[table.page],
+                    source_id=None,
+                    x0=x0,
+                    y0=row.band[0],
+                    x1=x1,
+                    y1=row.band[1],
+                )
