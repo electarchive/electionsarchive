@@ -3,9 +3,10 @@ import json
 import re
 import subprocess
 import unicodedata
+import zipfile
 from collections import Counter
 from datetime import date
-from typing import NamedTuple
+from typing import Any, NamedTuple
 from uuid import uuid5
 
 import fastexcel
@@ -32,7 +33,62 @@ MEASURES = {"registered": REGISTERED, "cast": CAST, "valid": VALID, "null": INVA
 GEOBOUNDARIES = "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/DOM"
 GB_PROVINCES = f"{GEOBOUNDARIES}/ADM1/geoBoundaries-DOM-ADM1.geojson"
 GB_MUNICIPALITIES = f"{GEOBOUNDARIES}/ADM2/geoBoundaries-DOM-ADM2.geojson"
+COD_URL = (
+    "https://data.humdata.org/dataset/1b26ea94-4d28-4167-9209-4984ab087973/resource/"
+    "66c7a7c9-5be1-4b1a-8b5a-a559e0c970a8/download/dom_admin_boundaries.geojson.zip"
+)
+"""The Oficina Nacional de Estadística's administrative boundaries, as OCHA publishes them (CC BY-IGO), valid June 2021."""
+COD_FROM = date(2021, 6, 29)
 SHAPES_FROM = date(2020, 1, 1)
+MUNICIPALITY_COD = {
+    1: "SANTO DOMINGO DE GUZMAN",
+    12: "SAN JUAN",
+    22: "NEIBA",
+    31: "SANTIAGO",
+    41: "MONTE CRISTI",
+    96: "VILLA BISONO NAVARRETE",
+    155: "LA MATA",
+}
+"""Municipalities, by the Board's code, that the ONE boundaries name otherwise than the Board does."""
+PROMOTED = {149: 149, 156: 156, 161: 161}
+"""Municipalities the Board codes with the number of the municipal district they grew out of; the ONE boundaries still
+draw each as that district."""
+DISTRICT_COD = {
+    141: "LAS LAGUNAS DE NISIBON",
+    163: "TIREO",
+    195: "JAIBON PUEBLO NUEVO",
+    199: "VILLA DE SONADOR",
+    208: "JUAN LOPEZ",
+    236: "LAS LAGUNAS",
+    237: "EL CEDRO",
+    252: "SAN JOSE DEL PUERTO",
+    253: "PALO VERDE",
+    260: "GANADERO",
+    268: "LA CUESTA",
+    270: "JAMAO AFUERA",
+    273: "EL HIGUERITO",
+    275: "LA ORTEGA",
+    297: "YAQUE",
+    298: "MONSERRATE MONTSERRAT",
+    299: "BOYA",
+    301: "BAORUCO",
+    302: "CATALINA",
+    312: "PALMAREJO VILLA LINDA",
+    317: "DERRUMBADERO",
+    334: "PUERTO VIEJO",
+    340: "DONA EMMA BALAGUER VIUDA VALLEJO",
+    341: "CLAVELLINA",
+    348: "JORJILLO",
+    352: "CANABACOA",
+    357: "LAS CHARCAS DE MARIA NOVA",
+    360: "CALETA",
+    375: "EL ESTRECHO DE LUPERON OMAR BROSS",
+    376: "PRESIDENTE DON ANTONIO GUZMAN FERNANDEZ",
+    378: "SANTA LUCIA",
+    385: "VERON PUNTA CANA",
+    390: "LAS ZANJAS",
+}
+"""Municipal districts, by the Board's code, that the ONE boundaries name otherwise than the Board does."""
 PROVINCE_SHAPES = {"LA ESTRELLETA": "ELIAS PINA", "EL SEYBO": "EL SEIBO", "HERMANAS": "HERMANAS MIRABAL"}
 """Province names the geoBoundaries extract spells otherwise than the Board does."""
 MUNICIPALITY_SHAPES = {
@@ -492,6 +548,7 @@ def sigla(column: str) -> str:
 def fetch() -> None:
     raw.fetch(SOURCE, GB_PROVINCES, suffix=".geojson")
     raw.fetch(SOURCE, GB_MUNICIPALITIES, suffix=".geojson")
+    raw.fetch(SOURCE, COD_URL, suffix=".zip")
     for d in DAYS:
         for s in d.sheets:
             raw.fetch(SOURCE, s.url, suffix=s.suffix)
@@ -974,14 +1031,77 @@ def shapes() -> tuple[dict[int, shapely.Geometry], dict[int, shapely.Geometry]]:
     return provinces, municipalities
 
 
+def _cod_name(text: str) -> str:
+    return re.sub(r"\b(D M|MUNICIPIO)\b", "", fold(text)).replace("-", " ").strip()
+
+
+@functools.cache
+def cod_shapes() -> tuple[dict[int, shapely.Geometry], dict[int, shapely.Geometry]]:
+    """The shapes the ONE boundaries add: municipal districts by district code, and municipalities that
+    geoBoundaries lacks by municipality code."""
+    found = places()
+    _, drawn = shapes()
+    with zipfile.ZipFile(raw.cached(SOURCE, COD_URL).path) as archive:
+        level3: list[dict[str, Any]] = json.loads(archive.read("dom_admin3.geojson"))["features"]
+        level4: list[dict[str, Any]] = json.loads(archive.read("dom_admin4.geojson"))["features"]
+    seats = {_cod_name(f["properties"]["adm3_name"]): f for f in level3}
+
+    def municipality_feature(mun: int) -> dict[str, Any] | None:
+        return seats.get(MUNICIPALITY_COD.get(mun, _cod_name(found.municipalities[mun][1])))
+
+    by_municipality: dict[str, dict[str, dict[str, Any]]] = {}
+    for f in level4:
+        if f["properties"]["adm4_pcode"].endswith("01"):
+            continue  # the municipality's seat, drawn again as the municipality itself
+        by_municipality.setdefault(f["properties"]["adm3_pcode"], {})[_cod_name(f["properties"]["adm4_name"])] = f
+    districts: dict[int, shapely.Geometry] = {}
+    used: set[str] = set()
+    for dm, (mun, text) in sorted(found.districts.items()):
+        parent = municipality_feature(mun)
+        if parent is None:
+            raise ValueError(f"municipality {mun} is not in the ONE boundaries")
+        feature = by_municipality.get(parent["properties"]["adm3_pcode"], {}).get(DISTRICT_COD.get(dm, _cod_name(text)))
+        if feature is None:
+            continue  # created after the 2021 boundaries
+        code = feature["properties"]["adm4_pcode"]
+        if code in used:
+            raise ValueError(f"municipal district shape {code} matches a second time")
+        used.add(code)
+        districts[dm] = _shape(feature)
+    municipalities: dict[int, shapely.Geometry] = {}
+    for mun in sorted(set(found.municipalities) - set(drawn)):
+        if mun in PROMOTED:
+            if PROMOTED[mun] not in districts:
+                raise ValueError(f"municipality {mun} has no district shape")
+            municipalities[mun] = districts[PROMOTED[mun]]
+        else:
+            feature = municipality_feature(mun)
+            if feature is None:
+                raise ValueError(f"municipality {mun} is not in the ONE boundaries")
+            municipalities[mun] = _shape(feature)
+    return districts, municipalities
+
+
 def unshaped() -> list[str]:
     """The municipalities, each with its province, that geoBoundaries does not draw."""
     found = places()
     _, drawn = shapes()
+    _, more = cod_shapes()
     return [
         f"{text} ({found.provinces[prov]})"
         for mun, (prov, text) in sorted(found.municipalities.items())
-        if mun not in drawn
+        if mun not in drawn and mun not in more
+    ]
+
+
+def unshaped_districts() -> list[str]:
+    """The municipal districts, each with its municipality, that no boundaries draw."""
+    found = places()
+    drawn, _ = cod_shapes()
+    return [
+        f"{text} ({found.municipalities[mun][1]})"
+        for dm, (mun, text) in sorted(found.districts.items())
+        if dm not in drawn
     ]
 
 
@@ -996,6 +1116,7 @@ def geo() -> Package:
     p.external |= {DOMINICAN, COUNTRY}
     _sources(p)
     province_source, municipality_source = key("source", "geoboundaries-adm1"), key("source", "geoboundaries-adm2")
+    one_source = key("source", "one-cod-ab")
     for id, title_, license_, license_url, notes in (
         (
             province_source,
@@ -1011,7 +1132,7 @@ def geo() -> Package:
             "https://creativecommons.org/licenses/by/4.0/",
             (
                 "Boundary year 2020 from the Caribbean GeoPortal, built December 2023. It draws 154 of the Board's 158 "
-                "municipalities; the other four, and the municipal districts, are left without a shape."
+                "municipalities; the Oficina Nacional de Estadística's boundaries draw the other four."
             ),
         ),
     ):
@@ -1027,6 +1148,23 @@ def geo() -> Package:
             attribution="geoBoundaries (William & Mary geoLab)",
             notes=notes,
         )
+    p.add(
+        "source",
+        id=one_source,
+        kind="official_body",
+        publisher="Oficina Nacional de Estadística (ONE), República Dominicana, through OCHA",
+        title="Dominican Republic: Subnational Administrative Boundaries (COD-AB), municipalities and municipal districts",
+        url="https://data.humdata.org/dataset/cod-ab-dom",
+        license="Creative Commons Attribution for Intergovernmental Organisations (CC BY-IGO)",
+        license_url="https://creativecommons.org/licenses/by/3.0/igo/",
+        attribution="Oficina Nacional de Estadística (ONE) and OCHA, Dominican Republic COD-AB",
+        notes=(
+            "The ONE's cartography as OCHA's Field Information Services Section publishes it, valid 2021-06-29. It "
+            "draws 155 municipalities and 231 municipal districts; the three municipalities newer than that plan are "
+            "still drawn as the districts they grew out of."
+        ),
+    )
+    p.artifact(raw.cached(SOURCE, COD_URL), one_source)
     p.artifact(raw.cached(SOURCE, GB_PROVINCES), province_source)
     p.artifact(raw.cached(SOURCE, GB_MUNICIPALITIES), municipality_source)
     for code, rank, kind, noun in (
@@ -1061,24 +1199,56 @@ def geo() -> Package:
         text = f"Circunscripción {circ}, {found.municipalities[mun][1]}"
         place("do.circunscripcion_municipal", f"{mun}:{circ}", text, area("do.municipio", str(mun)))
     drawn_provinces, drawn_municipalities = shapes()
-    for scheme, vintage in (("do.provincia", "2022"), ("do.municipio", "2020")):
+    drawn_districts, extra_municipalities = cod_shapes()
+    for scheme, vintage, start in (
+        ("do.provincia", "2022", SHAPES_FROM),
+        ("do.municipio", "2020", SHAPES_FROM),
+        ("do.municipio", "2021", COD_FROM),
+        ("do.distrito_municipal", "2021", COD_FROM),
+    ):
         p.add(
             "boundary_set",
             id=key("boundary_set", scheme, vintage),
             scheme_code=scheme,
             vintage=vintage,
-            valid_from=SHAPES_FROM,
-            as_of=SHAPES_FROM,
+            valid_from=start,
+            as_of=start,
         )
-    for scheme, drawn, source_id, quality in (
-        ("do.provincia", {f"{c:02d}": g for c, g in drawn_provinces.items()}, province_source, "academic"),
-        ("do.municipio", {str(c): g for c, g in drawn_municipalities.items()}, municipality_source, "academic"),
+    for scheme, drawn, source_id, quality, start in (
+        (
+            "do.provincia",
+            {f"{c:02d}": g for c, g in drawn_provinces.items()},
+            province_source,
+            "academic",
+            SHAPES_FROM,
+        ),
+        (
+            "do.municipio",
+            {str(c): g for c, g in drawn_municipalities.items()},
+            municipality_source,
+            "academic",
+            SHAPES_FROM,
+        ),
+        (
+            "do.municipio",
+            {str(c): g for c, g in extra_municipalities.items()},
+            one_source,
+            "official",
+            COD_FROM,
+        ),
+        (
+            "do.distrito_municipal",
+            {str(c): g for c, g in drawn_districts.items()},
+            one_source,
+            "official",
+            COD_FROM,
+        ),
     ):
         for code, shape in sorted(drawn.items()):
             p.add(
                 "area_geometry",
                 area_id=area(scheme, code),
-                valid_from=SHAPES_FROM,
+                valid_from=start,
                 geom=shapely.to_wkb(shape, hex=True, include_srid=True),
                 label_point=shapely.to_wkb(
                     shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
