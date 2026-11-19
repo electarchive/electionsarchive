@@ -5,11 +5,14 @@
 The Commission publishes two PDFs for 2018: the list of the 329 winning candidates, and the winners' votes at each
 registration center. Both are printed from Excel, and their text layer holds the Arabic as letters in visual order
 with the letters that hang below the line as separate runs; `ea.sources.iq.text` puts them back. The Commission
-publishes no vote totals for lists or for the other candidates in these files, so the package holds each winner's
-votes at each registration center, the declared winners, and nothing else.
+publishes no votes for the other candidates in these files. A third set of PDFs, one per governorate, gives each
+list's final votes and seats after the manual recount, which the package holds beside each winner's votes at each
+registration center and the declared winners.
 """
 
 import re
+import subprocess
+import unicodedata
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from datetime import date
@@ -27,7 +30,30 @@ CENTERS = f"{UPLOADS}/2021/02/نتائج-المرشحين-الفائزين-عل�
 PAGE = "https://ihec.iq/results/"
 PATH = f"iq/{DAY}-council-of-representatives"
 KEY = f"{SOURCE}/cor-2018"
-VOTES = 1
+VOTES, VALID = 1, 4
+FINAL = "browser://20261119-175332-3261ec/2018-final/"
+# The final list totals of each governorate, by the file the Commission published. The Commission's Babil files are
+# swapped: the one it names for the lists holds the winners, and the one it names for the winners holds the lists.
+TALLIES = {
+    "IQ-AN": "anbar.k",
+    "IQ-AR": "arbel.k",
+    "IQ-BA": "basra.k",
+    "IQ-BB": "babel.m",
+    "IQ-BG": "bagdad.k",
+    "IQ-DA": "dhok.k",
+    "IQ-DI": "deyala.k",
+    "IQ-DQ": "zeqar.k",
+    "IQ-KA": "karbala.k",
+    "IQ-KI": "krkuk.k",
+    "IQ-MA": "maysan.k",
+    "IQ-MU": "moth.k",
+    "IQ-NA": "najef.k",
+    "IQ-NI": "naenawa.k",
+    "IQ-QA": "qades.k",
+    "IQ-SD": "salah.k",
+    "IQ-SU": "sulaemanya.k",
+    "IQ-WA": "waset.k",
+}
 
 # The governorates by ISO 3166-2 code: Arabic name, English name, and the spellings the PDFs' text layer gives.
 GOVERNORATES: dict[str, tuple[str, str, tuple[str, ...]]] = {
@@ -63,48 +89,6 @@ QUOTA = {
 # Lists numbered for one candidate, who stands alone: the Shabak, Sabaean-Mandaean, and Faili Kurd seats.
 INDIVIDUALS = {"103", "116", "133"}
 
-# The list names as the Commission prints them, where the text layer displaces letters.
-LISTS = {
-    "103": "قصي عباس (شبكي - مستقل)",
-    "104": "الجماعة الإسلامية الكوردستانية / العراق",
-    "106": "التحالف المدني الديمقراطي",
-    "109": "تحالف الفتح",
-    "113": "المجلس الشعبي الكلداني السرياني الآشوري",
-    "114": "حزب التقدم الإيزيدي",
-    "116": "نوفل الناصري",
-    "118": "تيار الحكمة الوطني",
-    "120": "حراك الجيل الجديد",
-    "123": "جبهة تركمان كركوك",
-    "128": "التحالف العربي في كركوك",
-    "133": "مازن عبدالمنعم (أبو حيدر)",
-    "134": "ائتلاف كفاءات للتغيير",
-    "135": "نينوى هويتنا",
-    "136": "تمدن",
-    "139": "ائتلاف الكلدان",
-    "142": "كوران (التغيير)",
-    "144": "ائتلاف الرافدين",
-    "145": "بيارق الخير",
-    "146": "تجمع رجال العراق",
-    "149": "تحالف بغداد",
-    "152": "ائتلاف دولة القانون",
-    "153": "التحالف من أجل الديمقراطية والعدالة",
-    "156": "سائرون",
-    "158": "ائتلاف النصر",
-    "160": "النهج الديمقراطي",
-    "162": "الاتحاد الوطني الكوردستاني",
-    "163": "تحالف صلاح الدين هويتنا",
-    "165": "الأنبار هويتنا",
-    "166": "حركة بابليون",
-    "168": "تحالف القرار العراقي",
-    "172": "حزب الجماهير الوطنية",
-    "175": "الاتحاد الإسلامي الكوردستاني",
-    "178": "الحزب المدني",
-    "180": "عابرون",
-    "184": "الحزب الديمقراطي الكوردستاني",
-    "185": "ائتلاف الوطنية",
-    "187": "ائتلاف قلعة الجماهير الوطنية",
-    "188": "حركة إرادة",
-}
 # Names the text layer spells with a displaced letter, as the same name reads in full elsewhere in the PDFs.
 TOKENS = {
     "خضن": "خضر",
@@ -121,10 +105,16 @@ TOKENS = {
     "موىس": "موسى",
 }
 
+LISTS_METHOD = (
+    "Each list's final votes and seats in the governorate, and the governorate's valid votes, from the Commission's "
+    "tables of the lists' votes published after the manual recount of 2018. A list's seats there include the "
+    "component seats it won, which are stored on the component seats' own contests, so a list's seats here are those "
+    "of the general contest. The list names come from the same tables."
+)
 METHOD = (
     "The declared winners' votes at each registration center, from the Commission's table of candidate votes by "
-    "registration center. The Commission publishes no list totals, no governorate totals, and no ballots cast, valid, "
-    "or invalid for 2018, so none are stored. The table also holds rows for candidates who did not win; they are "
+    "registration center. The Commission publishes no votes for the other candidates, and no ballots cast or invalid "
+    "ballots for 2018, so none are stored. The table also holds rows for candidates who did not win; they are "
     "left out because the table does not say which contest they stood in. It does not say whether it holds every "
     "center at which a winner received votes, so a winner's votes summed over centers need not equal the winner's "
     "total. Candidate and list names come from the PDFs' text layer, which stores some Arabic letters displaced or in "
@@ -284,6 +274,80 @@ def seats() -> list[Seat]:
     return found
 
 
+def fold(name: str) -> str:
+    """A governorate's name without the letters the files spell differently."""
+    name = unicodedata.normalize("NFKC", name).translate(str.maketrans("یکھۀ", "يكهه"))
+    return re.sub(r"[ً-ٰٟـ\s]", "", name).translate(str.maketrans("أإآىة", "ااايه"))
+
+
+def governorate(name: str) -> str:
+    found = {fold(arabic): iso for iso, (arabic, _, _) in GOVERNORATES.items()}
+    if fold(name) not in found:
+        raise ValueError(f"unknown governorate {name!r}")
+    return found[fold(name)]
+
+
+@dataclass(frozen=True)
+class TallyList:
+    number: int
+    name: str
+    votes: int
+    seats: int
+
+
+@dataclass(frozen=True)
+class Tally:
+    valid: int
+    seats: int
+    lists: dict[int, TallyList]
+
+
+def _cells(line: str) -> list[str]:
+    text = unicodedata.normalize("NFKC", line).translate(str.maketrans("یکھۀ", "يكهه"))
+    text = re.sub(r"[\u202a-\u202e\u200e\u200f]", "", text)
+    return [c.strip() for c in re.split(r"\s{2,}", text.strip()) if c.strip()]
+
+
+@cache
+def tally(iso: str) -> Tally:
+    """A governorate's final votes and seats for every list, from the Commission's table after the manual recount."""
+    path = raw.cached(SOURCE, f"{FINAL}{TALLIES[iso]}.pdf").path
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    valid = seats = 0
+    lists: dict[int, TallyList] = {}
+    total: tuple[int, int] | None = None
+    for line in text.splitlines():
+        cells = _cells(line)
+        if not cells:
+            continue
+        if (
+            any("محافظة" in c for c in cells)
+            and governorate(next(c for c in cells if "محافظة" in c).split("محافظة")[-1]) != iso
+        ):
+            raise ValueError(f"{TALLIES[iso]} is not the table of {iso}")
+        if cells[-1] == "المجموع الكلي للاصوات الصحيحة":
+            valid = int(cells[0])
+        elif cells[-1] == "عدد المقاعد الكلي":
+            seats = int(cells[0])
+        elif len(cells) >= 5 and all(cells[i].isdigit() for i in (0, 1, -1, -2)):
+            name = " ".join(cells[2:-2])
+            lists[int(cells[-2])] = TallyList(int(cells[-2]), name, int(cells[1]), int(cells[0]))
+        elif len(cells) == 3 and cells[2] == "مجموع أصوات الأحزاب والائتلافات":
+            total = (int(cells[0]), int(cells[1]))
+    if total != (sum(t.seats for t in lists.values()), valid) or valid != sum(t.votes for t in lists.values()):
+        raise ValueError(f"{TALLIES[iso]}: the lists do not add up to the printed totals")
+    return Tally(valid, seats, lists)
+
+
+def list_names() -> dict[int, str]:
+    """Each list's name as the Commission's tables print it most often."""
+    seen: dict[int, Counter[str]] = defaultdict(Counter)
+    for iso in TALLIES:
+        for item in tally(iso).lists.values():
+            seen[item.number][item.name] += 1
+    return {number: counts.most_common(1)[0][0] for number, counts in seen.items()}
+
+
 def fetch() -> None:
     for url in (WINNERS, CENTERS):
         raw.fetch(SOURCE, url, suffix=".pdf")
@@ -294,6 +358,10 @@ area = governorate_area
 
 def party(number: str) -> str:
     return key("party", number)
+
+
+def gov_unit(iso: str) -> str:
+    return key("unit", DAY.year, iso)
 
 
 def registry(p: Package) -> None:
@@ -308,7 +376,7 @@ def registry(p: Package) -> None:
         license="Official publication; reuse terms are not stated",
         attribution="Independent High Electoral Commission of Iraq",
     )
-    for url in (WINNERS, CENTERS):
+    for url in (WINNERS, CENTERS, *(f"{FINAL}{stem}.pdf" for stem in TALLIES.values())):
         p.artifact(raw.cached(SOURCE, url), IHEC)
     systems = (
         (
@@ -337,17 +405,19 @@ def registry(p: Package) -> None:
     for id, rules, body in systems:
         p.add("electoral_system", id=id, polity_id=IRAQ, rules=rules, rules_version=1)
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=body, lang="en")
-    for number in sorted({seat.list for seat in seats() if seat.list not in INDIVIDUALS}, key=int):
-        p.add("party", id=party(number), kind="list_vehicle", polity_id=IRAQ)
-        p.name(party(number), LISTS[number], "ar", "official")
+    names = list_names()
+    for number in sorted(names):
+        if str(number) not in INDIVIDUALS:
+            p.add("party", id=party(str(number)), kind="list_vehicle", polity_id=IRAQ)
+            p.name(party(str(number)), names[number], "ar", "official")
 
 
 def election() -> Package:
     p = Package(
         KEY,
         SOURCE,
-        "Iraq's Council of Representatives election of 12 May 2018: the 329 declared winners and their votes at each "
-        "registration center",
+        "Iraq's Council of Representatives election of 12 May 2018: every list's votes and seats by governorate, the "
+        "329 declared winners, and their votes at each registration center",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external.add(IRAQ)
@@ -377,6 +447,17 @@ def election() -> Package:
             kind="standard",
         )
         p.name(unit, fix(row.center_name), "ar", "official")
+    for iso in GOVERNORATES:
+        p.add(
+            "reporting_unit",
+            id=gov_unit(iso),
+            polity_id=IRAQ,
+            scheme_code=GOVERNORATE_SCHEME,
+            code=f"{DAY}:{iso}",
+            area_relation="equals",
+            area_id=area(iso),
+            kind="standard",
+        )
     for (governorate, seat_kind), members in sorted(contests.items()):
         _contest(p, entity, governorate, seat_kind, members, by_row)
     return p
@@ -399,7 +480,7 @@ def _contest(
         "contest",
         id=contest,
         election_id=entity,
-        kind="body_seats",
+        kind="body_seats" if quota else "list_allocation",
         body_id=COUNCIL,
         district_area_id=area(governorate),
         magnitude=len(members),
@@ -421,7 +502,7 @@ def _contest(
         kind="counted",
         source_id=IHEC,
         status="active",
-        is_default=True,
+        is_default=quota,
     )
     p.add(
         "note",
@@ -431,6 +512,9 @@ def _contest(
         body_md=METHOD,
         lang="en",
     )
+    lists: dict[int, str] = {}
+    if not quota:
+        lists = _lists(p, entity, contest, governorate, members)
     for seat in sorted(members, key=lambda s: (int(s.list), int(s.candidate))):
         slot = f"{governorate}:{seat.list}:{seat.candidate}"
         individual = seat.list in INDIVIDUALS
@@ -441,15 +525,17 @@ def _contest(
             id=option,
             contest_id=contest,
             kind="candidate",
+            parent_option_id=lists.get(int(seat.list)),
             party_id=None if individual else party(seat.list),
             ballot_position=int(seat.candidate),
             ballot_label=name,
         )
         p.add("person", id=person, gender=seat.gender)
         p.name(person, name, "ar", "official")
+        candidacy = key("candidacy", slot)
         p.add(
             "candidacy",
-            id=key("candidacy", slot),
+            id=candidacy,
             person_id=person,
             option_id=option,
             role="list_member" if not individual else "head",
@@ -458,7 +544,12 @@ def _contest(
             member_of_party_id=None if individual else party(seat.list),
             is_independent=True if individual else None,
         )
-        p.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
+        if quota:
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
+        else:
+            parent = lists[int(seat.list)]
+            for rs in (result_set, key("result_set", code, "lists")):
+                p.add("outcome", result_set_id=rs, option_id=parent, candidacy_id=candidacy, kind="elected")
         for row in by_row[skeleton(seat.name)]:
             p.add(
                 "result_value",
@@ -471,3 +562,68 @@ def _contest(
                 flags=0,
                 value=row.votes,
             )
+
+
+def _lists(p: Package, entity: str, contest: str, governorate: str, members: list[Seat]) -> dict[int, str]:
+    """The governorate's lists with their final votes and seats, as a second result set on its contest."""
+    t = tally(governorate)
+    result_set = key("result_set", f"{governorate}:general", "lists")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=entity,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=IHEC,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=LISTS_METHOD, lang="en")
+    unit = gov_unit(governorate)
+    for measure, amount in ((VALID, t.valid),):
+        p.add(
+            "result_value",
+            result_set_id=result_set,
+            unit_id=unit,
+            option_id=None,
+            channel=0,
+            measure=measure,
+            count_round=0,
+            flags=0,
+            value=amount,
+        )
+        p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=amount)
+    general = Counter(int(seat.list) for seat in members)
+    options: dict[int, str] = {}
+    for number, item in sorted(t.lists.items()):
+        id = key("option", "list", governorate, number)
+        options[number] = id
+        individual = str(number) in INDIVIDUALS
+        p.add(
+            "contest_option",
+            id=id,
+            contest_id=contest,
+            kind="independents" if individual else "list",
+            party_id=None if individual else party(str(number)),
+            ballot_position=number,
+            ballot_label=f"{number} – {item.name}",
+        )
+        p.add(
+            "result_value",
+            result_set_id=result_set,
+            unit_id=unit,
+            option_id=id,
+            channel=0,
+            measure=VOTES,
+            count_round=0,
+            flags=0,
+            value=item.votes,
+        )
+        p.add("declared", result_set_id=result_set, option_id=id, measure=VOTES, value=item.votes)
+        if general[number]:
+            p.add("outcome", result_set_id=result_set, option_id=id, kind="won", seats=general[number])
+    if sum(general.values()) > sum(item.seats for item in t.lists.values()) or set(general) - set(t.lists):
+        raise ValueError(f"{governorate}: the winners and the lists' seats disagree")
+    return options
