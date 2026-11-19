@@ -992,7 +992,8 @@
           "body_kinds": [
             "unicameral"
           ],
-          "iso_pattern": "GE-AB"
+          "iso_pattern": "GE-AB",
+          "valid_to": "1992-07-23"
         }
       ],
       "dates": []
