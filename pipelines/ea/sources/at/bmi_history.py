@@ -13,6 +13,9 @@ of its columns, so every stored number points at its page and box. A row coded `
 national total, the constituencies of each state and of the country against the printed state and national figures,
 the lists or candidates against the valid votes, and the votes cast less the invalid votes against the valid votes. A mismatch raises, unless the transcription records that the printed figures themselves
 disagree, so a misread number never reaches a package.
+
+Where `bmi_tables/{brochure}-gemeinden.txt` holds a presidential brochure's results by municipality
+(`bmi_gemeinden`), each round also gets a result set by municipality that supersedes the one by state.
 """
 
 import re
@@ -25,6 +28,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.at import bmi_gemeinden
 from ea.sources.at.bmi import AUSTRIA, COUNTRY, NATIONAL_COUNCIL, PRESIDENCY, area, key
 from ea.sources.at.parlament import NAMES_1923
 
@@ -471,7 +475,7 @@ def _previous(e: Edition) -> Edition | None:
     return BY_KEY[f"{e.key[:-2]}-1"]
 
 
-def _method(e: Edition, pages: list[int], by_constituency: bool) -> str:
+def _method(e: Edition, pages: list[int], by_constituency: bool, by_municipality: bool = False) -> str:
     return (
         f"Transcribed from the scanned summary tables of the official result brochure (pages {', '.join(map(str, pages))} "
         f"of {e.file}), which the Austrian Central Statistical Office prepared for the Federal Ministry of the "
@@ -482,8 +486,12 @@ def _method(e: Edition, pages: list[int], by_constituency: bool) -> str:
             else "each state column against the national total, the "
         )
         + ("lists" if e.family == NR else "candidates")
-        + " against the valid votes, and the votes cast less the invalid votes against the valid votes. The brochure "
-        "also prints the results of every municipality, which are not yet stored."
+        + " against the valid votes, and the votes cast less the invalid votes against the valid votes. "
+        + (
+            "The results of every municipality, which the brochure also prints, form the set that supersedes this one."
+            if by_municipality
+            else "The brochure also prints the results of every municipality, which are not yet stored."
+        )
     )
 
 
@@ -558,6 +566,7 @@ def election(e: Edition) -> Package:
     p.name(contest, f"{year} {title}{suffix}", "en", "official")
     p.add("slug", path=f"{path}/{changeset.slug(title)}", entity_id=contest, is_current=True)
     result_set = key("result_set", e.key)
+    by_municipality = e.family == BP and bmi_gemeinden.exists(e.key)
     p.add(
         "result_set",
         id=result_set,
@@ -567,7 +576,7 @@ def election(e: Edition) -> Package:
         kind="counted",
         source_id=HISTORY_SOURCE,
         status="active",
-        is_default=True,
+        is_default=not by_municipality,
         completeness=1.0,
     )
     pages = sorted({table.page for table in t.tables if table.constituencies or not wks})
@@ -576,7 +585,7 @@ def election(e: Edition) -> Package:
         id=key("note", result_set),
         entity_id=result_set,
         kind="methodology",
-        body_md=_method(e, pages, bool(wks)),
+        body_md=_method(e, pages, bool(wks), by_municipality),
         lang="en",
     )
     for index, text in enumerate([*e.notes, *t.source_errors]):
@@ -760,4 +769,128 @@ def election(e: Edition) -> Package:
                     x1=round(x1, 4),
                     y1=round(y1, 4),
                 )
+    if by_municipality:
+        _municipalities(p, e, election_id, contest, result_set, options, units, national, stored, sizes, page_ids)
     return p
+
+
+def _municipalities(
+    p: Package,
+    e: Edition,
+    election_id: str,
+    contest: str,
+    by_state: str,
+    options: dict[str, str],
+    units: dict[str, dict[str, int | None]],
+    national: dict[str, int | None],
+    stored: raw.Artifact,
+    sizes: dict[int, tuple[int, int]],
+    page_ids: dict[int, str],
+) -> None:
+    """Add the result set by municipality, which supersedes the one by state and takes the default."""
+    for code, values in bmi_gemeinden.state_figures(e.key, e.round).items():
+        for column, value in values.items():
+            if units[code].get(column) is not None and units[code][column] != value:
+                raise ValueError(
+                    f"{e.key} {LANDS[code]}, {column}: the summary prints {units[code][column]}, the municipal "
+                    f"pages {value}"
+                )
+    result_set = key("result_set", e.key, "gemeinden")
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election_id,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=HISTORY_SOURCE,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+        supersedes_id=by_state,
+    )
+    for outcome in [row for row in p.rows.get("outcome", []) if row["result_set_id"] == by_state]:
+        p.add("outcome", **{**outcome, "result_set_id": result_set})
+    pages = bmi_gemeinden.municipal_pages(e.key)
+    b = bmi_gemeinden.brochure(bmi_gemeinden.brochure_key(e.key))
+    method = (
+        f"Transcribed from the results by municipality in the official result brochure (pages {pages[0]} to "
+        f"{pages[-1]} of {e.file}, 'Örtliche Wahlergebnisse nach Gemeinden'), which the Austrian Central Statistical "
+        "Office prepared for the Federal Ministry of the Interior. The page images were straightened and read "
+        "figure by figure; every number was checked against the totals the pages print: within each row the votes "
+        "cast less the invalid votes against the valid votes and the candidates against the valid votes, the "
+        "municipalities of each political district against the district row, the municipalities and the votes cast "
+        "abroad of each state against the state row, and the state rows against the summary tables. Vienna is "
+        "reported by municipal district. The set supersedes the one by state."
+    )
+    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
+    caveats = [
+        (
+            'The votes cast abroad ("darunter im Ausland abgegeben") are printed for each state and belong to no '
+            "municipality, so they are stored as one unit per state without registered voters."
+        ),
+    ]
+    if b.split:
+        caveats.append(
+            "Municipalities carry the codes of 1995. In the political districts "
+            + ", ".join(sorted(b.split))
+            + " some municipalities of 1995 were not yet separate at this election, so the municipalities of those "
+            "districts are linked to the areas of 1995 only approximately."
+        )
+    for index, text in enumerate(caveats):
+        p.add(
+            "note",
+            id=key("note", result_set, "caveat", index),
+            entity_id=result_set,
+            kind="caveat",
+            body_md=text,
+            lang="en",
+        )
+    over = sum(
+        1
+        for row in b.rows
+        if row.kind == "gem" and row.registered is not None and row.rounds[e.round - 1]["cast"] > row.registered
+    )
+    if over:
+        text = (
+            f"In {over} municipalities more votes were cast than voters were registered. The brochure counts the "
+            "votes of voters with a voting card (Wahlkarte) in the municipality where they voted, not the one that "
+            "lists them, so the figures are stored as printed."
+        )
+        p.accept("accounting.turnout", text)
+        p.add(
+            "note",
+            id=key("note", result_set, "turnout"),
+            entity_id=result_set,
+            kind="caveat",
+            body_md=text,
+            lang="en",
+        )
+    if e.round == 1:
+        for number in pages:
+            width, height = sizes[number]
+            page_ids[number] = key("page", e.file, number)
+            p.add(
+                "source_page",
+                id=page_ids[number],
+                artifact_id=artifact_id(stored.storage_key),
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{stored.sha256}/{number}.png",
+                width=width,
+                height=height,
+            )
+    else:
+        for number in pages:
+            page_ids[number] = key("page", e.file, number)
+    context = bmi_gemeinden.Context(
+        key=e.key,
+        round_number=e.round,
+        day=e.day,
+        result_set=result_set,
+        supersedes=by_state,
+        election_id=election_id,
+        contest=contest,
+        options=options,
+        national=national,
+    )
+    bmi_gemeinden.add_result_set(p, context, page_ids, sizes, key, area, AUSTRIA, MEASURES, VOTES)
