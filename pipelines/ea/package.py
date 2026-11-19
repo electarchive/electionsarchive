@@ -1232,6 +1232,43 @@ def _clashes(conn: Connection, path: Path, pipeline: str) -> list[str]:
     ]
 
 
+def _supersede(conn: Connection, staged: dict[str, tuple[str, list[str]]], owned: list[str]) -> list[str]:
+    """Settle the default of sets that one pipeline's set replaces for another's.
+
+    A default set that names another pipeline's set in `supersedes_id` takes that set's place: the older set is
+    marked not default and superseded, and only those columns change. The reverse holds when the older package is
+    reloaded: its staged rows keep the demoted state instead of flipping the default back. Returns the ids of
+    default sets demoted, which the changeset records so a later version can restore them.
+    """
+    if "result_set" not in staged or "supersedes_id" not in staged["result_set"][1]:
+        return []
+    name = sql.Identifier(staged["result_set"][0])
+    # An older package reloaded after its successor: keep its sets demoted.
+    conn.execute(
+        sql.SQL(
+            """update {s} x set is_default = false, status = 'superseded'
+               where exists (select from result_set n where n.supersedes_id = x.id and n.is_default
+                               and n.changeset_id <> all(%s::uuid[]))
+                 and (x.is_default or x.status <> 'superseded')"""
+        ).format(s=name),
+        [owned],
+    )
+    # A package's default sets that replace sets already held.
+    held = conn.execute(
+        sql.SQL(
+            """select r.id::text, r.is_default from result_set r
+               where r.id in (select n.supersedes_id from {s} n where n.is_default and n.supersedes_id is not null)
+                 and r.id not in (select id from {s}) and (r.is_default or r.status <> 'superseded')"""
+        ).format(s=name)
+    ).fetchall()
+    if held:
+        conn.execute(
+            "update result_set set is_default = false, status = 'superseded' where id = any(%s::uuid[])",
+            [[id for id, _ in held]],
+        )
+    return [id for id, was_default in held if was_default]
+
+
 def _restore(conn: Connection, key: str, changeset_id: str, demoted: list[str]) -> list[str]:
     earlier = {
         str(id)
@@ -1243,7 +1280,7 @@ def _restore(conn: Connection, key: str, changeset_id: str, demoted: list[str]) 
     restored: list[str] = []
     for id in sorted(earlier - set(demoted)):
         if conn.execute(
-            """update result_set r set is_default = true where r.id = %s and not r.is_default
+            """update result_set r set is_default = true, status = case when status = 'superseded' then 'active' else status end where r.id = %s and not r.is_default
                  and not exists (select from result_set o where o.is_default and o.election_id = r.election_id
                                    and o.contest_id is not distinct from r.contest_id and o.stage = r.stage)
                returning r.id""",
@@ -1338,7 +1375,7 @@ def _facts(
                 sql.SQL("x.changeset_id = any({}::uuid[])").format(sql.Literal(owned)),
             )
             staged[table] = (f"pkg_{table}", columns)
-    demoted = _demote(conn, path, str(manifest["pipeline"]), owned)
+    demoted = sorted({*_supersede(conn, staged, owned), *_demote(conn, path, str(manifest["pipeline"]), owned)})
     if demoted:
         conn.execute(
             "update changeset set scope = scope || jsonb_build_object('demoted', %s::jsonb) where id = %s",
