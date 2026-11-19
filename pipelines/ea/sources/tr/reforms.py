@@ -15,7 +15,7 @@ from ea.sources.tr.ysk_local import title
 from ea.store import DATA, connect
 
 SOURCE = "tr.reforms"
-VERSION = "1"
+VERSION = "2"
 LICENSE = "Laws and official texts may be freely reproduced (Law 5846 art. 31)."
 PARSED = DATA / "parsed" / SOURCE
 ICISLERI = "https://icisleri.gov.tr/kurumlar/icisleri.gov.tr/IcSite/illeridaresi/" + quote(
@@ -953,6 +953,11 @@ def emit() -> Path:
                 kept += 1
             elif key not in closures:
                 closures[key] = (row["date"], row["kind"], row["targets"], row["law"], row["note"])
+        for day, law, _, kind, plate, divided, _, targets, note in ILCE_CHANGES:
+            for town in targets if kind == "split" else []:
+                key = town_key(plate, divided, town, register=False)
+                if town != divided and key in towns:
+                    closures.setdefault(key, (day, "absorbed", [town], law, note))
         renamed_centers = {
             plate: new
             for day, _, _, kind, plate, new, sources, _, _ in ILCE_CHANGES
