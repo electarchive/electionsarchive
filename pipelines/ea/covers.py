@@ -112,18 +112,29 @@ back(id, depth) as (
 )
 select array(select distinct id from back), array(select id from named), array(select id from merged)"""
 
+PROBE = 10_000
 DROP = """with hit(id) as (
   select unnest(%(contests)s::uuid[])
-  union select t.contest_id from unnest(%(named)s::uuid[]) n(id)
-        cross join lateral (select contest_id from contest_top where inferred @> array[n.id] offset 0) t
-  union select t.contest_id from unnest(%(merged)s::uuid[]) n(id)
-        cross join lateral (select contest_id from contest_top where refs @> array[n.id] offset 0) t
+  union {named}
+  union {merged}
 ),
 gone as (
   delete from contest_top where contest_id = any(array(select id from hit)) returning contest_id
 )
 insert into cover_stale (contest_id, changeset_id)
 select contest_id, %(id)s::uuid from gone where contest_id <> all(%(up)s::uuid[])"""
+
+
+def _holding(column: str, ids: str, count: int) -> sql.Composed:
+    if count <= PROBE:
+        return sql.SQL(
+            """select t.contest_id from unnest({ids}::uuid[]) n(id)
+               cross join lateral (select contest_id from contest_top where {column} @> array[n.id] offset 0) t"""
+        ).format(ids=sql.Placeholder(ids), column=sql.Identifier(column))
+    return sql.SQL(
+        """select t.contest_id from contest_top t cross join unnest(t.{column}) x(id)
+           join (select distinct unnest({ids}::uuid[]) as id) n on n.id = x.id"""
+    ).format(ids=sql.Placeholder(ids), column=sql.Identifier(column))
 
 
 def uncover(
@@ -149,6 +160,10 @@ def uncover(
         up = row[0] if row else []
         found = conn.execute(TOPS, {**params, "up": up}).fetchone()
         if found is not None:
+            contests, named, merged = found
             conn.execute(
-                DROP, {"id": changeset_id, "up": up, **dict(zip(("contests", "named", "merged"), found, strict=True))}
+                sql.SQL(DROP).format(
+                    named=_holding("inferred", "named", len(named)), merged=_holding("refs", "merged", len(merged))
+                ),
+                {"id": changeset_id, "up": up, "contests": contests, "named": named, "merged": merged},
             )
