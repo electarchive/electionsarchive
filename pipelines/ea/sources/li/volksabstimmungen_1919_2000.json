@@ -1,0 +1,2351 @@
+[
+  {
+    "first": "1919-03-02",
+    "last": "1919-03-02",
+    "text": "2. März 1919",
+    "questions": [{"de": "Erhöhung der Zahl der vom Volk zu wählenden Landtagsabgeordneten", "en": "Increase in the number of elected members of the Landtag", "type": "referendum"}, {"de": "Herabsetzung des Wahlfähigkeitsalters auf 21 Jahre", "en": "Lowering of the voting age to 21", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1919-03-05_19190305",
+        "page": "00000075",
+        "box": [130, 2950, 1130, 3800],
+        "kind": "report",
+        "columns": ["cards", "yes.1", "no.1", "yes.0", "no.0"],
+        "rows": {
+          "Vaduz": [183, 76, 100, 74, 102],
+          "Triesen": [163, 97, 66, 102, 61],
+          "Balzers": [202, 138, 64, 143, 58],
+          "Triesenberg": [198, 139, 59, 144, 53],
+          "Schaan": [226, 106, 118, 117, 109],
+          "Planken": [17, 6, 11, 5, 12],
+          "Oberland": [989, 562, 418, 585, 395],
+          "Eschen": [168, 53, 115, 48, 120],
+          "Mauren": [184, 27, 157, 25, 158],
+          "Gamprin": [74, 26, 46, 23, 49],
+          "Ruggell": [107, 27, 80, 14, 93],
+          "Schellenberg": [64, 17, 47, 16, 48],
+          "Unterland": [597, 150, 445, 126, 468],
+          "Liechtenstein": [1586, 712, 863, 711, 863]
+        }
+      }
+    ],
+    "notes": ["The paper prints the votes cast and the yes and no votes on each question by municipality, under the heading 'Auf 21' (the voting age) and 'Abgeordnete' (the number of members)."]
+  },
+  {
+    "first": "1921-03-28",
+    "last": "1921-03-28",
+    "text": "28. März 1921",
+    "questions": [{"de": "Verbleiben von Josef Peer als Regierungsverweser", "en": "Josef Peer remaining head of government", "type": "plebiscite"}],
+    "tables": [
+      {
+        "issue": "000476564_1921-03-30_19210330",
+        "page": "00000097",
+        "box": [150, 4440, 1110, 4980],
+        "kind": "report",
+        "columns": ["reg", "yes", "no", "invalid", "cards"],
+        "rows": {
+          "Vaduz": [213, 129, 56, 1, 186],
+          "Triesen": [190, 72, 97, 1, 170],
+          "Balzers": [234, 66, 143, 3, 212],
+          "Triesenberg": [240, 76, 135, 1, 212],
+          "Schaan": [253, 181, 35, 7, 223],
+          "Planken": [18, 17, 0, 0, 17]
+        }
+      },
+      {
+        "issue": "000476564_1921-03-30_19210330",
+        "page": "00000097",
+        "box": [1150, 1630, 2120, 1960],
+        "kind": "report",
+        "columns": ["reg", "yes", "no", "invalid", "cards"],
+        "rows": {
+          "Eschen": [183, 115, 41, 1, 157],
+          "Mauren": [217, 156, 43, 2, 201],
+          "Gamprin": [79, 46, 28, 0, 74],
+          "Ruggell": [119, 82, 28, 0, 110],
+          "Schellenberg": [69, 53, 9, 2, 64],
+          "Liechtenstein": [1815, 993, 615, 18, 1626]
+        }
+      }
+    ],
+    "notes": ["The Volksblatt prints the table 'Die Ergebnisse der Volksabstimmung vom 28. März 1921' in two pieces on the same page: the Oberland municipalities at the foot of the first column and the Unterland municipalities with the unlabeled national total at the top of the next column.", "Columns are Wähler (registered), Ja, Nein, Ungiltig and Zusammen (all votes cast, recorded as cards); dashes are recorded as 0.", "No official notice with the result by municipality was found in the Volksblatt up to 25 days after the vote; the Oberrheinische Nachrichten of 2 April 1921 reprints the same table."]
+  },
+  {
+    "first": "1922-12-24",
+    "last": "1922-12-24",
+    "text": "24. Dezember 1922",
+    "questions": [{"de": "Steuergesetz", "en": "Tax Act", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1922-12-30_19221230",
+        "page": "00000412",
+        "box": [340, 3850, 1700, 4900],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [249, 218, 210, 4, 3, 173, 37],
+          "Triesen": [220, 198, 190, 3, 5, 115, 75],
+          "Balzers": [283, 256, 250, 2, 4, 159, 91],
+          "Triesenberg": [268, 248, 232, 4, 12, 150, 82],
+          "Schaan": [282, 254, 248, 2, 4, 126, 122],
+          "Planken": [19, 19, 19, 0, 0, 7, 12],
+          "Eschen": [199, 177, 174, 1, 2, 71, 103],
+          "Mauren": [247, 228, 216, 3, 9, 124, 92],
+          "Gamprin": [97, 90, 90, 0, 0, 46, 44],
+          "Ruggell": [135, 122, 118, 1, 3, 75, 43],
+          "Schellenberg": [76, 64, 62, 0, 2, 32, 30],
+          "Liechtenstein": [2075, 1874, 1807, 21, 44, 1078, 731]
+        }
+      }
+    ],
+    "misprints": [{"row": "Liechtenstein", "column": "valid", "note": "printed 1807, the municipalities add up to 1809, which is also yes 1078 + no 731; read again from the image"}, {"row": "Liechtenstein", "column": "invalid", "note": "printed 21, the municipalities add up to 20; with Vaduz's ballots 218 against 210+4+3 = 217, Vaduz's invalid was probably 5; read again from the image"}],
+    "notes": ["Official notice of the Fürstliche Regierung (Zl. 5820/Reg., dated 28 December 1922) in the Volksblatt of 30 December 1922, giving the result 'gemeindeweise'.", "Columns are Zahl der Stimmberechtigten, Abgegebene Stimmzettel (recorded as ballots), gültig, hievon ungültig, leer, and the Ja and Nein votes; dashes are recorded as 0.", "As printed, Vaduz has 218 ballots but 210 valid + 4 invalid + 3 blank = 217."]
+  },
+  {
+    "first": "1924-04-27",
+    "last": "1924-04-27",
+    "text": "27. April 1924",
+    "questions": [{"de": "Abänderung des Steuergesetzes", "en": "Tax Act amendment", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1924-04-30_19240430",
+        "page": "00000170",
+        "box": [1700, 2150, 2800, 3200],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [253, 208, 198, 1, 9, 166, 32],
+          "Triesen": [240, 189, 169, 2, 18, 113, 56],
+          "Balzers": [312, 248, 231, 4, 13, 183, 48],
+          "Triesenberg": [273, 223, 212, 3, 8, 123, 89],
+          "Schaan": [286, 268, 238, 8, 22, 173, 65],
+          "Planken": [19, 19, 12, 4, 3, 8, 4],
+          "Eschen": [200, 178, 164, 2, 12, 80, 84],
+          "Mauren": [235, 205, 192, 2, 11, 104, 88],
+          "Gamprin": [98, 97, 88, 3, 6, 41, 47],
+          "Ruggell": [140, 127, 122, 4, 1, 58, 64],
+          "Schellenberg": [76, 62, 60, 0, 2, 39, 21],
+          "Liechtenstein": [2032, 1826, 1686, 33, 105, 1088, 598]
+        }
+      }
+    ],
+    "misprints": [{"row": "Liechtenstein", "column": "reg", "note": "printed 2032, the municipalities add up to 2132; read again from the image (Balzers clearly 312); the Oberrheinische Nachrichten of 30 April 1924 prints the same figures"}, {"row": "Liechtenstein", "column": "ballots", "note": "printed 1826, the municipalities add up to 1824; every municipality's ballots equal valid + invalid + blank as printed"}],
+    "notes": ["Official notice of the Fürstliche Regierung (dated Vaduz, 28 April 1924) in the Volksblatt of 30 April 1924; the Oberrheinische Nachrichten of the same day (page 146) prints it too.", "Columns are Zahl der Stimmberechtigten, Abgegebene Stimmzettel (recorded as ballots), and of these gültig, ungültig and leer, then the Ja and Nein votes; the dash for Schellenberg's invalid ballots is recorded as 0."]
+  },
+  {
+    "first": "1925-09-13",
+    "last": "1925-09-13",
+    "text": "13. September 1925",
+    "questions": [{"de": "Landeskraftwerk Lawena", "en": "Lawena national power plant", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1925-09-16_19250916",
+        "page": "00000344",
+        "box": [780, 2850, 1950, 3990],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [268, 224, 207, 1, 16, 137, 70],
+          "Triesen": [251, 216, 200, 3, 13, 150, 50],
+          "Balzers": [321, 266, 242, 4, 20, 186, 56],
+          "Triesenberg": [270, 211, 195, 1, 15, 143, 52],
+          "Schaan": [281, 251, 229, 5, 17, 112, 117],
+          "Planken": [22, 20, 19, 1, 0, 2, 17],
+          "Oberland": [1413, 1188, 1092, 15, 81, 730, 362],
+          "Mauren": [232, 193, 184, 1, 8, 46, 138],
+          "Eschen": [205, 187, 175, 3, 9, 41, 134],
+          "Gamprin": [99, 90, 77, 7, 6, 40, 37],
+          "Ruggell": [142, 124, 116, 4, 4, 69, 47],
+          "Schellenberg": [76, 63, 61, 0, 2, 31, 30],
+          "Unterland": [754, 657, 613, 15, 29, 227, 386],
+          "Liechtenstein": [2167, 1845, 1705, 30, 110, 957, 748]
+        }
+      }
+    ],
+    "notes": ["Official notice of the Fürstliche Regierung (dated Vaduz, 14 September 1925) in the Volksblatt of 16 September 1925.", "Columns are Zahl der Stimmberechtigten, Abgegebene Stimmzettel (recorded as ballots), gültig, hievon ungültig, leer, and the Ja and Nein votes; the Oberland and Unterland subtotals are printed without labels and the national row is 'Gesamtergebnis'."]
+  },
+  {
+    "first": "1925-12-13",
+    "last": "1925-12-13",
+    "text": "13. Dezember 1925",
+    "questions": [{"de": "Initiative Gassner (Abänderung der Zivilprozessordnung)", "en": "Gassner initiative (Civil Procedure Code amendment)", "type": "initiative"}, {"de": "Gegenvorschlag des Landtags", "en": "Counter-proposal of the Landtag", "type": "counter_proposal"}],
+    "tables": [
+      {
+        "issue": "000476564_1925-12-16_19251216",
+        "page": "00000468",
+        "box": [2220, 2330, 4260, 3440],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes.0", "no.0", "yes.1", "no.1"],
+        "rows": {
+          "Vaduz": [268, 216, 207, 6, 3, 8, 184, 157, 39],
+          "Triesen": [249, 217, 191, 0, 26, 35, 146, 127, 55],
+          "Balzers": [326, 262, 262, 0, 17, 12, 208, 201, 29],
+          "Triesenberg": [279, 241, 221, 4, 16, 49, 153, 160, 48],
+          "Schaan": [278, 247, 219, 9, 19, 24, 171, 170, 32],
+          "Planken": [22, 21, 21, 0, 0, 0, 20, 21, 0],
+          "Oberland": [1422, 1204, 1121, 19, 81, 128, 882, 836, 203],
+          "Mauren": [234, 200, 178, 11, 11, 17, 148, 126, 40],
+          "Eschen": [204, 177, 165, 2, 10, 14, 135, 119, 14],
+          "Gamprin": [100, 93, 85, 6, 2, 9, 71, 62, 15],
+          "Ruggell": [142, 128, 119, 5, 4, 1, 104, 94, 18],
+          "Schellenberg": [77, 67, 63, 1, 3, 2, 60, 56, 0],
+          "Unterland": [757, 665, 610, 25, 30, 43, 518, 457, 87],
+          "Liechtenstein": [2179, 1869, 1731, 44, 111, 171, 1400, 1293, 290]
+        }
+      }
+    ],
+    "notes": ["Official notice of the Fürstliche Regierung (dated Vaduz, 14 December 1925) in the Volksblatt of 16 December 1925, 'betreffend die Initiative Gaßner'.", "Columns are Zahl der Stimmberechtigten, Abgegebene Stimmzettel (recorded as ballots), and of these gültig, ungültig and leer, then Ja and Nein on the Gassner initiative and Ja and Nein on the Landtag's counter-proposal; dashes are recorded as 0.", "Voters could answer both questions on one ballot, so the yes and no votes on each question need not add up to the valid ballots.", "As printed, Balzers has 262 valid ballots, equal to its 262 ballots although 17 were blank (262 + 17 = 279); the Oberland and national valid totals (1121, 1731) include the 262, so the error is in the notice itself."]
+  },
+  {
+    "first": "1926-02-07",
+    "last": "1926-02-07",
+    "text": "7. Februar 1926",
+    "questions": [{"de": "Gesetz über die Errichtung einer Landes-Brandschaden-Versicherungsanstalt für das Fürstentum Liechtenstein", "en": "National fire insurance institution", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476556_1926-02-10_19260210",
+        "page": "00000066",
+        "box": [640, 750, 2200, 1830],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [278, 244, 241, 0, 3, 93, 148],
+          "Triesen": [265, 228, 217, 0, 11, 78, 139],
+          "Balzers": [326, 279, 273, 2, 4, 126, 147],
+          "Triesenberg": [280, 253, 244, 2, 7, 109, 135],
+          "Schaan": [291, 261, 253, 1, 7, 43, 210],
+          "Planken": [22, 22, 22, 0, 0, 1, 21],
+          "Oberland": [1462, 1287, 1250, 5, 32, 450, 800],
+          "Eschen": [208, 186, 180, 2, 4, 56, 124],
+          "Mauren": [236, 215, 209, 2, 4, 51, 158],
+          "Gamprin": [101, 96, 96, 0, 0, 33, 63],
+          "Ruggell": [146, 136, 135, 0, 1, 46, 89],
+          "Schellenberg": [79, 70, 69, 1, 0, 27, 42],
+          "Unterland": [770, 703, 689, 5, 9, 213, 476],
+          "Liechtenstein": [2232, 1990, 1939, 10, 41, 663, 1276]
+        }
+      }
+    ],
+    "notes": ["The Volksblatt for January to early May 1926 is not in the archive; this is the official notice of the Fürstliche Regierung (dated Vaduz, 8 February 1926) in the Liechtensteiner Nachrichten of 10 February 1926, which also prints a news table on page 63 of the same issue.", "Columns are Zahl der Stimmberechtigten, Abgegebene Stimmen (recorded as ballots, since they equal valid + invalid + blank), and of these gültig, ungültig and leer, then the Ja and Nein votes; dashes are recorded as 0.", "In this typeface 3 and 8 are hard to tell apart; the Unterland yes figure is read as 213, which the municipalities and the national 663 confirm."]
+  },
+  {
+    "first": "1927-01-30",
+    "last": "1927-01-30",
+    "text": "30. Januar 1927",
+    "questions": [{"de": "Initiative zur Abschaffung der Konzessionspflicht im Baugewerbe", "en": "Initiative to abolish licensing in the building trade", "type": "initiative"}, {"de": "Gegenvorschlag des Landtags", "en": "Counter-proposal of the Landtag", "type": "counter_proposal"}],
+    "tables": [
+      {
+        "issue": "000476564_1927-02-05_19270205",
+        "page": "00000063",
+        "box": [150, 4150, 3420, 5780],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "ignore", "ignore", "ignore", "ignore", "ignore", "ignore", "ignore", "ignore", "yes.0", "no.0", "yes.1", "no.1"],
+        "rows": {
+          "Vaduz": [286, 228, 224, 3, 1, 24, 200, 6, 207, 24, 200, 6, 207, 24, 199, 6, 207],
+          "Triesen": [261, 219, 217, 1, 1, 139, 70, 4, 208, 140, 70, 4, 208, 139, 70, 4, 204],
+          "Balzers": [339, 274, 264, 4, 6, 158, 104, 10, 228, 158, 104, 10, 228, 159, 104, 10, 229],
+          "Triesenberg": [274, 220, 206, 4, 10, 137, 50, 14, 0, 137, 50, 14, 0, 135, 62, 15, 144],
+          "Schaan": [300, 265, 256, 3, 6, 49, 182, 16, 182, 49, 198, 16, 231, 49, 199, 16, 219],
+          "Planken": [23, 20, 20, 0, 0, 10, 10, 0, 16, 10, 10, 0, 16, 10, 10, 0, 16],
+          "Oberland": [1483, 1226, 1187, 15, 24, 517, 616, 50, 841, 518, 632, 50, 890, 516, 644, 51, 1019],
+          "Mauren": [230, 198, 195, 1, 2, 116, 79, 4, 176, 116, 79, 4, 176, 116, 79, 4, 176],
+          "Eschen": [214, 175, 169, 2, 4, 59, 107, 14, 145, 59, 108, 14, 146, 59, 108, 14, 146],
+          "Gamprin": [103, 90, 87, 0, 3, 44, 41, 3, 71, 44, 41, 3, 71, 44, 41, 3, 71],
+          "Ruggell": [146, 126, 119, 2, 5, 42, 63, 8, 87, 53, 64, 9, 88, 53, 64, 9, 89],
+          "Schellenberg": [77, 62, 61, 1, 0, 16, 38, 7, 38, 16, 43, 7, 49, 16, 43, 7, 49],
+          "Unterland": [770, 651, 631, 6, 14, 277, 328, 36, 517, 288, 335, 37, 530, 288, 335, 37, 531],
+          "Liechtenstein": [2253, 1877, 1818, 21, 38, 794, 944, 86, 1358, 806, 967, 87, 1420, 804, 979, 88, 1550]
+        }
+      }
+    ],
+    "notes": ["Official notice of the Fürstliche Regierung (signed Schädler) in the Volksblatt of 5 February 1927, headed as the result of the vote on 'die Initiative auf Erlassung eines Gesetzes betr. die Bautätigkeit' and the Landtag's proposal.", "Columns are Zahl der Stimmberechtigten, Abgegebene Stimmen (recorded as ballots, since they equal valid + invalid + blank), and of these giltig and ungiltig, then Leer; dashes are recorded as 0.", "The yes/no votes are printed three times: as found by the municipal voting commissions, as found by the main voting commission (both kept as 'ignore' columns, in that order: initiative Ja, Nein, Landtag proposal Ja, Nein), and the 'Revidiertes Ergebnis der Regierung', which is recorded as the result.", "The table prints 'Oberland zus.' twice, after the Oberland municipalities and again above the national total; the repeated row is identical and kept once.", "Voters could answer both questions on one ballot, so the yes and no votes on each question need not add up to the valid ballots."]
+  },
+  {
+    "first": "1927-05-01",
+    "last": "1927-05-01",
+    "text": "1. Mai 1927",
+    "questions": [{"de": "Abänderung des Gesetzes betreffend das Besoldungs- und Entschädigungswesen", "en": "Salaries and compensation amendment", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1927-05-04_19270504",
+        "page": "00000216",
+        "box": [520, 3950, 1720, 5080],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [285, 245, 234, 1, 10, 143, 91],
+          "Triesen": [265, 212, 194, 3, 15, 39, 155],
+          "Balzers": [344, 274, 264, 2, 8, 55, 209],
+          "Triesenberg": [273, 234, 229, 1, 4, 54, 175],
+          "Schaan": [297, 265, 257, 4, 4, 96, 161],
+          "Planken": [23, 21, 21, 0, 0, 20, 1],
+          "Eschen": [217, 196, 190, 1, 5, 68, 122],
+          "Mauren": [229, 206, 199, 1, 6, 86, 113],
+          "Gamprin": [101, 93, 93, 0, 0, 27, 66],
+          "Ruggell": [143, 130, 127, 1, 2, 47, 80],
+          "Schellenberg": [78, 62, 61, 0, 1, 23, 38],
+          "Liechtenstein": [2252, 1938, 1869, 14, 55, 658, 1211]
+        }
+      }
+    ],
+    "misprints": [{"row": "Liechtenstein", "column": "reg", "note": "printed 2252, the municipalities add up to 2255; every municipal figure read again from a closer crop"}],
+    "notes": ["Official notice of the Fürstliche Regierung (dated Vaduz, 2 May 1927) headed 'Volksabstimmung vom 1. Mai 1927', in the Volksblatt of 4 May 1927.", "Columns are Stimmberechtigte, Abgegebene Stimmen (recorded as ballots, since they equal valid + invalid + blank), hievon gültig, ungültig, leer, and the Ja and Nein votes; the national total is printed without a label and dashes are recorded as 0."]
+  },
+  {
+    "first": "1929-05-26",
+    "last": "1929-05-26",
+    "text": "26. Mai 1929",
+    "questions": [{"de": "Alkoholsteuergesetz", "en": "Alcohol Tax Act", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1929-05-28_19290528",
+        "page": "00000342",
+        "box": [3230, 720, 4331, 1880],
+        "kind": "notice",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [290, 216, 211, 0, 5, 109, 102],
+          "Triesen": [273, 208, 193, 0, 15, 60, 133],
+          "Balzers": [344, 262, 251, 1, 10, 117, 134],
+          "Triesenberg": [275, 213, 198, 2, 13, 105, 93],
+          "Schaan": [292, 259, 240, 1, 18, 134, 106],
+          "Planken": [23, 22, 22, 0, 0, 15, 7],
+          "Oberland": [1497, 1180, 1115, 4, 61, 540, 575],
+          "Eschen": [214, 191, 187, 2, 2, 126, 61],
+          "Mauren": [232, 205, 193, 0, 12, 100, 93],
+          "Gamprin": [102, 89, 87, 1, 1, 62, 25],
+          "Ruggell": [142, 121, 118, 0, 3, 83, 35],
+          "Schellenberg": [74, 62, 62, 0, 0, 39, 23],
+          "Unterland": [764, 668, 647, 3, 18, 410, 237],
+          "Liechtenstein": [2261, 1848, 1762, 7, 79, 950, 812]
+        }
+      }
+    ],
+    "notes": ["The Volksblatt of 28 May 1929 prints the government's result notice 'Ergebnis der Volksabstimmung vom 26. Mai 1929 über die Einführung einer Alkoholsteuer', dated 27 May 1929 and signed Fürstliche Regierung; it gives the absolute majority as 882."]
+  },
+  {
+    "first": "1930-03-02",
+    "last": "1930-03-02",
+    "text": "2. März 1930",
+    "questions": [{"de": "Verfassungsinitiative für das Proporzwahlsystem", "en": "Constitutional initiative for proportional representation", "type": "initiative"}, {"de": "Gesetzesinitiative für das Proporzwahlsystem", "en": "Legislative initiative for proportional representation", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476556_1930-03-04_19300304",
+        "page": "00000102",
+        "box": [600, 2200, 1680, 3780],
+        "kind": "notice",
+        "columns": ["reg.0", "cards.0", "valid.0", "invalid.0", "blank.0", "yes.0", "no.0"],
+        "rows": {
+          "Vaduz": [289, 259, 258, 0, 1, 104, 154],
+          "Triesen": [276, 247, 240, 0, 7, 91, 149],
+          "Balzers": [349, 301, 294, 2, 5, 146, 148],
+          "Triesenberg": [281, 255, 251, 2, 2, 159, 92],
+          "Schaan": [310, 290, 280, 1, 9, 73, 207],
+          "Planken": [24, 24, 23, 0, 1, 0, 23],
+          "Oberland": [1529, 1376, 1346, 5, 25, 573, 773],
+          "Eschen": [228, 206, 198, 2, 6, 67, 131],
+          "Mauren": [229, 215, 210, 3, 2, 50, 160],
+          "Gamprin": [99, 91, 90, 0, 1, 30, 60],
+          "Ruggell": [148, 137, 136, 0, 1, 56, 80],
+          "Schellenberg": [76, 65, 65, 0, 0, 29, 36],
+          "Unterland": [780, 714, 699, 5, 10, 232, 467],
+          "Liechtenstein": [2309, 2090, 2045, 10, 35, 805, 1240]
+        }
+      },
+      {
+        "issue": "000476556_1930-03-04_19300304",
+        "page": "00000102",
+        "box": [600, 3770, 1680, 5040],
+        "kind": "notice",
+        "columns": ["reg.1", "cards.1", "valid.1", "invalid.1", "blank.1", "yes.1", "no.1"],
+        "rows": {
+          "Vaduz": [289, 254, 257, 0, 2, 104, 153],
+          "Triesen": [276, 247, 241, 0, 6, 92, 149],
+          "Balzers": [349, 301, 294, 2, 5, 145, 149],
+          "Triesenberg": [281, 255, 251, 2, 2, 159, 92],
+          "Schaan": [310, 290, 280, 1, 9, 71, 207],
+          "Planken": [24, 24, 23, 0, 1, 0, 23],
+          "Oberland": [1529, 1376, 1346, 5, 25, 571, 773],
+          "Eschen": [228, 206, 198, 2, 6, 67, 131],
+          "Mauren": [229, 215, 210, 3, 2, 50, 160],
+          "Gamprin": [99, 91, 90, 0, 1, 30, 60],
+          "Ruggell": [148, 137, 136, 0, 1, 56, 80],
+          "Schellenberg": [76, 65, 65, 0, 0, 29, 36],
+          "Unterland": [780, 714, 699, 5, 10, 232, 467],
+          "Liechtenstein": [2309, 2090, 2045, 10, 35, 803, 1240]
+        }
+      }
+    ],
+    "misprints": [{"row": "Oberland", "column": "cards.1", "note": "printed 1376, the municipalities add up to 1371 because Vaduz is printed 254 (259 in the table for the first question, and 257 valid + 2 blank = 259); the Volksblatt prints the same 254"}, {"row": "Liechtenstein", "column": "cards.1", "note": "printed 2090, the municipalities add up to 2085 because of Vaduz's printed 254 (see Oberland)"}],
+    "notes": ["The government's notice 'Ergebnis der Volksabstimmung vom 2. März 1930', dated 3 March 1930 and signed Fürstliche Regierung, prints one table per initiative (A: constitution, B: Volksrechte law); it is transcribed from the Liechtensteiner Nachrichten of 4 March 1930 because in the Volksblatt of the same day (000476564_1930-03-04_19300304, page 156) the Nein column is lost in the binding.", "The Volksblatt's copy of the notice prints Eschen's registered voters as 288; the Nachrichten prints 228, which is what the Unterland total of 780 requires.", "In the second table Schaan's yes and no (71 + 207 = 278) do not add up to its 280 valid votes as printed, so the Oberland and national yes + no also fall 2 short of valid; the printed national result is Ja 803, Nein 1240."]
+  },
+  {
+    "first": "1930-10-26",
+    "last": "1930-10-26",
+    "text": "26. Oktober 1930",
+    "questions": [{"de": "Pressegesetz", "en": "Press Act", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1930-10-30_19301030",
+        "page": "00000750",
+        "box": [2380, 3680, 4400, 5000],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [301, 271, 262, 1, 8, 128, 134],
+          "Triesen": [276, 244, 236, 1, 7, 98, 138],
+          "Balzers": [357, 306, 300, 2, 4, 126, 174],
+          "Triesenberg": [278, 251, 239, 0, 12, 57, 182],
+          "Schaan": [320, 298, 279, 0, 19, 156, 123],
+          "Planken": [26, 24, 22, 0, 2, 21, 1],
+          "Oberland": [1558, 1394, 1338, 4, 52, 586, 752],
+          "Eschen": [227, 202, 194, 2, 6, 122, 72],
+          "Mauren": [237, 218, 207, 1, 10, 135, 72],
+          "Gamprin": [99, 88, 87, 0, 1, 53, 34],
+          "Ruggell": [150, 130, 128, 1, 1, 76, 52],
+          "Schellenberg": [77, 59, 59, 0, 0, 33, 26],
+          "Unterland": [790, 697, 675, 4, 18, 419, 256],
+          "Liechtenstein": [2348, 2091, 2013, 8, 70, 1005, 1008]
+        }
+      }
+    ],
+    "notes": ["The Volksblatt of 30 October 1930 prints the government's notice 'Ergebnis der Volksabstimmung vom 26. Okt. 1930 betr. das Pressegesetz', dated 29 October 1930 and signed Fürstliche Regierung, stating that the figures follow a recount by a commission of members of both parties; it gives the absolute majority as 1006.", "The second column is headed 'Abgegebene Stimmzettel' (ballots handed in) and is recorded as ballots."]
+  },
+  {
+    "first": "1930-12-14",
+    "last": "1930-12-14",
+    "text": "14. Dezember 1930",
+    "questions": [{"de": "Bau des Binnenkanals", "en": "Construction of the inland canal", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1930-12-16_19301216",
+        "page": "00000870",
+        "box": [3280, 1500, 4400, 2860],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [301, 275, 264, 4, 7, 179, 85],
+          "Triesen": [275, 247, 237, 2, 8, 132, 105],
+          "Balzers": [362, 304, 292, 2, 10, 185, 107],
+          "Triesenberg": [279, 264, 253, 1, 10, 81, 172],
+          "Schaan": [324, 300, 292, 0, 8, 214, 78],
+          "Planken": [26, 25, 25, 0, 0, 22, 3],
+          "Oberland": [1567, 1415, 1363, 9, 43, 813, 550],
+          "Eschen": [227, 216, 216, 0, 0, 215, 1],
+          "Mauren": [237, 228, 223, 2, 3, 208, 15],
+          "Gamprin": [98, 91, 90, 0, 1, 81, 9],
+          "Ruggell": [151, 134, 127, 5, 2, 102, 25],
+          "Schellenberg": [76, 67, 66, 1, 0, 50, 16],
+          "Unterland": [789, 736, 722, 8, 6, 656, 66],
+          "Liechtenstein": [2356, 2151, 2085, 17, 49, 1469, 616]
+        }
+      }
+    ],
+    "notes": ["The Volksblatt of 16 December 1930 prints the government's notice 'Ergebnis der Volksabstimmung vom 14. Dezember 1930 betreffend den Bau des Binnenkanals', dated 15 December 1930 and signed Fürstliche Regierung; it gives the absolute majority as 1043.", "The second column is headed 'Abgegeb. Stimmz.' (ballots handed in) and is recorded as ballots."]
+  },
+  {
+    "first": "1931-11-22",
+    "last": "1931-11-22",
+    "text": "22. November 1931",
+    "questions": [{"de": "Arbeitslosenversicherungsgesetz", "en": "Unemployment Insurance Act", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1931-11-24_19311124",
+        "page": "00000836",
+        "box": [720, 700, 2950, 2120],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [298, 228, 211, 0, 17, 113, 98],
+          "Triesen": [281, 229, 202, 3, 24, 126, 76],
+          "Triesenberg": [294, 253, 197, 7, 49, 95, 102],
+          "Balzers": [366, 306, 285, 0, 21, 83, 202],
+          "Schaan": [312, 276, 243, 2, 31, 74, 169],
+          "Planken": [28, 25, 22, 0, 3, 7, 15],
+          "Oberland": [1579, 1317, 1160, 12, 145, 498, 662],
+          "Eschen": [224, 205, 185, 1, 19, 52, 133],
+          "Mauren": [240, 215, 198, 0, 17, 41, 157],
+          "Gamprin": [102, 87, 82, 0, 5, 27, 55],
+          "Ruggell": [154, 117, 118, 2, 7, 18, 100],
+          "Schellenberg": [77, 67, 62, 0, 5, 17, 45],
+          "Unterland": [797, 701, 645, 3, 53, 155, 490],
+          "Liechtenstein": [2376, 2018, 1805, 15, 198, 653, 1152]
+        }
+      }
+    ],
+    "misprints": [{"row": "Unterland", "column": "ballots", "note": "printed 701, the municipalities add up to 691 because Ruggell's ballots are printed 117; Ruggell's 118 valid + 2 invalid + 7 blank = 127, which gives 701"}, {"row": "Liechtenstein", "column": "ballots", "note": "printed 2018, the municipalities add up to 2008 because of Ruggell's printed 117 (see Unterland)"}],
+    "notes": ["The Volksblatt of 24 November 1931 prints the government's 'Bekanntmachung des Ergebnisses der Volksabstimmung vom 22. November 1931 über die Arbeitslosenversicherung', dated 23 November 1931 and signed Fürstl. Regierung; it gives the absolute majority as 903 and states that the bill failed.", "The second column is headed 'Abgegebene Stimmzettel' (ballots handed in) and is recorded as ballots.", "Ruggell's ballots are printed 117, fewer than its 118 valid votes; the row and the totals imply 127. No other paper in the archive prints the full table."]
+  },
+  {
+    "first": "1932-02-14",
+    "last": "1932-02-14",
+    "text": "14. Februar 1932",
+    "questions": [{"de": "Verfassungsänderung über den Wahlmodus für den Landtag", "en": "Constitutional amendment on the Landtag electoral system", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1932-02-18_19320218",
+        "page": "00000120",
+        "box": [2270, 1750, 3480, 3620],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [316, 286, 281, 3, 2, 146, 135],
+          "Triesen": [271, 262, 253, 3, 6, 127, 126],
+          "Balzers": [374, 324, 321, 1, 2, 152, 169],
+          "Triesenberg": [294, 278, 265, 1, 12, 93, 172],
+          "Schaan": [331, 306, 297, 3, 6, 168, 129],
+          "Planken": [31, 28, 27, 0, 1, 22, 5],
+          "Oberland": [1627, 1484, 1444, 11, 29, 708, 736],
+          "Eschen": [231, 212, 209, 2, 1, 133, 76],
+          "Mauren": [247, 231, 225, 3, 3, 170, 55],
+          "Gamprin": [101, 93, 93, 0, 0, 64, 29],
+          "Ruggell": [153, 141, 141, 0, 0, 80, 61],
+          "Schellenberg": [79, 76, 76, 0, 0, 47, 29],
+          "Unterland": [811, 753, 744, 5, 4, 494, 250],
+          "Liechtenstein": [2338, 2237, 2188, 16, 33, 1202, 986]
+        }
+      }
+    ],
+    "misprints": [{"row": "Oberland", "column": "reg", "note": "printed 1627, the municipalities add up to 1617 because the Volksblatt prints Triesen's registered voters as 271; the Liechtensteiner Nachrichten of 18 February 1932 (000476556_1932-02-18_19320218, page 91) prints Triesen 281, which gives 1627"}, {"row": "Liechtenstein", "column": "reg", "note": "printed 2338 in both the Volksblatt and the Nachrichten, while the printed district totals 1627 + 811 give 2438 (the municipalities as printed in the Volksblatt add up to 2428)"}],
+    "notes": ["The Volksblatt of 18 February 1932 prints the government's 'Ergebnis der Volksbefragung vom 14. Febr. 1932 über Aufnahme neuer Grundsätze in das Landtags-Wahlgesetz (nach der von der fürstlichen Regierung vorgenommenen Ueberprüfung)', dated 16 February 1932 and signed Fürstliche Regierung, by Obere and Untere Landschaft; the district rows carry no label and are recorded as Oberland and Unterland.", "The notice gives absolute majorities of 723 (Oberland), 373 (Unterland) and 1095 (whole country). The second column is headed 'Abgegebene Stimmzettel' and is recorded as ballots.", "The Liechtensteiner Nachrichten's copy of the same notice differs from the Volksblatt in Triesen's registered voters (281) and the Oberland blank total (28)."]
+  },
+  {
+    "first": "1935-05-30",
+    "last": "1935-05-30",
+    "text": "30. Mai 1935",
+    "questions": [{"de": "Verfassungsinitiative für das Proporzwahlsystem", "en": "Constitutional initiative for proportional representation", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1935-06-01_19350601",
+        "page": "00000387",
+        "box": [2870, 250, 4363, 1820],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [351, 336, 330, 1, 5, 164, 166],
+          "Triesen": [305, 290, 284, 0, 6, 158, 126],
+          "Balzers": [395, 376, 370, 1, 5, 218, 152],
+          "Triesenberg": [322, 312, 306, 0, 6, 202, 104],
+          "Schaan": [381, 361, 351, 0, 10, 149, 202],
+          "Planken": [29, 28, 27, 0, 1, 4, 23],
+          "Oberland": [1783, 1703, 1668, 2, 33, 895, 773],
+          "Eschen": [265, 257, 254, 0, 3, 99, 155],
+          "Mauren": [264, 255, 248, 2, 5, 61, 187],
+          "Gamprin": [106, 98, 96, 1, 1, 36, 60],
+          "Ruggell": [168, 159, 157, 0, 2, 64, 93],
+          "Schellenberg": [84, 80, 78, 2, 0, 27, 51],
+          "Unterland": [887, 849, 833, 5, 11, 287, 546],
+          "Liechtenstein": [2670, 2552, 2501, 7, 44, 1182, 1319]
+        }
+      }
+    ],
+    "notes": ["The vote was held on Thursday 30 May 1935 (Ascension Day); the Volksblatt of 1 June 1935 prints the government's notice 'Ergebnis der Volksabstimmung vom 30. Mai 1935 über Abänderung der Verfassung (Proporz-Initiative)', dated 30 May 1935 and signed Fürstl. Regierung.", "The notice gives the absolute majority as 1251 and declares the proposal rejected under Art. 33 para. 4. The second column is headed 'Abgeb. Stimmzettel' and is recorded as ballots."]
+  },
+  {
+    "first": "1937-08-22",
+    "last": "1937-08-22",
+    "text": "22. August 1937",
+    "questions": [{"de": "Gesetz über das Verbot von Warenhäusern und Einheitspreisgeschäften", "en": "Ban on department and single-price stores", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1937-08-24_19370824",
+        "page": "00000518",
+        "box": [690, 600, 2150, 1960],
+        "kind": "notice",
+        "columns": ["yes", "no", "blank", "invalid"],
+        "rows": {
+          "Vaduz": [182, 86, 5, 2],
+          "Triesen": [108, 116, 14, 0],
+          "Balzers": [156, 172, 14, 2],
+          "Triesenberg": [70, 179, 15, 5],
+          "Schaan": [252, 76, 11, 4],
+          "Planken": [19, 4, 2, 0],
+          "Eschen": [130, 97, 7, 5],
+          "Mauren": [167, 63, 5, 6],
+          "Gamprin": [42, 44, 5, 0],
+          "Ruggell": [108, 42, 3, 6],
+          "Schellenberg": [60, 17, 2, 0],
+          "Liechtenstein": [1294, 896, 83, 30]
+        }
+      }
+    ],
+    "notes": ["The Volksblatt of 24 August 1937 prints the government's notice of 'Das endgültige Ergebnis der Volksabstimmung vom 22. August 1937 betreffend das Gesetz über das Verbot der Eröffnung von Warenhäusern, Einheitspreisgeschäften und ähnlichen Großunternehmungen und deren Filialen', dated 23 August 1937 and signed Fürstliche Regierung.", "The notice prints only yes, no, blank and invalid by municipality and an unlabeled national total row, with no district totals and no registered voters; it subtracts 896 from 1294 and declares the law adopted with a majority of 398. No paper within about 25 days prints a fuller table; the earlier news tables (Volksblatt 24 August page 515, Vaterland 25 August page 269) give only preliminary yes and no figures."]
+  },
+  {
+    "first": "1945-03-18",
+    "last": "1945-03-18",
+    "text": "18. März 1945",
+    "questions": [{"de": "Vermehrung der Landtagsmandate von 15 auf 21", "en": "Increase of the Landtag from 15 to 21 seats", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1945-03-22_19450322",
+        "page": "00000182",
+        "box": [2920, 3640, 4515, 5220],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [437, 316, 303, 11, 2, 69, 234],
+          "Triesen": [319, 246, 234, 2, 10, 65, 169],
+          "Balzers": [450, 379, 364, 4, 11, 43, 321],
+          "Triesenberg": [350, 290, 271, 4, 15, 54, 217],
+          "Schaan": [436, 364, 358, 0, 6, 40, 318],
+          "Planken": [24, 23, 23, 0, 0, 7, 16],
+          "Oberland": [2016, 1618, 1553, 21, 44, 278, 1275],
+          "Eschen": [319, 246, 231, 7, 8, 77, 154],
+          "Mauren": [302, 248, 242, 1, 5, 41, 201],
+          "Gamprin": [123, 104, 101, 0, 3, 25, 76],
+          "Ruggell": [206, 177, 173, 4, 0, 41, 132],
+          "Schellenberg": [110, 97, 97, 0, 0, 36, 61],
+          "Unterland": [1060, 872, 844, 12, 16, 220, 624],
+          "Liechtenstein": [3076, 2490, 2397, 33, 60, 498, 1899]
+        }
+      }
+    ],
+    "notes": ["Official notice of the government dated 20 March 1945 in the Liechtensteiner Volksblatt of 22 March 1945; 'Abgegebene Stimmzettel' is recorded as ballots, 'gilt' as valid, and dashes as 0."]
+  },
+  {
+    "first": "1947-01-19",
+    "last": "1947-01-19",
+    "text": "19. Jänner 1947",
+    "questions": [{"de": "Abänderung des Finanzgesetzes (Herabsetzung des Steuersatzes)", "en": "Finance Act amendment (lower tax rate)", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1947-01-21_19470121",
+        "page": "00000040",
+        "box": [1650, 2600, 3280, 4260],
+        "kind": "notice",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [484, 362, 344, 1, 17, 169, 175],
+          "Triesen": [336, 275, 250, 1, 24, 149, 101],
+          "Balzers": [452, 394, 373, 1, 20, 232, 141],
+          "Triesenberg": [364, 303, 279, 1, 23, 160, 119],
+          "Schaan": [460, 413, 392, 3, 18, 227, 165],
+          "Planken": [21, 21, 21, 0, 0, 6, 15],
+          "Oberland": [2117, 1768, 1659, 7, 102, 943, 716],
+          "Eschen": [344, 280, 263, 7, 10, 174, 89],
+          "Mauren": [316, 266, 255, 1, 10, 154, 101],
+          "Gamprin": [128, 107, 104, 1, 2, 75, 29],
+          "Ruggell": [203, 181, 177, 2, 2, 103, 74],
+          "Schellenberg": [110, 95, 92, 1, 2, 49, 43],
+          "Unterland": [1101, 929, 891, 12, 26, 555, 336],
+          "Liechtenstein": [3218, 2697, 2550, 19, 128, 1498, 1052]
+        }
+      }
+    ],
+    "notes": ["Amtliche Kundmachung dated 20 January 1947 in the Liechtensteiner Volksblatt of 21 January 1947 on the formulated initiative to amend Art. 4 of the Finance Act for 1946 (Steuerinitiative); 'Zahl der abgegebenen Stimmen' is recorded as cards, dashes as 0."]
+  },
+  {
+    "first": "1947-06-15",
+    "last": "1947-06-15",
+    "text": "15. Juni 1947",
+    "questions": [{"de": "Gesetz über die Liechtensteinischen Kraftwerke und Saminakraftwerk", "en": "Liechtenstein Power Plants Act and the Samina power plant", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1947-06-17_19470617",
+        "page": "00000363",
+        "box": [1930, 1920, 3800, 2940],
+        "kind": "report",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [480, 300, 280, 2, 18, 270, 10],
+          "Triesen": [335, 272, 258, 2, 12, 243, 15],
+          "Balzers": [455, 390, 376, 0, 14, 370, 6],
+          "Triesenberg": [372, 291, 279, 1, 11, 266, 13],
+          "Schaan": [450, 402, 376, 2, 24, 336, 40],
+          "Planken": [21, 20, 20, 0, 0, 20, 0],
+          "Oberland": [2113, 1675, 1589, 7, 79, 1505, 84],
+          "Eschen": [335, 256, 225, 1, 30, 173, 52],
+          "Mauren": [316, 263, 221, 4, 38, 190, 31],
+          "Gamprin": [125, 99, 91, 1, 7, 67, 24],
+          "Ruggell": [205, 175, 169, 2, 4, 150, 19],
+          "Schellenberg": [109, 95, 94, 0, 1, 88, 6],
+          "Unterland": [1090, 888, 800, 8, 80, 668, 132],
+          "Liechtenstein": [3203, 2563, 2389, 15, 159, 2173, 216]
+        }
+      }
+    ],
+    "notes": ["No official notice was found in the Liechtensteiner Volksblatt up to 15 July 1947; this is the paper's own table of 17 June 1947 ('Zusammenstellung der Abstimmungsresultate nach Landschaft'), and the Liechtensteiner Vaterland of 18 June 1947 prints the same table. 'Abgegebene Stimmen' is recorded as cards, dashes as 0."]
+  },
+  {
+    "first": "1949-06-12",
+    "last": "1949-06-12",
+    "text": "12. Juni 1949",
+    "questions": [{"de": "Abänderung der Gewerbeordnung", "en": "Trade Regulations amendment", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1949-06-15_19490615",
+        "page": "00000368",
+        "box": [1880, 3200, 3300, 4900],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [554, 357, 331, 0, 26, 115, 216],
+          "Triesen": [340, 271, 260, 0, 11, 57, 203],
+          "Balzers": [450, 373, 353, 4, 16, 43, 310],
+          "Triesenberg": [379, 292, 284, 1, 7, 26, 258],
+          "Schaan": [466, 381, 352, 0, 29, 132, 220],
+          "Planken": [24, 23, 23, 0, 0, 4, 19],
+          "Oberland": [2213, 1697, 1603, 5, 89, 377, 1226],
+          "Eschen": [334, 273, 255, 1, 17, 46, 209],
+          "Mauren": [332, 262, 246, 2, 14, 42, 204],
+          "Gamprin": [128, 104, 101, 1, 2, 16, 85],
+          "Ruggell": [208, 165, 157, 1, 7, 31, 126],
+          "Schellenberg": [107, 87, 85, 0, 2, 17, 68],
+          "Unterland": [1109, 891, 844, 5, 42, 152, 692],
+          "Liechtenstein": [3322, 2588, 2447, 10, 131, 529, 1918]
+        }
+      }
+    ],
+    "notes": ["Amtliche Kundmachung dated 13 June 1949 in the Liechtensteiner Volksblatt of 15 June 1949 on the Landtag decision of 29 December 1948 (law on a new Gewerbeordnung), declared rejected; 'Zahl der eingegangenen Stimmzettel' is recorded as ballots, dashes as 0."]
+  },
+  {
+    "first": "1950-03-12",
+    "last": "1950-03-12",
+    "text": "12. März 1950",
+    "questions": [{"de": "Waffengesetz", "en": "Weapons Act", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1950-03-14_19500314",
+        "page": "00000164",
+        "box": [1250, 150, 3300, 1300],
+        "kind": "notice",
+        "columns": ["reg", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [496, 345, 302, 0, 43, 128, 174],
+          "Triesen": [350, 275, 253, 6, 16, 46, 207],
+          "Balzers": [449, 367, 338, 1, 28, 86, 252],
+          "Triesenberg": [374, 323, 298, 3, 22, 35, 263],
+          "Schaan": [474, 392, 346, 3, 43, 149, 197],
+          "Planken": [23, 22, 20, 0, 2, 10, 10],
+          "Oberland": [2166, 1724, 1557, 13, 154, 454, 1103],
+          "Eschen": [319, 262, 240, 0, 22, 64, 176],
+          "Mauren": [338, 288, 259, 0, 29, 54, 205],
+          "Gamprin": [126, 100, 96, 3, 1, 18, 78],
+          "Ruggell": [209, 176, 164, 3, 9, 52, 112],
+          "Schellenberg": [107, 94, 90, 0, 4, 25, 65],
+          "Unterland": [1099, 920, 849, 6, 65, 213, 636],
+          "Liechtenstein": [3265, 2644, 2406, 19, 219, 667, 1739]
+        }
+      }
+    ],
+    "notes": ["Amtliche Kundmachung dated 13 March 1950 in the Liechtensteiner Volksblatt of 14 March 1950 on the Landtag decision of 22 December 1949 on a new Waffengesetz, declared rejected; 'Zahl der eingelegten Stimmzettel' is recorded as ballots, dashes as 0."]
+  },
+  {
+    "first": "1952-12-14",
+    "last": "1952-12-14",
+    "text": "14. Dezember 1952",
+    "questions": [{"de": "Alters- und Hinterbliebenenversicherung (AHV)", "en": "Old-age and survivors' insurance (AHV)", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1952-12-16_19521216",
+        "page": "00000973",
+        "box": [2150, 1650, 4515, 2950],
+        "kind": "report",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [526, 455, 429, 0, 26, 275, 154],
+          "Triesen": [366, 332, 314, 1, 17, 216, 98],
+          "Balzers": [454, 421, 408, 0, 13, 216, 192],
+          "Triesenberg": [387, 348, 345, 0, 3, 266, 79],
+          "Schaan": [490, 453, 434, 0, 19, 217, 217],
+          "Planken": [25, 22, 21, 0, 1, 13, 8],
+          "Oberland": [2248, 2031, 1951, 1, 79, 1203, 748],
+          "Eschen": [348, 316, 304, 2, 10, 140, 164],
+          "Mauren": [338, 309, 299, 1, 9, 95, 204],
+          "Gamprin": [122, 109, 108, 0, 1, 26, 82],
+          "Ruggell": [214, 191, 187, 1, 3, 75, 112],
+          "Schellenberg": [109, 95, 91, 1, 3, 35, 56],
+          "Unterland": [1131, 1020, 989, 5, 26, 371, 618],
+          "Liechtenstein": [3379, 3051, 2940, 6, 105, 1574, 1366]
+        }
+      }
+    ],
+    "notes": ["Liechtensteiner Volksblatt of 16 December 1952, an unsigned table 'Ergebnis der Volksabstimmung vom 14. Dezember 1952' on the law on old-age and survivors' insurance (Landtag decision of 13 November 1952); the Liechtensteiner Vaterland of 17 December 1952 prints the same table, and no signed government notice was found in either paper within 28 days. 'Zahl der abgegebenen Stimmen' is recorded as cards, dashes as 0."]
+  },
+  {
+    "first": "1954-10-03",
+    "last": "1954-10-03",
+    "text": "3. Oktober 1954",
+    "questions": [{"de": "Initiative zur Beschränkung der Fischereikarten und Gegenvorschlag des Landtags", "en": "Initiative to restrict fishing licenses and the Landtag's counter-proposal", "type": "initiative", "options": ["Initiative Ja", "Initiative Nein", "Landtagsvorschlag Ja"]}],
+    "tables": [
+      {
+        "issue": "000476564_1954-10-05_19541005",
+        "page": "00000755",
+        "box": [1990, 4360, 3800, 5080],
+        "kind": "report",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "opt.0", "opt.1", "opt.2"],
+        "rows": {
+          "Vaduz": [546, 332, 279, 4, 49, 169, 79, 31],
+          "Triesen": [372, 287, 238, 7, 42, 139, 66, 33],
+          "Balzers": [448, 375, 348, 3, 24, 141, 169, 38],
+          "Triesenberg": [398, 305, 252, 5, 48, 104, 105, 43],
+          "Schaan": [494, 379, 338, 4, 37, 244, 84, 10],
+          "Planken": [24, 21, 18, 0, 3, 15, 2, 1],
+          "Eschen": [346, 247, 216, 2, 29, 153, 45, 18],
+          "Mauren": [337, 261, 225, 6, 30, 179, 36, 10],
+          "Gamprin": [116, 95, 87, 2, 6, 54, 26, 7],
+          "Schellenberg": [103, 89, 84, 5, 0, 62, 16, 6],
+          "Ruggell": [222, 189, 178, 3, 8, 122, 41, 15],
+          "Liechtenstein": [3406, 2580, 2263, 41, 276, 1382, 669, 212]
+        }
+      }
+    ],
+    "notes": ["No official notice was found in the Liechtensteiner Volksblatt or the Liechtensteiner Vaterland within 28 days; this is the Volksblatt's own table of 5 October 1954 ('Ergebnis der Abstimmung nach Gemeinden'), which the Vaterland of 6 October 1954 also prints.", "Each valid ballot chose one of three answers: the initiative (column 'Initiative Ja', yes.0), no change (column 'Initiative Nein', no.0, which the article calls 'Belassung des bisherigen Zustandes'), or the Landtag's counter-proposal (column 'Landtagsvorschlag Ja', yes.1); the three add up to the valid ballots, so yes.0 + no.0 does not equal valid.", "The paper prints no Oberland or Unterland totals; the unlabeled national total row is recorded as Liechtenstein. 'Total abgegeb. Stimmen' is recorded as cards, 'gültige Stimmzettel' as valid, dashes as 0.", "Each ballot chose one of three answers: yes to the initiative, no to it, or yes to the Landtag's counter-proposal; the three add up to the valid ballots, so the archive keeps them as one question with three answers."]
+  },
+  {
+    "first": "1961-03-12",
+    "last": "1961-03-12",
+    "text": "12. März 1961",
+    "questions": [{"de": "Steuergesetz", "en": "Tax Act", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1961-03-14_19610314",
+        "page": "00000209",
+        "box": [290, 3990, 2200, 4890],
+        "kind": "report",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [567, 451, 427, 1, 23, 299, 128],
+          "Schaan": [542, 462, 446, 1, 15, 292, 154],
+          "Balzers": [476, 412, 395, 3, 14, 272, 123],
+          "Triesen": [411, 334, 309, 1, 24, 254, 55],
+          "Triesenberg": [401, 341, 327, 1, 13, 217, 110],
+          "Planken": [30, 28, 28, 0, 0, 25, 3],
+          "Oberland": [2427, 2028, 1932, 7, 89, 1359, 573],
+          "Mauren": [357, 316, 310, 1, 5, 181, 129],
+          "Eschen": [372, 308, 301, 0, 7, 181, 120],
+          "Schellenberg": [106, 95, 91, 0, 4, 59, 32],
+          "Ruggell": [209, 191, 187, 0, 4, 120, 67],
+          "Gamprin": [124, 109, 106, 0, 3, 52, 54],
+          "Unterland": [1168, 1019, 995, 1, 23, 593, 402]
+        }
+      },
+      {
+        "issue": "000476564_1961-03-14_19610314",
+        "page": "00000209",
+        "box": [2180, 2300, 3180, 2800],
+        "kind": "report",
+        "columns": ["reg", "cards", "invalid", "blank", "valid", "yes", "no"],
+        "rows": {
+          "Liechtenstein": [3595, 3047, 8, 112, 2927, 1952, 975]
+        }
+      }
+    ],
+    "notes": ["No official notice was found in the Liechtensteiner Volksblatt or the Liechtensteiner Vaterland within 28 days; this is the Volksblatt's own report of 14 March 1961, with a table by municipality ('Volksabstimmung 12. März 1961: Steuergesetz') and a separate national 'Totalergebnis' box on the same page.", "'Abgegebene Stimmen' is recorded as cards; dashes and Planken's empty invalid and blank cells are recorded as 0."]
+  },
+  {
+    "first": "1961-08-04",
+    "last": "1961-08-06",
+    "text": "4./6. August 1961",
+    "questions": [{"de": "Initiative zum Gesetz über die Landesvermessung (Güterzusammenlegungen)", "en": "Initiative on the Land Survey Act (land consolidation votes)", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1961-08-08_19610808",
+        "page": "00000680",
+        "box": [760, 1700, 1720, 2820],
+        "kind": "notice",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [572, 362, 333, 3, 26, 153, 180],
+          "Schaan": [550, 460, 437, 2, 21, 304, 133],
+          "Planken": [28, 26, 26, 0, 0, 6, 20],
+          "Triesen": [412, 272, 239, 1, 32, 137, 102],
+          "Triesenberg": [400, 260, 248, 0, 12, 148, 100],
+          "Balzers": [477, 389, 364, 0, 25, 230, 134],
+          "Mauren": [363, 258, 248, 1, 9, 180, 68],
+          "Eschen": [380, 294, 282, 0, 12, 177, 105],
+          "Gamprin": [119, 99, 96, 1, 2, 77, 19],
+          "Ruggell": [214, 188, 182, 1, 5, 99, 83],
+          "Schellenberg": [106, 92, 86, 2, 4, 37, 49],
+          "Liechtenstein": [3621, 2700, 2541, 11, 148, 1548, 993]
+        }
+      }
+    ],
+    "notes": ["Government 'Amtliche Bekanntmachung' in the Liechtensteiner Volksblatt of 8 August 1961, on the initiative amending Article 10 of the Land Survey Act of 1 February 1945; the vote was held on 4 and 6 August 1961.", "The same issue (page 00000675) also prints a news table with identical municipal figures plus Oberland and Unterland subtotals and a turnout of 74.2%."]
+  },
+  {
+    "first": "1961-12-07",
+    "last": "1961-12-08",
+    "text": "7./8. Dezember 1961",
+    "questions": [{"de": "Verfassungsinitiative zur Aufhebung des Jagdregals", "en": "Constitutional initiative to abolish the state hunting monopoly", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1961-12-12_19611212",
+        "page": "00001099",
+        "box": [2050, 4400, 3900, 5700],
+        "kind": "notice",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [579, 416, 402, 1, 13, 86, 316],
+          "Schaan": [547, 464, 437, 0, 27, 155, 282],
+          "Planken": [27, 25, 24, 0, 1, 11, 13],
+          "Triesen": [411, 324, 302, 0, 22, 182, 120],
+          "Triesenberg": [397, 322, 310, 1, 11, 260, 50],
+          "Balzers": [481, 387, 366, 0, 21, 142, 224],
+          "Mauren": [359, 292, 280, 0, 12, 188, 92],
+          "Eschen": [379, 314, 300, 0, 14, 212, 88],
+          "Gamprin": [122, 98, 94, 0, 4, 55, 39],
+          "Ruggell": [212, 184, 178, 0, 6, 77, 105],
+          "Schellenberg": [105, 85, 82, 0, 3, 52, 30],
+          "Liechtenstein": [3619, 2911, 2775, 2, 134, 1416, 1359]
+        }
+      }
+    ],
+    "misprints": [{"row": "Liechtenstein", "column": "yes", "note": "printed 1416, the municipalities add up to 1420: the notice prints Ruggell yes as 77 (checked twice in the image), but 178 valid - 105 no = 73, and the Volksblatt news table of 9 December 1961 (page 00001079) prints Ruggell 73 with an Unterland yes total of 580 that matches 73"}],
+    "notes": ["Government's 'Amtliche Bekanntmachung' in the Liechtensteiner Volksblatt of 12 December 1961, on the initiative amending Article 22 of the constitution (hunting rights); the vote was held on Thursday and Friday 7 and 8 December 1961."]
+  },
+  {
+    "first": "1962-02-23",
+    "last": "1962-02-25",
+    "text": "23./25. Februar 1962",
+    "questions": [{"de": "Zivilschutzgesetz", "en": "Civil Protection Act", "type": "referendum"}, {"de": "Jagdgesetz", "en": "Hunting Act", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1962-03-03_19620303",
+        "page": "00000215",
+        "box": [170, 2850, 2020, 3900],
+        "kind": "notice",
+        "columns": ["reg.0", "cards.0", "valid.0", "invalid.0", "blank.0", "yes.0", "no.0"],
+        "rows": {
+          "Vaduz": [578, 417, 389, 3, 25, 152, 237],
+          "Schaan": [552, 451, 425, 2, 24, 119, 306],
+          "Balzers": [481, 405, 368, 2, 35, 109, 259],
+          "Triesen": [412, 309, 284, 0, 25, 81, 203],
+          "Triesenberg": [400, 294, 268, 4, 22, 37, 231],
+          "Planken": [27, 25, 25, 0, 0, 14, 11],
+          "Mauren": [360, 283, 261, 0, 22, 50, 211],
+          "Eschen": [381, 303, 282, 5, 16, 43, 239],
+          "Gamprin": [122, 103, 99, 0, 4, 24, 75],
+          "Ruggell": [209, 186, 180, 1, 5, 31, 149],
+          "Schellenberg": [106, 95, 89, 0, 6, 27, 62],
+          "Liechtenstein": [3628, 2871, 2670, 17, 184, 687, 1983]
+        }
+      },
+      {
+        "issue": "000476564_1962-03-03_19620303",
+        "page": "00000215",
+        "box": [170, 4580, 2020, 5640],
+        "kind": "notice",
+        "columns": ["reg.1", "cards.1", "valid.1", "invalid.1", "blank.1", "yes.1", "no.1"],
+        "rows": {
+          "Vaduz": [578, 422, 388, 3, 31, 271, 117],
+          "Schaan": [552, 450, 417, 0, 33, 231, 186],
+          "Balzers": [481, 405, 366, 2, 37, 241, 125],
+          "Triesen": [412, 309, 276, 0, 33, 151, 125],
+          "Triesenberg": [400, 294, 266, 3, 25, 79, 187],
+          "Planken": [27, 25, 25, 0, 0, 16, 9],
+          "Mauren": [360, 282, 243, 0, 39, 104, 139],
+          "Eschen": [381, 300, 272, 0, 28, 129, 143],
+          "Gamprin": [122, 104, 96, 1, 7, 46, 50],
+          "Ruggell": [209, 186, 170, 2, 14, 116, 54],
+          "Schellenberg": [106, 95, 87, 0, 8, 40, 47],
+          "Liechtenstein": [3628, 2872, 2606, 11, 255, 1424, 1182]
+        }
+      }
+    ],
+    "notes": ["Two government 'Amtliche Bekanntmachung' notices dated 26 February 1962, printed in the Liechtensteiner Volksblatt of 3 March 1962, one per law (Zivilschutz, Jagdgesetz); the vote was held on 23 and 25 February 1962.", "Each notice counts its own votes cast, so the accounting columns are suffixed by question."]
+  },
+  {
+    "first": "1964-12-19",
+    "last": "1964-12-20",
+    "text": "19./20. Dezember 1964",
+    "questions": [{"de": "Gewerbeinitiative (Zwangsmitgliedschaft in der Gewerbegenossenschaft)", "en": "Trade initiative (compulsory membership of the trade guild)", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1964-12-24_19641224",
+        "page": "00001760",
+        "box": [160, 4640, 2080, 5640],
+        "kind": "notice",
+        "columns": ["reg", "cards", "blank", "invalid", "valid", "yes", "no"],
+        "rows": {
+          "Vaduz": [601, 459, 23, 5, 431, 114, 317],
+          "Planken": [31, 28, 0, 0, 28, 2, 26],
+          "Triesenberg": [416, 344, 8, 1, 335, 179, 156],
+          "Schaan": [588, 507, 31, 2, 474, 174, 300],
+          "Balzers": [501, 427, 23, 4, 400, 175, 225],
+          "Triesen": [435, 350, 12, 4, 334, 124, 210],
+          "Oberland": [2572, 2115, 97, 16, 2002, 768, 1234],
+          "Mauren": [391, 318, 15, 1, 302, 153, 149],
+          "Schellenberg": [108, 100, 1, 0, 99, 29, 70],
+          "Gamprin": [131, 110, 2, 0, 108, 23, 85],
+          "Ruggell": [203, 185, 2, 1, 182, 53, 129],
+          "Eschen": [404, 332, 12, 1, 319, 105, 214],
+          "Unterland": [1237, 1045, 32, 3, 1010, 363, 647],
+          "Liechtenstein": [3809, 3160, 129, 19, 3012, 1131, 1881]
+        }
+      }
+    ],
+    "notes": ["Government notice dated 22 December 1964 in the Liechtensteiner Volksblatt of 24 December 1964, on the initiative on the trade association levy (compulsory membership of the Gewerbegenossenschaft); the vote was held on 19 and 20 December 1964."]
+  },
+  {
+    "first": "1965-06-25",
+    "last": "1965-06-27",
+    "text": "25./27. Juni 1965",
+    "questions": [{"de": "Initiative zur Erhöhung der Kinder- und Familienzulagen", "en": "Initiative to raise child and family allowances", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1965-06-29_19650629",
+        "page": "00000877",
+        "box": [1990, 1480, 3900, 2480],
+        "kind": "notice",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [600, 419, 404, 0, 15, 243, 161],
+          "Planken": [29, 24, 23, 0, 1, 18, 5],
+          "Triesenberg": [416, 302, 289, 2, 11, 227, 62],
+          "Schaan": [595, 467, 449, 2, 16, 248, 201],
+          "Balzers": [504, 405, 381, 2, 22, 219, 162],
+          "Triesen": [437, 338, 322, 1, 15, 231, 91],
+          "Oberland": [2581, 1955, 1868, 7, 80, 1186, 682],
+          "Mauren": [389, 278, 269, 2, 7, 167, 102],
+          "Schellenberg": [108, 91, 87, 0, 4, 51, 36],
+          "Gamprin": [129, 118, 113, 1, 4, 67, 46],
+          "Ruggell": [206, 184, 176, 2, 6, 105, 71],
+          "Eschen": [411, 312, 298, 0, 14, 205, 93],
+          "Unterland": [1243, 983, 943, 5, 35, 595, 348],
+          "Liechtenstein": [3824, 2938, 2811, 12, 115, 1781, 1030]
+        }
+      }
+    ],
+    "notes": ["Government 'Amtliche Bekanntmachung' dated 28 June 1965 in the Liechtensteiner Volksblatt of 29 June 1965, on the initiative amending the family allowances act; the vote was held on 25 and 27 June 1965. The notice gives a turnout of 76.83%."]
+  },
+  {
+    "first": "1967-01-20",
+    "last": "1967-01-22",
+    "text": "20./22. Januar 1967",
+    "questions": [{"de": "Schutz des Alpengebiets und Berglandzonierung", "en": "Protection of the alpine area and mountain zoning", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1967-01-24_19670124",
+        "page": "00000135",
+        "box": [2150, 1640, 4100, 3120],
+        "kind": "report",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [605, 509, 493, 1, 15, 251, 242],
+          "Planken": [32, 30, 30, 0, 0, 22, 8],
+          "Triesenberg": [441, 396, 390, 1, 5, 74, 316],
+          "Schaan": [607, 551, 532, 2, 17, 243, 289],
+          "Balzers": [532, 488, 474, 1, 13, 174, 300],
+          "Triesen": [450, 408, 396, 4, 8, 115, 281],
+          "Oberland": [2667, 2382, 2315, 9, 58, 879, 1436],
+          "Mauren": [393, 335, 326, 3, 6, 123, 203],
+          "Schellenberg": [107, 98, 96, 1, 1, 42, 54],
+          "Gamprin": [139, 130, 129, 0, 1, 57, 72],
+          "Ruggell": [209, 201, 200, 0, 1, 96, 104],
+          "Eschen": [407, 357, 352, 1, 4, 135, 217],
+          "Unterland": [1255, 1121, 1103, 5, 13, 453, 650],
+          "Liechtenstein": [3922, 3503, 3418, 14, 71, 1332, 2086]
+        }
+      }
+    ],
+    "notes": ["Table on page 1 of the Liechtensteiner Volksblatt of 24 January 1967, with the article on the vote (held on Friday 20 and Sunday 22 January 1967) on the law protecting the alpine area; no separate government notice was found in the Volksblatt within 25 days. The paper gives a turnout of 89.34%."]
+  },
+  {
+    "first": "1968-07-04",
+    "last": "1968-07-04",
+    "text": "4. Juli 1968",
+    "questions": [{"de": "Konsultativabstimmung über das Frauenstimmrecht", "en": "Consultative vote on women's suffrage", "type": "plebiscite"}],
+    "tables": [
+      {
+        "issue": "000476564_1968-07-06_19680706",
+        "page": "00001079",
+        "box": [3600, 1580, 4040, 2780],
+        "kind": "report",
+        "columns": ["yes", "no"],
+        "rows": {
+          "Vaduz": [470, 261],
+          "Balzers": [227, 489],
+          "Triesen": [236, 278],
+          "Triesenberg": [225, 153],
+          "Schaan": [399, 409],
+          "Planken": [22, 20],
+          "Eschen": [169, 350],
+          "Mauren": [174, 183],
+          "Gamprin": [55, 134],
+          "Ruggell": [126, 218],
+          "Schellenberg": [49, 87],
+          "Liechtenstein": [2152, 2582]
+        }
+      }
+    ],
+    "notes": ["Consultative vote (Meinungsumfrage) on women's suffrage held on Thursday 4 July 1968 in all municipalities, in which men and women voted separately; the only table by municipality found is the Liechtensteiner Volksblatt's 'Inoffiz. Result.' table of 6 July 1968 (page 1), which prints the votes cast, yes and no of men and of women and the yes and no of all voters by municipality. The Volksblatt printed no official notice within 25 days, and the Vaterland pages could not be fetched (HTTP 403).", "The table lists Eschen/Nendeln, Mauren/Schaanwald and Gamprin/Bendern; these are the municipalities Eschen, Mauren and Gamprin.", "The archive keeps the yes and no of all voters; the table's national figures for men are 3,992 registered, 2,247 votes cast, 887 yes and 1,341 no, and for women 4,103 registered, 2,516 votes cast, 1,265 yes and 1,241 no. Women did not yet have the vote, so the result only advised the Landtag."]
+  },
+  {
+    "first": "1968-10-04",
+    "last": "1968-10-06",
+    "text": "4./6. Oktober 1968",
+    "questions": [{"de": "Initiative zur Abschaffung der Alkoholgetränkesteuer", "en": "Initiative to abolish the alcoholic beverages tax", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1968-10-08_19681008",
+        "page": "00001619",
+        "box": [1040, 1690, 3100, 3620],
+        "kind": "report",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [638, 392, 380, 6, 6, 198, 182],
+          "Balzers": [552, 436, 418, 0, 18, 177, 241],
+          "Planken": [30, 20, 20, 0, 0, 10, 10],
+          "Schaan": [634, 459, 450, 2, 7, 228, 222],
+          "Triesen": [464, 314, 303, 1, 10, 147, 156],
+          "Triesenberg": [431, 280, 269, 0, 11, 85, 184],
+          "Oberland": [2749, 1901, 1840, 9, 52, 845, 995],
+          "Eschen": [421, 302, 298, 1, 3, 109, 189],
+          "Gamprin": [145, 115, 114, 1, 0, 38, 76],
+          "Mauren": [390, 244, 239, 0, 5, 82, 157],
+          "Ruggell": [222, 200, 196, 0, 4, 113, 83],
+          "Schellenberg": [109, 95, 92, 0, 3, 27, 65],
+          "Unterland": [1287, 956, 939, 2, 15, 369, 570],
+          "Liechtenstein": [4036, 2857, 2779, 11, 67, 1214, 1565]
+        }
+      }
+    ],
+    "notes": ["Table on page 1 of the Liechtensteiner Volksblatt of 8 October 1968 ('Die Alkoholsteuer-Initiative verworfen!'), on the vote of 4 and 6 October 1968; no government notice by municipality was found in the Volksblatt within 25 days."]
+  },
+  {
+    "first": "1970-03-01",
+    "last": "1970-03-01",
+    "text": "27. Februar / 1. März 1970",
+    "questions": [{"de": "Initiative zur Erhöhung des Finanzausgleichs", "en": "Initiative to raise revenue sharing with the municipalities", "type": "initiative"}, {"de": "Gegenvorschlag des Landtags", "en": "Counter-proposal of the Landtag", "type": "counter_proposal"}],
+    "tables": [
+      {
+        "issue": "000476564_1970-03-07_19700307",
+        "page": "00000392",
+        "box": [300, 240, 2200, 1900],
+        "kind": "notice",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes.0", "no.0", "blank.0", "yes.1", "no.1", "blank.1"],
+        "rows": {
+          "Vaduz": [681, 507, 483, 5, 19, 223, 246, 14, 210, 244, 29],
+          "Triesen": [496, 384, 366, 5, 13, 273, 87, 6, 89, 252, 25],
+          "Balzers": [608, 507, 497, 1, 9, 350, 135, 12, 133, 296, 68],
+          "Triesenberg": [444, 326, 314, 6, 6, 273, 38, 3, 35, 244, 35],
+          "Schaan": [683, 573, 547, 6, 20, 330, 207, 10, 181, 311, 55],
+          "Planken": [37, 30, 30, 0, 0, 24, 6, 0, 4, 24, 2],
+          "Oberland": [2949, 2327, 2237, 23, 67, 1473, 719, 45, 652, 1371, 214],
+          "Mauren": [410, 295, 288, 1, 6, 196, 85, 7, 80, 166, 42],
+          "Eschen": [447, 349, 340, 2, 7, 214, 116, 10, 115, 171, 54],
+          "Gamprin": [148, 130, 123, 3, 4, 78, 43, 2, 45, 62, 16],
+          "Ruggell": [239, 209, 204, 0, 5, 146, 54, 4, 54, 129, 21],
+          "Schellenberg": [119, 108, 104, 1, 3, 74, 28, 2, 28, 57, 19],
+          "Unterland": [1363, 1091, 1059, 7, 25, 708, 326, 25, 322, 585, 152],
+          "Liechtenstein": [4312, 3418, 3296, 30, 92, 2181, 1045, 70, 974, 1956, 366]
+        }
+      }
+    ],
+    "notes": ["Official notice of the government ('Amtliche Bekanntmachung') in the Liechtensteiner Volksblatt of 7 March 1970.", "The notice prints total votes cast, valid votes, invalid votes, ballots blank on both questions ('leer in beiden Rubriken'), and for each question yes, no and blank on that question only ('leer in der betr. Rubrik'); valid = yes + no + blank on that question.", "Turnout printed as 79.27 percent."]
+  },
+  {
+    "first": "1971-02-26",
+    "last": "1971-02-28",
+    "text": "26./28. Februar 1971",
+    "questions": [{"de": "Einführung des Frauenstimmrechts", "en": "Women's suffrage", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1971-03-09_19710309",
+        "page": "00000387",
+        "box": [2570, 1170, 4100, 2950],
+        "kind": "notice",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [682, 576, 567, 0, 9, 360, 207],
+          "Balzers": [626, 535, 533, 0, 2, 219, 314],
+          "Planken": [37, 32, 32, 0, 0, 18, 14],
+          "Schaan": [697, 624, 614, 3, 7, 328, 286],
+          "Triesen": [492, 423, 421, 0, 2, 182, 239],
+          "Triesenberg": [449, 367, 362, 0, 5, 142, 220],
+          "Oberland": [2985, 2557, 2529, 3, 25, 1249, 1280],
+          "Eschen": [455, 382, 372, 2, 8, 158, 214],
+          "Gamprin": [154, 141, 141, 0, 0, 68, 73],
+          "Mauren": [426, 369, 361, 0, 8, 163, 198],
+          "Ruggell": [243, 210, 210, 0, 3, 116, 91],
+          "Schellenberg": [122, 106, 103, 0, 3, 62, 41],
+          "Unterland": [1400, 1208, 1187, 2, 22, 567, 617],
+          "Liechtenstein": [4385, 3765, 3716, 5, 47, 1816, 1897]
+        }
+      }
+    ],
+    "misprints": [{"row": "Oberland", "column": "reg", "note": "printed 2985, the Oberland municipalities add up to 2983; read twice from the image (682, 626, 37, 697, 492, 449); one municipality figure is probably 2 short"}, {"row": "Liechtenstein", "column": "reg", "note": "printed 4385 = 2985 + 1400 as printed; the municipalities add up to 4383"}],
+    "notes": ["Official notice of the government ('Amtliche Bekanntmachung') in the Liechtensteiner Volksblatt of 9 March 1971; men only voted.", "Ruggell is printed with 210 valid votes although its yes and no add up to 207 and 210 cards less 3 blank is 207; the Unterland total of valid votes (1187) is the sum with 210 as printed.", "Turnout printed as 85.86 percent, yes 48.91 percent, no 51.09 percent."]
+  },
+  {
+    "first": "1972-06-30",
+    "last": "1972-07-02",
+    "text": "30. Juni / 2. Juli 1972",
+    "questions": [{"de": "Verfassungsgesetz über die Abänderung von Artikel 46 der Verfassung (Erhöhung der Zahl der Abgeordneten auf 21 und Sperrklausel von 8 %)", "en": "21 seats and an 8% threshold", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1972-07-11_19720711",
+        "page": "00001200",
+        "box": [380, 1300, 1900, 3170],
+        "kind": "report",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [702, 456, 437, 3, 16, 263, 174],
+          "Balzers": [633, 461, 429, 0, 32, 202, 227],
+          "Planken": [40, 33, 31, 0, 2, 15, 16],
+          "Schaan": [703, 496, 476, 1, 19, 217, 259],
+          "Triesen": [491, 346, 328, 0, 18, 186, 142],
+          "Triesenberg": [456, 224, 203, 0, 21, 101, 102],
+          "Oberland": [3025, 2016, 1904, 4, 108, 984, 920],
+          "Eschen": [462, 272, 261, 0, 11, 104, 157],
+          "Gamprin": [152, 109, 108, 0, 1, 53, 55],
+          "Mauren": [446, 292, 281, 1, 10, 100, 181],
+          "Ruggell": [246, 188, 182, 0, 6, 89, 93],
+          "Schellenberg": [121, 92, 88, 0, 4, 45, 43],
+          "Unterland": [1427, 953, 920, 1, 32, 391, 529],
+          "Liechtenstein": [4452, 2969, 2824, 5, 140, 1375, 1449]
+        }
+      }
+    ],
+    "notes": ["Result in the format of the government's notices, headed 'Abstimmungsergebnis betreffend das Verfassungsgesetz über die Abänderung von Artikel 46 der Verfassung', printed unsigned among the advertisements of the Liechtensteiner Volksblatt of 11 July 1972; no other paper had a table in the archive search.", "The last digit of Schaan's votes cast is badly printed; it reads as 496, which matches 476 valid + 1 invalid + 19 blank and the Oberland total of 2016.", "Turnout printed as 66.69 percent."]
+  },
+  {
+    "first": "1973-02-09",
+    "last": "1973-02-11",
+    "text": "9./11. Februar 1973",
+    "questions": [{"de": "Einführung des Frauenstimmrechts", "en": "Women's suffrage", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1973-02-17_19730217",
+        "page": "00000352",
+        "box": [2580, 930, 4164, 2750],
+        "kind": "notice",
+        "columns": ["reg", "cards", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [696, 582, 572, 0, 10, 331, 241],
+          "Schaan": [710, 632, 623, 1, 8, 290, 333],
+          "Planken": [41, 32, 31, 1, 0, 15, 16],
+          "Triesen": [497, 432, 425, 1, 6, 175, 250],
+          "Triesenberg": [461, 380, 377, 0, 3, 142, 235],
+          "Balzers": [642, 563, 554, 1, 8, 220, 334],
+          "Oberland": [3047, 2621, 2582, 4, 35, 1173, 1409],
+          "Eschen": [472, 384, 379, 0, 5, 137, 242],
+          "Mauren": [441, 382, 376, 2, 4, 120, 256],
+          "Gamprin": [151, 139, 137, 1, 1, 81, 56],
+          "Ruggell": [251, 219, 217, 1, 1, 111, 106],
+          "Schellenberg": [121, 111, 110, 0, 1, 53, 57],
+          "Unterland": [1436, 1235, 1219, 4, 12, 502, 717],
+          "Liechtenstein": [4483, 3856, 3801, 8, 47, 1675, 2126]
+        }
+      }
+    ],
+    "notes": ["Government notice ('Bekanntmachung', signed Fürstliche Regierung, gez. Dr. Alfred Hilbe) in the Liechtensteiner Volksblatt of 17 February 1973; men only voted.", "Turnout printed as 86.01 percent."]
+  },
+  {
+    "first": "1973-10-12",
+    "last": "1973-10-14",
+    "text": "12./14. Oktober 1973",
+    "questions": [{"de": "Gesetz betreffend die Ausübung der politischen Volksrechte in Landesangelegenheiten (Volksrechtegesetz, Kandidatenproporz)", "en": "Popular Rights Act (candidate proportional representation)", "type": "referendum"}, {"de": "Verfassungsgesetz betreffend die Abänderung der Verfassung (Artikel 46, Sperrklausel von 8 %)", "en": "8% threshold", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1973-10-20_19731020",
+        "page": "00002071",
+        "box": [320, 1380, 1900, 2900],
+        "kind": "notice",
+        "columns": ["reg.0", "cards.0", "valid.0", "invalid.0", "blank.0", "yes.0", "no.0"],
+        "rows": {
+          "Vaduz": [704, 472, 431, 20, 21, 230, 201],
+          "Balzers": [642, 485, 440, 17, 28, 247, 193],
+          "Planken": [47, 36, 31, 1, 4, 12, 19],
+          "Schaan": [718, 539, 490, 18, 31, 282, 208],
+          "Triesen": [506, 364, 322, 22, 20, 186, 136],
+          "Triesenberg": [461, 310, 290, 8, 12, 203, 87],
+          "Oberland": [3077, 2206, 2004, 86, 116, 1160, 844],
+          "Eschen": [471, 341, 313, 16, 12, 167, 146],
+          "Gamprin": [156, 140, 136, 3, 1, 60, 76],
+          "Mauren": [445, 317, 300, 9, 8, 139, 161],
+          "Ruggell": [253, 222, 206, 6, 10, 128, 78],
+          "Schellenberg": [126, 104, 95, 5, 4, 51, 44],
+          "Unterland": [1451, 1124, 1050, 39, 35, 545, 505],
+          "Liechtenstein": [4528, 3330, 3054, 125, 151, 1705, 1349]
+        }
+      },
+      {
+        "issue": "000476564_1973-10-20_19731020",
+        "page": "00002071",
+        "box": [320, 3050, 1900, 4600],
+        "kind": "notice",
+        "columns": ["reg.1", "cards.1", "valid.1", "invalid.1", "blank.1", "yes.1", "no.1"],
+        "rows": {
+          "Vaduz": [704, 482, 441, 23, 18, 301, 140],
+          "Balzers": [641, 478, 442, 15, 21, 298, 144],
+          "Planken": [47, 36, 30, 0, 6, 24, 6],
+          "Schaan": [718, 542, 493, 23, 26, 339, 154],
+          "Triesen": [506, 364, 325, 23, 16, 226, 99],
+          "Triesenberg": [461, 309, 291, 8, 10, 211, 80],
+          "Oberland": [3077, 2211, 2022, 92, 97, 1399, 623],
+          "Eschen": [471, 342, 316, 11, 15, 206, 110],
+          "Gamprin": [156, 140, 137, 2, 1, 73, 64],
+          "Mauren": [445, 318, 299, 10, 9, 181, 118],
+          "Ruggell": [253, 222, 206, 8, 8, 160, 46],
+          "Schellenberg": [126, 104, 93, 3, 8, 67, 26],
+          "Unterland": [1451, 1126, 1051, 34, 41, 687, 364],
+          "Liechtenstein": [4528, 3337, 3073, 126, 138, 2086, 987]
+        }
+      }
+    ],
+    "misprints": [{"row": "Oberland", "column": "reg.0", "note": "printed 3077, the municipalities add up to 3078 because Balzers is printed 642 in this notice (read twice from the image) but 641 in the Article 46 notice"}, {"row": "Liechtenstein", "column": "reg.0", "note": "printed 4528 = 3077 + 1451 as printed; the municipalities add up to 4529 with Balzers 642"}],
+    "notes": ["Two separate government notices ('Amtliche Bekanntmachung') on the same page of the Liechtensteiner Volksblatt of 20 October 1973, one for the Popular Rights Act and one for the constitutional amendment of Article 46; each prints its own votes cast, so all columns are per question.", "Turnout printed as 73.54 percent (Popular Rights Act; yes 55.82, no 44.17 percent) and 73.69 percent (Article 46; yes 67.88, no 32.11 percent)."]
+  },
+  {
+    "first": "1975-02-28",
+    "last": "1975-03-02",
+    "text": "28. Februar / 2. März 1975",
+    "questions": [{"de": "Gesetzesbeschluss betreffend die Abänderung des Steuergesetzes (Abänderung der Ertragssteuer für juristische Personen, der Couponsteuer und der Fahrzeugsteuer)", "en": "Higher capital, profit, coupon and vehicle taxes", "type": "referendum"}, {"de": "Gesetzesbeschluss betreffend das Gesetz über die vorläufige Reduktion der mittels Finanzausgleich an die Gemeinden ausgeschütteten Steuermittel (Finanzausgleich)", "en": "Temporary cut in revenue sharing with the municipalities", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1975-03-06_19750306",
+        "page": "00000444",
+        "box": [2680, 300, 4375, 2380],
+        "kind": "notice",
+        "columns": ["reg.0", "cards.0", "ballots.0", "valid.0", "invalid.0", "blank.0", "yes.0", "no.0"],
+        "rows": {
+          "Vaduz": [719, 539, 535, 524, 0, 11, 247, 277],
+          "Balzers": [649, 539, 538, 519, 7, 12, 181, 338],
+          "Planken": [48, 39, 38, 38, 0, 0, 23, 15],
+          "Schaan": [725, 594, 594, 582, 5, 7, 238, 344],
+          "Triesen": [524, 425, 425, 405, 4, 16, 138, 267],
+          "Triesenberg": [478, 380, 376, 357, 15, 4, 96, 261],
+          "Oberland": [3143, 2515, 2506, 2425, 31, 50, 923, 1502],
+          "Eschen": [512, 383, 383, 371, 1, 11, 148, 223],
+          "Gamprin": [162, 140, 140, 138, 1, 1, 54, 84],
+          "Mauren": [445, 369, 369, 352, 2, 15, 147, 205],
+          "Ruggell": [256, 228, 228, 224, 1, 3, 103, 121],
+          "Schellenberg": [132, 119, 119, 116, 1, 2, 49, 67],
+          "Unterland": [1507, 1239, 1239, 1201, 6, 32, 501, 700],
+          "Liechtenstein": [4650, 3755, 3745, 3626, 37, 82, 1424, 2202]
+        }
+      },
+      {
+        "issue": "000476564_1975-03-06_19750306",
+        "page": "00000444",
+        "box": [2680, 2400, 4375, 3900],
+        "kind": "notice",
+        "columns": ["reg.1", "cards.1", "ballots.1", "valid.1", "invalid.1", "blank.1", "yes.1", "no.1"],
+        "rows": {
+          "Vaduz": [719, 539, 539, 526, 0, 13, 306, 220],
+          "Balzers": [649, 539, 539, 518, 7, 14, 202, 316],
+          "Planken": [48, 39, 38, 37, 0, 1, 23, 14],
+          "Schaan": [725, 594, 594, 580, 4, 10, 265, 315],
+          "Triesen": [524, 425, 425, 408, 1, 16, 149, 259],
+          "Triesenberg": [478, 380, 380, 366, 8, 6, 94, 272],
+          "Oberland": [3143, 2516, 2515, 2435, 20, 60, 1039, 1396],
+          "Eschen": [512, 383, 383, 368, 2, 13, 168, 200],
+          "Gamprin": [162, 140, 140, 136, 1, 3, 60, 76],
+          "Mauren": [445, 369, 369, 350, 2, 17, 161, 189],
+          "Ruggell": [256, 228, 228, 222, 1, 5, 92, 130],
+          "Schellenberg": [132, 119, 119, 114, 2, 3, 45, 69],
+          "Unterland": [1507, 1239, 1239, 1190, 8, 41, 526, 664],
+          "Liechtenstein": [4650, 3755, 3754, 3625, 28, 101, 1565, 2060]
+        }
+      }
+    ],
+    "misprints": [{"row": "Oberland", "column": "cards.0", "note": "printed 2515 in the tax-law table, the municipalities add up to 2516 (as printed in the revenue-sharing table and implied by the national 3755); read twice from the image"}],
+    "notes": ["One government notice ('Amtliche Bekanntmachung') in the Liechtensteiner Volksblatt of 6 March 1975 with a separate table for each law: first the tax law amendment, then the cut in revenue sharing (Finanzausgleich).", "Columns: registered voters, voting cards cast (abgegebene Stimmkarten), ballots put in (eingelegte Stimmzettel), valid, invalid, blank, yes, no.", "Turnout printed as 80.75 percent for both; the revenue-sharing table prints yes 43.2 and no 56.8 percent."]
+  },
+  {
+    "first": "1975-11-28",
+    "last": "1975-11-30",
+    "text": "28./30. November 1975",
+    "questions": [{"de": "Verfassungsinitiative betreffend die Ergänzung von Art. 46 der Verfassung (Mehrheitsklausel)", "en": "Constitutional initiative for a majority clause", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1975-12-04_19751204",
+        "page": "00002354",
+        "box": [2540, 1650, 4219, 4100],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [728, 595, 595, 577, 2, 16, 315, 262],
+          "Balzers": [670, 585, 585, 565, 1, 19, 252, 313],
+          "Planken": [50, 46, 46, 44, 0, 2, 34, 10],
+          "Schaan": [743, 648, 647, 615, 10, 22, 307, 308],
+          "Triesen": [514, 454, 454, 440, 2, 12, 188, 252],
+          "Triesenberg": [485, 420, 420, 411, 3, 6, 172, 239],
+          "Oberland": [3190, 2748, 2747, 2652, 18, 77, 1268, 1384],
+          "Mauren": [452, 378, 375, 368, 1, 6, 214, 154],
+          "Eschen": [520, 441, 441, 432, 1, 8, 215, 217],
+          "Schellenberg": [139, 124, 124, 122, 0, 2, 67, 55],
+          "Gamprin": [163, 148, 147, 144, 1, 2, 86, 58],
+          "Ruggell": [253, 239, 239, 234, 1, 4, 115, 119],
+          "Unterland": [1527, 1330, 1326, 1300, 4, 22, 697, 603],
+          "Liechtenstein": [4717, 4078, 4073, 3952, 22, 99, 1965, 1987]
+        }
+      }
+    ],
+    "notes": ["Government notice ('Amtliche Kundmachung' under Art. 77 para. 4 of the Popular Rights Act) in the Liechtensteiner Volksblatt of 4 December 1975; it declares the initiative rejected.", "Columns: registered voters, voting cards cast, ballots put in, valid, invalid, blank, yes, no."]
+  },
+  {
+    "first": "1976-09-17",
+    "last": "1976-09-19",
+    "text": "17./19. September 1976",
+    "questions": [{"de": "Finanzbeschluss betreffend die Bewilligung eines Verpflichtungskredites zum Bau der Ortsumfahrungsstrasse Schaan–Vaduz", "en": "Credit for the Schaan–Vaduz bypass", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1976-09-25_19760925",
+        "page": "00001877",
+        "box": [120, 250, 4000, 2300],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [731, 593, 593, 583, 1, 9, 218, 365],
+          "Balzers": [673, 544, 544, 532, 1, 11, 85, 447],
+          "Planken": [50, 49, 47, 46, 1, 0, 7, 39],
+          "Schaan": [758, 631, 631, 617, 2, 12, 152, 465],
+          "Triesen": [531, 423, 423, 410, 2, 11, 68, 342],
+          "Triesenberg": [489, 341, 341, 332, 2, 7, 46, 286],
+          "Oberland": [3232, 2581, 2579, 2520, 9, 50, 576, 1944],
+          "Mauren": [454, 356, 356, 351, 0, 5, 38, 313],
+          "Eschen": [525, 439, 439, 429, 1, 9, 57, 372],
+          "Schellenberg": [136, 116, 116, 114, 0, 2, 20, 94],
+          "Gamprin": [164, 145, 145, 140, 1, 4, 28, 112],
+          "Ruggell": [251, 224, 224, 219, 0, 5, 27, 192],
+          "Unterland": [1530, 1280, 1280, 1253, 2, 25, 170, 1083],
+          "Liechtenstein": [4762, 3861, 3859, 3773, 11, 75, 746, 3027]
+        }
+      }
+    ],
+    "notes": ["Government notice ('Amtliche Kundmachung' under Art. 77 para. 4 of the Popular Rights Act) in the Liechtensteiner Volksblatt of 25 September 1976; it declares the credit rejected.", "Columns: registered voters, voting cards cast, ballots put in, valid, invalid, blank, yes, no; the national row is printed as 'Gesamttotal'."]
+  },
+  {
+    "first": "1977-09-30",
+    "last": "1977-10-02",
+    "text": "30. September/2. Oktober 1977",
+    "questions": [{"de": "Verpflichtungskredit geschützte Operationsstelle (GOPS)", "en": "Credit for a protected operating theater (GOPS)", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1977-10-08_19771008",
+        "page": "00002326",
+        "box": [390, 3200, 2290, 5260],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [762, 564, 564, 554, 2, 8, 470, 84],
+          "Balzers": [675, 503, 503, 479, 0, 24, 256, 223],
+          "Planken": [50, 37, 36, 36, 0, 0, 17, 19],
+          "Schaan": [759, 608, 608, 588, 1, 19, 190, 398],
+          "Triesen": [544, 394, 394, 378, 0, 16, 240, 138],
+          "Triesenberg": [482, 319, 318, 308, 0, 10, 146, 162],
+          "Oberland": [3272, 2425, 2423, 2343, 3, 77, 1319, 1024],
+          "Mauren": [467, 307, 306, 297, 2, 7, 159, 138],
+          "Eschen": [533, 369, 369, 356, 5, 8, 160, 196],
+          "Schellenberg": [142, 117, 117, 111, 0, 6, 62, 49],
+          "Gamprin": [169, 137, 137, 132, 0, 5, 75, 57],
+          "Ruggell": [250, 201, 201, 192, 0, 9, 92, 100],
+          "Unterland": [1561, 1131, 1130, 1088, 7, 35, 548, 540],
+          "Liechtenstein": [4833, 3556, 3553, 3431, 10, 112, 1867, 1564]
+        }
+      }
+    ],
+    "notes": ["Official notice (Amtliche Kundmachung) of the government dated 6 October 1977 on the vote of 30 September/2 October 1977 on the Finanzbeschluss for the Sanitäts-Zivilschutzanlage at Vaduz hospital, printed in the Liechtensteiner Volksblatt of 8 October 1977; dashes are recorded as 0, and the notice abbreviates Triesenberg as T'berg."]
+  },
+  {
+    "first": "1980-09-05",
+    "last": "1980-09-07",
+    "text": "5./7. September 1980",
+    "questions": [{"de": "Verpflichtungskredit Kunsthaus", "en": "Credit for an art museum", "type": "optional_referendum"}, {"de": "Verpflichtungskredit Konferenztrakt", "en": "Credit for a conference wing", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1980-09-12_19800912",
+        "page": "00002166",
+        "box": [570, 980, 3200, 2160],
+        "kind": "notice",
+        "columns": ["reg.0", "cards.0", "ballots.0", "valid.0", "invalid.0", "blank.0", "yes.0", "no.0"],
+        "rows": {
+          "Vaduz": [784, 610, 609, 599, 1, 10, 371, 228],
+          "Balzers": [692, 543, 543, 531, 4, 8, 239, 292],
+          "Planken": [50, 39, 39, 37, 0, 2, 20, 17],
+          "Schaan": [787, 629, 625, 599, 4, 22, 249, 350],
+          "Triesen": [574, 391, 388, 379, 0, 12, 173, 206],
+          "Triesenberg": [508, 380, 378, 353, 9, 15, 144, 209],
+          "Oberland": [3395, 2592, 2582, 2498, 18, 69, 1196, 1302],
+          "Eschen": [574, 397, 397, 388, 0, 9, 217, 171],
+          "Gamprin": [168, 137, 137, 131, 0, 6, 90, 41],
+          "Mauren": [500, 363, 363, 355, 3, 5, 181, 174],
+          "Ruggell": [276, 226, 226, 215, 1, 10, 121, 94],
+          "Schellenberg": [154, 119, 119, 115, 0, 4, 59, 56],
+          "Unterland": [1672, 1242, 1242, 1204, 4, 34, 668, 536],
+          "Liechtenstein": [5067, 3834, 3824, 3702, 22, 103, 1864, 1838]
+        }
+      },
+      {
+        "issue": "000476564_1980-09-12_19800912",
+        "page": "00002166",
+        "box": [570, 3160, 3200, 4340],
+        "kind": "notice",
+        "columns": ["reg.1", "cards.1", "ballots.1", "valid.1", "invalid.1", "blank.1", "yes.1", "no.1"],
+        "rows": {
+          "Vaduz": [784, 610, 608, 591, 0, 12, 340, 251],
+          "Balzers": [692, 543, 543, 531, 4, 8, 233, 298],
+          "Planken": [50, 39, 39, 38, 0, 1, 20, 18],
+          "Schaan": [787, 629, 628, 602, 2, 24, 220, 382],
+          "Triesen": [574, 391, 388, 376, 1, 14, 165, 211],
+          "Triesenberg": [508, 380, 378, 351, 9, 18, 139, 212],
+          "Oberland": [3395, 2592, 2584, 2489, 16, 77, 1117, 1372],
+          "Eschen": [574, 397, 397, 384, 0, 13, 201, 183],
+          "Gamprin": [168, 137, 137, 129, 0, 8, 76, 53],
+          "Mauren": [500, 363, 363, 358, 1, 4, 179, 179],
+          "Ruggell": [276, 226, 226, 216, 1, 9, 111, 105],
+          "Schellenberg": [154, 119, 116, 113, 0, 3, 53, 60],
+          "Unterland": [1672, 1242, 1239, 1200, 2, 37, 620, 580],
+          "Liechtenstein": [5067, 3834, 3823, 3689, 18, 114, 1737, 1952]
+        }
+      }
+    ],
+    "notes": ["Two official notices (Amtliche Kundmachung) of the government dated 9 September 1980, one per Finanzbeschluss (the national contribution to the Kunsthaus-Stiftung, and the national conference wing), printed one above the other in the Liechtensteiner Volksblatt of 12 September 1980; each prints its own accounting columns, so every column is suffixed with its question; dashes are recorded as 0.", "In several rows the printed valid, invalid and blank votes do not add up to the ballots put in (e.g. Vaduz, Triesen, Triesenberg on the Kunsthaus; Vaduz and Triesen on the conference wing); the figures were re-read from the image and are kept as printed."]
+  },
+  {
+    "first": "1981-05-08",
+    "last": "1981-05-10",
+    "text": "8./10. Mai 1981",
+    "questions": [{"de": "Verfassungsinitiative Mehrheitsklausel", "en": "Constitutional initiative for a majority clause", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1981-05-14_19810514",
+        "page": "00001172",
+        "box": [520, 4280, 2120, 5420],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [807, 716, 716, 701, 1, 14, 361, 340],
+          "Balzers": [693, 635, 635, 628, 0, 7, 251, 377],
+          "Planken": [53, 49, 49, 48, 0, 1, 37, 11],
+          "Schaan": [789, 708, 708, 680, 2, 26, 329, 351],
+          "Triesen": [587, 499, 498, 487, 1, 11, 208, 279],
+          "Triesenberg": [509, 442, 441, 438, 1, 3, 151, 287],
+          "Oberland": [3438, 3049, 3047, 2982, 5, 62, 1337, 1645],
+          "Eschen": [588, 536, 536, 528, 1, 7, 231, 297],
+          "Gamprin": [177, 164, 164, 159, 0, 5, 97, 62],
+          "Mauren": [514, 460, 459, 441, 1, 17, 244, 197],
+          "Ruggell": [281, 263, 263, 260, 0, 3, 128, 132],
+          "Schellenberg": [153, 146, 146, 144, 0, 2, 90, 54],
+          "Unterland": [1713, 1569, 1568, 1532, 2, 34, 790, 742],
+          "Liechtenstein": [5151, 4618, 4615, 4514, 7, 96, 2127, 2387]
+        }
+      }
+    ],
+    "notes": ["Official notice (Amtliche Kundmachung) of the government dated 14 May 1981 on the vote of 8/10 May 1981 on the constitutional initiative supplementing Article 46 of the Constitution, printed in the Liechtensteiner Volksblatt of 14 May 1981; the notice declares the proposal rejected; dashes are recorded as 0.", "In Triesen, Triesenberg, the Oberland and the national total the printed valid, invalid and blank votes add up to the cards cast rather than the ballots put in; the figures were re-read from the image and are kept as printed."]
+  },
+  {
+    "first": "1984-06-29",
+    "last": "1984-07-01",
+    "text": "29. Juni/1. Juli 1984",
+    "questions": [{"de": "Einführung des Frauenstimmrechts", "en": "Women's suffrage", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1984-07-06_19840706",
+        "page": "00001685",
+        "box": [2470, 1180, 4080, 2310],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [841, 684, 684, 673, 3, 8, 402, 271],
+          "Balzers": [726, 634, 634, 624, 1, 9, 282, 342],
+          "Planken": [57, 54, 54, 54, 0, 0, 30, 24],
+          "Schaan": [837, 748, 748, 730, 2, 16, 423, 307],
+          "Triesen": [644, 541, 541, 530, 1, 10, 214, 316],
+          "Triesenberg": [534, 473, 472, 464, 0, 8, 188, 276],
+          "Oberland": [3639, 3134, 3133, 3075, 7, 51, 1539, 1536],
+          "Eschen": [632, 524, 524, 520, 0, 4, 260, 260],
+          "Gamprin": [204, 182, 182, 180, 0, 2, 116, 64],
+          "Mauren": [521, 466, 466, 460, 1, 5, 212, 248],
+          "Ruggell": [301, 257, 256, 248, 1, 7, 161, 87],
+          "Schellenberg": [156, 139, 139, 138, 0, 1, 82, 56],
+          "Unterland": [1814, 1568, 1567, 1546, 2, 19, 831, 715],
+          "Liechtenstein": [5453, 4702, 4700, 4621, 9, 70, 2370, 2251]
+        }
+      }
+    ],
+    "notes": ["Official notice (Amtliche Kundmachung) of the government dated 3 July 1984 on the vote on the amendment of the Constitution of 5 October 1921 (introduction of women's suffrage), printed in the Liechtensteiner Volksblatt of 6 July 1984; the notice declares it accepted by the people; dashes are recorded as 0."]
+  },
+  {
+    "first": "1985-02-01",
+    "last": "1985-02-03",
+    "text": "1./3. Februar 1985",
+    "questions": [{"de": "Jagdgesetz", "en": "Hunting Act", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1985-02-08_19850208",
+        "page": "00000404",
+        "box": [620, 4130, 2240, 5260],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [1973, 1250, 1250, 1189, 5, 56, 474, 715],
+          "Balzers": [1638, 1121, 1121, 1083, 2, 36, 464, 619],
+          "Planken": [135, 108, 108, 101, 0, 7, 28, 73],
+          "Schaan": [1975, 1505, 1505, 1405, 4, 96, 590, 815],
+          "Triesen": [1434, 877, 877, 836, 5, 36, 270, 566],
+          "Triesenberg": [1176, 911, 911, 883, 2, 26, 151, 732],
+          "Oberland": [8331, 5772, 5772, 5497, 18, 257, 1977, 3520],
+          "Eschen": [1390, 927, 927, 894, 2, 31, 390, 504],
+          "Gamprin": [433, 305, 305, 289, 0, 16, 110, 179],
+          "Mauren": [1154, 762, 762, 733, 1, 28, 268, 465],
+          "Ruggell": [648, 402, 402, 389, 0, 13, 210, 179],
+          "Schellenberg": [316, 244, 244, 234, 0, 10, 55, 179],
+          "Unterland": [3941, 2640, 2640, 2539, 3, 98, 1033, 1506],
+          "Liechtenstein": [12272, 8412, 8412, 8036, 21, 355, 3010, 5026]
+        }
+      }
+    ],
+    "notes": ["Official notice (Amtliche Kundmachung) of the government dated 5 February 1985 on the vote of 1/3 February 1985 on a new Jagdgesetz, printed in the Liechtensteiner Volksblatt of 8 February 1985; the notice declares the bill rejected; registered voters include women for the first time; dashes are recorded as 0."]
+  },
+  {
+    "first": "1985-05-31",
+    "last": "1985-06-02",
+    "text": "31. Mai/2. Juni 1985",
+    "questions": [{"de": "Erhöhung der Zahl der Landtagsabgeordneten (VU-Initiative, FBP-Initiative)", "en": "Enlarging the Landtag (VU and FBP initiatives)", "type": "initiative", "options": ["JA Initiative vom 14. Dez. 1984", "JA Initiative vom 18. Dez. 1984", "NEIN"]}],
+    "tables": [
+      {
+        "issue": "000476564_1985-06-08_19850608",
+        "page": "00001814",
+        "box": [440, 1740, 2700, 3720],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "opt.0", "opt.1", "opt.2"],
+        "rows": {
+          "Vaduz": [1974, 1361, 1361, 1301, 32, 28, 446, 620, 235],
+          "Balzers": [1639, 1218, 1218, 1166, 7, 45, 495, 481, 190],
+          "Planken": [138, 117, 117, 116, 0, 1, 32, 69, 15],
+          "Schaan": [1982, 1483, 1483, 1426, 17, 40, 530, 649, 247],
+          "Triesen": [1439, 880, 880, 849, 15, 16, 367, 348, 134],
+          "Triesenberg": [1186, 887, 885, 844, 17, 24, 388, 230, 226],
+          "Oberland": [8358, 5946, 5944, 5702, 88, 154, 2258, 2397, 1047],
+          "Eschen": [1384, 928, 928, 912, 7, 9, 371, 361, 180],
+          "Gamprin": [435, 328, 328, 317, 4, 7, 120, 163, 34],
+          "Mauren": [1163, 832, 832, 810, 11, 11, 253, 428, 129],
+          "Ruggell": [657, 503, 503, 491, 3, 9, 221, 219, 51],
+          "Schellenberg": [320, 264, 264, 257, 5, 2, 87, 133, 37],
+          "Unterland": [3959, 2855, 2855, 2787, 30, 38, 1052, 1304, 431],
+          "Liechtenstein": [12317, 8801, 8799, 8489, 118, 192, 3310, 3701, 1478]
+        }
+      }
+    ],
+    "notes": ["Official notice (Amtliche Kundmachung) of the government dated 4 June 1985 on the vote of 31 May/2 June 1985 on two simultaneously submitted initiatives on Articles 46 and 49 of the Constitution, printed in the Liechtensteiner Volksblatt of 8 June 1985; the notice declares both initiatives rejected.", "The ballot offered three answers, printed as three columns headed 'Initiative vom 14. Dez. 1984 JA', 'Initiative vom 18. Dez. 1984 JA' and 'NEIN'; the notice does not name the parties, but the national figures match the reference list's VU initiative (3310, the 14 December 1984 initiative) and FBP initiative (3701, the 18 December 1984 initiative).", "Below the table the notice prints the shares: JA Initiative vom 14. Dez. 1984 39,0 %, JA Initiative vom 18. Dez. 1984 43,6 %, NEIN 17,4 %, turnout (Stimmbeteiligung) 71,45 %. Dashes are recorded as 0."]
+  },
+  {
+    "first": "1985-11-29",
+    "last": "1985-12-01",
+    "text": "29. November/1. Dezember 1985",
+    "questions": [{"de": "Gleiche Rechte für Mann und Frau (Initiative, Gegenvorschlag)", "en": "Equal rights for men and women (initiative and counter-proposal)", "type": "initiative", "options": ["Verfassungsinitiative vom 27. Sept. 1985", "Gegenvorschlag des Landtages vom 23. Okt. 1985", "NEIN"]}],
+    "tables": [
+      {
+        "issue": "000476564_1985-12-06_19851206",
+        "page": "00003950",
+        "box": [370, 3180, 2620, 4960],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "opt.0", "opt.1", "opt.2"],
+        "rows": {
+          "Vaduz": [2013, 1294, 1294, 1247, 19, 28, 419, 318, 510],
+          "Balzers": [1655, 1247, 1247, 1213, 5, 29, 228, 361, 624],
+          "Planken": [141, 113, 113, 108, 1, 4, 61, 20, 27],
+          "Schaan": [2004, 1484, 1484, 1397, 27, 60, 416, 416, 565],
+          "Triesen": [1448, 893, 893, 859, 8, 26, 228, 250, 381],
+          "Triesenberg": [1187, 856, 856, 836, 2, 18, 121, 227, 488],
+          "Oberland": [8448, 5887, 5887, 5660, 62, 165, 1473, 1592, 2595],
+          "Eschen": [1387, 981, 981, 935, 8, 38, 147, 271, 517],
+          "Gamprin": [438, 317, 317, 301, 7, 9, 56, 89, 156],
+          "Mauren": [1184, 931, 931, 892, 13, 26, 179, 210, 503],
+          "Ruggell": [663, 476, 476, 463, 4, 9, 68, 178, 217],
+          "Schellenberg": [325, 236, 236, 231, 2, 3, 50, 60, 121],
+          "Unterland": [3997, 2941, 2941, 2822, 34, 85, 500, 808, 1514],
+          "Liechtenstein": [12445, 8828, 8828, 8482, 96, 250, 1973, 2400, 4109]
+        }
+      }
+    ],
+    "notes": ["Official notice (Amtliche Kundmachung) of the government dated 3 December 1985 on the vote of 29 November/1 December 1985 on the constitutional initiative of 27 September 1985 and the Landtag's counter-proposal of 23 October 1985 (supplement to Article 31 of the Constitution), printed in the Liechtensteiner Volksblatt of 6 December 1985; the notice declares both rejected.", "The ballot offered three answers, printed as three columns headed 'Verfassungsinitiative vom 27. Sept. 1985', 'Gegenvorschlag des Landtages vom 23. Okt. 1985' and 'NEIN', with no separate JA column.", "Below the table the notice prints the shares: JA Initiative vom 27. Sept. 1985 23,26 %, JA Gegenvorschlag des Landtages vom 23. Oktober 1985 28,30 %, NEIN 48,44 %, turnout (Stimmbeteiligung) 70,94 %."]
+  },
+  {
+    "first": "1986-12-05",
+    "last": "1986-12-07",
+    "text": "5./7. Dezember 1986",
+    "questions": [{"de": "Erleichterte Einbürgerung von Kindern liechtensteinischer Mütter", "en": "Easier naturalization of children of Liechtenstein mothers", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1986-12-11_19861211",
+        "page": "00003840",
+        "box": [480, 2120, 2160, 3300],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2038, 1486, 1486, 1371, 8, 107, 830, 541],
+          "Balzers": [1677, 1370, 1370, 1281, 3, 86, 604, 677],
+          "Planken": [142, 124, 124, 120, 0, 4, 80, 40],
+          "Schaan": [2012, 1645, 1645, 1528, 4, 113, 883, 645],
+          "Triesen": [1518, 1098, 1098, 1031, 1, 66, 514, 517],
+          "Triesenberg": [1207, 1000, 1000, 952, 2, 46, 468, 484],
+          "Oberland": [8594, 6723, 6723, 6283, 18, 422, 3379, 2904],
+          "Eschen": [1414, 1118, 1118, 1083, 0, 35, 562, 521],
+          "Gamprin": [440, 353, 353, 338, 0, 15, 138, 200],
+          "Mauren": [1182, 936, 936, 896, 4, 36, 418, 478],
+          "Ruggell": [682, 537, 537, 519, 1, 17, 251, 268],
+          "Schellenberg": [324, 268, 268, 247, 0, 21, 126, 121],
+          "Unterland": [4042, 3212, 3212, 3083, 5, 124, 1495, 1588],
+          "Liechtenstein": [12636, 9935, 9935, 9366, 23, 546, 4874, 4492]
+        }
+      }
+    ],
+    "notes": ["Official notice (Amtliche Kundmachung) of the government dated 11 December 1986 on the vote of 5/7 December 1986 on the amendments of the Act on the acquisition and loss of citizenship and of the Municipalities Act (easier naturalization of foreign children of Liechtenstein mothers and readmission of former Liechtenstein women), voted together as one bill, printed in the Liechtensteiner Volksblatt of 11 December 1986; dashes are recorded as 0."]
+  },
+  {
+    "first": "1987-09-11",
+    "last": "1987-09-13",
+    "text": "11./13. September 1987",
+    "questions": [{"de": "Einführung des doppelten Ja", "en": "Double yes in popular votes", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1987-09-17_19870917",
+        "page": "00002488",
+        "box": [500, 1400, 2420, 2720],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2071, 962, 959, 927, 4, 31, 668, 259],
+          "Balzers": [1732, 923, 920, 878, 1, 44, 519, 359],
+          "Planken": [147, 114, 114, 110, 1, 3, 76, 34],
+          "Schaan": [2095, 1257, 1254, 1182, 6, 69, 811, 371],
+          "Triesen": [1547, 839, 830, 790, 4, 45, 487, 303],
+          "Triesenberg": [1221, 734, 723, 675, 0, 59, 309, 366],
+          "Oberland": [8813, 4829, 4805, 4562, 16, 251, 2870, 1692],
+          "Eschen": [1433, 728, 728, 715, 1, 12, 384, 331],
+          "Gamprin": [445, 234, 234, 225, 0, 9, 144, 81],
+          "Mauren": [1205, 642, 642, 604, 2, 36, 431, 173],
+          "Ruggell": [691, 338, 338, 330, 2, 6, 218, 112],
+          "Schellenberg": [336, 214, 214, 206, 0, 8, 134, 72],
+          "Unterland": [4110, 2156, 2156, 2080, 5, 71, 1311, 769],
+          "Liechtenstein": [12923, 6985, 6961, 6642, 21, 322, 4181, 2461]
+        }
+      }
+    ],
+    "misprints": [{"row": "Oberland", "column": "ballots", "note": "printed 4805, the municipalities add up to 4800 (Triesen clearly printed 830); checked twice in the image"}, {"row": "Liechtenstein", "column": "ballots", "note": "printed 6961, the municipalities add up to 6956; follows from the Oberland discrepancy"}],
+    "notes": ["Government notice (Amtliche Kundmachung) on the result of the vote of 11/13 September 1987, Liechtensteiner Volksblatt 17 September 1987.", "In this notice valid + invalid + blank equals the cards cast, not the ballots put in, in every row."]
+  },
+  {
+    "first": "1988-01-22",
+    "last": "1988-01-24",
+    "text": "22./24. Januar 1988",
+    "questions": [{"de": "Erhöhung der Mandatszahl des Landtags", "en": "Enlarging the Landtag", "type": "referendum"}, {"de": "Gesetz über die betriebliche Personalvorsorge", "en": "Occupational Pensions Act", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1988-01-30_19880130",
+        "page": "00000308",
+        "box": [640, 1500, 2400, 3120],
+        "kind": "notice",
+        "columns": ["reg.0", "cards.0", "ballots.0", "valid.0", "invalid.0", "blank.0", "yes.0", "no.0"],
+        "rows": {
+          "Vaduz": [2093, 1382, 1381, 1347, 11, 23, 735, 612],
+          "Balzers": [1743, 1145, 1146, 1111, 4, 31, 615, 496],
+          "Planken": [148, 126, 126, 117, 2, 7, 82, 35],
+          "Schaan": [2118, 1581, 1579, 1547, 1, 34, 781, 766],
+          "Triesen": [1560, 930, 928, 901, 3, 26, 466, 435],
+          "Triesenberg": [1235, 880, 880, 867, 5, 8, 289, 578],
+          "Oberland": [8897, 6044, 6040, 5890, 26, 129, 2968, 2922],
+          "Eschen": [1417, 957, 957, 946, 3, 8, 457, 489],
+          "Gamprin": [448, 333, 333, 324, 0, 9, 197, 127],
+          "Mauren": [1212, 871, 871, 849, 2, 20, 473, 376],
+          "Ruggell": [702, 507, 507, 494, 3, 10, 285, 209],
+          "Schellenberg": [341, 270, 270, 268, 0, 2, 157, 111],
+          "Unterland": [4120, 2938, 2938, 2881, 8, 49, 1569, 1312],
+          "Liechtenstein": [13017, 8982, 8978, 8771, 34, 178, 4537, 4234]
+        }
+      },
+      {
+        "issue": "000476564_1988-01-30_19880130",
+        "page": "00000308",
+        "box": [640, 4050, 2400, 5600],
+        "kind": "notice",
+        "columns": ["reg.1", "cards.1", "ballots.1", "valid.1", "invalid.1", "blank.1", "yes.1", "no.1"],
+        "rows": {
+          "Vaduz": [2093, 1382, 1381, 1329, 16, 36, 654, 675],
+          "Balzers": [1743, 1145, 1149, 1105, 8, 36, 606, 499],
+          "Planken": [148, 126, 126, 120, 2, 4, 71, 49],
+          "Schaan": [2118, 1581, 1578, 1522, 13, 46, 737, 785],
+          "Triesen": [1560, 930, 927, 898, 3, 29, 498, 400],
+          "Triesenberg": [1235, 880, 880, 865, 3, 12, 411, 454],
+          "Oberland": [8897, 6044, 6041, 5839, 45, 163, 2977, 2862],
+          "Eschen": [1417, 957, 956, 933, 1, 22, 465, 468],
+          "Gamprin": [448, 333, 333, 324, 0, 9, 187, 137],
+          "Mauren": [1212, 871, 871, 841, 3, 27, 440, 401],
+          "Ruggell": [702, 507, 507, 488, 2, 17, 266, 222],
+          "Schellenberg": [341, 270, 270, 267, 1, 2, 161, 106],
+          "Unterland": [4120, 2938, 2937, 2853, 7, 77, 1519, 1334],
+          "Liechtenstein": [13017, 8982, 8978, 8692, 52, 240, 4496, 4196]
+        }
+      }
+    ],
+    "notes": ["Two government notices (Amtliche Kundmachungen) dated 28 January 1988, one per question, Liechtensteiner Volksblatt 30 January 1988; a dash for invalid votes is recorded as 0."]
+  },
+  {
+    "first": "1988-09-30",
+    "last": "1988-10-02",
+    "text": "30. September/2. Oktober 1988",
+    "questions": [{"de": "Verpflichtungskredit Strassentunnel Gnalp–Steg", "en": "Credit for the Gnalp–Steg road tunnel", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1988-10-07_19881007",
+        "page": "00003332",
+        "box": [740, 1240, 2470, 2940],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2121, 1105, 1105, 1103, 2, 17, 620, 466],
+          "Balzers": [1768, 968, 968, 967, 1, 26, 583, 358],
+          "Planken": [149, 119, 119, 119, 0, 6, 66, 47],
+          "Schaan": [2148, 1223, 1223, 1222, 1, 41, 718, 463],
+          "Triesen": [1577, 782, 782, 782, 0, 22, 406, 354],
+          "Triesenberg": [1265, 1026, 1026, 1025, 1, 9, 313, 703],
+          "Oberland": [9028, 5223, 5223, 5218, 5, 121, 2706, 2391],
+          "Eschen": [1446, 707, 707, 701, 6, 17, 455, 229],
+          "Gamprin": [454, 264, 264, 261, 3, 6, 129, 126],
+          "Mauren": [1223, 617, 617, 614, 3, 18, 328, 268],
+          "Ruggell": [718, 338, 338, 337, 1, 6, 214, 117],
+          "Schellenberg": [346, 193, 193, 192, 1, 1, 111, 80],
+          "Unterland": [4187, 2119, 2119, 2105, 14, 48, 1237, 820],
+          "Liechtenstein": [13215, 7342, 7342, 7223, 19, 169, 3943, 3211]
+        }
+      }
+    ],
+    "misprints": [{"row": "Liechtenstein", "column": "valid", "note": "printed 7223, the district totals and municipalities add up to 7323 (= 3943 + 3211 + 169); checked twice in the image"}],
+    "notes": ["Government notice (Amtliche Kundmachung) dated 7 October 1988, Liechtensteiner Volksblatt 7 October 1988; here the valid column includes the blank votes (valid = yes + no + blank), and a dash for invalid votes is recorded as 0."]
+  },
+  {
+    "first": "1989-03-17",
+    "last": "1989-03-19",
+    "text": "17./19. März 1989",
+    "questions": [{"de": "Abänderung des Krankenversicherungsgesetzes", "en": "Health Insurance Act amendment", "type": "optional_referendum"}, {"de": "Einführung des Staatsvertragsreferendums", "en": "Referendum on treaties", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1989-03-24_19890324",
+        "page": "00001106",
+        "box": [800, 1300, 2530, 2920],
+        "kind": "notice",
+        "columns": ["reg.0", "cards.0", "ballots.0", "valid.0", "invalid.0", "blank.0", "yes.0", "no.0"],
+        "rows": {
+          "Vaduz": [2141, 1258, 1256, 1212, 7, 37, 760, 452],
+          "Balzers": [1799, 1179, 1171, 1154, 1, 16, 696, 458],
+          "Planken": [150, 119, 119, 116, 0, 3, 70, 46],
+          "Schaan": [2152, 1408, 1408, 1359, 2, 47, 845, 514],
+          "Triesen": [1590, 990, 990, 969, 5, 16, 618, 351],
+          "Triesenberg": [1267, 906, 906, 889, 3, 14, 452, 437],
+          "Oberland": [9099, 5860, 5850, 5699, 18, 133, 3441, 2258],
+          "Eschen": [1450, 976, 976, 958, 2, 16, 539, 419],
+          "Gamprin": [456, 323, 323, 317, 3, 3, 183, 134],
+          "Mauren": [1230, 782, 782, 775, 0, 7, 440, 335],
+          "Ruggell": [722, 446, 446, 438, 1, 7, 242, 196],
+          "Schellenberg": [349, 252, 252, 247, 1, 4, 131, 116],
+          "Unterland": [4207, 2779, 2779, 2735, 7, 37, 1535, 1200],
+          "Liechtenstein": [13306, 8639, 8629, 8434, 25, 170, 4976, 3458]
+        }
+      },
+      {
+        "issue": "000476564_1989-03-24_19890324",
+        "page": "00001106",
+        "box": [2700, 1300, 4420, 2920],
+        "kind": "notice",
+        "columns": ["reg.1", "cards.1", "ballots.1", "valid.1", "invalid.1", "blank.1", "yes.1", "no.1"],
+        "rows": {
+          "Vaduz": [2141, 1258, 1258, 1234, 4, 20, 538, 696],
+          "Balzers": [1799, 1179, 1175, 1153, 4, 18, 518, 635],
+          "Planken": [150, 119, 119, 115, 0, 4, 48, 67],
+          "Schaan": [2152, 1408, 1408, 1366, 1, 41, 670, 696],
+          "Triesen": [1590, 990, 990, 961, 2, 27, 396, 565],
+          "Triesenberg": [1267, 906, 906, 880, 5, 21, 353, 527],
+          "Oberland": [9099, 5860, 5856, 5709, 16, 131, 2523, 3186],
+          "Eschen": [1450, 976, 975, 947, 3, 25, 412, 535],
+          "Gamprin": [456, 323, 323, 314, 3, 6, 114, 200],
+          "Mauren": [1230, 782, 782, 773, 1, 8, 338, 435],
+          "Ruggell": [722, 446, 446, 438, 2, 6, 163, 275],
+          "Schellenberg": [349, 252, 252, 250, 0, 2, 94, 156],
+          "Unterland": [4207, 2779, 2778, 2722, 9, 47, 1121, 1601],
+          "Liechtenstein": [13306, 8639, 8634, 8431, 25, 178, 3644, 4787]
+        }
+      }
+    ],
+    "notes": ["Two government notices (Amtliche Kundmachungen) dated 23 March 1989, side by side, Liechtensteiner Volksblatt 24 March 1989; a dash for invalid votes is recorded as 0."]
+  },
+  {
+    "first": "1989-12-01",
+    "last": "1989-12-03",
+    "text": "1./3. Dezember 1989",
+    "questions": [{"de": "Kontrolle der Justizverwaltung", "en": "Oversight of the judicial administration", "type": "initiative"}, {"de": "Minderheitenrecht auf Kontrolle", "en": "Minority right of oversight", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1989-12-08_19891208",
+        "page": "00004224",
+        "box": [800, 900, 2520, 2700],
+        "kind": "notice",
+        "columns": ["reg.0", "cards.0", "ballots.0", "valid.0", "invalid.0", "blank.0", "yes.0", "no.0"],
+        "rows": {
+          "Vaduz": [2152, 884, 860, 798, 13, 49, 399, 399],
+          "Balzers": [1834, 1202, 1184, 1063, 13, 108, 604, 459],
+          "Planken": [153, 118, 117, 104, 5, 8, 66, 38],
+          "Schaan": [2169, 1289, 1243, 1077, 12, 154, 618, 459],
+          "Triesen": [1591, 715, 715, 635, 6, 74, 400, 235],
+          "Triesenberg": [1276, 520, 512, 466, 5, 41, 288, 178],
+          "Oberland": [9175, 4728, 4631, 4143, 54, 434, 2375, 1768],
+          "Eschen": [1446, 678, 653, 632, 21, 40, 333, 259],
+          "Gamprin": [473, 283, 275, 265, 10, 30, 126, 109],
+          "Mauren": [1242, 758, 740, 721, 19, 54, 337, 330],
+          "Ruggell": [733, 373, 364, 351, 13, 20, 201, 130],
+          "Schellenberg": [356, 209, 202, 202, 0, 13, 108, 81],
+          "Unterland": [4250, 2301, 2234, 2171, 63, 157, 1105, 909]
+        }
+      },
+      {
+        "issue": "000476564_1989-12-08_19891208",
+        "page": "00004224",
+        "box": [800, 3580, 2520, 5380],
+        "kind": "notice",
+        "columns": ["reg.1", "cards.1", "ballots.1", "valid.1", "invalid.1", "blank.1", "yes.1", "no.1"],
+        "rows": {
+          "Vaduz": [2152, 884, 877, 850, 7, 20, 530, 320],
+          "Balzers": [1834, 1202, 1200, 1129, 5, 66, 626, 503],
+          "Planken": [153, 118, 117, 113, 0, 4, 87, 26],
+          "Schaan": [2169, 1289, 1277, 1194, 5, 78, 746, 448],
+          "Triesen": [1591, 715, 715, 675, 0, 40, 358, 317],
+          "Triesenberg": [1276, 520, 514, 483, 4, 27, 234, 249],
+          "Oberland": [9175, 4728, 4700, 4444, 21, 235, 2581, 1863],
+          "Eschen": [1446, 678, 668, 667, 1, 12, 369, 286],
+          "Gamprin": [473, 283, 283, 282, 1, 19, 156, 107],
+          "Mauren": [1242, 758, 753, 750, 3, 28, 496, 226],
+          "Ruggell": [733, 373, 368, 365, 3, 6, 192, 167],
+          "Schellenberg": [356, 209, 208, 208, 0, 1, 119, 88],
+          "Unterland": [4250, 2301, 2280, 2272, 8, 66, 1332, 874]
+        }
+      }
+    ],
+    "notes": ["Two government notices headed 'Abstimmungsergebnis', dated 9 December 1989, Liechtensteiner Volksblatt 8 December 1989 issue; they print Oberland and Unterland totals but no national total row; a dash for invalid votes is recorded as 0.", "In the Unterland rows the valid column includes the blank votes (valid = yes + no + blank), while in the Oberland rows it does not."]
+  },
+  {
+    "first": "1990-10-19",
+    "last": "1990-10-21",
+    "text": "19./21. Oktober 1990",
+    "questions": [{"de": "Gesetz über die Landes- und Gemeindesteuern", "en": "National and Municipal Taxes Act", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1990-10-27_19901027",
+        "page": "00004194",
+        "box": [620, 2000, 2320, 3640],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2172, 1378, 1378, 1337, 2, 39, 288, 1049],
+          "Balzers": [1853, 1239, 1239, 1205, 0, 34, 301, 904],
+          "Planken": [159, 123, 123, 118, 0, 5, 37, 81],
+          "Schaan": [2193, 1680, 1680, 1633, 0, 47, 390, 1243],
+          "Triesen": [1640, 1005, 1005, 988, 2, 15, 266, 722],
+          "Triesenberg": [1296, 882, 882, 869, 0, 13, 183, 686],
+          "Oberland": [9313, 6307, 6307, 6150, 4, 153, 1465, 4685],
+          "Eschen": [1488, 1170, 1169, 1133, 4, 32, 268, 865],
+          "Gamprin": [480, 382, 382, 369, 0, 13, 75, 294],
+          "Mauren": [1254, 930, 930, 917, 2, 11, 181, 736],
+          "Ruggell": [739, 553, 553, 543, 0, 10, 203, 340],
+          "Schellenberg": [368, 271, 271, 263, 0, 8, 62, 201],
+          "Unterland": [4329, 3306, 3305, 3225, 6, 74, 789, 2436],
+          "Liechtenstein": [13642, 9613, 9612, 9375, 10, 227, 2254, 7121]
+        }
+      }
+    ],
+    "notes": ["Government notice 'Ergebnis der Volksabstimmung vom 19./21. Oktober 1990' on the Steuergesetz, Liechtensteiner Volksblatt 27 October 1990."]
+  },
+  {
+    "first": "1991-09-20",
+    "last": "1991-09-22",
+    "text": "20./22. September 1991",
+    "questions": [{"de": "Gesetz zum Schutz gegen Lärm", "en": "Noise Protection Act", "type": "optional_referendum"}, {"de": "Beibehalt der 6-Tage-Woche (Schulgesetz)", "en": "Keeping the six-day school week", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1991-09-28_19910928",
+        "page": "00003478",
+        "box": [690, 1300, 2390, 2900],
+        "kind": "notice",
+        "columns": ["reg.0", "cards.0", "ballots.0", "valid.0", "invalid.0", "blank.0", "yes.0", "no.0"],
+        "rows": {
+          "Vaduz": [2137, 1290, 1288, 1269, 3, 16, 335, 934],
+          "Balzers": [1870, 1371, 1375, 1336, 4, 35, 228, 1108],
+          "Planken": [163, 144, 144, 143, 0, 1, 31, 112],
+          "Schaan": [2221, 1612, 1610, 1580, 9, 21, 408, 1172],
+          "Triesen": [1666, 1056, 1056, 1034, 17, 5, 194, 840],
+          "Triesenberg": [1316, 895, 894, 875, 3, 16, 135, 740],
+          "Oberland": [9373, 6368, 6367, 6237, 36, 94, 1331, 4906],
+          "Eschen": [1511, 1046, 1046, 1020, 2, 24, 209, 811],
+          "Gamprin": [496, 355, 354, 349, 0, 5, 70, 279],
+          "Mauren": [1301, 945, 942, 927, 1, 14, 142, 785],
+          "Ruggell": [757, 548, 546, 535, 0, 11, 103, 432],
+          "Schellenberg": [378, 294, 294, 290, 1, 3, 48, 242],
+          "Unterland": [4443, 3188, 3182, 3121, 4, 57, 572, 2549],
+          "Liechtenstein": [13816, 9556, 9549, 9358, 40, 151, 1903, 7455]
+        }
+      },
+      {
+        "issue": "000476564_1991-09-28_19910928",
+        "page": "00003478",
+        "box": [2570, 1300, 4270, 2900],
+        "kind": "notice",
+        "columns": ["reg.1", "cards.1", "ballots.1", "valid.1", "invalid.1", "blank.1", "yes.1", "no.1"],
+        "rows": {
+          "Vaduz": [2137, 1290, 1289, 1252, 5, 32, 386, 866],
+          "Balzers": [1870, 1371, 1368, 1330, 3, 35, 404, 926],
+          "Planken": [163, 144, 144, 142, 0, 2, 48, 94],
+          "Schaan": [2221, 1612, 1612, 1541, 10, 61, 588, 953],
+          "Triesen": [1666, 1056, 1056, 1026, 24, 6, 260, 766],
+          "Triesenberg": [1316, 895, 894, 881, 3, 10, 158, 723],
+          "Oberland": [9373, 6368, 6363, 6172, 45, 146, 1844, 4328],
+          "Eschen": [1511, 1046, 1046, 1024, 0, 22, 449, 575],
+          "Gamprin": [496, 355, 355, 347, 0, 8, 137, 210],
+          "Mauren": [1301, 945, 945, 925, 0, 20, 416, 509],
+          "Ruggell": [757, 548, 545, 539, 1, 5, 248, 291],
+          "Schellenberg": [378, 294, 294, 287, 3, 4, 132, 155],
+          "Unterland": [4443, 3188, 3185, 3122, 4, 59, 1382, 1740],
+          "Liechtenstein": [13816, 9556, 9548, 9294, 49, 205, 3226, 6068]
+        }
+      }
+    ],
+    "notes": ["Two government notices (Amtliche Kundmachungen) dated 28 September 1991, side by side, Liechtensteiner Volksblatt 28 September 1991; the second covers the initiative to amend the Schulgesetz; a dash for invalid votes is recorded as 0."]
+  },
+  {
+    "first": "1992-03-13",
+    "last": "1992-03-15",
+    "text": "13./15. März 1992",
+    "questions": [{"de": "Einführung des Staatsvertragsreferendums", "en": "Referendum on treaties", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1992-03-21_19920321",
+        "page": "00001018",
+        "box": [650, 1220, 2380, 2800],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2131, 1292, 1292, 1272, 0, 20, 932, 340],
+          "Balzers": [1883, 1212, 1212, 1178, 1, 33, 856, 322],
+          "Planken": [165, 123, 123, 120, 0, 3, 82, 38],
+          "Schaan": [2222, 1637, 1637, 1609, 3, 25, 1149, 460],
+          "Triesen": [1688, 1062, 1062, 1042, 2, 18, 720, 322],
+          "Triesenberg": [1312, 715, 715, 709, 0, 6, 501, 208],
+          "Oberland": [9401, 6041, 6041, 5930, 6, 105, 4240, 1690],
+          "Eschen": [1525, 970, 968, 938, 3, 27, 683, 255],
+          "Gamprin": [509, 372, 372, 358, 13, 1, 245, 113],
+          "Mauren": [1303, 798, 798, 781, 1, 16, 614, 167],
+          "Ruggell": [752, 539, 531, 531, 0, 8, 342, 189],
+          "Schellenberg": [380, 257, 257, 256, 1, 0, 157, 99],
+          "Unterland": [4469, 2936, 2926, 2864, 17, 53, 2041, 823],
+          "Liechtenstein": [13870, 8977, 8967, 8794, 23, 158, 6281, 2513]
+        }
+      }
+    ],
+    "misprints": [{"row": "Unterland", "column": "invalid", "note": "printed 17, the municipalities add up to 18; the totals agree with the municipalities if Schellenberg's 1 invalid were 1 blank (Schellenberg prints invalid 1, blank dash); checked twice in the image"}, {"row": "Unterland", "column": "blank", "note": "printed 53, the municipalities add up to 52; the totals agree with the municipalities if Schellenberg's 1 invalid were 1 blank (Schellenberg prints invalid 1, blank dash); checked twice in the image"}, {"row": "Liechtenstein", "column": "invalid", "note": "printed 23, the municipalities add up to 24; follows from the Unterland discrepancy"}, {"row": "Liechtenstein", "column": "blank", "note": "printed 158, the municipalities add up to 157; follows from the Unterland discrepancy"}],
+    "notes": ["Government notice (Amtliche Kundmachung) dated 21 March 1992 on the initiative to amend the constitution (Staatsvertragsreferendum), Liechtensteiner Volksblatt 21 March 1992; dashes are recorded as 0."]
+  },
+  {
+    "first": "1992-06-26",
+    "last": "1992-06-28",
+    "text": "26./28. Juni 1992",
+    "questions": [{"de": "Herabsetzung des Stimm- und Wahlrechtsalters", "en": "Lowering the voting age", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1992-07-04_19920704",
+        "page": "00002376",
+        "box": [490, 2830, 2420, 4010],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2151, 690, 690, 680, 0, 10, 326, 354],
+          "Balzers": [1879, 633, 632, 619, 2, 11, 276, 343],
+          "Planken": [171, 118, 118, 116, 0, 2, 57, 59],
+          "Schaan": [2221, 971, 971, 951, 0, 20, 452, 499],
+          "Triesen": [1695, 526, 526, 518, 2, 6, 211, 307],
+          "Triesenberg": [1319, 419, 419, 416, 0, 3, 144, 272],
+          "Oberland": [9436, 3357, 3356, 3300, 4, 52, 1466, 1834],
+          "Eschen": [1528, 550, 550, 535, 4, 11, 208, 327],
+          "Gamprin": [508, 242, 242, 240, 0, 2, 90, 150],
+          "Mauren": [1310, 457, 457, 454, 0, 3, 229, 225],
+          "Ruggell": [754, 280, 280, 279, 0, 1, 95, 184],
+          "Schellenberg": [389, 195, 195, 190, 0, 5, 96, 94],
+          "Unterland": [4489, 1724, 1724, 1698, 4, 22, 718, 980],
+          "Liechtenstein": [13925, 5081, 5080, 4998, 8, 74, 2184, 2814]
+        }
+      }
+    ],
+    "notes": ["Official government notice (Kundmachung, dated 4 July 1992) in the Liechtensteiner Volksblatt of 4 July 1992, covering the constitutional law and the law of 15 April 1992 lowering the voting age; dashes in the invalid column are recorded as 0."]
+  },
+  {
+    "first": "1992-11-06",
+    "last": "1992-11-08",
+    "text": "6./8. November 1992",
+    "questions": [{"de": "Aufhebung der 8%-Sperrklausel", "en": "Abolishing the 8% threshold", "type": "initiative"}, {"de": "Diskriminierungsverbot (Art. 31bis)", "en": "Ban on discrimination (Article 31bis)", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1992-11-14_19921114",
+        "page": "00004398",
+        "box": [2480, 4220, 4400, 5400],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots.0", "valid.0", "invalid.0", "blank.0", "yes.0", "no.0"],
+        "rows": {
+          "Vaduz": [2163, 1247, 1245, 1224, 3, 18, 401, 823],
+          "Balzers": [1885, 972, 968, 950, 0, 18, 322, 628],
+          "Planken": [174, 130, 130, 123, 1, 6, 45, 78],
+          "Schaan": [2214, 1252, 1252, 1230, 3, 19, 415, 815],
+          "Triesen": [1700, 754, 754, 748, 0, 6, 220, 528],
+          "Triesenberg": [1330, 589, 589, 581, 0, 8, 198, 383],
+          "Oberland": [9466, 4944, 4938, 4856, 7, 75, 1601, 3255],
+          "Eschen": [1547, 926, 924, 896, 3, 25, 257, 639],
+          "Gamprin": [511, 297, 297, 290, 0, 7, 78, 212],
+          "Mauren": [1307, 693, 693, 678, 1, 14, 238, 440],
+          "Ruggell": [757, 396, 396, 387, 2, 7, 136, 251],
+          "Schellenberg": [391, 232, 232, 230, 0, 2, 63, 167],
+          "Unterland": [4513, 2544, 2542, 2481, 6, 55, 772, 1709],
+          "Liechtenstein": [13979, 7488, 7480, 7337, 13, 130, 2373, 4964]
+        }
+      },
+      {
+        "issue": "000476564_1992-11-14_19921114",
+        "page": "00004398",
+        "box": [2480, 1530, 4400, 2740],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots.1", "valid.1", "invalid.1", "blank.1", "yes.1", "no.1"],
+        "rows": {
+          "Vaduz": [2163, 1247, 1245, 1213, 0, 32, 323, 890],
+          "Balzers": [1885, 972, 974, 939, 2, 33, 226, 713],
+          "Planken": [174, 130, 130, 124, 0, 6, 35, 89],
+          "Schaan": [2214, 1252, 1251, 1218, 4, 29, 340, 878],
+          "Triesen": [1700, 754, 754, 744, 0, 10, 177, 567],
+          "Triesenberg": [1330, 589, 589, 575, 0, 14, 133, 442],
+          "Oberland": [9466, 4944, 4943, 4813, 6, 124, 1234, 3579],
+          "Eschen": [1547, 926, 919, 882, 8, 29, 172, 710],
+          "Gamprin": [511, 297, 297, 280, 1, 16, 54, 226],
+          "Mauren": [1307, 693, 693, 671, 4, 18, 172, 499],
+          "Ruggell": [757, 396, 395, 380, 2, 13, 92, 288],
+          "Schellenberg": [391, 232, 232, 229, 1, 2, 58, 171],
+          "Unterland": [4513, 2544, 2536, 2442, 16, 78, 548, 1894],
+          "Liechtenstein": [13979, 7488, 7479, 7255, 22, 202, 1782, 5473]
+        }
+      }
+    ],
+    "notes": ["Two official government notices (Kundmachungen dated 10 November 1992) on the same page of the Liechtensteiner Volksblatt of 14 November 1992, one per initiative; registered voters and cards cast are common to both, the other columns are per question; dashes are recorded as 0.", "In the Diskriminierungsverbot notice Balzers prints 974 ballots against 972 cards cast; the Oberland total (4943) agrees with 974."]
+  },
+  {
+    "first": "1992-12-11",
+    "last": "1992-12-13",
+    "text": "11./13. Dezember 1992",
+    "questions": [{"de": "Abkommen über den Europäischen Wirtschaftsraum (EWR)", "en": "Agreement on the European Economic Area (EEA)", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1992-12-19_19921219",
+        "page": "00005066",
+        "box": [770, 2840, 2420, 4130],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2167, 1852, 1852, 1839, 0, 13, 954, 885],
+          "Balzers": [1882, 1636, 1636, 1610, 1, 25, 829, 781],
+          "Planken": [174, 160, 160, 159, 0, 1, 99, 60],
+          "Schaan": [2212, 1974, 1971, 1951, 2, 21, 1191, 760],
+          "Triesen": [1704, 1423, 1423, 1405, 3, 15, 727, 678],
+          "Triesenberg": [1333, 1153, 1153, 1148, 1, 4, 628, 520],
+          "Oberland": [9472, 8198, 8195, 8112, 7, 79, 4428, 3684],
+          "Eschen": [1544, 1337, 1337, 1318, 5, 14, 675, 642],
+          "Gamprin": [511, 457, 457, 453, 0, 4, 278, 175],
+          "Mauren": [1304, 1143, 1143, 1138, 0, 5, 681, 457],
+          "Ruggell": [757, 682, 682, 678, 0, 4, 433, 245],
+          "Schellenberg": [394, 347, 347, 345, 0, 2, 226, 119],
+          "Unterland": [4510, 3966, 3966, 3932, 5, 29, 2293, 1638],
+          "Liechtenstein": [13982, 12164, 12161, 12044, 12, 108, 6721, 5322]
+        }
+      }
+    ],
+    "notes": ["Official government notice (Kundmachung, dated 19 December 1992) in the Liechtensteiner Volksblatt of 19 December 1992; the notice prints 6721 yes nationally, one fewer than the reference figure (6722).", "Re-read from the image: Schaan prints 1974 votes cast but 1971 ballots (valid+invalid+blank = 1974), and Eschen prints 675 yes + 642 no against 1318 valid; the totals carry both as printed."]
+  },
+  {
+    "first": "1993-03-05",
+    "last": "1993-03-07",
+    "text": "5./7. März 1993",
+    "questions": [{"de": "Verpflichtungskredit für ein Landtagsgebäude", "en": "Credit for a Landtag building", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1993-03-13_19930313",
+        "page": "00000890",
+        "box": [690, 1840, 2380, 3120],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2158, 1387, 1387, 1369, 5, 13, 319, 1050],
+          "Balzers": [1892, 1129, 1128, 1117, 1, 10, 233, 884],
+          "Planken": [178, 136, 136, 136, 0, 0, 45, 91],
+          "Schaan": [2217, 1390, 1390, 1378, 0, 12, 279, 1099],
+          "Triesen": [1706, 909, 909, 897, 1, 11, 212, 685],
+          "Triesenberg": [1330, 663, 663, 658, 2, 3, 146, 512],
+          "Oberland": [9481, 5614, 5613, 5555, 9, 49, 1234, 4321],
+          "Eschen": [1556, 891, 891, 878, 1, 12, 145, 733],
+          "Gamprin": [511, 343, 342, 339, 1, 2, 54, 285],
+          "Mauren": [1302, 785, 785, 776, 2, 7, 94, 682],
+          "Ruggell": [763, 450, 450, 446, 1, 4, 77, 368],
+          "Schellenberg": [396, 259, 259, 257, 0, 2, 78, 179],
+          "Unterland": [4528, 2728, 2727, 2696, 5, 27, 448, 2247],
+          "Liechtenstein": [14009, 8342, 8340, 8251, 14, 76, 1682, 6568]
+        }
+      }
+    ],
+    "notes": ["Official government notice (Kundmachung, dated 13 March 1993) in the Liechtensteiner Volksblatt of 13 March 1993 on the credit of 58.5 million francs for the Landtag building and other works in the government quarter.", "Re-read from the image: Ruggell prints 446 valid with 1 invalid and 4 blank against 450 ballots, and 77 yes + 368 no = 445; the Unterland and national totals carry the same differences."]
+  },
+  {
+    "first": "1995-04-07",
+    "last": "1995-04-09",
+    "text": "7./9. April 1995",
+    "questions": [{"de": "Teilnahme am Europäischen Wirtschaftsraum (EWR)", "en": "Participation in the European Economic Area (EEA)", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_1995-04-15_19950415",
+        "page": "00001418",
+        "box": [415, 4180, 2330, 5380],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2150, 1723, 1723, 1692, 1, 30, 931, 761],
+          "Balzers": [1959, 1561, 1564, 1523, 3, 38, 841, 682],
+          "Planken": [183, 158, 158, 155, 1, 2, 101, 54],
+          "Schaan": [2260, 1888, 1888, 1844, 0, 44, 1125, 719],
+          "Triesen": [1737, 1381, 1381, 1359, 0, 22, 750, 609],
+          "Triesenberg": [1360, 1112, 1111, 1084, 4, 23, 576, 508],
+          "Oberland": [9649, 7823, 7825, 7657, 9, 159, 4324, 3333],
+          "Eschen": [1585, 1325, 1325, 1299, 3, 23, 659, 640],
+          "Gamprin": [529, 457, 456, 442, 0, 14, 232, 210],
+          "Mauren": [1357, 1122, 1122, 1097, 2, 23, 601, 496],
+          "Ruggell": [772, 661, 661, 650, 0, 11, 397, 253],
+          "Schellenberg": [394, 330, 330, 329, 0, 1, 199, 130],
+          "Unterland": [4637, 3895, 3894, 3817, 5, 72, 2088, 1729],
+          "Liechtenstein": [14286, 11718, 11719, 11474, 14, 231, 6412, 5062]
+        }
+      }
+    ],
+    "notes": ["Official government notice (Kundmachung, dated 10 April 1995) in the Liechtensteiner Volksblatt of 15 April 1995; dashes in the invalid column are recorded as 0.", "Balzers prints 1564 ballots against 1561 cards cast, so the Oberland and national ballot totals also exceed the cards cast; the totals agree with the municipalities as printed."]
+  },
+  {
+    "first": "1999-01-29",
+    "last": "1999-01-31",
+    "text": "31. Januar 1999",
+    "questions": [{"de": "Gesetzesinitiative betreffend die Abänderung des Gesetzes über die Krankenversicherung", "en": "Health Insurance Act amendment", "type": "initiative"}],
+    "tables": [
+      {
+        "issue": "000476564_1999-02-06_19990206",
+        "page": "00000692",
+        "box": [195, 3790, 1880, 5040],
+        "kind": "notice",
+        "columns": ["reg", "ignore", "cards", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2183, 90, 1747, 1747, 1693, 4, 50, 563, 1130],
+          "Balzers": [2121, 82, 1786, 1781, 1732, 1, 48, 521, 1211],
+          "Planken": [194, 9, 173, 171, 171, 0, 2, 72, 99],
+          "Schaan": [2436, 50, 1913, 1912, 1839, 12, 61, 570, 1269],
+          "Triesen": [1924, 33, 1442, 1442, 1413, 5, 24, 402, 1011],
+          "Triesenberg": [1416, 48, 1139, 1137, 1111, 7, 19, 302, 809],
+          "Oberland": [10274, 312, 8200, 8190, 7959, 29, 204, 2430, 5529],
+          "Eschen": [1697, 50, 1470, 1470, 1434, 11, 28, 543, 891],
+          "Gamprin": [566, 23, 499, 502, 491, 6, 5, 220, 271],
+          "Mauren": [1427, 26, 1185, 1183, 1152, 9, 22, 499, 653],
+          "Ruggell": [858, 40, 778, 776, 757, 4, 15, 269, 488],
+          "Schellenberg": [431, 12, 391, 390, 380, 4, 6, 174, 206],
+          "Unterland": [4979, 151, 4323, 4321, 4214, 34, 76, 1705, 2509],
+          "Liechtenstein": [15253, 463, 12523, 12511, 12173, 63, 280, 4135, 8038]
+        }
+      }
+    ],
+    "notes": ["Official government notice (Kundmachung, dated 4 February 1999) in the Liechtensteiner Volksblatt of 6 February 1999, printed on the same page as the municipal election results; the notice dates the vote 31 January 1999.", "The second column (ignore) is the number of postal votes (Zahl der brieflichen Stimmabgaben), which are included in the votes cast; the national row is printed as 'Total Unter- und Oberland'.", "Gamprin prints 502 ballots against 499 votes cast; the Unterland totals agree with the municipalities as printed."]
+  },
+  {
+    "first": "2000-02-25",
+    "last": "2000-02-27",
+    "text": "25./27. Februar 2000",
+    "questions": [{"de": "Gesetz über die Förderung des preiswerten Wohnungsbaus", "en": "Affordable Housing Promotion Act", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_2000-03-04_20000304",
+        "page": "00001510",
+        "box": [700, 1720, 2420, 3000],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ignore", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2257, 1107, 29, 1107, 1089, 3, 15, 440, 649],
+          "Schaan": [2584, 1467, 21, 1467, 1432, 7, 28, 623, 809],
+          "Balzers": [2264, 1203, 4, 1203, 1188, 3, 12, 430, 758],
+          "Planken": [201, 142, 5, 142, 138, 0, 4, 39, 99],
+          "Triesen": [2008, 1016, 8, 1016, 998, 1, 17, 351, 647],
+          "Triesenberg": [1500, 1172, 29, 1169, 1141, 3, 25, 306, 835],
+          "Oberland": [10814, 6107, 96, 6104, 5986, 17, 101, 2189, 3797],
+          "Eschen": [1738, 936, 7, 936, 920, 2, 14, 253, 667],
+          "Gamprin": [605, 380, 5, 380, 368, 1, 11, 98, 270],
+          "Ruggell": [903, 546, 10, 545, 537, 2, 6, 194, 343],
+          "Schellenberg": [472, 303, 1, 303, 298, 1, 4, 91, 207],
+          "Mauren": [1516, 864, 12, 863, 858, 1, 4, 212, 646],
+          "Unterland": [5234, 3029, 35, 3027, 2981, 7, 39, 848, 2133],
+          "Liechtenstein": [16048, 9136, 131, 9131, 8967, 24, 140, 3037, 5930]
+        }
+      }
+    ],
+    "notes": ["Official government notice (Kundmachung, dated 29 February 2000) in the Liechtensteiner Volksblatt of 4 March 2000 on the referendum against the affordable housing promotion act.", "The third column (ignore) is the number of postal votes (Zahl der brieflichen Stimmabgaben); the national row is printed as 'Total Unter- und Oberland'."]
+  },
+  {
+    "first": "2000-06-16",
+    "last": "2000-06-18",
+    "text": "16./18. Juni 2000",
+    "questions": [{"de": "Erleichterte Einbürgerung alteingesessener Ausländer", "en": "Easier naturalization of long-resident foreigners", "type": "referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_2000-06-24_20000624",
+        "page": "00004336",
+        "box": [425, 3500, 2150, 4770],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ignore", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2232, 970, 25, 970, 954, 2, 14, 613, 341],
+          "Schaan": [2609, 1278, 19, 1278, 1263, 1, 14, 759, 504],
+          "Balzers": [2266, 1049, 11, 1049, 1030, 3, 16, 485, 545],
+          "Planken": [207, 137, 7, 137, 136, 0, 1, 81, 55],
+          "Triesen": [2012, 915, 11, 915, 900, 0, 15, 463, 437],
+          "Triesenberg": [1506, 626, 9, 626, 616, 4, 6, 266, 350],
+          "Oberland": [10832, 4975, 82, 4975, 4899, 10, 66, 2667, 2232],
+          "Eschen": [1760, 970, 25, 964, 944, 5, 15, 381, 563],
+          "Gamprin": [607, 376, 9, 376, 367, 1, 8, 152, 215],
+          "Ruggell": [903, 489, 10, 489, 479, 2, 8, 253, 226],
+          "Schellenberg": [480, 228, 1, 228, 222, 0, 6, 108, 114],
+          "Mauren": [1526, 797, 7, 797, 790, 0, 7, 297, 493],
+          "Unterland": [5276, 2860, 52, 2854, 2802, 8, 44, 1191, 1611],
+          "Liechtenstein": [16108, 7835, 134, 7829, 7701, 18, 110, 3858, 3843]
+        }
+      }
+    ],
+    "notes": ["Official government notice (Kundmachung, dated 19 June 2000) in the Liechtensteiner Volksblatt of 24 June 2000 on the law amending the law on the acquisition and loss of citizenship (Gesetz über den Erwerb und Verlust des Landesbürgerrechtes).", "The third column (ignore) is the number of postal votes (Zahl der brieflichen Stimmabgaben); dashes in the invalid column are recorded as 0; the national row is printed as 'Total Unter- und Oberland'."]
+  },
+  {
+    "first": "2000-09-22",
+    "last": "2000-09-24",
+    "text": "22./24. September 2000",
+    "questions": [{"de": "Vereinbarung über die leistungsabhängige Schwerverkehrsabgabe", "en": "Agreement on the heavy vehicle charge", "type": "optional_referendum"}],
+    "tables": [
+      {
+        "issue": "000476564_2000-09-30_20000930",
+        "page": "00006820",
+        "box": [325, 4230, 2050, 5500],
+        "kind": "notice",
+        "columns": ["reg", "cards", "ignore", "ballots", "valid", "invalid", "blank", "yes", "no"],
+        "rows": {
+          "Vaduz": [2222, 1081, 51, 1081, 1066, 5, 10, 799, 267],
+          "Schaan": [2607, 1600, 61, 1600, 1572, 0, 28, 1224, 348],
+          "Balzers": [2279, 1268, 23, 1268, 1255, 1, 12, 876, 379],
+          "Planken": [207, 145, 8, 145, 144, 0, 1, 105, 39],
+          "Triesen": [2026, 1004, 15, 1004, 987, 2, 15, 691, 296],
+          "Triesenberg": [1522, 751, 18, 751, 746, 1, 4, 447, 299],
+          "Oberland": [10863, 5849, 176, 5849, 5770, 9, 70, 4142, 1628],
+          "Eschen": [1779, 1010, 15, 1010, 993, 8, 9, 694, 299],
+          "Gamprin": [609, 404, 6, 404, 398, 1, 5, 264, 134],
+          "Ruggell": [910, 703, 22, 703, 690, 1, 12, 500, 190],
+          "Schellenberg": [490, 310, 4, 310, 308, 0, 2, 214, 94],
+          "Mauren": [1522, 898, 17, 898, 881, 2, 15, 603, 278],
+          "Unterland": [5310, 3325, 64, 3325, 3270, 12, 43, 2275, 995],
+          "Liechtenstein": [16173, 9174, 240, 9174, 9040, 21, 113, 6417, 2623]
+        }
+      }
+    ],
+    "notes": ["Official government notice (Kundmachung, dated 26 September 2000) in the Liechtensteiner Volksblatt of 30 September 2000 on the referendum against the agreement with Switzerland on the performance-related heavy vehicle charge; the same page is also scanned as page 00006818 of that issue.", "The third column (ignore) is the number of postal votes (Zahl der brieflichen Stimmabgaben); the national row is printed as 'Total Unter- und Oberland'."]
+  }
+]
