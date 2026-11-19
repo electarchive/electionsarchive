@@ -557,35 +557,15 @@ def _external(scheme: str, value: str) -> str:
     return str(uuid5(package.NAMESPACE, f"external_id:{scheme}\x1f{value}"))
 
 
-def _minted_source(publisher: str, title: str) -> str:
-    """The id `Changeset.source` mints for a source from its publisher and title."""
-    return str(uuid5(package.NAMESPACE, f"source\x1f{publisher}\x1f{title}"))
-
-
 @dataclass(frozen=True)
 class National:
     election: str
     contest: str
-    result_set: str
-    source: str
 
 
 def national(year: int) -> National:
     contest = f"HR:{year}:eu.member_state:HR"
-    if year == 2024:
-        title = "Izbori članova u Europski parlament iz Republike Hrvatske 2024: rezultati"
-        return National(
-            _external("eu.election", f"HR:{year}:european-parliament"),
-            _external("eu.contest", contest),
-            _external("eu.ep2024.result_set", f"HR:{year}"),
-            _minted_source("Državno izborno povjerenstvo Republike Hrvatske", title),
-        )
-    return National(
-        _external("eu.election", f"HR:{year}:european-parliament"),
-        _external("eu.contest", contest),
-        _external("eu.ep_cadmus.result_set", contest),
-        _minted_source("European University Institute", "EP election results at constituency level, 1979–2019"),
-    )
+    return National(_external("eu.election", f"HR:{year}:european-parliament"), _external("eu.contest", contest))
 
 
 def elected_url(d: Day) -> str:
@@ -1465,7 +1445,7 @@ def election(d: Day) -> Package:
         "predsjednik": "general" if d.round == 1 else "runoff",
     }.get(d.family, "referendum")
     if eu is not None:
-        p.external |= {eu.election, eu.contest, eu.source}
+        p.external |= {eu.election, eu.contest}
         p.artifact(raw.cached(SOURCE, elected_url(d)), SOURCE_ID)
         election_id = eu.election
     else:
@@ -1527,14 +1507,13 @@ def election(d: Day) -> Package:
             stage="official",
             kind="counted",
             source_id=SOURCE_ID,
-            status="superseded" if eu is not None else "active",
+            status="active",
             is_default=eu is None,
             completeness=1.0,
-            supersedes_id=eu.result_set if eu is not None else None,
         )
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
         if eu is not None:
-            _supersede(p, d, eu, result_set)
+            _supersede(p, d, result_set)
         options = _options(p, d, contest, contest_id, result_set, target, previous)
         _declared_rows(p, result_set, target, options, {m for s in here for m in s.counts} if here else None)
         if not here:
@@ -1561,35 +1540,20 @@ def election(d: Day) -> Package:
     return p
 
 
-def _supersede(p: Package, d: Day, eu: National, result_set: str) -> None:
-    """Stage the national totals beside the polling-station set, neither as a default.
+def _supersede(p: Package, d: Day, result_set: str) -> None:
+    """Note on a polling-station set staged beside the national set another pipeline holds as the default.
 
-    Production holds the national set as an official default, and the loader's defaults step flips the default to
-    the polling-station set, so no staged row is a second default.
-
-    The national set is re-staged with its own election, contest, and source. Its completeness is left open: the
-    package holds none of its facts, and a set with facts missing from the package fails the empty-set check.
+    The national set is another pipeline's row, so this package neither restates nor demotes it; the
+    polling-station set stays non-default.
     """
-    p.add(
-        "result_set",
-        id=eu.result_set,
-        election_id=eu.election,
-        contest_id=eu.contest,
-        stage="official",
-        kind="counted",
-        source_id=eu.source,
-        status="superseded",
-        is_default=False,
-        completeness=None,
-    )
     p.add(
         "note",
         id=key("note", result_set, "supersedes"),
         entity_id=result_set,
         kind="methodology",
         body_md="This set holds the same contest by polling station, with each candidate's preference votes and the "
-        "seats and elected members from the commission's decision on the distribution of seats. It supersedes "
-        "the set of national totals.",
+        "seats and elected members from the commission's decision on the distribution of seats. It sits beside "
+        "the set of national totals, which another source holds as the default.",
         lang="en",
     )
     if d.year == 2019:
