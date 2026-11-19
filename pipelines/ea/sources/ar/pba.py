@@ -1,6 +1,7 @@
 import functools
 import json
 import re
+import subprocess
 import unicodedata
 from collections import Counter
 from collections.abc import Callable
@@ -89,6 +90,27 @@ def province_csv_url(kind: str, year: int) -> str:
     return f"{BASE}/provinciaEstadisticasHistoricas{'EPAOS' if kind == 'e' else ''}Acsv.php#anio={year}"
 
 
+def results_home_url() -> str:
+    return f"{BASE}/mapa-provincia-bsas.php"
+
+
+def results_listing_url(did: str) -> str:
+    """The modal the province map opens for a partido, which links the Junta's definitive-count PDF of each year."""
+    return f"{BASE}/distritos.php?distrito={did}"
+
+
+def pdf_url(year: int, did: str) -> str:
+    return f"{BASE}/resultados/{year}{did}.pdf"
+
+
+def pdf_years(did: str) -> list[int]:
+    """The general-election years whose definitive-count PDF the partido's listing links. Earlier years are not
+    in the statistics the packages already hold."""
+    text = raw.cached(SOURCE, results_listing_url(did)).path.read_text(encoding="utf-8", errors="replace")
+    found = {int(y) for y in re.findall(rf"resultados/(\d{{4}}){did}\.pdf", text)}
+    return sorted(found & GENERAL_DAYS.keys())
+
+
 def _client() -> httpx.Client:
     return httpx.Client(headers={"User-Agent": raw.USER_AGENT}, follow_redirects=True, timeout=120)
 
@@ -132,12 +154,151 @@ def fetch() -> None:
     raw.fetch_many(SOURCE, [html_url(*item) for item in held], suffix=".html", workers=8)
     totals = [(kind, year) for kind in KINDS for year in TOTAL_YEARS[kind]]
     raw.fetch_many(SOURCE, [province_url(*item) for item in totals], suffix=".html", workers=4)
+    raw.fetch_many(SOURCE, [results_home_url()], suffix=".html", workers=1)
+    raw.fetch_many(SOURCE, [results_listing_url(did) for did in codes], suffix=".html", workers=8)
+    raw.fetch_many(SOURCE, [pdf_url(year, did) for did in codes for year in pdf_years(did)], suffix=".pdf", workers=8)
     wanted = [csv_url(*item) for item in held] + [province_csv_url(*item) for item in totals]
     have = raw.keys(SOURCE)
     pending = [url for url in wanted if url not in have]
     with _client() as client, ThreadPoolExecutor(8) as pool:
         for url, content in zip(pending, pool.map(lambda url: _post(client, url), pending), strict=True):
             raw.store(SOURCE, url, content, suffix=".csv", retrieved_at=datetime.now(UTC), media_type="text/csv")
+
+
+class Board(NamedTuple):
+    """One partido's school board in one general election, from the Junta's definitive-count PDF."""
+
+    seats: int
+    quotient: float
+    table: list[tuple[int, str, int]]
+    figures: dict[str, int]
+    won: list[tuple[str, int]]
+
+
+SEATS = re.compile(
+    r"^\s*(?:Correspond[ae]:? a:?\s*)?(?P<name>\S.*?)(?:\s+(?P<council>\d+)\s+Concejal(?:es|e)?)?"
+    r"\s+(?P<board>\d+),?\s+Consejeros?\s*$",
+    re.IGNORECASE,
+)
+LIST_LINE = re.compile(r"^\s*(?P<number>\d\.\d{3}|\d{1,4})(?:\s*-\s*(?=\S)|\s*(?=[^\W\d_]))(?P<rest>.+)$")
+FOOTER = {
+    "positive": re.compile(r"^\s*(?:TOTAL )?VOTOS? POSITIVOS?|^\s*TOTAL VOTOS VALIDOS", re.IGNORECASE),
+    "blank": re.compile(r"^\s*(?:VOTOS? EN )?BLANCOS?\b", re.IGNORECASE),
+    "null": re.compile(r"^\s*(?:VOTOS? )?(?:NULOS?|ANULADOS)\b", re.IGNORECASE),
+    "total": re.compile(r"^\s*TOTAL DE VOTOS|^\s*TOTAL VOTOS EMITIDOS", re.IGNORECASE),
+    "registered": re.compile(r"^\s*TOTAL DE (?:ELECTORES|INSCRIPTOS)", re.IGNORECASE),
+}
+FIGURE = re.compile(r"(?<![\w.,])\d{1,3}(?:[.,]\d{3})*(?![\w.,])|(?<![\w.,])\d+(?![\w.,])")
+# The Junta's short names in a PDF's seat table that match no list name closely enough.
+SEAT_ALIASES: dict[tuple[int, str, str], str] = {
+    (2003, "028", ".Mov. para la Victoria de Cnel.Suarez"): "AGRUPACION MOVIMIENTO PARA LA VICTORIA DE CORONEL SUAREZ",
+    (2003, "035", "Acción Federalista por Buenos Aires"): "ACCION FEDER. POR BS. AS.",
+}
+
+
+def _count(text: str) -> float:
+    return float(text.replace(".", "").replace(",", ".")) if "," in text else float(text.replace(".", ""))
+
+
+def _row_tail(tail: list[str]) -> bool:
+    """Whether the trailing numbers of a list row are its votes and, after them, at most its percent."""
+    if not re.fullmatch(r"\d{1,3}([.,]\d{3})*|\d+", tail[0]) or len(tail) > 2:
+        return False
+    return len(tail) == 1 or bool(re.fullmatch(r"\d{1,3}([,.]\d{1,2})?", tail[1]))
+
+
+def _table(lines: list[str]) -> tuple[list[tuple[int, str, int]], dict[str, int]]:
+    """The list table and the accounting lines of a PDF's text. A long name wraps onto the next line, which
+    carries no list number, and a wrapped row may put its percent there."""
+    rows: list[tuple[int, str, int]] = []
+    figures: dict[str, int] = {}
+    started = False
+    for line in lines:
+        if re.match(r"^\s*(LISTAS?|Lista)\s+(VOTOS|Votos)", line):
+            started = True
+            continue
+        if not started:
+            continue
+        label = next((name for name, pattern in FOOTER.items() if pattern.match(line)), None)
+        if label is not None:
+            found = FIGURE.findall(re.sub(r"^\D*", "", line.replace("2 %", "")))
+            if found and label not in figures:
+                figures[label] = int(re.sub(r"[.,]", "", found[0]))
+            continue
+        if figures:
+            continue
+        match = LIST_LINE.match(re.sub(r"(\d), (\d)", r"\1,\2", line))
+        if match is None:
+            continue
+        tokens = re.sub(r"\s+", " ", match["rest"]).strip().split(" ")
+        tail: list[str] = []
+        while tokens and re.fullmatch(r"[\d.,]+", tokens[-1]):
+            tail.insert(0, tokens.pop())
+        k = next((k for k in range(len(tail)) if _row_tail(tail[k:])), None)
+        if k is None or not tokens:
+            continue
+        rows.append(
+            (int(match["number"].replace(".", "")), " ".join([*tokens, *tail[:k]]), int(re.sub(r"[.,]", "", tail[k])))
+        )
+    return rows, figures
+
+
+@functools.cache
+def board(year: int, did: str) -> Board:
+    path = raw.cached(SOURCE, pdf_url(year, did)).path
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    elige = re.search(r"ELIGE:[^\n]*?(\d+),?\s+Consejeros\s+Escolares", text, re.IGNORECASE)
+    quotient = re.search(
+        r"COCIENTE\s+CONSEJEROS(?:\s+ESCOLARES)?(?:\s*\([^)]*\)|\s*\*)?\s+([\d.,]+)", text, re.IGNORECASE
+    )
+    if elige is None or quotient is None:
+        raise ValueError(f"{year} {did}: no school board seats or quotient in {path.name}")
+    lines = text.splitlines()
+    table, figures = _table(lines)
+    won: list[tuple[str, int]] = []
+    for line in lines:
+        found = SEATS.match(line)
+        if found is None or "Concejales y" in line:
+            continue
+        name = re.sub(r"\s+", " ", found["name"]).strip()
+        if int(found["board"]):
+            won.append((name, int(found["board"])))
+    seats = int(elige[1])
+    positive = figures.get("positive")
+    divisor = (positive or 0) / _count(quotient[1])
+    if abs(divisor - round(divisor)) > 0.02:
+        divisor = sum(votes for _, _, votes in table) / _count(quotient[1])
+    problems = [
+        (sum(seats for _, seats in won) != seats, f"{won} do not fill {seats} seats"),
+        (
+            divisor < seats - 0.02 or abs(divisor - round(divisor)) > 0.02,
+            f"quotient {quotient[1]} divides {positive} {divisor:.3f} times",
+        ),
+    ]
+    for bad, message in problems:
+        if bad:
+            raise ValueError(f"{year} {did}: {message}")
+    return Board(seats, _count(quotient[1]), table, figures, won)
+
+
+def match_list(name: str, table: list[tuple[int, str, int]], year: int, did: str) -> int:
+    """The index of the table row a seat table's short name stands for."""
+    name = SEAT_ALIASES.get((year, did, name), name)
+    target = normal(name)
+    names = [normal(row[1]) for row in table]
+    exact = [i for i, other in enumerate(names) if other == target]
+    if len(exact) == 1:
+        return exact[0]
+    close = [i for i, row in enumerate(table) if _similar(name, row[1])]
+    if not close:
+        close = [i for i, other in enumerate(names) if f" {target} " in f" {other} "]
+    if len(close) > 1:
+        close.sort(key=lambda i: -SequenceMatcher(None, target, names[i]).ratio())
+        if SequenceMatcher(None, target, names[close[0]]).ratio() > 0.95:
+            close = close[:1]
+    if len(close) != 1:
+        raise ValueError(f"{year} {did}: {name!r} matches {[table[i][1] for i in close]}")
+    return close[0]
 
 
 class Row(NamedTuple):
@@ -322,6 +483,7 @@ def area(scheme: str, code: str) -> str:
 PROVINCE = key("area", "ar-b.provincia", "B")
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fARG"))
 JUNTA = key("source", "junta")
+ESCRUTINIO = key("source", "junta-escrutinio")
 SHAPES = key("source", "geoboundaries")
 SECTION_NAMES = {
     1: "Primera",
@@ -344,6 +506,11 @@ BODIES = {
         "council",
         "Municipal councils of Buenos Aires Province",
         "Concejos Deliberantes de la Provincia de Buenos Aires",
+    ),
+    "school_board": (
+        "council",
+        "School boards (consejos escolares) of Buenos Aires Province",
+        "Consejos Escolares de la Provincia de Buenos Aires",
     ),
 }
 OFFICES = {
@@ -685,10 +852,31 @@ def parties() -> dict[tuple[int, str, int | None], Party]:
             if number == lista:
                 nearest = min((abs(y - year), index) for index, (cluster, _) in enumerate(made) for y, _ in cluster)
                 out[(lista, "", year)] = made[nearest[1]][1]
+    for (lista, name), party_ in sorted(_unlisted(seen, out).items()):
+        out[(lista, normal(name), None)] = party_
     for lista, year in blank:
         if (lista, "", year) not in out:
             raise ValueError(f"list {lista} is unnamed in {year} and has no named year")
     return out
+
+
+def _unlisted(
+    seen: dict[int, Counter[tuple[int, str]]], out: dict[tuple[int, str, int | None], Party]
+) -> dict[tuple[int, str], Party]:
+    """The parties of lists that a definitive-count PDF's table prints with votes but the statistics file of the
+    same partido and year leaves out. A list joins a party the statistics files name under its number when the
+    names are close, and otherwise starts one."""
+    found: dict[tuple[int, str], Party] = {}
+    for did in districts():
+        for year in pdf_years(did):
+            have = {row.lista for row in everything()[("g", year)][did].rows}
+            for lista, name, votes in board(year, did).table:
+                if lista in have or not votes or (lista, name) in found:
+                    continue
+                known = [party_ for (number, _, _), party_ in out.items() if number == lista]
+                near = next((p_ for p_ in known if _similar(name, p_.name)), None)
+                found[(lista, name)] = near or Party(key("party", lista, year, normal(name)), name)
+    return found
 
 
 @functools.cache
@@ -755,6 +943,18 @@ def registry() -> Package:
     )
     for kind in KINDS:
         p.artifact(raw.cached(SOURCE, home_url(kind)), JUNTA)
+    p.add(
+        "source",
+        id=ESCRUTINIO,
+        kind="official_body",
+        publisher="Junta Electoral de la Provincia de Buenos Aires",
+        title="Escrutinio definitivo de las elecciones generales por partido",
+        url=results_home_url(),
+        license="Official public record, no license stated",
+        license_url=results_home_url(),
+        attribution="Junta Electoral de la Provincia de Buenos Aires",
+    )
+    p.artifact(raw.cached(SOURCE, results_home_url()), ESCRUTINIO)
     for name, (kind, english, spanish) in BODIES.items():
         p.add("body", id=body(name), polity_id=ARGENTINA, kind=kind)
         p.name(body(name), english, "en", "english", False)
@@ -862,6 +1062,13 @@ def election(kind: str, year: int) -> Package:
         "positive votes, blank votes, null votes, and registered voters its partido pages print. The Junta "
         "publishes no seats or winners with these tables. "
         + (
+            ""
+            if primary
+            else "Each partido's school board (consejo escolar) is added from the Junta's definitive-count PDF "
+            "for the partido, which prints one list table for the councillors and the school board together and "
+            "declares the school board seats each list won. "
+        )
+        + (
             "In the primaries each list's votes are those of its internal lines, which sit under the list."
             if primary
             else ""
@@ -899,6 +1106,13 @@ def election(kind: str, year: int) -> Package:
         _reconcile(p, declared, data)
     for (cargo, scope), dids in sorted(groups.items()):
         _contest(p, kind, year, election_id, path, cargo, scope, dids, data, units, declared if cargo == "04" else None)
+    if not primary:
+        for did in sorted(data):
+            if year in pdf_years(did):
+                p.artifact(raw.cached(SOURCE, pdf_url(year, did)), ESCRUTINIO)
+                p.artifact(raw.cached(SOURCE, results_listing_url(did)), ESCRUTINIO)
+                _school_board(p, year, election_id, path, did, data[did], units[did])
+        _accept_gaps(p, year, data)
     return p
 
 
@@ -1052,6 +1266,152 @@ def _contest(
             )
     if declared is not None:
         _declare(p, result_set, declared, option)
+
+
+def _accept_gaps(p: Package, year: int, data: dict[str, Held]) -> None:
+    """Accept the accounting findings that the PDFs' own printed figures cause: a list table that does not add
+    up to the printed positive votes, or positive, blank, and null votes that do not add up to the votes cast."""
+    sums: list[str] = []
+    totals: list[str] = []
+    for did in sorted(data):
+        if year not in pdf_years(did):
+            continue
+        here = board(year, did)
+        listed = sum(votes for _, _, votes in here.table)
+        figures = here.figures
+        positive = figures.get("positive")
+        if positive is not None and listed != positive and not _recovered(here, data[did], positive):
+            sums.append(f"{NAMES[did]} (lists {listed:,}, positive votes {positive:,})")
+        pos, blank, null, total = (figures.get(name) for name in ("positive", "blank", "null", "total"))
+        if (
+            pos is not None
+            and blank is not None
+            and null is not None
+            and total is not None
+            and pos + blank + null != total
+        ):
+            totals.append(
+                f"{NAMES[did]} (positive, blank, and null votes {pos + blank + null:,}, votes cast {total:,})"
+            )
+    if sums:
+        p.accept(
+            "accounting.votes_valid",
+            "In the Junta's definitive-count PDF the printed list votes do not add up to the printed positive votes "
+            f"for {'; '.join(sums)}. The package keeps each figure as printed.",
+        )
+    if totals:
+        p.accept(
+            "accounting.ballots_sum",
+            "In the Junta's definitive-count PDF the printed positive, blank, and null votes do not add up to the "
+            f"printed votes cast for {'; '.join(totals)}. The package keeps each figure as printed.",
+        )
+
+
+def _recovered(here: Board, held_: Held, positive: int) -> bool:
+    """Whether a list the table leaves out, taken from the statistics file, brings the table to the positive votes."""
+    cargo = "11" if "11" in held_.accounting else "10"
+    numbers = {row[0] for row in here.table}
+    missing = [row for row in held_.rows if row.cargo == cargo and row.lista < BLANK and row.lista not in numbers]
+    return sum(votes for _, _, votes in here.table) + sum(row.votes for row in missing) == positive
+
+
+def _list_party(lista: int, name: str, held_: Held, year: int) -> tuple[Party, str]:
+    """The party a PDF's list row stands for, found by number among the partido's rows in the statistics file
+    of the same year (and its name there), or else by the name the PDF prints for a list the file leaves out."""
+    for row in held_.rows:
+        if row.lista == lista:
+            return party(row, year), row.name or party(row, year).name
+    return parties()[(lista, normal(name), None)], name
+
+
+def _school_board(p: Package, year: int, election_id: str, path: str, did: str, held_: Held, unit: str) -> None:
+    """The partido's consejo escolar: the list votes of the Junta's definitive-count PDF, which prints one list
+    table for the councillors and the school board together, and the school board seats it declares to each
+    list. A list the PDF's table leaves out but the statistics file prints, with votes that bring the table to the
+    PDF's positive votes, is taken from the statistics file."""
+    here = board(year, did)
+    listed = {row.lista for row in held_.rows}
+    table = [row for row in here.table if row[2] or row[0] in listed]
+    cargo = "11" if "11" in held_.accounting else "10"
+    positive = here.figures.get("positive")
+    missing = [
+        row for row in held_.rows if row.cargo == cargo and row.lista < BLANK and row.lista not in {t[0] for t in table}
+    ]
+    if (
+        missing
+        and positive is not None
+        and sum(votes for _, _, votes in table) + sum(r.votes for r in missing) == positive
+    ):
+        table += [(row.lista, row.name, row.votes) for row in missing]
+    name = NAMES[did]
+    contest = key("contest", "g", year, "school", did)
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election_id,
+        district_area_id=area("ar-b.partido", did),
+        round_number=1,
+        default_result_kind="counted",
+        kind="list_allocation",
+        body_id=body("school_board"),
+        magnitude=here.seats,
+    )
+    p.name(contest, f"Consejeros escolares de {name}", "es", "official")
+    p.name(contest, f"School board members (consejeros escolares) of {name}", "en", "english", False)
+    p.add("slug", path=f"{path}/school-board-{changeset.slug(name)}", entity_id=contest, is_current=True)
+    result_set = key("result_set", "g", year, "school", did)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election_id,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=ESCRUTINIO,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    options: dict[int, str] = {}
+    for lista, list_name, _ in table:
+        found, label = _list_party(lista, list_name, held_, year)
+        options[lista] = key("option", "g", year, "school", did, found.id)
+        p.add(
+            "contest_option",
+            id=options[lista],
+            contest_id=contest,
+            kind="list",
+            party_id=found.id,
+            ballot_label=label,
+        )
+    for measure, label in ((2, "registered"), (3, "total"), (4, "positive"), (5, "null"), (6, "blank")):
+        if label in here.figures:
+            p.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=None,
+                channel=0,
+                measure=measure,
+                count_round=0,
+                flags=0,
+                value=here.figures[label],
+            )
+    for lista, _, votes in table:
+        p.add(
+            "result_value",
+            result_set_id=result_set,
+            unit_id=unit,
+            option_id=options[lista],
+            channel=0,
+            measure=1,
+            count_round=0,
+            flags=0,
+            value=votes,
+        )
+    for list_name, seats in here.won:
+        lista = table[match_list(list_name, table, year, did)][0]
+        p.add("outcome", result_set_id=result_set, option_id=options[lista], kind="won", seats=seats)
 
 
 def _reconcile(p: Package, declared: Declared, data: dict[str, Held]) -> None:
