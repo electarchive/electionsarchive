@@ -193,6 +193,8 @@ TAIWAN_UNITS = {
 }
 DISTRICT = re.compile(r"^[가-힣\d\s]+(?:선거구|제\d+|[시군구읍면동리가][갑을병정무]?)$")
 NUMBERED = re.compile(r"^\d+ - ")
+KARMA = re.compile(r"[बव]ि\.?\s?क\.")
+KARMA_LATIN = re.compile(r"(?<!\w)(?:VDC|[BV]\.?\s?K\.?|Bi\.?\s?K\.?)(?!\w)")
 ROMAN = {"II", "III", "IV", "VI", "VII", "VIII", "IX", "XI", "XII"}
 
 
@@ -542,6 +544,8 @@ def plan(entity: Entity, answers: dict[str, dict[str, object]]) -> tuple[list[Na
             lead = NUMBERED.match(text)
             if lead is not None and not romanized.startswith(lead[0]):
                 romanized = lead[0] + romanized
+            if KARMA.search(text):
+                romanized = KARMA_LATIN.sub("B.K.", romanized)
             names.append(Name(id, tidy(romanized), lang, "Latn", "transliteration"))
         return names, wants
     source = cased if group == "person" else titled(text, True)
