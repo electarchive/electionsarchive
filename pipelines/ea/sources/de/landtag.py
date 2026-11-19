@@ -1,30 +1,44 @@
 import csv
+import hashlib
 import html
 import io
 import itertools
+import json
 import re
 import subprocess
 import zipfile
+from collections.abc import Callable
 from datetime import date
 from pathlib import Path
 from typing import Any
 from uuid import UUID, uuid5
 
 import polars as pl
+import pymupdf
 import shapely
 
-from ea import raw
+from ea import package, raw
 from ea.boundaries import read as read_boundaries
 from ea.changeset import NAMESPACE, Changeset
+from ea.package import Draft
 from ea.sources.de.btw import CONSTITUENCIES
 from ea.sources.licenses import PUBLIC_RECORD
 from ea.store import DATA, connect
 
 SOURCE = "de.landtag"
-VERSION = "5"
+VERSION = "6"
+SUMMARY = (
+    "German state elections: 2026 (Baden-Württemberg, Berlin, Mecklenburg-Vorpommern, Rhineland-Palatinate, and "
+    "Saxony-Anhalt) by constituency, every earlier Landtag election since 1946 by Land from the Bundeswahlleiterin "
+    "and the Länder statistical offices, and Thuringia's elections since 1990, Saxony's since 2009, and Brandenburg's "
+    "since 2004 by constituency"
+)
 # The changesets this pipeline published before packages: the first de.landtag/all package adopts them, so its load
 # takes over their rows (Thuringia's constituency outlines among them) instead of clashing with them.
 ADOPTS = ["01a1dc05-d0ac-7577-a355-7ec53e090e92"]
+# Rows the package format does not hold. The changesets that wrote them keep them: the merger relations of the
+# former Länder, and the merge of the East German KPD into the party of 1990.
+CHANGESET_ONLY = ("polity_relation", "entity_merge")
 PARSED = DATA / "parsed" / SOURCE
 BW = "https://wahlen.statistik-bw.de/ltw26"
 MV = "https://www.laiv-mv.de/static/LAIV/Wahlen/2-Landtagswahlen/2026/Ergebnisse"
@@ -79,6 +93,89 @@ TH_1990_NOTE = (
     f"those of the Thüringer Landesamt für Statistik ({TH_YEARBOOK}), which agree with the 44 constituency winners "
     f"and 45 list members it names ({TH_1990_ELECTED})."
 )
+SN_DOWNLOAD = "https://www.wahlen.sachsen.de/download"
+SN_LIBRARY = "https://www.statistischebibliothek.de/mir/servlets/MCRFileNodeServlet"
+SN_RESULTS = {
+    2014: (f"{SN_DOWNLOAD}/Bundestag/LW14_Ergebnisse_ORIGINALE.xlsx", "LW14_Ergebnisse_WK"),
+    2019: (f"{SN_DOWNLOAD}/Landtag/LW19_endgErgebnisse_Stand27092019.xlsx", "LW19_endgErgebnisse_SN&WK"),
+    2024: (f"{SN_DOWNLOAD}/Landtag/statistik-sachsen_LW24_endgErgebniss.xlsx", "LW24_endgErgebnisse_SN&WK"),
+}
+SN_ELECTED = {
+    2009: f"{SN_LIBRARY}/SNHeft_derivate_00005761/B_VII_2-2_5j09_SN.pdf",
+    2014: f"{SN_LIBRARY}/SNHeft_derivate_00005762/B_VII_2_2_5j_14_SN.pdf",
+    2019: f"{SN_DOWNLOAD}/Landtag/LW19_gewaehlte_Direktbewerber.pdf",
+    2024: f"{SN_DOWNLOAD}/Landtag/statistik-sachsen_LW24_gewaehlte_Direktbewerber.pdf",
+}
+# Pages of the 2009 final report (1-based): table 4 (the Land), 7 (registered voters and voters), and 8 (valid and
+# invalid votes), and the facing pages of tables 9 (constituency votes) and 10 (list votes) with their columns.
+SN_2009_PAGES = {"land": (29, 29), "registered": (32, 35), "valid": (36, 39)}
+SN_2009_FIRST = (
+    ("Insgesamt", "CDU", "DIE LINKE", "SPD", "NPD", "FDP"),
+    ("GRÜNE", "PBC", "BüSo", "DSU", "Freie Sachsen", "FP Deutschlands"),
+    ("HUMANWIRTSCHAFT", "SVP", "BILDUNG", "DOSE", "Förster", "Freie Bürger"),
+    ("Für unsere Region", "FW Sachsen", "Frieden", "Gerechtigkeit", "Nitzsche"),
+)
+SN_2009_LIST = (
+    ("Insgesamt", "CDU", "DIE LINKE", "SPD", "NPD", "FDP", "GRÜNE"),
+    (
+        "Die Tierschutzpartei",
+        "PBC",
+        "BüSo",
+        "DSU",
+        "REP",
+        "Freie Sachsen",
+        "FP Deutschlands",
+        "HUMANWIRTSCHAFT",
+        "PIRATEN",
+        "SVP",
+    ),
+)
+# Each table prints a group of constituencies on even pages that start with the number and on odd pages that end
+# with it.
+SN_2009_VOTES = {
+    1: [(40 + 4 * group + page, columns) for group in range(4) for page, columns in enumerate(SN_2009_FIRST)],
+    2: [(56 + 2 * group + page, columns) for group in range(4) for page, columns in enumerate(SN_2009_LIST)],
+}
+SN_WAHLKREISE = 60
+SN_PUBLISHER = "Statistisches Landesamt des Freistaates Sachsen"
+SN_TITLE = "Wahlen im Freistaat Sachsen: Landtagswahlen 2009 bis 2024, endgültige Ergebnisse nach Wahlkreisen"
+SN_URL = "https://www.wahlen.sachsen.de/landtagswahlen.html"
+# The 2014 report's font stores each character 29 code points down, except these.
+SN_2014_GLYPHS = {"l": "ä", "|": "ö", "\x81": "ü", "\x89": "ß", "\x8b": "©"}
+SN_NOTE = (
+    "Each voter has two votes, a constituency vote (Direktstimme) and a list vote (Listenstimme). The votes shown are "
+    "list votes, which decide the seats; each constituency's contest holds its constituency votes."
+)
+# The Amt für Statistik Berlin-Brandenburg's final reports (Statistischer Bericht B VII 2-3), one per election. The
+# 2004 report is a workbook with a sheet per constituency; 2014, 2019, and 2024 print a page per constituency; 2009
+# prints tables of all constituencies. The 1994 and 1999 reports are scans without a text layer.
+BB_REPORTS = {
+    2004: f"{SN_LIBRARY}/BBHeft_derivate_00011854/SB_B7-2-3_5j-04_BB.xls",
+    2009: f"{SN_LIBRARY}/BBHeft_derivate_00011855/SB_B7-2-3_5j-09_BB.pdf",
+    2014: f"{SN_LIBRARY}/BBHeft_derivate_00005974/SB_B07-02-03_2014j05_BBa.pdf",
+    2019: f"{SN_LIBRARY}/BBHeft_derivate_00020261/SB_B07-02-03_2019j05_BB.pdf",
+    2024: f"{SN_LIBRARY}/BBHeft_derivate_00034670/SB_B07-02-03_2024j05_BB.pdf",
+}
+BB_WAHLKREISE = 44
+BB_PUBLISHER = "Amt für Statistik Berlin-Brandenburg"
+BB_TITLE = "Statistischer Bericht B VII 2-3: Landtagswahlen im Land Brandenburg 2004 bis 2024, endgültige Ergebnisse"
+BB_URL = "https://www.statistik-berlin-brandenburg.de/landtagswahlen-brandenburg"
+# Pages of the 2009 report (1-based): table 3.1 (the constituency winners), 4.1 (constituency votes, with the smaller
+# proposals printed together as Sonstige), and the facing pages of 4.3 (list votes).
+BB_2009_PAGES = {"winners": 74, "first": 82, "second": (84, 85)}
+BB_2009_FIRST = ("SPD", "DIE LINKE", "CDU", "GRÜNE/B 90", "FDP", "Sonstige")
+BB_NOTE = (
+    "Each voter has two votes, a constituency vote (Erststimme) and a list vote (Zweitstimme). The votes shown are "
+    "list votes, which decide the seats; each constituency's contest holds its constituency votes."
+)
+# Where the Bundeswahlleiterin's compilation differs from the state office's final Land table (2004: Tab1-Land of the
+# workbook), the constituencies add up to the state office's figures, which the list votes then show.
+BB_LAND = {date(2004, 9, 19): {"DVU": (71045, 71041), "GRÜNE/B 90": (42087, 42091)}}
+BB_LAND_NOTE = (
+    "The Bundeswahlleiterin's compilation prints {printed}. The votes shown are those of the Amt für Statistik "
+    "Berlin-Brandenburg's final report, whose Land table and constituencies print {final}."
+)
+DISTRICT_OTHERS = ("Sonstige", "Übrige")
 TH_TITLES = re.compile(r"\b(?:Prof\.|Dr\.|sc\.|med\.|rer\.|nat\.|phil\.|oec\.|habil\.|h\.\s?c\.|Dipl\.-\S+)\s*")
 
 
@@ -529,6 +626,20 @@ def fetch() -> None:
             raw.fetch(SOURCE, th_page(year, wk), suffix=".html")
     for url in TH_SHAPES.values():
         raw.fetch(SOURCE, url, suffix=".zip")
+    fetch_sn()
+    fetch_bb()
+
+
+def fetch_bb() -> None:
+    for url in BB_REPORTS.values():
+        raw.fetch(SOURCE, url, suffix=f".{url.rsplit('.', 1)[1]}")
+
+
+def fetch_sn() -> None:
+    for url, _ in SN_RESULTS.values():
+        raw.fetch(SOURCE, url, suffix=".xlsx")
+    for url in SN_ELECTED.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def history_count(text: str) -> int | None:
@@ -777,8 +888,6 @@ def parse_history() -> None:
     election_frame.write_parquet(PARSED / "history_elections.parquet")
     result_frame.write_parquet(PARSED / "history_results.parquet")
     pl.DataFrame(glossary).write_parquet(PARSED / "history_glossary.parquet")
-    parse_th(elections, results)
-    parse_th_shapes()
 
 
 def parse_th_shapes() -> None:
@@ -997,6 +1106,574 @@ def parse_th(elections: list[dict[str, Any]], results: list[dict[str, Any]]) -> 
     vote_frame.write_parquet(PARSED / "th_votes.parquet")
     pl.DataFrame(members).write_parquet(PARSED / "th_members.parquet")
     pl.DataFrame(labels).write_parquet(PARSED / "th_labels.parquet")
+
+
+def sn_glyphs(text: str) -> str:
+    out = []
+    for char in text:
+        if char in SN_2014_GLYPHS:
+            out.append(SN_2014_GLYPHS[char])
+        elif ord(char) < 0x60:
+            out.append(chr(ord(char) + 29))
+        else:
+            raise ValueError(f"SN 2014 report: unknown glyph {char!r} in {text!r}")
+    return "".join(out)
+
+
+def sn_winners(year: int) -> list[dict[str, object]]:
+    """The constituency winners, in the cell order every one of the Land's tables of elected members uses: number,
+    constituency, party, "family name, first names", and votes. The 2009 and 2014 tables are on pages 16 and 17 of
+    the final reports."""
+    document = pymupdf.open(raw.cached(SOURCE, SN_ELECTED[year]).path)
+    pages = (15, 16) if year in (2009, 2014) else range(document.page_count)
+    lines: list[str] = []
+    for number in pages:
+        for block in document[number].get_text("rawdict")["blocks"]:
+            for line in block.get("lines", []):
+                text = "".join(char["c"] for span in line["spans"] for char in span["chars"])
+                lines.append((sn_glyphs(text) if year == 2014 else text).strip())
+    winners: list[dict[str, object]] = []
+    at = 0
+    for wk in range(1, SN_WAHLKREISE + 1):
+        at = next(
+            i
+            for i in range(at, len(lines) - 4)
+            if lines[i] == str(wk)
+            and not re.fullmatch(r"[\d ,.%]+|absolut", lines[i + 1])
+            and any("," in lines[j] for j in range(i + 2, i + 5))
+        )
+        name_at = next(j for j in range(at + 2, at + 5) if "," in lines[j])
+        family, first = th_person(lines[name_at])
+        winners.append(
+            {
+                "wk": f"{wk:02d}",
+                "kind": "direct",
+                "party": lines[name_at - 1],
+                "family": family,
+                "first": first,
+                "position": None,
+                "votes": int(re.sub(r"[ .]", "", lines[name_at + 1])),
+            }
+        )
+        at = name_at
+    return winners
+
+
+def sn_workbook(year: int) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    url, sheet = SN_RESULTS[year]
+    rows = pl.read_excel(raw.cached(SOURCE, url).path, sheet_name=sheet, has_header=False, infer_schema_length=0).rows()
+    header = list(rows[0])
+    end = header.index(None) if None in header else len(header)
+    columns = {name: column for column, name in enumerate(header[:end])}
+    cons: list[dict[str, Any]] = []
+    votes: list[dict[str, Any]] = []
+    for row in rows[1:]:
+        if "Ebene" in columns and row[columns["Ebene"]] != "WK":
+            continue
+        wk = f"{int(row[columns['WK-Nr']]):02d}"
+        counts = {
+            name: number(row[column])
+            for name, column in columns.items()
+            if name in ("Wahlberechtigte", "Wähler") or re.fullmatch(r".+_[12]", name)
+        }
+        cons.append(
+            {
+                "wk": wk,
+                "name": row[columns["WK-Name"]].strip(),
+                "registered": counts["Wahlberechtigte"],
+                "voters": counts["Wähler"],
+                "invalid1": counts["ungültige_1"],
+                "valid1": counts["gültige_1"],
+                "invalid2": counts["ungültige_2"],
+                "valid2": counts["gültige_2"],
+            }
+        )
+        for name, count in counts.items():
+            match = re.fullmatch(r"(.+)_([12])", name)
+            if match is None or match[1] in ("ungültige", "gültige") or not count:
+                continue
+            votes.append({"wk": wk, "ballot": int(match[2]), "label": match[1], "votes": count})
+    return cons, votes
+
+
+def sn_2009() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """The 2009 constituencies from the final report's tables 7 (registered voters and voters), 8 (valid and invalid
+    votes), 9 (constituency votes), and 10 (list votes), which print each constituency's votes in a row of absolute
+    numbers across facing pages; every row adds up to the total it prints."""
+    document = pymupdf.open(raw.cached(SOURCE, SN_ELECTED[2009]).path)
+
+    def lines(first: int, last: int) -> list[str]:
+        return [
+            line for page in range(first - 1, last) for line in document[page].get_text("text", sort=True).splitlines()
+        ]
+
+    def cells(text: str) -> list[int | None]:
+        return [number(cell) for cell in re.split(r"\s{2,}", text.strip())]
+
+    accounting: dict[str, dict[str, Any]] = {}
+    for line in lines(*SN_2009_PAGES["registered"]):
+        if match := re.fullmatch(r"\s*(\d+)\s+(.+?)\s+2009\s+(.+)", line):
+            registered, voters, _, _, _ = re.split(r"\s{2,}", match[3].strip())
+            accounting[f"{int(match[1]):02d}"] = {
+                # Leipzig 7 carries a footnote mark about the repeat vote of 2004.
+                "name": re.sub(r"\s+\d\)$", "", match[2].strip()),
+                "registered": number(registered),
+                "voters": number(voters),
+            }
+    for line in lines(*SN_2009_PAGES["valid"]):
+        if match := re.fullmatch(r"\s*(\d+)\s+(.+?)\s+2009\s+(.+)", line):
+            valid1, _, invalid1, _, valid2, _, invalid2, _ = re.split(r"\s{2,}", match[3].strip())
+            accounting[f"{int(match[1]):02d}"] |= {
+                "invalid1": number(invalid1),
+                "valid1": number(valid1),
+                "invalid2": number(invalid2),
+                "valid2": number(valid2),
+            }
+    counts: dict[tuple[int, str], dict[str, int | None]] = {}
+    for ballot, groups in SN_2009_VOTES.items():
+        for first, columns in groups:
+            for line in lines(first, first):
+                if first % 2 == 0:
+                    match = re.fullmatch(r"\s*(?P<wk>\d+)\s+\S.*?\s+absolut\s+(?P<text>.+)", line)
+                else:
+                    match = re.fullmatch(r"(?P<text>.+?)\s+absolut\s+\S.*?\s+(?P<wk>\d+)\s*", line)
+                    if match is None and ballot == 2 and "," not in line:
+                        match = re.fullmatch(r"\s*(?P<text>[\dx][\d x]*?)\s{2,}(?P<wk>\d+)\s*", line)
+                if match is None:
+                    continue
+                wk, text = match["wk"], match["text"]
+                found = cells(text)
+                if len(found) != len(columns):
+                    raise ValueError(f"SN 2009 page {first}: {len(found)} cells for {columns} in {line!r}")
+                counts.setdefault((ballot, f"{int(wk):02d}"), {}).update(zip(columns, found, strict=True))
+    cons = [{"wk": wk, **row} for wk, row in sorted(accounting.items())]
+    votes: list[dict[str, Any]] = []
+    for (ballot, wk), row in sorted(counts.items()):
+        total = row.pop("Insgesamt")
+        if total != sum(count or 0 for count in row.values()) or total != accounting[wk][f"valid{ballot}"]:
+            raise ValueError(f"SN 2009 {wk} ballot {ballot}: {row} against {total} and table 8")
+        votes += [{"wk": wk, "ballot": ballot, "label": label, "votes": count} for label, count in row.items() if count]
+    land: dict[str, int] = {}
+    for line in lines(*SN_2009_PAGES["land"]):
+        if match := re.fullmatch(r"\s*(\S.*?)\s{2,}(\d[\d ]*?)\s{2,}.*", line):
+            land.setdefault(match[1], int(match[2].replace(" ", "")))
+    for label in {vote["label"] for vote in votes if vote["ballot"] == 1}:
+        total = sum(vote["votes"] for vote in votes if vote["ballot"] == 1 and vote["label"] == label)
+        if land.get(label) != total:
+            raise ValueError(f"SN 2009 constituency votes for {label}: {total} against table 4's {land.get(label)}")
+    return cons, votes
+
+
+def parse_sn(elections: list[dict[str, Any]], results: list[dict[str, Any]]) -> None:
+    """Saxony's constituency results from the Statistisches Landesamt's workbooks, and the winners from its tables of
+    elected members; every constituency's votes add up to its valid votes, and the constituencies to the Land."""
+    cons: list[dict[str, object]] = []
+    votes: list[dict[str, object]] = []
+    members: list[dict[str, object]] = []
+    labels: list[dict[str, object]] = []
+    problems: list[str] = []
+    days = {election["day"].year: election for election in elections if election["state"] == "SN"}
+    for year in SN_ELECTED:
+        election = days[year]
+        day = election["day"]
+        year_cons, year_votes = sn_workbook(year) if year in SN_RESULTS else sn_2009()
+        cons += [{"day": day, **row} for row in year_cons]
+        votes += [{"day": day, **vote} for vote in year_votes]
+        land = [row for row in cons if row["day"] == day]
+        if len(land) != SN_WAHLKREISE:
+            problems.append(f"SN {day}: {len(land)} constituencies")
+        for field in ("registered", "voters", "invalid", "valid"):
+            column = "invalid2" if field == "invalid" else "valid2" if field == "valid" else field
+            if sum(int(row[column]) for row in land) != election[field]:
+                problems.append(f"SN {day} {field}: constituencies against Land {election[field]}")
+        totals: dict[str, int] = {}
+        for vote in votes:
+            if vote["day"] == day and vote["ballot"] == 2:
+                totals[str(vote["label"])] = totals.get(str(vote["label"]), 0) + int(vote["votes"])
+        land_rows = {row["label"]: row["votes"] for row in results if row["index"] == election["index"]}
+        for label, count in totals.items():
+            matches = [land_label for land_label, land_count in land_rows.items() if land_count == count]
+            if len(matches) != 1:
+                problems.append(f"SN {day} second vote {label} {count}: Land rows {matches}")
+                continue
+            labels.append({"day": day, "label": label, "land": matches[0]})
+        if len(totals) != len(land_rows):
+            problems.append(f"SN {day}: {len(land_rows)} Land rows, {len(totals)} constituency labels")
+        for winner in sn_winners(year):
+            first_votes = {
+                str(vote["label"]): int(vote["votes"])
+                for vote in votes
+                if vote["day"] == day and vote["wk"] == winner["wk"] and vote["ballot"] == 1
+            }
+            if first_votes.get(str(winner["party"])) != winner["votes"] or winner["votes"] != max(first_votes.values()):
+                problems.append(f"SN {day} {winner['wk']}: winner {winner} against {first_votes}")
+            members.append({"day": day, **{key: value for key, value in winner.items() if key != "votes"}})
+    cons_frame = pl.DataFrame(cons)
+    vote_frame = pl.DataFrame(votes)
+    for row in cons_frame.iter_rows(named=True):
+        ballots = vote_frame.filter((pl.col("day") == row["day"]) & (pl.col("wk") == row["wk"]))
+        for ballot in (1, 2):
+            total = ballots.filter(pl.col("ballot") == ballot)["votes"].sum()
+            if total != row[f"valid{ballot}"]:
+                problems.append(f"SN {row['day']} {row['wk']} ballot {ballot}: votes {total} against valid")
+            if row[f"valid{ballot}"] + row[f"invalid{ballot}"] != row["voters"]:
+                problems.append(f"SN {row['day']} {row['wk']} ballot {ballot}: valid and invalid against voters")
+    for problem in problems:
+        print(problem)
+    if problems:
+        raise ValueError(f"{len(problems)} Saxon problems")
+    print(cons_frame.height, "Saxon constituency results,", vote_frame.height, "vote rows,", len(members), "members")
+    cons_frame.write_parquet(PARSED / "sn_constituencies.parquet")
+    vote_frame.write_parquet(PARSED / "sn_votes.parquet")
+    pl.DataFrame(members).write_parquet(PARSED / "sn_members.parquet")
+    pl.DataFrame(labels).write_parquet(PARSED / "sn_labels.parquet")
+
+
+def bb_count(text: str | None) -> int | None:
+    text = (text or "").strip()
+    if text in ("", "x", "X", "–", "-", "."):
+        return None
+    return int(float(re.sub(r"\s", "", text)))
+
+
+def bb_cells(line: str) -> list[str]:
+    """A table line split into its cells: dot leaders, and the leader glyphs the 2014 and 2019 reports' fonts leave
+    unmapped, become gaps, and two spaces or more separate cells."""
+    text = re.sub(r"\.{2,}|�+|…+", "  ", line)
+    return [cell.strip() for cell in re.split(r"\s{2,}", text.strip()) if cell.strip()]
+
+
+def bb_winner(wk: str, first: dict[str, int], candidates: list[tuple[str, str | None]]) -> dict[str, object]:
+    """The constituency's winner: the proposal with the most constituency votes, named from the page's list of
+    proposals, where an independent appears without a party and under "EB" and the family name in the tables."""
+    top = max(first, key=lambda label: first[label])
+    if sorted(first.values())[-2:].count(first[top]) > 1:
+        raise ValueError(f"BB {wk}: a tie for the most constituency votes")
+    found = [
+        person
+        for person, party in candidates
+        if (party is not None and folded(party) == folded(top))
+        or (party is None and top.startswith("EB") and folded(person.split(",")[0]) in folded(top))
+    ]
+    if len(found) != 1:
+        raise ValueError(f"BB {wk}: {len(found)} candidates for {top} in {candidates}")
+    family, given = th_person(found[0])
+    return {"wk": wk, "kind": "direct", "party": top, "family": family, "first": given, "position": None}
+
+
+def bb_pages(year: int) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    """The 2014, 2019, and 2024 reports' page per constituency: the electorate, voters, invalid and valid votes, and
+    each party's constituency and list votes in the first and third columns, then the proposals in the constituency.
+    2024 also names the winner, which must be the proposal with the most constituency votes."""
+    document = pymupdf.open(raw.cached(SOURCE, BB_REPORTS[year]).path)
+    cons: list[dict[str, Any]] = []
+    votes: list[dict[str, Any]] = []
+    members: list[dict[str, Any]] = []
+    fields = {"Wahlberechtigte": "registered", "Wähler": "voters", "Wählende": "voters"}
+    skipped = ("ohne Wahlschein", "mit Wahlschein", "Briefwähler", "darunter Briefwählende")
+    for page in document:
+        lines = page.get_text("text", sort=True).splitlines()
+        heading = next(
+            (
+                match
+                for line in lines
+                if ".." not in line and (match := re.fullmatch(r"\s*3\.\d+\s+Wahlkreis\s+(\d+)\s+(\S.*?)\s*", line))
+            ),
+            None,
+        )
+        if heading is None or not any(line.strip().startswith("Wahlberechtigte") for line in lines):
+            continue
+        wk = f"{int(heading[1]):02d}"
+        row: dict[str, Any] = {"wk": wk, "name": re.sub(r"\s*/\s*", "/", heading[2])}
+        counts: dict[int, dict[str, int]] = {1: {}, 2: {}}
+        elected = None
+        listed: list[str] = []
+        parties = False
+        for at, line in enumerate(lines):
+            if match := re.search(r"Gewählt ist:\s*(.+)", line):
+                elected = match[1].strip()
+                continue
+            if re.search(r"Wahlkreiskandidaten:|Alle Wahlkreisvorschläge:", line):
+                listed = [line]
+                for following in lines[at + 1 :]:
+                    if not following.strip():
+                        break
+                    listed.append(following)
+                break
+            cells = bb_cells(line)
+            if len(cells) < 5:
+                continue
+            label, values = cells[0], cells[1:]
+            if label in fields:
+                row[fields[label]] = bb_count(values[0])
+            elif label in ("Ungültige Stimmen", "Gültige Stimmen"):
+                kind = "invalid" if label.startswith("Ungültige") else "valid"
+                row[f"{kind}1"], row[f"{kind}2"] = bb_count(values[0]), bb_count(values[2])
+                parties = kind == "valid"
+            elif parties and label not in skipped:
+                for ballot, value in ((1, values[0]), (2, values[2])):
+                    count = bb_count(value)
+                    if count:
+                        counts[ballot][label] = count
+        # A party in parentheses ends an entry even where a line break lost the semicolon after it.
+        text = re.sub(r"\)\s*", ");", re.sub(r"\s+", " ", " ".join(listed).split(":", 1)[1])) if listed else ""
+        candidates = [
+            (match[1].strip(), match[2].strip())
+            if (match := re.fullmatch(r"(.+?)\s*\((.+)\)", entry))
+            else (entry, None)
+            for entry in (part.strip() for part in text.split(";"))
+            if entry
+        ]
+        winner = bb_winner(wk, counts[1], candidates)
+        if elected is not None:
+            family, given = th_person(re.sub(r"\s*\([^)]*\)$", "", elected))
+            if (family, given) != (winner["family"], winner["first"]):
+                raise ValueError(f"BB {year} {wk}: elected {elected} against {winner}")
+        cons.append(row)
+        votes += [
+            {"wk": wk, "ballot": ballot, "label": label, "votes": count}
+            for ballot, found in counts.items()
+            for label, count in found.items()
+        ]
+        members.append(winner)
+    return cons, votes, members
+
+
+def bb_2004() -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    """The 2004 workbook's sheet per constituency (Tab1-Wk01 to Tab1-Wk44): the electorate and voters, invalid and
+    valid votes, each party's constituency and list votes, the proposals, and the winner."""
+    path = raw.cached(SOURCE, BB_REPORTS[2004]).path
+    cons: list[dict[str, Any]] = []
+    votes: list[dict[str, Any]] = []
+    members: list[dict[str, Any]] = []
+    for number in range(1, BB_WAHLKREISE + 1):
+        wk = f"{number:02d}"
+        sheet = pl.read_excel(path, sheet_name=f"Tab1-Wk{wk}", has_header=False, infer_schema_length=0).rows()
+        cells = [[(cell or "").strip() for cell in row] + [""] * 5 for row in sheet]
+        at = next(i for i, row in enumerate(cells) if row[0] == f"Landtagswahlkreis {wk}")
+        name = next(row[0] for row in cells[at + 1 :] if row[0])
+        row: dict[str, Any] = {"wk": wk, "name": re.sub(r"\s*/\s*", "/", name)}
+        parties = seen = False
+        for label, first, _, second, _ in (line[:5] for line in cells):
+            if label == "Wahlberechtigte":
+                row["registered"] = bb_count(first)
+            elif label.startswith("Wähler"):
+                row["voters"] = bb_count(first)
+            elif label.startswith(("Ungültige Stimmen", "Gültige Stimmen")):
+                kind = "invalid" if label.startswith("Ungültige") else "valid"
+                row[f"{kind}1"], row[f"{kind}2"] = bb_count(first), bb_count(second)
+                parties = kind == "valid"
+            elif label.endswith(":"):
+                parties = False
+            elif parties and label:
+                seen = True
+                party = re.sub(r"^davon\s+", "", label)
+                for ballot, value in ((1, first), (2, second)):
+                    count = bb_count(value)
+                    if count:
+                        votes.append({"wk": wk, "ballot": ballot, "label": party, "votes": count})
+            elif parties and seen:
+                parties = False
+        elected = next(i for i, line in enumerate(cells) if line[0] == "Gewählt im Wahlkreis:")
+        party, person = cells[elected + 1][:2]
+        first_votes = {
+            str(vote["label"]): int(vote["votes"]) for vote in votes if vote["wk"] == wk and vote["ballot"] == 1
+        }
+        winner = bb_winner(wk, first_votes, [(person, None if party == "EB" else party)])
+        cons.append(row)
+        members.append(winner)
+    return cons, votes, members
+
+
+def bb_2009(land_rows: dict[str, int]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    """The 2009 report's tables of all constituencies: 4.1 for the constituency votes (the smaller proposals together
+    as Sonstige), the facing pages of 4.3 for the list votes, whose columns are matched to the Land's parties by their
+    totals, and 3.1 for the winners. Each table's printed Land row equals the sum of its constituencies."""
+    document = pymupdf.open(raw.cached(SOURCE, BB_REPORTS[2009]).path)
+
+    def table(number: int) -> tuple[dict[str, list[int | None]], dict[str, str], list[int | None]]:
+        rows: dict[str, list[int | None]] = {}
+        names: dict[str, str] = {}
+        land: list[int | None] = []
+        pending: tuple[str | None, str] = (None, "")
+        for line in document[number - 1].get_text("text", sort=True).splitlines():
+            cells = bb_cells(line)
+            numeric = [bool(re.fullmatch(r"[\dx ]+", cell)) for cell in cells]
+            wk = None
+            # The constituency number stands before its name on left-hand pages and after the numbers on right-hand
+            # pages, as its own cell or one space from the name.
+            for at, cell in enumerate(cells):
+                if (match := re.fullmatch(r"(\d{1,2})\s+(\D.*)", cell)) and not numeric[at]:
+                    wk, cells[at] = match[1], match[2]
+                elif numeric[at] and re.fullmatch(r"\d{1,2}", cell) and at + 1 < len(cells) and not numeric[at + 1]:
+                    wk, numeric[at], cells[at] = cell, False, ""
+            # Numbers of a row are two spaces apart, but the Land row runs its first three together.
+            numbers = [
+                found
+                for cell, flag in zip(cells, numeric, strict=True)
+                if flag
+                for found in re.findall(r"x|\d{1,3}(?: \d{3})*", cell)
+            ]
+            text = " ".join(cell for cell, flag in zip(cells, numeric, strict=True) if not flag and cell)
+            if "Land Brandenburg" in line:
+                land = [bb_count(cell) for cell in numbers]
+                continue
+            if not numbers:
+                pending = (wk, text)
+                continue
+            name = text if wk is not None else f"{pending[1]} {text}".strip()
+            wk = wk or pending[0]
+            pending = (None, "")
+            if wk is None:
+                continue
+            key = f"{int(wk):02d}"
+            rows[key] = [bb_count(cell) for cell in numbers]
+            names[key] = re.sub(r"\s*/\s*", "/", name)
+        return rows, names, land
+
+    first_rows, names, first_land = table(BB_2009_PAGES["first"])
+    left, _, left_land = table(BB_2009_PAGES["second"][0])
+    right, _, right_land = table(BB_2009_PAGES["second"][1])
+    if len(first_rows) != BB_WAHLKREISE or len(left) != BB_WAHLKREISE or len(right) != BB_WAHLKREISE:
+        raise ValueError(f"BB 2009: {len(first_rows)}, {len(left)}, and {len(right)} constituency rows")
+    columns = len(right_land)
+    sums = [sum(row[i] or 0 for row in right.values()) for i in range(columns)]
+    sums_left = [sum(row[i] or 0 for row in left.values()) for i in range(len(left_land))]
+    if sums != right_land or sums_left != left_land:
+        raise ValueError("BB 2009: list votes differ from the printed Land rows")
+    first_sums = [sum(row[i] or 0 for row in first_rows.values()) for i in range(len(first_land))]
+    if first_sums != first_land:
+        raise ValueError("BB 2009: constituency votes differ from the printed Land row")
+    second_totals = left_land[3:] + right_land
+    labels: list[str] = []
+    for total in second_totals:
+        matches = [label for label, count in land_rows.items() if count == total]
+        if len(matches) != 1:
+            raise ValueError(f"BB 2009: list column total {total} matches {matches}")
+        labels.append(matches[0])
+    cons: list[dict[str, Any]] = []
+    votes: list[dict[str, Any]] = []
+    for wk in sorted(first_rows):
+        registered, voters, valid1, *first = first_rows[wk]
+        _, _, valid2, *second = left[wk]
+        second += right[wk]
+        cons.append(
+            {
+                "wk": wk,
+                "name": names[wk],
+                "registered": registered,
+                "voters": voters,
+                "invalid1": (voters or 0) - (valid1 or 0),
+                "valid1": valid1,
+                "invalid2": (voters or 0) - (valid2 or 0),
+                "valid2": valid2,
+            }
+        )
+        votes += [
+            {"wk": wk, "ballot": 1, "label": label, "votes": count}
+            for label, count in zip(BB_2009_FIRST, first, strict=True)
+            if count
+        ]
+        votes += [
+            {"wk": wk, "ballot": 2, "label": label, "votes": count}
+            for label, count in zip(labels, second, strict=True)
+            if count
+        ]
+    members: list[dict[str, Any]] = []
+    pending = None
+    for line in document[BB_2009_PAGES["winners"] - 1].get_text("text", sort=True).splitlines():
+        cells = bb_cells(line)
+        if cells and (match := re.fullmatch(r"(\d{2})(?:\s+(\D.*))?", cells[0])):
+            pending, cells = match[1], ([match[2]] if match[2] else []) + cells[1:]
+        named = [
+            i
+            for i, cell in enumerate(cells)
+            if "," in cell
+            and not re.search(r"\d", cell)
+            and i + 1 < len(cells)
+            and re.fullmatch(r"[\d ]+", cells[i + 1])
+        ]
+        if pending is None or not named or not 1 <= int(pending) <= BB_WAHLKREISE:
+            continue
+        at = named[0]
+        party, person, count = cells[at - 1], cells[at], bb_count(cells[at + 1])
+        first_votes = {
+            str(vote["label"]): int(vote["votes"]) for vote in votes if vote["wk"] == pending and vote["ballot"] == 1
+        }
+        winner = bb_winner(pending, first_votes, [(person, party)])
+        if first_votes[str(winner["party"])] != count:
+            raise ValueError(f"BB 2009 {pending}: winner {person} with {count} against {first_votes}")
+        members.append(winner)
+        pending = None
+    return cons, votes, members
+
+
+def parse_bb(elections: list[dict[str, Any]], results: list[dict[str, Any]]) -> None:
+    """Brandenburg's constituency results from the Amt für Statistik Berlin-Brandenburg's final reports; every
+    constituency's votes add up to its valid votes, and the constituencies to the Land."""
+    cons: list[dict[str, object]] = []
+    votes: list[dict[str, object]] = []
+    members: list[dict[str, object]] = []
+    labels: list[dict[str, object]] = []
+    problems: list[str] = []
+    days = {election["day"].year: election for election in elections if election["state"] == "BB"}
+    for year in BB_REPORTS:
+        election = days[year]
+        day = election["day"]
+        land_rows = {row["label"]: row["votes"] for row in results if row["index"] == election["index"]}
+        for label, (printed, final) in BB_LAND.get(day, {}).items():
+            if land_rows[label] != printed:
+                raise ValueError(f"BB {day} {label}: the compilation prints {land_rows[label]}, not {printed}")
+            land_rows[label] = final
+        year_cons, year_votes, year_members = (
+            bb_2004() if year == 2004 else bb_2009(land_rows) if year == 2009 else bb_pages(year)
+        )
+        cons += [{"day": day, **row} for row in year_cons]
+        votes += [{"day": day, **vote} for vote in year_votes]
+        members += [{"day": day, **member} for member in year_members]
+        land = [row for row in year_cons]
+        if len(land) != BB_WAHLKREISE or len(year_members) != BB_WAHLKREISE:
+            problems.append(f"BB {day}: {len(land)} constituencies, {len(year_members)} winners")
+        for field in ("registered", "voters", "invalid", "valid"):
+            column = "invalid2" if field == "invalid" else "valid2" if field == "valid" else field
+            total = sum(int(row[column]) for row in land)
+            if total != election[field]:
+                problems.append(f"BB {day} {field}: constituencies {total} against Land {election[field]}")
+        totals: dict[str, int] = {}
+        for vote in year_votes:
+            if vote["ballot"] == 2:
+                totals[str(vote["label"])] = totals.get(str(vote["label"]), 0) + int(vote["votes"])
+        for label, count in totals.items():
+            matches = [land_label for land_label, land_count in land_rows.items() if land_count == count]
+            if len(matches) != 1:
+                problems.append(f"BB {day} list vote {label} {count}: Land rows {matches}")
+                continue
+            labels.append({"day": day, "label": label, "land": matches[0]})
+        if len(totals) != len(land_rows):
+            problems.append(f"BB {day}: {len(land_rows)} Land rows, {len(totals)} constituency labels")
+    cons_frame = pl.DataFrame(cons)
+    vote_frame = pl.DataFrame(votes)
+    for row in cons_frame.iter_rows(named=True):
+        ballots = vote_frame.filter((pl.col("day") == row["day"]) & (pl.col("wk") == row["wk"]))
+        for ballot in (1, 2):
+            total = ballots.filter(pl.col("ballot") == ballot)["votes"].sum()
+            if total != row[f"valid{ballot}"]:
+                problems.append(
+                    f"BB {row['day']} {row['wk']} ballot {ballot}: votes {total} against {row[f'valid{ballot}']}"
+                )
+            if row[f"valid{ballot}"] + row[f"invalid{ballot}"] != row["voters"]:
+                problems.append(f"BB {row['day']} {row['wk']} ballot {ballot}: valid and invalid against voters")
+    for problem in problems:
+        print(problem)
+    if problems:
+        raise ValueError(f"{len(problems)} Brandenburg problems")
+    print(
+        cons_frame.height, "Brandenburg constituency results,", vote_frame.height, "vote rows,", len(members), "members"
+    )
+    cons_frame.write_parquet(PARSED / "bb_constituencies.parquet")
+    vote_frame.write_parquet(PARSED / "bb_votes.parquet")
+    pl.DataFrame(members).write_parquet(PARSED / "bb_members.parquet")
+    pl.DataFrame(labels).write_parquet(PARSED / "bb_labels.parquet")
 
 
 def parse() -> None:
@@ -1358,6 +2035,19 @@ def parse() -> None:
     pl.DataFrame(seats).write_parquet(PARSED / "seats.parquet")
     member_frame.write_parquet(PARSED / "members.parquet")
     parse_history()
+    elections, results = history()
+    parse_th(elections, results)
+    parse_th_shapes()
+    parse_sn(elections, results)
+    parse_bb(elections, results)
+
+
+def history() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """The Land-level elections and party rows parse_history wrote, as the per-Land parsers check against them."""
+    return (
+        pl.read_parquet(PARSED / "history_elections.parquet").to_dicts(),
+        pl.read_parquet(PARSED / "history_results.parquet").to_dicts(),
+    )
 
 
 def emit() -> Path:
@@ -1366,13 +2056,8 @@ def emit() -> Path:
     seats = pl.read_parquet(PARSED / "seats.parquet")
     members = pl.read_parquet(PARSED / "members.parquet")
     with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary="German state elections: 2026 (Baden-Württemberg, Berlin, Mecklenburg-Vorpommern, Rhineland-Palatinate, and Saxony-Anhalt) by constituency, every earlier Landtag election since 1946 by Land from the Bundeswahlleiterin and the Länder statistical offices, and Thuringia's elections since 1990 by constituency",
-            polity="DE",
-        )
+        cs = Draft(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="DE")
+        cs.adopts += ADOPTS
 
         def name(entity: UUID, text: str, kind: str = "official", lang: str = "en") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
@@ -1654,7 +2339,169 @@ def emit() -> Path:
         history_results = pl.read_parquet(PARSED / "history_results.parquet")
         glossary = pl.read_parquet(PARSED / "history_glossary.parquet")
         emit_history(cs, conn, germany, history_elections, history_results, glossary)
+        for table in CHANGESET_ONLY:
+            cs.rows.pop(table, None)
+            cs.frames.pop(table, None)
         return cs.write()
+
+
+def derived_id(table: str, row: dict[str, object]) -> str:
+    """The id apply gives a name or note row: an md5 of the table, the pipeline, and each column's text."""
+    parts = [table, SOURCE]
+    for column in sorted(row):
+        value = row[column]
+        parts += [column, chr(30) if value is None else str(value).lower() if isinstance(value, bool) else str(value)]
+    digest = hashlib.md5(chr(31).join(parts).encode()).hexdigest()
+    return str(UUID(f"{digest[:12]}8{digest[13:16]}8{digest[17:]}"))
+
+
+def package_from_export() -> Path:
+    """Build de.landtag/all from the archive's published rows (`ea package export`) plus Saxony's constituency
+    results since 2009 and Brandenburg's since 2004, which replace the Land-level rows of their list contests.
+
+    The Saxon and Brandenburg rows come from the same Districts code emit_history runs, through a Changeset that
+    resolves every id the archive already holds, so the package equals the one the Draft emit builds from the full raw
+    cache. It reads only those Länder's raw files and the Bundeswahlleiterin's compilation that parse_sn and parse_bb
+    check against."""
+    key = f"{SOURCE}/all"
+    out = package.export(SOURCE)
+    manifest = json.loads((out / "package.json").read_text())
+    before = {code: n for code, n, _ in package.check(out)}
+    tables = {file.stem: pl.read_parquet(file) for file in out.glob("*.parquet")}
+    options = tables["contest_option"]
+    replaced: set[str] = set()
+    values: list[tuple[UUID, UUID, UUID | None, int, int | None]] = []
+    with connect() as conn:
+        cs = Changeset(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="DE")
+        sources = {"SN": sn_artifacts(cs), "BB": bb_artifacts(cs)}
+        for abbreviation, source in sources.items():
+            held = sorted(
+                date.fromisoformat(value[3:])
+                for value in tables["external_id"].filter(
+                    (pl.col("scheme") == f"{SOURCE}.election") & pl.col("value").str.starts_with(f"{abbreviation}:")
+                )["value"]
+            )
+            lists = [str(cs.key(f"{SOURCE}.contest", f"{abbreviation}:{day}:list")) for day in held]
+            parties: dict[str, str] = {}
+            for label, party in (
+                options.filter(pl.col("contest_id").is_in(lists)).select("ballot_label", "party_id").iter_rows()
+            ):
+                if parties.setdefault(label, party) != party:
+                    raise ValueError(f"{abbreviation} list label {label} names two parties")
+            district = Districts(cs, abbreviation, lambda label, parties=parties: UUID(parties[label]))
+            for day in sorted(district.days):
+                following = next((other for other in held if other > day), None)
+                election = cs.key(f"{SOURCE}.election", f"{abbreviation}:{day}")
+                contest = cs.key(f"{SOURCE}.contest", f"{abbreviation}:{day}:list")
+                if {election, contest} & cs.minted:
+                    raise ValueError(f"{abbreviation} {day}: the archive holds no such election")
+                english_name = f"{day.year} {LAND_INFO[abbreviation][1]} state election"
+                if english_name not in set(tables["name"].filter(pl.col("entity_id") == str(election))["text"]):
+                    raise ValueError(f"{abbreviation} {day}: the election is not named {english_name}")
+                if tables["note"].filter(pl.col("entity_id") == str(contest)).height:
+                    raise ValueError(f"{abbreviation} {day}: the list contest already has a note")
+
+                def make_set(
+                    key: str,
+                    contest: UUID | None,
+                    election: UUID = election,
+                    day: date = day,
+                    abbreviation: str = abbreviation,
+                    source: UUID = source,
+                ) -> UUID:
+                    set_id = cs.key(f"{SOURCE}.result_set", f"{abbreviation}:{day}:{key}")
+                    cs.add(
+                        "result_set",
+                        id=set_id,
+                        election_id=election,
+                        contest_id=contest,
+                        stage="official",
+                        kind="counted",
+                        status="active",
+                        source_id=source,
+                        is_default=True,
+                        completeness=1,
+                    )
+                    return set_id
+
+                accounting = make_set("election", None)
+                root = make_set("list", contest)
+                replaced |= {str(accounting), str(root)}
+                list_options = dict(
+                    options.filter(pl.col("contest_id") == str(contest)).select("ballot_label", "id").iter_rows()
+                )
+                path = f"de/{abbreviation.lower()}/{day}-general"
+                cs.add("note", entity_id=contest, kind="context", body_md=district_note(abbreviation, day))
+                values += district.rows(
+                    day,
+                    following,
+                    election,
+                    english_name,
+                    path,
+                    cs.key(f"{SOURCE}.body", f"landtag:{abbreviation}"),
+                    cs.area("de.land", LAND_INFO[abbreviation][0]),
+                    accounting,
+                    root,
+                    {label: UUID(option) for label, option in list_options.items()},
+                    make_set,
+                )
+        staged = cs._tables()
+        defaults = cs.defaults
+        # As a Draft package does, the manifest cites the files the new rows read and those the adopted changesets
+        # cite, each with its url and sha256.
+        _, adopted_files = package._adopted(conn, SOURCE)
+        cited = package._cited(conn, adopted_files, staged.get("source_artifact"))
+    adopts = sorted({*manifest["adopts"], *ADOPTS})
+    staged["result_value"] = pl.DataFrame(
+        [
+            {
+                "result_set_id": str(set_id),
+                "unit_id": str(unit),
+                "option_id": None if option is None else str(option),
+                "channel": 0,
+                "measure": measure,
+                "count_round": 0,
+                "flags": 0,
+                "value": value,
+            }
+            for set_id, unit, option, measure, value in values
+            if value is not None
+        ]
+    )
+    for table, frame in staged.items():
+        schema = package.FACTS.get(table) or package.TABLES[table][1]
+        if "id" in schema and "id" not in frame.columns:
+            frame = frame.with_columns(
+                id=pl.Series([derived_id(table, row) for row in frame.iter_rows(named=True)], dtype=pl.String)
+            )
+        base = tables.get(table)
+        columns = list(base.columns) if base is not None else list(schema)
+        frame = frame.select(
+            package._column(frame, column, schema[column], defaults.get(table, {}).get(column)) for column in columns
+        )
+        if base is None:
+            tables[table] = frame
+            continue
+        frame = frame.cast(dict(base.schema))
+        if table == "result_value":
+            tables[table] = pl.concat([base.filter(~pl.col("result_set_id").is_in(list(replaced))), frame])
+        elif package.TABLES[table][0] is not None:
+            keyed = list(package.TABLES[table][0])
+            tables[table] = pl.concat([base.join(frame.select(keyed), on=keyed, how="anti"), frame])
+        else:
+            tables[table] = pl.concat([base, frame]).unique(maintain_order=True)
+    counts: dict[str, int] = {}
+    for table, frame in tables.items():
+        frame.write_parquet(out / f"{table}.parquet", statistics=False)
+        counts[table] = frame.height
+    built = package._seal(key, SOURCE, SUMMARY, out, counts, adopts, cited, None)
+    after = {code: n for code, n, _ in package.check(out)}
+    if after != before:
+        raise ValueError(f"{key}: the Saxon rows change the check findings from {before} to {after}")
+    built["accepted"] = manifest["accepted"]
+    (out / "package.json").write_text(json.dumps(built, indent=1) + "\n")
+    print(f"{key}: {len(replaced)} Saxon and Brandenburg sets now by constituency, {len(values):,} values", flush=True)
+    return out
 
 
 def party_words(text: str) -> set[str]:
@@ -1828,6 +2675,253 @@ def history_parties(
     return ids
 
 
+def folded(text: str) -> str:
+    return re.sub(r"[\W_]", "", text).casefold()
+
+
+def sn_artifacts(cs: Changeset) -> UUID:
+    source = cs.source(SN_PUBLISHER, SN_TITLE)
+    cs.add(
+        "source",
+        id=source,
+        kind="official_body",
+        publisher=SN_PUBLISHER,
+        title=SN_TITLE,
+        url=SN_URL,
+        license=PUBLIC_RECORD,
+        license_url=None,
+    )
+    for url in [url for url, _ in SN_RESULTS.values()] + list(SN_ELECTED.values()):
+        cs.artifact(raw.cached(SOURCE, url), source)
+    return source
+
+
+def bb_artifacts(cs: Changeset) -> UUID:
+    source = cs.source(BB_PUBLISHER, BB_TITLE)
+    cs.add(
+        "source",
+        id=source,
+        kind="official_body",
+        publisher=BB_PUBLISHER,
+        title=BB_TITLE,
+        url=BB_URL,
+        # The 2004 to 2014 reports allow copies with attribution; the 2019 and 2024 reports are CC BY 3.0 DE.
+        license="Vervielfältigung und Verbreitung, auch auszugsweise, mit Quellenangabe gestattet",
+        license_url=None,
+    )
+    for url in BB_REPORTS.values():
+        cs.artifact(raw.cached(SOURCE, url), source)
+    return source
+
+
+def district_note(abbreviation: str, day: date) -> str:
+    """The list contest's note once its votes are by constituency, with any Land figure the state office corrects."""
+    if abbreviation == "SN":
+        return SN_NOTE
+    fixes = BB_LAND.get(day, {})
+    if not fixes:
+        return BB_NOTE
+    printed = " and ".join(f"{old:,} list votes for {label}" for label, (old, _) in fixes.items())
+    final = " and ".join(f"{new:,}" for _, new in fixes.values())
+    return f"{BB_NOTE} {BB_LAND_NOTE.format(printed=printed, final=final)}"
+
+
+class Districts:
+    """One Land's results by constituency, as parse_th and parse_sn write them: each constituency's list votes
+    replace the Land-level row of the list contest, and its constituency votes become a contest of their own."""
+
+    def __init__(
+        self,
+        cs: Changeset,
+        abbreviation: str,
+        land_party: Callable[[str], UUID],
+        shapes: dict[tuple[int, str], dict[str, Any]] | None = None,
+        shapes_source: UUID | None = None,
+    ) -> None:
+        prefix = abbreviation.lower()
+        self.cs = cs
+        self.abbreviation = abbreviation
+        self.scheme = f"de.{prefix}_wahlkreis"
+        self.cons = pl.read_parquet(PARSED / f"{prefix}_constituencies.parquet")
+        self.votes = pl.read_parquet(PARSED / f"{prefix}_votes.parquet")
+        self.members = pl.read_parquet(PARSED / f"{prefix}_members.parquet")
+        self.labels = pl.read_parquet(PARSED / f"{prefix}_labels.parquet")
+        self.days = set(self.cons["day"])
+        self.shapes = shapes or {}
+        self.shapes_source = shapes_source
+        self.parties: dict[str, UUID] = {}
+        for page_label, land_label in self.labels.select("label", "land").iter_rows():
+            self.parties[folded(page_label)] = land_party(land_label)
+            self.parties[folded(land_label)] = land_party(land_label)
+        self.persons: dict[str, UUID] = {}
+        cs.add(
+            "scheme",
+            code=self.scheme,
+            polity_id=cs.polity(f"DE-{abbreviation}"),
+            kind="electoral_district",
+            rank=2,
+            noun="constituency",
+        )
+
+    def person(self, family: str, first: str) -> UUID:
+        cs = self.cs
+        key = f"{self.abbreviation}:{family}|{first}"
+        if key not in self.persons:
+            self.persons[key] = cs.key(f"{SOURCE}.person", key)
+            if self.persons[key] in cs.minted:
+                cs.add("person", id=self.persons[key])
+                cs.add(
+                    "name",
+                    entity_id=self.persons[key],
+                    text=f"{first} {family}",
+                    lang="de",
+                    kind="official",
+                    is_preferred=True,
+                )
+        return self.persons[key]
+
+    def rows(
+        self,
+        day: date,
+        following: date | None,
+        election: UUID,
+        english_name: str,
+        path: str,
+        body: UUID,
+        land_area: UUID,
+        accounting: UUID,
+        root: UUID,
+        list_options: dict[str, UUID],
+        make_set: Any,
+    ) -> list[tuple[UUID, UUID, UUID | None, int, int | None]]:
+        cs, state, scheme = self.cs, self.abbreviation, self.scheme
+        fptp = cs.key("de.electoral_system", CONSTITUENCIES[0])
+        labels = dict(self.labels.filter(pl.col("day") == day).select("label", "land").iter_rows())
+        votes = self.votes.filter(pl.col("day") == day)
+        winners = {
+            row["wk"]: row
+            for row in self.members.filter((pl.col("day") == day) & (pl.col("kind") == "direct")).iter_rows(named=True)
+        }
+        cs.add("boundary_set", scheme_code=scheme, vintage=str(day.year), valid_from=day, valid_to=following, as_of=day)
+        values: list[tuple[UUID, UUID, UUID | None, int, int | None]] = []
+        for row in self.cons.filter(pl.col("day") == day).sort("wk").iter_rows(named=True):
+            wk = row["wk"]
+            area = cs.area(scheme, wk, day)
+            cs.add("area", id=area, scheme_code=scheme)
+            cs.add("area_code", area_id=area, code=wk, valid_from=day, valid_to=following)
+            cs.add("area_parent", area_id=area, parent_id=land_area, valid_from=day, valid_to=following)
+            cs.add("name", entity_id=area, text=row["name"], lang="de", kind="official", is_preferred=True)
+            shape = self.shapes.get((day.year, wk))
+            if shape is not None:
+                if not folded(shape["name"]).startswith(folded(row["name"])):
+                    raise ValueError(f"{state} {day} {wk}: shape {shape['name']} for {row['name']}")
+                cs.add(
+                    "area_geometry",
+                    area_id=area,
+                    valid_from=day,
+                    valid_to=following,
+                    geom=shape["geom"],
+                    label_point=shape["label_point"],
+                    quality="official",
+                    source_id=self.shapes_source,
+                )
+            unit = cs.unit(scheme, wk, day)
+            cs.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=cs.polity(f"DE-{state}"),
+                scheme_code=scheme,
+                code=wk,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+                valid_from=day,
+                valid_to=following,
+            )
+            values += [
+                (accounting, unit, None, 2, row["registered"]),
+                (accounting, unit, None, 3, row["voters"]),
+                (root, unit, None, 5, row["invalid2"]),
+                (root, unit, None, 4, row["valid2"]),
+            ]
+            for label, count in (
+                votes.filter((pl.col("wk") == wk) & (pl.col("ballot") == 2)).select("label", "votes").iter_rows()
+            ):
+                values.append((root, unit, list_options[labels[label]], 1, count))
+            contest = cs.key(f"{SOURCE}.contest", f"{state}:{day}:{wk}")
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="body_seats",
+                body_id=body,
+                district_area_id=area,
+                magnitude=1,
+                electoral_system_id=fptp,
+                default_result_kind="counted",
+            )
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{english_name}, constituency {int(wk)} ({row['name']})",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
+            cs.add("slug", path=f"{path}/wahlkreis-{wk}", entity_id=contest)
+            cs.add("note", entity_id=contest, kind="context", body_md=WINNERS_NOTE)
+            contest_set = make_set(f"wk:{wk}", contest)
+            values += [(contest_set, unit, None, 5, row["invalid1"]), (contest_set, unit, None, 4, row["valid1"])]
+            options: dict[str, UUID] = {}
+            for label, count in (
+                votes.filter((pl.col("wk") == wk) & (pl.col("ballot") == 1)).select("label", "votes").iter_rows()
+            ):
+                options[folded(label)] = cs.key(f"{SOURCE}.option", f"{state}:{day}:{wk}:{label}")
+                others = label in DISTRICT_OTHERS
+                cs.add(
+                    "contest_option",
+                    id=options[folded(label)],
+                    contest_id=contest,
+                    kind="others" if others else "candidate",
+                    party_id=None if others else self.parties.get(folded(label)),
+                    ballot_label=label,
+                )
+                values.append((contest_set, unit, options[folded(label)], 1, count))
+            winner = winners[wk]
+            option = options[folded(winner["party"])]
+            cs.add(
+                "candidacy",
+                id=cs.key(f"{SOURCE}.candidacy", f"{state}:{day}:{wk}"),
+                person_id=self.person(winner["family"], winner["first"]),
+                option_id=option,
+                role="head",
+                ballot_name=f"{winner['first']} {winner['family']}",
+                member_of_party_id=self.parties.get(folded(winner["party"])),
+            )
+            cs.add("outcome", result_set_id=contest_set, option_id=option, candidacy_id=None, kind="elected", seats=1)
+        for member in self.members.filter((pl.col("day") == day) & (pl.col("kind") == "list")).iter_rows(named=True):
+            land_label = next(label for label in list_options if folded(label) == folded(member["party"]))
+            candidacy = cs.key(f"{SOURCE}.candidacy", f"{state}:{day}:list:{land_label}:{member['position']}")
+            cs.add(
+                "candidacy",
+                id=candidacy,
+                person_id=self.person(member["family"], member["first"]),
+                option_id=list_options[land_label],
+                role="list_member",
+                list_position=member["position"],
+                ballot_name=f"{member['first']} {member['family']}",
+                member_of_party_id=self.parties[folded(land_label)],
+            )
+            cs.add(
+                "outcome",
+                result_set_id=root,
+                option_id=list_options[land_label],
+                candidacy_id=candidacy,
+                kind="elected",
+            )
+        return values
+
+
 def emit_history(
     cs: Changeset,
     conn: Any,
@@ -1883,7 +2977,6 @@ def emit_history(
                 license_url=None,
             )
             cs.artifact(raw.cached(SOURCE, url), early_sources[abbreviation])
-    fptp = cs.key("de.electoral_system", CONSTITUENCIES[0])
     th_source = cs.source(TH_PUBLISHER, TH_TITLE)
     cs.add(
         "source",
@@ -1918,174 +3011,14 @@ def emit_history(
     th_shapes = {
         (row["year"], row["wk"]): row for row in pl.read_parquet(PARSED / "th_shapes.parquet").iter_rows(named=True)
     }
-    th_cons = pl.read_parquet(PARSED / "th_constituencies.parquet")
-    th_votes = pl.read_parquet(PARSED / "th_votes.parquet")
-    th_members = pl.read_parquet(PARSED / "th_members.parquet")
-    th_labels = pl.read_parquet(PARSED / "th_labels.parquet")
-    scheme = "de.th_wahlkreis"
-    cs.add("scheme", code=scheme, polity_id=cs.polity("DE-TH"), kind="electoral_district", rank=2, noun="constituency")
-
-    def folded(text: str) -> str:
-        return re.sub(r"[\W_]", "", text).casefold()
-
-    th_parties: dict[str, UUID] = {}
-    for page_label, land_label in th_labels.select("label", "land").iter_rows():
-        th_parties[folded(page_label)] = party_ids["TH", land_label]
-        th_parties[folded(land_label)] = party_ids["TH", land_label]
-    th_persons: dict[str, UUID] = {}
-
-    def th_person_id(family: str, first: str) -> UUID:
-        key = f"TH:{family}|{first}"
-        if key not in th_persons:
-            th_persons[key] = cs.key(f"{SOURCE}.person", key)
-            if th_persons[key] in cs.minted:
-                cs.add("person", id=th_persons[key])
-                cs.add(
-                    "name",
-                    entity_id=th_persons[key],
-                    text=f"{first} {family}",
-                    lang="de",
-                    kind="official",
-                    is_preferred=True,
-                )
-        return th_persons[key]
-
-    def th_constituencies(
-        day: date,
-        following: date | None,
-        election: UUID,
-        english_name: str,
-        path: str,
-        body: UUID,
-        land_area: UUID,
-        accounting: UUID,
-        root: UUID,
-        list_options: dict[str, UUID],
-        make_set: Any,
-    ) -> list[tuple[UUID, UUID, UUID | None, int, int | None]]:
-        labels = dict(th_labels.filter(pl.col("day") == day).select("label", "land").iter_rows())
-        votes = th_votes.filter(pl.col("day") == day)
-        winners = {
-            row["wk"]: row
-            for row in th_members.filter((pl.col("day") == day) & (pl.col("kind") == "direct")).iter_rows(named=True)
-        }
-        cs.add("boundary_set", scheme_code=scheme, vintage=str(day.year), valid_from=day, valid_to=following, as_of=day)
-        values: list[tuple[UUID, UUID, UUID | None, int, int | None]] = []
-        for row in th_cons.filter(pl.col("day") == day).sort("wk").iter_rows(named=True):
-            wk = row["wk"]
-            area = cs.area(scheme, wk, day)
-            cs.add("area", id=area, scheme_code=scheme)
-            cs.add("area_code", area_id=area, code=wk, valid_from=day, valid_to=following)
-            cs.add("area_parent", area_id=area, parent_id=land_area, valid_from=day, valid_to=following)
-            cs.add("name", entity_id=area, text=row["name"], lang="de", kind="official", is_preferred=True)
-            shape = th_shapes.get((day.year, wk))
-            if shape is not None:
-                if not folded(shape["name"]).startswith(folded(row["name"])):
-                    raise ValueError(f"TH {day} {wk}: shape {shape['name']} for {row['name']}")
-                cs.add(
-                    "area_geometry",
-                    area_id=area,
-                    valid_from=day,
-                    valid_to=following,
-                    geom=shape["geom"],
-                    label_point=shape["label_point"],
-                    quality="official",
-                    source_id=th_shapes_source,
-                )
-            unit = cs.unit(scheme, wk, day)
-            cs.add(
-                "reporting_unit",
-                id=unit,
-                polity_id=cs.polity("DE-TH"),
-                scheme_code=scheme,
-                code=wk,
-                area_relation="equals",
-                area_id=area,
-                kind="standard",
-                valid_from=day,
-                valid_to=following,
-            )
-            values += [
-                (accounting, unit, None, 2, row["registered"]),
-                (accounting, unit, None, 3, row["voters"]),
-                (root, unit, None, 5, row["invalid2"]),
-                (root, unit, None, 4, row["valid2"]),
-            ]
-            for label, count in (
-                votes.filter((pl.col("wk") == wk) & (pl.col("ballot") == 2)).select("label", "votes").iter_rows()
-            ):
-                values.append((root, unit, list_options[labels[label]], 1, count))
-            contest = cs.key(f"{SOURCE}.contest", f"TH:{day}:{wk}")
-            cs.add(
-                "contest",
-                id=contest,
-                election_id=election,
-                kind="body_seats",
-                body_id=body,
-                district_area_id=area,
-                magnitude=1,
-                electoral_system_id=fptp,
-                default_result_kind="counted",
-            )
-            cs.add(
-                "name",
-                entity_id=contest,
-                text=f"{english_name}, constituency {int(wk)} ({row['name']})",
-                lang="en",
-                kind="official",
-                is_preferred=True,
-            )
-            cs.add("slug", path=f"{path}/wahlkreis-{wk}", entity_id=contest)
-            cs.add("note", entity_id=contest, kind="context", body_md=WINNERS_NOTE)
-            contest_set = make_set(f"wk:{wk}", contest)
-            values += [(contest_set, unit, None, 5, row["invalid1"]), (contest_set, unit, None, 4, row["valid1"])]
-            options: dict[str, UUID] = {}
-            for label, count in (
-                votes.filter((pl.col("wk") == wk) & (pl.col("ballot") == 1)).select("label", "votes").iter_rows()
-            ):
-                options[folded(label)] = cs.key(f"{SOURCE}.option", f"TH:{day}:{wk}:{label}")
-                cs.add(
-                    "contest_option",
-                    id=options[folded(label)],
-                    contest_id=contest,
-                    kind="candidate",
-                    party_id=th_parties.get(folded(label)),
-                    ballot_label=label,
-                )
-                values.append((contest_set, unit, options[folded(label)], 1, count))
-            winner = winners[wk]
-            option = options[folded(winner["party"])]
-            cs.add(
-                "candidacy",
-                id=cs.key(f"{SOURCE}.candidacy", f"TH:{day}:{wk}"),
-                person_id=th_person_id(winner["family"], winner["first"]),
-                option_id=option,
-                role="head",
-                ballot_name=f"{winner['first']} {winner['family']}",
-                member_of_party_id=th_parties[folded(winner["party"])],
-            )
-            cs.add("outcome", result_set_id=contest_set, option_id=option, candidacy_id=None, kind="elected", seats=1)
-        for member in th_members.filter((pl.col("day") == day) & (pl.col("kind") == "list")).iter_rows(named=True):
-            land_label = next(label for label in list_options if folded(label) == folded(member["party"]))
-            candidacy = cs.key(f"{SOURCE}.candidacy", f"TH:{day}:list:{land_label}:{member['position']}")
-            cs.add(
-                "candidacy",
-                id=candidacy,
-                person_id=th_person_id(member["family"], member["first"]),
-                option_id=list_options[land_label],
-                role="list_member",
-                list_position=member["position"],
-                ballot_name=f"{member['first']} {member['family']}",
-                member_of_party_id=th_parties[folded(land_label)],
-            )
-            cs.add(
-                "outcome",
-                result_set_id=root,
-                option_id=list_options[land_label],
-                candidacy_id=candidacy,
-                kind="elected",
-            )
-        return values
+    districts = {
+        "TH": Districts(
+            cs, "TH", lambda label: party_ids["TH", label], shapes=th_shapes, shapes_source=th_shapes_source
+        ),
+        "SN": Districts(cs, "SN", lambda label: party_ids["SN", label]),
+        "BB": Districts(cs, "BB", lambda label: party_ids["BB", label]),
+    }
+    district_sources = {"SN": sn_artifacts(cs), "BB": bb_artifacts(cs)}
 
     second_from: dict[str, date] = {}
     for state, notes in elections.select("state", "notes").iter_rows():
@@ -2159,9 +3092,13 @@ def emit_history(
             path = f"de/{FORMER[abbreviation][1] if abbreviation in FORMER else abbreviation.lower()}/{day}-general"
             cs.add("slug", path=path, entity_id=election)
 
+            district = districts.get(abbreviation)
+            covered = district is not None and day in district.days
             row_source = (
                 th_source
                 if abbreviation == "TH"
+                else district_sources[abbreviation]
+                if covered
                 else early_sources[abbreviation]
                 if row["source"] is not None
                 else source
@@ -2254,6 +3191,8 @@ def emit_history(
                     "Each voter has two votes, a constituency vote and a list vote (Landesstimme). The votes shown are "
                     "list votes, which decide the seats; each constituency's contest holds its constituency votes."
                 )
+            elif covered:
+                notes.append(district_note(abbreviation, day))
             if row["extra"] is not None:
                 notes.append(row["extra"])
             if row["relabeled"] is not None:
@@ -2284,7 +3223,7 @@ def emit_history(
             root = make_set("list", contest)
             unit = units[abbreviation]
             values: list[tuple[UUID, UUID, UUID | None, int, int | None]] = []
-            if abbreviation != "TH":
+            if not covered:
                 values = [
                     (accounting, unit, None, 2, row["registered"]),
                     (accounting, unit, None, 14 if multiple else 3, row["voters"]),
@@ -2305,12 +3244,12 @@ def emit_history(
                     party_id=None if others else party_ids[abbreviation, label_],
                     ballot_label=label_,
                 )
-                if abbreviation != "TH":
+                if not covered:
                     values.append((root, unit, option, 1, party_row["votes"]))
                 if party_row["seats"]:
                     cs.add("outcome", result_set_id=root, option_id=option, kind="won", seats=party_row["seats"])
-            if abbreviation == "TH":
-                values = th_constituencies(
+            if district is not None and covered:
+                values = district.rows(
                     day, following, election, english_name, path, body, land_area, accounting, root, options, make_set
                 )
             cs.frame(
