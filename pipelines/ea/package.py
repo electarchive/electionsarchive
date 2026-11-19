@@ -1231,8 +1231,14 @@ def _facts(
                 sql.SQL("alter table {} rename to {}").format(sql.Identifier(staged[table][0]), sql.Identifier(name))
             )
             retire[table] = (name, staged[table][1])
-    sizes, changed = _merge(conn, "result_value", files.get("result_value"), sets_before, counts, referencing)
-    _merge(conn, "value_locator", files.get("value_locator"), sets_before, counts, referencing)
+    mine = sorted(
+        {
+            *sets_before,
+            *(k for (k,) in conn.execute("select k from result_set where changeset_id = %s", [changeset_id])),
+        }
+    )
+    sizes, changed = _merge(conn, "result_value", files.get("result_value"), mine, counts, referencing)
+    _merge(conn, "value_locator", files.get("value_locator"), mine, counts, referencing)
     _refuse_merged(conn, changeset_id, set(files))
     current = conn.execute(
         """select k from result_set where id = any(%(sets)s::uuid[]) or contest_id = any(%(contests)s::uuid[])
