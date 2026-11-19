@@ -3,14 +3,18 @@
 Before its JSON results application, the Commission (CIK BiH) published each election's certified results as a
 website of its own: the 2006 general election as classic ASP pages, the 2010 and 2014 general elections as an ASP.NET
 application driven by form postbacks, and the 2012 local elections as static HTML pages, with later certifications for
-a few municipalities on sites of their own. This module walks each site down to the finest unit it reads: polling
-stations for 2012 and municipalities for the general elections.
+a few municipalities on sites of their own. This module walks each site down to the finest unit it reads, which is the
+polling station for every election.
 """
 
 import functools
 import html
 import re
+import sys
+import threading
+import time
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, timedelta
 from html.parser import HTMLParser
@@ -236,7 +240,9 @@ MENU_2010 = {  # race to the menu link that opens it; the Presidency is the appl
     "7": "ctl00$linkSkupstineKantona",
 }
 TOP_2010 = re.compile(r"rightContentPlaceHolder\$(lb\d+|link(FBIH|RS|Bosnjacki|Hrvatski|Srpski))$|imgMap\d+$")
-MUNICIPALITY_2010 = re.compile(r"gvMunicipalities\$ctl\d+\$linkRegions$")
+MUNICIPALITY_2010 = re.compile(r"gvMunicipality\$gvMunicipalities\$ctl\d+\$linkRegions$")
+STATION_STEP = "gvPS$"
+STATION_2010 = re.compile(r"gvPS\$gvMunicipalities\$ctl\d+\$linkRegions$")
 
 
 def hidden_fields(text: str) -> dict[str, str]:
@@ -282,77 +288,133 @@ class Session2010:
         self.start = start
         self.client = httpx.Client(headers={"User-Agent": USER_AGENT}, follow_redirects=True, timeout=120)
 
-    def post(self, url: str, text: str, target: str, argument: str) -> tuple[str, str]:
-        for attempt in range(4):
+    def send(self, method: str, url: str, data: dict[str, str] | None = None) -> tuple[str, str]:
+        for attempt in range(5):
             try:
-                response = self.client.post(
-                    url, data={**hidden_fields(text), "__EVENTTARGET": target, "__EVENTARGUMENT": argument}
-                )
+                response = self.client.request(method, url, data=data)
                 response.raise_for_status()
                 return str(response.url), response.text
             except httpx.HTTPError:
-                if attempt == 3:
+                if attempt == 4:
                     raise
+                time.sleep(2**attempt)
         raise AssertionError
+
+    def post(self, url: str, text: str, target: str, argument: str) -> tuple[str, str]:
+        return self.send("POST", url, {**hidden_fields(text), "__EVENTTARGET": target, "__EVENTARGUMENT": argument})
 
     def walk(self, path: tuple[tuple[str, str], ...]) -> tuple[str, str]:
         self.client.cookies.clear()
-        url, text = self.start, self.client.get(self.start).text
+        url, text = self.send("GET", self.start)
         for target, argument in path:
             url, text = self.post(url, text, target, argument)
         return url, text
 
 
-def store_page(start: str, path: tuple[tuple[str, str], ...], text: str) -> None:
-    raw.store(
-        SOURCE,
-        path_key(start, path),
-        text.encode(),
-        suffix=".html",
-        retrieved_at=datetime.now(UTC),
-        media_type="text/html; charset=utf-8",
-    )
+PENDING: list[tuple[str, bytes]] = []
+PENDING_LOCK = threading.Lock()
+Path_ = tuple[tuple[str, str], ...]
 
 
-def crawl_race(start: str, race: str) -> int:
-    """Every district and municipality page of one race, stored under the postback path that reaches it."""
-    done = raw.keys(SOURCE)
+def store_page(start: str, path: Path_, text: str, *, last: bool = False) -> None:
+    """Queue a page under the postback path that reaches it. The queue is written to the cache in batches, because
+    the cache's index is rewritten with each write."""
+    with PENDING_LOCK:
+        if text:
+            PENDING.append((path_key(start, path), text.encode()))
+        if PENDING and (last or len(PENDING) >= 300):
+            raw.store_many(
+                SOURCE, PENDING, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html; charset=utf-8"
+            )
+            PENDING.clear()
+
+
+def crawl_race(start: str, race: str, done: set[str]) -> list[Path_]:
+    """Every district and municipality page of one race, stored under the postback path that reaches it. Returns
+    the paths of the municipality pages."""
     session = Session2010(start)
     menu = MENU_2010[race]
-    root: tuple[tuple[str, str], ...] = ((menu, ""),) if menu else ()
+    root: Path_ = ((menu, ""),) if menu else ()
     url, text = session.walk(root)
     if root and path_key(start, root) not in done:
         store_page(start, root, text)
-    count = 0
     tops = [(t, a) for t, a in postbacks(text) if TOP_2010.search(t)]
-    parents: list[tuple[tuple[tuple[str, str], ...], str, str]] = [(root, url, text)]
+    parents: list[tuple[Path_, str, str]] = [(root, url, text)]
     for step in tops:
         path = (*root, step)
-        if path_key(start, path) in done:
-            parents.append((path, *session.walk(path)))
-            continue
         here, page = session.walk(path)
-        store_page(start, path, page)
-        count += 1
+        if path_key(start, path) not in done:
+            store_page(start, path, page)
         parents.append((path, here, page))
+    out: list[Path_] = []
     for path, _, page in parents:
         for step in [(t, a) for t, a in postbacks(page) if MUNICIPALITY_2010.search(t)]:
             child = (*path, step)
-            if path_key(start, child) in done:
-                continue
-            _, leaf = session.walk(child)
-            store_page(start, child, leaf)
-            count += 1
-    return count
+            out.append(child)
+            if path_key(start, child) not in done:
+                _, leaf = session.walk(child)
+                store_page(start, child, leaf)
+    store_page(start, root, "", last=True)
+    return out
+
+
+def crawl_stations(start: str, municipality: Path_, done: set[str]) -> int:
+    """Every polling station page under one municipality page: a postback from the municipality's station table."""
+    text = maybe_read(path_key(start, municipality))
+    steps = [(t, a) for t, a in postbacks(text or "") if STATION_2010.search(t)]
+    missing = [step for step in steps if path_key(start, (*municipality, step)) not in done]
+    if not missing:
+        return 0
+    session = Session2010(start)
+    url, page = session.walk(municipality)
+    for target, argument in missing:
+        _, station = session.post(url, page, target, argument)
+        store_page(start, (*municipality, (target, argument)), station)
+        done.add(path_key(start, (*municipality, (target, argument))))
+    return len(missing)
+
+
+def retried[T](work: Callable[..., T], *args: object) -> T:
+    """Run a crawl step again if the application answers with an error that outlasts the request's own retries."""
+    for attempt in range(3):
+        try:
+            return work(*args)
+        except httpx.HTTPError as failure:
+            print(f"{SOURCE}: {failure}", file=sys.stderr, flush=True)
+            if attempt == 2:
+                raise
+            time.sleep(30)
+    raise AssertionError
 
 
 def fetch_apps() -> None:
     from concurrent.futures import ThreadPoolExecutor
 
-    for slug, start in APPS.items():
-        with ThreadPoolExecutor(6) as pool:
-            for race, n in zip(MENU_2010, pool.map(lambda r: crawl_race(start, r), MENU_2010), strict=True):
-                print(f"{SOURCE}: {slug} race {race}: {n} pages", flush=True)
+    done = raw.keys(SOURCE)
+    municipalities: list[tuple[str, Path_]] = []
+    jobs = [(slug, start, race) for slug, start in APPS.items() for race in MENU_2010]
+    with ThreadPoolExecutor(6) as pool:
+        for (slug, start, race), found in zip(
+            jobs, pool.map(lambda j: retried(crawl_race, j[1], j[2], done), jobs), strict=True
+        ):
+            print(f"{SOURCE}: {slug} race {race}: {len(found)} municipality pages", flush=True)
+            municipalities += [(start, path) for path in found]
+    for start, path in municipalities:  # the pages just stored are not in `done`, which was read before the crawl
+        done.add(path_key(start, path))
+
+    def one(job: tuple[str, Path_]) -> int:
+        try:
+            return retried(crawl_stations, *job, done)
+        except httpx.HTTPError:
+            return 0  # the next run takes up the stations still missing
+
+    total = 0
+    with ThreadPoolExecutor(16) as pool:
+        for n, count in enumerate(pool.map(one, municipalities), 1):
+            total += count
+            if n % 100 == 0:
+                print(f"{SOURCE}: {n}/{len(municipalities)} municipality pages, {total} station pages", flush=True)
+    store_page("", (), "", last=True)
 
 
 # The 2006 general election: classic ASP pages linked by plain URLs.
@@ -396,6 +458,28 @@ def fetch_2006() -> None:
                     nxt.append(target)
         print(f"{SOURCE}: 2006: {len(wave)} pages, {len(nxt)} more", flush=True)
         wave = nxt
+    fetch_stations_2006()
+
+
+def station_links_2006(url: str, text: str) -> list[str]:
+    from urllib.parse import urljoin
+
+    found = (urljoin(url, html.unescape(href).strip()) for href in re.findall(r"href=\"([^\"#]+)\"", text))
+    return list(dict.fromkeys(target for target in found if "Polling=" in target and target.startswith(SITE_2006)))
+
+
+def fetch_stations_2006() -> None:
+    """The polling stations under every municipality total page: a municipality's station list, then each station."""
+    lists = []
+    for key in sorted(raw.keys(SOURCE)):
+        if key.startswith(SITE_2006) and "kod=" in key:
+            for stations, total in TOTALS_2006.items():
+                if total in key:
+                    lists.append(key.replace(total, stations))
+    get_many(lists)
+    stations = [link for url in lists if (text := maybe_read(url)) for link in station_links_2006(url, text)]
+    print(f"{SOURCE}: 2006: {len(lists)} station lists, {len(set(stations))} stations", flush=True)
+    get_many(stations)
 
 
 # One model for every site: contests, their options, and the units they are counted in.
@@ -588,7 +672,21 @@ class Page:
 
 @functools.cache
 def pages_2010(start: str) -> dict[str, Page]:
-    return {k: Page(k, rows(read(k))) for k in sorted(raw.keys(SOURCE)) if k.startswith(f"{start}#postback")}
+    return {
+        k: Page(k, rows(read(k)))
+        for k in sorted(raw.keys(SOURCE))
+        if k.startswith(f"{start}#postback") and STATION_STEP not in k
+    }
+
+
+@functools.cache
+def station_keys_2010(start: str) -> dict[str, list[str]]:
+    """The cache keys of each municipality page's polling station pages, by the municipality page's key."""
+    out: dict[str, list[str]] = defaultdict(list)
+    for k in sorted(raw.keys(SOURCE)):
+        if k.startswith(f"{start}#postback") and STATION_STEP in k:
+            out[k.rsplit(">", 1)[0]].append(k)
+    return out
 
 
 def where_2010(page: Page) -> list[str]:
@@ -665,13 +763,36 @@ def magnitudes_2010(start: str) -> dict[str, tuple[str, int]]:
     return out
 
 
-def municipal_units(start: str, race: str, district: str, candidates: bool) -> tuple[list[Unit], list[str]]:
+def station_accounting_2010(page: Page) -> dict[int, int]:
+    out = accounting_2010(page)
+    registered = page.info().get("Ukupan broj glasača")
+    if registered is not None:
+        out[REGISTERED] = registered
+    return out
+
+
+def station_units_2010(start: str, race: str, district: str, candidates: bool) -> tuple[list[Unit], list[str]]:
+    """A district's polling stations, from the station pages under each of its municipalities' pages. A municipality
+    whose page lists no stations is one unit of its own."""
     _, units = layout_2010(start)
+    stations = station_keys_2010(start)
     out = []
     files = []
     for code, (_, page) in sorted(units.get((race, district), {}).items()):
-        files.append(page.key)
-        out.append(Unit(code, code, accounting_2010(page), unit_votes_2010(page, candidates)))
+        found = stations.get(page.key, [])
+        if not found:
+            files.append(page.key)
+            out.append(Unit(code, code, accounting_2010(page), unit_votes_2010(page, candidates)))
+        for k in found:
+            station = Page(k, rows(read(k)))
+            files.append(k)
+            where = where_2010(station)[3].split()[0]
+            if not re.fullmatch(r"\d{3}[A-Z0-9]+", where):  # Brčko's stations are listed under codes 027 and 028 too
+                raise ValueError(f"{k} is not a polling station page: {where}")
+            out.append(Unit(where, code, station_accounting_2010(station), unit_votes_2010(station, candidates)))
+    duplicated = [code for code, n in Counter(u.code for u in out).items() if n > 1]
+    if duplicated:
+        raise ValueError(f"{start} race {race} {district}: stations listed twice: {duplicated[:5]}")
     return out, files
 
 
@@ -694,7 +815,7 @@ def contests_2010(start: str) -> list[Contest]:
             members.setdefault(MEMBERS_2010[last], []).extend((o, page) for o in candidate_options_2010(page))
     for entity, found in sorted(members.items()):
         unit_key = next(k for k, v in PRESIDENCY_UNITS_2010.items() if v == entity)
-        units, files = municipal_units(start, "1", unit_key, candidates=True)
+        units, files = station_units_2010(start, "1", unit_key, candidates=True)
         out.append(
             Contest(
                 "1",
@@ -706,12 +827,12 @@ def contests_2010(start: str) -> list[Contest]:
                 units,
                 sorted({p.key for _, p in found}) + files,
                 magnitude=2 if entity == "1" else 1,
-                finest="municipality",
+                finest="polling station totals",
             )
         )
     president = pages[path_key(start, ((MENU_2010["5"] or "", ""),))]
     options = candidate_options_2010(president)
-    units, files = municipal_units(start, "5", "600", candidates=True)
+    units, files = station_units_2010(start, "5", "600", candidates=True)
     out.append(
         Contest(
             "5",
@@ -723,7 +844,7 @@ def contests_2010(start: str) -> list[Contest]:
             units,
             [president.key, *files],
             magnitude=sum(o.elected for o in options),
-            finest="municipality",
+            finest="polling station totals",
         )
     )
     for (race, district), page in sorted(districts.items()):
@@ -734,7 +855,7 @@ def contests_2010(start: str) -> list[Contest]:
             continue
         code = m.group(1)
         options = list_options_2010(page, seats=4)
-        units, files = municipal_units(start, race, district, candidates=False)
+        units, files = station_units_2010(start, race, district, candidates=False)
         by_code(options, units)
         out.append(
             Contest(
@@ -747,7 +868,7 @@ def contests_2010(start: str) -> list[Contest]:
                 units,
                 [page.key, *files],
                 magnitude=sum(o.seats or 0 for o in options),
-                finest="municipality",
+                finest="polling station totals",
             )
         )
     for page in pages.values():
@@ -834,8 +955,13 @@ def party_code(text: str) -> str:
 
 
 @functools.cache
+@functools.cache
 def pages_2006() -> dict[str, Page]:
-    return {k[len(SITE_2006) :]: Page(k, rows(read(k))) for k in sorted(raw.keys(SOURCE)) if k.startswith(SITE_2006)}
+    return {
+        k[len(SITE_2006) :]: Page(k, rows(read(k)))
+        for k in sorted(raw.keys(SOURCE))
+        if k.startswith(SITE_2006) and "Polling=" not in k
+    }
 
 
 def query(path: str) -> dict[str, str]:
@@ -884,26 +1010,37 @@ def candidate_name_2006(page_rows: list[Row], label: str) -> str:
     return label
 
 
-def unit_pages_2006(prefix: str, level: str) -> dict[str, Page]:
-    """The municipality total pages under one level ("nivo"), by municipality code."""
-    out = {}
-    for path, page in pages_2006().items():
-        if path.startswith(prefix) and "Ukupno.asp" in path:
+@functools.cache
+def station_keys_2006() -> dict[tuple[str, str], list[tuple[str, str, str]]]:
+    """Each polling station page's (station code, municipality code, cache key), by its folder ("" for the district
+    pages) and level ("nivo")."""
+    out: dict[tuple[str, str], list[tuple[str, str, str]]] = defaultdict(list)
+    seen: set[tuple[str, str, str]] = set()
+    for k in sorted(raw.keys(SOURCE)):
+        if k.startswith(SITE_2006) and "Polling=" in k:
+            path = k[len(SITE_2006) :]
             q = query(path)
-            if q.get("nivo") == level and "kod" in q:
-                out.setdefault(q["kod"], page)
+            page = path.split("?")[0]
+            folder = page.rsplit("/", 1)[0] if "/" in page else ""
+            if (folder, q["nivo"], q["Polling"]) not in seen:
+                seen.add((folder, q["nivo"], q["Polling"]))
+                out[(folder, q["nivo"])].append((q["Polling"], q["Polling"][:3], k))
     return out
 
 
-def units_from_2006(found: dict[str, Page], candidates: bool) -> tuple[list[Unit], list[str]]:
+def station_units_2006(folder: str, level: str, candidates: bool) -> tuple[list[Unit], list[str]]:
+    """The polling stations of one ballot: a folder ("predsjednistvo_bih", or "" for the district pages) and level."""
     out = []
-    for code, page in sorted(found.items()):
+    files = []
+    for code, municipality, k in sorted(station_keys_2006().get((folder, level), [])):
+        page = Page(k, rows(read(k)))
         if candidates:
             votes = {cells[1].text: number(cells[2].text) or 0 for cells in numbered(page, 3)}
         else:
             votes = {party_code(cells[1].text): number(cells[3].text) or 0 for cells in numbered(page, 4)}
-        out.append(Unit(code, code, {VALID: sum(votes.values())}, votes))
-    return out, [p.key for _, p in sorted(found.items())]
+        out.append(Unit(code, municipality, {VALID: sum(votes.values())}, votes))
+        files.append(k)
+    return out, files
 
 
 def units_2006() -> dict[str, str]:
@@ -924,7 +1061,7 @@ def contests_2006() -> list[Contest]:
         names = {o.label: candidate_name_2006(page.rows, o.label) for page in members for o in candidates_2006(page)}
         for o in options:
             o.code = None
-        units, files = units_from_2006(unit_pages_2006("predsjednistvo_bih/", UNIT_LEVELS_2006[entity]), True)
+        units, files = station_units_2006("predsjednistvo_bih", UNIT_LEVELS_2006[entity], True)
         c = Contest(
             "1",
             f"1:{entity}",
@@ -935,7 +1072,7 @@ def contests_2006() -> list[Contest]:
             units,
             [page.key for page in members] + files,
             magnitude=len(members),
-            finest="municipality votes",
+            finest="polling station votes",
         )
         c.names = names
         out.append(c)
@@ -944,7 +1081,7 @@ def contests_2006() -> list[Contest]:
     names = {o.label: candidate_name_2006(president.rows, o.label) for o in options}
     for o in options:
         o.code = None
-    units, files = units_from_2006(unit_pages_2006("predsjednik_rs/", "600"), True)
+    units, files = station_units_2006("predsjednik_rs", "600", True)
     c = Contest(
         "5",
         "5",
@@ -955,7 +1092,7 @@ def contests_2006() -> list[Contest]:
         units,
         [president.key, *files],
         magnitude=sum(o.elected for o in options),
-        finest="municipality votes",
+        finest="polling station votes",
     )
     c.names = names
     out.append(c)
@@ -974,7 +1111,7 @@ def contests_2006() -> list[Contest]:
                 )
                 for cells in numbered(page, 6)
             ]
-            units, files = units_from_2006(unit_pages_2006("PoOsnovnimJedinicamaUkupno", code), False)
+            units, files = station_units_2006("", code, False)
             by_code(options, units)
             name = (
                 magnitudes_2010(APPS["2010-10-03"]).get(code, (heading.split(" - ")[-1], 0))[0]
@@ -992,7 +1129,7 @@ def contests_2006() -> list[Contest]:
                     units,
                     [page.key, *files],
                     magnitude=page.info().get("Broj mjesta za dodjelu"),
-                    finest="municipality votes",
+                    finest="polling station votes",
                 )
             )
     for path, (race, entity) in SUMMARIES_2006.items():
@@ -1090,6 +1227,20 @@ METHOD = {
         "publishes them. Votes that the district total holds beyond its municipalities', which are the postal, "
         "absentee, mobile-team, and tendered ballots the Commission counts centrally, are in one centrally counted "
         "unit for the district."
+    ),
+    "polling station votes": (
+        "Votes by polling station as the Central Election Commission's certified results site publishes them. The "
+        "2006 station pages print only each option's votes, so a station's valid ballots here are the sum of its "
+        "option votes, and the district's invalid ballots, which the site prints only for the whole district, are in "
+        "one centrally counted unit together with the postal, absentee, and tendered ballots the Commission counts "
+        "centrally."
+    ),
+    "polling station totals": (
+        "Votes by polling station as the Central Election Commission's certified results site publishes them, with "
+        "each station's registered voters, valid ballots, and invalid ballots. The Commission counts postal, "
+        "absentee, mobile-team, and tendered ballots centrally and prints them only inside the district total, so "
+        "the votes and ballots that the district total holds beyond its stations' are in one centrally counted unit "
+        "for the district."
     ),
     "municipality votes": (
         "Votes by municipality (basic electoral unit) as the Central Election Commission's certified results site "
@@ -1682,6 +1833,14 @@ def election(e: Election, report: Report) -> Package:
         else:
             cited.add(artifact.storage_key)
             p.artifact(artifact, SOURCE_ID)
+    if report.problems:
+        what = "; ".join(report.problems)
+        for code in ("accounting.declared", "accounting.votes_valid"):
+            p.accept(
+                code,
+                "The polling station pages print more votes for some options than the district total the Commission "
+                f"prints, so the stations alone exceed it: {what}.",
+            )
     if over:
         p.accept(
             "accounting.turnout",
