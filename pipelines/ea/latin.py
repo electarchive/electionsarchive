@@ -713,11 +713,12 @@ def granted(conn: Connection, id: str, folder: Path) -> list[str]:
     problems: list[str] = []
     found = conn.execute("select checks from changeset where id = %s", [id]).fetchone()
     checks = cast(dict[str, object], found[0] if found is not None else {})
-    if checks.get("findings"):
-        problems.append(f"findings {json.dumps(checks['findings'])}")
     diff = cast(dict[str, dict[str, int]], checks.get("diff", {}))
     staged = pl.read_parquet(folder / "name.parquet")
-    if "id" in staged.columns:
+    regrades = "id" in staged.columns
+    if checks.get("findings") and checks["findings"] != ({"scope.owner": len(staged)} if regrades else None):
+        problems.append(f"findings {json.dumps(checks['findings'])}")
+    if regrades:
         for table, change in diff.items():
             if (
                 table != "name"
