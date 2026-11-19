@@ -24,6 +24,7 @@ import shapely.geometry
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.be import kieskring
 
 SOURCE = "be.vlaanderen"
 STATBEL = "be.statbel"
@@ -108,6 +109,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".xlsx")
     for name, _, _ in PLANS.values():
         raw.fetch(STATBEL, SECTORS + name, suffix=".zip")
+    kieskring.fetch(SOURCE)
 
 
 def packages() -> list[str]:
@@ -201,6 +203,7 @@ def plan(vintage: str) -> Plan:
 
 
 STATBEL_SOURCE = key("source", "statbel")
+DECREE_SOURCE = key("source", "kieskring")
 VLAANDEREN_SOURCE = key("source", SOURCE)
 
 
@@ -212,12 +215,36 @@ def district_area(day: str, code: str) -> str:
     return key("area", "be.kieskring", day, code)
 
 
+def district_members(day: str) -> dict[str, list[str]]:
+    """The codes of the municipalities in each provincial council district of an election, by the NIS code that the
+    results workbook gives the district."""
+    current = plan(ELECTION_PLAN[day])
+    if day == "2024-10-13":
+        # the decree's 2025 annex lists the merged Beveren-Kruibeke-Zwijndrecht, so the published district totals fix
+        # the assignment
+        owned: dict[str, list[str]] = defaultdict(list)
+        for code in sorted(PR_DISTRICT_OF):
+            owned[PR_DISTRICT_OF[code]].append(code)
+        return dict(owned)
+    by_name = kieskring.members(day, {m.code: m.names["nl"] for m in current.municipalities})
+    found: dict[str, list[str]] = {}
+    for nis in districts("PR")[day]:
+        owner = [name for name, codes in by_name.items() if nis in codes]
+        if len(owner) != 1:
+            raise ValueError(f"{day}: district {nis} is not in exactly one decree district")
+        found[nis] = by_name[owner[0]]
+    if sorted(code for codes in found.values() for code in codes) != sorted(m.code for m in current.municipalities):
+        raise ValueError(f"{day}: the districts do not partition the municipalities")
+    return found
+
+
 def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
         "Flanders' provinces and municipalities in the 2018, 2019, and 2025 municipal plans, from Statbel's "
-        "statistical sectors, with the provincial council and Antwerp district council areas",
+        "statistical sectors, with the provincial council districts (the unions of the municipalities that the "
+        "decrees assign to them) and the Antwerp district council areas",
     )
     p.external.add(BELGIUM)
     p.add(
@@ -258,6 +285,17 @@ def geo() -> Package:
         for town in current.municipalities:
             parent = area("be.provincie", town.province)
             _place(p, seen, "be.gemeente", town.code, town.names, parent, town.shape, current.crs, since, until)
+    p.add(
+        "source",
+        id=DECREE_SOURCE,
+        kind="official_body",
+        publisher="Vlaamse overheid",
+        title="Composition of the provincial council districts (decree annexes)",
+        url="https://codex.vlaanderen.be/",
+        attribution="Vlaamse overheid, Vlaamse Codex and Vlaams Parlement",
+    )
+    for url, _ in kieskring.DECREES.values():
+        p.artifact(raw.cached(SOURCE, url), DECREE_SOURCE)
     council_days = sorted(FILES)
     for index, day in enumerate(council_days):
         since = date.fromisoformat(day)
@@ -267,6 +305,22 @@ def geo() -> Package:
             p.add("area", id=id, scheme_code="be.kieskring")
             p.add("area_code", area_id=id, code=nis, valid_from=since, valid_to=until)
             p.name(id, name, "nl", "official")
+        current = plan(ELECTION_PLAN[day])
+        shapes = {m.code: m.shape for m in current.municipalities}
+        for nis, codes in district_members(day).items():
+            wgs = _wgs(shapely.coverage_union_all([shapes[code] for code in codes]), current.crs)
+            p.add(
+                "area_geometry",
+                area_id=district_area(day, nis),
+                valid_from=since,
+                valid_to=until,
+                geom=shapely.to_wkb(wgs, hex=True, include_srid=True),
+                label_point=shapely.to_wkb(
+                    shapely.set_srid(shapely.point_on_surface(wgs), 4326), hex=True, include_srid=True
+                ),
+                quality="official",
+                source_id=STATBEL_SOURCE,
+            )
     latest: dict[str, str] = {}
     for names in districts("DI").values():
         latest.update(names)
