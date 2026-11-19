@@ -9,7 +9,9 @@ Gračanica, Kamenica with Ranilug, Vitina with Kllokot, Gnjilane with Partesh, D
 i Elezit. The five Kosovo districts are the unions of their municipalities; the others are the layer's districts.
 
 The layer draws no outline for Belgrade's 17 city municipalities, for the five city municipalities of Niš, or for
-Kostolac, Sevojno, and Vranjska Banja; they stay without a shape. Novi Sad appears in the gazetteer twice, as
+Kostolac, Sevojno, and Vranjska Banja; they stay without a shape. Six Kosovo municipalities that the gazetteer took
+from the 1997 tables (Podujevo, Glogovac, Kačanik, Štimlje, Dečani, and Đakovica) count toward their districts'
+outlines but get none of their own until the gazetteer that holds them is loaded. Novi Sad appears in the gazetteer twice, as
 "Novi Sad-grad" and as "Grad Novi Sad", and both take the city's outline.
 """
 
@@ -102,6 +104,9 @@ NO_SHAPE = {
     "70220", "70238", "70246", "70254", "71293", "71285", "71307", "71315", "71323", "71331", "71340", "71358",
     "71366",
 }  # fmt: skip
+# Kosovo municipalities the Commission's gazetteer gained from the 1997 tables after the loaded `rs.rik/geo`; their
+# outlines still count toward their district's union, and are drawn once that gazetteer is loaded.
+PENDING = {"90034", "90069", "90085", "90115", "90247", "90310"}
 ALIAS = {"80284": "89010"}
 GRID = 1e-6
 CYRILLIC = dict(
@@ -273,6 +278,8 @@ def geo() -> Package:
             source = sources["xkx"]
             drawn.update(KOSOVO[code])
             members.setdefault(okrug, []).append(shape)
+            if code in PENDING:
+                continue
         else:
             label = by_name.get(_latin(names[ALIAS.get(code, code)] if code in ALIAS else names[code]))
             if label is None:
