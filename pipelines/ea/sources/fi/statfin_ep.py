@@ -23,7 +23,8 @@ from ea.sources.fi import vaalit
 
 SOURCE = "fi.statfin_ep"
 BASE = "https://statfin.stat.fi/PXWeb/api/v1/en/StatFin/euvaa"
-TURNOUT, SUPPORT = "14gu", "14gv"
+TURNOUT, SUPPORT, ELECTED = "14gu", "14gv", "14h8"
+CANDIDATE = "vaalitiedot_42_20240612"
 SEX = {TURNOUT: "sukupuoli_9_20180101", SUPPORT: "sukupuoli_25_20190101"}
 PLACE = "kunta_117_20240101"
 LISTING = "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin_Passiivi/evaa/001_oi57_statfin_tulos1_2003_fi.px"
@@ -32,6 +33,7 @@ FINLAND = vaalit.FINLAND
 # The sessions of the tables that this pipeline builds
 DAYS = {1996: date(1996, 10, 20), 1999: date(1999, 6, 13)}
 
+MAGNITUDE = 16
 REGISTERED, CAST, VALID, INVALID = 2, 3, 4, 5
 VOTES_MEASURE = 1
 
@@ -59,6 +61,17 @@ def body(table: str, year: int) -> dict[str, object]:
     }
 
 
+def elected_body(year: int) -> dict[str, object]:
+    """The candidates of one year with their votes; those with a figure are the elected members."""
+    return {
+        "query": [
+            {"code": "timeperiod_y", "selection": {"filter": "item", "values": [str(year)]}},
+            {"code": "contentscode", "selection": {"filter": "item", "values": ["aanet_euvaa_as"]}},
+        ],
+        "response": {"format": "json-stat2"},
+    }
+
+
 def url(table: str) -> str:
     return f"{BASE}/{table}.px"
 
@@ -68,10 +81,25 @@ def fetch() -> None:
     for year in DAYS:
         for table in (TURNOUT, SUPPORT):
             raw.fetch(SOURCE, url(table), suffix=".json", body=body(table, year))
+        raw.fetch(SOURCE, url(ELECTED), suffix=".json", body=elected_body(year))
 
 
 def artifacts(year: int) -> list[raw.Artifact]:
-    return [raw.cached(SOURCE, url(table), body(table, year)) for table in (TURNOUT, SUPPORT)]
+    return [raw.cached(SOURCE, url(table), body(table, year)) for table in (TURNOUT, SUPPORT)] + [
+        raw.cached(SOURCE, url(ELECTED), elected_body(year))
+    ]
+
+
+def seats(year: int) -> dict[str, int]:
+    """The seats of each list, by the party's abbreviation, counted from the members elected in table 14h8."""
+    table = cube(artifacts(year)[2])
+    won: dict[str, int] = {}
+    for named, _ in rows(table):
+        code = named[CANDIDATE]
+        if len(code) > 3:
+            abbreviation = table.labels[CANDIDATE][code[:3]].lower()
+            won[abbreviation] = won.get(abbreviation, 0) + 1
+    return won
 
 
 def packages() -> list[str]:
@@ -157,7 +185,7 @@ class Count:
 
 @functools.cache
 def read(year: int) -> Count:
-    turnout, support = artifacts(year)
+    turnout, support, _ = artifacts(year)
     first, second = cube(turnout), cube(support)
     place = {
         code: re.sub(r"\s+-\d\d$", "", re.sub(r"^\d+\s+", "", label)) for code, label in first.labels[PLACE].items()
@@ -326,12 +354,12 @@ def registry() -> Package:
 # Elections
 
 METHOD = (
-    "Statistics Finland's StatFin tables 14gu and 14gv, which hold the figures of the Ministry of Justice's election "
+    "Statistics Finland's StatFin tables 14gu, 14gv, and 14h8, which hold the figures of the Ministry of Justice's election "
     "information system by municipality. Registered voters are the persons entitled to vote, which include Finnish "
     "citizens living abroad and, from 1996, citizens of other European Union countries living in Finland; ballots "
     "cast are the persons who voted. Valid ballots are the votes for all lists, and invalid ballots are the rejected "
     "ones. A voter abroad is counted in the municipality that the voting register assigns. Each list holds its votes; "
-    "the tables print no seats and no candidate votes, so none are stored. Lists that stood in no municipality have "
+    "seats are the members elected, counted per list from StatFin table 14h8, whose 16 elected candidates each belong to one list. Candidate votes are not stored. Lists that stood in no municipality have "
     "no counts there."
 )
 
@@ -372,7 +400,7 @@ def election(year: int) -> Package:
         kind="list_allocation",
         body_id=None,
         district_area_id=vaalit.COUNTRY,
-        magnitude=None,
+        magnitude=MAGNITUDE,
         round_number=1,
         electoral_system_id=vaalit.system_of_kind("EP"),
         default_result_kind="counted",
@@ -416,6 +444,14 @@ def election(year: int) -> Package:
             ballot_position=None,
             ballot_label=label,
         )
+    won = seats(year)
+    if sum(won.values()) != MAGNITUDE:
+        raise ValueError(f"{year}: {sum(won.values())} seats, not {MAGNITUDE}")
+    for code, option in options.items():
+        if code != OTHERS and won.get(CODES[code][year], 0):
+            p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=won.pop(CODES[code][year]))
+    if won:
+        raise ValueError(f"{year}: seats for lists without a ballot option: {won}")
     for measure, value in count.voters[NATIONAL].items():
         p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
     p.add("declared", result_set_id=result_set, option_id=None, measure=VALID, value=totals["00"])
