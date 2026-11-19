@@ -1,0 +1,340 @@
+area_code	ine2015	ine2004	name2015	name2004
+1:alcala	010404	010404	Alcalá	Villa Alcalá
+1:azurduy	010201	010201	Azurduy	Villa Azurduy
+1:camargo	010701	010701	Camargo	Camargo
+1:camataqui	010901	010901	Villa Abecia	Villa Abecia
+1:culpina	010902	010902	Culpina	Culpina
+1:el-villar	010405	010405	El Villar	El Villar
+1:huacareta	010502	010502	Huacareta	San Pablo de Huacareta
+1:huacaya	011002	011002	Huacaya	Huacaya
+1:icla	010304	010304	Villa Ricardo Mugia - Icla	Icla (R.Mujia)
+1:incahuasi	010703	010703	Incahuasi	Incahuasi
+1:las-carreras	010903	010903	Las Carreras	Las Carretas
+1:machareti	011003	011003	Macharetí	Machareti
+1:mojocoya	010303	010303	Mojocoya	Villa Mojocoya
+1:monteagudo	010501	010501	Monteagudo	Monteagudo
+1:muyupampa	011001	011001	Villa Vaca Guzmán	Villa Vaca Guzmán (Muyupa
+1:padilla	010401	010401	Padilla	Padilla
+1:pescado	010801	010801	Villa Serrano	Villa Serrano
+1:poroma	010103	010103	Poroma	Poroma
+1:presto	010302	010302	Presto	Presto
+1:san-lucas	010702	010702	San Lucas	San Lucas
+1:sopachuy	010403	010403	Sopachui	Sopachuy
+1:sucre	010101	010101	Sucre	Sucre
+1:tacopaya	010301	010301	Zudañez	Zudañez
+1:tarabuco	010601	010601	Tarabuco	Tarabuco
+1:tarvita	010202	010202	Tarvita	Tarvita (Villa Arias)
+1:tomina	010402	010402	Tomina	Tomina
+1:villa-charcas	010704		Villa Charcas	
+1:yamparaez	010602	010602	Yamparáez	Yamparáez
+1:yotala	010102	010102	Yotala	Yotala
+2:achacachi	020201	020201	Achacachi	Achacachi
+2:achocalla	020104	020104	Achocalla	Achocalla
+2:alto-beni	022002		Alto Beni	
+2:ancoraimes	020202	020202	Villa Ancoraimes	Ancoraimes
+2:apolo	020701	020701	Apolo	Apolo
+2:aroma	021307	021307	Collana	Collana
+2:aucapata	020503	020503	Aucapata	Aucapata
+2:ayata	020502	020502	Ayata	Ayata
+2:ayo-ayo	021303	021303	Ayo Ayo	Ayo Ayo
+2:batallas	021203	021203	Batallas	Batallas
+2:cairoma	020905	020905	Cairoma	Cairoma
+2:cajuata	021003	021003	Cajuata	Cajuata
+2:calacoto	020303	020303	Calacoto	Calacoto
+2:calamarca	021304	021304	Calamarca	Calamarca
+2:caquiaviri	020302	020302	Caquiaviri	Caquiaviri
+2:carabuco	020403	020403	Puerto Mayor de Carabuco	Puerto Carabuco
+2:caranavi	022001	022001	Caranavi	Caranavi
+2:catacora	021902	021902	Catacora	Catacora
+2:chacarilla	021803	021803	Chacarilla	Chacarilla
+2:charana	020305	020305	Charaña	Charaña
+2:charazani	021601	021601	Charazani	Charazani (Gral.Perez)
+2:chua-cocani	020206		Chua Cocani	
+2:chulumani	021101	021101	Chulumani	Chulumani
+2:chuma	020501	020501	Chuma	Chuma
+2:colquencha	021306	021306	Colquencha	Colquencha
+2:colquiri	021004	021004	Colquiri	Colquiri
+2:comanche	020304	020304	Comanche	Comanche
+2:combaya	020605	020605	Combaya	Combaya
+2:copacabana	021701	021701	Copacabana	Copacabana
+2:coripata	021402	021402	Coripata	Coripata
+2:coro-coro	020301	020301	Corocoro	Coro Coro
+2:coroico	021401	021401	Coroico	Coroico
+2:curva	021602	021602	Curva	Curva
+2:desaguadero	020804	020804	Desaguadero	Desaguadero
+2:el-alto	020105	020105	El Alto	El Alto
+2:escoma	020405		Escoma	
+2:guanay	020602	020602	Guanay	Guanay
+2:guaqui	020802	020802	Puerto Mayor de Guaqui	Guaqui
+2:huarina	020203		Huarina	
+2:huatajata	020205		Huatajata	
+2:humanata	020404		Humanata	
+2:ichoca	021005	021005	Ichoca	Ichoca
+2:inquisivi	021001	021001	Inquisivi	Inquisivi
+2:irupana	021102	021102	Irupana	Irupana
+2:ixiamas	021501	021501	Ixiamas	Ixiamas
+2:jesus-de-machaca	020806	020806	Jesús de Machaka	Jesús de Machaca
+2:la-asunta	021105	021105	La Asunta	La Asunta
+2:la-paz	020101	020101	Nuestra Señora de La Paz	Nuestra Señora de La Paz
+2:laja	021202	021202	Laja	Laja
+2:licoma-pampa	021006	021006	Villa Libertad Licoma	Licoma (Villa Libertad)
+2:luribay	020901	020901	Luribay	Luribay
+2:malla	020904	020904	Malla	Malla
+2:mapiri	020607	020607	Mapiri	Mapiri
+2:mecapaca	020103	020103	Mecapaca	Mecapaca
+2:mocomoco	020402	020402	Mocomoco	Mocomoco
+2:nazacara	020307	020307	Nazacara de Pacajes	Nazacara de Pacajes
+2:palca	020102	020102	Palca	Palca
+2:palos-blancos	021104	021104	Palos Blancos	Palos Blancos
+2:papel-pampa	021802	021802	Papel Pampa	Papel Pampa
+2:patacamaya	021305	021305	Patacamaya	Patacamaya
+2:pelechuco	020702	020702	Pelechuco	Pelechuco
+2:pucarani	021201	021201	Pucarani	Pucarani
+2:puerto-acosta	020401	020401	Puerto Acosta	Puerto Acosta
+2:puerto-perez	021204	021204	Puerto Pérez	Puerto Perez
+2:quiabaya	020604	020604	Quiabaya	Quiabaya
+2:quime	021002	021002	Quime	Quime
+2:san-andres-de-machaca	020805	020805	La (Marka) San Andrés de Machaca	San Andrés de Machaca
+2:san-buenaventura	021502	021502	San Buenaventura	San Buenaventura
+2:san-pedro-de-curahuara	021801	021801	San Pedro de Curahuara	San Pedro de Curahuara
+2:san-pedro-de-tiquina	021702	021702	San Pedro de Tiquina	San Pedro de Tiquina
+2:santiago-de-callapa	020308	020308	Santiago de Callapa	Santiago de Callapa
+2:santiago-de-huata	020204		Santiago de Huata	
+2:santiago-de-machaca	021901	021901	Santiago de Machaca	Santiago de Machaca
+2:sapahaqui	020902	020902	Sapahaqui	Sapahaqui
+2:sica-sica	021301	021301	Sicasica	Sica Sica
+2:sorata	020601	020601	Sorata	Sorata
+2:tacacoma	020603	020603	Tacacoma	Tacacoma
+2:taraco	020807	020807	Taraco	Taraco
+2:teoponte	020608	020608	Teoponte	Teoponte
+2:tiahuanacu	020803	020803	Tiahuanacu	Tiahuanacu
+2:tipuani	020606	020606	Tipuani	Tipuani
+2:tito-yupanqui	021703	021703	Tito Yupanqui	Tito Yupanki
+2:umala	021302	021302	Umala	Umala
+2:viacha	020801	020801	Viacha	Viacha
+2:waldo-ballivian	020306	020306	Waldo Ballivian	Waldo Ballivian
+2:yaco	020903	020903	Yaco	Yaco
+2:yanacachi	021103	021103	Yanacachi	Yanacachi
+3:aiquile	030201	030201	Aiquile	Aiquile
+3:alalay	031303	031303	Alalay	Alalay
+3:anzaldo	030402	030402	Anzaldo	Anzaldo
+3:arani	030501	030501	Arani	Arani
+3:arbieto	030403	030403	Arbieto	Arbieto
+3:arque	030601	030601	Arque	Arque
+3:ayopaya	030301	030301	Ayopaya	Independencia
+3:bolivar	031501	031501	Bolivar	Bolivar
+3:capinota	030701	030701	Capinota	Capinota
+3:chimore	031204	031204	Chimoré	Chimore
+3:cliza	030801	030801	Cliza	Cliza
+3:cocapata	030303		Cocapata	
+3:cochabamba	030101	030101	Cochabamba	Cochabamba
+3:colcapirhua	030905	030905	Colcapirhua	Colcapirhua
+3:colomi	031002	031002	Colomi	Colomi
+3:cuchumuela	031405	031405	Villa Gualberto Villarroel	Cuchumuela (V. G.Villarro
+3:entre-rios	031206	031206	Entre Ríos	Entre Rios (Bulo Bulo)
+3:mizque	031301	031301	Mizque	Mizque
+3:morochata	030302	030302	Morochata	Morochata
+3:omereque	030203	030203	Omereque	Omereque
+3:pasorapa	030202	030202	Pasorapa	Pasorapa
+3:pocona	031203	031203	Pocona	Pocona
+3:pojo	031202	031202	Pojo	Pojo
+3:puerto-villarroel	031205	031205	Puerto Villarroel	Puerto Villarroel
+3:punata	031401	031401	Punata	Punata
+3:quillacollo	030901	030901	Quillacollo	Quillacollo
+3:sacaba	031001	031001	Sacaba	Sacaba
+3:sacabamba	030404	030404	Sacabamba	Sacabamba
+3:san-benito	031403	031403	San Benito	San Benito
+3:santivanez	030702	030702	Santivañez	Santibañez
+3:shinahota	031602		Shinahota	
+3:sicaya	030703	030703	Sicaya	Sicaya
+3:sipe-sipe	030902	030902	Sipesipe	Sipe Sipe
+3:tacachi	031404	031404	Tacachi	Tacachi
+3:tacopaya	030602	030602	Tacopaya	Tacopaya
+3:tapacari	031101	031101	Tapacarí	Tapacarí
+3:tarata	030401	030401	Tarata	Tarata
+3:tiquipaya	030903	030903	Tiquipaya	Tiquipaya
+3:tiraque	031601	031601	Tiraque	Tiraque
+3:toco	030802	030802	Toco	Toko
+3:tolata	030803	030803	Tolata	Tolata
+3:totora	031201	031201	Totora	Totora
+3:vacas	030502	030502	Vacas	Vacas
+3:vila-vila	031302	031302	Vila Vila	Vila Vila
+3:villa-rivero	031402	031402	Villa Rivero	Villa Rivero
+3:villa-tunari	031003	031003	Villa Tunari	Villa Tunari
+3:vinto	030904	030904	Vinto	Vinto
+4:andamarca	041201	041201	Andamarca	Santiago de Andamarca
+4:antequera	040603	040603	Antequera	Antequera (Bolivar)
+4:belen-de-andamarca	041202	041202	Belén de Andamarca	Belén de Andamarca
+4:caracollo	040102	040102	Caracollo	Caracollo
+4:carangas	041503	041503	Carangas	Carangas
+4:challapata	040201	040201	Challapata	Challapata
+4:chipaya	040903	040903	Chipaya	Chipaya
+4:choque-cota	040302	040302	Choquecota	Choquecota
+4:coipasa	040902	040902	Coipasa	Coipasa
+4:corque	040301	040301	Corque	Corque
+4:cruz-de-machacamarca	040503	040503	Cruz de Machacamarca	Cruz de Machacamarca
+4:curahuara-de-carangas	040401	040401	Curahuara de Carangas	Curahuara de Carangas
+4:el-choro	040103	040103	El Choro	El Choro
+4:escara	040502	040502	Escara	Escara
+4:esmeralda	040505	040505	Esmeralda	Esmeralda
+4:eucaliptus	041101	041101	Eucaliptus	Eucaliptus
+4:huachacalla	040501	040501	Huachacalla	Huachacalla
+4:huanuni	040701	040701	Huanuni	Villa Huanuni
+4:huayllamarca	041601	041601	Huayllamarca	Santiago de Huayllamarca
+4:la-rivera	041501	041501	La Rivera	La Rivera
+4:machacamarca	040702	040702	Machacamarca	Machacamarca
+4:oruro	040101	040101	Oruro	Oruro
+4:pampa-aullagas	040802	040802	Pampa Aullagas	Pampa Aullagas
+4:pazna	040602	040602	Pazña	Pazña
+4:poopo	040601	040601	Poopó	Poopó
+4:sabaya	040901	040901	Sabaya	Sabaya
+4:salinas-de-garci-mendoza	040801	040801	Salinas de Garcí Mendoza	Salinas de Garci Mendoza
+4:san-pedro-de-totora	041301	041301	Totora	San Pedro de Totora
+4:santiago-de-huari	041401	041401	Santiago de Huari	Santiago de Huari
+4:santuario-de-quillacas	040202	040202	Santuario de Quillacas	Santuario de Quillacas
+4:soracachi	040104	040104	Paria	Paria
+4:todos-santos	041502	041502	Todos Santos	Todos Santos
+4:toledo	041001	041001	Toledo	Toledo
+4:turco	040402	040402	Turco	Turco
+4:yunguyo-de-litoral	040504	040504	Yunguyo del Litoral	Yunguyo del Litoral *
+5:acasio	051302	051302	Acasio	Acasio
+5:arampampa	051301	051301	Arampampa	Arampampa
+5:atocha	050802	050802	Atocha	Atocha
+5:belen-de-urmiri	050104	050104	Urmiri	Belén de Urmiri
+5:betanzos	050301	050301	Betanzos	Betanzos
+5:caiza-d	051102	051102	Caiza "D"	Caiza "D"
+5:caripuyo	050702	050702	Caripuyo	Caripuyo
+5:chaqui	050302	050302	Chaquí	Chaqui
+5:chayanta	050202	050202	Chayanta	Chayanta
+5:chuquihuta	050204		Chuquihuta Ayllu Jucumani	
+5:ckochas	051103		Ckochas	
+5:colcha-k	050901	050901	Colcha "K"	Colcha"K" (V.Martin)
+5:colquechaca	050401	050401	Colquechaca	Colquechaca
+5:cotagaita	050601	050601	Cotagaita	Cotagaita
+5:llallagua	050203	050203	Llallagua	Llallagua
+5:llica	051401	051401	Llica	Llica
+5:mojinete	051002	051002	Mojinete	Mojinete
+5:ocuri	050404	050404	Ocurí	Ocuri
+5:pocoata	050403	050403	Pocoata	Pocoata
+5:porco	051203	051203	Porco	Porco
+5:potosi	050101	050101	Potosí	Potosí
+5:puna	051101	051101	Puna	Puna
+5:ravelo	050402	050402	Ravelo	Ravelo
+5:sacaca	050701	050701	Sacaca	Sacaca
+5:san-agustin	051601	051601	San Agustín	San Agustín
+5:san-antonio-de-esmoruco	051003	051003	San Antonio de Esmoruco	San Antonio de Esmoraca
+5:san-pablo-de-lipez	051001	051001	San Pablo	San Pablo de Lipez
+5:san-pedro-de-buena-vista	050501	050501	San Pedro	San Pedro de Buena Vista
+5:san-pedro-de-quemes	050902	050902	San Pedro de Quemes	San Pedro de Quemes
+5:tacobamba	050303	050303	Tacobamba	Tacobamba
+5:tahua	051402	051402	Tahua	Tahua
+5:tinguipaya	050102	050102	Tinguipaya	Tinquipaya
+5:tomave	051202	051202	Tomave	Tomave
+5:toro-toro	050502	050502	Toro Toro	Toro Toro
+5:tupiza	050801	050801	Tupiza	Tupiza
+5:uncia	050201	050201	Uncía	Uncía
+5:uyuni	051201	051201	Uyuni	Uyuni (Thola Pampa)
+5:villa-de-yocalla	050103	050103	Yocalla	Yocalla
+5:villazon	051501	051501	Villazón	Villazón
+5:vitichi	050602	050602	Vitiche	Vitichi
+6:bermejo	060202	060202	Bermejo	Bermejo
+6:carapari	060302	060302	Caraparí	Caraparí
+6:concepcion	060401	060401	Uriondo	Uriondo
+6:el-puente	060502	060502	El Puente	Tomayapo (El Puente)
+6:entre-rios	060601	060601	Entre Ríos	Entre Rios (La Moreta)
+6:padcaya	060201	060201	Padcaya	Padcaya
+6:tarija	060101	060101	Tarija	Tarija
+6:villa-san-lorenzo	060501	060501	San Lorenzo	Villa San Lorenzo
+6:villamontes	060303	060303	Villa Montes	Villamontes
+6:yacuiba	060301	060301	Yacuiba	Yacuiba
+6:yunchara	060402	060402	Yunchará	Yunchara
+7:agustin-saavedra	071002	071002	General Saavedra	General Saavedra
+7:ascension-de-guarayos	071501	071501	Ascención de Guarayos	Ascención de Guarayos
+7:ayacucho	070103	070103	Porongo	Porongo (Ayacucho)
+7:boyuibe	070707	070707	Boyuibe	Boyuibe
+7:buena-vista	070401	070401	Buena Vista	Buena Vista
+7:cabezas	070703	070703	Cabezas	Cabezas
+7:camiri	070706	070706	Camiri	Camiri
+7:charagua	070702	070702	Charagua	Charagua
+7:colonia-japonesa-san-juan	070404	070404	San Juan	San Juan
+7:colpa-belgica	070603	070603	Colpa Bélgica	Colpa Belgica
+7:comarapa	071301	071301	Comarapa	Comarapa
+7:concepcion	071101	071101	Concepción	Concepción
+7:cotoca	070102	070102	Cotoca	Cotoca
+7:cuatro-canadas	071106	071106	Cuatro Cañadas	Cuatro Canadas
+7:cuevo	070704	070704	Cuevo	Cuevo
+7:el-carmen-rivero-torrez	071403	071403	El Carmen Rivero Tórrez	Carmen Rivero Torrez
+7:el-puente	071503	071503	El Puente	El Puente
+7:el-torno	070105	070105	El Torno	El Torno
+7:fernandez-alonso	071004	071004	Fernández Alonso	Fernandez Alonso
+7:gutierrez	070705	070705	Gutiérrez	Gutiérrez
+7:la-guardia	070104	070104	La Guardia	La Guardia
+7:lagunillas	070701	070701	Lagunillas	Lagunillas
+7:mairana	070903	070903	Mairana	Mairana
+7:mineros	071003	071003	Mineros	Mineros
+7:montero	071001	071001	Montero	Montero
+7:moro-moro	070803	070803	Moromoro	Moro Moro
+7:okinawa-uno	070202	070202	Okinawa Uno	Okinawa Uno
+7:pailon	070502	070502	Pailón	Pailón
+7:pampa-grande	070902	070902	Pampa Grande	Pampa Grande
+7:portachuelo	070601	070601	Portachuelo	Portachuelo
+7:postrer-valle	070804	070804	Postrervalle	Postrer Valle
+7:pucara	070805	070805	Pucará	Pucara
+7:puerto-quijarro	071402	071402	Puerto Quijarro	Puerto Quijarro
+7:puerto-suarez	071401	071401	Puerto Suarez	Puerto Suarez
+7:quirusillas	070904	070904	Quirusillas	Quirusillas
+7:robore	070503	070503	Roboré	Robore
+7:saipina	071302	071302	Saipina	Saipina
+7:samaipata	070901	070901	Samaipata	Samaipata
+7:san-antonio-de-lomerio	071104	071105	San Antonio de Lomerio	San Antonio de Lomerio
+7:san-carlos	070402	070402	San Carlos	San Carlos
+7:san-ignacio-de-velasco	070301	070301	San Ignacio	San Ignacio de Velasco
+7:san-javier	071102	071102	San Javier	San Javier
+7:san-jose-de-chiquitos	070501	070501	San José	San Jose de Chiquitos
+7:san-julian	071103	071104	San Julián	San Julián
+7:san-matias	071201	071201	San Matías	San Matías
+7:san-miguel-de-velasco	070302	070302	San Miguel	San Miguel de Velasco
+7:san-pedro	071005	071005	San Pedro	San Pedro
+7:san-rafael	070303	070303	San Rafael	San Rafael
+7:san-ramon	071105	071103	San Ramón	San Ramón
+7:santa-cruz-de-la-sierra	070101	070101	Santa Cruz de la Sierra	Santa Cruz de la Sierra
+7:santa-rosa-del-sara	070602	070602	Santa Rosa	Santa Rosa del Sara
+7:trigal	070802	070802	Trigal	Trigal
+7:urubicha	071502	071502	Urubicha	Urubicha
+7:vallegrande	070801	070801	Vallegrande	Vallegrande
+7:warnes	070201	070201	Warnes	Warnes
+7:yapacani	070403	070403	Yapacaní	Yapacaní
+8:baures	080802	080802	Baures	Baures
+8:exaltacion	080402	080402	Exaltación	Exaltacion
+8:huacaraje	080803	080803	Huacaraje	Huacaraje
+8:loreto	080601	080601	Loreto	Loreto
+8:magdalena	080801	080801	Magdalena	Magdalena
+8:puerto-guayaramerin	080202	080202	Guayaramerín	Guayaramerín
+8:puerto-rurrenabaque	080304	080304	Puerto Menor de Rurrenabaque	Rurrenabaque
+8:puerto-siles	080703	080703	Puerto Siles	Puerto Siles
+8:reyes	080301	080301	Reyes	Reyes
+8:riberalta	080201	080201	Riberalta	Riberalta
+8:san-andres	080602	080602	San Andrés	San Andrés
+8:san-borja	080302	080302	San Borja	San Borja
+8:san-ignacio	080501	080501	San Ignacio	San Ignacio
+8:san-javier	080102	080102	San Javier	San Javier
+8:san-joaquin	080701	080701	San Joaquín	San Joaquín
+8:san-ramon	080702	080702	San Ramón	San Ramón
+8:santa-ana-del-yacuma	080401	080401	Santa Ana	Santa Ana de Yacuma
+8:santa-rosa	080303	080303	Santa Rosa	Santa Rosa
+8:trinidad	080101	080101	Trinidad	Trinidad
+9:bella-flor	090104	090104	Bella Flor	Bella Flor
+9:bolpebra	090103	090103	Bolpebra	Bolpebra (Mukden)
+9:cobija	090101	090101	Cobija	Cobija
+9:filadelfia	090203	090203	Filadelfia	Filadelfia
+9:humaita	090402	090402	Ingavi	Ingavi
+9:loma-alta	090502	090502	Villa Nueva	Villa Nueva (Loma Alta)
+9:nueva-esperanza	090501	090501	Nueva Esperanza	Nuevo Manoa (Nueva Espera
+9:porvenir	090102	090102	Porvenir	Porvenir
+9:puerto-gonzalo-moreno	090301	090301	Puerto Gonzalo Moreno	Puerto Gonzales Moreno
+9:puerto-rico	090201	090201	Puerto Rico	Puerto Rico
+9:san-lorenzo	090302	090302	San Lorenzo	San Lorenzo
+9:san-pedro	090202	090202	San Pedro	San Pedro (Conquista)
+9:santa-rosa-del-abuna	090401	090401	Santa Rosa	Santa Rosa del Abuná
+9:santos-mercado	090503	090503	Santos Mercado	Santos Mercado
+9:sena	090303	090303	Sena	El Sena
