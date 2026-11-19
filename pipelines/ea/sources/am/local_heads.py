@@ -3,6 +3,9 @@
 The Commission lists every community head poll on one page that only a form post returns. Each poll's page lists its
 candidates and, for the whole community or for one polling station chosen by a second form post, the protocol figures
 and the votes of each candidate. The region and community pickers name the places.
+
+The regions, and every community that also held a council of elders poll, are the areas am.local_councils holds, with
+the region outlines and their 2005 boundary set; this pipeline adds only the communities that list lacks.
 """
 
 import functools
@@ -21,11 +24,10 @@ from uuid import uuid5
 
 import httpx
 import polars as pl
-import shapely
-import shapely.geometry
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.am import local_councils as councils
 
 SOURCE = "am.local_heads"
 SITE = "https://www.elections.am"
@@ -155,7 +157,6 @@ def stations(poll: int) -> list[tuple[str, str]]:
 
 
 def fetch() -> None:
-    raw.fetch(SOURCE, REGION_SHAPES, suffix=".geojson")
     polls = listing()
     print(f"{SOURCE}: {len(polls)} polls listed", file=sys.stderr, flush=True)
     regions = raw.fetch(SOURCE, regions_url(), suffix=".json")
@@ -210,24 +211,6 @@ def key(kind: str, *parts: object) -> str:
 
 SOURCE_ID = key("source", SOURCE)
 HEAD_SYSTEM = key("electoral_system", "fptp")
-SHAPES_ID = key("source", "geoboundaries.arm.adm1")
-REGION_SHAPES = (
-    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/ARM/ADM1/"
-    "geoBoundaries-ARM-ADM1.geojson"
-)
-REGIONS = {
-    "ԵՐԵՒԱՆ": "Yerevan",
-    "ԱՐԱԳԱԾՈՏՆ": "Aragatsotn",
-    "ԱՐԱՐԱՏ": "Ararat",
-    "ԱՐՄԱՎԻՐ": "Armavir",
-    "ԳԵՂԱՐՔՈՒՆԻՔ": "Gegharkunik",
-    "ԼՈՌԻ": "Lori",
-    "ԿՈՏԱՅՔ": "Kotayk",
-    "ՇԻՐԱԿ": "Shirak",
-    "ՍՅՈՒՆԻՔ": "Syunik",
-    "ՎԱՅՈՑ ՁՈՐ": "Vayots Dzor",
-    "ՏԱՎՈՒՇ": "Tavush",
-}
 
 
 def number(text: str) -> int | None:
@@ -370,12 +353,27 @@ def packages() -> list[str]:
     return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(day) for day in sorted({p.day for p in polls()}))]
 
 
-def area(scheme: str, text: str) -> str:
-    return key("area", scheme, text)
+@functools.cache
+def held() -> frozenset[tuple[str, str]]:
+    """The (region, community) pairs whose areas am.local_councils already holds."""
+    return frozenset((poll.region, poll.community) for poll in councils.polls())
+
+
+def region_area(region: str) -> str:
+    if region not in {held_region for held_region, _ in held()}:
+        raise ValueError(f"region {region!r} is not one am.local_councils holds")
+    return councils.area("am.marz", region)
+
+
+def place(region: str, community: str) -> str:
+    """The archive's area for a community: the one am.local_councils holds, else one this pipeline adds."""
+    if (region, community) in held():
+        return councils.area("am.community", f"{region}:{community}")
+    return key("area", "am.community", f"{region}:{community}")
 
 
 def community_area(poll: Poll) -> str:
-    return area("am.community", f"{poll.region}:{poll.community}")
+    return place(poll.region, poll.community)
 
 
 def office_id(poll: Poll) -> str:
@@ -408,53 +406,20 @@ def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "The regions (marzer) and communities named in the Central Electoral Commission's list of community head polls",
+        "The communities named in the Central Electoral Commission's list of community head polls that its list of "
+        "council of elders polls lacks",
+        depends=[f"{councils.SOURCE}/geo"],
     )
-    p.external |= {ARMENIA, COUNTRY, "am.marz", "am.community", "am.precinct"}
+    p.external |= {"am.community"}
     source(p)
-    shapes = raw.cached(SOURCE, REGION_SHAPES)
-    p.add(
-        "source",
-        id=SHAPES_ID,
-        kind="academic",
-        publisher="geoBoundaries",
-        title="geoBoundaries gbOpen Armenia ADM1 (province and city outlines, 2005)",
-        url="https://www.geoboundaries.org/",
-        license="Creative Commons Attribution 2.5 Generic",
-        license_url="https://creativecommons.org/licenses/by/2.5/",
-        attribution="geoBoundaries (William & Mary geoLab), from Wikimedia Commons",
-    )
-    p.artifact(shapes, SHAPES_ID)
-    outlines = {
-        feature["properties"]["shapeName"]: shapely.geometry.shape(feature["geometry"])
-        for feature in json.loads(shapes.path.read_text(encoding="utf-8"))["features"]
-    }
-    regions = sorted({poll.region for poll in polls()})
-    for region in regions:
-        id = area("am.marz", region)
-        p.add("area", id=id, scheme_code="am.marz")
-        outline = outlines.get(REGIONS.get(fold(region), ""))
-        if outline is not None:
-            outline = shapely.set_srid(shapely.MultiPolygon(list(shapely.get_parts(shapely.make_valid(outline)))), 4326)
-            p.add(
-                "area_geometry",
-                area_id=id,
-                geom=shapely.to_wkb(outline, hex=True, include_srid=True),
-                label_point=shapely.to_wkb(
-                    shapely.set_srid(shapely.point_on_surface(outline), 4326), hex=True, include_srid=True
-                ),
-                quality="academic",
-                source_id=SHAPES_ID,
-            )
-        p.add("area_code", area_id=id, code=region)
-        p.add("area_parent", area_id=id, parent_id=COUNTRY)
-        p.name(id, region, "hy", "official")
-        p.name(id, REGIONS.get(fold(region), title(region)), "en", "english", False)
     for region, community in sorted({(poll.region, poll.community) for poll in polls()}):
-        id = area("am.community", f"{region}:{community}")
+        parent = region_area(region)
+        if (region, community) in held():
+            continue
+        id = place(region, community)
         p.add("area", id=id, scheme_code="am.community")
         p.add("area_code", area_id=id, code=f"{region}:{community}")
-        p.add("area_parent", area_id=id, parent_id=area("am.marz", region))
+        p.add("area_parent", area_id=id, parent_id=parent)
         p.name(id, community, "hy", "official")
         p.name(id, title(community), "en", "english", False)
     return p
@@ -572,7 +537,7 @@ def election(day: date, group: list[Poll]) -> Package:
         package_key(day),
         SOURCE,
         f"The community head elections of {day.isoformat()} by polling station from the Central Electoral Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[f"{councils.SOURCE}/geo", f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external |= {ARMENIA, COUNTRY, "am.precinct"}
     path = f"am/{day.isoformat()}-community-heads"
