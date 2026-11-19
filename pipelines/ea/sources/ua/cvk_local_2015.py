@@ -837,7 +837,7 @@ def registry() -> Package:
         SOURCE,
         "The electoral systems of Ukraine's local elections of 2015 and the parties that nominated candidates in them "
         "that the 2020 registry lacks, from the Central Election Commission",
-        depends=[f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/registry", "ua.cvk/registry"],
     )
     p.external.add(UKRAINE)
     p.add(
@@ -982,7 +982,7 @@ def first() -> Package:
         "village councils with each list's votes and seats or each district's deputy, and the heads of villages, "
         "settlements, and cities, with every candidate's votes where the city had a results page, from the Central "
         "Election Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", GEO, REGISTRY],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", GEO, REGISTRY, "ua.cvk/registry"],
     )
     p.external.add(UKRAINE)
     p.external |= party_ids(set(nominators()))
@@ -1214,7 +1214,7 @@ def runoff() -> Package:
         SOURCE,
         f"The second round of {RUNOFF_DAY:%-d %B %Y} of the elections of Ukrainian city heads and Kyiv's mayor, from "
         "the Central Election Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", GEO, REGISTRY, f"{SOURCE}/{DAY}"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", GEO, REGISTRY, "ua.cvk/registry", f"{SOURCE}/{DAY}"],
     )
     p.external.add(UKRAINE)
     p.external |= party_ids(set(nominators()))
