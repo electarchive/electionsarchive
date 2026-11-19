@@ -600,6 +600,9 @@ def package_from_export() -> Path:
         held = conn.execute(
             "select path, entity_id::text from slug where path = any(%s)", [slugs["path"].to_list()]
         ).fetchall()
+        # The export cites its files by storage key alone; as a Draft package does, the manifest cites each with its
+        # url and sha256, which the inbox verifies the cache against.
+        cited = package._cited(conn, package._adopted(conn, SOURCE)[1], tables.get("source_artifact"))
     if set(units) != set(codes):
         raise LookupError(f"the archive lacks the id.provinsi units {sorted(set(codes) - set(units))}")
     owners = dict(slugs.select("path", "entity_id").iter_rows())
@@ -628,7 +631,7 @@ def package_from_export() -> Path:
     for table in ("contest", "slug", "result_value", "value_locator"):
         tables[table].write_parquet(out / f"{table}.parquet", statistics=False)
         counts[table] = tables[table].height
-    built = package._seal(KEY, SOURCE, SUMMARY, out, counts, manifest["adopts"], manifest["sources"], None)
+    built = package._seal(KEY, SOURCE, SUMMARY, out, counts, manifest["adopts"], cited, None)
     after = {code: n for code, n, _ in package.check(out)}
     if after != before:
         raise ValueError(f"{KEY}: the changes move the check findings from {before} to {after}")
