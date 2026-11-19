@@ -834,7 +834,12 @@ def election_key(volume: Volume) -> str:
 
 
 def packages() -> list[str]:
-    return ["pk.ecp/registry", *(f"pk.ecp/{election_key(v)}" for v in VOLUMES), "pk.ecp/2008-02-18", "pk.ecp/2008-06-26"]
+    return [
+        "pk.ecp/registry",
+        *(f"pk.ecp/{election_key(v)}" for v in VOLUMES),
+        "pk.ecp/2008-02-18",
+        "pk.ecp/2008-06-26",
+    ]
 
 
 def fetch() -> None:
