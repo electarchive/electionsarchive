@@ -326,7 +326,10 @@ def geo() -> Package:
 
 
 def outlines(p: Package) -> None:
-    """Attach the geoBoundaries outlines of the three regions. The communities have no open outlines."""
+    """Attach the geoBoundaries outlines of the three regions.
+
+    The communities as they stood before the 2016-2017 mergers have no open outlines.
+    """
     p.add(
         "source",
         id=GEO_SOURCE,
