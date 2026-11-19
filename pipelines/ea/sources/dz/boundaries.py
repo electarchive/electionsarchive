@@ -1,14 +1,15 @@
-"""Algeria's wilayas (48 from 1984, 58 from 2019, 69 from 2026) and its 1,541 communes.
+"""Algeria's 31 wilayas of 1974, its wilayas (48 from 1984, 58 from 2019, 69 from 2026) and its 1,541 communes.
 
 The commune shapes come from the OCHA COD-AB dataset. Which commune belongs to which wilaya comes from the commune
-lists that Loi 19-12 (JO 78/2019) and Loi 26-06 (JO 25/2026) print for each wilaya they touch. A wilaya's shape is
-the union of its communes.
+lists that Loi 19-12 (JO 78/2019) and Loi 26-06 (JO 25/2026) print for each wilaya they touch. The 31 wilayas of 1974
+get their communes from the decrees in JO 57/1974. A wilaya's shape is the union of its communes.
 """
 
 import collections
 import difflib
 import functools
 import io
+import json
 import re
 import subprocess
 import unicodedata
@@ -33,11 +34,13 @@ COD = (
 L84_09 = "https://www.joradp.dz/FTP/JO-FRANCAIS/1984/F1984006.pdf"
 L19_12 = "https://www.joradp.dz/FTP/JO-FRANCAIS/2019/F2019078.pdf"
 L26_06 = "https://www.joradp.dz/FTP/JO-FRANCAIS/2026/F2026025.pdf"
+JO57_1974 = "https://www.joradp.dz/FTP/JO-FRANCAIS/1974/F1974057.pdf"
 ALGERIA = str(uuid5(package.NAMESPACE, "polity\x1fDZ"))
 TERRITORY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fDZA"))
 JORADP = "Secrétariat général du Gouvernement, Journal officiel de la République algérienne (JORADP)"
 # the pages of each issue that print the commune lists; each page has two columns
 PAGES = {L19_12: range(12, 16), L26_06: range(4, 10)}
+CREATED_1974 = date(1974, 7, 2)
 FIRST = date(1984, 2, 4)
 SECOND = date(2019, 12, 18)
 THIRD = date(2026, 4, 5)
@@ -135,9 +138,22 @@ def packages() -> list[str]:
     return [f"{SOURCE}/geo"]
 
 
+def wilaya_1974() -> dict[str, int]:
+    """The 1974 wilaya number (the first 31 codes of 1984) of each commune of the dataset.
+
+    Decrees 74-124 to 74-154 (JO 57 of 16 July 1974) list the communes of each of the 31 wilayas, and their limits
+    coincide with those of the communes, with a few communes cut in part. The communes of 1974 were split into the
+    1,541 of the dataset, so each commune takes the wilaya whose decree names it. A commune that no decree names
+    takes the wilaya of its neighbors that the 1984 wilaya it belongs to could have come from. The table is the
+    result, so a rebuild gives the same shapes.
+    """
+    table = json.loads((Path(__file__).parent / "wilaya_1974.json").read_text())
+    return {str(code): int(number) for code, number in table.items()}
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, COD, suffix=".zip")
-    for url in (L84_09, L19_12, L26_06):
+    for url in (L84_09, L19_12, L26_06, JO57_1974):
         raw.fetch(SOURCE, url, suffix=".pdf")
 
 
@@ -381,6 +397,17 @@ def geo() -> Package:
         p.add("source", id=id, kind="official_body", publisher=JORADP, title=title, url=url)
         p.artifact(raw.cached(SOURCE, url), id)
     p.artifact(raw.cached(SOURCE, COD), cod)
+    jo57 = key("source", "jo57-1974")
+    p.add(
+        "source",
+        id=jo57,
+        kind="official_body",
+        publisher=JORADP,
+        title="Décrets n° 74-124 à 74-154 du 12 juillet 1974 fixant les limites territoriales et la composition "
+        "des wilayas (JO n° 57)",
+        url=JO57_1974,
+    )
+    p.artifact(raw.cached(SOURCE, JO57_1974), jo57)
     for code, rank, noun, system in (
         ("dz.wilaya", 1, "wilaya", "wilaya_number"),
         ("dz.commune", 2, "commune", "cod_ab"),
@@ -397,6 +424,16 @@ def geo() -> Package:
             valid_to=end,
             as_of=start,
         )
+    p.add("scheme", code="dz.wilaya_1974", polity_id=ALGERIA, kind="administrative", rank=2, noun="wilaya (1974)")
+    p.add(
+        "boundary_set",
+        id=key("boundary_set", "dz.wilaya_1974", 1974),
+        scheme_code="dz.wilaya_1974",
+        vintage="1974",
+        valid_from=CREATED_1974,
+        valid_to=FIRST,
+        as_of=CREATED_1974,
+    )
     p.add(
         "boundary_set",
         id=key("boundary_set", "dz.commune", 2021),
@@ -441,6 +478,21 @@ def geo() -> Package:
         for wilaya, start, end in _spans({v: wilaya_of[found[v][code]] for v in found}):
             p.add("area_parent", area_id=id, parent_id=wilaya, valid_from=start, valid_to=end)
         _outline(p, id, row.shape, cod, FIRST, None)
+    # the 31 wilayas of 1974 to 1984, each the union of the communes its decree names
+    old_wilaya = wilaya_1974()
+    if set(old_wilaya) != set(book) or sorted(set(old_wilaya.values())) != list(range(1, 32)):
+        raise ValueError("the 1974 table must give each of the 1,541 communes one of the 31 wilayas of 1974")
+    for num in range(1, 32):
+        id = area("dz.wilaya_1974", f"{num:02d}")
+        name = "El Asnam" if OLD[num][0] == "Chlef" else OLD[num][0]
+        p.add("area", id=id, scheme_code="dz.wilaya_1974")
+        p.name(id, name, "fr", "official")
+        if native := arabic().get(OLD[num][1]):
+            p.name(id, native, "ar", "native")
+        p.add("area_code", area_id=id, code=f"{num:02d}", valid_from=CREATED_1974, valid_to=FIRST)
+        p.add("area_parent", area_id=id, parent_id=TERRITORY, valid_from=CREATED_1974, valid_to=FIRST)
+        outline = shapely.union_all([book[c].shape for c in sorted(book) if old_wilaya[c] == num])
+        _outline(p, id, outline, cod, CREATED_1974, FIRST)
     # lineage: each new wilaya was created from the wilaya whose communes it took, and that wilaya's shape changed
     for vintage, law in laws.items():
         source = l19 if vintage == 2019 else l26
