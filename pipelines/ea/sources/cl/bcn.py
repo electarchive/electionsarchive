@@ -35,6 +35,13 @@ DISTRICTS_LAW = (
     "https://www.puntaarenas.cl/transparencia2010/normativa/L18700.pdf"  # Ley 18.700 with Ley 18.799's article 179
 )
 DISTRICTS_FILE = Path(__file__).with_name("distritos_1989.tsv")
+CORE_FILE = Path(__file__).with_name("circ_provincial.tsv")
+CORE_ELECTIONS = {"2013": date(2013, 11, 17), "2017": date(2017, 11, 19), "2021": date(2021, 11, 21)}
+CORE_PATTERNS = {
+    "2013": r"2022/12/\d\d_Resultados_Mesa_Cores_Ter\.xlsx",
+    "2017": r"2022/12/\d\d_Resultados_Mesa_Cores_Ter-1\.xlsx",
+    "2021": r"2022/12/CORE-1\.zip",
+}
 HISTORIAL = "https://historial.servel.cl/SitioHistorico/paginas/2005/diputados"
 LAW_SOURCE = str(uuid5(package.NAMESPACE, f"{SOURCE}\x1fsource\x1fley-18700-distritos"))
 CIRC_SOURCE = str(uuid5(package.NAMESPACE, f"{SOURCE}\x1fsource\x1fley-18828-circunscripciones"))
@@ -57,7 +64,7 @@ REGION_DISTRICTS = {
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/geo_1989"]
+    return [f"{SOURCE}/geo", f"{SOURCE}/geo_1989", f"{SOURCE}/geo_core"]
 
 
 def fetch() -> None:
@@ -71,6 +78,7 @@ def fetch() -> None:
 def parse() -> None:
     geo().write()
     geo_1989().write()
+    geo_core().write()
 
 
 def emit() -> None:
@@ -360,4 +368,96 @@ def geo_1989() -> Package:
             CIRCS_FROM,
             method.format(law=law),
         )
+    return p
+
+
+def core_memberships() -> dict[str, dict[str, list[str]]]:
+    """Each provincial constituency's communes by election, from `circ_provincial.tsv`.
+
+    Servel's results by table for the regional council elections name each table's commune and provincial constituency.
+    The file lists every pair that appears in the results of 2013, 2017, and 2021.
+    """
+    found: dict[str, dict[str, list[str]]] = {}
+    with CORE_FILE.open(encoding="utf-8", newline="") as file:
+        for r in csv.DictReader(file, delimiter="\t"):
+            found.setdefault(r["code"], {}).setdefault(r["election"], []).append(r["commune"])
+    return found
+
+
+def geo_core() -> Package:
+    p = Package(
+        f"{SOURCE}/geo_core",
+        SOURCE,
+        "Boundaries of Chile's provincial constituencies for the regional council elections of 2013, 2017, and 2021, "
+        "dissolved from the Biblioteca del Congreso Nacional's commune outlines by the communes of each constituency's "
+        "voting tables",
+        depends=[f"{servel.SOURCE}/registry"],
+    )
+    communes = raw.cached(SOURCE, COMUNAS)
+    p.add(
+        "source",
+        id=BCN_SOURCE,
+        kind="official_body",
+        publisher="Biblioteca del Congreso Nacional de Chile",
+        title="Mapas vectoriales: comunas y regiones",
+        url=PAGE,
+        license="Creative Commons Attribution 3.0 Chile (CC BY 3.0 CL)",
+        license_url="https://creativecommons.org/licenses/by/3.0/cl/",
+        attribution="Biblioteca del Congreso Nacional de Chile / BCN",
+    )
+    p.artifact(communes, BCN_SOURCE)
+    p.uses(raw.cached(servel.SOURCE, servel.url(servel.TERRITORIES)))
+    for pattern in CORE_PATTERNS.values():
+        for path in servel.paths(servel.Group("core", pattern)):
+            p.uses(raw.cached(servel.SOURCE, servel.url(path)))
+    members = core_memberships()
+    days = sorted(CORE_ELECTIONS)
+    for vintage, since, until in (("2013", "2013", "2021"), ("2021", "2021", None)):
+        p.add(
+            "boundary_set",
+            id=p.id("boundary_set", "cl.circ_provincial", vintage),
+            scheme_code="cl.circ_provincial",
+            vintage=vintage,
+            valid_from=CORE_ELECTIONS[since],
+            valid_to=CORE_ELECTIONS[until] if until else None,
+            as_of=CORE_ELECTIONS["2017" if vintage == "2013" else "2021"],
+        )
+    shapes: dict[str, shapely.Geometry] = {}
+    rows, outlines = _read(COMUNAS)
+    for row, shape in zip(rows, outlines, strict=True):
+        name = servel.comuna(str(row["Comuna"]))
+        if name is not None:
+            shapes[name] = shape
+    for code, by_election in sorted(members.items(), key=lambda item: (int(item[0].split(":")[0]), item[0])):
+        names = sorted({name for names in by_election.values() for name in names})
+        missing = [name for name in names if name not in shapes]
+        for name in missing:
+            print(f"no shape: {name} has no outline in the BCN's commune map ({code})", flush=True)
+        outline = [shapes[name] for name in names if name in shapes]
+        if not outline:
+            raise ValueError(f"{code} has no commune outline")
+        used = sorted(by_election)
+        later = [day for day in days if day > used[-1]]
+        area = servel.area("cl.circ_provincial", code)
+        shape = _wgs(shapely.union_all(outline))
+        p.add(
+            "area_geometry",
+            area_id=area,
+            valid_from=CORE_ELECTIONS[used[0]],
+            valid_to=CORE_ELECTIONS[later[0]] if later else None,
+            geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+            label_point=shapely.to_wkb(
+                shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
+            ),
+            quality="official",
+            source_id=BCN_SOURCE,
+        )
+        text = (
+            "Dissolved from the Biblioteca del Congreso Nacional's current commune outlines. Servel's results by table "
+            f"for the regional council elections of {', '.join(used)} place the constituency's tables in "
+            f"{', '.join(names)}."
+        )
+        if missing:
+            text += " The commune map has no separate outline for " + ", ".join(missing) + "."
+        p.add("note", id=p.id("note", area, "methodology"), entity_id=area, kind="methodology", body_md=text, lang="en")
     return p
