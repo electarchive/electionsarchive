@@ -57,6 +57,7 @@ def fetch() -> None:
             raw.fetch(SOURCE, row.document, suffix=".pdf")
     raw.fetch(SOURCE, LAU, suffix=".geojson")
     raw.fetch(SOURCE, GB_COUNTIES, suffix=".geojson")
+    raw.fetch(SOURCE, OSM, suffix=".geojson")
 
 
 class Table(HTMLParser):
@@ -226,6 +227,21 @@ TERRITORY = hv.TERRITORY
 PROTOCOLS = Path(__file__).with_name("helyi_nepszavazas_protocols.json")
 LAU = "https://gisco-services.ec.europa.eu/distribution/v2/lau/geojson/LAU_RG_01M_2023_4326.geojson"
 GB_COUNTIES = "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/HUN/ADM1/geoBoundaries-HUN-ADM1.geojson"
+# OpenStreetMap relations (admin_level 9) of the Budapest districts the settlement shapes lack, by settlement code.
+OSM_DISTRICTS = {
+    "01003": 221976,
+    "01007": 1606102,
+    "01008": 1606100,
+    "01010": 1552463,
+    "01012": 221995,
+    "01013": 1605916,
+    "01018": 1550598,
+}
+OSM = (
+    "https://nominatim.openstreetmap.org/lookup?osm_ids="
+    + ",".join(f"R{i}" for i in OSM_DISTRICTS.values())
+    + "&format=geojson&polygon_geojson=1&polygon_threshold=0.00001"
+)
 UNIT_SCHEME = "hu.helyi_nepszavazas"
 VOTES, REGISTERED, CAST, VALID, INVALID = 1, 2, 3, 4, 5
 
@@ -237,6 +253,7 @@ def key(kind: str, *parts: object) -> str:
 NVI = key("source", "nvi")
 LAU_SOURCE = key("source", "gisco-lau")
 GB_SOURCE = key("source", "geoboundaries-adm1")
+OSM_SOURCE = key("source", "osm-budapest-districts")
 SYSTEM = key("electoral_system", "local-referendum")
 SYSTEM_NOTE = (
     "A local referendum is valid when more than half of the voters on the register take part, and its result binds "
@@ -371,6 +388,9 @@ def shapes() -> tuple[dict[str, shapely.Geometry], dict[str, shapely.Geometry]]:
     if budapest:
         counties["01"] = budapest[0]
     areas: dict[str, shapely.Geometry] = {}
+    by_relation = {relation: code for code, relation in OSM_DISTRICTS.items()}
+    for feature in json.loads(raw.cached(SOURCE, OSM).path.read_bytes())["features"]:
+        areas[by_relation[feature["properties"]["osm_id"]]] = shape(feature)
     for found in {event.place for group in events().values() for event in group}:
         if found.maz == "01":
             continue
@@ -435,8 +455,21 @@ def geo() -> Package:
         license_url="https://creativecommons.org/licenses/by/4.0/",
         attribution="geoBoundaries",
     )
+    p.add(
+        "source",
+        id=OSM_SOURCE,
+        kind="academic",
+        publisher="OpenStreetMap contributors",
+        title="OpenStreetMap administrative boundaries (admin_level 9) of Budapest districts III, VII, VIII, X, XII, "
+        "XIII, and XVIII",
+        url="https://www.openstreetmap.org/",
+        license="Open Database License 1.0",
+        license_url="https://opendatacommons.org/licenses/odbl/1-0/",
+        attribution="© OpenStreetMap contributors",
+    )
     p.artifact(raw.cached(SOURCE, LAU), LAU_SOURCE)
     p.artifact(raw.cached(SOURCE, GB_COUNTIES), GB_SOURCE)
+    p.artifact(raw.cached(SOURCE, OSM), OSM_SOURCE)
     counties, areas = shapes()
     used = {event.place for group in events().values() for event in group}
     for maz in sorted({place.maz for place in used}):
@@ -460,7 +493,10 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=county_area(place.maz))
         p.name(id, hv.person_text(place.name) if place.name.isupper() else place.name, "hu", "official")
         if place.code in areas:
-            geometry(p, id, areas[place.code], LAU_SOURCE, "official")
+            if place.code in OSM_DISTRICTS:
+                geometry(p, id, areas[place.code], OSM_SOURCE, "osm")
+            else:
+                geometry(p, id, areas[place.code], LAU_SOURCE, "official")
     for scheme, vintage, as_of in (("hu.megye", "2023", date(2023, 1, 1)), ("hu.telepules", "2023", date(2023, 1, 1))):
         p.add(
             "boundary_set",
