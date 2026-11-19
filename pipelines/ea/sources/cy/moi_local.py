@@ -16,6 +16,7 @@ from typing import Any
 from uuid import uuid5
 
 from ea import package, raw
+from ea.changeset import slug
 from ea.package import Package
 from ea.sources.cy import crawl
 from ea.sources.cy import moi as national
@@ -337,7 +338,85 @@ def geo() -> Package:
         p.name(id, greek, "el", "official")
         if english:
             p.name(id, english, "en", "english", False)
+        kind = polity_kind(code) if home(code) == code else None
+        if kind is not None:
+            place = polity(code)
+            p.add("polity", id=place, kind=kind, iso_code=None)
+            p.add("polity_parent", polity_id=place, parent_id=CYPRUS)
+            p.add("polity_territory", polity_id=place, area_id=id)
+            p.add("slug", path=polity_paths()[code], entity_id=place, is_current=True)
+            p.name(place, greek, "el", "official")
+            if english:
+                p.name(place, english.title() if english.isupper() else english, "en", "english", False)
     return p
+
+
+# The 2024 school board elections list their areas under codes of 10000 plus the code of the municipality whose school
+# board it is, such as 14010 for Aradippou's 4010. Those areas are school board districts, not places of their own.
+SCHOOL_BOARD_OFFSET = 10000
+
+
+def home(code: int) -> int:
+    """The municipality or community whose polity holds the body or office of an area."""
+    return code - SCHOOL_BOARD_OFFSET if code >= SCHOOL_BOARD_OFFSET else code
+
+
+def polity(code: int) -> str:
+    """The polity of a municipality or community that has a council or an office of its own."""
+    return key("polity", home(code))
+
+
+@functools.cache
+def _holders() -> tuple[dict[int, str], dict[int, tuple[str, str | None, int]]]:
+    """Every place with a body or office of its own across both package sets, with its polity kind and names.
+
+    A place that held a municipal council election on any of the municipal election days is a municipality; any other
+    place with a school board or deputy mayor is a community, which the archive stores as a submunicipal polity.
+    """
+    elections = tuple(e for e in ELECTIONS if e.site in COUNCIL_SITES | OFFICE_SITES)
+    municipalities = {
+        place["node"][0] for e in elections if e.site in COUNCIL_SITES for _, place, *_ in national._boxes(e.site)
+    }
+    holders = {
+        home(place["node"][0])
+        for e in elections
+        if KINDS[e.kind].scope == "area"
+        for _, place, *_ in national._boxes(e.site)
+    }
+    kinds = {code: "municipality" if code in municipalities else "submunicipal" for code in sorted(holders)}
+    names = _places(elections)[1]
+    if missing := sorted(code for code in kinds if code not in names):
+        raise ValueError(f"no area for the school board districts of {missing}")
+    return kinds, names
+
+
+def polity_kind(code: int) -> str | None:
+    return _holders()[0].get(code)
+
+
+@functools.cache
+def polity_paths() -> dict[int, str]:
+    """A slug for each polity: the place's English name, with its district's name where two places share one."""
+    kinds, names = _holders()
+    districts = _places(tuple(e for e in ELECTIONS if e.site in COUNCIL_SITES | OFFICE_SITES))[0]
+    base = {code: slug(names[code][1] or names[code][0]) for code in kinds}
+    count: dict[str, int] = defaultdict(int)
+    for text in base.values():
+        count[text] += 1
+    out: dict[int, str] = {}
+    for code, text in base.items():
+        if count[text] > 1:
+            district = districts[names[code][2]]
+            text = f"{text}-{slug(district[1] or district[0])}"
+        out[code] = f"cy/{text}"
+    if len(set(out.values())) != len(out):
+        raise ValueError("two Cypriot polities share a slug")
+    return out
+
+
+def holder(kind: str, code: int) -> str:
+    """The polity that holds a body or office: its municipality or community, or the country for a district's."""
+    return polity(code) if KINDS[kind].scope == "area" else CYPRUS
 
 
 def entity(kind: str, code: int) -> str:
@@ -407,7 +486,7 @@ def registry() -> Package:
         f"{prefix()}/registry",
         PIPELINE,
         "Cyprus's local councils, offices, and party ballot lines",
-        depends=[f"{prefix()}/geo"],
+        depends=[f"{prefix()}/geo", *([] if MODE[0] == "councils" else [f"{COUNCIL_PREFIX}/geo"])],
     )
     p.external |= {CYPRUS, COUNTRY}
     for e in active():
@@ -417,12 +496,12 @@ def registry() -> Package:
             id = entity(kind, code)
             english, greek = entity_names(kind, code)
             if KINDS[kind].contest == "list_allocation":
-                p.add("body", id=id, polity_id=CYPRUS, kind="council")
+                p.add("body", id=id, polity_id=holder(kind, code), kind="council")
             else:
                 p.add(
                     "office",
                     id=id,
-                    polity_id=CYPRUS,
+                    polity_id=holder(kind, code),
                     kind={"mayor": "mayor", "deputy": "deputy_mayor"}.get(kind, "other"),
                 )
             p.name(id, english, "en", "official")
