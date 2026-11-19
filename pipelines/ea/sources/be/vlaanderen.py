@@ -2,7 +2,8 @@
 
 The workbooks hold the results of the municipal, provincial, Antwerp district, and (in the facility municipalities)
 OCMW council elections, one workbook per body and year, and for 2024 the finer counts by polling station and counting
-office. Statbel's statistical sectors supply the municipal and provincial boundaries for each municipal plan, and the city of Antwerp's district layer the district outlines.
+office. The 2012 and 2018 OCMW council elections of the seven facility municipalities come from the results site's
+data files. Statbel's statistical sectors supply the municipal and provincial boundaries for each municipal plan, and the city of Antwerp's district layer the district outlines.
 """
 
 import functools
@@ -11,8 +12,10 @@ import json
 import re
 import zipfile
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
+from typing import Any
 from uuid import uuid5
 
 import fastexcel
@@ -79,6 +82,10 @@ FILES: dict[str, dict[str, str]] = {
         "CS": "v1729064048/Resultaten_OCMWraadsverkiezingen_13_oktober_2024_kv1arg.xlsx",
     },
 }
+# the OCMW councils of the facility municipalities were elected directly in 2012 and 2018; the results site serves
+# their counts as one data file per list and per municipality
+OCMW_API = "https://resultaten2018.vlaanderenkiest.be/api/"
+OCMW_YEARS = {"2012-10-14": "2012", "2018-10-14": "2018"}
 # 2024 counts by polling station and counting office, by province
 FINE_PROVINCES = ("Antwerpen", "Limburg", "Oost-Vlaanderen", "Vlaams-Brabant", "West-Vlaanderen")
 FINE: dict[str, dict[str, str]] = {
@@ -112,9 +119,35 @@ def urls() -> list[str]:
     return found
 
 
+def _fetched(url: str) -> Any:
+    return json.loads(raw.fetch(SOURCE, url, suffix=".json").path.read_bytes())
+
+
+def _cached(url: str) -> Any:
+    return json.loads(raw.cached(SOURCE, url).path.read_bytes())
+
+
+def ocmw_urls(year: str, load: Callable[[str], Any]) -> list[str]:
+    """The data files of one year's OCMW council elections, found by reading each file that lists the next."""
+    base = f"{OCMW_API}{year}/lv/ocmw/"
+    found = [base + "overzicht.json", base + "statistiek.json"]
+    for nis in load(found[0])["O"]:
+        found += [f"{base}{nis}/{name}.json" for name in ("entiteitLijsten", "entiteitUitslag", "verwant")]
+        for entry in load(f"{base}{nis}/entiteitLijsten.json")["O"].values():
+            found += [f"{base}{nis}/{entry['nr']}/{name}.json" for name in ("lijst", "uitslag")]
+    return found
+
+
+def ocmw_all() -> list[str]:
+    return [url for year in OCMW_YEARS.values() for url in ocmw_urls(year, _cached)]
+
+
 def fetch() -> None:
     for url in urls():
         raw.fetch(SOURCE, url, suffix=".xlsx")
+    for year in OCMW_YEARS.values():
+        for url in ocmw_urls(year, _fetched):
+            _fetched(url)
     for name, _, _ in PLANS.values():
         raw.fetch(STATBEL, SECTORS + name, suffix=".zip")
     raw.fetch(ANTWERP, DISTRICTS, suffix=".geojson")
@@ -171,7 +204,7 @@ def plan(vintage: str) -> Plan:
     )
     crs = pyproj.CRS.from_wkt(archive.read(base + ".prj").decode())
     pieces: dict[str, list[shapely.Geometry]] = defaultdict(list)
-    info: dict[str, dict[str, object]] = {}
+    info: Any = {}
     for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True):
         if record is None or shape is None:
             continue
@@ -483,7 +516,71 @@ class Body:
     cands: pl.DataFrame  # nis, nr, pos, name, votes, elected, successor
 
 
+def ocmw_body(year: str) -> Body:
+    """The OCMW council results of one year's facility municipalities, from the results site's data files."""
+    base = f"{OCMW_API}{year}/lv/ocmw/"
+    statistics = _cached(base + "statistiek.json")["O"]
+    entities: list[dict[str, Any]] = []
+    lists: list[dict[str, object]] = []
+    cands: list[dict[str, object]] = []
+    for nis in _cached(base + "overzicht.json")["O"]:
+        figures = statistics[nis]
+        related = json.loads(raw.cached(SOURCE, f"{base}{nis}/verwant.json").path.read_bytes())
+        name = next(row["c"] for row in related if row["e"] == "O")
+        shown = _cached(f"{base}{nis}/entiteitLijsten.json")["O"]
+        counted = _cached(f"{base}{nis}/entiteitUitslag.json")["O"][nis]["us"]
+        seats = 0
+        for key_, entry in shown.items():
+            nr = int(entry["nr"])
+            result = counted[key_]
+            won = int(result["zs"])
+            seats += won
+            lists.append(
+                {
+                    "nis": nis,
+                    "nr": nr,
+                    "label": entry["nm"].strip(),
+                    "cat1": None,
+                    "cat2": None,
+                    "votes": int(result["sc"]),
+                    "seats": won,
+                }
+            )
+            names = _cached(f"{base}{nis}/{nr}/lijst.json")[key_]
+            ranked = _cached(f"{base}{nis}/{nr}/uitslag.json")["O"][nis][key_]["kd"]
+            for item in ranked:
+                ((person, row),) = item.items()
+                cands.append(
+                    {
+                        "nis": nis,
+                        "nr": nr,
+                        "pos": int(names[person]["vn"]),
+                        "name": names[person]["nm"].strip(),
+                        "votes": int(row["ns"]),
+                        "elected": row["vk"] == "1",
+                        "successor": int(row["vv"]) if row["vk"] != "1" and str(row["vv"]).isdigit() else None,
+                    }
+                )
+        entities.append(
+            {
+                "nis": nis,
+                "name": name,
+                "seats": seats,
+                "registered": int(figures["sg"]),
+                "ballots": int(figures["ui"]),
+                "blank": int(figures["os"]),
+            }
+        )
+    return Body(
+        pl.DataFrame(entities),
+        pl.DataFrame(lists, schema_overrides={"cat1": pl.Int64, "cat2": pl.Int64}),
+        pl.DataFrame(cands, schema_overrides={"successor": pl.Int64}),
+    )
+
+
 def body(day: str, kind: str) -> Body:
+    if kind == "CS" and day in OCMW_YEARS:
+        return ocmw_body(OCMW_YEARS[day])
     url = UP + FILES[day][kind]
     book = sheets(url)
     year = day[:4]
@@ -673,7 +770,7 @@ def registry() -> Package:
         noun="counting unit",
         code_system=None,
     )
-    for url in urls():
+    for url in [*urls(), *ocmw_all()]:
         p.artifact(raw.cached(SOURCE, url), VLAANDEREN_SOURCE)
     for kind, (_, english, dutch, _, _) in BODIES.items():
         id = body_id(kind)
@@ -754,7 +851,7 @@ def districts(kind: str) -> dict[str, dict[str, str]]:
 
 def election(day: str) -> Package:
     rerun = day == RERUN
-    kinds = ["CG"] if rerun else list(FILES[day])
+    kinds = ["CG"] if rerun else [*FILES[day], *(["CS"] if day in OCMW_YEARS else [])]
     year = day[:4]
     p = Package(
         f"{SOURCE}/{day}",
@@ -767,7 +864,11 @@ def election(day: str) -> Package:
     )
     p.external.add(BELGIUM)
     for kind in kinds:
-        p.uses(raw.cached(SOURCE, UP + FILES["2018-10-14" if rerun else day][kind]))
+        if kind == "CS" and day in OCMW_YEARS:
+            for url in ocmw_urls(OCMW_YEARS[day], _cached):
+                p.uses(raw.cached(SOURCE, url))
+        else:
+            p.uses(raw.cached(SOURCE, UP + FILES["2018-10-14" if rerun else day][kind]))
     election_id = key("election", day)
     base = f"be/{day}-local-flanders"
     p.add(
