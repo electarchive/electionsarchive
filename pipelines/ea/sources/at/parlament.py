@@ -5,8 +5,11 @@ historical page for National Council elections, one PDF per election, and a summ
 five elections with the seats each party won. The Parliament's statistics page on the composition of the National
 Council gives each election day and the seats.
 
-- 1919 and 1920: the BMI summary (`nrw_08_abgestimmen1919_1930.pdf`) and the 1920 sheet (`nrw_1920_ergebnisse.pdf`)
-  have a text layer and give national results only, so the national total is the finest unit stored.
+- 1919: Tafel IV (registered voters and turnout) and Tafel V (votes of every list) of the statistical office's
+  publication on the Constituent National Assembly election give the results of each of the 25 constituencies that
+  voted. The seats come from the BMI summary (`nrw_08_abgestimmen1919_1930.pdf`).
+- 1920: the BMI's 1920 sheet (`nrw_1920_ergebnisse.pdf`) has a text layer and gives national results only, so the
+  national total is the finest unit stored.
 - 1923: the BMI's 1923 file prints, for each of the 25 constituencies, the registered voters, the votes cast, and the
   valid votes of four groups of parties (the Christian Social, German nationalist, and Social Democratic groups, and
   the other parties). It labels them preliminary; their national sums equal the final national totals.
@@ -45,14 +48,15 @@ HISTORY = f"{BMI}/historischer_rueckblick.html"
 SUMMARY = f"{BMI}/nationalratswahl_2008/files/history/nrw_08_abgestimmen1919_1930.pdf"
 PARLIAMENT = "https://www.parlament.gv.at/recherchieren/statistiken/personen-statistiken/zusammensetzung-nr"
 FILES = {
+    1919: f"{BMI}/files/nrw-1919.pdf",
     1920: f"{BMI}/files/nrw_1920_ergebnisse.pdf",
     1923: f"{BMI}/files/nrw_1923.pdf",
     1927: f"{BMI}/files/nrw_1927.pdf",
     1930: f"{BMI}/files/nrw-1930.pdf",
 }
 
-VOTES, REGISTERED, CAST, VALID, INVALID = 1, 2, 3, 4, 5
-MEASURES = {"registered": REGISTERED, "cast": CAST, "valid": VALID, "invalid": INVALID}
+VOTES, REGISTERED, CAST, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
+MEASURES = {"registered": REGISTERED, "cast": CAST, "valid": VALID, "invalid": INVALID, "blank": BLANK}
 
 
 def key(kind: str, *parts: object) -> str:
@@ -143,6 +147,10 @@ class Election:
     won: dict[str, int]
     stage: str = "official"
     notes: tuple[str, ...] = ()
+    sums: tuple[tuple[str, tuple[str, ...]], ...] = ()
+    """Columns of the transcription that must equal the sum of other columns in every row and total."""
+    labels: dict[str, str] = field(default_factory=dict)
+    """Column of the transcription mapped to the label its option is keyed and printed by, when not the party name."""
 
 
 # Labels of the 1919 lists as the BMI summary prints them, in its order.
@@ -175,20 +183,91 @@ LISTS_1919 = {
     "Wirtschaftspolitische Volkspartei": "wirtschaftspolitische-volkspartei",
 }
 
+# Columns of the 1919 transcription mapped to the labels of the BMI summary.
+CODES_1919 = {
+    "SD": "Sozialdemokraten",
+    "CS": "Christlichsoziale",
+    "NOEBB": "Niederösterreichischer Bauernbund",
+    "CSBA": "Christlichsoziale Bürger- und Arbeiterpartei",
+    "TBB": "Tiroler Bauernbund",
+    "TVV": "Tiroler Volksverein",
+    "DNAT": "Deutschnationale",
+    "TS": "Tschechoslowaken",
+    "DDEM": "Deutschdemokraten",
+    "DVP": "Deutsche Volkspartei",
+    "DFOP": "Deutsche Freiheits- und Ordnungspartei",
+    "BD": "Bürgerliche Demokraten",
+    "STBP": "Steirische Bauernpartei",
+    "ND": "Nationaldemokraten",
+    "KBB": "Kärntner Bauernbund",
+    "NSAP": "Nationalsozialistische Arbeiterpartei",
+    "DVW": "Deutschvölkischer Wahlausschuß",
+    "DEM": "Demokraten",
+    "DSV": "Demokratische Ständevereinigung",
+    "FSBB": "Freiheitlicher Salzburger Bauernbund",
+    "JN": "Jüdischnationale",
+    "DMP": "Demokratische Mittelstandspartei",
+    "DWP": "Demokratische Wirtschaftspartei",
+    "DOEVP": "Deutschösterreichische Volkspartei",
+    "TREIPL": "Treiplpartei",
+    "WPVP": "Wirtschaftspolitische Volkspartei",
+}
+SUMS_1919 = (
+    ("registered", ("reg_m", "reg_f")),
+    ("cast", ("cast_m", "cast_f")),
+    ("cast", ("ballots",)),
+    ("ballots", ("valid", "invalid", "blank")),
+    ("valid_check", ("valid",)),
+    ("CSALL", ("CS", "CSBA", "NOEBB", "TVV", "TBB")),
+    (
+        "DNALL",
+        (
+            "DNAT", "ND", "DVW", "DVP", "DSV", "DDEM", "NSAP", "DWP", "DOEVP", "DFOP", "FSBB", "STBP", "KBB", "BD",
+            "DEM", "DMP", "WPVP",
+        ),
+    ),
+)  # fmt: skip
+
 ELECTIONS = {
     1919: Election(
         1919,
         date(1919, 2, 16),
         "assembly",
         170,
-        LISTS_1919,
+        {code: LISTS_1919[label] for code, label in CODES_1919.items()},
         {},
+        sums=SUMS_1919,
+        labels=CODES_1919,
         notes=(
             (
                 "On 16 February 1919, 159 members were elected; on 4 April 1919 the Assembly summoned 11 more for the "
                 "constituencies whose voters could not take part. The BMI summary counts all 170 seats by party, and the "
-                "seats are stored as it prints them."
+                "seats are stored as it prints them. The votes are those of the statistical office's publication, whose "
+                "national totals differ slightly from the summary's: the summary counts 3,554,242 registered voters, "
+                "2,998,297 votes cast, and 2,973,454 valid votes, and, for example, 1,211,814 votes for the Social "
+                "Democrats against the publication's 1,211,393."
             ),
+            (
+                "Constituencies 12 (Znaimer Kreis), 18 (Böhmerwaldgau), and 28 to 38 (Deutschböhmen, Sudetenland, and "
+                "the enclaves of Brünn, Iglau, and Olmütz) could not vote. In Mittel- und Untersteier only the part "
+                "under Austrian control voted, in Carinthia the court districts of Tarvis, Eisenkappel, Bleiburg, and "
+                "Eberndorf did not vote, and of Deutsch-Südtirol only the political district of Lienz voted."
+            ),
+            (
+                "The publication counts some lists under the column of a related party and names them in footnotes: "
+                "in Viertel ober dem Wienerwald the Deutschvölkische Partei (Deutschnationale), in Viertel unter dem "
+                "Manhartsberg 30 votes of the Unabhängige christlich-republikanische Arbeiterpartei (Christlichsoziale), "
+                "in Graz und Umgebung the Schutzverband deutscharischer Kriegsteilnehmer (Deutschnationale), in Lienz "
+                "the Tiroler Volkspartei (Tiroler Volksverein) and the Deutschfreiheitliche Partei (Deutschnationale), "
+                "in Vorarlberg the Christlichsoziale Volkspartei, in Wien West the joint list of the Nationaldemokraten "
+                "and Deutschnationale (Nationaldemokraten), in Wien West and Viertel unter dem Wienerwald the "
+                "Bürgerliche Demokraten und Wirtschaftspartei der Festbesoldeten, in the Traunviertel the Deutsche "
+                "Freiheits- und Ordnungspartei und völkischer Wirtschaftsbund, and in Salzburg the Deutsche "
+                "Arbeiterpartei (Nationalsozialistische Arbeiterpartei). Each is stored under that column. The "
+                "Deutschnationale of Viertel unter dem Manhartsberg include 864 votes of the Treipl-Partei, which are "
+                "stored as the Treiplpartei."
+            ),
+            ("In Oststeier the invalid votes include the blank ballot papers, which are not printed separately."),
             (
                 "The BMI summary prints the five Christian Social lists (Christlichsoziale, Niederösterreichischer "
                 "Bauernbund, Christlichsoziale Bürger- und Arbeiterpartei, Tiroler Bauernbund, and Tiroler Volksverein) "
@@ -348,6 +427,8 @@ class Row:
     code: str
     band: tuple[float, float]
     values: dict[str, int | None]
+    splits: dict[str, tuple[str, int]] = field(default_factory=dict)
+    """Column mapped to the list and votes a footnote says the cell includes."""
 
 
 @dataclass
@@ -361,6 +442,22 @@ class Table:
 
 def _number(text: str) -> int | None:
     return None if text == "-" else int(text)
+
+
+SPLIT = re.compile(r"^(\d+)\[([A-Z]+):(\d+)\]$")
+
+
+def _cells(columns: list[str], texts: list[str]) -> tuple[dict[str, int | None], dict[str, tuple[str, int]]]:
+    values: dict[str, int | None] = {}
+    splits: dict[str, tuple[str, int]] = {}
+    for column, text in zip(columns, texts, strict=True):
+        found = SPLIT.match(text)
+        if found:
+            values[column] = int(found[1])
+            splits[column] = (found[2], int(found[3]))
+        else:
+            values[column] = _number(text)
+    return values, splits
 
 
 @cache
@@ -380,8 +477,8 @@ def tables(year: int) -> list[Table]:
             found[-1].edges = list(zip(edges[::2], edges[1::2], strict=True))
         elif head == "row":
             y0, y1 = rest[1].removeprefix("@").split(":")
-            values = dict(zip(found[-1].columns, (_number(x) for x in rest[2:]), strict=True))
-            found[-1].rows.append(Row(rest[0], (float(y0), float(y1)), values))
+            values, splits = _cells(found[-1].columns, rest[2:])
+            found[-1].rows.append(Row(rest[0], (float(y0), float(y1)), values, splits))
         elif head == "total":
             first, last = rest[1].split("-")
             values = dict(zip(found[-1].columns, (_number(x) for x in rest[2:]), strict=True))
@@ -392,14 +489,20 @@ def tables(year: int) -> list[Table]:
 
 
 def _check(year: int, where: str, values: dict[str, int | None], parties: list[str]) -> None:
+    for column, parts in ELECTIONS[year].sums:
+        if column in values and all(part in values for part in parts):
+            summed = sum(values[part] or 0 for part in parts)
+            if summed != (values[column] or 0):
+                raise ValueError(f"{year} {where}: {'+'.join(parts)} add up to {summed}, {column} is {values[column]}")
     valid = values.get("valid")
     if valid is not None:
         listed = sum(values.get(column) or 0 for column in parties)
         if listed != valid:
             raise ValueError(f"{year} {where}: the lists add up to {listed}, the valid votes are {valid}")
     cast, invalid = values.get("cast"), values.get("invalid")
-    if valid is not None and cast is not None and invalid is not None and cast - invalid != valid:
-        raise ValueError(f"{year} {where}: {cast} cast less {invalid} invalid is not {valid} valid")
+    blank = values.get("blank") or 0
+    if valid is not None and cast is not None and invalid is not None and cast - invalid - blank != valid:
+        raise ValueError(f"{year} {where}: {cast} cast less {invalid} invalid and {blank} blank is not {valid} valid")
 
 
 @cache
@@ -414,7 +517,7 @@ def constituencies(year: int) -> tuple[dict[str, dict[str, int | None]], dict[st
             units.setdefault(row.code, {}).update(row.values)
         for name, span, printed in table.totals:
             for column in table.columns:
-                summed = sum(rows[str(n)].values[column] or 0 for n in span)
+                summed = sum(rows[str(n)].values[column] or 0 for n in span if str(n) in rows)
                 if summed != (printed[column] or 0):
                     raise ValueError(
                         f"{year} total {name}, {column}: rows add up to {summed}, printed {printed[column]}"
@@ -451,7 +554,7 @@ def national_text(year: int) -> tuple[dict[str, int], dict[str, int], dict[str, 
     totals: dict[str, int] = {}
     votes: dict[str, int] = {}
     seats: dict[str, int] = {}
-    labels = ELECTIONS[year].columns
+    labels = LISTS_1919 if year == 1919 else ELECTIONS[year].columns
     for line in lines:
         found = FIGURE.match(line)
         if found is None:
@@ -511,15 +614,63 @@ PLAN = date(1923, 10, 21)
 """The 25 constituencies of the National Council Election Act of 1923, used in 1923, 1927, and 1930."""
 
 
-def area(number: int) -> str:
-    return key("area", SCHEME, PLAN, number)
+# The 38 constituencies of the Election Act for the Constituent National Assembly of 18 December 1918, as Tafel III of
+# the 1919 publication names them. It names the constituencies of Deutschböhmen (28 to 33), Sudetenland (34 and 35),
+# and the enclaves (36 to 38) only as groups.
+NAMES_1919 = {
+    1: "Wien Innen-Ost",
+    2: "Wien Innen-West",
+    3: "Wien Nordwest",
+    4: "Wien Nordost",
+    5: "Wien Südost",
+    6: "Wien Südwest",
+    7: "Wien West",
+    8: "Viertel oberm Wienerwald",
+    9: "Viertel unterm Wienerwald",
+    10: "Viertel oberm Manhartsberg",
+    11: "Viertel unterm Manhartsberg",
+    12: "Znaimer Kreis",
+    13: "Linz und Umgebung",
+    14: "Innviertel",
+    15: "Hausruckviertel",
+    16: "Traunviertel",
+    17: "Mühlviertel",
+    18: "Böhmerwaldgau",
+    19: "Salzburg",
+    20: "Graz und Umgebung",
+    21: "Mittel- und Untersteier",
+    22: "Oststeier",
+    23: "Obersteier",
+    24: "Kärnten",
+    25: "Nordtirol",
+    26: "Deutsch-Südtirol",
+    27: "Vorarlberg",
+    **{n: f"Deutschböhmen, Wahlkreis {n}" for n in range(28, 34)},
+    **{n: f"Sudetenland, Wahlkreis {n}" for n in (34, 35)},
+    **{n: f"Einschlußgebiete, Wahlkreis {n}" for n in range(36, 39)},
+}
+PLAN_1919 = date(1918, 12, 18)
+END_1919 = date(1920, 10, 17)
+"""The 1919 constituencies served until the National Council election of 1920, held under a new election act."""
+# The units of 1919 as Tafel V names them; in 21, 24, and 26 only part of the constituency voted.
+UNITS_1919 = {
+    **{n: NAMES_1919[n] for n in NAMES_1919 if n <= 27 and n not in (12, 18)},
+    21: "Mittelsteier",
+    26: "Politischer Bezirk Lienz",
+}
+PARTIAL_1919 = {21, 24, 26}
+
+
+def area(number: int, year: int = 1923) -> str:
+    return key("area", SCHEME, PLAN_1919 if year == 1919 else PLAN, number)
 
 
 def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "The 25 National Council constituencies of Austria from 1923 to 1930",
+        "The 38 constituencies of the Constituent National Assembly election of 1919 and the 25 National Council "
+        "constituencies of Austria from 1923 to 1930",
     )
     p.external |= {AUSTRIA, COUNTRY}
     p.add(
@@ -536,6 +687,13 @@ def geo() -> Package:
         p.add("area", id=id, scheme_code=SCHEME)
         p.add("area_code", area_id=id, code=f"1923:{number}", valid_from=PLAN, valid_to=date(1934, 5, 1))
         p.add("area_parent", area_id=id, parent_id=COUNTRY, valid_from=PLAN, valid_to=date(1934, 5, 1))
+        p.name(id, text, "de", "official")
+    for number, text in NAMES_1919.items():
+        id = area(number, 1919)
+        p.add("area", id=id, scheme_code=SCHEME)
+        p.add("area_code", area_id=id, code=f"1919:{number}", valid_from=PLAN_1919, valid_to=END_1919)
+        if number <= 27:
+            p.add("area_parent", area_id=id, parent_id=COUNTRY, valid_from=PLAN_1919, valid_to=END_1919)
         p.name(id, text, "de", "official")
     return p
 
@@ -613,13 +771,22 @@ METHOD_SCAN = (
     "of 1919 to 1930 prints; they were allocated in the constituencies and then in the four constituency "
     "associations (Wahlkreisverbände), so they are stored only for Austria as a whole."
 )
+METHOD_1919 = (
+    "Transcribed from the scanned tables of the statistical office's publication on this election (Beiträge zur "
+    "Statistik Deutschösterreichs, 1. Heft; pages {pages} of {file}, published by the Federal Ministry of the "
+    "Interior): Tafel IV for the registered voters and turnout and Tafel V for the votes of every list. Every number "
+    "was checked against the totals the tables print: the lists against the valid votes and against the printed "
+    "Christian Social and German national group totals, men and women against both sexes, the valid, invalid, and "
+    "blank ballot papers against the votes cast, and the constituencies against each printed state total and the "
+    "national total. The seats are those the BMI summary of 1919 to 1930 prints for Austria as a whole."
+)
 
 
 def election(e: Election) -> Package:
     assembly = e.family == "assembly"
     noun = "Constituent National Assembly election" if assembly else "National Council election"
     native = "Wahl zur Konstituierenden Nationalversammlung" if assembly else "Nationalratswahl"
-    scanned = e.year in (1923, 1927, 1930)
+    scanned = e.year in (1919, 1923, 1927, 1930)
     p = Package(
         f"{SOURCE}/{slug(e)}",
         SOURCE,
@@ -632,7 +799,7 @@ def election(e: Election) -> Package:
     url = FILES[e.year] if scanned else (FILES[1920] if e.year == 1920 else SUMMARY)
     stored = raw.cached(SOURCE, url)
     p.uses(stored)
-    if not scanned:
+    if not scanned or e.year == 1919:
         p.uses(raw.cached(SOURCE, SUMMARY))
     p.uses(raw.cached(SOURCE, PARLIAMENT))
     election_id = key("election", e.year)
@@ -681,7 +848,9 @@ def election(e: Election) -> Package:
     file = url.rsplit("/", 1)[1]
     if scanned:
         pages = sorted({table.page for table in tables(e.year)})
-        method = METHOD_SCAN.format(pages=", ".join(str(n) for n in pages), file=file)
+        method = (METHOD_1919 if e.year == 1919 else METHOD_SCAN).format(
+            pages=", ".join(str(n) for n in pages), file=file
+        )
     else:
         method = METHOD_TEXT.format(file=file)
     p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
@@ -692,7 +861,7 @@ def election(e: Election) -> Package:
 
     def option(column: str, label: str, position: int) -> str:
         code = e.columns[column]
-        id = options[column] = key("option", e.year, column)
+        id = options[column] = key("option", e.year, e.labels.get(column, column))
         if code == OTHERS:
             p.add(
                 "contest_option", id=id, contest_id=contest, kind="others", ballot_position=position, ballot_label=label
@@ -737,17 +906,36 @@ def election(e: Election) -> Package:
         return p
 
     units, national = constituencies(e.year)
-    order = sorted(e.columns, key=lambda column: -(national.get(column) or 0))
+    stored_columns = {*e.columns, *MEASURES}
+    splits: dict[str, int] = {}
+    for table in tables(e.year):
+        for row in table.rows:
+            for column, (code, n) in row.splits.items():
+                splits[column] = splits.get(column, 0) + n
+                splits[code] = splits.get(code, 0) - n
+    national = {
+        column: value - splits.get(column, 0) if value is not None else None for column, value in national.items()
+    }
+    national |= {code: -n for code, n in splits.items() if code not in national}
+    if e.labels:
+        order = list(e.labels)
+    else:
+        order = sorted(e.columns, key=lambda column: -(national.get(column) or 0))
     for position, column in enumerate(order, start=1):
         code = e.columns[column]
-        option(column, "Andere Parteien" if code == OTHERS else PARTIES[code].name, position)
-    won = {column: e.won[e.columns[column]] for column in e.columns if e.columns[column] in e.won}
+        label = e.labels.get(column) or ("Andere Parteien" if code == OTHERS else PARTIES[code].name)
+        option(column, label, position)
+    if e.labels:
+        seats = national_text(e.year)[2]
+        won = {column: seats[label] for column, label in e.labels.items() if label in seats}
+    else:
+        won = {column: e.won[e.columns[column]] for column in e.columns if e.columns[column] in e.won}
     if sum(won.values()) != e.seats:
         raise ValueError(f"{e.year}: the seats add up to {sum(won.values())}, not {e.seats}")
     for column, n in won.items():
         p.add("outcome", result_set_id=result_set, option_id=options[column], kind="won", seats=n)
     for column, value in national.items():
-        if value is None:
+        if value is None or column not in stored_columns:
             continue
         if column in MEASURES:
             p.add("declared", result_set_id=result_set, option_id=None, measure=MEASURES[column], value=value)
@@ -770,43 +958,50 @@ def election(e: Election) -> Package:
     unit_ids: dict[str, str] = {}
     for code in sorted(units, key=int):
         unit = unit_ids[code] = key("unit", e.year, code)
+        partial = e.year == 1919 and int(code) in PARTIAL_1919
         p.add(
             "reporting_unit",
             id=unit,
             polity_id=AUSTRIA,
             scheme_code=SCHEME,
             code=f"{e.day}:{code}",
-            area_relation="equals",
-            area_id=area(int(code)),
+            area_relation="within" if partial else "equals",
+            area_id=area(int(code), e.year),
             kind="standard",
         )
-        p.name(unit, NAMES_1923[int(code) - 1], "de", "official")
+        name = UNITS_1919[int(code)] if e.year == 1919 else NAMES_1923[int(code) - 1]
+        p.name(unit, name, "de", "official")
     for table in tables(e.year):
         for row in table.rows:
             for column, (x0, x1) in zip(table.columns, table.edges, strict=True):
                 value = row.values[column]
-                if value is None:
+                if value is None or column not in stored_columns:
                     continue
-                if column in MEASURES:
-                    option_id, measure = None, MEASURES[column]
-                else:
-                    option_id, measure = options[column], VOTES
-                _value(p, result_set, unit_ids[row.code], option_id, measure, value)
-                p.add(
-                    "value_locator",
-                    result_set_id=result_set,
-                    unit_id=unit_ids[row.code],
-                    option_id=option_id,
-                    channel=0,
-                    measure=measure,
-                    count_round=0,
-                    page_id=page_ids[table.page],
-                    source_id=None,
-                    x0=x0,
-                    y0=row.band[0],
-                    x1=x1,
-                    y1=row.band[1],
-                )
+                parts = [(column, value)]
+                if column in row.splits:
+                    code, n = row.splits[column]
+                    parts = [(column, value - n), (code, n)]
+                for part, number in parts:
+                    if part in MEASURES:
+                        option_id, measure = None, MEASURES[part]
+                    else:
+                        option_id, measure = options[part], VOTES
+                    _value(p, result_set, unit_ids[row.code], option_id, measure, number)
+                    p.add(
+                        "value_locator",
+                        result_set_id=result_set,
+                        unit_id=unit_ids[row.code],
+                        option_id=option_id,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        page_id=page_ids[table.page],
+                        source_id=None,
+                        x0=x0,
+                        y0=row.band[0],
+                        x1=x1,
+                        y1=row.band[1],
+                    )
     return p
 
 
