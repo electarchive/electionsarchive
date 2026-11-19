@@ -1635,7 +1635,7 @@ def build(election: Election) -> Package:
             stage=election.stage,
             kind="counted",
             source_id=SERVEL,
-            status="active",
+            status="superseded" if (day, kind, code) in SUPERSEDED else "active",
             is_default=(day, kind, code) not in SUPERSEDED,
             completeness=1.0,
         )
