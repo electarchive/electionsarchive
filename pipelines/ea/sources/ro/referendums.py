@@ -17,6 +17,7 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.ro import aep
 
 SOURCE = "ro.referendums"
 ROMANIA = str(uuid5(package.NAMESPACE, "polity\x1fRO"))
@@ -88,10 +89,6 @@ def key(kind: str, *parts: object) -> str:
 
 def tidy(text: object) -> str:
     return " ".join(str(text or "").translate(FOLD).split())
-
-
-def title(text: object) -> str:
-    return tidy(text).title()
 
 
 def fetch() -> None:
@@ -262,6 +259,12 @@ def units(p: Package, scheme: str, rows: list[tuple[str, str, str]]) -> None:
 # 26 May 2019
 
 
+def station_id(code: str) -> str:
+    """The European Parliament election was held the same day at the same stations, and its pipeline already holds
+    every station of the referendum under the same code, so the referendum reuses those units."""
+    return aep.key("unit", code)
+
+
 def stations(question: int) -> pl.DataFrame:
     frame = pl.read_csv(raw.cached(SOURCE, CSV[question]).path, encoding="utf8-lossy", infer_schema=False)
     numbers = [str(n) for n in range(1, 8)]
@@ -323,7 +326,7 @@ def referendum_2019() -> Package:
     }
     questions: dict[int, Question] = {}
     frames = {n: stations(n) for n in (1, 2)}
-    rows: dict[str, str] = {}
+    codes: set[str] = set()
     for number in (1, 2):
         registered, cast, yes, no, null = NATIONAL_2019[number]
         total = (
@@ -344,12 +347,9 @@ def referendum_2019() -> Package:
         )
         for row in frames[number].iter_rows(named=True):
             code = f"{day}:{row['Cod birou electoral']}/{tidy(row['Nr'])}"
-            if code not in rows:
-                where = title(row["Localitate"])
-                station = tidy(row["Secție"])
-                rows[code] = f"{station} ({where}, station {tidy(row['Nr'])})" if station else f"{where}, {row['Nr']}"
-            questions[number].record(key("unit", code), row["1"], row["2"], row["5"], row["6"], row["7"])
-    units(p, STATIONS, [(key("unit", code), code, text) for code, text in rows.items()])
+            codes.add(code)
+            questions[number].record(station_id(code), row["1"], row["2"], row["5"], row["6"], row["7"])
+    p.external.update(station_id(code) for code in codes)
     for question in questions.values():
         question.stage()
     p.accept(
