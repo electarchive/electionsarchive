@@ -144,6 +144,12 @@ def fetch18() -> None:
             re.findall(rf"votes-nominatifs%EF%B9%96el=CG&amp;id={code}&amp;party=(\d+)\.html", html)
         ):
             lists.append(u18("votes-nominatifs", el="CG", id=code, party=party))
+    for code in found.districts:
+        html = read(SOURCE, u18("resultats-chiffres", el="PR", id=code))
+        for party in dict.fromkeys(
+            re.findall(rf"votes-nominatifs%EF%B9%96el=PR&amp;id={code}&amp;party=(\d+)\.html", html)
+        ):
+            lists.append(u18("votes-nominatifs", el="PR", id=code, party=party))
     raw.fetch_many(SOURCE, lists, suffix=".html")
 
 
@@ -222,6 +228,11 @@ def load18() -> Year:
     for code, name in found.districts.items():
         page = page18(code, name, read(SOURCE, u18("resultats-chiffres", el="PR", id=code)))
         council = Council(code[3:], name, page, group=code[3])
+        html = read(SOURCE, u18("resultats-chiffres", el="PR", id=code))
+        for party in dict.fromkeys(
+            re.findall(rf"votes-nominatifs%EF%B9%96el=PR&amp;id={code}&amp;party=(\d+)\.html", html)
+        ):
+            council.candidates += candidates18(read(SOURCE, u18("votes-nominatifs", el="PR", id=code, party=party)))
         for canton, canton_name in found.cantons.items():
             if found.district_of[canton].removeprefix("Cantons - District de ") == name and canton[3] == code[3]:
                 council.units.append(
@@ -349,6 +360,19 @@ def fetch12() -> None:
         for link in re.findall(rf'value="(preferred_{code}_\d+\.html)"', read(SOURCE, url)):
             rest.append(f"{HOST}/2012/fr/com/preferred/{link}")
     raw.fetch_many(SOURCE, list(dict.fromkeys(rest)), suffix=".html")
+    raw.fetch(SOURCE, f"{HOST}/2012/fr/pro/preferred/preferred_top.html", suffix=".html")
+    top = read(SOURCE, f"{HOST}/2012/fr/pro/preferred/preferred_top.html")
+    first = [
+        f"{HOST}/2012/fr/pro/preferred/preferred_{c}_{party}.html"
+        for c, party in re.findall(r"preferred_(PRD\d+)_(\d+)\.html", top)
+    ]
+    raw.fetch_many(SOURCE, first, suffix=".html")
+    rest = []
+    for url in first:
+        code = url.split("preferred_")[1].split("_")[0]
+        for link in re.findall(rf'value="(preferred_{code}_\d+\.html)"', read(SOURCE, url)):
+            rest.append(f"{HOST}/2012/fr/pro/preferred/{link}")
+    raw.fetch_many(SOURCE, list(dict.fromkeys(rest)), suffix=".html")
 
 
 def load12() -> Year:
@@ -356,6 +380,9 @@ def load12() -> Year:
     found = index12()
     top = read(SOURCE, f"{HOST}/2012/fr/com/preferred/preferred_top.html")
     starts = dict(re.findall(r"preferred_(CGM\d+)_(\d+)\.html", top))
+    district_starts = dict(
+        re.findall(r"preferred_(PRD\d+)_(\d+)\.html", read(SOURCE, f"{HOST}/2012/fr/pro/preferred/preferred_top.html"))
+    )
     communes = []
     for code, name in found.communes.items():
         page = page12(code, name, read(SOURCE, tab12("com", code)))
@@ -370,6 +397,10 @@ def load12() -> Year:
     for code, name in found.districts.items():
         page = page12(code, name, read(SOURCE, tab12("pro", code)))
         council = Council(code[3:], name, page, group=code[3])
+        if code in district_starts:
+            first = f"{HOST}/2012/fr/pro/preferred/preferred_{code}_{district_starts[code]}.html"
+            for link in dict.fromkeys(re.findall(rf'value="(preferred_{code}_\d+\.html)"', read(SOURCE, first))):
+                council.candidates += candidates12(page.rows, read(SOURCE, f"{HOST}/2012/fr/pro/preferred/{link}"))
         for canton, canton_name in found.cantons.items():
             if proper(found.district_of[canton]) == name and canton[3] == code[3]:
                 council.units.append(
@@ -910,6 +941,53 @@ def election(number: int) -> Package:
                 p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=row.seats)
         return c, result_set, options
 
+    def candidacies(
+        council: Council, prefix: str, unit_tag: str, c: str, result_set: str, unit: str, options: dict[str, str]
+    ) -> None:
+        for cand in council.candidates:
+            tag = f"{prefix}:{cand.number}:{cand.position}"
+            person = key("person", tag)
+            p.add("person", id=person, birth_precision=None)
+            p.name(person, cand.name, "fr", "official")
+            candidacy = key("candidacy", tag)
+            list_option = options[cand.number]
+            p.add(
+                "candidacy",
+                id=candidacy,
+                person_id=person,
+                option_id=list_option,
+                role="list_member",
+                list_position=cand.position,
+                ballot_name=cand.name,
+            )
+            sub = key("option", day, unit_tag, cand.number, cand.position, "candidate")
+            p.add(
+                "contest_option",
+                id=sub,
+                contest_id=c,
+                kind="candidate",
+                parent_option_id=list_option,
+                ballot_position=cand.position,
+                ballot_label=cand.name,
+            )
+            p.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=sub,
+                channel=0,
+                measure=PREFERENCE,
+                count_round=0,
+                flags=0,
+                value=cand.votes,
+            )
+            if unit_tag.startswith("PRD"):
+                p.add("declared", result_set_id=result_set, option_id=sub, measure=PREFERENCE, value=cand.votes)
+            if cand.elected:
+                p.add(
+                    "outcome", result_set_id=result_set, option_id=list_option, candidacy_id=candidacy, kind="elected"
+                )
+
     for council in data.communes:
         town = area(MUNICIPALITY, RENUMBERED.get(council.code, council.code))
         c, result_set, options = contest(
@@ -944,47 +1022,7 @@ def election(number: int) -> Package:
                 flags=0,
                 value=row.votes,
             )
-        for cand in council.candidates:
-            tag = f"{day}:{council.code}:{cand.number}:{cand.position}"
-            person = key("person", tag)
-            p.add("person", id=person, birth_precision=None)
-            p.name(person, cand.name, "fr", "official")
-            candidacy = key("candidacy", tag)
-            list_option = options[cand.number]
-            p.add(
-                "candidacy",
-                id=candidacy,
-                person_id=person,
-                option_id=list_option,
-                role="list_member",
-                list_position=cand.position,
-                ballot_name=cand.name,
-            )
-            sub = key("option", day, f"CGM{council.code}", cand.number, cand.position, "candidate")
-            p.add(
-                "contest_option",
-                id=sub,
-                contest_id=c,
-                kind="candidate",
-                parent_option_id=list_option,
-                ballot_position=cand.position,
-                ballot_label=cand.name,
-            )
-            p.add(
-                "result_value",
-                result_set_id=result_set,
-                unit_id=unit,
-                option_id=sub,
-                channel=0,
-                measure=PREFERENCE,
-                count_round=0,
-                flags=0,
-                value=cand.votes,
-            )
-            if cand.elected:
-                p.add(
-                    "outcome", result_set_id=result_set, option_id=list_option, candidacy_id=candidacy, kind="elected"
-                )
+        candidacies(council, f"{day}:{council.code}", f"CGM{council.code}", c, result_set, unit, options)
     for council in data.districts:
         province = area(PROVINCE, PROVINCES[council.group])
         c, result_set, options = contest(
@@ -995,6 +1033,22 @@ def election(number: int) -> Package:
             (f"{council.name} provincial district", f"Conseil provincial, district de {council.name}"),
             f"{base}/provincial-councils/{changeset.slug(PROVINCE_NAMES[council.group])}/{changeset.slug(council.name)}",
         )
+        if council.candidates:
+            # candidates' preference votes are published for the whole district, not for its cantons
+            district_unit = key("unit", day, f"PRD{council.code}")
+            p.add(
+                "reporting_unit",
+                id=district_unit,
+                polity_id=BELGIUM,
+                scheme_code=UNIT,
+                code=f"{day}:PRD{council.code}",
+                area_relation="within",
+                area_id=province,
+                kind="standard",
+            )
+            candidacies(
+                council, f"{day}:PRD{council.code}", f"PRD{council.code}", c, result_set, district_unit, options
+            )
         for page_code, page_name, page in council.units:
             unit = key("unit", day, f"PRK{page_code}")
             p.add(
