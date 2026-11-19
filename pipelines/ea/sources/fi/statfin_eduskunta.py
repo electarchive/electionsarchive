@@ -419,9 +419,8 @@ def registry() -> Package:
         license_url=LICENSE_URL,
         attribution="Tilastokeskus, Suomen virallinen tilasto",
     )
-    for year in YEARS:
-        for artifact in seats.cited(year):
-            p.artifact(artifact, PUBLICATIONS)
+    for artifact in {a.storage_key: a for year in YEARS for a in seats.cited(year)}.values():
+        p.artifact(artifact, PUBLICATIONS)
     for code, label in parties().items():
         if code in OTHERS:
             continue
