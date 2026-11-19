@@ -360,7 +360,13 @@ def ward_names() -> dict[str, str]:
 
 
 def geo() -> Package:
-    return shapes.geo(seats(), ward_names())
+    return shapes.geo(seats(), ward_names(), {n: display(v) for n, v in constituencies().items()})
+
+
+def alike(name: str, other: str) -> bool:
+    """Whether two spellings of a constituency are one, as its name changed little across the notices."""
+    one, two = despaced(name), despaced(other)
+    return one.startswith(two) or two.startswith(one) or SequenceMatcher(None, one, two).ratio() >= 0.8
 
 
 def area(day: date, part: Part, u: Unit, code: str) -> str | None:
@@ -373,10 +379,18 @@ def area(day: date, part: Part, u: Unit, code: str) -> str | None:
                 f"{day}: constituency {code} {u.name!r} does not match the 2016 plan's {seats()[int(code)]}"
             )
         return shapes.constituency_area(int(code))
+    if part.kind in ("president", "assembly") and shapes.PLAN_1991 <= day < shapes.PLAN_2016:
+        listed = constituencies().get(int(code))
+        if listed is None or not any(
+            alike(place(u.name, int(code), day.year), spelled)
+            for spelled in (listed, shapes.NEW_NAMES.get(despaced(listed), listed))
+        ):
+            raise ValueError(f"{day}: constituency {code} {u.name!r} does not match the 150-seat plan's {listed}")
+        return shapes.constituency_area_150(int(code))
     if part.kind == "ward" and shapes.WARDS_2021 <= day < shapes.PLAN_2026:
         district = _ward_district(part, u)
-        place = shapes.ward(district, u.name, u.parent_name)
-        return shapes.ward_area(place.pcode) if place else None
+        found = shapes.ward(district, u.name, u.parent_name)
+        return shapes.ward_area(found.pcode) if found else None
     return None
 
 
@@ -523,7 +537,7 @@ def build(day: date) -> Package:
         SOURCE,
         f"The Zambian {'by-elections' if held_by else 'election'} of {day.day} {day:%B %Y}, by constituency, district, "
         "and ward, from the Electoral Commission of Zambia's public notices",
-        depends=[f"{SOURCE}/registry", *([f"{SOURCE}/geo"] if shapes.PLAN_2016 <= day < shapes.PLAN_2026 else [])],
+        depends=[f"{SOURCE}/registry", *([f"{SOURCE}/geo"] if shapes.PLAN_1991 <= day < shapes.PLAN_2026 else [])],
     )
     p.external.add(ZAMBIA)
     id = key("election", day)

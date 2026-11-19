@@ -16,9 +16,11 @@ from datetime import date
 from uuid import uuid5
 
 import numpy
+import pyproj
 import shapefile
 import shapely
 from shapely.geometry import shape
+from shapely.ops import transform
 
 from ea import package, raw
 from ea.package import Package
@@ -28,6 +30,62 @@ COD = (
     "https://data.humdata.org/dataset/01c71cfd-32ff-4a32-a1dd-5909702c12db/resource/"
     "7e9c310d-b9d1-4f82-8ad5-09c1ce744482/download/zmb_admin_boundaries.shp.zip"
 )
+# Two public-domain layers of the 150 constituencies that the notices of 1996 to 2015 report: the Central Statistical
+# Office's wards of 1991 to 2006 as digitized by the Provincial Centre for Geographic Information Services, and the
+# ward and constituency maps of 2006 to 2010 that the Electoral Commission provided to Nicholas Eubank.
+STACKS = "https://stacks.stanford.edu/file/druid"
+OLD = f"{STACKS}:rn812zx7730/WardAndConstituencyBoundaries_1991to2006."
+NEW = f"{STACKS}:yc436vm9005/Zambia_ConstituenciesAndWards_2006to2010_UTM35S."
+PARTS = ("shp", "shx", "dbf", "prj")
+PLAN_1991 = date(1991, 1, 1)
+PLAN_2006 = date(2006, 1, 1)
+PLAN_150 = 150
+# the 2008 notice's name (letters only) where a layer spells or splits it differently
+OLD_NAMES = {
+    "KABWECENTRAL": "KABWE",
+    "MWEMBEZHI": "MWEMBESHI",
+    "BWANANKUBWA": "BWANAMUKUBWA",
+    "CHIPATACENTRAL": "CHIPATA",
+    "PAMBASHE": "MPAMBASHE",
+    "LUSAKACENTRAL": "LUSAKACANTRAL",
+    "KASAMACENTRAL": "KASAMA",
+    "LUBANSENSHI": "LUBANSESHI",
+    "SENGAHILL": "SENGA",
+    "MPIKA": "MPIKACENTRAL",
+    "CHOMACENTRAL": "CHOMA",
+    "DUNDUMWEZI": "DUNDUMWENZE",
+    "KALOMOCENTRAL": "KALOMO",
+    "MAZABUKACENTRAL": "MAZABUKA",
+    "MONZECENTRAL": "MONZE",
+    "NAMWALA": "NAMWALACENTRAL",
+    "KALABOCENTRAL": "KALABO",
+    "KAOMACENTRAL": "KAOMA",
+    "MONGUCENTRAL": "MONGU",
+}
+NEW_NAMES = {
+    "BWANANKUBWA": "BWANAMKUBWA",
+    "NDOLACENTRAL": "NDOLA",
+    "CHIPATACENTRAL": "CHIPATA",
+    "MALAMBO": "MAMBWE",
+    # the layer labels these two the other way round: each overlaps the other's 1991 shape by 98 percent or more
+    "MANSACENTRAL": "CHEMBE",
+    "CHEMBE": "MANSA",
+    "CHIENGE": "CHIENGI",
+    "BANGWEULU": "BANGEULU",
+    "SHIWANGANDU": "SHIWANGADU",
+    "ISOKAEAST": "MAFINGA",
+    "ISOKAWEST": "ISOKA",
+    "MWINILUNGAEAST": "MWINILUNGA",
+    "MWINILUNGAWEST": "IKELENGE",
+    "KASAMACENTRAL": "KASAMA",
+    "LUBANSENSHI": "LUBASENSHI",
+    "CHOMACENTRAL": "CHOMA",
+    "CHIKANKATA": "CHIKANKANTA",
+    "MAZABUKACENTRAL": "MAZABUKA",
+    "MONZECENTRAL": "MONZE",
+    "KALABOCENTRAL": "KALABO",
+    "MONGUCENTRAL": "MONGU",
+}
 ZAMBIA = str(uuid5(package.NAMESPACE, "polity\x1fZM"))
 TERRITORY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fZMB"))
 # The 156 constituencies were first contested on 11 August 2016 and last on 12 August 2021; the 226 of the 2026
@@ -85,6 +143,49 @@ def _reader(name: str) -> shapefile.Reader:
         dbf=io.BytesIO(archive.read(f"{name}.dbf")),
         encoding="utf-8",
     )
+
+
+def constituency_area_150(number: int) -> str:
+    return key("area", "zm.constituency", 1991, f"{number:03d}")
+
+
+def _layer(base: str, field: str) -> dict[str, shapely.Geometry]:
+    """A ward layer dissolved into constituencies by their letters, in degrees of WGS 84 and simplified as a
+    coverage."""
+    parts = {suffix: raw.cached(SOURCE, base + suffix).path for suffix in PARTS}
+    reader = shapefile.Reader(
+        shp=io.BytesIO(parts["shp"].read_bytes()),
+        shx=io.BytesIO(parts["shx"].read_bytes()),
+        dbf=io.BytesIO(parts["dbf"].read_bytes()),
+        encoding="latin-1",
+    )
+    move = pyproj.Transformer.from_crs(pyproj.CRS.from_wkt(parts["prj"].read_text()), 4326, always_xy=True).transform
+    grouped: dict[str, list[shapely.Geometry]] = {}
+    for record, outline in zip(reader.records(), reader.shapes(), strict=True):
+        if record is None or outline is None:
+            raise ValueError(f"{base} holds a record without a shape")
+        grouped.setdefault(letters(str(record[field])), []).append(
+            transform(move, shapely.make_valid(shape(outline.__geo_interface__)))
+        )
+    names = sorted(grouped)
+    merged = [shapely.make_valid(shapely.union_all(grouped[name]).buffer(0)) for name in names]
+    simple = shapely.coverage_simplify(numpy.array(merged), TOLERANCE)
+    return {name: _multi(outline) for name, outline in zip(names, simple, strict=True)}
+
+
+@functools.cache
+def old_plan() -> dict[str, shapely.Geometry]:
+    return _layer(OLD, "NAME2_")
+
+
+@functools.cache
+def new_plan() -> dict[str, shapely.Geometry]:
+    return _layer(NEW, "constName")
+
+
+def seat_150(name: str) -> str:
+    """A 150-seat constituency's letters as the 2008 notice prints them, which the unit's name must match."""
+    return letters(name)
 
 
 def _multi(geometry: shapely.Geometry) -> shapely.Geometry:
@@ -203,14 +304,15 @@ def _outline(p: Package, id: str, geometry: shapely.Geometry, source: str, start
     )
 
 
-def geo(listed: dict[int, str], ward_names: dict[str, str]) -> Package:
+def geo(listed: dict[int, str], ward_names: dict[str, str], listed_150: dict[int, str]) -> Package:
     """The constituencies, `listed` by number as a notice prints them, and the wards, named by `ward_names` by p-code
     where a notice names them and by the dataset otherwise."""
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "Zambia's 156 constituencies of 2016 to 2026 and its 1,853 wards of 2021 to 2026, with their shapes from the "
-        "COD-AB dataset compiled by the Disaster Management and Mitigation Unit",
+        "Zambia's 150 constituencies of 1991 to 2016, its 156 of 2016 to 2026, and its 1,853 wards of 2021 to 2026, with "
+        "their shapes from public-domain ward layers and the COD-AB dataset compiled by the Disaster Management and "
+        "Mitigation Unit",
         depends=[f"{SOURCE}/registry"],
     )
     p.external |= {ZAMBIA, TERRITORY}
@@ -232,6 +334,59 @@ def geo(listed: dict[int, str], ward_names: dict[str, str]) -> Package:
         ),
     )
     p.artifact(raw.cached(SOURCE, COD), cod)
+    old = key("source", "pcgis-1991-2006")
+    new = key("source", "eubank-2006-2010")
+    p.add(
+        "source",
+        id=old,
+        kind="academic",
+        publisher="Provincial Centre for Geographic Information Services (Zambia), through Stanford Libraries",
+        title="Ward and Constituency Boundaries: Zambia, 1991-2006",
+        url="https://purl.stanford.edu/rn812zx7730",
+        license="Public domain",
+        attribution="Provincial Centre for Geographic Information Services (Zambia)",
+        notes=(
+            "Wards digitized from Central Statistical Office maps, each naming its constituency; dissolved here by "
+            "constituency, moved from the Arc 1950 datum to WGS 84, and simplified to about 11 meters as one coverage."
+        ),
+    )
+    p.add(
+        "source",
+        id=new,
+        kind="academic",
+        publisher="Nicholas Eubank, through Stanford Libraries",
+        title="Zambian 2006 to 2010 Constituency and Ward Boundaries",
+        url="https://purl.stanford.edu/yc436vm9005",
+        license="Public domain",
+        attribution="Nicholas Eubank",
+        notes=(
+            "Best estimates of the wards, georeferenced from printed maps the Electoral Commission of Zambia "
+            "provided; dissolved here by constituency, moved from UTM zone 35S to WGS 84, and simplified to about "
+            "11 meters as one coverage."
+        ),
+    )
+    for base, source in ((OLD, old), (NEW, new)):
+        for suffix in PARTS:
+            p.artifact(raw.cached(SOURCE, base + suffix), source)
+    plan = key("boundary_set", "zm.constituency", "1991")
+    p.add(
+        "boundary_set",
+        id=plan,
+        scheme_code="zm.constituency",
+        vintage="1991",
+        valid_from=PLAN_1991,
+        valid_to=PLAN_2016,
+        as_of=PLAN_1991,
+    )
+    for number, name in sorted(listed_150.items()):
+        id = constituency_area_150(number)
+        spelled = letters(name)
+        p.add("area", id=id, scheme_code="zm.constituency")
+        p.add("area_code", area_id=id, code=f"{number:03d}", valid_from=PLAN_1991, valid_to=PLAN_2016)
+        p.add("area_parent", area_id=id, parent_id=TERRITORY, valid_from=PLAN_1991, valid_to=PLAN_2016)
+        p.name(id, name, "en", "official")
+        _outline(p, id, old_plan()[OLD_NAMES.get(spelled, spelled)], old, PLAN_1991, PLAN_2006)
+        _outline(p, id, new_plan()[NEW_NAMES.get(spelled, spelled)], new, PLAN_2006, PLAN_2016)
     for scheme, vintage, start in (("zm.constituency", "2016", PLAN_2016), ("zm.ward", "2021", WARDS_2021)):
         p.add(
             "boundary_set",
