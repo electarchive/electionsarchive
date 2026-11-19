@@ -205,7 +205,7 @@ def fetch() -> None:
     for base in (shapes.OLD, shapes.NEW):
         for suffix in shapes.PARTS:
             raw.fetch(SOURCE, base + suffix, suffix=f".{suffix}")
-    for url in shapes.SCHEDULES:
+    for url in (*shapes.SCHEDULES, *shapes.DISTRICT_URLS):
         raw.fetch(SOURCE, url, suffix=".pdf")
 
 
@@ -437,6 +437,11 @@ def area(day: date, part: Part, u: Unit, code: str) -> str | None:
         district = _ward_district(part, u)
         found = shapes.ward(district, u.name, u.parent_name)
         return shapes.ward_area(found.pcode) if found else None
+    if part.kind == "mayor" and day >= shapes.WARDS_2021:
+        found = shapes.district_of(u.name)
+        if found is None:
+            raise ValueError(f"{day}: district {u.name!r} is not in the boundary dataset")
+        return found
     if part.name == "2011-councillor" and shapes.PLAN_2006 <= day < shapes.PLAN_2016:
         old = wards_2011().get(u.code)
         return shapes.ward_area_2006(old.constituency, shapes.letters(old.name)) if old else None
