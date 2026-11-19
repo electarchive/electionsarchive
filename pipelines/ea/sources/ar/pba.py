@@ -206,6 +206,18 @@ SEAT_ALIASES: dict[tuple[int, str, str], str] = {
 }
 
 
+# A list the proclamation names in words that match no row of the PDF's list table closely enough, because the
+# table truncates long names or the paragraph wraps them.
+LABEL_ALIASES: dict[tuple[int, str, str], str] = {
+    (2003, "035", "ACCION FEDERALISTA POR BUENOS AIRES"): "ACCION FEDER. POR BS. AS.",
+    (2003, "050", "FRENTE"): "EL FRENTE ( GENERAL PUEYRREDON)",
+    (2003, "052", "AGRUPACION VECINAL JOSE HERNANDEZ"): "GENERAL SAN MARTIN, AGRUPACION VECINAL",
+    (2003, "070", "AZA. PARA UNA REPUBLICA IGUALITARIA"): "AZA.AFIRMACION PARA UNA REPUBLICA IGUA-",
+    (2003, "096", "agrupación 26 DE OCTUBRE"): "ROJAS, 26 DE OCTUBRE",
+    (2003, "107", "AGRUPACION MUNICIPAL DEL ACUERDO"): "SAN NICOLAS, AGRUPACION MUNICIPAL DEL",
+}
+
+
 def _count(text: str) -> float:
     return float(text.replace(".", "").replace(",", ".")) if "," in text else float(text.replace(".", ""))
 
@@ -307,6 +319,105 @@ def _council_seats(text: str, lines: list[str]) -> tuple[int | None, tuple[tuple
     return int(elige[1]), tuple(won)
 
 
+class Proclaimed(NamedTuple):
+    """The people a PDF's "resultaron electos" paragraph proclaims: the mayor, the titular and substitute
+    councillors, each with the list label the paragraph prints before the name."""
+
+    mayor: tuple[str, str] | None
+    titular: tuple[tuple[str, str], ...]
+    substitute: tuple[tuple[str, str], ...]
+
+
+SECTIONS = re.compile(
+    r"(INTENDENTE(?:\s+MUNICIPAL)?|CONCEJALES\s+TITULARES|CONCEJALES\s+SUPLENTES|"
+    r"CONSEJEROS\s+ESCOLARES\s+TITULARES|CONSEJEROS\s+ESCOLARES\s+SUPLENTES)\s*:",
+    re.IGNORECASE,
+)
+ARTICLE = re.compile(r"^(?:por\s+(?:(?:el|la|los|las)\s+)?)", re.IGNORECASE)
+
+
+def _people(block: str) -> list[tuple[str, str]]:
+    """The (list label, "SURNAME, Given") pairs of one section. The paragraph names a list once, with a colon,
+    and then its people, separated by semicolons. Its punctuation is loose: a semicolon for the comma after a
+    surname, a comma for the semicolon between people, a missing comma, and a list named after a semicolon."""
+    out: list[tuple[str, str]] = []
+    label = ""
+    pending = ""
+    block = re.sub(r"(,\s*)+,", ",", re.sub(r"[\s.;-]+$", "", block))
+    for item in block.split(";"):
+        unnamed = bool(re.search(r"\w,\s*$", item))
+        item = re.sub(r"\s+", " ", item).strip(" .-,")
+        if not item:
+            continue
+        if ":" in item:
+            head, item = item.rsplit(":", 1)
+            label = ARTICLE.sub("", head.strip())
+            item = item.strip(" .-,")
+        elif not pending and ARTICLE.match(item) and "," not in item:
+            label = ARTICLE.sub("", item).strip()
+            continue
+        if not item:
+            continue
+        if unnamed and label and item.isupper() and not pending:
+            out.append((label, f"{item}, "))
+            continue
+        if pending:
+            item, pending = f"{pending}, {item}", ""
+        parts = [part.strip() for part in item.split(",")]
+        if len(parts) == 1 and out and not item.split()[0].isupper():
+            out[-1] = (out[-1][0], f"{out[-1][1]} {item}")
+            continue
+        if len(parts) == 1:
+            words = item.split()
+            cut = next((i for i, w in enumerate(words) if i and not w.isupper()), None)
+            if cut is None:
+                pending = item
+                continue
+            parts = [" ".join(words[:cut]), " ".join(words[cut:])]
+        if len(parts) % 2 or not label:
+            raise ValueError(f"cannot read {item!r} under {label!r}")
+        for surname, given in zip(parts[0::2], parts[1::2], strict=True):
+            out.append((label, f"{surname}, {given}"))
+    if pending:
+        raise ValueError(f"cannot read {pending!r} under {label!r}")
+    return out
+
+
+@functools.cache
+def proclaimed(year: int, did: str) -> Proclaimed:
+    path = raw.cached(SOURCE, pdf_url(year, did)).path
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    found = re.search(r"RESULTARON\s+ELECTOS\s*:", text, re.IGNORECASE)
+    if found is None:
+        raise ValueError(f"{year} {did}: no proclamation in {path.name}")
+    body = re.split(r"PROVINCIA DE BUENOS AIRES\s*\n\s*JUNTA ELECTORAL", text[found.end() :])[0]
+    body = re.sub(r"-\s*\n\s*", "", body)
+    body = re.sub(r'["“”¨*]', "", body).replace("´", "'").replace("`", "'").replace("’", "'")
+    body = re.sub(r"\s+", " ", body)
+    body = re.sub(r"[,;]\s*(?=[Pp]or\s)|\s+(?=[Pp]or\s+(?:el|la|los|las)\s+[A-ZÁÉÍÓÚÑa-z])", "; ", body)
+    body = re.sub(r"(?<=\s[A-Z]\.) (?=[A-ZÁÉÍÓÚÑ]{2,}(?: [A-ZÁÉÍÓÚÑ]{2,})*,)", "; ", body)
+    parts = SECTIONS.split(body)
+    sections: dict[str, list[tuple[str, str]]] = {}
+    for head, block in zip(parts[1::2], parts[2::2], strict=True):
+        sections[re.sub(r"\s+", " ", head.upper())] = _people(block)
+    mayor = sections.get("INTENDENTE") or sections.get("INTENDENTE MUNICIPAL")
+    if mayor is not None and len(mayor) != 1:
+        raise ValueError(f"{year} {did}: {len(mayor)} mayors in {path.name}")
+    return Proclaimed(
+        mayor[0] if mayor else None,
+        tuple(sections.get("CONCEJALES TITULARES", [])),
+        tuple(sections.get("CONCEJALES SUPLENTES", [])),
+    )
+
+
+def display(printed: str) -> str:
+    """A person's name in reading order from the Junta's "SURNAME, Given" form."""
+    surname, _, given = printed.partition(",")
+    small = {"de", "del", "la", "las", "los", "y", "e", "van", "von"}
+    words = [w if w in small and i else w.capitalize() for i, w in enumerate(surname.lower().split())]
+    return f"{given.strip()} {' '.join(words)}".strip()
+
+
 def match_list(name: str, table: list[tuple[int, str, int]], year: int, did: str) -> int:
     """The index of the table row a seat table's short name stands for."""
     name = SEAT_ALIASES.get((year, did, name), name)
@@ -322,6 +433,8 @@ def match_list(name: str, table: list[tuple[int, str, int]], year: int, did: str
         close.sort(key=lambda i: -SequenceMatcher(None, target, names[i]).ratio())
         if SequenceMatcher(None, target, names[close[0]]).ratio() > 0.95:
             close = close[:1]
+    if not close:
+        close = [i for i, other in enumerate(names) if other.replace(" ", "") == target.replace(" ", "")]
     if len(close) != 1:
         raise ValueError(f"{year} {did}: {name!r} matches {[table[i][1] for i in close]}")
     return close[0]
@@ -1092,8 +1205,13 @@ def election(kind: str, year: int) -> Package:
             if primary
             else "Each partido's school board (consejo escolar) is added from the Junta's definitive-count PDF "
             "for the partido, which prints one list table for the mayor, the councillors, and the school board "
-            "together and declares the seats each list won. In a year the statistics hold only the mayor, the "
+            "together and declares the seats each list won. The same PDF proclaims the winners: the mayor's list "
+            "and name, and the titular and substitute councillors of each list. Those become the declared seats "
+            "of each council, an elected outcome for the mayor and each titular councillor, and a candidacy for "
+            "each person named, with names as printed. In a year the statistics hold only the mayor, the "
             "partido's councillors come from the same PDF, with that table's votes and the councillor seats. "
+            "The provincial senators and deputies carry no declared seats: no source the archive reads publishes "
+            "them by list. "
         )
         + (
             "In the primaries each list's votes are those of its internal lines, which sit under the list."
@@ -1129,10 +1247,24 @@ def election(kind: str, year: int) -> Package:
                     f"{kind} {year} cargo {cargo} section {scope} lacks {sorted(set(everyone) - set(dids))}"
                 )
     declared = province_rows(kind, year) if total else None
+    added: list[str] = []
     if declared is not None:
         _reconcile(p, declared, data)
     for (cargo, scope), dids in sorted(groups.items()):
-        _contest(p, kind, year, election_id, path, cargo, scope, dids, data, units, declared if cargo == "04" else None)
+        _contest(
+            p,
+            kind,
+            year,
+            election_id,
+            path,
+            cargo,
+            scope,
+            dids,
+            data,
+            units,
+            declared if cargo == "04" else None,
+            added,
+        )
     if not primary:
         for did in sorted(data):
             if year in pdf_years(did):
@@ -1141,7 +1273,7 @@ def election(kind: str, year: int) -> Package:
                 _school_board(p, year, election_id, path, did, data[did], units[did])
                 if "11" not in data[did].accounting:
                     _council(p, year, election_id, path, did, data[did], units[did])
-        _accept_gaps(p, year, data)
+        _accept_gaps(p, year, data, added)
     return p
 
 
@@ -1157,6 +1289,7 @@ def _contest(
     data: dict[str, Held],
     units: dict[str, str],
     declared: Declared | None,
+    added: list[str],
 ) -> None:
     primary = kind == "e"
     contest = key("contest", kind, year, cargo, scope)
@@ -1185,13 +1318,18 @@ def _contest(
         tail = f"{'mayor' if mayor else 'council'}-{changeset.slug(name)}"
         district = area("ar-b.partido", scope)
     del place
-    seat = {
+    seats_by_cargo: dict[str, dict[str, str | int]] = {
         "04": {"kind": "office", "office_id": office("governor"), "magnitude": 1},
         "10": {"kind": "office", "office_id": office("mayor"), "magnitude": 1},
         "06": {"kind": "list_allocation", "body_id": body("senate")},
         "08": {"kind": "list_allocation", "body_id": body("deputies")},
         "11": {"kind": "list_allocation", "body_id": body("council")},
-    }[cargo]
+    }
+    seat = seats_by_cargo[cargo]
+    if cargo == "11" and not primary and year in pdf_years(scope):
+        magnitude = board(year, scope).council
+        if magnitude is not None:
+            seat = {**seat, "magnitude": magnitude}
     p.add(
         "contest",
         id=contest,
@@ -1295,12 +1433,47 @@ def _contest(
             )
     if declared is not None:
         _declare(p, result_set, declared, option)
+    if not primary and cargo in ("10", "11") and year in pdf_years(scope):
+        held_ = data[scope]
+
+        def top(lista: int, name: str) -> str:
+            found = _list_party(lista, name, held_, year)[0].id
+            if found not in tops:
+                # a list the statistics file leaves out of this contest but the PDF's table prints with its votes
+                votes = next((v for n, _, v in board(year, scope).table if n == lista), None)
+                if votes is None:
+                    raise ValueError(f"{year} {scope}: list {lista} {name!r} has no votes for contest {cargo}")
+                counted = sum(r.votes for r in held_.rows if r.cargo == cargo and r.lista < BLANK)
+                positive = held_.accounting[cargo].get("positive")
+                if positive is not None and counted == positive and counted + votes != positive:
+                    added.append(
+                        f"{NAMES[scope]} (the statistics file's positive votes, {counted:,}, leave out list {lista} "
+                        f"{name!r}, which the PDF prints with {votes:,})"
+                    )
+                tops[found] = key("option", kind, year, cargo, scope, found)
+                p.add(
+                    "contest_option", id=tops[found], contest_id=contest, kind="list", party_id=found, ballot_label=name
+                )
+                p.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=units[scope],
+                    option_id=tops[found],
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    flags=0,
+                    value=votes,
+                )
+            return tops[found]
+
+        _proclaim(p, year, scope, result_set, top, held_, cargo, True)
 
 
-def _accept_gaps(p: Package, year: int, data: dict[str, Held]) -> None:
+def _accept_gaps(p: Package, year: int, data: dict[str, Held], added: list[str]) -> None:
     """Accept the accounting findings that the PDFs' own printed figures cause: a list table that does not add
     up to the printed positive votes, or positive, blank, and null votes that do not add up to the votes cast."""
-    sums: list[str] = []
+    sums: list[str] = list(added)
     totals: list[str] = []
     for did in sorted(data):
         if year not in pdf_years(did):
@@ -1325,7 +1498,7 @@ def _accept_gaps(p: Package, year: int, data: dict[str, Held]) -> None:
     if sums:
         p.accept(
             "accounting.votes_valid",
-            "In the Junta's definitive-count PDF the printed list votes do not add up to the printed positive votes "
+            "In the Junta's published figures the list votes do not add up to the printed positive votes "
             f"for {'; '.join(sums)}. The package keeps each figure as printed.",
         )
     if totals:
@@ -1463,6 +1636,110 @@ def _board_contest(
     for list_name, won in here.council_won if council else here.won:
         lista = table[match_list(list_name, table, year, did)][0]
         p.add("outcome", result_set_id=result_set, option_id=options[lista], kind="won", seats=won)
+    if council:
+        _proclaim(p, year, did, result_set, lambda lista, _: options[lista], held_, "11", False)
+
+
+def _proclaim(
+    p: Package,
+    year: int,
+    did: str,
+    result_set: str,
+    option_of: Callable[[int, str], str],
+    held_: Held,
+    cargo: str,
+    seats_outcomes: bool,
+) -> None:
+    """The people the Junta's PDF proclaims for the partido's mayor (cargo 10) or council (cargo 11): each is a
+    person and a candidacy on the list that won the seat, with an elected outcome for the mayor and the titular
+    councillors and, for the council, the seats each list won. The paragraph names its lists, which are found
+    in the PDF's list table by name. Titular councillors per list must equal the seats the PDF declares."""
+    here = board(year, did)
+    proclamation = proclaimed(year, did)
+
+    cargo_rows = [(r.lista, r.name, r.votes) for r in held_.rows if r.lista < BLANK and r.cargo in ("10", "11")]
+
+    def find(label: str) -> tuple[int, str]:
+        label = LABEL_ALIASES.get((year, did, label), label)
+        try:
+            lista, name, _ = here.table[match_list(label, here.table, year, did)]
+        except ValueError:
+            # a list the PDF's table leaves out is found among the partido's rows of the statistics file
+            lista, name, _ = cargo_rows[match_list(label, cargo_rows, year, did)]
+        return lista, name
+
+    def option(label: str) -> tuple[int, str]:
+        lista, name = find(label)
+        return lista, option_of(lista, name)
+
+    if cargo == "10":
+        if proclamation.mayor is None:
+            return  # the PDF's first proclamation leaves the mayor to a complementary election
+        label, printed = proclamation.mayor
+        lista, chosen = option(label)
+        _candidacy(p, year, did, "mayor", lista, 0, printed, "head", chosen, result_set, elected=True)
+        return
+    counts: Counter[str] = Counter()
+    for role, people in (("titular", proclamation.titular), ("substitute", proclamation.substitute)):
+        order: Counter[int] = Counter()
+        for label, printed in people:
+            lista, chosen = option(label)
+            order[lista] += 1
+            if role == "titular":
+                counts[chosen] += 1
+            _candidacy(
+                p,
+                year,
+                did,
+                role,
+                lista,
+                order[lista],
+                printed,
+                "list_member" if role == "titular" else "substitute",
+                chosen,
+                result_set,
+                elected=role == "titular",
+            )
+    if here.council_won:
+        declared = Counter()
+        for list_name, won in here.council_won:
+            declared[option(list_name)[1]] += won
+        if declared != counts:
+            raise ValueError(
+                f"{year} {did}: the proclaimed councillors {dict(counts)} differ from the seats {dict(declared)}"
+            )
+    if seats_outcomes:
+        for chosen, won in counts.items():
+            p.add("outcome", result_set_id=result_set, option_id=chosen, kind="won", seats=won)
+
+
+def _candidacy(
+    p: Package,
+    year: int,
+    did: str,
+    role: str,
+    lista: int,
+    order: int,
+    printed: str,
+    kind: str,
+    option_id: str,
+    result_set: str,
+    elected: bool,
+) -> None:
+    person = key("person", "g", year, did, role, lista, order)
+    candidacy = key("candidacy", "g", year, did, role, lista, order)
+    p.add("person", id=person, birth_precision=None)
+    p.name(person, display(printed), "es", "official")
+    p.add(
+        "candidacy",
+        id=candidacy,
+        person_id=person,
+        option_id=option_id,
+        role=kind,
+        ballot_name=printed.rstrip(", "),
+    )
+    if elected:
+        p.add("outcome", result_set_id=result_set, option_id=option_id, candidacy_id=candidacy, kind="elected")
 
 
 def _reconcile(p: Package, declared: Declared, data: dict[str, Held]) -> None:
