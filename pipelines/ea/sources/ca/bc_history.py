@@ -4,11 +4,13 @@ from uuid import UUID
 
 import polars as pl
 
-from ea import raw
-from ea.changeset import Changeset, slug
+from ea import package, raw
+from ea.changeset import slug
+from ea.package import Draft
 from ea.store import DATA, connect
 
 SOURCE = "ca.bc_history"
+KEY = f"{SOURCE}/all"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 CATALOGUE = "https://catalogue.data.gov.bc.ca/dataset"
@@ -19,6 +21,23 @@ BY_PLACE = (
     f"{VOTES}/resource/4e7be8e3-0805-4f39-87f3-47c4c29e262d/download/provincial_voting_results_by_voting_place.csv"
 )
 COUNTS = f"{REGISTERED}/resource/c332d1dc-67aa-4a6a-883f-18a50751844d/download/provincial_registered_voter_counts.csv"
+RPT = "https://elections.bc.ca/docs/rpt"
+RESULTS_PAGE = "https://elections.bc.ca/resources/results/provincial-election-results/"
+BY_PAGE = "https://elections.bc.ca/resources/results/provincial-by-elections-results/"
+STATEMENTS = {
+    "1996": f"{RPT}/1996-SOVGeneralElection.pdf",
+    "2001": f"{RPT}/2001GEResults/2001-SOVGeneralElection.pdf",
+}
+SHEETS = {
+    "1996": f"{RPT}/1996GEResults/1996-Voting-Results-by-Voting-Area.xls",
+    "2001": f"{RPT}/2001GEResults/2001ResultsxED.xls",
+}
+BY_STATEMENTS = {
+    "1997": f"{RPT}/swr-sov97.pdf",
+    "1998": f"{RPT}/par-sov98.pdf",
+    "1999": f"{RPT}/dls_sov99.pdf",
+    "2004": f"{RPT}/SOV_By-election_2004_SRP.pdf",
+}
 PUBLISHER = "Elections BC"
 LICENSE = "Elections BC Open Data Licence"
 LICENSE_URL = "https://www.elections.bc.ca/docs/EBC-Open-Data-Licence.pdf"
@@ -55,6 +74,10 @@ def map_of(day: date) -> str | None:
 def fetch() -> None:
     for url in (BY_AREA, BY_PLACE, COUNTS):
         raw.fetch(SOURCE, url, suffix=".csv")
+    for url in (*STATEMENTS.values(), *BY_STATEMENTS.values()):
+        raw.fetch(SOURCE, url, suffix=".pdf")
+    for url in SHEETS.values():
+        raw.fetch(SOURCE, url, suffix=".xls")
 
 
 def read(url: str, encoding: str) -> pl.DataFrame:
@@ -126,6 +149,7 @@ def parse() -> None:
         f"{districts['event'].n_unique()} events, {districts.height} contests, {candidates.height} candidates, "
         f"{candidates['affiliation'].n_unique()} affiliations"
     )
+    print(build())
 
 
 def listed(items: list[str]) -> str:
@@ -143,11 +167,17 @@ def person_name(text: str) -> str:
     return f"{given.strip()} {family.strip()}".strip()
 
 
-def emit() -> Path:
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package ca.bc_history/all from the parsed tables. It reads the database, through Draft, so the
+    rows it rebuilds keep the ids the changeset path gave them."""
     districts = pl.read_parquet(PARSED / "districts.parquet").sort("date", "district")
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
