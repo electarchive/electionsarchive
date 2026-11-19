@@ -280,7 +280,7 @@ const stated = async (id: string) => {
       ),
       sql`, `,
     )}) as s(path, scheme) on s.path = ps.path
-    join area a on a.scheme_code = s.scheme
+    join area a on a.scheme_code = s.scheme and not exists (select from entity_merge m where m.entity_id = a.id)
     cross join lateral (
       select ac.code from area_code ac where ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null) offset 0
     ) ac

@@ -740,7 +740,7 @@ export const zooms = async (tiles: string, ks: Array<number>) => {
         from spots s
         cross join lateral ST_Dump(s.points) p
         join area_geometry g on g.geom && p.geom and g.valid @> ${day}::date
-        join area a on a.id = g.area_id and a.scheme_code <> ${scheme}
+        join area a on a.id = g.area_id and a.scheme_code <> ${scheme} and not exists (select from entity_merge m where m.entity_id = a.id)
         join scheme sc on sc.code = a.scheme_code and sc.kind = 'administrative'
       )
       select s.index, g.area_id::text as place, s.total,

@@ -1402,7 +1402,7 @@ const crumbIds = async (polity: string, keep: string | null) =>
               join polity_territory t on t.polity_id = y.id and upper_inf(t.valid)
               join area_geometry g on g.area_id = t.area_id and upper_inf(g.valid)
               join polity_parent cp on cp.parent_id = pp.parent_id
-              join polity c on c.id = cp.polity_id and c.kind = 'county'
+              join polity c on c.id = cp.polity_id and c.kind = 'county' and not exists (select from entity_merge m where m.entity_id = c.id)
               join polity_territory ct on ct.polity_id = c.id and upper_inf(ct.valid)
               join area_geometry cg on cg.area_id = ct.area_id and upper_inf(cg.valid)
               where y.id = ${polity}::uuid and y.kind in ('municipality', 'school_district', 'special_district')
@@ -2169,7 +2169,7 @@ async function offspring(parent: string) {
       }>(sql`
         select a.id, a.k, a.scheme_code as scheme, p.valid::text as valid
         from area_parent p join area a on a.id = p.area_id
-        where p.parent_id = ${parent}::uuid
+        where p.parent_id = ${parent}::uuid and not exists (select from entity_merge m where m.entity_id = a.id)
       `);
       return found.rows;
     },
@@ -2476,6 +2476,7 @@ async function survey(
                 from area_parent p join area a on a.id = p.area_id
                 where p.parent_id = any(${parents})
                   and p.valid @> ${date}::date
+                  and not exists (select from entity_merge m where m.entity_id = a.id)
                   and a.scheme_code in (${level})
                   and exists (select from boundary_set bs where bs.scheme_code = a.scheme_code and bs.valid @> ${date}::date)
               `,
@@ -10343,6 +10344,7 @@ export const contests = {
             and d.district_valid @> coalesce(bs.valid_from, ${day}::date) and d.county_valid @> ${day}::date
             and (d.share >= 0.98 or d.rest <= 0.02)
           join polity_territory pt on pt.area_id = d.county_area_id and pt.valid @> ${day}::date
+            and not exists (select from entity_merge m where m.entity_id = pt.polity_id)
           where c.id = ${contest.root}::uuid and c.district_area_id = ${area.id}::uuid
           limit 1
         `);
@@ -12500,7 +12502,7 @@ export const contests = {
               (ST_YMin(o.geom) - ST_YMax(o.geom)) * 0.2
             )::geometry
           ) f
-          join area a on a.id = f.area_id
+          join area a on a.id = f.area_id and not exists (select from entity_merge m where m.entity_id = a.id)
           join scheme s on s.code = a.scheme_code
           cross join own o
           cross join cap
@@ -15551,7 +15553,7 @@ async function universe(
                 select id, k, scheme from l1 union all select id, k, scheme from l2
                 union all select id, k, scheme from l3 union all select id, k, scheme from l4
               ) x
-              where scheme = ${level}
+              where scheme = ${level} and not exists (select from entity_merge m where m.entity_id = x.id)
               order by id
             )
             select id, k, true as held, false as outside, false as pending,
@@ -18829,6 +18831,7 @@ export const elections = {
             join polity_territory pt on pt.polity_id = pp.polity_id and pt.valid @> ${election.date}::date
             join area a on a.id = pt.area_id
             where pp.parent_id = ${election.polity}::uuid and pp.valid @> ${election.date}::date
+              and not exists (select from entity_merge m where m.entity_id = pp.polity_id)
           ),
           districts as (
             select distinct c.district_area_id as area from contest c
@@ -23046,7 +23049,7 @@ export const elections = {
           join kids on kids.id = w.kid
           join polity y on y.id = kids.polity_id
           join area_code ac on ac.code = y.iso_code
-          join area a on a.id = ac.area_id and a.scheme_code = 'eu.member_state'
+          join area a on a.id = ac.area_id and a.scheme_code = 'eu.member_state' and not exists (select from entity_merge m where m.entity_id = a.id)
           left join lateral (
             select parent_party_id from party_affiliation
             where kind = 'ep_group' and party_id = w.party and valid @> kids.day + 40
@@ -23738,6 +23741,7 @@ export async function record(input: { id: string; body?: string }) {
           and exists (
             select from polity_parent pp
             where pp.parent_id = e.polity_id and pp.valid @> e.date_from
+              and not exists (select from entity_merge m where m.entity_id = pp.polity_id)
               and not exists (select from election k where k.parent_id = e.id and k.polity_id = pp.polity_id)
           )
       )

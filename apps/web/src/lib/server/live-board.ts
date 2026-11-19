@@ -161,7 +161,7 @@ export async function pieces(
     ),
     picked as materialized (
       select distinct on (a.id) a.id, a.k, a.scheme_code as scheme, g.geom
-      from hit h join area a on a.id = h.area_id and a.scheme_code = ${scheme}
+      from hit h join area a on a.id = h.area_id and a.scheme_code = ${scheme} and not exists (select from entity_merge m where m.entity_id = a.id)
       join area_geometry g on g.area_id = a.id and g.valid @> ${date}::date
       order by a.id, g.valid_from desc nulls last
     ),
