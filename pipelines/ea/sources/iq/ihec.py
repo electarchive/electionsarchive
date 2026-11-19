@@ -80,6 +80,7 @@ TABLES: dict[str, tuple[str, tuple[str, ...]]] = {
             "Voters_female",
         ),
     ),
+    "centers": ("EDAS", ("PC_PS", "PC_NAME")),
     "cancelled": (
         "CANCELED_PS_STATS_28_11",
         ("PC_PS", "Edno", "PC_NO", "PS_NO", "ValidBallot", "InvalidBallot", "Voters", "reason"),
@@ -251,13 +252,19 @@ def arabic(text: str) -> str:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/cor-2018", f"{SOURCE}/cor-2021"]
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        f"{SOURCE}/cor-2018",
+        f"{SOURCE}/cor-2021",
+        f"{SOURCE}/cor-2021-stations",
+    ]
 
 
 def parse() -> None:
     from ea.sources.iq import ihec_2018
 
-    for build in (geo(), registry(), ihec_2018.election(), election()):
+    for build in (geo(), registry(), ihec_2018.election(), election(), stations()):
         build.write()
 
 
@@ -282,6 +289,8 @@ GEO = key("source", "geoboundaries-adm1")
 COUNCIL = key("body", "council-of-representatives")
 SYSTEM_DISTRICT = key("electoral_system", "district")
 SYSTEM_QUOTA = key("electoral_system", "quota")
+STATION_SCHEME = "iq.ihec_station"
+BALLOTS, VALID, INVALID = 3, 4, 5
 ELECTION = key("election", 2021)
 BOUNDARY_FROM = date(2005, 1, 1)
 
@@ -601,3 +610,95 @@ def election() -> Package:
 def units_area(constituency: str) -> str:
     govno = CONSTITUENCIES[constituency][1]
     return COUNTRY if govno is None else governorate_area(GOVERNORATES[govno][0])
+
+
+def stations() -> Package:
+    """The ballots cast at each polling station, as a second result set on each of the 83 district contests.
+
+    A district's default result set keeps the Commission's candidate votes and registered electors, so its contest
+    accounting is unchanged. This one holds the valid and invalid ballots of every station the Commission lists under
+    the district, kept apart so that the ballots cast in special and out-of-district stations, which the Commission
+    counts toward each voter's home district, are never read as that district's own.
+    """
+    p = Package(
+        f"{SOURCE}/cor-2021-stations",
+        SOURCE,
+        "Ballots cast at each polling station of the 2021 Iraqi Council of Representatives election, from the "
+        "Independent High Electoral Commission's results report",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/cor-2021"],
+    )
+    p.external |= {IRAQ, COUNTRY, IHEC, ELECTION}
+    for name in ("stations", "centers"):
+        for artifact in pages(name):
+            p.artifact(artifact, IHEC)
+    p.add("scheme", code=STATION_SCHEME, polity_id=IRAQ, kind="precinct", rank=3, noun="polling station")
+    names = {int(str(row["PC_PS"])): arabic(str(row["PC_NAME"] or "")) for row in table("centers")}
+    rows: dict[int, dict[str, object]] = {}
+    for row in table("stations"):
+        station = int(str(row["PC_PS"]))
+        if station in rows:
+            if rows[station] != row:
+                raise ValueError(f"station {station} appears twice with different figures")
+            continue
+        rows[station] = row
+    districts = {str(row["edno"]) for row in regular()}
+    by_district: dict[str, list[int]] = {}
+    for station, row in sorted(rows.items()):
+        if str(row["Edno"]) not in districts:
+            raise ValueError(f"station {station} lies in unknown district {row['Edno']}")
+        by_district.setdefault(str(row["Edno"]), []).append(station)
+    if len(by_district) != 83:
+        raise ValueError(f"stations fall in {len(by_district)} districts")
+    values: list[dict[str, object]] = []
+    for edno, members in sorted(by_district.items()):
+        p.external |= {key("contest", edno), key("unit", edno), district_area(edno)}
+        result_set = key("result_set", "stations", edno)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=ELECTION,
+            contest_id=key("contest", edno),
+            stage="official",
+            kind="counted",
+            source_id=IHEC,
+            status="active",
+            is_default=False,
+            completeness=1.0,
+        )
+        for station in members:
+            row = rows[station]
+            unit = key("unit", "station", station)
+            p.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=IRAQ,
+                scheme_code=STATION_SCHEME,
+                code=str(station),
+                parent_id=key("unit", edno),
+                area_relation="within",
+                area_id=district_area(edno),
+                kind="precinct",
+            )
+            p.name(
+                unit, f"{names[station]} - {row['PS_NO']}" if names[station] else str(station), "ar", "native", False
+            )
+            valid, invalid = int(str(row["ValidBallot"])), int(str(row["InvalidBallot"]))
+            if int(str(row["Voters"])) != valid + invalid:
+                raise ValueError(f"station {station}: ballots do not add up")
+            for measure, value in ((BALLOTS, valid + invalid), (VALID, valid), (INVALID, invalid)):
+                values.append(
+                    {
+                        "result_set_id": result_set,
+                        "unit_id": unit,
+                        "option_id": None,
+                        "channel": 0,
+                        "measure": measure,
+                        "count_round": 0,
+                        "flags": 0,
+                        "value": value,
+                    }
+                )
+    cast = sum(int(str(v["value"])) for v in values if v["measure"] == BALLOTS)
+    print(f"{SOURCE}: {len(rows)} stations, {cast:,} ballots")
+    p.frame("result_value", pl.DataFrame(values, infer_schema_length=None))
+    return p
