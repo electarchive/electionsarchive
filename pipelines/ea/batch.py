@@ -27,11 +27,14 @@ ROOT = DATA / "batch"
 JOBS = ROOT / "jobs"
 ACCOUNTS = ROOT / "accounts.json"
 APPROVALS = ROOT / "approvals.json"
+SNAPSHOT = ROOT / "snapshot.json"
+PUSH = os.environ.get("EA_BATCH_PUSH", "ea-fsn2:electionsarchive/data/ops/batch.json")
 PROXY_KEY = "anthropic-batch-proxy"
 PRICES = {"claude-haiku-5-5": (0.05, 0.25), "claude-sonnet-5-5": (1.0, 5.0), "claude-opus-5-5": (5.0, 25.0)}
 MAX_REQUESTS = 100_000
 MAX_BYTES = 200_000_000
 MARGIN = 0.95
+CREDIT = "credit balance"
 ATTEMPTS = 3
 LOCAL = {"i18n"}
 WORKERS = 8
@@ -48,6 +51,7 @@ class Sent(TypedDict):
     estimate: float
     spent: NotRequired[float]
     ended: NotRequired[float]
+    counts: NotRequired[dict[str, int]]
 
 
 class Job(TypedDict):
@@ -58,11 +62,17 @@ class Job(TypedDict):
     failed: dict[str, str]
 
 
+class Failure(TypedDict):
+    at: float
+    message: str
+
+
 class Account(TypedDict):
     usd: float
     since: float
     billed: NotRequired[float]
     billed_at: NotRequired[float]
+    error: NotRequired[Failure]
 
 
 def client(account: str) -> anthropic.Anthropic:
@@ -152,6 +162,7 @@ def collect(job: Job) -> list[str]:
             continue
         api = client(sent["account"])
         status = api.messages.batches.retrieve(sent["id"])
+        sent["counts"] = status.request_counts.model_dump()
         if status.processing_status != "ended":
             counts = status.request_counts
             notes.append(f"{sent['id'][-8:]} {status.processing_status}, {counts.processing} processing")
@@ -181,10 +192,42 @@ def collect(job: Job) -> list[str]:
             job["failed"][key] = (
                 result.result.error.error.message[:300] if result.result.type == "errored" else result.result.type
             )
+            if CREDIT in job["failed"][key].lower():
+                flag(sent["account"], job["failed"][key])
         sent["spent"] = spent
         sent["ended"] = time.time()
         notes.append(f"{sent['id'][-8:]} ended, ${spent:.3f}")
     return notes
+
+
+def flag(name: str, message: str | None) -> None:
+    books = accounts()
+    if name not in books or (message is None and "error" not in books[name]):
+        return
+    if message is None:
+        del books[name]["error"]
+    else:
+        books[name]["error"] = {"at": time.time(), "message": message[:300]}
+    ACCOUNTS.write_text(json.dumps(books, indent=1))
+
+
+def reason(error: anthropic.APIStatusError) -> str:
+    body = error.body
+    inner = body.get("error") if isinstance(body, dict) else None
+    message = inner.get("message") if isinstance(inner, dict) else None
+    return message if isinstance(message, str) else error.message
+
+
+def created(api: anthropic.Anthropic, account: str, requests: list[Request]) -> str:
+    try:
+        batch = api.messages.batches.create(requests=requests)
+    except anthropic.APIStatusError as error:
+        if CREDIT in reason(error).lower():
+            flag(account, reason(error))
+            publish()
+        raise
+    flag(account, None)
+    return batch.id
 
 
 def pick(projected: float) -> str:
@@ -340,6 +383,13 @@ def work(job: Job, source: str, todo: dict[str, Want]) -> str:
 
 
 def ensure(source: str, name: str, wanted: dict[str, Want], *, approved: float | None = None) -> tuple[bool, str]:
+    try:
+        return advance(source, name, wanted, approved)
+    finally:
+        publish()
+
+
+def advance(source: str, name: str, wanted: dict[str, Want], approved: float | None) -> tuple[bool, str]:
     with opened(source, name) as job:
         notes = collect(job)
         if any("ended" not in sent for sent in job["batches"]):
@@ -378,10 +428,9 @@ def ensure(source: str, name: str, wanted: dict[str, Want], *, approved: float |
         for group in groups:
             tag = f"{source}-r" if source == "i18n" else "r"
             requests = [Request(custom_id=f"{tag}{index}", params=want[0]) for index, (_, want) in enumerate(group)]
-            created = api.messages.batches.create(requests=requests)
             job["batches"].append(
                 {
-                    "id": created.id,
+                    "id": created(api, account, requests),
                     "account": account,
                     "at": time.time(),
                     "keys": {f"{tag}{index}": key for index, (key, _) in enumerate(group)},
@@ -402,6 +451,7 @@ def poll() -> str:
         with opened(job["source"], job["name"]) as live:
             found = collect(live)
         notes.append(f"{job['source']}/{job['name']}: {'; '.join(found)}")
+    publish()
     return "\n".join(notes) or "no open batches"
 
 
@@ -418,6 +468,7 @@ def cancel(job: str) -> str:
             if "ended" not in sent:
                 client(sent["account"]).messages.batches.cancel(sent["id"])
         notes = collect(live)
+    publish()
     return "; ".join(notes) or "nothing open"
 
 
@@ -426,6 +477,7 @@ def approve(prefix: str, usd: float) -> str:
     granted = approvals()
     granted[prefix] = usd
     APPROVALS.write_text(json.dumps(granted, indent=1))
+    publish()
     return f"approved ${usd:.2f} for {prefix}"
 
 
@@ -434,6 +486,7 @@ def account(name: str, usd: float) -> str:
     books = accounts()
     books[name] = {"usd": usd, "since": time.time()}
     ACCOUNTS.write_text(json.dumps(books, indent=1))
+    publish()
     return f"account {name}: ${usd:.2f} from now"
 
 
@@ -474,6 +527,7 @@ def billed() -> str:
                 break
             page = body["next_page"]
     ACCOUNTS.write_text(json.dumps(books, indent=1))
+    publish()
     return "\n".join(lines) or "no accounts set"
 
 
@@ -482,6 +536,10 @@ def status() -> str:
     for name, record in accounts().items():
         used = committed(name, record)
         lines.append(f"{name}: ${used:.2f} of ${record['usd']:.2f} (stops at {MARGIN:.0%})")
+        if "error" in record:
+            lines.append(
+                f"  {name} failed {datetime.fromtimestamp(record['error']['at']):%Y-%m-%d %H:%M}: {record['error']['message']}"
+            )
     for prefix, usd in approvals().items():
         used = sum(cost(sent) for job in jobs(prefix) for sent in job["batches"])
         lines.append(f"approved {prefix}: ${used:.2f} of ${usd:.2f}")
@@ -490,4 +548,106 @@ def status() -> str:
         if waiting:
             lines.append(f"open batch:{job['source']}/{job['name']}: {len(waiting)} batches")
     lines.extend(progress())
+    publish()
     return "\n".join(lines) or "no accounts, approvals, or jobs"
+
+
+def check() -> str:
+    lines: list[str] = []
+    for name in accounts():
+        api = client(name)
+        probe = Request(
+            custom_id="check",
+            params={"model": "claude-haiku-5-5", "max_tokens": 1, "messages": [{"role": "user", "content": "ok"}]},
+        )
+        try:
+            batch = created(api, name, [probe])
+        except anthropic.APIStatusError as error:
+            lines.append(f"{name}: {reason(error)}")
+            continue
+        api.messages.batches.cancel(batch)
+        lines.append(f"{name}: accepts batches")
+    publish()
+    return "\n".join(lines) or "no accounts set"
+
+
+def summary() -> dict[str, object]:
+    granted = approvals()
+    books = accounts()
+    runs: dict[str, Progress] = {}
+    for file in JOBS.glob("**/*.progress"):
+        record: Progress = json.loads(file.read_text())
+        runs[record["job"]] = record
+    listed: list[dict[str, object]] = []
+    for job in jobs():
+        key = f"{job['source']}/{job['name']}"
+        sent = job["batches"]
+        if not sent and key not in runs:
+            continue
+        open_ = [item for item in sent if "ended" not in item]
+        counts: dict[str, int] = {}
+        for item in sent:
+            for state, value in item.get("counts", {}).items():
+                counts[state] = counts.get(state, 0) + value
+        run = runs.get(key)
+        listed.append(
+            {
+                "job": key,
+                "state": "running" if open_ else "failed" if job["failed"] else "ended",
+                "batches": len(sent),
+                "open": len(open_),
+                "requests": sum(len(item["keys"]) for item in sent),
+                "counts": counts,
+                "failed": len(job["failed"]),
+                "gave_up": sum(job["attempts"].get(failed, 0) >= ATTEMPTS for failed in job["failed"]),
+                "accounts": sorted({item["account"] for item in sent}),
+                "submitted": min((item["at"] for item in sent), default=None),
+                "ended": None if open_ or not sent else max(item["ended"] for item in sent if "ended" in item),
+                "cost": round(sum(cost(item) for item in sent), 4),
+                "estimated": any("spent" not in item for item in sent),
+                "run": None if run is None else {**run, "report": report(run)},
+            }
+        )
+    return {
+        "at": time.time(),
+        "margin": MARGIN,
+        "accounts": [
+            {
+                "name": name,
+                "cap": record["usd"],
+                "since": record["since"],
+                "committed": round(committed(name, record), 4),
+                "billed": record.get("billed"),
+                "billed_at": record.get("billed_at"),
+                "error": record.get("error"),
+            }
+            for name, record in books.items()
+        ],
+        "approvals": [
+            {
+                "prefix": prefix,
+                "limit": usd,
+                "used": round(sum(cost(item) for job in jobs(prefix) for item in job["batches"]), 4),
+            }
+            for prefix, usd in granted.items()
+        ],
+        "jobs": listed,
+    }
+
+
+def publish() -> None:
+    try:
+        ROOT.mkdir(parents=True, exist_ok=True)
+        partial = SNAPSHOT.with_suffix(".part")
+        partial.write_text(json.dumps(summary(), indent=1))
+        partial.replace(SNAPSHOT)
+        if PUSH:
+            subprocess.Popen(
+                ["rsync", "-q", "--timeout=20", "-e", "ssh -o BatchMode=yes -o ConnectTimeout=8", str(SNAPSHOT), PUSH],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True,
+            )
+    except (OSError, ValueError, KeyError) as error:
+        print(f"batch snapshot not written: {error}", file=sys.stderr)

@@ -210,9 +210,11 @@ def main() -> None:
     )
     batching.add_argument(
         "action",
-        choices=("status", "poll", "approve", "account", "cancel", "billed"),
+        choices=("status", "poll", "approve", "account", "cancel", "billed", "check"),
         help="show caps, approvals, and open jobs; collect ended batches; approve dollars for a job prefix; set an "
-        "account's remaining credit; cancel a job's open batches; or pull billed cost per account",
+        "account's remaining credit; cancel a job's open batches; pull billed cost per account; or check that each "
+        "account still accepts batches. Every action writes data/batch/snapshot.json and copies it to fsn2 "
+        "(EA_BATCH_PUSH) for the ops board",
     )
     batching.add_argument("target", nargs="?", help="job or prefix (us.scans/al-osr-1970) or account name")
     batching.add_argument("usd", nargs="?", type=float, help="dollars for approve or account")
