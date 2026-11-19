@@ -578,7 +578,7 @@ def tie(contest: Contest, found: list[Slate]) -> dict[str, str | None] | None:
 # than this site's commune pages, so they carry the elections, contests, options, offices, bodies, and parties. The
 # two sources agree except in a few contests, where this site's commune pages add up to the candidate totals its own
 # district and national pages print and the workbooks do not. For each of those contests (`servel.SUPERSEDED`) this
-# pipeline publishes its commune counts as the default result set, superseding the workbook's, on Servel's contest.
+# pipeline publishes its commune counts as a non-default result set that supersedes the workbook's, on Servel's contest.
 #
 # The workbooks name each list by its letter and give it no votes. For every deputies, senators, and council contest
 # the commune pact pages add the lists' names and votes as one more result set, which is not the default, on Servel's
@@ -656,7 +656,7 @@ METHOD = (
 SUPERSEDES = (
     "The commune counts add up to the candidate totals that the site's own page for the {where} prints. Some "
     "candidates' totals in Servel's workbooks by circunscripcion electoral differ from those, so this set supersedes "
-    "the workbooks' set for this contest."
+    "the workbooks' set for this contest, and stays non-default beside it."
 )
 
 
@@ -934,7 +934,9 @@ def _supersede(
         kind="counted",
         source_id=SOURCE_ID,
         status="active",
-        is_default=True,
+        # Servel's workbook set already holds the contest's default in production, and a load never demotes another
+        # package's default, so this set stays non-default until a later change promotes it.
+        is_default=False,
         supersedes_id=servel.key("result_set", *ident),
         completeness=1.0,
     )
