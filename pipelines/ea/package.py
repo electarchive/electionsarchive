@@ -2220,13 +2220,13 @@ def _adopted(conn: Connection, pipeline: str) -> tuple[list[str], list[str]]:
     return sorted(row[0]), sorted(row[1])
 
 
-def cited(out: Path) -> list[dict[str, str]]:
-    """The raw artifacts a build's source_artifact rows name, as the manifest lists them: URL, sha256, and the
-    storage key in the raw cache. A changeset's artifact_keys name its own parquet files, not raw ones."""
-    file = out / "source_artifact.parquet"
-    if not file.exists():
+def cited(artifacts: pl.DataFrame | None) -> list[dict[str, str]]:
+    """The raw artifacts a build read, from the source_artifact rows it staged, as the manifest lists them: URL,
+    sha256, and the storage key in the raw cache. Rows an export carries over were read by the changesets it adopts,
+    which keep their own artifact keys, so a build cites only what it read itself."""
+    if artifacts is None or artifacts.is_empty():
         return []
-    rows = pl.read_parquet(file, columns=["url", "sha256", "storage_key"]).unique("storage_key").sort("storage_key")
+    rows = artifacts.select("url", "sha256", "storage_key").unique("storage_key").sort("storage_key")
     return [{"url": url, "sha256": sha, "storage_key": key} for url, sha, key in rows.iter_rows()]
 
 
@@ -2395,7 +2395,7 @@ def export(pipeline: str) -> Path:
         out,
         counts,
         owned,
-        cited(out),
+        [],
         EXPORT_REASON,
     )
     print(f"{key}: {', '.join(f'{t} {n:,}' for t, n in counts.items())}; {len(owned):,} changesets adopted", flush=True)
@@ -2661,7 +2661,8 @@ class Draft(Changeset):
                     _trim(table, out / f"{table}.parquet")
                 counts[table] = carried.height
         owned, _ = _adopted(self.conn, pipeline)
-        _seal(key, pipeline, str(self.manifest["summary"]), out, counts, owned, cited(out), None)
+        read = cited(tables.get("source_artifact"))
+        _seal(key, pipeline, str(self.manifest["summary"]), out, counts, owned, read, None)
         print(
             f"{key}: {', '.join(f'{t} {n:,}' for t, n in counts.items())}; {len(owned):,} changesets adopted",
             flush=True,
