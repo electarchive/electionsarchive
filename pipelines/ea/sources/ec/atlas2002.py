@@ -5,6 +5,7 @@ results by province, each table beside a map. A table's rows are found by their 
 abbreviation that wraps over several lines belongs to the row whose figures sit closest to it.
 """
 
+import collections
 import functools
 import re
 import subprocess
@@ -225,6 +226,62 @@ class National(NamedTuple):
     null: int
     seats: int | None
     elected: list[tuple[str, str, str]]  # list number, name, and sex of each member elected
+
+
+class Mayor(NamedTuple):
+    province: str
+    canton: str
+    number: str
+    sigla: str
+    name: str
+    votes: int
+    share: str
+
+
+MAYOR_PAGES = range(134, 156)
+CAPTION = {"Organización", "política", "más", "votada", "por", "cantón"}
+
+
+def mayors() -> list[Mayor]:
+    """The elected mayor of each canton in 2004, with the winner's votes and share, from the atlas's province tables.
+
+    A cell wraps over several lines, so each word goes to the row whose share sits closest to it vertically and to the
+    column whose left edge, found as the position every row's cell starts at, lies just left of it.
+    """
+    result: list[Mayor] = []
+    for page in MAYOR_PAGES:
+        words = pages()[page - 1]
+        lines = [line.strip() for line in text(page).splitlines() if line.strip()]
+        province = lines[lines.index("Alcaldes electos según cantón y organización política") + 1]
+        header = min((w for w in words if w.text == "Lista"), key=lambda w: w.y)
+        shares = sorted((w for w in words if PCT.match(w.text) and w.y > header.y), key=lambda w: w.y)
+        votes = [
+            max((w for w in words if NUM.match(w.text) and abs(w.y - s.y) < 1 and w.x1 < s.x0), key=lambda w: w.x0)
+            for s in shares
+        ]
+        limit = min(v.x0 for v in votes)
+        bottom = shares[-1].y + 30
+        # the map's caption sits just under the last row
+        body = [
+            w
+            for w in words
+            if header.y < w.y < bottom and w.x1 <= limit + 1 and not PCT.match(w.text) and w.text not in CAPTION
+        ]
+        starts = collections.Counter(round(w.x0) for w in body)
+        edges = sorted(x for x, n in starts.items() if n >= len(shares))
+        if len(edges) != 4:
+            raise ValueError(f"mayor table on page {page}: {len(edges)} column edges")
+        cells: list[list[list[Word]]] = [[[], [], [], []] for _ in shares]
+        for w in body:
+            row = min(range(len(shares)), key=lambda i: abs(shares[i].y - w.y))
+            column = max(i for i, edge in enumerate(edges) if edge <= w.x0 + 3) if w.x0 + 3 >= edges[0] else 0
+            cells[row][column].append(w)
+        for share, vote, cell in zip(shares, votes, cells, strict=True):
+            parts = [_joined(sorted(c, key=lambda w: (round(w.y / 4), w.x0))) for c in cell]
+            if not all(parts):
+                raise ValueError(f"mayor row on page {page} has an empty cell: {parts}")
+            result.append(Mayor(province, parts[0], parts[1], parts[2], parts[3], number(vote.text), share.text))
+    return result
 
 
 def _totals(lines: list[str]) -> dict[str, list[int]]:
