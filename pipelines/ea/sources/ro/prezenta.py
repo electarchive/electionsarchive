@@ -239,6 +239,8 @@ class Contest:
     round_number: int = 1
     previous: str | None = None
     method: str = METHOD
+    # the contest of the EU-wide record this one supersedes: (election id, contest id, result set id, source id)
+    linked: tuple[str, str, str, str] | None = None
 
 
 @dataclass
@@ -348,29 +350,30 @@ class Build:
                 }
             ),
         )
-        contest_ids = {name: key("contest", name) for name in self.contests}
+        contest_ids = {name: c.linked[1] if c.linked else key("contest", name) for name, c in self.contests.items()}
         set_ids = {name: key("result_set", name) for name in self.contests}
         contests = list(self.contests.values())
+        fresh = [c for c in contests if not c.linked]
         p.frame(
             "contest",
             pl.DataFrame(
                 {
-                    "id": [contest_ids[c.key] for c in contests],
-                    "election_id": [c.election for c in contests],
-                    "kind": [c.kind for c in contests],
-                    "office_id": [c.office for c in contests],
-                    "body_id": [c.body for c in contests],
-                    "magnitude": [c.magnitude for c in contests],
-                    "round_number": [c.round_number for c in contests],
-                    "previous_round_id": [c.previous for c in contests],
-                    "electoral_system_id": [c.system for c in contests],
+                    "id": [contest_ids[c.key] for c in fresh],
+                    "election_id": [c.election for c in fresh],
+                    "kind": [c.kind for c in fresh],
+                    "office_id": [c.office for c in fresh],
+                    "body_id": [c.body for c in fresh],
+                    "magnitude": [c.magnitude for c in fresh],
+                    "round_number": [c.round_number for c in fresh],
+                    "previous_round_id": [c.previous for c in fresh],
+                    "electoral_system_id": [c.system for c in fresh],
                     "default_result_kind": "counted",
                 },
                 schema_overrides={"magnitude": pl.Int32, "round_number": pl.Int16},
             ),
         )
-        names = [(contest_ids[c.key], c.english, "en", "official", True) for c in contests]
-        names += [(contest_ids[c.key], c.romanian, "ro", "native", False) for c in contests]
+        names = [(contest_ids[c.key], c.english, "en", "official", True) for c in fresh]
+        names += [(contest_ids[c.key], c.romanian, "ro", "native", False) for c in fresh]
         p.frame(
             "name",
             pl.DataFrame(
@@ -388,8 +391,8 @@ class Build:
             "slug",
             pl.DataFrame(
                 {
-                    "path": [c.slug for c in contests],
-                    "entity_id": [contest_ids[c.key] for c in contests],
+                    "path": [c.slug for c in fresh],
+                    "entity_id": [contest_ids[c.key] for c in fresh],
                     "is_current": True,
                 }
             ),
@@ -407,9 +410,14 @@ class Build:
                     "status": "active",
                     "is_default": True,
                     "completeness": 1.0,
-                }
+                    "supersedes_id": [c.linked[2] if c.linked else None for c in contests],
+                },
+                schema_overrides={"supersedes_id": pl.String},
             ),
         )
+        for c in contests:
+            if c.linked:
+                superseded(p, c.linked, set_ids[c.key])
         notes = [(set_ids[c.key], c.method) for c in contests]
         posted = {contest for contest, _, _, channel, _, _ in self.values if channel == POSTAL}
         notes += [(set_ids[name], POST_METHOD) for name in self.contests if name in posted]
@@ -552,6 +560,50 @@ def election(
     p.name(id, english, "en", "official")
     p.name(id, romanian, "ro", "native", False)
     return id
+
+
+def _external(scheme: str, value: str) -> str:
+    return str(uuid5(package.NAMESPACE, f"external_id:{scheme}\x1f{value}"))
+
+
+# The archive holds the 2024 European Parliament election in Romania as a national result set, from the pipeline that
+# covers every member state. The polling-station set supersedes it and reuses its election and contest.
+EU_SOURCE_PUBLISHER = "Biroul Electoral Central"
+EU_SOURCE_TITLE = (
+    "Proces-verbal privind centralizarea voturilor și atribuirea mandatelor la alegerile pentru membrii din România "
+    "în Parlamentul European din data de 09 iunie 2024"
+)
+EU_RECORD = (
+    _external("eu.election", "RO:2024:european-parliament"),
+    _external("eu.contest", "RO:2024:eu.member_state:RO"),
+    _external("eu.ep2024.result_set", "RO:2024"),
+    str(uuid5(package.NAMESPACE, f"source\x1f{EU_SOURCE_PUBLISHER}\x1f{EU_SOURCE_TITLE}")),
+)
+
+
+def superseded(p: Package, eu: tuple[str, str, str, str], result_set: str) -> None:
+    """Keep the EU-wide national totals as a superseded set, re-staged with its own election, contest, and source."""
+    election, contest, old, source = eu
+    p.add(
+        "result_set",
+        id=old,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=source,
+        status="superseded",
+        is_default=False,
+        completeness=None,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set, "supersedes"),
+        entity_id=result_set,
+        kind="methodology",
+        body_md="This set holds the same contest by polling station. It supersedes the set of national totals.",
+        lang="en",
+    )
 
 
 def accept(p: Package) -> None:
@@ -776,22 +828,15 @@ def allocate(b: Build, day: str) -> None:
 
 
 def european(parties: set[str]) -> tuple[Package, Build]:
-    day, first, name = "2024-06-09", date(2024, 6, 9), "europarlamentare09062024"
+    day, name = "2024-06-09", "europarlamentare09062024"
     p = package_of(
         f"{day}-european",
         "The election of Romania's members of the European Parliament of 9 June 2024 by polling station, from the "
         "Permanent Electoral Authority's results portal",
     )
     p.artifact(raw.cached(SOURCE, URLS[name]), AEP_SOURCE)
-    eid = election(
-        p,
-        f"european-{day}",
-        first,
-        "general",
-        "2024 European Parliament election in Romania",
-        "Alegeri pentru Parlamentul European din 09.06.2024",
-        f"ro/{day}-european",
-    )
+    eid = EU_RECORD[0]
+    p.external |= {EU_RECORD[0], EU_RECORD[1], EU_RECORD[3]}
     b = Build(p, day, parties)
     contest = f"european-{day}"
     b.contest(
@@ -804,6 +849,7 @@ def european(parties: set[str]) -> tuple[Package, Build]:
             "list_allocation",
             body=EUROPEAN_PARLIAMENT,
             magnitude=33,
+            linked=EU_RECORD,
         )
     )
     for row in records(name):
