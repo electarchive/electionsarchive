@@ -110,6 +110,23 @@ COUNTIES_2009 = (
     "0086", "0784", "0795",
 )  # fmt: skip
 TALLINN, TARTU = "0784", "0795"
+MERGED_2005 = {
+    "Jõhvi linn": "0251",
+    "Türi linn": "0835",
+    "Tapa linn": "0790",
+    "Tamsalu linn": "0786",
+    "Kilingi-Nõmme linn": "0710",
+    "Suure-Jaani linn": "0758",
+    "Loksa vald": "0353",
+    "Kabala vald": "0835",
+    "Lehtse vald": "0790",
+    "Oisu vald": "0835",
+    "Avanduse vald": "0926",
+    "Saksi vald": "0790",
+    "Tali vald": "0710",
+    "Olustvere vald": "0758",
+    "Vastemõisa vald": "0758",
+}  # 2004 units abolished in the 2005 mergers, to the EHAK code of the municipality that took them in
 EVOTES = "E-hääled"
 ABROAD_2009 = "Alaliselt välisriigis elavad valijad"
 ABROAD_2004 = "Välisriigid"
@@ -715,7 +732,11 @@ def read_2004(spec: Spec) -> Block:
                 found.votes.update(zip(labels, unit_values(n, line), strict=True))
             pending = []
     for label in valid:
-        if label not in codes and label not in places and label not in ABROAD_UNITS:
+        if label in codes or label in places or label in ABROAD_UNITS:
+            continue
+        if label in MERGED_2005:
+            places[label] = (f"{day}:{label}", "within", area("ee.vald", MERGED_2005[label]), "standard")
+        else:
             places[label] = (f"{day}:{label}", "unlocated", None, "standard")
     hints = {regno: code for regno, code, _, _ in mandate_rows(spec)}
     known = known_codes()
