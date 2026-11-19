@@ -9,6 +9,7 @@ by-election (a dissolved council) has a results report and a seat report per mun
 import functools
 import json
 import re
+import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
@@ -82,6 +83,7 @@ class Session:
             except httpx.HTTPError:
                 if attempt == 3:
                     raise
+                time.sleep(5 * (attempt + 1))
                 continue
             if response.status_code == 200 and "Error 500" not in response.text:
                 self.page = response.text
@@ -105,7 +107,11 @@ class Session:
         if link is None:
             raise RuntimeError(f"no {button} link")
         for attempt in range(4):
-            response = self.client.get(HOST + link)
+            try:
+                response = self.client.get(HOST + link)
+            except httpx.HTTPError:  # the portal sometimes drops the connection; the link stays valid
+                time.sleep(5 * (attempt + 1))
+                continue
             if response.status_code == 200 and response.headers.get("content-type", "").startswith("application/"):
                 return response.content
         raise RuntimeError(f"{button} did not download")
@@ -675,6 +681,29 @@ def _value(p: Package, result_set: str, unit: str, option: str | None, measure: 
     )
 
 
+def ward_unit(p: Package, seen: set[str], day: date, since: date, ward: str, kind: str) -> str:
+    """The one reporting unit of a ward on a by-election date, shared by its ward and proportional contests.
+
+    A ward that holds a ward by-election and also votes in its council's proportional by-election on the same date
+    is one place where votes are counted, so both contests report on the same unit; the unit's scheme and code may
+    occur once for its validity.
+    """
+    unit = key("unit", day, "ward", ward)
+    if unit not in seen:
+        seen.add(unit)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=SOUTH_AFRICA,
+            scheme_code="za.ward",
+            code=f"{day}:{ward}",
+            area_relation="equals",
+            area_id=area("za.ward", since, ward),
+            kind=kind,
+        )
+    return unit
+
+
 def election(day: date) -> Package:
     p = Package(
         f"za.mbe/{day}",
@@ -693,6 +722,7 @@ def election(day: date) -> Package:
     p.name(id, f"{day} South African municipal by-elections", "en", "official")
     p.add("slug", path=path, entity_id=id, is_current=True)
     wards, councils = reports(day)
+    council_wards = {ward_code for _, council in councils for ward_code in council.wards}
     seen: set[str] = set()
     off = 0
     for event, ward in sorted(wards, key=lambda item: item[1].ward):
@@ -736,17 +766,7 @@ def election(day: date) -> Package:
                 ballot_position=None,
                 ballot_label=clean(candidate.name),
             )
-        total = key("unit", day, "ward", ward.ward, "total")
-        p.add(
-            "reporting_unit",
-            id=total,
-            polity_id=SOUTH_AFRICA,
-            scheme_code="za.ward",
-            code=f"{day}:{ward.ward}",
-            area_relation="equals",
-            area_id=area("za.ward", since, ward.ward),
-            kind="aggregate",
-        )
+        total = ward_unit(p, seen, day, since, ward.ward, "standard" if ward.ward in council_wards else "aggregate")
         if ward.registered:
             _value(p, result_set, total, None, 2, ward.registered)
         for vd, (valid, spoilt, cast) in sorted(ward.districts.items()):
@@ -821,17 +841,7 @@ def election(day: date) -> Package:
         )
         options = {}
         for ward_code, votes in sorted(council.wards.items()):
-            unit = key("unit", day, "ward", ward_code)
-            p.add(
-                "reporting_unit",
-                id=unit,
-                polity_id=SOUTH_AFRICA,
-                scheme_code="za.ward",
-                code=f"{day}:{ward_code}",
-                area_relation="equals",
-                area_id=area("za.ward", since, ward_code),
-                kind="standard",
-            )
+            unit = ward_unit(p, seen, day, since, ward_code, "standard")
             figures = council.totals.get(ward_code, {})
             _value(p, result_set, unit, None, 2, figures.get("Registered Voters"))
             _value(p, result_set, unit, None, 4, figures.get("Total Valid Votes"))
