@@ -42,8 +42,6 @@ OUTLINES = (
     "geoBoundaries-ARM-ADM1_simplified.geojson"
 )
 GEO_SOURCE = str(uuid5(package.NAMESPACE, "am.local_referendums\x1fsource\x1fgeoboundaries"))
-# The am.marz boundary set of 2005, which am.local_councils/geo mints from the same geoBoundaries release.
-MARZ_2005 = str(uuid5(package.NAMESPACE, "am.local_councils\x1fboundary_set\x1fam.marz\x1f2005"))
 METHOD = (
     "Counted by the precinct commissions and published by the Central Electoral Commission in its regional results "
     "spreadsheet, with the protocol it prints on each poll's page for the whole community. Registered voters are the "
@@ -328,7 +326,7 @@ def geo() -> Package:
 
 
 def outlines(p: Package) -> None:
-    """Attach the geoBoundaries outlines of the three regions to the am.marz 2005 boundary set am.local_councils owns.
+    """Attach the geoBoundaries outlines of the three regions.
 
     The communities as they stood before the 2016-2017 mergers have no open outlines.
     """
@@ -344,8 +342,15 @@ def outlines(p: Package) -> None:
         attribution="geoBoundaries (William & Mary geoLab), Wikimedia Commons",
     )
     p.artifact(raw.cached(GEOBOUNDARIES, OUTLINES), GEO_SOURCE)
-    # The boundary set of am.marz at the 2005 vintage belongs to am.local_councils/geo; these outlines fall under it.
-    p.external |= {MARZ_2005}
+    p.add(
+        "boundary_set",
+        id=key("boundary_set", "am.marz", 2005),
+        scheme_code="am.marz",
+        vintage="2005",
+        valid_from=DAY,
+        valid_to=None,
+        as_of=date(2005, 1, 1),
+    )
     wanted = {english: marz for marz, english, _ in REGIONS.values()}
     found: dict[str, shapely.geometry.base.BaseGeometry] = {}
     for feature in json.loads(raw.cached(GEOBOUNDARIES, OUTLINES).path.read_text("utf-8"))["features"]:
