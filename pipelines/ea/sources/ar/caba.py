@@ -14,6 +14,7 @@ import shapely.geometry
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.ar import caba_tables
 
 SOURCE = "ar.caba"
 TSJ = "https://www.eleccionesciudad.gob.ar"
@@ -57,6 +58,7 @@ class Held:
 
 
 # The elections of the City held under the Constitution of 1996 that this pipeline builds, each by comuna.
+TABLED = {"2015-paso", "2015-general", "2015-runoff", "2025-general"}  # the elections built by polling table
 HELD = [
     Held("2015-paso", date(2015, 4, 26), "primary", 3),
     Held("2015-general", date(2015, 7, 5), "general", 4),
@@ -144,6 +146,8 @@ def fetch() -> None:
                 raw.fetch(SOURCE, url, suffix=".pdf" if held.docs else ".html")
             except httpx.HTTPStatusError as failure:
                 print(f"{url}: {failure.response.status_code}", flush=True)
+    caba_tables.fetch_tsj([held.page for held in HELD if held.page is not None])
+    caba_tables.fetch_te()
 
 
 @dataclass
@@ -1121,6 +1125,7 @@ def geo() -> Package:
     p.artifact(artifact, GCBA_SOURCE)
     p.add("scheme", code="ar.caba_ciudad", polity_id=ARGENTINA, kind="administrative", rank=1, noun="city")
     p.add("scheme", code="ar.caba_comuna", polity_id=ARGENTINA, kind="administrative", rank=2, noun="comuna")
+    p.add("scheme", code="ar.caba_mesa", polity_id=ARGENTINA, kind="precinct", rank=3, noun="polling table")
     p.add(
         "boundary_set",
         id=key("boundary_set", "ar.caba_comuna", "ley1777"),
@@ -1341,6 +1346,78 @@ def _at(totals: dict[str, list[int]], k: int) -> dict[str, int]:
     return {label: values[min(k, len(values) - 1)] for label, values in totals.items()}
 
 
+@dataclass
+class Counted:
+    comuna: int
+    number: str
+    establishment: str
+    url: str
+    page: Page
+
+
+def counted_tables(held: Held) -> list[Counted]:
+    """The polling tables of an election that the service lists, each with its parsed results page."""
+    if held.page is not None:
+        listed = caba_tables.tsj_tables(held.page)
+    else:
+        listed = caba_tables.te_all_tables()
+    read = tsj_page if held.page is not None else te_page
+    return [
+        Counted(table.comuna or 0, table.number, table.establishment, table.url, read(table.url))
+        for table in listed
+        if table.url != PRISONS_URL
+    ]
+
+
+TABLE_METHOD = (
+    " Each polling table (mesa) is a reporting unit of its comuna, with the count of its own results page. The"
+    " comuna's unit holds no votes, so nothing is counted twice; its registered electors, where the service prints"
+    " them, stay on it, and the comuna's own declared totals are in the note on the contest."
+)
+TEST_METHOD = (
+    " The service also lists fifteen tables named \u201cprueba\u201d (test), numbered 50001 to 50015, each with a few"
+    " votes. The comuna totals it prints include them, each in the comuna of its number, so they are kept as tables."
+)
+SHORT_REASON = (
+    "the Tribunal Superior's comuna and city totals are its definitive count, which runs a few dozen votes per comuna "
+    "above the sum of the tables' own pages; both are printed as published"
+)
+
+
+def _declared_note(
+    p: Package, result_set: str, comunas: list[tuple[int, Page, int]], tables: list[Counted], cargo: str
+) -> None:
+    lines = [
+        (
+            "The comuna totals as the authority declares them, beside the sum of the polling tables listed under each "
+            "comuna (valid, blank, null, and total votes):"
+        ),
+        "",
+        "| Comuna | Declared | Sum of tables |",
+        "| --- | --- | --- |",
+    ]
+    for comuna, page, k in comunas:
+        got = _at(page.totals, k)
+        here = [t.page for t in tables if t.comuna == comuna and cargo in t.page.cargos]
+        summed = {
+            label: sum(_at(t.totals, t.cargos.index(cargo))[label] for t in here)
+            for label in ("valid", "blank", "null", "cast")
+        }
+
+        def line(values: dict[str, int]) -> str:
+            return f"{values['valid']:,} / {values['blank']:,} / {values['null']:,} / {values['cast']:,}"
+
+        lines.append(f"| {comuna} | {line(got)} | {line(summed)} |")
+    p.add(
+        "note",
+        id=key("note", result_set, "comunas"),
+        entity_id=result_set,
+        kind="caveat",
+        body_md="\n".join(lines),
+        lang="en",
+    )
+
+
 def election(name: str) -> Package:
     held = next(h for h in HELD if h.key == name)
     year = held.day.year
@@ -1348,6 +1425,7 @@ def election(name: str) -> Package:
     english, spanish = ELECTION_NAMES[held.kind]
     city = page_of(held, None)
     pages: dict[int, Page] = {comuna: page_of(held, comuna) for comuna in COMUNAS}
+    tabled = counted_tables(held) if held.key in TABLED else []
     grain = "by comuna" if any(page.cargos for page in pages.values()) else "for the whole City"
     p = Package(
         f"{SOURCE}/{held.key}",
@@ -1359,6 +1437,10 @@ def election(name: str) -> Package:
     source = source_of(held)
     for url in urls(held):
         p.uses(raw.cached(SOURCE, url))
+    for table in tabled:
+        p.uses(raw.cached(SOURCE, table.url))
+    if tabled and held.page is not None:
+        p.accept("accounting.declared", SHORT_REASON)
     primary = held.kind == "primary"
     if held.key == "2021-paso":
         scan = raw.cached(SOURCE, doc_url(PASO_2021_NATIONAL))
@@ -1406,6 +1488,20 @@ def election(name: str) -> Package:
             area_relation="equals",
             area_id=area("ar.caba_comuna", str(comuna)),
             kind="aggregate",
+        )
+    table_units: dict[tuple[int, str], str] = {}
+    for table in tabled:
+        unit = table_units[(table.comuna, table.number)] = key("unit", held.day, table.comuna, "table", table.number)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=ARGENTINA,
+            scheme_code="ar.caba_mesa",
+            code=f"{held.day}:{table.number}",
+            area_relation="within",
+            area_id=area("ar.caba_comuna", str(table.comuna)),
+            kind="standard",
+            parent_id=units[table.comuna],
         )
     city_unit = key("unit", held.day, "city")
     if any(cargo not in pages[1].cargos for cargo in city.cargos):
@@ -1511,16 +1607,44 @@ def election(name: str) -> Package:
                 + (PRIMARY_DOCS_METHOD if primary and year == 2023 else ""),
                 lang="en",
             )
+            if tabled:
+                p.add(
+                    "note",
+                    id=key("note", result_set, "tables"),
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md=TABLE_METHOD.strip() + (TEST_METHOD if held.page is None else ""),
+                    lang="en",
+                )
+                _declared_note(
+                    p,
+                    result_set,
+                    [
+                        (c, pages[c], pages[c].cargos.index(cargo))
+                        for c in (COMUNAS if scope == 0 else [scope])
+                        if cargo in pages[c].cargos
+                    ],
+                    tabled,
+                    cargo,
+                )
             here: list[tuple[str, Page, int]] = [
                 (units[c], pages[c], pages[c].cargos.index(cargo)) for c in COMUNAS if cargo in pages[c].cargos
             ]
             if scope:
                 here = [(units[scope], pages[scope], pages[scope].cargos.index("junta"))]
-            elif prison is not None and cargo in prison.cargos:
+            if tabled:
+                here = [
+                    (table_units[(t.comuna, t.number)], t.page, t.page.cargos.index(cargo))
+                    for t in tabled
+                    if cargo in t.page.cargos and (not scope or t.comuna == scope)
+                ]
+            if not scope and prison is not None and cargo in prison.cargos:
                 here.append((prison_unit, prison, prison.cargos.index(cargo)))
             if scope == 0 and not here:
                 here = [(city_unit, city, city.cargos.index(cargo))]
             looked = [*here, ("", city, city.cargos.index(cargo))] if scope == 0 else here
+            if tabled and scope:
+                looked = [*here, ("", pages[scope], pages[scope].cargos.index("junta"))]
             options: dict[tuple[str, str], str] = {}
             numbers = sorted({row.number for _, page, k in looked for row in page.rows if row.votes[k]}, key=order)
             for number in numbers:
@@ -1569,7 +1693,7 @@ def election(name: str) -> Package:
                         ballot_label=name_of,
                     )
             for unit, page, k in here:
-                _accounting(p, result_set, unit, _at(page.totals, k), page.registered, page.boxes)
+                _accounting(p, result_set, unit, _at(page.totals, k), None if tabled else page.registered, page.boxes)
                 flags = DIGITIZED if page.boxes else 0
                 for row in page.rows:
                     if (row.number, "") not in options:
@@ -1583,10 +1707,20 @@ def election(name: str) -> Package:
                                     _locate(p, result_set, unit, option, 1, page.boxes[f"{row.number}:{lista.code}"])
                     else:
                         _value(p, result_set, unit, options[(row.number, "")], 1, row.votes[k], flags=flags)
-            if scope == 0:
-                k = city.cargos.index(cargo)
-                _accounting(p, result_set, None, _at(city.totals, k), city.registered)
-                for row in city.rows:
+            if tabled:
+                # the comuna's own count is declared, and its registered voters stay on the comuna's unit
+                for comuna in COMUNAS if scope == 0 else [scope]:
+                    registered = pages[comuna].registered
+                    if registered is not None and cargo in pages[comuna].cargos:
+                        _value(p, result_set, units[comuna], None, 2, registered)
+            if scope == 0 or tabled:
+                whole, k = (
+                    (city, city.cargos.index(cargo))
+                    if scope == 0
+                    else (pages[scope], pages[scope].cargos.index("junta"))
+                )
+                _accounting(p, result_set, None, _at(whole.totals, k), whole.registered if not tabled else None)
+                for row in whole.rows:
                     if (row.number, "") not in options:
                         continue
                     if primary:
