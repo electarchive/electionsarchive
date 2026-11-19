@@ -402,10 +402,50 @@ COSTA_RICA, COUNTRY, TSE_SOURCE, key, area, party = (
     tse.area,
     tse.party,
 )
-MAYOR_OFFICE = key("office", "mayor")
-INTENDANT_OFFICE = key("office", "intendant")
-DISTRICT_COUNCIL = key("body", "district_council")
 MUNICIPAL_DISTRICT_COUNCIL = key("body", "municipal_district_council")
+"""The body of the councilors a district with an intendency elects, which the registry holds no seat for."""
+FAMILY = {MAYOR: tse.MAYOR, COUNCIL: tse.DISTRICT_COUNCIL, INTENDANT: tse.INTENDANT}
+"""The registry family of the seat each kind of contest here fills."""
+
+
+def seat_code(contest: Contest) -> str:
+    """The code of the seat a contest fills: its canton for a mayor, its district for the others."""
+    return contest.code
+
+
+@functools.cache
+def registry_seats() -> dict[str, dict[str, str]]:
+    """The seats the municipal registry holds, by family: the code of each and its name."""
+    return tse.municipal_places()
+
+
+def seat_of(contest: Contest) -> str:
+    if contest.kind not in FAMILY:
+        return MUNICIPAL_DISTRICT_COUNCIL
+    return tse.seat(FAMILY[contest.kind], seat_code(contest))
+
+
+def missing_seats() -> dict[tuple[str, str], str]:
+    """The seats the three elections fill that the registry lacks, by family and code, with the name of the place."""
+    held = registry_seats()
+    cantons, districts = names()
+    found: dict[tuple[str, str], str] = {}
+    for day in DAYS:
+        for contest in contests_of(day.day):
+            if contest.kind not in FAMILY:
+                continue
+            family, code = FAMILY[contest.kind], seat_code(contest)
+            if code in held[family] or (family, code) in found:
+                continue
+            canton = cantons[f"{contest.province}{contest.canton:02d}"]
+            found[family, code] = (
+                canton
+                if contest.district is None
+                else f"{districts[pcd(contest.province, contest.canton, contest.district)]} ({canton})"
+            )
+    return found
+
+
 MUNICIPAL_SOURCE_NOTE = (
     "Counted by the Tribunal Supremo de Elecciones, as published in its workbooks of the vote count (cómputo de "
     "votos) of the municipal elections. The registered electorate (electorado), the votes received (ballots cast), "
@@ -504,20 +544,19 @@ def municipal() -> Package:
     sources(p)
     for day in DAYS:
         p.artifact(raw.cached(SOURCE, tse.zip_url(day.archive)), TSE_SOURCE)
-    for id, text, native in (
-        (MAYOR_OFFICE, "Mayor of a canton of Costa Rica", "Alcalde"),
-        (INTENDANT_OFFICE, "Intendant of a district of Costa Rica", "Intendente de distrito"),
-    ):
-        p.add("office", id=id, polity_id=COSTA_RICA, kind="mayor")
-        p.name(id, text, "en", "official")
-        p.name(id, native, "es", "native", False)
-    for id, text, native in (
-        (DISTRICT_COUNCIL, "District council of Costa Rica", "Concejo de distrito"),
-        (MUNICIPAL_DISTRICT_COUNCIL, "Municipal district council of Costa Rica", "Concejo municipal de distrito"),
-    ):
-        p.add("body", id=id, polity_id=COSTA_RICA, kind="council")
-        p.name(id, text, "en", "official")
-        p.name(id, native, "es", "native", False)
+    for (family, code), text in sorted(missing_seats().items()):
+        english, native, kind = tse.AREAS[family]
+        id = tse.seat(family, code)
+        if kind == "council":
+            p.add("body", id=id, polity_id=COSTA_RICA, kind="council")
+        else:
+            p.add("office", id=id, polity_id=COSTA_RICA, kind=kind)
+        p.name(id, f"{english} of {text}", "en", "official")
+        p.name(id, f"{native} de {text}", "es", "native", False)
+    if any(c.kind not in FAMILY for day in DAYS for c in contests_of(day.day)):
+        p.add("body", id=MUNICIPAL_DISTRICT_COUNCIL, polity_id=COSTA_RICA, kind="council")
+        p.name(MUNICIPAL_DISTRICT_COUNCIL, "Municipal district council of Costa Rica", "en", "official")
+        p.name(MUNICIPAL_DISTRICT_COUNCIL, "Concejo municipal de distrito", "es", "native", False)
     parties, areas = national_ids()
     for column, text in sorted(seen_columns().items()):
         id = party(column)
@@ -628,8 +667,8 @@ def election(day: date) -> Package:
             id=contest_id,
             election_id=election_id,
             kind="office" if office else "list_allocation",
-            office_id=(MAYOR_OFFICE if contest.kind == MAYOR else INTENDANT_OFFICE) if office else None,
-            body_id=None if office else (DISTRICT_COUNCIL if contest.kind == COUNCIL else MUNICIPAL_DISTRICT_COUNCIL),
+            office_id=seat_of(contest) if office else None,
+            body_id=None if office else seat_of(contest),
             district_area_id=area("cr.canton", f"{contest.province}{contest.canton:02d}")
             if contest.district is None
             else area("cr.distrito", pcd(contest.province, contest.canton, contest.district)),
