@@ -9,7 +9,7 @@ import threading
 import time
 from collections.abc import Iterable, Iterator
 from contextlib import suppress
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
 from pathlib import Path
@@ -776,6 +776,12 @@ CHECKS = {
                                 and coalesce(o.valid_from, date '0001-01-01') < coalesce(b.valid_to, date '9999-12-31')
                                 and coalesce(b.valid_from, date '0001-01-01') < coalesce(o.valid_to, date '9999-12-31')
                                group by all having count(*) > 1""",
+    "unique.unit_code": """with u as (select id, scheme_code, code, valid_from, valid_to, row_number() over () as n
+                                           from reporting_unit)
+                                 select a.id, b.id, a.scheme_code, a.code, a.valid_from, a.valid_to
+                                 from u a join u b on a.scheme_code = b.scheme_code and a.code = b.code and a.n < b.n
+                                 where coalesce(a.valid_from, date '0001-01-01') < coalesce(b.valid_to, date '9999-12-31')
+                                   and coalesce(b.valid_from, date '0001-01-01') < coalesce(a.valid_to, date '9999-12-31')""",
     "fact.negative": "select * from result_value where value < 0",
     "fact.flow_negative": "select * from result_flow where value < 0",
     "fact.flow_self": "select * from result_flow where from_option_id = option_id",
@@ -2162,6 +2168,49 @@ def _ready(source: Connection | Reference, key: str, batch: set[str], minted: se
     return found
 
 
+def _declared_twice(keys: list[str]) -> list[str]:
+    """Reporting units that two rows of the batch declare for one scheme, code, and overlapping validity.
+
+    The database allows one unit per scheme and code at a time, so a unit two packages of a run both emit (or one
+    package twice, under two ids) fails the load; each unit must come from one package, and the others list it as
+    external.
+    """
+    frames = []
+    for key in keys:
+        file = _resolve(key) / "reporting_unit.parquet"
+        if file.exists():
+            present = set(pl.read_parquet_schema(file))
+            frame = pl.read_parquet(
+                file, columns=[c for c in ("id", "scheme_code", "code", "valid_from", "valid_to") if c in present]
+            )
+            for column in ("valid_from", "valid_to"):
+                if column not in frame.columns:
+                    frame = frame.with_columns(pl.lit(None, pl.Date).alias(column))
+            frames.append(frame.with_columns(pl.lit(key).alias("package")))
+    if not frames:
+        return []
+    units = pl.concat(frames, how="vertical_relaxed").with_row_index("n")
+    low, high = date(1, 1, 1), date(9999, 12, 31)
+    units = units.with_columns(pl.col("valid_from").fill_null(low), pl.col("valid_to").fill_null(high))
+    repeated = units.filter(pl.len().over("scheme_code", "code") > 1)
+    pairs = (
+        repeated.join(repeated, on=["scheme_code", "code"], suffix="_b")
+        .filter(
+            (pl.col("n") < pl.col("n_b"))
+            & (pl.col("valid_from") < pl.col("valid_to_b"))
+            & (pl.col("valid_from_b") < pl.col("valid_to"))
+        )
+        .sort("scheme_code", "code", "n")
+    )
+    return [
+        f"{row['package']}: ready.unit_twice: reporting unit {row['scheme_code']} {row['code']} from "
+        f"{row['valid_from']} is declared again by {row['package_b']}"
+        + (" under another id" if row["id"] != row["id_b"] else "")
+        + "; emit it from one package and list it as external in the others"
+        for row in pairs.head(20).iter_rows(named=True)
+    ] + ([f"ready.unit_twice: {pairs.height:,} repeated units in all"] if pairs.height > 20 else [])
+
+
 def readiness(keys: list[str], reference: Path | None = None) -> None:
     minted = _minted(_resolve(key) for key in keys)
     if reference is not None:
@@ -2170,6 +2219,7 @@ def readiness(keys: list[str], reference: Path | None = None) -> None:
     else:
         with store.connect() as conn:
             found = [f"{key}: {problem}" for key in keys for problem in _ready(conn, key, set(keys), minted)]
+    found += _declared_twice(keys)
     for line in found:
         print(line, flush=True)
     if found:
