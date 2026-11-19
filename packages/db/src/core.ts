@@ -3250,7 +3250,7 @@ export const rowDrop = pgTable("row_drop", {
 		name: "row_drop_changeset_id_fkey"
 	}),
 	index("row_drop_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
-check("row_drop_key_check", sql`((jsonb_typeof(key) = 'object'::text) AND (key <> '{}'::jsonb))`),check("row_drop_reason_check", sql`(reason <> ''::text)`),check("row_drop_relation_check", sql`(relation = ANY (ARRAY['citation'::text, 'label'::text, 'party_color'::text, 'party_image'::text, 'person_image'::text, 'translation'::text, 'alliance_member'::text, 'candidacy_nomination'::text, 'government_party'::text, 'tenure_affiliation'::text, 'area_event_member'::text, 'party_relation'::text, 'party_affiliation'::text, 'source_artifact'::text]))`),]);
+check("row_drop_key_check", sql`((jsonb_typeof(key) = 'object'::text) AND (key <> '{}'::jsonb))`),check("row_drop_reason_check", sql`(reason <> ''::text)`),check("row_drop_relation_check", sql`(relation = ANY (ARRAY['citation'::text, 'label'::text, 'party_color'::text, 'party_image'::text, 'person_image'::text, 'translation'::text, 'alliance_member'::text, 'candidacy_nomination'::text, 'government_party'::text, 'tenure_affiliation'::text, 'area_event_member'::text, 'party_relation'::text, 'party_affiliation'::text, 'source_artifact'::text, 'area_geometry'::text, 'area_parent'::text, 'polity_parent'::text, 'polity_territory'::text, 'party_position'::text, 'flag'::text, 'unit_area_drop'::text, 'contest'::text, 'reporting_unit'::text]))`),]);
 
 export const scheme = pgTable("scheme", {
 	code: text().primaryKey(),
