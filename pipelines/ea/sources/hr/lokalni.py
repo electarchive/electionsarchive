@@ -725,6 +725,8 @@ SHAPE_ALIASES = {
     "opicina pirovac": "pirovac",
 }
 BOUNDARIES_FROM = date(2013, 1, 1)
+# The State Geodetic Administration's shapes (hr.granice) take over from the 2021 census units.
+BOUNDARIES_TO = date(2021, 1, 1)
 
 
 def _shape(feature: dict[str, object]) -> shapely.Geometry:
@@ -739,6 +741,7 @@ def _geometry(p: Package, area: str, shape: shapely.Geometry, source: str) -> No
         "area_geometry",
         area_id=area,
         valid_from=BOUNDARIES_FROM,
+        valid_to=BOUNDARIES_TO,
         geom=shapely.to_wkb(shape, hex=True, include_srid=True),
         label_point=shapely.to_wkb(
             shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
