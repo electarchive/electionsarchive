@@ -2553,6 +2553,11 @@ def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | Non
                 ),
                 {"id": changeset_id},
             )
+            conn.execute(
+                """update entity e set changeset_id = s.changeset_id from source s
+                   where e.id = s.id and e.changeset_id = %(id)s and s.changeset_id <> %(id)s""",
+                {"id": changeset_id},
+            )
         restored: list[str] = []
         for table in histories:
             history = sql.Identifier(f"{table}_history")
