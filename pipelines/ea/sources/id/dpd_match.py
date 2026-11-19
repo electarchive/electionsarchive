@@ -62,6 +62,17 @@ TITLES = {
     "hi",
     "tgh",
 }
+DEGREES = {
+    "s", "sos", "si", "m", "se", "sh", "mm", "mh", "msi", "mpd", "spd", "skm", "mkes", "st", "mt", "mba", "ma",
+    "msc", "phd", "sp", "kom", "ssi", "sag", "mhum", "mp", "kes", "mkom", "sip", "ssos", "sy", "lc", "mag", "mpa",
+}  # fmt: skip
+SPELLING = {"muh": "muhammad", "mohammad": "muhammad", "bactiar": "bakhtiar"}
+ALIASES = {
+    ("sultan", "bakhtiar"): ("sultan", "bakhtiar", "najamudin"),
+    ("sultan", "b", "najamudin"): ("sultan", "bakhtiar", "najamudin"),
+}
+# Two Wikidata items of one name, settled by hand: the older one holds the membership and the candidacies
+PINS: dict[tuple[str, ...], str] = {("novita", "anakotta"): "Q109541898"}
 DPD = "Q21328635"
 DCT_2024 = "Q123724130"
 QUERY = """SELECT ?name ?item ?description ?pos WHERE {{ VALUES ?name {{ {names} }}
@@ -83,15 +94,22 @@ class Run(NamedTuple):
     won: bool
 
 
+def words(text: str) -> list[str]:
+    folded = "".join(c for c in unicodedata.normalize("NFKD", text.lower()) if not unicodedata.combining(c))
+    found = re.findall(r"[a-z]+", re.sub(r"\bk\.\s*h\.", "kh ", folded.replace("'", "").replace("`", "")))
+    return [SPELLING.get(word, word) for word in found]
+
+
 def core(printed: str) -> tuple[str, ...]:
-    for text in re.sub(r"\(.*?\)", " ", printed).split(","):
-        folded = "".join(c for c in unicodedata.normalize("NFKD", text.lower()) if not unicodedata.combining(c))
-        words = re.findall(r"[a-z]+", re.sub(r"\bk\.\s*h\.", "kh ", folded.replace("'", "").replace("`", "")))
-        while words and words[0] in TITLES:
-            words.pop(0)
-        if words:
-            return tuple(words)
-    return ()
+    parts = [words(text) for text in re.sub(r"\(.*?\)", " ", printed).split(",")]
+    parts = [part for part in parts if any(word not in TITLES | DEGREES for word in part)]
+    # "SURNAME, GIVEN" (2009) lists the given names last; degrees after a comma were dropped above
+    found = [word for part in reversed(parts) for word in part]
+    while found and found[0] in TITLES:
+        found.pop(0)
+    while len(found) > 2 and found[-1] in DEGREES:
+        found.pop()
+    return ALIASES.get(tuple(found), tuple(found))
 
 
 def runs(conn: Connection) -> list[Run]:
@@ -337,6 +355,12 @@ def emit() -> Path:
                 for item, evidence in labeled.get(key, {}).items()
                 if evidence - ({"candidate-2024"} if run.day.year != 2024 else set())
             }
+            if key in PINS:
+                items = {PINS[key]}
+            if len(items) > 1 and crowd[run.day, key] == 1:
+                members = {item for item in items if "held" in labeled.get(key, {}).get(item, set())}
+                if len(members) == 1:
+                    items = members
             if not items:
                 items = {
                     item
