@@ -852,7 +852,7 @@ def run() -> str:
         notes = [f"{len(ids):,} entities without a Latin-script name, {len(names):,} names generated"]
         notes += [f"published {id} ({what})" for id, what in published]
         notes += [f"held {id}: {why}" for id, why in held_back]
-        notes.append(f"{len(queue):,} names wait for the model step (ea names model on the Mac)")
+        notes.append(f"{len(queue):,} names wait for the model step (ea-names-model.timer)")
         return "; ".join(notes)
 
 
