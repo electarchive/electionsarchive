@@ -352,21 +352,33 @@ def party(name: str) -> str:
     return str(uuid5(package.NAMESPACE, f"{SOURCE}\x1fparty\x1f{name}"))
 
 
+def person(name: str) -> str:
+    """One id for a candidate for president, the same in every year they stood."""
+    return str(uuid5(package.NAMESPACE, f"{SOURCE}\x1fperson\x1f{name}"))
+
+
 def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
-        "The lists on the ballot in Molise's 2018 and 2023 regional elections",
+        "The lists and the candidates for president on the ballot in Molise's 2018 and 2023 regional elections",
     )
     p.external.add(MOLISE)
     names: dict[str, None] = {}
+    people: dict[str, None] = {}
     for year, held in HELD.items():
         for url in links(held):
             p.uses(raw.cached(CACHE, url))
-        names.update(dict.fromkeys(read(year).list_totals))
+        count = read(year)
+        names.update(dict.fromkeys(count.list_totals))
+        people.update(dict.fromkeys(count.candidate_totals))
     for name in sorted(names):
         p.add("party", id=party(name), kind="party", polity_id=MOLISE)
         p.name(party(name), LIST_NAMES.get(name) or cased(name), "it", "official")
+    for name in sorted(people):
+        p.add("person", id=person(name))
+        surname, forename = SPLIT.get(name) or name.split(" ", 1)
+        p.name(person(name), f"{cased(forename)} {cased(surname)}", "it", "official")
     return p
 
 
@@ -418,7 +430,7 @@ def election(year: int) -> Package:
     p.add("slug", path=path, entity_id=election, is_current=True)
 
     def result_set(contest: str, note: str) -> str:
-        id = p.id("result_set", contest)
+        id = p.id("result_set", year, contest)
         p.add(
             "result_set",
             id=id,
@@ -431,7 +443,7 @@ def election(year: int) -> Package:
             is_default=True,
             completeness=1.0,
         )
-        p.add("note", id=p.id("note", id), entity_id=id, kind="methodology", body_md=note, lang="en")
+        p.add("note", id=p.id("note", year, id), entity_id=id, kind="methodology", body_md=note, lang="en")
         return id
 
     values: list[dict[str, object]] = []
@@ -450,7 +462,7 @@ def election(year: int) -> Package:
             }
         )
 
-    council = p.id("contest", "council")
+    council = p.id("contest", year, "council")
     p.add(
         "contest",
         id=council,
@@ -463,12 +475,12 @@ def election(year: int) -> Package:
     )
     p.name(council, f"{year} Molise regional election, council lists", "en", "official")
     p.add("slug", path=f"{path}/consiglio", entity_id=council, is_current=True)
-    p.add("note", id=p.id("note", council), entity_id=council, kind="context", body_md=held.allocated, lang="en")
+    p.add("note", id=p.id("note", year, council), entity_id=council, kind="context", body_md=held.allocated, lang="en")
     lists = result_set(council, held.counted)
     if held.seats and (sum(held.seats.values()) != SIZE or not set(held.seats) <= set(count.list_totals)):
         raise ValueError(f"{year}: seats do not match the lists or the council")
     for position, name in enumerate(sorted(count.list_totals, key=lambda n: (-count.list_totals[n], n)), 1):
-        option = p.id("option", "list", name)
+        option = p.id("option", year, "list", name)
         p.add("contest_option", id=option, contest_id=council, kind="list", party_id=party(name), ballot_label=name)
         if held.seats.get(name):
             p.add("outcome", result_set_id=lists, option_id=option, kind="won", seats=held.seats[name])
@@ -478,7 +490,7 @@ def election(year: int) -> Package:
     for unit, valid in count.list_valid.items():
         value(lists, unit, None, VALID, valid)
 
-    race = p.id("contest", "president")
+    race = p.id("contest", year, "president")
     p.add(
         "contest",
         id=race,
@@ -491,21 +503,17 @@ def election(year: int) -> Package:
     )
     p.name(race, f"{year} Molise regional election, President", "en", "official")
     p.add("slug", path=f"{path}/presidente", entity_id=race, is_current=True)
-    p.add("note", id=p.id("note", race), entity_id=race, kind="context", body_md=DIRECT, lang="en")
+    p.add("note", id=p.id("note", year, race), entity_id=race, kind="context", body_md=DIRECT, lang="en")
     running = result_set(race, held.counted)
     top = max(count.candidate_totals.values())
     winners = [name for name, votes in count.candidate_totals.items() if votes == top]
     if len(winners) != 1 or (held.elected is not None and winners != [held.elected]):
         raise ValueError(f"{year}: the candidate with the most votes is {winners}, not {held.elected}")
     for name in sorted(count.candidate_totals, key=lambda n: (-count.candidate_totals[n], n)):
-        option = p.id("option", "president", name)
+        option = p.id("option", year, "president", name)
         p.add("contest_option", id=option, contest_id=race, kind="candidate", ballot_label=name)
-        person = p.id("person", name)
-        p.add("person", id=person)
-        surname, forename = SPLIT.get(name) or name.split(" ", 1)
-        p.name(person, f"{cased(forename)} {cased(surname)}", "it", "official")
-        candidacy = p.id("candidacy", "president", name)
-        p.add("candidacy", id=candidacy, person_id=person, option_id=option, role="head", ballot_name=name)
+        candidacy = p.id("candidacy", year, "president", name)
+        p.add("candidacy", id=candidacy, person_id=person(name), option_id=option, role="head", ballot_name=name)
         if name == winners[0]:
             p.add("outcome", result_set_id=running, option_id=option, kind="elected")
         for (unit, who), votes in count.candidates.items():
