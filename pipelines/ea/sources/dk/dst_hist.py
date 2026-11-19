@@ -10,6 +10,7 @@ from collections import Counter
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
+from pathlib import Path
 from uuid import uuid5
 
 from ea import package, raw, scan
@@ -89,6 +90,7 @@ class Unit:
     answers: list[tuple[int, int]]  # (yes, no) per question
     cast: int | None = None
     invalid: int | None = None
+    scheme: str = SCHEME
     where: dict[tuple[str | None, int], tuple[int, Box]] = field(default_factory=dict)  # (option, measure) -> page, box
 
 
@@ -110,6 +112,7 @@ class Vote:
     totals: dict[str, int]  # the printed national figures: registered, valid, and yes/no per question
     pages: str = ""
     scanned: bool = False
+    reading: str = ""
 
 
 def modern(volume: str, votes: tuple[str, str], ballots: tuple[str, str]) -> tuple[list[Unit], dict[str, int]]:
@@ -241,7 +244,7 @@ def election(vote: Vote) -> Package:
         f"The {vote.day} Danish referendum by nomination district",
         depends=[f"{SOURCE}/registry"],
     )
-    p.external.update({DENMARK, SCHEME})
+    p.external.update({DENMARK, SCHEME, *(unit.scheme for unit in vote.units)})
     source = volume_source(vote.volume)
     stored = raw.cached(SOURCE, FILES[vote.volume])
     artifact = p.artifact(stored, source)
@@ -260,7 +263,7 @@ def election(vote: Vote) -> Package:
             "reporting_unit",
             id=uid,
             polity_id=DENMARK,
-            scheme_code=SCHEME,
+            scheme_code=unit.scheme,
             code=f"{vote.day}:{unit.group}:{unit.number}",
             area_relation="unlocated",
             area_id=None,
@@ -301,7 +304,7 @@ def election(vote: Vote) -> Package:
             id=key("note", result_set),
             entity_id=result_set,
             kind="methodology",
-            body_md=METHOD + (SCAN_METHOD if vote.scanned else ""),
+            body_md=METHOD + (SCAN_METHOD if vote.scanned else "") + vote.reading,
             lang="en",
         )
         options = {}
@@ -431,6 +434,7 @@ def votes() -> list[Vote]:
         found.append(Vote(volume, day, english, danish, [Question("question", english, danish)], units, totals))
     for volume, day in SCANNED.items():
         found.append(scanned(volume, day))
+    found.append(printed_1986())
     return found
 
 
@@ -452,7 +456,9 @@ def scanned(volume: str, day: date) -> Vote:
             (None, CAST): (node.ballots.page, node.ballots.boxes[1]),
             (None, INVALID): (node.ballots.page, node.ballots.boxes[3]),
         }
-        units.append(Unit(county, str(number), name, registered, valid, [(yes, no)], ballots[1], ballots[3], where))
+        units.append(
+            Unit(county, str(number), name, registered, valid, [(yes, no)], ballots[1], ballots[3], where=where)
+        )
     registered, valid, yes, no = root.votes.values
     totals = {
         "registered": registered,
@@ -528,11 +534,17 @@ def emit() -> None:
 # the tables print: yes plus no make the valid votes, the percentages follow from the counts, a district's
 # polling areas add up to the district, and the districts add up to the county and to the country.
 
+DAY_1986 = date(1986, 2, 27)
+FILE_1986 = Path(__file__).with_name("dst_hist_1986.tsv")
 SCANNED = {"1992": date(1992, 6, 2), "1993": date(1993, 5, 18)}
 VOTE_PAGES = range(8, 18)  # table 7: registered, valid, yes, no
 BALLOT_PAGES = range(18, 28)  # table 9: registered, ballots cast, invalid, valid
 SHAPES = {7: 8, 9: 10}  # numeric cells printed per row of each table
 FLIP = {"0": "86", "1": "7", "2": "7", "3": "85", "5": "63", "6": "58", "7": "12", "8": "035", "9": "4"}
+TITLE_1986 = (
+    "1986 advisory referendum on the European Community package (Single European Act)",
+    "Den vejledende folkeafstemning den 27. februar 1986 om Danmarks tiltrædelse af EF-pakken (Europæisk Fælles Akt)",
+)
 SCANNED_TITLES = {
     "1992": (
         "1992 referendum on the Treaty on European Union",
@@ -938,3 +950,120 @@ def districts(volume: str) -> list[tuple[str, int, str, Node]]:
             pending.append(node)
     flush()
     return found
+
+
+# The 1986 volume (Statistiske Efterretninger 1986:5) prints its Table I on pages 6 to 14 of a scan with a poor text
+# layer. The table's rows are kept in dst_hist_1986.tsv: one line per printed row, with the kind of row, its name, the
+# page, the nine counts, and the box in which each count is printed at 300 dpi. Each count was read twice, from the
+# scan's text layer and from a character recognition of the page image, and settled by the arithmetic the table
+# prints (ballots cast are valid plus invalid, invalid are blank plus other, valid are yes plus no, and the printed
+# percentages follow from the counts). The rows are then checked here: the units add up to their nomination district,
+# the districts to the county or metropolitan constituency, these to the three regions, and the regions to the country.
+
+KINDS_1986 = ("total", "region", "amt", "kreds", "leaf")
+METROPOLITAN = ("Søndre storkreds", "Østre storkreds", "Vestre storkreds")
+COUNTS_1986 = 9  # registered, cast, letter votes, invalid, blank, other, valid, yes, no
+
+
+@dataclass
+class Line:
+    kind: str
+    name: str
+    page: int
+    values: tuple[int, ...]
+    boxes: tuple[Box, ...]
+
+
+def table_1986() -> list[Line]:
+    lines: list[Line] = []
+    for row in FILE_1986.read_text(encoding="utf-8").splitlines():
+        cells = row.split("\t")
+        values = tuple(int(c) for c in cells[3 : 3 + COUNTS_1986])
+        boxes = tuple(
+            (int(b[0]), int(b[1]), int(b[2]), int(b[3]))
+            for b in (c.split(":") for c in cells[3 + COUNTS_1986 : 3 + 2 * COUNTS_1986])
+        )
+        lines.append(Line(cells[0], cells[1], int(cells[2]), values, boxes))
+    return lines
+
+
+def nest_1986(lines: list[Line]) -> list[tuple[Line, list[Line]]]:
+    """Each row that has others nested under it, with those rows, failing unless the counts add up."""
+    levels = [KINDS_1986.index(line.kind) for line in lines]
+    found: list[tuple[Line, list[Line]]] = []
+    for index, line in enumerate(lines):
+        children: list[Line] = []
+        for later in range(index + 1, len(lines)):
+            if levels[later] <= levels[index]:
+                break
+            if levels[later] == levels[index] + 1:
+                children.append(lines[later])
+        if children:
+            found.append((line, children))
+            for position, value in enumerate(line.values):
+                total = sum(child.values[position] for child in children)
+                if total != value:
+                    raise ValueError(
+                        f"1986 {line.name} p{line.page}: count {position} prints {value}, rows under it add to {total}"
+                    )
+    return found
+
+
+def printed_1986() -> Vote:
+    """The 1986 advisory referendum, by municipality, polling area in Copenhagen and Frederiksberg, and district."""
+    lines = table_1986()
+    nest_1986(lines)
+    units: list[Unit] = []
+    county = kreds = ""
+    kreds_at = leaf_at = 0
+    for line in lines:
+        if line.kind == "amt":
+            county = line.name
+        elif line.kind == "kreds":
+            kreds, kreds_at, leaf_at = line.name, kreds_at + 1, 0
+        elif line.kind == "leaf":
+            leaf_at += 1
+            registered, cast, _letter, invalid, _blank, _other, valid, yes, no = line.values
+            if county in METROPOLITAN:
+                scheme, name = "dk.afstemningsomraade", f"{line.name} ({kreds} kreds)"
+            elif line.name.endswith(", del af"):
+                scheme, name = SCHEME, f"{line.name} ({kreds} kreds)"
+            else:
+                scheme, name = "dk.kommune", line.name
+            where: dict[tuple[str | None, int], tuple[int, Box]] = {
+                (None, REGISTERED): (line.page, line.boxes[0]),
+                (None, CAST): (line.page, line.boxes[1]),
+                (None, INVALID): (line.page, line.boxes[3]),
+                (None, VALID): (line.page, line.boxes[6]),
+                ("yes", VOTES): (line.page, line.boxes[7]),
+                ("no", VOTES): (line.page, line.boxes[8]),
+            }
+            units.append(
+                Unit(
+                    county, f"{kreds_at}.{leaf_at}", name, registered, valid, [(yes, no)], cast, invalid, scheme, where
+                )
+            )
+    top = lines[0].values
+    totals = {
+        "registered": top[0],
+        "cast": top[1],
+        "invalid": top[3],
+        "valid": top[6],
+        "yes0": top[7],
+        "no0": top[8],
+    }
+    english, danish = TITLE_1986
+    check("1986", units, totals)
+    reading = (
+        " The volume is a scan. Table I prints the voters and votes of each municipality, of each polling area of "
+        "Copenhagen and Frederiksberg, and of each nomination district that holds only part of a municipality. Each "
+        "figure was read twice, from the scan's embedded text and by optical character recognition, and settled by the "
+        "arithmetic the table prints: yes and no add up to the valid votes, valid and invalid votes to the votes "
+        "cast, and the printed percentages follow from the counts. The units add up to each nomination district, the "
+        "districts to the county or metropolitan constituency, these to the three regions, and the regions to the "
+        "national figures printed in Table 1. Each figure is stored with the page and the box where it is printed. "
+        "The referendum was advisory."
+    )
+    return Vote(
+        "1986", DAY_1986, english, danish, [Question("question", english, danish)], units, totals, reading=reading
+    )
