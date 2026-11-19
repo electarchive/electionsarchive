@@ -22,6 +22,9 @@ from ea.store import DATA, connect
 
 SOURCE = "de.landtag"
 VERSION = "5"
+# The changesets this pipeline published before packages: the first de.landtag/all package adopts them, so its load
+# takes over their rows (Thuringia's constituency outlines among them) instead of clashing with them.
+ADOPTS = ["01a1dc05-d0ac-7577-a355-7ec53e090e92"]
 PARSED = DATA / "parsed" / SOURCE
 BW = "https://wahlen.statistik-bw.de/ltw26"
 MV = "https://www.laiv-mv.de/static/LAIV/Wahlen/2-Landtagswahlen/2026/Ergebnisse"

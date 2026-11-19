@@ -2667,6 +2667,9 @@ class Draft(Changeset):
             )
         }
         self.accepted: dict[str, str] = {}
+        # Changesets the package takes over besides the pipeline's published ones the database lists, so a build
+        # without a database still names them and `ready.area_geometry` counts their outlines as its own.
+        self.adopts: list[str] = []
 
     def accept(self, code: str, reason: str) -> None:
         self.accepted[code] = reason
@@ -2915,6 +2918,7 @@ class Draft(Changeset):
                     _trim(table, out / f"{table}.parquet")
                 counts[table] = carried.height
         owned, artifacts = _adopted(self.conn, pipeline)
+        owned = sorted({*owned, *self.adopts})
         new = tables.get("source_artifact")
         _seal(
             key,
