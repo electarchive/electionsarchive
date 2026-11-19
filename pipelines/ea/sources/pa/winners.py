@@ -50,15 +50,26 @@ def cell_number(cell: object) -> int | None:
 # 2024 workbooks --------------------------------------------------------------------------------------------------
 
 
-def xlsx_deputies(grid: list[list[object]]) -> list[Place]:
+# The columns of Cuadro 6 holding the circuit code, its type, and each deputy's name, votes, party, and how the seat
+# was won. The 2004 and 2019 tables print a column of the circuit's voters before the code; 2019 adds a valid-votes
+# column before the names.
+DEPUTY_COLUMNS_2024 = (0, 1, 7, 8, 10, 11)
+DEPUTY_COLUMNS_2019 = (1, 2, 8, 9, 11, 12)
+DEPUTY_COLUMNS_2004 = (1, 2, 7, 8, 10, 11)
+
+
+def xlsx_deputies(grid: list[list[object]], columns: tuple[int, ...] = DEPUTY_COLUMNS_2024) -> list[Place]:
     """Cuadro 6: the deputies proclaimed in each circuit, with how each won the seat."""
+    at_code, at_kind, at_name, at_votes, at_party, at_how = columns
     places: dict[str, Place] = {}
     code = kind = ""
     for row in grid:
-        cells = [*row, *([None] * 12)]
-        if re.fullmatch(r"\d+\.\d+", cell_text(cells[0])):
-            code, kind = cell_text(cells[0]), cell_text(cells[1])
-        name, votes = cell_text(cells[7]), cell_number(cells[8])
+        cells = [*row, *([None] * 14)]
+        if re.fullmatch(r"\d+\.\d+", cell_text(cells[at_code])):
+            code, kind = cell_text(cells[at_code]), cell_text(cells[at_kind])
+            if code in places:
+                code += "0"  # a code stored as a number: circuit 8.10 reads as 8.1, after 8.9
+        name, votes = cell_text(cells[at_name]), cell_number(cells[at_votes])
         if not code or not name or votes is None:
             continue
         place = places.get(code)
@@ -68,7 +79,7 @@ def xlsx_deputies(grid: list[list[object]]) -> list[Place]:
                 raise ValueError(f"circuit {code}: unknown type {kind!r}")
             seats = int(match[2]) if match[2] else 1
             place = places[code] = Place((code,), [], seats, match[1])
-        place.winners.append(Winner(name, cell_text(cells[10]), votes, cell_text(cells[11]) or None))
+        place.winners.append(Winner(name, cell_text(cells[at_party]), votes, cell_text(cells[at_how]) or None))
     return list(places.values())
 
 
@@ -91,17 +102,32 @@ def xlsx_representatives(grid: list[list[object]], is_province: Callable[[str, i
     """Cuadro 13: the representative proclaimed in each corregimiento, under its province and district.
 
     The table prints some districts flush left, so a line with no candidate is a province only when `is_province`
-    says so for its text and indent. A comarca's corregimientos with no district line carry an empty district.
+    says so for its text and indent. A comarca's corregimientos with no district line carry an empty district, and a
+    comarca printed flush left with its own representative (the Kuna comarcas of 2004 and 2019) is its own
+    corregimiento. A corregimiento with no proclamation (2004) lists its candidates on the lines below it, the last of
+    them beside the next district's name.
     """
     places: list[Place] = []
     province = district = ""
+    unproclaimed: int | None = None  # the indent of a corregimiento whose candidates follow, none proclaimed
     for row in grid:
         cells = [*row, *([None] * 4)]
         label = "" if cells[0] is None else str(cells[0]).replace("\xa0", " ").rstrip()
         if not label.strip():
             continue
+        indent = len(label) - len(label.lstrip())
         name, votes = cell_text(cells[1]), cell_number(cells[3])
-        if name and votes is not None:
+        if name.upper().startswith("SIN PROCLAMACI"):
+            unproclaimed = indent
+            continue
+        if unproclaimed is not None:
+            if indent < unproclaimed and name:
+                name, votes = "", None
+                cells = [cells[0], None, None, None]
+            unproclaimed = None
+        if name and votes is not None and indent == 0 and clean(label).lower().startswith("comarca"):
+            places.append(Place((clean(label), "", clean(label)), [Winner(name, cell_text(cells[2]), votes)]))
+        elif name and votes is not None:
             places.append(Place((province, district, clean(label)), [Winner(name, cell_text(cells[2]), votes)]))
         elif not name and not cell_text(cells[2]) and not cell_text(cells[3]):
             if is_province(clean(label), len(label) - len(label.lstrip())):
@@ -300,12 +326,11 @@ def pdf_list(lines: list[str], place: str) -> list[Place]:
 def xlsx_party_seats(grid: list[list[object]]) -> dict[str, int]:
     """The seats each party won, from the 2024 table of seats by party and proclamation type."""
     seats: dict[str, int] = {}
-    for row in grid:
-        cells = [*row, *([None] * 5)]
-        label, won = cell_text(cells[0]), cell_number(cells[3])
-        if not label or won is None or label.lower() == "total":
+    lines = [(cell_text(row[0]) if row else "", cell_number([*row, None, None, None, None][3])) for row in grid]
+    for (label, won), (after, after_won) in zip(lines, [*lines[1:], ("", None)], strict=True):
+        if not label or won is None or label.lower() in ("total", "totales"):
             continue
-        if label.startswith("*") and "libre" not in label.lower():
+        if label.startswith("*") and after and not after.startswith("*") and after_won is not None:
             continue  # an alliance's line; its parties follow
         seats[clean(label.strip("* "))] = won
     return seats
@@ -338,3 +363,17 @@ def pdf_president(lines: list[str]) -> tuple[Winner, Winner | None]:
     if head is None or not party:
         raise ValueError("no president in the list")
     return Winner(head, party, None), Winner(mate, party, None) if mate else None
+
+
+def pdf_president_list(lines: list[str]) -> tuple[Winner, Winner | None]:
+    """The president and vice president from the Tribunal's 2019 list of winners, which prints the names they ran
+    under and the parties that postulated them."""
+    head = mate = None
+    for line in lines:
+        if match := re.match(r"\s*PRESIDENTE\s{2,}(.+?)\s{2,}(.+?)\s*$", line):
+            head = Winner(clean(match[1]), clean(match[2]).replace(" ,", ","), None)
+        elif match := re.match(r"\s*VICEPRESIDENT[EA]\s{2,}(.+?)\s{2,}(.+?)\s*$", line):
+            mate = Winner(clean(match[1]), clean(match[2]).replace(" ,", ","), None)
+    if head is None:
+        raise ValueError("no president in the list")
+    return head, mate
