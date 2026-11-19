@@ -111,6 +111,7 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
     "area_event_member": (None, {"event_id": U, "area_id": U, "role": U}),
     "body": (("id",), {"id": U, "polity_id": U, "kind": U}),
     "office": (("id",), {"id": U, "polity_id": U, "body_id": U, "kind": U}),
+    "body_size": (None, {"body_id": U, "seats": I32, "valid_from": D, "valid_to": D}),
     "electoral_system": (
         ("id",),
         {"id": U, "polity_id": U, "valid_from": D, "valid_to": D, "rules": U, "rules_version": I32},
@@ -278,6 +279,10 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
         },
     ),
     "ballot_question": (None, {"contest_id": U, "type": U}),
+    "ballot_question_text": (
+        ("id",),
+        {"id": U, "contest_id": U, "kind": U, "lang": U, "body": U, "url": U, "source_id": U, "locator": U},
+    ),
     "entity_retirement": (None, {"entity_id": U, "reason": U}),
 }
 FACT = ("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round")
@@ -749,6 +754,9 @@ REFERENCES = [
     ("party_affiliation", "party_id", "party"),
     ("party_affiliation", "parent_party_id", "party"),
     ("ballot_question", "contest_id", "contest"),
+    ("ballot_question_text", "contest_id", "contest"),
+    ("ballot_question_text", "source_id", "source"),
+    ("body_size", "body_id", "body"),
 ]
 TARGET_KEY = {"scheme": "code", "polity": "id"}
 OUTSIDE = ("seat",)
@@ -2619,6 +2627,7 @@ def _text(value: object) -> str | None:
 # rows on its own survivors as they stand. It also carries the pipeline's own non-preferred names: the changeset path
 # keeps a name a later emit demoted as an alias rather than deleting it.
 REDIRECTED = ("name", "slug")
+GEOMETRY_COLUMNS = ("geom", "label_point")
 
 
 class Draft(Changeset):
@@ -2825,6 +2834,7 @@ class Draft(Changeset):
             [[json.dumps(value) if isinstance(value, dict | list) else value for value in row] for row in rows],
             schema=list(schema),
             orient="row",
+            infer_schema_length=None,
         )
         return frame.select(_column(frame, name, kind, None) for name, kind in schema.items()).with_columns(
             pl.col(name).map_elements(canonical, return_dtype=pl.String) for name in schema if name in JSON_COLUMNS
@@ -2870,6 +2880,11 @@ class Draft(Changeset):
                 column for column, kind in schema.items() if kind == F and _type(self.conn, table, column) == "real"
             ]
             final = final.with_columns(pl.col(column).cast(pl.Float32).cast(U).cast(F) for column in reals)
+            # The database gives geometry back as upper-case hex EWKB, so a module's lower-case hex is written the
+            # same way and its rows match the export's.
+            final = final.with_columns(
+                pl.col(column).str.to_uppercase() for column in GEOMETRY_COLUMNS if column in final.columns
+            )
             if table in REDIRECTED:
                 final = final.filter(~pl.col("entity_id").is_in(self.absorbed()))
             carried = self._carry(table, schema)
