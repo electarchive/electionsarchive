@@ -404,7 +404,7 @@ def geo() -> Package:
     )
     p.artifact(raw.cached(SHAPES, SHAPE_URL), sid)
     p.add(
-        "scheme", code=STATE, polity_id=VENEZUELA, kind="administrative", rank=1, noun="state", code_system="iso3166-2"
+        "scheme", code=STATE, polity_id=VENEZUELA, kind="administrative", rank=1, noun="state", code_system="iso_3166_2"
     )
     p.add(
         "scheme",
@@ -413,7 +413,7 @@ def geo() -> Package:
         kind="administrative",
         rank=0,
         noun="country",
-        code_system="iso3166-1",
+        code_system="iso_3166_1",
     )
     p.add(
         "boundary_set",
