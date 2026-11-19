@@ -1,18 +1,14 @@
-import json
 import re
 import subprocess
 import unicodedata
 from datetime import date
 from uuid import uuid5
 
-import shapely
-import shapely.geometry
-
 from ea import package, raw
 from ea.package import Package
+from ea.sources.bo import oep_referendos, places
 
 SOURCE = "bo.oep"
-SHAPES = "bo.geoboundaries"
 PAGE = "https://web.oep.org.bo/elecciones-primarias-2019/"
 UPLOADS = "https://web.oep.org.bo/wp-content/uploads/"
 SEPARATA = UPLOADS + "2019/02/separata_4_resultados_elecciones_primarias_2019.pdf"
@@ -25,10 +21,6 @@ SNAPSHOTS = {
     ACTA: ARCHIVE + "20261012215552id_/" + ACTA,
     CANDIDATES: ARCHIVE + "20260325190207id_/" + CANDIDATES,
 }
-OUTLINES = (
-    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/BOL/ADM1/"
-    "geoBoundaries-BOL-ADM1_simplified.geojson"
-)
 BOLIVIA = str(uuid5(package.NAMESPACE, "polity\x1fBO"))
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fBOL"))
 DEPARTMENT = "bo.departamento"
@@ -46,6 +38,8 @@ DEPARTMENTS = {
     "BO-B": "Beni",
     "BO-N": "Pando",
 }
+# The OEP's department numbers, which the referendum source uses as the department areas' codes.
+DEPARTMENT_NUMBERS = {iso: str(number) for number, iso in enumerate(DEPARTMENTS, 1)}
 # Each ticket, in the order the separata prints them (the date each organization's legal personality was recognized):
 # code, kind, full name, president, vice president, and the national figures the separata prints
 # (registered members, ballots cast, valid, blank, null).
@@ -152,11 +146,11 @@ def _key(kind: str, *parts: object) -> str:
 
 
 def area(code: str) -> str:
-    return _key("area", DEPARTMENT, code)
+    """The referendum source's id for the department with this ISO 3166-2 code."""
+    return oep_referendos.area(DEPARTMENT, DEPARTMENT_NUMBERS[code])
 
 
 SOURCE_ID = _key("source", SOURCE)
-SHAPES_ID = _key("source", SHAPES)
 PRESIDENCY = _key("office", "president")
 SYSTEM = _key("electoral_system", "primaries")
 
@@ -172,7 +166,6 @@ def packages() -> list[str]:
 def fetch() -> None:
     for url, suffix in FILES.items():
         raw.fetch(SOURCE, url, suffix=suffix)
-    raw.fetch(SHAPES, OUTLINES, suffix=".geojson")
 
 
 def parse() -> None:
@@ -257,67 +250,34 @@ def _check_names() -> None:
 
 
 def geo() -> Package:
+    """The 2015 department set and the nine department areas, as the referendum source already loaded them.
+
+    The referendum source owns Bolivia's department boundary set of vintage 2015 and the nine department areas,
+    with their 2015 outlines. This package declares the same boundary set and areas under the same ids, codes, and
+    names, so the load treats them as the rows already there and no department is duplicated. It carries no
+    outlines, because the referendum source's outlines already cover these areas for 2015.
+    """
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "Bolivia's nine departments, with outlines from geoBoundaries",
+        "Bolivia's nine departments, shared with the referendum source's 2015 department set",
     )
-    p.external |= {BOLIVIA, COUNTRY}
-    shapes = raw.cached(SHAPES, OUTLINES)
-    p.add(
-        "source",
-        id=SHAPES_ID,
-        kind="academic",
-        publisher="geoBoundaries",
-        title="geoBoundaries gbOpen Bolivia ADM1 (department outlines, simplified, 2015), derived from GeoBolivia",
-        url="https://www.geoboundaries.org/",
-        license="CC BY 4.0",
-        license_url="https://creativecommons.org/licenses/by/4.0/",
-        attribution="geoBoundaries (William & Mary geoLab); original data from GeoBolivia",
-    )
-    p.artifact(shapes, SHAPES_ID)
-    p.add(
-        "scheme",
-        code=DEPARTMENT,
-        polity_id=BOLIVIA,
-        kind="administrative",
-        rank=1,
-        noun="department",
-        code_system="iso_3166_2",
-    )
+    p.external |= {BOLIVIA, COUNTRY, DEPARTMENT}
     p.add(
         "boundary_set",
-        id=_key("boundary_set", DEPARTMENT, 2015),
+        id=oep_referendos.key("boundary_set", DEPARTMENT, "2015"),
         scheme_code=DEPARTMENT,
         vintage="2015",
-        as_of=shapes.retrieved_at.date(),
+        valid_from=date(2015, 1, 1),
+        as_of=date(2015, 1, 1),
     )
-    outlines = {
-        feature["properties"]["shapeISO"]: shapely.geometry.shape(feature["geometry"])
-        for feature in json.loads(shapes.path.read_text(encoding="utf-8"))["features"]
-    }
-    if set(outlines) != set(DEPARTMENTS):
-        raise ValueError(f"outlines for {sorted(outlines)}, expected {sorted(DEPARTMENTS)}")
-    for code, text in DEPARTMENTS.items():
-        id = area(code)
+    for iso in DEPARTMENTS:
+        code = DEPARTMENT_NUMBERS[iso]
+        id = area(iso)
         p.add("area", id=id, scheme_code=DEPARTMENT)
         p.add("area_code", area_id=id, code=code)
-        p.add("area_kind", area_id=id, kind="department", source_id=SHAPES_ID)
         p.add("area_parent", area_id=id, parent_id=COUNTRY)
-        p.name(id, text, "es", "official")
-        shape = shapely.make_valid(outlines[code])
-        parts = [part for part in shapely.get_parts(shape) if shapely.get_type_id(part) in (3, 6)]
-        shape = shapely.set_srid(shapely.MultiPolygon(list(shapely.get_parts(parts))), 4326)
-        p.add(
-            "area_geometry",
-            area_id=id,
-            geom=shapely.to_wkb(shape, hex=True, include_srid=True),
-            label_point=shapely.to_wkb(
-                shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
-            ),
-            quality="official",
-            source_id=SHAPES_ID,
-        )
+        p.name(id, places.NAMES[code], "es", "official")
     return p
 
 
