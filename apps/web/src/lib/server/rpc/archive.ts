@@ -23664,7 +23664,9 @@ export async function record(input: { id: string; body?: string }) {
     alone as materialized (
       select distinct w.id, c.id as contest, c.election_id, c.body_id
       from winners w join contest c on c.id = w.contest
-      where exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent)
+      left join leads ld on ld.parent = w.id
+      where w.party_id is null and ld.party_id is null
+        and exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent)
     ),
     partisan as materialized (
       select a.id from alone a
