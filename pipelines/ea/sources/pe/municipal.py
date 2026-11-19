@@ -21,7 +21,7 @@ from uuid import uuid4
 import httpx
 
 from ea import raw
-from ea.sources.pe import jne
+from ea.sources.pe import complementaria, jne
 
 SOURCE = "pe.municipal"
 BASE = jne.BASE
@@ -648,7 +648,31 @@ METHOD = (
 
 
 def party(org: str) -> str:
-    return key("party", org)
+    """The party of an Infogob political organization (IdOrgPol). The by-election pipeline, which shares Infogob's
+    organization ids, mints the same id, so each organization is one party under the pe.municipal.orgpol scheme."""
+    return complementaria.party(org)
+
+
+def party_in(p: Package, org: str) -> str:
+    """The party's id, listed as external when the by-election registry writes it."""
+    id = party(org)
+    if org in shared():
+        p.external.add(id)
+    return id
+
+
+@functools.cache
+def shared() -> frozenset[str]:
+    """The organizations the by-election registry already writes, which this registry references instead."""
+    found: set[str] = set()
+    for c in complementaria.contests():
+        for row in complementaria.rows_of(c):
+            org = row.get("IdOrgPol")
+            if org and org not in complementaria.SPECIAL:
+                found.add(str(org))
+        for row in complementaria.electos_of(c):
+            found.add(complementaria.org_of(row))
+    return frozenset(found)
 
 
 def org_of(row: dict[str, object]) -> str:
@@ -718,8 +742,12 @@ def registry() -> Package:
             people.setdefault(person(str(row["TxRutaPolitico"])), []).append(
                 (when, " ".join(str(row["TxCandidato"]).split()))
             )
+    held = shared()
     for org, seen in sorted(names.items()):
         id = party(org)
+        if org in held:
+            p.external.add(id)
+            continue
         p.add("party", id=id, kind="party", polity_id=PERU)
         p.add("external_id", entity_id=id, scheme="pe.municipal.orgpol", value=org)
         latest = max(seen)[1]
@@ -828,25 +856,33 @@ def election_day(when: date) -> Package:
     for e in {c.election.id: c.election for c in here}.values():
         p.artifact(raw.cached(SOURCE, jne.ficha_url(e.id)), INFOGOB)
         p.artifact(cached(partial(e)), INFOGOB)
-    election = key("election", when)
     path = f"pe/{when}-municipal"
-    p.add(
-        "election",
-        id=election,
-        polity_id=PERU,
-        kind=election_kind(when),
-        date_from=when,
-        date_to=when,
-        date_precision="day",
-        status="held",
-    )
-    p.name(election, english_name(when), "en", "official")
-    spanish = sorted(
-        {title(e.flags["nombreEleccion"].split(" - ")[0]) for e in {c.election.id: c.election for c in here}.values()}
-    )
-    for index, text in enumerate(spanish):
-        p.name(election, text, "es", "native", index == 0)
-    p.add("slug", path=path, entity_id=election, is_current=True)
+    if when in complementaria.days():
+        # New districts' first councils elected on a by-election day join that day's election.
+        election = complementaria.key("election", when)
+        p.external.add(election)
+    else:
+        election = key("election", when)
+        p.add(
+            "election",
+            id=election,
+            polity_id=PERU,
+            kind=election_kind(when),
+            date_from=when,
+            date_to=when,
+            date_precision="day",
+            status="held",
+        )
+        p.name(election, english_name(when), "en", "official")
+        spanish = sorted(
+            {
+                title(e.flags["nombreEleccion"].split(" - ")[0])
+                for e in {c.election.id: c.election for c in here}.values()
+            }
+        )
+        for index, text in enumerate(spanish):
+            p.name(election, text, "es", "native", index == 0)
+        p.add("slug", path=path, entity_id=election, is_current=True)
     units: set[str] = set()
     mismatched: Counter[str] = Counter()
     over: Counter[str] = Counter()
@@ -973,7 +1009,7 @@ def _contest(
                 id=id,
                 contest_id=contest,
                 kind="list",
-                party_id=party(org),
+                party_id=party_in(p, org),
                 ballot_label=" ".join(label.split()),
             )
         return options[org]
@@ -1016,7 +1052,7 @@ def _contest(
             option_id=chosen,
             role=role,
             ballot_name=" ".join(str(row["TxCandidato"]).split()),
-            member_of_party_id=party(org_of(row)),
+            member_of_party_id=party_in(p, org_of(row)),
         )
         if role != "substitute":
             seats[chosen] += 1
@@ -1262,7 +1298,7 @@ def onpe_day(p: Package, when: date, here: list[Contest], election: str) -> None
                 "id": key("unit", when, "mesa", mesa),
                 "polity_id": PERU,
                 "scheme_code": MESA,
-                "code": f"{when}:{mesa}",
+                "code": f"{when}:municipal:{mesa}",
                 "area_relation": "within" if inside else "unlocated",
                 "area_id": area(DISTRICT, ubigeo) if inside else None,
                 "kind": "standard",
