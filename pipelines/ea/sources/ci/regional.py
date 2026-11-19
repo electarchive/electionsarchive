@@ -6,17 +6,22 @@ The blocks are laid out by position, so the parser reads word coordinates from t
 assigns candidate rows to regions by walking both in table order until each region's candidate votes equal its own
 printed valid votes.
 
-Each election is one package, `ci.cei/regional-<date>`, with one contest per region. The 21 July 2013 and 2 December
-2023 polls reran regions whose first poll was annulled; each is its own election.
+Each polling day is one package, `ci.cei/regional-<date>`, with one contest per region. The 21 July 2013 and 2 December
+2023 polls reran regions whose first poll was annulled; each is its own election. Municipal councils were elected on
+the same days, and one polling day is one election: where the municipal packages already hold a day's election, the
+regional contests attach to it.
 """
 
 import functools
+import json
 import re
 import subprocess
 import unicodedata
 from dataclasses import dataclass, field
 from datetime import date
 from uuid import uuid5
+
+import shapely
 
 from ea import package, raw
 from ea.package import Package
@@ -436,6 +441,11 @@ REGISTRY = "ci.cei/regional-registry"
 GEO = "ci.cei/geo"
 ALIASES = {"PPACI": "PPA-CI"}
 UNAFFILIATED = {"INDEPENDANT", ""}
+# polling days whose election the municipal packages already hold: one polling day is one election, so the regional
+# packages attach their contests to it and leave its record, names, and slug to those packages
+SHARED_DAYS = {date(2013, 4, 21), date(2018, 10, 13), date(2018, 12, 16), date(2023, 9, 2)}
+# parties the commission's other tables already list under the same label, with the same id
+SHARED_PARTIES = {"AIRD", "FPI", "PDCI-RDA", "PDCI-RDA/PPA-CI", "PPA-CI", "RDR", "REEL.CI", "RHDP", "UDPCI"}
 METHOD = (
     "Counted by the Commission Électorale Indépendante per region, as printed in its results table. Each region "
     "elects its council in one circumscription, from lists that each name a head of list. Registered voters are the "
@@ -448,9 +458,35 @@ def packages() -> list[str]:
     return [GEO, REGISTRY, *(f"ci.cei/regional-{plan.day}" for plan in PLANS)]
 
 
+SHAPES = "ci.geoboundaries"
+SHAPE_URL = (
+    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/main/releaseData/gbOpen/CIV/ADM2/"
+    "geoBoundaries-CIV-ADM2_simplified.geojson"
+)
+SHAPE_SOURCE = key("source", "geoboundaries", "CIV", "ADM2")
+SHAPE_ALIASES = {"ME": "LAME"}  # geoBoundaries drops the article of La Mé
+PLAN_FROM = date(2011, 9, 28)  # the decree that set up the 31 regions
+
+
 def fetch() -> None:
     for url in FILES.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
+    raw.fetch(SHAPES, SHAPE_URL, suffix=".geojson")
+
+
+def shapes() -> dict[str, shapely.Geometry]:
+    """The geoBoundaries outline of each region, by the commission's region code; the two autonomous districts hold no
+    regional council and are left out."""
+    data = json.loads(raw.cached(SHAPES, SHAPE_URL).path.read_text(encoding="utf-8"))
+    by_name = {fold(name): code for code, name in NAMES.items()}
+    out: dict[str, shapely.Geometry] = {}
+    for feature in data["features"]:
+        name = fold(feature["properties"]["shapeName"])
+        code = by_name.get(SHAPE_ALIASES.get(name, name))
+        if code is not None:
+            out[code] = shapely.geometry.shape(feature["geometry"])
+    assert set(out) == set(NAMES), sorted(set(NAMES) - set(out))
+    return out
 
 
 def parse() -> None:
@@ -504,11 +540,40 @@ def geo() -> Package:
     )
     p.external.add(COUNTRY)
     p.add("scheme", code="ci.region", polity_id=COUNTRY, kind="administrative", rank=1, noun="region")
+    p.add(
+        "source",
+        id=SHAPE_SOURCE,
+        kind="aggregator",
+        publisher="geoBoundaries (William & Mary geoLab), from World Bank data",
+        title="Second-level administrative boundaries of Côte d'Ivoire (geoBoundaries gbOpen CIV ADM2, simplified)",
+        url=SHAPE_URL,
+        license="CC BY 4.0",
+        attribution="geoBoundaries gbOpen; World Bank",
+    )
+    p.artifact(raw.cached(SHAPES, SHAPE_URL), SHAPE_SOURCE)
+    outlines = shapes()
     for code, name in NAMES.items():
         id = area(code)
         p.add("area", id=id, scheme_code="ci.region")
         p.add("area_code", area_id=id, code=code)
         p.name(id, name, "fr", "official")
+        parts = [
+            part
+            for part in shapely.get_parts(shapely.make_valid(outlines[code]))
+            if shapely.get_type_id(part) in (3, 6)
+        ]
+        wgs = shapely.set_srid(shapely.MultiPolygon(list(shapely.get_parts(parts))), 4326)
+        p.add(
+            "area_geometry",
+            area_id=id,
+            valid_from=PLAN_FROM,
+            geom=shapely.to_wkb(wgs, hex=True, include_srid=True),
+            label_point=shapely.to_wkb(
+                shapely.set_srid(shapely.point_on_surface(wgs), 4326), hex=True, include_srid=True
+            ),
+            quality="official",
+            source_id=SHAPE_SOURCE,
+        )
     return p
 
 
@@ -537,6 +602,8 @@ def registry() -> Package:
     p.name(BODY, "Regional councils of Côte d'Ivoire", "en", "official")
     p.name(BODY, "Conseils régionaux de Côte d'Ivoire", "fr", "native", False)
     for label in party_labels():
+        if label in SHARED_PARTIES:
+            continue
         id = p.id("party", label)
         p.add("party", id=id, kind="bloc" if "/" in label else "party", polity_id=COUNTRY)
         p.name(id, label, "fr", "abbreviation")
@@ -559,6 +626,39 @@ def put(p: Package, result_set: str, unit: str, option: str | None, measure: int
 
 def sig(region: Region) -> list[tuple[int, str, str, str]]:
     return [(c.score, c.name, c.party, c.list_name) for c in region.candidates]
+
+
+def own_election(p: Package, plan: Plan, election: str, path: str) -> None:
+    """Write the record, names, and slug of an election no other package holds."""
+    main = plan.kind == "local"
+    year = plan.day.year
+    p.add(
+        "election",
+        id=election,
+        polity_id=COUNTRY,
+        kind=plan.kind,
+        date_from=plan.day,
+        date_to=plan.day,
+        status="held",
+        rerun_of_id=p.id("election", plan.rerun_of) if plan.rerun_of else None,
+    )
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    when = f"{plan.day.day} {plan.day.strftime('%B %Y')}"
+    p.name(
+        election,
+        f"{year} Ivorian regional council elections" if main else f"{year} Ivorian regional council poll of {when}",
+        "en",
+        "official",
+    )
+    p.name(
+        election,
+        f"Élection des conseillers régionaux de {year}"
+        if main
+        else f"Élection des conseillers régionaux, scrutin du {plan.day.day:02d}/{plan.day.month:02d}/{year}",
+        "fr",
+        "native",
+        False,
+    )
 
 
 def build(plan: Plan) -> Package:
@@ -591,36 +691,15 @@ def build(plan: Plan) -> Package:
     if revised and plan.revises:
         p.uses(raw.cached(SOURCE, FILES[plan.revises]))
     election = p.id("election", plan.day)
-    main = plan.kind == "local"
     year = plan.day.year
-    p.add(
-        "election",
-        id=election,
-        polity_id=COUNTRY,
-        kind=plan.kind,
-        date_from=plan.day,
-        date_to=plan.day,
-        status="held",
-        rerun_of_id=p.id("election", plan.rerun_of) if plan.rerun_of else None,
-    )
+    p.external.update(p.id("party", label) for label in SHARED_PARTIES)
+    if plan.rerun_of in SHARED_DAYS:
+        p.external.add(p.id("election", plan.rerun_of))
     path = f"ci/{plan.day}-regional"
-    p.add("slug", path=path, entity_id=election, is_current=True)
-    when = f"{plan.day.day} {plan.day.strftime('%B %Y')}"
-    p.name(
-        election,
-        f"{year} Ivorian regional council elections" if main else f"{year} Ivorian regional council poll of {when}",
-        "en",
-        "official",
-    )
-    p.name(
-        election,
-        f"Élection des conseillers régionaux de {year}"
-        if main
-        else f"Élection des conseillers régionaux, scrutin du {plan.day.day:02d}/{plan.day.month:02d}/{year}",
-        "fr",
-        "native",
-        False,
-    )
+    if plan.day in SHARED_DAYS:
+        p.external.add(election)
+    else:
+        own_election(p, plan, election, path)
     for region in regions:
         code = region_code(region)
         name = NAMES[code]
