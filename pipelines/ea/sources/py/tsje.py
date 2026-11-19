@@ -5,7 +5,7 @@ import subprocess
 import unicodedata
 import zipfile
 from collections import Counter
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from datetime import date
 from typing import NamedTuple
 from uuid import uuid5
@@ -256,11 +256,14 @@ def parse() -> None:
     compare2021()
     compare2015()
     compare2008()
+    compare2013()
+    compare2010()
     geo().write()
     registry().write()
     election().write()
     history().write()
-    for build in (vice_2000, general_2008, municipal_2015, general_2018, municipal_2021):
+    memoir_parties().write()
+    for build in (vice_2000, general_2008, municipal_2010, general_2013, municipal_2015, general_2018, municipal_2021):
         build().write()
 
 
@@ -1024,6 +1027,8 @@ MUNICIPAL_2015_FILES = {
     "candidatos": f"{ARCHIVE}/20151119114116id_/http://tsje.gov.py:80/static/ups/docs/archivos/2015/boletines/candidatos-distrito-09-11-2015.xlsx",
 }
 MEMORIA_2008 = f"{ARCHIVE}/20160808124710id_/http://tsje.gov.py/static/ups/libros/pdf/2008_resultados.pdf"
+MEMORIA_2013 = f"{ARCHIVE}/2016id_/http://tsje.gov.py/static/ups/libros/pdf/2013.pdf"
+MEMORIA_2010 = f"{ARCHIVE}/2016id_/http://tsje.gov.py/static/ups/libros/pdf/em-myee-2010.pdf"
 # The Tribunal's district-level file for the 2000 vice-presidential election and the 2011 referendum, as the national open-data portal
 # published it. Only its 2000 rows are read.
 VICE_2000_FILE = (
@@ -1037,6 +1042,8 @@ HISTORY_FILES = {
     MUNICIPAL_2015_FILES["resultados"]: ".pdf",
     MUNICIPAL_2015_FILES["candidatos"]: ".xlsx",
     MEMORIA_2008: ".pdf",
+    MEMORIA_2013: ".pdf",
+    MEMORIA_2010: ".pdf",
     VICE_2000_FILE: ".csv",
 }
 GENERAL_2008 = date(2008, 4, 20)
@@ -1044,7 +1051,17 @@ GENERAL_2018 = date(2018, 4, 22)
 MUNICIPAL_2021 = date(2021, 10, 10)
 VICE_2000 = date(2000, 8, 13)
 MUNICIPAL_2015 = date(2015, 11, 15)
-HISTORY_DAYS = (VICE_2000, GENERAL_2008, MUNICIPAL_2015, GENERAL_2018, MUNICIPAL_2021)
+MUNICIPAL_2010 = date(2010, 11, 7)
+GENERAL_2013 = date(2013, 4, 21)
+HISTORY_DAYS = (
+    VICE_2000,
+    GENERAL_2008,
+    MUNICIPAL_2010,
+    GENERAL_2013,
+    MUNICIPAL_2015,
+    GENERAL_2018,
+    MUNICIPAL_2021,
+)
 ABROAD = 18
 UNIT_KEY = ("dep", "dis", "zona", "local", "mesa")
 OPEN_DATA = "Public official records of the Republic of Paraguay; reuse with the source acknowledged"
@@ -2558,7 +2575,7 @@ def history() -> Package:
 
 
 def history_packages() -> list[str]:
-    return [f"{SOURCE}/history", *(f"{SOURCE}/{day}" for day in HISTORY_DAYS)]
+    return [f"{SOURCE}/history", f"{SOURCE}/memoir-parties", *(f"{SOURCE}/{day}" for day in HISTORY_DAYS)]
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -2624,12 +2641,12 @@ def _column(text: str) -> str:
     return name if re.fullmatch(r"L\d+\(\*\)", name) else name.replace("(*)", "")
 
 
-def _assign(ends: list[int], columns: list[int]) -> list[int] | None:
+def _assign(ends: Sequence[float], columns: Sequence[float]) -> list[int] | None:
     """Place each figure under the header whose right edge is nearest, keeping their order."""
-    k, n, inf = len(ends), len(columns), 10**9
+    k, n, inf = len(ends), len(columns), 10.0**9
     cost = [[inf] * (n + 1) for _ in range(k + 1)]
     take = [[False] * (n + 1) for _ in range(k + 1)]
-    cost[0] = [0] * (n + 1)
+    cost[0] = [0.0] * (n + 1)
     for i in range(1, k + 1):
         for j in range(1, n + 1):
             use = cost[i - 1][j - 1] + abs(ends[i - 1] - columns[j - 1])
@@ -3237,5 +3254,1196 @@ def vice_2000() -> Package:
     p.frame(
         "result_value",
         values.with_columns(channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)),
+    )
+    return p
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The general election of 21 April 2013, from the Tribunal's memoir of that election.
+
+CONTESTS_2013 = {
+    "PRESIDENTE Y VICEPRESIDENTE": "president",
+    "SENADORES": "senate",
+    "PARLAMENTO MERCOSUR": "parlasur",
+    "DIPUTADOS": "deputies",
+    "GOBERNADORES": "governor",
+    "JUNTA DEPARTAMENTAL": "board",
+}
+ORDER_2013 = ("president", "senate", "parlasur", "deputies", "governor")
+HEADING_2013 = re.compile(
+    r"RESULTADOS PARA (PRESIDENTE Y VICEPRESIDENTE|SENADORES|PARLAMENTO MERCOSUR|DIPUTADOS|GOBERNADORES|"
+    r"JUNTA DEPARTAMENTAL)\b",
+    re.IGNORECASE,
+)
+ABROAD_2013 = re.compile(r"^4\.2\.([123]) Resultados")
+HEADER_LINE_2013 = re.compile(r"\s*C?OD\b\.?\s")
+TOTALS_2013 = re.compile(r"^\s*TOTALE?S?\s{2,}([\d-].*)$")
+NOT_COLUMNS_2013 = ("COD.", "COD", "OD.", "DISTRITO", "ZONAS", "ZONA", "PAÍS", "DEPARTAMENTO")
+SKIPPED_2013 = ("PARTICIPACION", "MESAS")
+DEPARTMENT_UNIT = -1  # the district code of a unit that is a whole department
+COUNTRIES_2013 = {"ARGENTINA", "ESPAÑA", "ESTADOS UNIDOS"}
+
+
+class Parsed2013(NamedTuple):
+    districts: dict[tuple[str, int, int], dict[str, int]]  # (contest, dep, dis) -> column -> figure
+    names: dict[tuple[int, int], str]
+    departments: dict[tuple[str, int], dict[str, int]]  # the department rows of a national summary
+    totals: dict[tuple[str, int], dict[str, int]]  # the TOTALES row printed under a department's table
+    national: dict[str, dict[str, int]]
+
+
+def _cells(text: str, offset: int, columns: list[tuple[str, int]], line: str) -> dict[str, int]:
+    """The figures of a 2013 row. Its cells are never blank (a zero is a dash), so a full row is read in order."""
+    found = [0 if m.group(0) == "-" else int(m.group(0).replace(".", "")) for m in FIGURE_2008.finditer(text)]
+    names = [name for name, _ in columns if name != "PARTICIPACION"]
+    if len(found) == len(names):
+        return dict(zip(names, found, strict=True))
+    return _figures(text, offset, columns, line)
+
+
+def _merge(into: dict[str, int], values: dict[str, int], where: str) -> None:
+    for column, value in values.items():
+        if into.setdefault(column, value) != value:
+            raise ValueError(f"{where}: {column} is printed twice with different figures")
+
+
+@functools.cache
+def memoir2013() -> Parsed2013:
+    """The district tables of the 2013 memoir's results chapter, placed under their column headers by position."""
+    deps = {**_dep_codes(), "PRESIDENTE HAYES": 15}
+    districts: dict[tuple[str, int, int], dict[str, int]] = {}
+    names: dict[tuple[int, int], str] = {}
+    departments: dict[tuple[str, int], dict[str, int]] = {}
+    totals: dict[tuple[str, int], dict[str, int]] = {}
+    national: dict[str, dict[str, int]] = {}
+    contest: str | None = None
+    section: str | None = None
+    columns: list[tuple[str, int]] | None = None
+    abroad = zones = False
+    for line in pdf_text(MEMORIA_2013).splitlines():
+        found = HEADING_2013.search(line)
+        if found:
+            contest = CONTESTS_2013[found.group(1).upper()]
+            if contest == "board":
+                contest = None
+            section, columns, zones = None, None, False
+            continue
+        found = ABROAD_2013.match(line)
+        if found:
+            contest = ("president", "senate", "parlasur")[int(found.group(1)) - 1]
+            section, columns, zones, abroad = "EXTERIOR", None, False, True
+            continue
+        if contest is None:
+            continue
+        if HEADER_LINE_2013.match(line):
+            if abroad and "ZONA" in line:
+                columns = None
+                continue
+            line = line.replace("MICABLANCOS", "MICA BLANCOS")
+            heads = [(_column(m.group(0)), m.end()) for m in HEADER_2008.finditer(line)]
+            columns = [(n, e) for n, e in heads if n not in NOT_COLUMNS_2013]
+            zones = "ZONAS" in line
+            continue
+        if columns is not None and re.match(r"\s*(PORCENTAJE|%)", line):
+            columns = None
+            continue
+        text = line.strip()
+        if columns is None:
+            if section is None or not abroad:
+                if normal(text) in deps:
+                    section, abroad = text, False
+                elif normal(text).startswith("RESUMEN A NIVEL"):
+                    section, abroad = "RESUMEN", False
+                elif text and section is None and not text.isdigit():
+                    section = text
+            continue
+        where = f"2013 memoir: {contest} {section}"
+        total = TOTALS_2013.match(line)
+        if total:
+            values = _cells(total.group(1), total.start(1), columns, line)
+            if section == "RESUMEN":
+                _merge(national.setdefault(contest, {}), values, where)
+            elif abroad:
+                _merge(totals.setdefault((contest, 18), {}), values, where)
+            else:
+                dep = deps[normal(section or "")] if not zones or section else 0
+                _merge(totals.setdefault((contest, dep), {}), values, where)
+                if zones:
+                    _merge(districts.setdefault((contest, dep, 0), {}), values, where)
+                    names[(dep, 0)] = "ASUNCION"
+            continue
+        row = ROW_2008.match(line)
+        if row is None or zones:
+            continue
+        code = int(row.group(1))
+        values = _cells(row.group(3), row.start(3), columns, line)
+        if section == "RESUMEN":
+            _merge(departments.setdefault((contest, code), {}), values, where)
+        elif abroad:
+            if row.group(2).strip() not in COUNTRIES_2013:
+                raise ValueError(f"{where}: unexpected abroad row {line.strip()[:60]!r}")
+            _merge(districts.setdefault((contest, 18, code), {}), values, where)
+            names[(18, code)] = clean(row.group(2))
+        else:
+            dep = deps[normal(section or "")]
+            _merge(districts.setdefault((contest, dep, code), {}), values, where)
+            names[(dep, code)] = clean(row.group(2))
+    for (c, dep, dis), values in districts.items():
+        parties = sum(v for k, v in values.items() if k not in META_2008)
+        if parties + values.get("BLANCOS", 0) + values.get("NULOS", 0) != values.get("TOTAL"):
+            raise ValueError(f"2013 memoir: {c} {dep}:{dis} does not add up to its printed total: {values}")
+    # The memoir's table of Concepción's districts for the Senate reports about two thirds of the department's votes
+    # (participation above 100% in several districts) and disagrees with the department row that the national
+    # summary prints, so the department is kept as one unit with the department row's figures.
+    for (contest, dep), printed in sorted(departments.items()):
+        counts: Counter[str] = Counter()
+        for (c, d, _), values in districts.items():
+            if (c, d) == (contest, dep):
+                counts.update({k: v for k, v in values.items() if k not in SKIPPED_2013})
+        if any(counts[k] != v for k, v in printed.items() if k not in SKIPPED_2013):
+            if (contest, dep) != ("senate", 1):
+                raise ValueError(f"2013 memoir: {contest} department {dep} differs from its districts")
+            for key_ in [k for k in districts if k[:2] == (contest, dep)]:
+                del districts[key_]
+            totals.pop((contest, dep), None)
+            districts[(contest, dep, DEPARTMENT_UNIT)] = dict(printed)
+            names[(dep, DEPARTMENT_UNIT)] = "CONCEPCION (DEPARTMENT)"
+    return Parsed2013(districts, names, departments, totals, national)
+
+
+def compare2013() -> dict[str, int]:
+    """Check the district tables against the department rows, the department totals, and the national totals."""
+    memoir = memoir2013()
+    known = set(districts().select("dep", "dis").iter_rows())
+    unknown = {(dep, dis) for _, dep, dis in memoir.districts if dep != ABROAD and dis != DEPARTMENT_UNIT} - known
+    if unknown:
+        raise ValueError(f"2013 memoir: districts without a place in the geography: {sorted(unknown)[:5]}")
+    sums: dict[tuple[str, int], Counter[str]] = {}
+    for (contest, dep, _), values in memoir.districts.items():
+        sums.setdefault((contest, dep), Counter()).update({k: v for k, v in values.items() if k != "PARTICIPACION"})
+    for (contest, dep), counts in sums.items():
+        for printed, what in (
+            (memoir.departments.get((contest, dep)), "department row"),
+            (memoir.totals.get((contest, dep)), "total"),
+        ):
+            if printed is None:
+                continue
+            wrong = {k: (v, counts[k]) for k, v in printed.items() if k not in SKIPPED_2013 and counts[k] != v}
+            if wrong:
+                raise ValueError(f"2013 memoir: {contest} {dep} {what} differs from its districts: {wrong}")
+    out = {"districts": len({(dep, dis) for _, dep, dis in memoir.districts})}
+    for contest in ORDER_2013:
+        total: Counter[str] = Counter()
+        for (c, _), counts in sums.items():
+            if c == contest:
+                total.update(counts)
+        printed_total = memoir.national.get(contest)
+        if printed_total is not None:
+            wrong = {k: (v, total[k]) for k, v in printed_total.items() if k not in SKIPPED_2013 and total[k] != v}
+            if wrong:
+                raise ValueError(f"2013 memoir: {contest} national totals differ from its districts: {wrong}")
+        out[f"{contest} votes"] = total["TOTAL"]
+    print(f"2013: {out}", flush=True)
+    return out
+
+
+# The ballot number and name of each acronym the 2013 tables use, from the Tribunal's list of the organizations that
+# registered candidacies. An alliance that ran in one department under its own acronym still ran as list 4.
+KNOWN_2013 = {
+    "ANR": (1, NATIONAL_PARTIES[(1, "ANR")]),
+    "PLRA": (2, NATIONAL_PARTIES[(2, "PLRA")]),
+    "PHP": (5, PARTIES_2008["PHP"]),
+    "UNACE": (7, NATIONAL_PARTIES[(7, "UNACE")]),
+    "PPQ": (8, NATIONAL_PARTIES[(8, "PPQ")]),
+    "PEN": (9, NATIONAL_PARTIES[(9, "PEN")]),
+    "PT": (14, PARTIES_2008["PT"]),
+    "PVP": (23, NATIONAL_PARTIES[(23, "PVP")]),
+    "FG": (40, NATIONAL_PARTIES[(40, "CNFG")]),
+    "PDP": (100, PARTIES_2008["PDP"]),
+}
+ACRONYMS_2013 = {
+    **KNOWN_2013,
+    "AP": (3, "CONCERTACION AVANZA PAIS"),
+    "PA": (4, "ALIANZA PARAGUAY ALEGRE"),
+    "PC": (4, "ALIANZA PATRIOTICA CAAZAPEÑA"),
+    "TIA": (4, "ALIANZA ITAPUA ALEGRE"),
+    "APA": (4, "ALIANZA ALTO PARAGUAY ALEGRE"),
+    "PCH": (4, "ALIANZA PASION CHAQUEÑA"),
+    "ATPA": (4, "ALIANZA TODOS POR UN PARAGUARI ALEGRE"),
+    "PB": (10, "PARTIDO BLANCO"),
+    "PEA": (13, "MOVIMIENTO PUEBLO EN ACCION"),
+    "MDIP": (16, "MOVIMIENTO DEMOCRATICO INDEPENDIENTE PARTICIPATIVO"),
+    "UDV": (18, "MOVIMIENTO UNIDAD DEMOCRATICA PARA LA VICTORIA"),
+    "PJ": (21, "PARTIDO DE LA JUVENTUD - FUERZA JOVEN"),
+    "PSD": (22, "PARTIDO SOCIAL DEMOCRATA"),
+    "MDC": (25, "MOVIMIENTO DESPERTAR CIUDADANO"),
+    "PSN": (26, "MOVIMIENTO PROPUESTA POR LA SOBERANIA NACIONAL"),
+    "PL": (28, "PARTIDO LIBERAL"),
+    "30-A": (30, "MOVIMIENTO NACIONAL PLURALISTA PARTICIPATIVO 30 DE AGOSTO"),
+    "PCA": (44, "MOVIMIENTO PODER CIUDADANO EN ACCION"),
+    "MII": (50, "MOVIMIENTO INDEPENDIENTE INSTITUCIONAL"),
+    "PPL": (55, "PARTIDO PATRIA LIBRE"),
+    "MKP": (69, "MOVIMIENTO KUÑA PYRENDA"),
+    "MT": (75, "MOVIMIENTO REGIONAL DE LOS TRABAJADORES DE AMAMBAY"),
+    "TC": (100, "CONCERTACION TODOS POR CONCEPCION"),
+    "PEP": (110, "MOVIMIENTO PARA EL PUEBLO ENCARNACION"),
+    "+PY": (500, "MOVIMIENTO POLITICO MAS PARAGUAY"),
+    "MICA": (900, "MOVIMIENTO INDEPENDIENTE CONSTITUCIONALISTA EN ALIANZA"),
+    "MOT": (911, "MOVIMIENTO REGIONAL OPORTUNIDAD PARA TODOS"),
+}
+SUMMARY_2013 = re.compile(r"^\s*(\d+)\s+(\S+)\s+(\S.*?)\s{2,}([\d.]+)\s+[\d,]+%\s*(\d+)?\s*$")
+ELECTED_2013 = re.compile(r"^\s*([A-ZÑÁÉÍÓÚ. ]+?)\s{2,}([A-ZÑÁÉÍÓÚ ]+?)\s{2,}(\d+)\s+(\S+)\s+\S.*$")
+
+
+def pcn_name(acronym: str, dep: int) -> str:
+    """The name of the list an acronym stands for in the department where it ran."""
+    name = ACRONYMS_2013[acronym][1]
+    if acronym == "PCH":
+        return f"{name} - {'PDTE. HAYES' if dep == 15 else 'BOQUERON'}"
+    return name
+
+
+class Summary2013(NamedTuple):
+    lists: dict[str, dict[int, tuple[str, int, int | None]]]  # contest -> list -> (acronym, votes, seats)
+    ticket: tuple[str, str]
+    governors: dict[int, tuple[str, int]]  # department -> (name, list) of the governor declared elected
+
+
+@functools.cache
+def summary2013() -> Summary2013:
+    """The national summaries of the memoir's results chapter, and the governors it declares elected."""
+    lines = pdf_text(MEMORIA_2013).splitlines()
+    lists: dict[str, dict[int, tuple[str, int, int | None]]] = {}
+    contest: str | None = None
+    ticket: list[str] = []
+    start = next(i for i, line in enumerate(lines) if line.startswith("4.1.1 Resultados"))
+    stop = next(i for i, line in enumerate(lines) if line.startswith("4.2.1 Resultados"))
+    for line in lines[start:stop]:
+        found = re.match(r"^4\.1\.([123]) Resultados", line)
+        if found:
+            contest = ("president", "senate", "parlasur")[int(found.group(1)) - 1]
+            continue
+        found = re.match(r"^\s*(Presidente|Vicepresidente)\s{2,}(\S.*?)\s{2,}ANR\s*$", line)
+        if found:
+            ticket.append(clean(found.group(2)))
+        found = SUMMARY_2013.match(line)
+        if found and contest is not None:
+            number, acronym = int(found.group(1)), found.group(2)
+            lists.setdefault(contest, {})[number] = (
+                acronym,
+                _count(found.group(4)),
+                int(found.group(5)) if found.group(5) else None,
+            )
+    deps = {**_dep_codes(), "PRESIDENTE HAYES": 15}
+    elected: dict[int, tuple[str, int]] = {}
+    at = next(i for i, line in enumerate(lines) if "GOBERNADORES ELECTOS POR DEPARTAMENTO" in line)
+    for line in lines[at : at + 140]:
+        found = ELECTED_2013.match(line)
+        if found and normal(found.group(1)) in deps and "NOMBRE" not in line:
+            elected.setdefault(deps[normal(found.group(1))], (clean(found.group(2)), int(found.group(3))))
+    if len(ticket) != 2 or len(elected) != 17:
+        raise ValueError(f"2013 memoir: read {len(ticket)} names of the ticket and {len(elected)} governors")
+    return Summary2013(lists, (ticket[0], ticket[1]), elected)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The organizations the two memoirs name that no other table of this pipeline does.
+
+MEMOIR_SCHEME = "py.tsje.memoria"
+CONCERTACION = "CONCERTACION"
+
+
+def _known_names() -> frozenset[str]:
+    return frozenset(normal(name) for name in (*PARTIES_2008.values(), *NATIONAL_PARTIES.values()))
+
+
+LISTS_2010: dict[str, tuple[int, str]] = {}
+
+
+def memoir_names() -> dict[str, str]:
+    """Normalized name -> spelling of each organization the memoirs name, that the other packages do not hold."""
+    found: dict[str, str] = {}
+    for acronym in ACRONYMS_2013:
+        for dep in (15, 17) if acronym == "PCH" else (0,):
+            found.setdefault(normal(pcn_name(acronym, dep)), pcn_name(acronym, dep))
+    for _, name in LISTS_2010.values():
+        found.setdefault(normal(name), name)
+    return {n: name for n, name in sorted(found.items()) if n not in _known_names()}
+
+
+def memoir_party(name: str) -> str | None:
+    """The party record of a list's organization: the shared one when the pipeline already holds it, else the memoirs'."""
+    if normal(name) in _known_names():
+        return party(name)
+    return key("party", "memoir", normal(name))
+
+
+def memoir_kind(name: str) -> str:
+    return "bloc" if normal(name).startswith(CONCERTACION) else _party_kind(name, {})
+
+
+def memoir_parties() -> Package:
+    p = Package(
+        f"{SOURCE}/memoir-parties",
+        SOURCE,
+        "The parties, alliances, and movements named in the Tribunal's memoirs of the 2010 municipal and 2013 general "
+        "elections that its other tables do not name",
+    )
+    p.external |= {PARAGUAY}
+    for normalized, name in memoir_names().items():
+        id = key("party", "memoir", normalized)
+        p.add("party", id=id, kind=memoir_kind(name), polity_id=PARAGUAY)
+        p.add("external_id", entity_id=id, scheme=MEMOIR_SCHEME, value=normalized)
+        p.name(id, name, "es", "official")
+    return p
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+
+GENERAL_2013_NOTE = (
+    "Counted by the Tribunal Superior de Justicia Electoral and printed, by municipality (distrito), in the results "
+    "chapter of its memoir of the general and departmental elections of 21 April 2013. Valid votes are the votes for "
+    "lists; blank and null ballots are the district's own counts, and ballots cast are the district total the memoir "
+    "prints. Registered voters are the district's roll as printed. The sums of the districts agree with the "
+    "department rows and with the national totals the memoir prints, for every list. The memoir also breaks the "
+    "Capital's results down by zone; the zones are not stored, and the Capital's own total is one unit. Voters abroad "
+    "are reported by country (Argentina, Spain, and the United States) and have no place in the archive's geography. "
+    "A numbered column of the memoir's tables is read as the list its acronym names in that department; an alliance "
+    "that ran under its own acronym in one department ran as list 4."
+)
+CONCEPCION_NOTE = (
+    "The memoir's table of Concepción's districts for the Senate reports 50,715 valid and invalid ballots, about two "
+    "thirds of the 76,304 that its department row and national summary print, and gives a participation above 100% "
+    "in several districts, so those district figures are not stored. The department is one unit here, with the "
+    "department row's figures."
+)
+
+
+def _units2013(p: Package, day: date, places: list[tuple[int, int]]) -> dict[tuple[int, int], str]:
+    rows = []
+    unit_of: dict[tuple[int, int], str] = {}
+    for dep, dis in places:
+        code = f"{day}:{dep}" if dis == DEPARTMENT_UNIT else f"{day}:{dep}:{dis}"
+        unit_of[(dep, dis)] = key("unit", code)
+        if dep == ABROAD:
+            scheme, area_id, relation = "py.distrito", None, "unlocated"
+        elif dis == DEPARTMENT_UNIT:
+            scheme, area_id, relation = "py.departamento", area("py.departamento", str(dep)), "equals"
+        else:
+            scheme, area_id, relation = "py.distrito", area("py.distrito", f"{dep}:{dis}"), "equals"
+        rows.append((unit_of[(dep, dis)], scheme, code, relation, area_id))
+    p.frame(
+        "reporting_unit",
+        pl.DataFrame(
+            rows,
+            schema={
+                "id": pl.String,
+                "scheme_code": pl.String,
+                "code": pl.String,
+                "area_relation": pl.String,
+                "area_id": pl.String,
+            },
+            orient="row",
+        ).with_columns(polity_id=pl.lit(PARAGUAY), kind=pl.lit("aggregate")),
+    )
+    return unit_of
+
+
+def general_2013() -> Package:
+    day = GENERAL_2013
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        "Paraguay's general elections of 21 April 2013 (President, Senate, Mercosur Parliament, Chamber of Deputies, "
+        "and governors), by municipality, from the Tribunal Superior de Justicia Electoral",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/history", f"{SOURCE}/memoir-parties"],
+    )
+    p.external |= {PARAGUAY, COUNTRY}
+    source_id = key("source", SOURCE, "general-2013")
+    _source(
+        p,
+        source_id,
+        "Memoria y Estadísticas Electorales: elecciones generales y departamentales de 2013",
+        original(MEMORIA_2013),
+        [MEMORIA_2013],
+    )
+    election_id = key("election", day)
+    path = f"py/{day}-general"
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=PARAGUAY,
+        kind="general",
+        date_from=day,
+        date_to=day,
+        date_precision="day",
+        status="held",
+    )
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    p.name(election_id, "2013 Paraguayan general election", "en", "official")
+    p.name(election_id, "Elecciones generales 2013", "es", "native", False)
+
+    memoir, summary = memoir2013(), summary2013()
+    unit_of = _units2013(p, day, sorted({(dep, dis) for _, dep, dis in memoir.districts}))
+    names = _dep_names()
+    slugs = {dep: changeset.slug(name) for dep, name in names.items()}
+    values: list[pl.DataFrame] = []
+
+    def contest(code: str, dep: int | None, spec: Spec) -> None:
+        mine = {
+            (d, dis): row for (c, d, dis), row in memoir.districts.items() if c == code and (dep is None or d == dep)
+        }
+        order: list[str] = []
+        for _, row in sorted(mine.items()):
+            order += [column for column in row if column not in META_2008 and column not in order]
+        labels: dict[int, tuple[str, str | None]] = {}
+        slot: dict[str, int] = {}
+        for column in order:
+            number = ACRONYMS_2013[column][0]
+            name = pcn_name(column, 0 if dep is None else dep)
+            if number in labels:
+                raise ValueError(f"2013 memoir: {code} {dep}: two columns on list {number}")
+            labels[number], slot[column] = (name, memoir_party(name)), number
+        rows = [
+            (unit_of[place], slot[column], value)
+            for place, row in mine.items()
+            for column, value in row.items()
+            if column not in META_2008
+        ]
+        accounting = [
+            (unit_of[place], row.get("ELECTORES") or None, row["TOTAL"], row.get("BLANCOS"), row.get("NULOS"))
+            for place, row in mine.items()
+        ]
+        printed = memoir.national.get(code) if dep is None else memoir.totals.get((code, dep))
+        declared: list[tuple[int | None, int, int]] = []
+        for column, value in (printed or {}).items():
+            if column in slot:
+                declared.append((slot[column], 1, value))
+        if printed:
+            for column, measure in (("BLANCOS", BLANK), ("NULOS", INVALID)):
+                if column in printed:
+                    declared.append((None, measure, printed[column]))
+            if all(row.get("ELECTORES") for row in mine.values()) and "ELECTORES" in printed:
+                declared.append((None, REGISTERED, printed["ELECTORES"]))
+        winner: int | None = None
+        members: tuple[tuple[int, int, str], ...] = ()
+        seats: dict[int, int] | None = None
+        if code == "president":
+            winner = 1
+            members = tuple((winner, rank, name) for rank, name in enumerate(summary.ticket, 1))
+        elif code == "governor" and dep is not None:
+            name, winner = summary.governors[dep]
+            members = ((winner, 1, name),)
+        elif code in ("senate", "parlasur"):
+            seats = {lista: n for lista, (_, _, n) in summary.lists[code].items() if n}
+            if lista_set := set(summary.lists[code]) - set(labels):
+                raise ValueError(f"2013 memoir: {code} summary lists {sorted(lista_set)} are not in its tables")
+        tally = Tally(
+            rows=pl.DataFrame(rows, schema=["unit_id", "lista", "votes"], orient="row"),
+            totals=pl.DataFrame(
+                accounting,
+                schema={
+                    "unit_id": pl.String,
+                    "registered": pl.Int64,
+                    "total": pl.Int64,
+                    "blank": pl.Int64,
+                    "invalid": pl.Int64,
+                },
+                orient="row",
+            ),
+            labels=labels,
+            seats=seats,
+            winner=winner,
+            members=members,
+            declared=tuple(declared),
+        )
+        values.append(_add_contest(p, election_id, day, path, spec, tally, source_id, GENERAL_2013_NOTE))
+        if code == "senate" and (1, DEPARTMENT_UNIT) in unit_of and (1, DEPARTMENT_UNIT) in mine:
+            result_set = key("result_set", day, spec.key)
+            p.add(
+                "note",
+                id=key("note", result_set, "department"),
+                entity_id=result_set,
+                kind="caveat",
+                body_md=CONCEPCION_NOTE,
+                lang="en",
+            )
+
+    contest(
+        "president",
+        None,
+        Spec(
+            "president",
+            "office",
+            "2013 Paraguayan presidential election",
+            "Elección presidencial 2013",
+            "president",
+            COUNTRY,
+            PRESIDENCY,
+            None,
+            PRESIDENT_SYSTEM,
+            1,
+            "ticket",
+        ),
+    )
+    contest(
+        "senate",
+        None,
+        Spec(
+            "senate",
+            "list_allocation",
+            "2013 Paraguayan Senate election",
+            "Elección de senadores 2013",
+            "senate",
+            COUNTRY,
+            None,
+            SENATE,
+            SENATE_SYSTEM,
+            45,
+            "list",
+        ),
+    )
+    contest(
+        "parlasur",
+        None,
+        Spec(
+            "parlasur",
+            "list_allocation",
+            "2013 election of Paraguay's members of the Mercosur Parliament",
+            "Elección de parlamentarios del Mercosur 2013",
+            "mercosur-parliament",
+            COUNTRY,
+            None,
+            PARLASUR,
+            PARLASUR_SYSTEM,
+            18,
+            "list",
+        ),
+    )
+    for dep in sorted({d for c, d, _ in memoir.districts if c == "deputies"}):
+        contest(
+            "deputies",
+            dep,
+            Spec(
+                f"deputies:{dep}",
+                "list_allocation",
+                f"2013 Chamber of Deputies election, {names[dep]}",
+                f"Elección de diputados 2013, {names[dep]}",
+                f"deputies-{slugs[dep]}",
+                area("py.departamento", str(dep)),
+                None,
+                CHAMBER,
+                CHAMBER_SYSTEM,
+                None,
+                "list",
+            ),
+        )
+    for dep in sorted({d for c, d, _ in memoir.districts if c == "governor"}):
+        contest(
+            "governor",
+            dep,
+            Spec(
+                f"governor:{dep}",
+                "office",
+                f"2013 governor election, {names[dep]}",
+                f"Elección de gobernador 2013, {names[dep]}",
+                f"governor-{slugs[dep]}",
+                area("py.departamento", str(dep)),
+                key("office", "governor", dep),
+                None,
+                GOVERNOR_SYSTEM,
+                1,
+                "candidate",
+            ),
+        )
+    p.frame(
+        "result_value",
+        pl.concat(values).with_columns(
+            channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)
+        ),
+    )
+    return p
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The municipal elections of 7 November 2010, from the Tribunal's memoir of that election.
+
+HEADING_2010 = re.compile(r"Resultados para (Intendentes|Junta Municipal)\b(?: - (Primera|Segunda) Parte)?")
+ROW_2010 = re.compile(r"^\s*(\d+)\s+(\S.*?)\s{2,}(\d.*)$")
+TOTALS_2010 = re.compile(r"^\s*TOTALES\s+(\d.*)$")
+FIXED_2010 = ("ELECTORES", "MESAS", "BLANCOS", "NULOS", "TOTAL")
+CONTESTS_2010 = {"Intendentes": "mayor", "Junta Municipal": "council"}
+ALLIANCE_2010 = re.compile(r"lista(\d+)|ALI/MOV\d+")
+LEGEND_2010 = re.compile(
+    r"(\d+|RESTO DE MUNICIPIOS)\s+(?:(\S.*?)\s{2,})?(\d+)\s+(\S+)\s{2,}(\S.*?)(?=\s{3,}(?:\d+\s+\S|RESTO)|\s*$)"
+)
+# The organizations that run under the same list number everywhere, by the acronym the tables print without dots.
+LISTS_2010 = {
+    "ANR": (1, NATIONAL_PARTIES[(1, "ANR")]),
+    "PLRA": (2, NATIONAL_PARTIES[(2, "PLRA")]),
+    "PRF": (3, NATIONAL_PARTIES[(3, "PRF")]),
+    "PPS": (4, PARTIES_2008["PPS"]),
+    "PHP": (5, PARTIES_2008["PHP"]),
+    "PDC": (6, NATIONAL_PARTIES[(6, "PDC")]),
+    "UNACE": (7, NATIONAL_PARTIES[(7, "UNACE")]),
+    "PPQ": (8, NATIONAL_PARTIES[(8, "PPQ")]),
+    "PEN": (9, NATIONAL_PARTIES[(9, "PEN")]),
+    "FG": (40, "FRENTE GUAZU"),
+    "PPT": (99, "PARTIDO POPULAR TEKOJOJA"),
+    "PDP": (100, PARTIES_2008["PDP"]),
+    "M20A": (20, "MOVIMIENTO 20 DE ABRIL"),
+}
+EDGE_2010 = 2.5  # how far a column's figures end before its header does
+EXTRA_2010 = 10_000  # list numbers a header does not print are numbered from here and have no ballot position
+
+
+def _acronym(text: str) -> str:
+    return re.sub(r"[^A-Z0-9/]", "", text.upper())
+
+
+class Table2010(NamedTuple):
+    rows: dict[int, dict[int | str, int]]  # district -> list number or column name -> figure
+    totals: dict[int | str, int]
+    acronyms: dict[int, str]
+
+
+def _placements(ends: list[float], anchors: list[float], slack: float = 14.0, limit: int = 12) -> list[tuple[int, ...]]:
+    """The ways to place figures under columns in order, best first, within a little of the best fit."""
+    best = _assign(ends, anchors)
+    if best is None:
+        return []
+    base = sum(abs(ends[i] - anchors[j]) for i, j in enumerate(best))
+    found: list[tuple[float, tuple[int, ...]]] = []
+
+    def step(i: int, start: int, cost: float, chosen: list[int]) -> None:
+        if len(found) > 400:
+            return
+        if i == len(ends):
+            found.append((cost, tuple(chosen)))
+            return
+        for j in range(start, len(anchors) - (len(ends) - i) + 1):
+            extra = abs(ends[i] - anchors[j])
+            if cost + extra <= base + slack:
+                chosen.append(j)
+                step(i + 1, j + 1, cost + extra, chosen)
+                chosen.pop()
+
+    step(0, 0, 0.0, [])
+    return [picks for _, picks in sorted(found)[:limit]]
+
+
+def _settle2010(
+    options: list[list[tuple[int, ...]]],
+    figures: list[list[int]],
+    names: list[int | str],
+    printed: dict[int | str, int],
+) -> list[tuple[int, ...]]:
+    """Choose each row's placement so that the columns add up to the totals the table prints, when it prints them."""
+    limits = [printed.get(name) for name in names]
+    sums = [0] * len(names)
+    chosen: list[tuple[int, ...]] = []
+
+    def walk(i: int) -> bool:
+        if i == len(options):
+            return all(limit is None or sums[j] == limit for j, limit in enumerate(limits))
+        for picks in options[i]:
+            for j, value in zip(picks, figures[i], strict=True):
+                sums[j] += value
+            fits = all((limit := limits[j]) is None or sums[j] <= limit for j in picks)
+            chosen.append(picks)
+            if fits and walk(i + 1):
+                return True
+            chosen.pop()
+            for j, value in zip(picks, figures[i], strict=True):
+                sums[j] -= value
+        return False
+
+    if not printed or not walk(0):
+        return [row[0] if row else () for row in options]
+    return list(chosen)
+
+
+def _read_table(lines: list[str], head: int) -> Table2010:
+    """One table of the 2010 chapter, with its figures placed under the column headers by position."""
+    header = lines[head]
+    above = [
+        line for line in lines[max(0, head - 4) : head] if "lista" in line and not line.strip().startswith("LISTA")
+    ]
+    if not above:
+        raise ValueError("2010 memoir: a table has no list numbers above its header")
+    # Each figure ends a little before the right edge of its column's header.
+    lists: list[tuple[int, float]] = []
+    extra = EXTRA_2010
+    for found in ALLIANCE_2010.finditer(above[-1]):
+        if found.group(1):
+            number = int(found.group(1))
+        else:
+            number, extra = extra, extra + 1
+        lists.append((number, found.end() - EDGE_2010))
+    if len({n for n, _ in lists}) != len(lists):
+        raise ValueError("2010 memoir: a table repeats a list number in its header")
+    columns: list[tuple[int | str, float]] = list(lists)
+    other = header.find("OTRAS LISTAS *")
+    if other >= 0:
+        columns.append(("OTHER", other + len("OTRAS LISTAS *") - EDGE_2010))
+    elif "Otras listas" in header:
+        columns.append(("AGGREGATE", header.rfind("Otras listas") + len("Otras listas") - EDGE_2010))
+    # A table that breaks the other lists down closes with the totals of the lists it leaves out.
+    last = max(found.end() for found in ALLIANCE_2010.finditer(above[-1]))
+    for n, found in enumerate(re.finditer(r"\S(?:.*?\S)?(?=\s{3,}|$)", above[-1][last:])):
+        text = clean(found.group(0))
+        if other < 0 and "Otras listas" not in header and text.lower().startswith(("otras", "listas")):
+            columns.append((f"AGGREGATE{n}", last + found.end() - EDGE_2010))
+    for name in ("BLANCOS", "NULOS", "TOTAL"):
+        ends = [m.end() for m in re.finditer(name, header)]
+        if ends:
+            columns.append((name, ends[-1] - 0.5))
+    columns.sort(key=lambda c: c[1])
+    start = header.find("MESAS") + 5
+    stop = min(
+        [i for i in (header.find("BLANCOS"), header.find("OTRAS LISTAS *"), header.find("Otras listas")) if i > 0]
+        or [len(header)]
+    )
+    chunks = [clean(m.group(0)) for m in re.finditer(r"\S(?:.*?\S)?(?=\s{2,}|$)", header[start:stop])]
+    words = header[start:stop].split()
+    pieces = words if len(words) == len(lists) else chunks
+    acronyms = {n: c for (n, _), c in zip(lists, pieces, strict=False)} if len(pieces) == len(lists) else {}
+    rows: dict[int, dict[int | str, int]] = {}
+    totals: dict[int | str, int] = {}
+    # A legend of alliances sometimes prints to the right of the table; its numbers are not the table's.
+    legend = [line.find("DETALLE") for line in lines[max(0, head - 4) : head + 2] if "DETALLE" in line]
+    limit = min(legend) - 2 if legend else None
+    entries: list[tuple[int | None, list[tuple[int, int]]]] = []  # (district, figures); None for the totals row
+    for line in lines[head + 1 :]:
+        line = line[:limit] if limit else line
+        total = TOTALS_2010.match(line)
+        row = None if total else ROW_2010.match(line)
+        match = total or row
+        if match is None:
+            continue
+        at = match.start(1 if total else 3)
+        found = [
+            (0 if m.group(0) == "-" else int(m.group(0).replace(".", "")), m.end() + at)
+            for m in FIGURE_2008.finditer(line[at:])
+        ]
+        if len(found) < 2 + sum(1 for c, _ in columns if c in ("BLANCOS", "NULOS", "TOTAL")):
+            raise ValueError(f"2010 memoir: too few figures in {line.strip()[:80]!r}")
+        entries.append((None if row is None else int(row.group(1)), found))
+        if row is None:
+            break
+    names = [c for c, _ in columns]
+    anchors = [a for _, a in columns]
+    printed: dict[int | str, int] = {}
+    if entries and entries[-1][0] is None:
+        figs = entries[-1][1][2:]
+        placed = (
+            list(range(len(columns))) if len(figs) == len(columns) else _assign([float(e) for _, e in figs], anchors)
+        )
+        if placed is None:
+            raise ValueError("2010 memoir: the totals row does not fit the headers")
+        printed = {names[j]: v for (v, _), j in zip(figs, placed, strict=True)}
+        totals = {"ELECTORES": entries[-1][1][0][0], "MESAS": entries[-1][1][1][0], **printed}
+    body = [(d, f) for d, f in entries if d is not None]
+    options = []
+    for _, found in body:
+        ends = [float(e) for _, e in found[2:]]
+        if len(ends) > len(columns):
+            raise ValueError(f"2010 memoir: {len(ends)} figures do not fit {len(columns)} headers")
+        options.append(_placements(ends, anchors))
+    chosen = _settle2010(options, [[v for v, _ in f[2:]] for _, f in body], names, printed)
+    for (district, found), picks in zip(body, chosen, strict=True):
+        row_values: dict[int | str, int] = {"ELECTORES": found[0][0], "MESAS": found[1][0]}
+        row_values.update({names[j]: v for (v, _), j in zip(found[2:], picks, strict=True)})
+        rows[district] = row_values  # type: ignore[index]
+    return Table2010(rows, totals, acronyms)
+
+
+class Block2010(NamedTuple):
+    contest: str
+    dep: int
+    line: int
+    lines: list[str]
+
+
+def blocks2010() -> list[Block2010]:
+    lines = pdf_text(MEMORIA_2010).splitlines()
+    deps = {**_dep_codes(), "PRESIDENTE HAYES": 15}
+    starts = [i for i, line in enumerate(lines) if HEADING_2010.search(line)]
+    out: list[Block2010] = []
+    for n, at in enumerate(starts):
+        end = starts[n + 1] if n + 1 < len(starts) else len(lines)
+        body = lines[at + 1 : end]
+        found = HEADING_2010.search(lines[at])
+        assert found is not None
+        place = next((normal(line) for line in body[:12] if normal(line) in deps), None)
+        if place is None:
+            # A department whose councillors share the mayors' page prints its name once, above the mayors' table.
+            if not out or out[-1].contest != "mayor" or CONTESTS_2010[found.group(1)] != "council":
+                continue
+            dep = out[-1].dep
+        else:
+            dep = deps[place]
+        out.append(Block2010(CONTESTS_2010[found.group(1)], dep, at, body))
+    return out
+
+
+def _page_table2010(contest: str, dep: int) -> Table2010:
+    """A table whose text layer prints twice, read from the positions of its words.
+
+    The page is set sideways and the memoir draws the table a second time, shifted, over the first. The words of the
+    shifted copy are dropped, and the rest are placed by their coordinates: a district runs along the page's width
+    and a column down its height.
+    """
+    import pymupdf  # imported here because only these pages need it
+
+    name = next(n for n, d in {**_dep_codes(), "PRESIDENTE HAYES": 15}.items() if d == dep)
+    doc = pymupdf.open(str(raw.cached(SOURCE, MEMORIA_2010).path))
+    heading = {v: k for k, v in CONTESTS_2010.items()}[contest]
+    page = next(
+        pg
+        for pg in doc
+        if f"Resultados para {heading}" in pg.get_text()
+        and name in normal(pg.get_text().replace("Ó", "O")).replace("  ", " ")
+        and pg.get_text().count("COD.") >= 2
+    )
+    words = [((w[0] + w[2]) / 2, (w[1] + w[3]) / 2, str(w[4])) for w in page.get_text("words")]
+    anchors = sorted((x, y) for x, y, t in words if t == "ELECTORES")
+    if len(anchors) < 2 or not 0 < anchors[1][0] - anchors[0][0] < 10:
+        raise ValueError(f"2010 memoir: {contest} {dep} does not print its table twice")
+    dx, dy = anchors[1][0] - anchors[0][0], anchors[1][1] - anchors[0][1]
+    spots = {(t, round(x), round(y)) for x, y, t in words}
+    first = [
+        (x, y, t)
+        for x, y, t in words
+        if not any((t, round(x - dx) + a, round(y - dy) + b) in spots for a in (-1, 0, 1) for b in (-1, 0, 1))
+    ]
+    code = next((y, x) for x, y, t in first if t == "COD." and abs(x - anchors[0][0]) < 4)
+    heads = {t: y for x, y, t in first if t in FIXED_2010 and abs(x - anchors[0][0]) < 4}
+    listed = sorted(
+        ((y, int(t[5:])) for x, y, t in first if re.fullmatch(r"lista\d+", t) and -14 < x - anchors[0][0] < -4),
+        reverse=True,
+    )
+    # The list numbers print once above each column, 'lista' lines at the lower position of the two copies.
+    numbers = sorted({(round(y), n) for y, n in listed})
+    columns = [(n, float(y)) for y, n in numbers] + [(name_, y) for name_, y in heads.items()]
+    columns.sort(key=lambda c: -c[1])
+    code_y = code[0]
+    bands: list[list[tuple[float, float, str]]] = []
+    for x, y, t in sorted(first):
+        if x <= anchors[0][0] + 4:
+            continue
+        if bands and abs(bands[-1][0][0] - x) < 5:
+            bands[-1].append((x, y, t))
+        else:
+            bands.append([(x, y, t)])
+    rows: dict[int, dict[int | str, int]] = {}
+    totals: dict[int | str, int] = {}
+    for band in bands:
+        if totals:
+            break
+        label = [t for x, y, t in band if abs(y - code_y) < 6 and t.isdigit()]
+        is_total = any(t == "TOTALES" for _, _, t in band)
+        if not label and not is_total:
+            continue
+        found = [
+            (0 if t == "-" else int(t.replace(".", "")), y)
+            for _, y, t in band
+            if FIGURE_2008.fullmatch(t) and abs(y - code_y) >= 6
+        ]
+        order = sorted(found, key=lambda f: -f[1])
+        placed = _assign([-y for _, y in order], [-y for _, y in columns])
+        if placed is None:
+            raise ValueError(f"2010 memoir: {contest} {dep}: figures do not fit the headers")
+        values = {columns[j][0]: v for (v, _), j in zip(order, placed, strict=True)}
+        if is_total:
+            totals = values
+        else:
+            rows[int(label[0])] = values
+    return Table2010(rows, totals, {})
+
+
+OTHERS_2010 = 9999  # the lists the memoir leaves unnamed, in one option
+SKIPPED_2010 = ("ELECTORES", "MESAS", "BLANCOS", "NULOS", "TOTAL", "OTHER")
+# Two tables print twice over each other in the memoir's text layer and are read from the page's coordinates instead.
+GARBLED_2010 = frozenset({("mayor", 1), ("mayor", 13)})
+
+
+class Parsed2010(NamedTuple):
+    districts: dict[tuple[str, int, int], dict[int, int]]  # (contest, dep, dis) -> list number -> votes
+    accounting: dict[tuple[str, int, int], dict[str, int]]  # ELECTORES, BLANCOS, NULOS, TOTAL of each district
+    acronyms: dict[tuple[str, int], dict[int, str]]  # (contest, dep) -> list number -> the table's acronym
+    national: dict[str, dict[str, int]]  # contest -> printed totals
+
+
+@functools.cache
+def memoir2010() -> Parsed2010:
+    """The district tables of the 2010 memoir's results chapter."""
+    districts: dict[tuple[str, int, int], dict[int, int]] = {}
+    accounting: dict[tuple[str, int, int], dict[str, int]] = {}
+    acronyms: dict[tuple[str, int], dict[int, str]] = {}
+    printed: dict[tuple[str, int], Counter[str | int]] = {}
+    for block in blocks2010():
+        found = [i for i, line in enumerate(block.lines) if "COD." in line and "DISTRITO" in line]
+        tables = (
+            [_page_table2010(block.contest, block.dep)]
+            if (block.contest, block.dep) in GARBLED_2010
+            else [_read_table(block.lines, head) for head in found]
+        )
+        for table in tables:
+            where = (block.contest, block.dep)
+            acronyms.setdefault(where, {}).update(table.acronyms)
+            counts = printed.setdefault(where, Counter())
+            for column, value in table.totals.items():
+                if isinstance(column, int):
+                    counts[column] += value
+                elif column in ("ELECTORES", "BLANCOS", "NULOS", "TOTAL"):
+                    counts.setdefault(column, value)
+            for dis, values in table.rows.items():
+                key_ = (block.contest, block.dep, dis)
+                votes = districts.setdefault(key_, {})
+                account = accounting.setdefault(key_, {})
+                for column, value in values.items():
+                    if column in SKIPPED_2010:
+                        if column != "OTHER" and account.setdefault(str(column), value) != value:
+                            raise ValueError(f"2010 memoir: {key_} prints {column} twice with different figures")
+                    elif isinstance(column, int) and votes.setdefault(column, value) != value:
+                        raise ValueError(f"2010 memoir: {key_} prints list {column} twice with different figures")
+    # The Capital prints the lists behind its 'other lists' in a small table with no district column.
+    capital = next(b for b in blocks2010() if (b.contest, b.dep) == ("council", 0))
+    at = next(
+        i for i, line in enumerate(capital.lines) if "OTRAS LISTAS *" in line and not line.strip().startswith("COD")
+    )
+    heads = ALLIANCE_2010.finditer(capital.lines[at + 1])
+    anchors = [m.end() - EDGE_2010 for m in heads]
+    figs_line = next(line for line in capital.lines[at + 2 :] if NUMBERS_LINE.match(line))
+    found = [(_count(m.group(0)), m.end()) for m in re.finditer(r"[\d.]+", figs_line)]
+    anchors.append(capital.lines[at + 1].rfind("Otras listas") + len("Otras listas") - EDGE_2010)
+    numbers = [int(m.group(1)) for m in ALLIANCE_2010.finditer(capital.lines[at + 1])]
+    placed = _assign([float(e) for _, e in found], anchors)
+    if placed is None or len(found) != len(numbers) + 1 or sum(v for v, _ in found[:-1]) != found[-1][0]:
+        raise ValueError("2010 memoir: the Capital's other lists do not add up")
+    for (value, _), j in zip(found[:-1], placed, strict=False):
+        districts[("council", 0, 0)][numbers[j]] = value
+    for key_, votes in districts.items():
+        account = accounting[key_]
+        rest = account["TOTAL"] - account.get("BLANCOS", 0) - account.get("NULOS", 0) - sum(votes.values())
+        if rest < 0:
+            raise ValueError(f"2010 memoir: {key_} lists add up to more than the printed total")
+        if rest:
+            votes[OTHERS_2010] = rest
+    # The department rows the memoir prints under each table must agree with the districts, for every list it names.
+    for (contest, dep), counts in printed.items():
+        sums: Counter[str | int] = Counter()
+        for (c, d, _), votes in districts.items():
+            if (c, d) == (contest, dep):
+                sums.update(votes)
+                sums.update(
+                    {k: v for k, v in accounting[(c, d, _)].items() if k in ("ELECTORES", "BLANCOS", "NULOS", "TOTAL")}
+                )
+        wrong = {k: (v, sums[k]) for k, v in counts.items() if k in sums or k in (OTHERS_2010,) and sums[k] != v}
+        wrong = {k: x for k, x in wrong.items() if x[0] != x[1] and k != "PARTICIPACION"}
+        if wrong:
+            raise ValueError(f"2010 memoir: {contest} department {dep} differs from its districts: {wrong}")
+    return Parsed2010(districts, accounting, acronyms, _national2010())
+
+
+def _national2010() -> dict[str, dict[str, int]]:
+    """The comparison of the parties' votes for mayors and councillors that the memoir prints before its tables."""
+    text = pdf_text(MEMORIA_2010)
+    out: dict[str, dict[str, int]] = {"mayor": {}, "council": {}}
+    patterns = (
+        ("BLANCOS", r"Votos en Blanco\s+([\d.]+)\s+[\d,]+%\s+([\d.]+)"),
+        ("NULOS", r"Votos Nulos\s+([\d.]+)\s+[\d,]+%\s+([\d.]+)"),
+        ("TOTAL", r"TOTAL DE VOTOS PARA INTENDENTES Y CONCEJALES\s+([\d.]+)\s+([\d.]+)"),
+        ("ANR", r"\n\s+ANR\s+ASOCIACION NACIONAL REPUBLICANA\s+([\d.]+)\s+[\d,]+%\s+([\d.]+)"),
+        ("PLRA", r"\n\s+PLRA\s+PARTIDO LIBERAL RADICAL AUTENTICO\s+([\d.]+)\s+[\d,]+%\s+([\d.]+)"),
+    )
+    for label, pattern in patterns:
+        found = re.search(pattern, text)
+        if found is None:
+            raise ValueError(f"2010 memoir: no national figure for {label}")
+        out["mayor"][label], out["council"][label] = _count(found.group(1)), _count(found.group(2))
+    return out
+
+
+def compare2010() -> dict[str, int]:
+    """Check the districts against the geography and the national figures the memoir prints."""
+    memoir = memoir2010()
+    known = set(districts().select("dep", "dis").iter_rows())
+    unknown = {(dep, dis) for _, dep, dis in memoir.districts} - known
+    if unknown:
+        raise ValueError(f"2010 memoir: districts without a place in the geography: {sorted(unknown)[:5]}")
+    out = {"districts": len({(dep, dis) for _, dep, dis in memoir.districts})}
+    for contest, printed in memoir.national.items():
+        total: Counter[str] = Counter()
+        for (c, _, _), account in memoir.accounting.items():
+            if c == contest:
+                total.update({k: v for k, v in account.items() if k in ("BLANCOS", "NULOS", "TOTAL")})
+        for (c, _, _), votes in memoir.districts.items():
+            if c == contest:
+                total["ANR"] += votes.get(1, 0)
+        wrong = {k: (v, total[k]) for k, v in printed.items() if k in total and total[k] != v}
+        if wrong:
+            raise ValueError(f"2010 memoir: {contest} national totals differ from its districts: {wrong}")
+        out[f"{contest} votes"] = total["TOTAL"]
+    print(f"2010: {out}", flush=True)
+    return out
+
+
+MUNICIPAL_2010_NOTE = (
+    "Counted by the Tribunal Superior de Justicia Electoral and printed, by municipality (distrito), in the results "
+    "chapter of its memoir of the municipal elections of 7 November 2010. Valid votes are the votes for lists; blank "
+    "and null ballots are the district's own counts, and ballots cast are the district total the memoir prints. "
+    "Registered voters are the district's roll as printed. The memoir prints each list's votes in the table's "
+    "column for it, and lists behind its 'other lists' column in a second table. The sums of the districts agree "
+    "with the department totals the memoir prints for every list, and with its national totals of votes, blank "
+    "ballots, and null ballots. A list is named by the acronym its table prints; the memoir's tables leave the "
+    "names of the alliances and movements to a legend that is not read here, and a column it labels only as an "
+    "alliance or movement is shown by its list number. The memoir prints the municipal councils' seats by "
+    "department, not by district, and does not declare the winning mayors in these tables, so no seats or "
+    "winners are stored."
+)
+
+
+def _label2010(contest: str, dep: int, number: int) -> tuple[str, str | None]:
+    if number == OTHERS_2010:
+        return "Other lists", None
+    acronym = memoir2010().acronyms.get((contest, dep), {}).get(number)
+    named = LISTS_2010.get(_acronym(acronym)) if acronym else None
+    if named is not None and named[0] == number:
+        return named[1], memoir_party(named[1])
+    if acronym is None:
+        fixed = {1: "ANR", 2: "PLRA"}.get(number)
+        if fixed is not None:
+            return LISTS_2010[fixed][1], memoir_party(LISTS_2010[fixed][1])
+    if acronym and not acronym.startswith("ALI/MOV"):
+        return acronym, None
+    return (f"Lista {number}" if number < EXTRA_2010 else "Alianza o movimiento"), None
+
+
+def municipal_2010() -> Package:
+    day = MUNICIPAL_2010
+    p = Package(
+        f"{SOURCE}/{day}",
+        SOURCE,
+        "Paraguay's municipal elections of 7 November 2010 (mayors and municipal councils), by district, from the "
+        "Tribunal Superior de Justicia Electoral",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/history", f"{SOURCE}/memoir-parties"],
+    )
+    p.external |= {PARAGUAY}
+    source_id = key("source", SOURCE, "municipal-2010")
+    _source(
+        p,
+        source_id,
+        "Elecciones Municipales 2010: Memoria y Estadísticas Electorales",
+        original(MEMORIA_2010),
+        [MEMORIA_2010],
+    )
+    election_id = key("election", day)
+    path = f"py/{day}-municipal"
+    p.add(
+        "election",
+        id=election_id,
+        polity_id=PARAGUAY,
+        kind="local",
+        date_from=day,
+        date_to=day,
+        date_precision="day",
+        status="held",
+    )
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    p.name(election_id, "2010 Paraguayan municipal elections", "en", "official")
+    p.name(election_id, "Elecciones municipales 2010", "es", "native", False)
+
+    memoir = memoir2010()
+    frame = pl.DataFrame(sorted({(dep, dis) for _, dep, dis in memoir.districts}), schema=["dep", "dis"], orient="row")
+    frame = frame.with_columns(code=pl.concat_str(pl.lit(str(day)), "dep", "dis", separator=":")).with_columns(
+        unit_id=pl.col("code").map_elements(lambda code: key("unit", code), return_dtype=pl.String)
+    )
+    p.frame(
+        "reporting_unit",
+        frame.select(
+            id="unit_id",
+            polity_id=pl.lit(PARAGUAY),
+            scheme_code=pl.lit("py.distrito"),
+            code="code",
+            area_relation=pl.lit("equals"),
+            area_id=pl.struct("dep", "dis").map_elements(
+                lambda row: area("py.distrito", f"{row['dep']}:{row['dis']}"), return_dtype=pl.String
+            ),
+            kind=pl.lit("aggregate"),
+        ),
+    )
+    unit_of = {(dep, dis): unit for dep, dis, unit in frame.select("dep", "dis", "unit_id").iter_rows()}
+    slugs = _slugs()
+    places = {(dep, dis): title(name) for dep, _, dis, name in districts().iter_rows()}
+    values: list[pl.DataFrame] = []
+    for dep, dis in sorted(unit_of):
+        place = places[(dep, dis)]
+        district = area("py.distrito", f"{dep}:{dis}")
+        for code in ("mayor", "council"):
+            votes = memoir.districts[(code, dep, dis)]
+            account = memoir.accounting[(code, dep, dis)]
+            labels = {number: _label2010(code, dep, number) for number in sorted(votes)}
+            rows = pl.DataFrame(
+                [(unit_of[(dep, dis)], number, value) for number, value in votes.items()],
+                schema=["unit_id", "lista", "votes"],
+                orient="row",
+            )
+            totals = pl.DataFrame(
+                [
+                    (
+                        unit_of[(dep, dis)],
+                        account.get("ELECTORES") or None,
+                        account["TOTAL"],
+                        account.get("BLANCOS"),
+                        account.get("NULOS"),
+                    )
+                ],
+                schema={
+                    "unit_id": pl.String,
+                    "registered": pl.Int64,
+                    "total": pl.Int64,
+                    "blank": pl.Int64,
+                    "invalid": pl.Int64,
+                },
+                orient="row",
+            )
+            positions = {n: (None if n >= EXTRA_2010 or n == OTHERS_2010 else n) for n in labels}
+            if code == "mayor":
+                spec = Spec(
+                    f"mayor:{dep}:{dis}",
+                    "office",
+                    f"Mayor of {place}",
+                    f"Intendente municipal de {place}",
+                    f"{slugs[(dep, dis)]}-mayor",
+                    district,
+                    office(dep, dis),
+                    None,
+                    MAYOR_SYSTEM,
+                    1,
+                    "candidate",
+                )
+            else:
+                spec = Spec(
+                    f"council:{dep}:{dis}",
+                    "list_allocation",
+                    f"{place} Municipal Council",
+                    f"Junta municipal de {place}",
+                    f"{slugs[(dep, dis)]}-council",
+                    district,
+                    None,
+                    body(dep, dis),
+                    COUNCIL_SYSTEM_BLOCKED,
+                    None,
+                    "list",
+                )
+            tally = Tally(rows=rows, totals=totals, labels=labels, positions=positions)
+            values.append(_add_contest(p, election_id, day, path, spec, tally, source_id, MUNICIPAL_2010_NOTE))
+    p.frame(
+        "result_value",
+        pl.concat(values).with_columns(
+            channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)
+        ),
     )
     return p
