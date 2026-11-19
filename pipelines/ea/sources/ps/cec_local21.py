@@ -87,7 +87,7 @@ FATAH = key("party", "fatah")
 def fetch() -> None:
     for url in FILES.values():
         raw.fetch(SOURCE, url, suffix=".aspx" if url.endswith(".aspx") else ".pdf")
-    raw.fetch(cec_local.GEOBOUNDARIES, cec_local.GEO_URL, suffix=".geojson")
+    cec_local.fetch()  # the 2026 tables say which reporting units the 2026 package already writes
 
 
 def packages() -> list[str]:
@@ -685,6 +685,36 @@ def _list_option(p: Package, authority: Authority, contest: str, position: int, 
     return option
 
 
+@cache
+def _written() -> frozenset[str]:
+    """The codes of the authorities whose reporting unit the 2026 pipeline already writes."""
+    return frozenset(a.ident for a in cec_local.authorities() if a.polled)
+
+
+def _unit(p: Package, authority: Authority) -> str:
+    """An authority's reporting unit, shared with the 2026 pipeline: the same code takes the same id there and here.
+
+    A unit the 2026 package already writes is referenced, not written again; any other is written under the key the
+    2026 pipeline would give it, so a later election of the same council reuses it.
+    """
+    unit = cec_local.key("unit", authority.ident)
+    if authority.ident in _written():
+        p.external.add(unit)
+        return unit
+    p.add(
+        "reporting_unit",
+        id=unit,
+        polity_id=PALESTINE,
+        scheme_code="ps.local_authority",
+        code=authority.ident,
+        area_relation="within",
+        area_id=cec_local.governorate(authority.district),
+        kind="standard",
+    )
+    p.name(unit, authority.name, "ar", "official")
+    return unit
+
+
 def election(phase: int) -> Package:
     day = DAYS[phase]
     p = Package(
@@ -692,7 +722,7 @@ def election(phase: int) -> Package:
         SOURCE,
         f"The Palestinian local elections of {day:%-d %B %Y} ({'first' if phase == 1 else 'second'} phase): the "
         "councils of the West Bank's local authorities, by authority, from the Central Elections Commission's tables",
-        depends=[f"{cec_local.SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[f"{cec_local.SOURCE}/geo", f"{cec_local.SOURCE}/{cec_local.DAY}", f"{SOURCE}/registry"],
     )
     p.external |= {PALESTINE, COUNTRY}
     for url in FILES.values():
@@ -758,18 +788,7 @@ def election(phase: int) -> Package:
         kinds: dict[str, str | None] = {}
         names: dict[str, str] = {}
         if authority.polled:
-            unit = key("unit", authority.ident)
-            p.add(
-                "reporting_unit",
-                id=unit,
-                polity_id=PALESTINE,
-                scheme_code="ps.local_authority",
-                code=authority.ident,
-                area_relation="within",
-                area_id=cec_local.governorate(authority.district),
-                kind="standard",
-            )
-            p.name(unit, authority.name, "ar", "official")
+            unit = _unit(p, authority)
             assert authority.registered is not None and authority.cast is not None
             counts["registered"] += _put(p, result_set, unit, None, REGISTERED, authority.registered, pages)
             counts["cast"] += _put(p, result_set, unit, None, CAST, authority.cast, pages)
