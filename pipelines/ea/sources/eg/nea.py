@@ -9,6 +9,13 @@ YEARS = (2020, 2025)
 STAGES = ("stage_1_round_1", "stage_1_round_2", "stage_2_round_1", "stage_2_round_2")
 LISTS = ("99901", "99902", "99903", "99904")
 OPTION = re.compile(r"<option value='(\d+)' class='\d+'>")
+# The scripted requests the static 2020 archive pages refuse are answered by the same pages on the main site. Their
+# labels are crossed: the "stage 2 round 1" page lists the constituencies of the second stage's governorates and the
+# "stage 2 round 2" page those of the first stage's, and each lists every constituency once for both rounds.
+ARCHIVE_2020 = {
+    "stage_2": "https://www.elections.eg/archive/house-2020/hor20-results/hor-20-stage2-round1-results",
+    "stage_1": "https://www.elections.eg/archive/house-2020/hor20-results/hor-20-stage2-round2-results",
+}
 
 
 def archive_url(year: int, stage: str) -> str:
@@ -28,23 +35,15 @@ def codes(year: int) -> dict[str, list[str]]:
         except LookupError:
             continue
         found[stage[:7]] |= set(OPTION.findall(page))
-    if not found["stage_2"]:
-        # The 2020 stage 2 archive pages refuse scripted requests, so reuse the 2025 codes and probe a few numbers
-        # past each governorate's last one; a code with no fragment answers 404 and is left out.
-        found["stage_2"] = set(codes_for_stage_two(2025))
-        highest: dict[str, int] = {}
-        for code in found["stage_2"]:
-            highest[code[:-2]] = max(highest.get(code[:-2], 0), int(code[-2:]))
-        found["stage_2"] |= {f"{gov}{n:02d}" for gov, top in highest.items() for n in range(1, top + 4)}
+    if year == 2020:
+        for stage, url in ARCHIVE_2020.items():
+            found[stage] |= set(OPTION.findall(raw.cached(SOURCE, url).path.read_text("utf-8")))
     return {stage: sorted(values, key=int) for stage, values in found.items()}
 
 
-def codes_for_stage_two(year: int) -> list[str]:
-    page = raw.cached(SOURCE, archive_url(year, "stage_2_round_1")).path.read_text("utf-8")
-    return sorted(set(OPTION.findall(page)), key=int)
-
-
 def fetch() -> None:
+    for url in ARCHIVE_2020.values():
+        raw.fetch(SOURCE, url, suffix=".html")
     for year in YEARS:
         for stage in STAGES:
             try:
