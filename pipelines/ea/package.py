@@ -11,7 +11,6 @@ from collections.abc import Iterable, Iterator
 from contextlib import suppress
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
-from functools import cache
 from io import BytesIO
 from pathlib import Path
 from typing import LiteralString, NamedTuple, NotRequired, TypedDict, cast
@@ -19,9 +18,9 @@ from uuid import NAMESPACE_URL, uuid5
 
 import duckdb
 import polars as pl
-from psycopg import Connection, OperationalError, errors, sql
+from psycopg import Connection, errors, sql
 
-from ea import covers, parties, search, store, touched
+from ea import covers, search, store, touched
 from ea.apply import MERGE_LOCK, _follow, _refuse_merged, _rollup, _survivors
 from ea.changeset import Changeset
 from ea.checks import MERGE_DELETES, RULES, merged
@@ -475,31 +474,6 @@ class Package:
             is_preferred=preferred,
         )
 
-    def party(
-        self,
-        polity_id: str,
-        kind: str,
-        *key: object,
-        names: list[tuple[str, str, str]],
-        wikidata: str | None = None,
-    ) -> str:
-        """The live party that the Wikidata id or an exact name in the polity resolves to, else a new one.
-
-        names holds (text, lang, kind) tuples, each written as a preferred name of a new party.
-        """
-        resolver = _resolver()
-        found = resolver.find(polity_id, kind, names, wikidata) if resolver is not None else None
-        if found is not None:
-            self.external.add(found.id)
-            return found.id
-        id = self.id("party", *key)
-        self.add("party", id=id, kind=kind, polity_id=polity_id)
-        for text, lang, name_kind in names:
-            self.name(id, text, lang, name_kind)
-        if wikidata is not None:
-            self.add("external_id", entity_id=id, scheme="wikidata", value=wikidata)
-        return id
-
     def artifact(self, artifact: Artifact, source_id: str) -> str:
         id = str(uuid5(NAMESPACE, f"source_artifact\x1f{source_id}\x1f{artifact.storage_key}"))
         self.add(
@@ -915,51 +889,6 @@ class Meter:
 
     def close(self) -> None:
         self.done.set()
-
-
-@cache
-def _resolver() -> parties.Resolver | None:
-    try:
-        return parties.Resolver(store.connect(autocommit=True))
-    except KeyError, OperationalError:
-        return None
-
-
-def duplicates(path: Path) -> list[tuple[str, str, str]]:
-    """New parties of a package that the resolver ties to a live party: (new id, name, live id)."""
-    resolver = _resolver()
-    file = path / "party.parquet"
-    if resolver is None or not file.exists():
-        return []
-    rows = pl.read_parquet(file, columns=["id", "kind", "polity_id"]).drop_nulls("polity_id")
-    known = {
-        str(id)
-        for (id,) in resolver.conn.execute(
-            "select id from party where id = any(%s::uuid[])", [rows["id"].to_list()]
-        ).fetchall()
-    }
-    names: dict[str, list[tuple[str, str, str]]] = {}
-    if (path / "name.parquet").exists():
-        for entity, text, lang, kind in pl.read_parquet(
-            path / "name.parquet", columns=["entity_id", "text", "lang", "kind"]
-        ).iter_rows():
-            names.setdefault(entity, []).append((text, lang, kind))
-    items: dict[str, str] = {}
-    if (path / "external_id.parquet").exists():
-        items = dict(
-            pl.read_parquet(path / "external_id.parquet")
-            .filter(pl.col("scheme") == "wikidata")
-            .select("entity_id", "value")
-            .iter_rows()
-        )
-    found: list[tuple[str, str, str]] = []
-    for id, kind, polity in rows.iter_rows():
-        if id in known:
-            continue
-        match = resolver.find(polity, kind, names.get(id, []), items.get(id))
-        if match is not None and match.id != id:
-            found.append((id, next((text for text, *_ in names.get(id, [])), ""), match.id))
-    return found
 
 
 def check(path: Path) -> list[tuple[str, int, list[tuple[object, ...]]]]:
@@ -1827,13 +1756,6 @@ def run(command: str, keys: list[str], reference: Path | None = None) -> None:
         if blocking:
             failed = True
             continue
-        twins = duplicates(path)
-        if twins:
-            print(
-                f"{key}: notice party.duplicate {len(twins):,} new parties match a live party, which party_merges "
-                f"merges after the load (Package.party reuses them at build time): {twins[:5]}",
-                flush=True,
-            )
         print(f"{key}: checks passed, {checked}", flush=True)
         ready.append((path, accepted))
     if command == "load" and ready and not failed:

@@ -1,6 +1,6 @@
 import re
 import unicodedata
-from collections import Counter, defaultdict
+from collections import defaultdict
 from dataclasses import dataclass, field
 from uuid import UUID
 
@@ -9,6 +9,7 @@ from ea.store import Connection
 APART = ("list_vehicle", "independent_group", "nuance", "parliamentary_group", "caucus")
 KEYS = ("official", "english", "native", "ballot", "historical", "transliteration")
 GAP = 12
+EARLY = 5
 HUB = 3
 GENERIC = re.compile(
     r"^(the )?(independ|indépend|unabh|bagimsiz|non ?partisan|unaffiliated|no party|none|others?|otros|outros|autres"
@@ -25,13 +26,19 @@ LIVE = """select p.id::text, p.polity_id::text, p.kind::text, c.pipeline, coales
                            from name n where n.entity_id = p.id), '{}')
           from party p join changeset c on c.id = p.changeset_id join entity e on e.id = p.id
           where e.retired_by is null and p.polity_id is not null and p.kind::text <> all(%(apart)s)
-            and not exists (select from entity_merge m where m.entity_id = p.id)
-            and (%(polities)s::uuid[] is null or p.polity_id = any(%(polities)s::uuid[]))"""
+            and not exists (select from entity_merge m where m.entity_id = p.id)"""
 FOOTPRINT = """select o.party_id::text, count(distinct k.election_id), count(*),
                       min(extract(year from e.date_from))::int, max(extract(year from e.date_from))::int,
                       coalesce(array_agg(distinct k.district_area_id::text)
-                               filter (where k.district_area_id is not null), '{}')
+                               filter (where k.district_area_id is not null), '{}'),
+                      array_agg(distinct k.election_id::text),
+                      coalesce(bool_or(a.scheme_code = 'world.country'
+                                       or (t.parent_tier_id is null and t.within_polity_id is null)), false)
                from contest_option o join contest k on k.id = o.contest_id join election e on e.id = k.election_id
+               left join area a on a.id = k.district_area_id
+               left join contest_class cc on cc.contest_id = k.id
+               left join census_class cl on cl.id = cc.class_id
+               left join census_tier t on t.id = cl.tier_id
                where o.party_id = any(%s) group by 1"""
 PLACES = """select distinct on (entity_id) entity_id::text, text from name where entity_id = any(%s)
             order by entity_id, is_preferred desc, lang = 'en' desc"""
@@ -65,6 +72,7 @@ class Party:
     first: int | None = None
     last: int | None = None
     areas: set[str] = field(default_factory=set)
+    held: set[str] = field(default_factory=set)
     national: bool = False
 
 
@@ -88,22 +96,25 @@ def party(
     )
 
 
-def live(conn: Connection, polities: list[str] | None = None) -> list[Party]:
+def live(conn: Connection) -> list[Party]:
     return [
         party(id, polity, kind, pipeline, unit, set(wikidata), [tuple(name.split("\x1f", 2)) for name in names])
-        for id, polity, kind, pipeline, unit, wikidata, names in conn.execute(
-            LIVE, {"apart": list(APART), "polities": polities}
-        ).fetchall()
+        for id, polity, kind, pipeline, unit, wikidata, names in conn.execute(LIVE, {"apart": list(APART)}).fetchall()
     ]
 
 
 def place(conn: Connection, parties: list[Party]) -> None:
     by = {p.id: p for p in parties}
     areas: dict[str, list[str]] = {}
-    for id, elections, options, first, last, districts in conn.execute(FOOTPRINT, [[UUID(id) for id in by]]).fetchall():
+    whole: set[str] = set()
+    for id, elections, options, first, last, districts, held, country in conn.execute(
+        FOOTPRINT, [[UUID(id) for id in by]]
+    ).fetchall():
         p = by[id]
-        p.elections, p.options, p.first, p.last = elections, options, first, last
+        p.elections, p.options, p.first, p.last, p.held = elections, options, first, last, set(held)
         areas[id] = districts
+        if country:
+            whole.add(id)
     names = dict(conn.execute(PLACES, [[UUID(a) for a in {a for found in areas.values() for a in found}]]).fetchall())
     countries: dict[str, set[str]] = defaultdict(set)
     for polity, text in conn.execute(
@@ -113,7 +124,7 @@ def place(conn: Connection, parties: list[Party]) -> None:
     for id, found in areas.items():
         p = by[id]
         p.areas = {fold(names[a]) for a in found if a in names}
-        p.national = bool(p.areas & countries[p.polity]) or p.pipeline.startswith("eu.")
+        p.national = id in whole or bool(p.areas & countries[p.polity]) or p.pipeline.startswith("eu.")
 
 
 def groups(parties: list[Party]) -> list[list[Party]]:
@@ -157,13 +168,11 @@ def judge(
         if a.native and b.native and not a.native & b.native:
             return "apart", "their names in the native script differ"
     kinds = {p.kind for p in members}
-    if len(kinds) > 1:
+    if len(kinds) > 1 and not ("party" in kinds and kinds <= {"party", "bloc", "federation"}):
         return "review", "their kinds differ: " + ", ".join(sorted(kinds))
-    if any(not a.names & b.names for a, b in pairs):
-        return "review", "chained through a third record; two of them share no name"
-    twice = sorted(unit for unit, n in Counter(p.unit for p in members).items() if n > 1)
-    if twice:
-        return "review", "one source holds several of them: " + ", ".join(twice)
+    together = sorted({a.unit for a, b in pairs if a.unit == b.unit and a.held & b.held})
+    if together:
+        return "review", "one source holds several of them in the same election: " + ", ".join(together)
     placed = [p for p in members if p.areas]
     reached = {placed[0].id} if placed else set()
     stack = placed[:1]
@@ -185,7 +194,7 @@ def judge(
             for p in members
             if p.first is not None
             and p.last is not None
-            and ((began is not None and p.first < began - 1) or (ended is not None and p.last > ended + 1))
+            and ((began is not None and p.first < began - EARLY) or (ended is not None and p.last > ended + 1))
         ]
         if outside:
             return "review", f"active outside {item}'s years ({began}-{ended})"
@@ -203,48 +212,3 @@ def judge(
 
 def survivor(members: list[Party]) -> Party:
     return min(members, key=lambda p: (not p.wikidata, -p.elections, -p.options, p.id))
-
-
-class Resolver:
-    """Finds the live party a new record names, by Wikidata id or by an exact full name in the same polity."""
-
-    def __init__(self, conn: Connection) -> None:
-        self.conn = conn
-        self.polities: dict[str, tuple[dict[str, Party], dict[str, list[Party]]]] = {}
-
-    def _index(self, polity: str) -> tuple[dict[str, Party], dict[str, list[Party]]]:
-        if polity not in self.polities:
-            parties = live(self.conn, [polity])
-            items = {item: p for p in parties for item in p.wikidata}
-            names: dict[str, list[Party]] = defaultdict(list)
-            for p in parties:
-                for name in p.names:
-                    names[name].append(p)
-            self.polities[polity] = items, names
-        return self.polities[polity]
-
-    def find(
-        self, polity: str, kind: str, names: list[tuple[str, str, str]], wikidata: str | None = None
-    ) -> Party | None:
-        items, index = self._index(polity)
-        if wikidata is not None and wikidata in items:
-            return items[wikidata]
-        if kind in APART:
-            return None
-        new = party("", polity, kind, "", "", set(), names)
-        found = {
-            p.id: p
-            for name in new.names
-            for p in index.get(name, [])
-            if p.kind == kind
-            and not (wikidata is not None and p.wikidata)
-            and not (new.native and p.native and not new.native & p.native)
-        }
-        if len(found) != 1:
-            return None
-        match = next(iter(found.values()))
-        if not match.wikidata:
-            place(self.conn, [match])
-            if not match.national:
-                return None
-        return match

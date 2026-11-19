@@ -11,7 +11,7 @@ from ea.sources import wikidata
 from ea.store import Connection, connect
 
 SOURCE = "party_merges"
-VERSION = "9"
+VERSION = "10"
 SAME = Path(__file__).with_name("party_same.tsv")
 APART = Path(__file__).with_name("party_apart.tsv")
 COLUMNS = (
