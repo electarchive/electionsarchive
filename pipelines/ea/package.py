@@ -2167,8 +2167,15 @@ def _ready(source: Connection | Reference, key: str, batch: set[str], minted: se
                join area_geometry g on g.area_id = n.area_id
                 and daterange(g.valid_from, g.valid_to, '[)') && daterange(n.valid_from, n.valid_to, '[)')
                join changeset c on c.id = g.changeset_id
-               where c.scope->>'package' is distinct from %s""",
-            [rows["area_id"].to_list(), rows["valid_from"].to_list(), rows["valid_to"].to_list(), key],
+               where c.scope->>'package' is distinct from %s and c.id <> all(%s::uuid[])""",
+            [
+                rows["area_id"].to_list(),
+                rows["valid_from"].to_list(),
+                rows["valid_to"].to_list(),
+                key,
+                # The changesets a package adopts hand their rows to it, so their outlines are its own.
+                list(manifest.get("adopts", [])),
+            ],
         ).fetchall()
         if taken:
             found.append(
