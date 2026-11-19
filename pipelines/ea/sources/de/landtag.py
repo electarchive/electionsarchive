@@ -2091,9 +2091,7 @@ def package_from_export() -> Path:
     for table, frame in tables.items():
         frame.write_parquet(out / f"{table}.parquet", statistics=False)
         counts[table] = frame.height
-    stored = {source["storage_key"] for source in manifest["sources"]}
-    added = [{"storage_key": storage} for storage in staged["source_artifact"]["storage_key"] if storage not in stored]
-    built = package._seal(key, SOURCE, SUMMARY, out, counts, manifest["adopts"], manifest["sources"] + added, None)
+    built = package._seal(key, SOURCE, SUMMARY, out, counts, manifest["adopts"], package.cited(out), None)
     after = {code: n for code, n, _ in package.check(out)}
     if after != before:
         raise ValueError(f"{key}: the Saxon rows change the check findings from {before} to {after}")

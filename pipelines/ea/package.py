@@ -2220,6 +2220,16 @@ def _adopted(conn: Connection, pipeline: str) -> tuple[list[str], list[str]]:
     return sorted(row[0]), sorted(row[1])
 
 
+def cited(out: Path) -> list[dict[str, str]]:
+    """The raw artifacts a build's source_artifact rows name, as the manifest lists them: URL, sha256, and the
+    storage key in the raw cache. A changeset's artifact_keys name its own parquet files, not raw ones."""
+    file = out / "source_artifact.parquet"
+    if not file.exists():
+        return []
+    rows = pl.read_parquet(file, columns=["url", "sha256", "storage_key"]).unique("storage_key").sort("storage_key")
+    return [{"url": url, "sha256": sha, "storage_key": key} for url, sha, key in rows.iter_rows()]
+
+
 def _canonicalize(file: Path, columns: list[str]) -> None:
     pl.read_parquet(file).with_columns(
         pl.col(column).map_elements(canonical, return_dtype=pl.String) for column in columns
@@ -2295,7 +2305,7 @@ def export(pipeline: str) -> Path:
     meter = Meter()
     with store.connect() as conn:
         conn.execute("set transaction isolation level repeatable read, read only")
-        owned, artifacts = _adopted(conn, pipeline)
+        owned, _ = _adopted(conn, pipeline)
         if not owned:
             raise LookupError(f"{pipeline} has no published changesets outside packages")
         mine = sql.SQL("t.changeset_id = any({}::uuid[])").format(sql.Literal(owned))
@@ -2385,7 +2395,7 @@ def export(pipeline: str) -> Path:
         out,
         counts,
         owned,
-        [{"storage_key": artifact} for artifact in artifacts],
+        cited(out),
         EXPORT_REASON,
     )
     print(f"{key}: {', '.join(f'{t} {n:,}' for t, n in counts.items())}; {len(owned):,} changesets adopted", flush=True)
@@ -2650,18 +2660,8 @@ class Draft(Changeset):
                 if table in OPTIONAL:
                     _trim(table, out / f"{table}.parquet")
                 counts[table] = carried.height
-        owned, artifacts = _adopted(self.conn, pipeline)
-        new = tables["source_artifact"]["storage_key"].to_list() if "source_artifact" in tables else []
-        _seal(
-            key,
-            pipeline,
-            str(self.manifest["summary"]),
-            out,
-            counts,
-            owned,
-            [{"storage_key": storage} for storage in sorted({*artifacts, *new})],
-            None,
-        )
+        owned, _ = _adopted(self.conn, pipeline)
+        _seal(key, pipeline, str(self.manifest["summary"]), out, counts, owned, cited(out), None)
         print(
             f"{key}: {', '.join(f'{t} {n:,}' for t, n in counts.items())}; {len(owned):,} changesets adopted",
             flush=True,
