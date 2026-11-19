@@ -187,3 +187,57 @@ def box_rows(pdf: Path, pages: range) -> list[BoxRow]:
                 )
             )
     return out
+
+
+def city_rows(text: list[str], start: int) -> list[tuple[str, dict[str, int]]]:
+    """The rows of the tables of votes abroad by country and city, in print order, with each table's total row.
+
+    A country's name that wraps over two lines is joined, and the row of Copenhagen, which the text layer scrambles with
+    the page footer, takes the counts of Denmark, whose only city it is.
+    """
+    out: list[tuple[str, dict[str, int]]] = []
+    for line in text[start:]:
+        match = ROW.match(line)
+        if match:
+            name = re.sub(r"\s+", " ", match.group("name")).strip()
+            if name == "República de":
+                name = "República de Corea del Sur"
+            out.append((name, counts(match.group("n"))))
+        elif re.match(r"\s*Copenhage\s", line):
+            out.append(("Copenhage", out[-1][1]))
+    return out
+
+
+def countries(
+    rows: list[tuple[str, dict[str, int]]],
+) -> list[tuple[str, dict[str, int], list[tuple[str, dict[str, int]]]]]:
+    """Groups the rows of each continent's table into countries and their cities.
+
+    Each table opens with its total row. A country row comes next; the cities that follow it add up to it, which is
+    where its group ends. Every table's countries add up to its total row.
+    """
+    out = []
+    tables: list[list[tuple[str, dict[str, int]]]] = []
+    for name, c in rows:
+        if name == "Total":
+            tables.append([])
+        tables[-1].append((name, c))
+    for table in tables:
+        total, block = table[0][1], table[1:]
+        have = dict.fromkeys(total, 0)
+        i = 0
+        while i < len(block):
+            country, want = block[i]
+            seen = dict.fromkeys(want, 0)
+            j = i + 1
+            while seen != want:
+                if j >= len(block):
+                    raise ValueError(f"the cities of {country} do not add up to {want}")
+                seen = {k: seen[k] + block[j][1][k] for k in seen}
+                j += 1
+            out.append((country, want, block[i + 1 : j]))
+            have = {k: have[k] + want[k] for k in have}
+            i = j
+        if have != total:
+            raise ValueError(f"the countries add up to {have}, not the table's {total}")
+    return out

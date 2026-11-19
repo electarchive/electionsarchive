@@ -353,10 +353,11 @@ BULLETINS = {
 
 
 BULLETIN_METHOD = (
-    "Counts from the results bulletin of the Servicio Intercultural de Fortalecimiento Democrático of the Tribunal "
-    "Supremo Electoral, at the finest level that the bulletin prints as text: the department, the municipality, or the "
-    "country of a vote cast abroad. The bulletin's tables add up to the totals it prints. The municipal tables of "
-    "the bulletins and the lists of polling places are not read here."
+    "Counts of each municipality are the sums of its polling tables in the digital Atlas Electoral of the Órgano "
+    "Electoral Plurinacional, because the results bulletin prints its municipal tables (5 to 13) as images. Counts of "
+    "each city abroad are tables 15 to 18 of the bulletin of the Servicio Intercultural de Fortalecimiento "
+    "Democrático. Every department's municipalities add up to the department's row in table 3 of the bulletin, every "
+    "country's cities add up to its row in table 14, and the whole adds up to the national total of table 1."
 )
 STATUTES_METHOD = (
     "Counts from the results bulletin of the Servicio Intercultural de Fortalecimiento Democrático of the Tribunal "
@@ -666,6 +667,7 @@ class Part(NamedTuple):
     counts: dict[str, int]
     page: int
     scheme: str = "bo.municipio"
+    town: str = ""  # the digital Atlas's code of a municipality read from its polling tables
 
 
 class BoxProvince(NamedTuple):
@@ -807,6 +809,50 @@ def statute_municipalities(pdf: Path, totals: dict[str, list[dict[str, int]]]) -
     return parts
 
 
+def constitutional(text: list[str]) -> tuple[list[Part], dict[str, list[dict[str, int]]]]:
+    """The 2016 referendum: each municipality from the polling tables, and each city abroad from tables 15 to 18.
+
+    The bulletin prints the municipal tables (5 to 13) as images, so the municipalities are the sums of the polling
+    tables of the electoral organ's digital Atlas, which the bulletin's department rows check. The votes abroad are the
+    cities of the text tables, which the country rows of table 14 check.
+    """
+    table = bulletins.rows(text, bulletins.after(text, r"SEGÚN RESIDENCIA\. REFERENDO"))
+    inside = bulletins.rows(text, bulletins.after(text, r"SEGÚN DEPARTAMENTO\. 2016"))
+    inside.pop("Total")
+    towns: dict[tuple[str, str], Mesa] = {}
+    sums: dict[tuple[str, str], dict[str, int]] = {}
+    for mesa in mesas(38):
+        k = (mesa.dept, mesa.town)
+        towns.setdefault(k, mesa)
+        sums[k] = add(sums.get(k, {}), mesa.counts)
+    parts = [
+        Part(dept, towns[(dept, town)].name, counts, 0, "digital.municipio", town)
+        for (dept, town), counts in sorted(sums.items())
+    ]
+    for label, counts in inside.items():
+        code = department(label)
+        if code is None:
+            raise ValueError(f"2016-constitutional: {label}")
+        if summed([part for part in parts if part.dept == code]) != counts:
+            raise ValueError(f"2016-constitutional: the municipalities of {label} do not add up to {counts}")
+    if summed(parts) != table["Bolivia"]:
+        raise ValueError(f"2016-constitutional: the municipalities add up to {summed(parts)}, not {table['Bolivia']}")
+    abroad = bulletins.rows(text, bulletins.after(text, r"SEGÚN PAÍS EN LA CONSULTA"), r"Gráfico N")
+    total = abroad.pop("Total")
+    abroad["Uruguay"] = URUGUAY
+    grouped = bulletins.countries(bulletins.city_rows(text, bulletins.after(text, r"Cuadro N° 15")))
+    if {named(c): counts for c, counts, _ in grouped} != {named(c): counts for c, counts in abroad.items()}:
+        raise ValueError("2016-constitutional: the countries of tables 15 to 18 differ from table 14's")
+    cities = [
+        Part("abroad", f"{country}, {city}", counts, 0, "bo.exterior")
+        for country, _, rows in grouped
+        for city, counts in rows
+    ]
+    if summed(cities) != table["Extranjero"] or table["Extranjero"] != total:
+        raise ValueError(f"2016-constitutional: the cities add up to {summed(cities)}, not {table['Extranjero']}")
+    return [*parts, *cities], {"country": [table["Total"]]}
+
+
 @functools.cache
 def bulletin(name: str) -> Result:
     text = bulletins.lines(raw.cached(SOURCE, BULLETINS[name]).path)
@@ -825,23 +871,7 @@ def bulletin(name: str) -> Result:
         for key, (dept, _) in ETA_2015.items():
             parts.append(Part(dept, eta_name(key), bulletins.locality_total(text, key), 0))
     elif name == "2016-constitutional":
-        table = bulletins.rows(text, bulletins.after(text, r"SEGÚN RESIDENCIA\. REFERENDO"))
-        totals["country"] = [table["Total"]]
-        inside = bulletins.rows(text, bulletins.after(text, r"SEGÚN DEPARTAMENTO\. 2016"))
-        inside.pop("Total")
-        for label, counts in inside.items():
-            code = department(label)
-            if code is None:
-                raise ValueError(f"{name}: {label}")
-            parts.append(Part(code, label, counts, 0, "bo.departamento"))
-        abroad = bulletins.rows(text, bulletins.after(text, r"SEGÚN PAÍS EN LA CONSULTA"), r"Gráfico N")
-        abroad.pop("Total")
-        abroad["Uruguay"] = URUGUAY
-        parts += [Part("abroad", label, counts, 0, "bo.exterior") for label, counts in abroad.items()]
-        if summed(parts[9:]) != table["Extranjero"]:
-            raise ValueError(f"{name}: the countries add up to {summed(parts[9:])}, not {table['Extranjero']}")
-        if summed(parts[:9]) != table["Bolivia"]:
-            raise ValueError(f"{name}: the departments add up to {summed(parts[:9])}, not {table['Bolivia']}")
+        parts, totals = constitutional(text)
     else:
         table = ETA_2016 if name == "2016-eta" else ETA_2017
         found = bulletins.eta_rows(text)
@@ -910,18 +940,23 @@ def mesas(n: int) -> list[Mesa]:
     return out
 
 
+def mesa_town(dept: str, town: str, name: str, found: Places) -> str:
+    """The code of the municipality that the digital Atlas's code and name stand for."""
+    if town in NEW_TOWNS:
+        return NEW_TOWNS[town][0]
+    if town in TOWNS:
+        return TOWNS[town]
+    assert found.settled is not None
+    codes = {found.settled[(dept, n)] for n in variants(name) if (dept, n) in found.settled}
+    if len(codes) != 1:
+        raise ValueError(f"{name} in department {dept} is {codes or 'unknown'}")
+    return codes.pop()
+
+
 def mesa_area(mesa: Mesa, found: Places) -> str:
     if mesa.name == "RAQAYPAMPA":
         return area("bo.eta", "Raqaypampa")
-    if mesa.town in NEW_TOWNS:
-        return area("bo.municipio", NEW_TOWNS[mesa.town][0])
-    if mesa.town in TOWNS:
-        return area("bo.municipio", TOWNS[mesa.town])
-    assert found.settled is not None
-    codes = {found.settled[(mesa.dept, name)] for name in variants(mesa.name) if (mesa.dept, name) in found.settled}
-    if len(codes) != 1:
-        raise ValueError(f"process {mesa.process}: {mesa.name} in department {mesa.dept} is {codes or 'unknown'}")
-    return area("bo.municipio", codes.pop())
+    return area("bo.municipio", mesa_town(mesa.dept, mesa.town, mesa.name, found))
 
 
 def district(contest: Contest, found: Places) -> str:
@@ -977,13 +1012,21 @@ def area(scheme: str, code: str) -> str:
 def unit_of(part: Part, found: Places) -> str:
     if part.scheme == "bo.municipio":
         return unit(found.code(part.dept, part.name))
+    if part.scheme == "digital.municipio":
+        if part.name == "RAQAYPAMPA":
+            return key("unit", "bo.eta", "Raqaypampa")
+        return unit(mesa_town(part.dept, part.town, part.name, found))
     if part.scheme == "bo.departamento":
         return key("unit", part.scheme, part.dept)
     return key("unit", part.scheme, part.name)
 
 
 def abroad() -> list[str]:
-    return [part.name for part in section("2016-constitutional").parts if part.scheme == "bo.exterior"]
+    """The countries of table 14 of the 2016 bulletin, each of which has a reporting unit."""
+    text = bulletins.lines(raw.cached(SOURCE, B2016).path)
+    found = bulletins.rows(text, bulletins.after(text, r"SEGÚN PAÍS EN LA CONSULTA"), r"Gráfico N")
+    found.pop("Total")
+    return [*found, "Uruguay"]
 
 
 def shape(geometry: dict[str, Any]) -> shapely.MultiPolygon:
@@ -1085,7 +1128,7 @@ def geo() -> Package:
     p.add(
         "scheme", code="bo.eta", polity_id=BOLIVIA, kind="administrative", rank=2, noun="autonomous territorial entity"
     )
-    p.add("scheme", code="bo.exterior", polity_id=BOLIVIA, kind="precinct", rank=3, noun="country of the vote abroad")
+    p.add("scheme", code="bo.exterior", polity_id=BOLIVIA, kind="precinct", rank=3, noun="city of the vote abroad")
     p.add("scheme", code="bo.mesa", polity_id=BOLIVIA, kind="precinct", rank=3, noun="polling table")
     for scheme in ("bo.departamento", "bo.municipio"):
         p.add(
@@ -1171,6 +1214,16 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=area("bo.departamento", code.split(":")[0]))
         p.name(id, name, "es", "official")
         outline(p, id, shapes.towns[code])
+        p.add(
+            "reporting_unit",
+            id=unit(code),
+            polity_id=BOLIVIA,
+            scheme_code="bo.municipio",
+            code=code,
+            area_relation="equals",
+            area_id=id,
+            kind="standard",
+        )
     return p
 
 
@@ -1379,7 +1432,11 @@ def add_contest(p: Package, election: str, base: str, source: str, contest: Cont
         id=p.id("citation", result_set),
         entity_id=result_set,
         source_id=source,
-        locator={"pages": pages, "table": "Resultados por municipio"} if pages else {"table": contest.section},
+        locator={"pages": pages, "table": "Resultados por municipio"}
+        if pages
+        else {"tables": "5 to 13 (municipalities, by polling table) and 15 to 18 (cities abroad)"}
+        if contest.section == "2016-constitutional"
+        else {"table": contest.section},
     )
     winner = 0 if total["yes"] > total["no"] else 1
     p.add("outcome", result_set_id=result_set, option_id=options[winner], kind="won")
