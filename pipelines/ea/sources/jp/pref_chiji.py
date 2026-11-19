@@ -1,6 +1,9 @@
+import itertools
 import re
 import subprocess
 import unicodedata
+import zipfile
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
@@ -10,12 +13,13 @@ from typing import Any
 import fastexcel
 import polars as pl
 
-from ea import raw
-from ea.changeset import Changeset
+from ea import package, raw
+from ea.package import Draft
 from ea.sources.jp import mic_chiji
 from ea.store import DATA, connect
 
 SOURCE = "jp.pref_chiji"
+KEY = f"{SOURCE}/all"
 VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{stamp}id_/{url}"
@@ -31,6 +35,23 @@ IWATE = "https://www.pref.iwate.jp/_res/projects/default_project/_page_/001"
 AKITA = "https://www.pref.akita.lg.jp/uploads/public"
 YAMAGATA = "https://www.pref.yamagata.jp/documents"
 FUKUSHIMA = "https://www.pref.fukushima.lg.jp/uploaded/attachment"
+NIIGATA = "https://www.pref.niigata.lg.jp/uploaded/attachment"
+ISHIKAWA = "https://www.pref.ishikawa.lg.jp/senkan/kako_data/documents"
+YAMANASHI = "https://www.pref.yamanashi.jp/documents"
+GIFU = "https://www.pref.gifu.lg.jp/uploaded/attachment"
+SHIZUOKA = "https://www.pref.shizuoka.jp/_res/projects/default_project/_page_/001"
+KYOTO = "https://www.pref.kyoto.jp/senkyo/documents"
+OSAKA = "https://www.pref.osaka.lg.jp/documents"
+HYOGO = "https://web.pref.hyogo.lg.jp/si01/documents"
+NAGANO = "https://www.pref.nagano.lg.jp/senkan"
+TOYAMA = "https://www.pref.toyama.jp/documents/13804"
+
+
+def site_terms(prefecture: str, terms: str) -> tuple[str, str]:
+    return (
+        f"Copyright {prefecture} (site terms); counts published as facts with attribution, raw files not redistributed",
+        terms,
+    )
 
 
 @dataclass(frozen=True)
@@ -151,8 +172,122 @@ COMMISSIONS = {
         "https://www.pref.wakayama.lg.jp/prefg/000200/opendata/hpopendatakiyaku.html",
         "出典：和歌山県ホームページ",
     ),
+    "新潟県": Commission(
+        "新潟県選挙管理委員会",
+        "新潟県知事選挙 開票結果・投票結果",
+        "https://www.pref.niigata.lg.jp/sec/senkyo/",
+        *site_terms("Niigata Prefecture", "https://www.pref.niigata.lg.jp/site/userguide/use.html"),
+        "出典：新潟県選挙管理委員会",
+    ),
+    "石川県": Commission(
+        "石川県選挙管理委員会",
+        "石川県知事選挙 開票結果調・投票結果調",
+        "https://www.pref.ishikawa.lg.jp/senkan/kako_data/chiji.html",
+        *site_terms("Ishikawa Prefecture", "https://www.pref.ishikawa.lg.jp/about_site/sitepolicy/index.html"),
+        "出典：石川県選挙管理委員会",
+    ),
+    "山梨県": Commission(
+        "山梨県選挙管理委員会",
+        "山梨県知事選挙 得票表（市町村別一覧表）・開票状況（開票区別投票総数）・投票状況（確定）",
+        "https://www.pref.yamanashi.jp/senkyo/r5chiji.html",
+        *site_terms("Yamanashi Prefecture", "https://www.pref.yamanashi.jp/info/howto_site.html"),
+        "出典：山梨県選挙管理委員会",
+    ),
+    "岐阜県": Commission(
+        "岐阜県選挙管理委員会",
+        "岐阜県知事選挙 開票状況・投票状況（結了発表）",
+        "https://www.pref.gifu.lg.jp/page/411554.html",
+        *site_terms("Gifu Prefecture", "https://www.pref.gifu.lg.jp/page/79328.html"),
+        "出典：岐阜県選挙管理委員会",
+    ),
+    "静岡県": Commission(
+        "静岡県選挙管理委員会",
+        "静岡県知事選挙 開票結果・投票結果（確定）",
+        "https://www.pref.shizuoka.jp/kensei/senkyo/",
+        *site_terms("Shizuoka Prefecture", "https://www.pref.shizuoka.jp/about/link.html"),
+        "出典：静岡県選挙管理委員会",
+    ),
+    "京都府": Commission(
+        "京都府選挙管理委員会",
+        "京都府知事選挙 開票結果・投票結果",
+        "https://www.pref.kyoto.jp/senkyo/kekka.html",
+        *site_terms("Kyoto Prefecture", "https://www.pref.kyoto.jp/copyright.html"),
+        "出典：京都府選挙管理委員会",
+    ),
+    "大阪府": Commission(
+        "大阪府選挙管理委員会",
+        "大阪府知事選挙 開票結果・投票結果（最終）",
+        "https://www.pref.osaka.lg.jp/soshikikarasagasu/senkan/index.html",
+        *site_terms("Osaka Prefecture", "https://www.pref.osaka.lg.jp/o070050/koho/information/use.html"),
+        "出典：大阪府選挙管理委員会",
+    ),
+    "兵庫県": Commission(
+        "兵庫県選挙管理委員会",
+        "兵庫県知事選挙 選挙の記録（投票・開票）",
+        f"{HYOGO}/06kaihyo.pdf",
+        *site_terms("Hyogo Prefecture", "https://web.pref.hyogo.lg.jp/about_link.html"),
+        "出典：兵庫県選挙管理委員会",
+    ),
+    "長野県": Commission(
+        "長野県選挙管理委員会",
+        "長野県知事選挙 開票状況速報・市町村別投票結果確定速報",
+        f"{NAGANO}/chiji2026/documents/05kaikekka.pdf",
+        *site_terms("Nagano Prefecture", "https://www.pref.nagano.lg.jp/koho/kensei/koho/homepage/riyo.html"),
+        "出典：長野県選挙管理委員会",
+    ),
+    "富山県": Commission(
+        "富山県選挙管理委員会",
+        "富山県知事選挙 開票結果（候補者得票集計表）・投票結果",
+        "https://www.pref.toyama.jp/500/kensei/kenseiunei/senkyo/iinkai/gs_kekka.html",
+        *site_terms("Toyama Prefecture", "https://www.pref.toyama.jp/1021/kensei/kouhou/0.html"),
+        "出典：富山県選挙管理委員会",
+    ),
 }
 RECORDS: dict[str, tuple[str, ...]] = {
+    "2026-08-09:長野県": (
+        f"{NAGANO}/chiji2026/documents/05kaikekka.pdf",
+        f"{NAGANO}/chiji2026/documents/03tokkekka.pdf",
+    ),
+    "2024-11-17:兵庫県": (f"{HYOGO}/06kaihyo.pdf", f"{HYOGO}/05tohyo.pdf"),
+    "2024-10-27:富山県": (f"{TOYAMA}/r6chiji_kaihyo_kekka.xlsx", f"{TOYAMA}/r6chiji_tohyo_kekka.xlsx"),
+    "2020-10-25:富山県": (f"{TOYAMA}/r2chiji_kaihyo_kekka.xlsx", f"{TOYAMA}/r2chiji_tohyo_kekka.xlsx"),
+    "2016-10-23:富山県": (f"{TOYAMA}/28chiji_kaihyo_kekka.xlsx", f"{TOYAMA}/28chiji_tohyo_kekka.xlsx"),
+    "2012-10-28:富山県": (
+        f"{TOYAMA}/24chiji_toyama_kaihyo_kekka.xls",
+        f"{TOYAMA}/24chiji_toyama_tohyo_kekka_teisei01.xls",
+    ),
+    "2017-07-02:兵庫県": (f"{HYOGO}/6tizikaihyo.pdf", f"{HYOGO}/5tizitohyo.pdf"),
+    "2026-05-31:新潟県": (f"{NIIGATA}/500104.pdf", f"{NIIGATA}/500103.pdf"),
+    "2026-04-05:京都府": (f"{KYOTO}/chijikaihyokekka20260405.pdf", f"{KYOTO}/chijitohyokekka20260405.pdf"),
+    "2026-02-08:大阪府": (
+        f"{OSAKA}/125389/4-4kaihyokekka_chiji.xlsx",
+        f"{OSAKA}/125389/4-2touhyoukekka_chiji.xlsx",
+    ),
+    "2025-01-26:岐阜県": (f"{GIFU}/430430.XLSX", f"{GIFU}/430424.XLSX"),
+    "2024-05-26:静岡県": (f"{SHIZUOKA}/063/017/kai-kaku.zip", f"{SHIZUOKA}/063/016/tou-kakuc.xlsx"),
+    "2023-01-22:山梨県": (
+        f"{YAMANASHI}/107987/tokuhyouhyou.pdf",
+        f"{YAMANASHI}/107987/touhyouzyoukyou.pdf",
+        f"{YAMANASHI}/107987/kaihyouzyoukyou.pdf",
+    ),
+    "2022-05-29:新潟県": (f"{NIIGATA}/323153.pdf", f"{NIIGATA}/323151.pdf"),
+    "2022-04-10:京都府": (
+        f"{KYOTO}/20220410chijisenkaihyokekka_1.pdf",
+        f"{KYOTO}/20220410chijisentohyokekka_1.pdf",
+    ),
+    "2022-03-13:石川県": (f"{ISHIKAWA}/kaihyoukekka.pdf", f"{ISHIKAWA}/touhyoukekka.pdf"),
+    "2021-06-20:静岡県": (f"{SHIZUOKA}/032/185/kai-kaku.xlsx", f"{SHIZUOKA}/032/184/tou-kaku-syuusei.xlsx"),
+    "2019-01-27:山梨県": (
+        f"{YAMANASHI}/88647/tokuhyousuu.pdf",
+        f"{YAMANASHI}/88647/touhyoujyoukyou.pdf",
+        f"{YAMANASHI}/88647/kaihyoukubetutokuhyousousuu.pdf",
+    ),
+    "2018-03-11:石川県": (f"{ISHIKAWA}/h30kklast.pdf", f"{ISHIKAWA}/h30tklast.pdf"),
+    "2017-06-25:静岡県": (f"{SHIZUOKA}/032/322/kai-kaku.xls", f"{SHIZUOKA}/032/323/tou-kaku.xls"),
+    "2015-11-22:大阪府": (f"{OSAKA}/15288/10.pdf", f"{OSAKA}/15288/04.pdf"),
+    "2014-04-06:京都府": (f"{KYOTO}/chijisen_kaihyoukekka.pdf", f"{KYOTO}/chijisen_touhyoukekka.pdf"),
+    "2014-03-16:石川県": (f"{ISHIKAWA}/h26kklast.pdf", f"{ISHIKAWA}/h26tklast.pdf"),
+    "2010-03-14:石川県": (f"{ISHIKAWA}/h22-chiji-kaihyo.pdf", f"{ISHIKAWA}/tohyo.pdf"),
     "2025-04-06:秋田県": (
         f"{AKITA}/archive_0000087917_00/2400kaihyou.xlsx",
         f"{AKITA}/archive_0000087917_00/touhyou1/touhyou1.xlsx",
@@ -707,6 +842,292 @@ def aomori_votes(path: Path, count: Path) -> tuple[list[str], list[dict[str, Any
     return [""] * len(places[0]["votes"]), places, total
 
 
+PERCENT = re.compile(r"^\d{1,3}\.(\d{2}|\d{4,})$")
+TOTALS = re.compile(r"^(\S{0,3}[都道府県])計$")
+# The workbooks Shizuoka zips together, in the order a record reads them: candidates, then ballots.
+BOOKS = ("開票結果", "開票区別得票数総数一覧")
+
+
+def wards_follow(order: list[str]) -> set[str]:
+    """Designated cities whose row the table follows with its wards' rows, named without the city."""
+    return {p for p, q in itertools.pairwise(order) if p.endswith("市") and q.endswith("区") and not q.startswith(p)}
+
+
+def section(path: Path, heading: str) -> list[tuple[str, list[Decimal]]]:
+    """The rows of one numbered section of an election record, from its heading to the next numbered heading, with
+    a place name the text layer wraps over two lines (朝 来 / 市) joined."""
+    lines = layout(path)
+    start = next(i for i, line in enumerate(lines) if heading in squash(line))
+    out, carry = [], ""
+    for line in lines[start + 1 :]:
+        if re.match(r"^\s*\(\d+\)", line):
+            break
+        tokens = line.split()
+        i = next((i for i, t in enumerate(tokens) if FIGURE.match(t)), len(tokens))
+        name = squash("".join(tokens[:i]))
+        if i == len(tokens):
+            carry = carry + name if len(name) <= 3 else ""
+            continue
+        figures = [number(t) for t in tokens[i:] if FIGURE.match(t) and not PERCENT.match(t)]
+        out.append((carry + name, figures))
+        carry = ""
+    return out
+
+
+def hyogo_votes(path: Path) -> tuple[list[str], list[dict[str, Any]], dict[str, Any]]:
+    """Hyogo's election records: the count by counting district is section (6) of the count chapter."""
+    return read_counts(section(path, "候補者別開票区別得票数"), True, str(path))
+
+
+def hyogo_turnout(path: Path) -> dict[str, tuple[str, str]]:
+    """Hyogo's election records: the electorate and voters by municipality and ward are section (2) of the voting
+    chapter."""
+    rows = [(place, figures) for place, figures in section(path, "市区町別投票結果") if unit(place)]
+    cities = wards_follow([place for place, _ in rows])
+    return {place: (str(f[2]), str(f[5])) for place, f in rows if place not in cities and len(f) >= 6}
+
+
+def wards_listed(places: Iterable[str]) -> set[str]:
+    """Designated cities whose wards the table also lists, so the city's own row is a subtotal."""
+    places = set(places)
+    return {p for p in places if p.endswith("市") and any(q != p and q.startswith(p) for q in places)}
+
+
+def book(source: Path | bytes) -> list[list[str]]:
+    reader = fastexcel.read_excel(source if isinstance(source, bytes) else str(source))
+    rows = []
+    for sheet in reader.sheet_names:
+        frame = reader.load_sheet(sheet, header_row=None, dtypes="string").to_polars()
+        for row in frame.iter_rows():
+            values = [unicodedata.normalize("NFKC", str(v)).strip() for v in row if v is not None]
+            rows.append([v for v in values if v])
+    return rows
+
+
+def rows_of(path: Path) -> list[list[str]]:
+    """A record's rows: the words of each line of a PDF's text layer, or the filled cells of each workbook row,
+    including the workbooks inside a zip, in order."""
+    if path.suffix == ".pdf":
+        return [line.split() for line in layout(path)]
+    if path.suffix == ".zip":
+        with zipfile.ZipFile(path) as archive:
+            books = {i.filename: i for i in archive.infolist() if i.file_size and i.filename.endswith(".xlsx")}
+            names = [n for part in BOOKS for n in sorted(books) if part in n]
+            return [row for name in names for row in book(archive.read(name))]
+    return book(path)
+
+
+def place_figures(path: Path) -> list[tuple[str, list[Decimal]]]:
+    """Each row's place (the words before its first figure, without spaces, parentheses, or the 結了 mark) and its
+    counts, leaving out percentages."""
+    out = []
+    for tokens in rows_of(path):
+        i = next((i for i, t in enumerate(tokens) if FIGURE.match(t)), len(tokens))
+        place = re.sub(r"^確(?=\S+[区市町村]$)", "", squash("".join(tokens[:i])).replace("*", "").replace("＊", ""))
+        figures = [number(t) for t in tokens[i:] if FIGURE.match(t) and not PERCENT.match(t)]
+        if place and figures:
+            out.append((place, figures))
+    return out
+
+
+def ledger(values: list[Decimal], total: Decimal, cast: bool, n: int) -> dict[str, str | None] | None:
+    """Find valid, invalid, and cast ballots after a row's n candidate votes: valid + invalid = cast, where valid
+    equals the votes' total or follows the total, 按分 truncation, and other ballots that add up to it; then voters,
+    the first later figure that equals cast plus the figures between them. Without a cast column (`cast=False`),
+    invalid is the figure after valid."""
+    v, zero = values, Decimal(0)
+    found = None
+    # Valid ballots after the total, 按分 truncation, and other ballots, then after the total and 按分, then the
+    # total itself, so a zero 按分 column is never taken for invalid ballots. Truncation drops less than a vote per
+    # candidate, which keeps total + invalid = cast from passing for total + 按分 = valid.
+    for lead in (3, 2, 0) if cast else (0,):
+        for a in range(lead, len(v) - 1):
+            if v[a - lead] != total or (lead and (sum(v[a - lead : a]) != v[a] or v[a - lead + 1] >= n)):
+                continue
+            if cast and (a + 2 >= len(v) or v[a] + v[a + 1] != v[a + 2]):
+                continue
+            found = a, (v[a - 2], v[a - 1]) if lead == 3 else (v[a - 1], zero) if lead == 2 else (zero, zero)
+            break
+        if found is not None:
+            break
+    if found is not None:
+        a, (cut, other) = found
+        valid, invalid = v[a], v[a + 1]
+        ballots = valid + invalid
+        voters = None
+        if cast:
+            voters = next((v[j] for j in range(a + 3, len(v)) if v[j] == ballots + sum(v[a + 3 : j])), None)
+        return {
+            "total": str(total),
+            "cut": str(cut),
+            "other": str(other),
+            "valid": str(valid),
+            "invalid": str(invalid),
+            "cast": str(ballots),
+            "unreturned": None if voters is None else str(voters - ballots),
+            "voters": None if voters is None else str(voters),
+        }
+    return None
+
+
+def table_votes(*paths: Path, cast: bool = True) -> tuple[list[str], list[dict[str, Any]], dict[str, Any]]:
+    """Votes by municipality from count tables whose rows give, by place, the candidates' votes and their total,
+    then valid, invalid, and cast ballots and voters. The rows of one place are joined across pages, tables, and
+    files in order, so a table split over two pages, or a candidate table followed by a ballot table, reads as one
+    row."""
+    return read_counts([row for path in paths for row in place_figures(path)], cast, str(paths[0]))
+
+
+Ledger = dict[str, str | None]
+
+
+def standard_row(v: list[Decimal], cast: bool) -> tuple[list[Decimal], Ledger] | None:
+    """The candidates' votes are the first run of figures that adds up to the figure after it, from the row's start
+    or after a count or two some totals rows lead with (the number of counting districts)."""
+    for s in range(3):
+        for n in range(1, len(v) - s):
+            if sum(v[s : s + n]) == v[s + n] and (read := ledger(v[s + n :], v[s + n], cast, n)) is not None:
+                return v[s : s + n], read
+    return None
+
+
+def cast_first_row(v: list[Decimal], cast: bool) -> tuple[list[Decimal], Ledger] | None:
+    """Rows that lead with cast ballots, then give the candidates' votes, 按分 truncation and other ballots where
+    printed, valid ballots, and invalid ballots; voters come from the turnout table."""
+    zero = Decimal(0)
+    for n in range(1, len(v) - 2):
+        votes = v[1 : 1 + n]
+        for cut, other, a in ((zero, zero, 1 + n), (v[1 + n], v[2 + n], 3 + n)):
+            if a + 1 < len(v) and sum(votes) + cut + other == v[a] and v[a] + v[a + 1] == v[0] and cut < n:
+                return votes, {
+                    "total": str(sum(votes)),
+                    "cut": str(cut),
+                    "other": str(other),
+                    "valid": str(v[a]),
+                    "invalid": str(v[a + 1]),
+                    "cast": str(v[0]),
+                    "unreturned": None,
+                    "voters": None,
+                }
+    return None
+
+
+def whole_cities(rows: list[tuple[str, list[Decimal]]]) -> list[tuple[str, list[Decimal]]]:
+    """Read a city its commission counts in several counting districts (富山市第1開票区) from its printed total row
+    (富山市計), dropping the districts, which have no area of their own."""
+    district = re.compile(r"^(.+?[市町村])第\d+開票区$")
+    split = {m[1] for place, _ in rows if (m := district.match(place))}
+    return [
+        (place[:-1] if place.endswith("計") and place[:-1] in split else place, figures)
+        for place, figures in rows
+        if not district.match(place)
+    ]
+
+
+def toyama_votes(path: Path) -> tuple[list[str], list[dict[str, Any]], dict[str, Any]]:
+    return read_counts(whole_cities(place_figures(path)), True, str(path), cast_first_row)
+
+
+def toyama_turnout(path: Path) -> dict[str, tuple[str, str]]:
+    return {
+        place: (str(f[2]), str(f[5])) for place, f in whole_cities(place_figures(path)) if unit(place) and len(f) >= 6
+    }
+
+
+def read_counts(
+    found: list[tuple[str, list[Decimal]]], cast: bool, label: str, row: Any = standard_row
+) -> tuple[list[str], list[dict[str, Any]], dict[str, Any]]:
+    rows: dict[str, list[Decimal]] = {}
+    for place, figures in found:
+        if unit(place) or TOTALS.match(place):
+            rows.setdefault(place, []).extend(figures)
+    places, total = [], None
+    cities = wards_listed(rows) | wards_follow([place for place, _ in found])
+    for place, v in rows.items():
+        if place in cities:
+            continue
+        read = row(v, cast)
+        if read is None:
+            raise ValueError(f"{label}: unread row {place} {v}")
+        entry = {"votes": [str(x) for x in read[0]], **read[1]}
+        if TOTALS.match(place):
+            total = entry
+        else:
+            places.append({"place": place, **entry})
+    if not places:
+        raise ValueError(f"{label} has no rows")
+    if total is None:
+        n = len(places[0]["votes"])
+        total = {
+            "votes": [str(sum(Decimal(p["votes"][k]) for p in places)) for k in range(n)],
+            **{
+                f: str(sum(Decimal(p[f]) for p in places))
+                for f in ("total", "cut", "other", "valid", "invalid", "cast")
+            },
+            "unreturned": None,
+            "voters": None,
+        }
+    return [""] * len(places[0]["votes"]), places, total
+
+
+def ballots_votes(*paths: Path) -> tuple[list[str], list[dict[str, Any]], dict[str, Any]]:
+    """Count tables that print valid and invalid ballots but neither cast ballots nor voters."""
+    return table_votes(*paths, cast=False)
+
+
+def turnout(path: Path) -> dict[str, tuple[str, str]]:
+    """The electorate and voters by place from turnout tables printing men, women, and total for each."""
+    out: dict[str, tuple[str, str]] = {}
+    for place, figures in place_figures(path):
+        if unit(place) and len(figures) >= 6:
+            out.setdefault(place, (str(figures[2]), str(figures[5])))
+    cities = wards_listed(out)
+    return {place: figures for place, figures in out.items() if place not in cities}
+
+
+# Prefectures whose tables print each county's name down a column beside its towns and villages, so the text layer
+# runs one or two of its characters into the first town names (上小布施町 for 上高井郡 小布施町).
+COUNTY_COLUMN = {"長野県"}
+
+
+def municipalities(prefecture: str) -> set[str]:
+    with connect() as conn:
+        return {
+            text
+            for (text,) in conn.execute(
+                """select distinct n.text from polity p
+                   join name pn on pn.entity_id = p.id and pn.lang = 'ja' and pn.kind = 'official'
+                   join area_code c on c.code like substr(p.iso_code, 4) || '%%'
+                   join area a on a.id = c.area_id and a.scheme_code = 'jp.municipality'
+                   join name n on n.entity_id = a.id and n.lang = 'ja' and n.kind = 'official'
+                   where p.iso_code like 'JP-__' and pn.text = %s""",
+                [prefecture],
+            )
+        }
+
+
+def unmangled(place: str, known: set[str]) -> str:
+    """The municipality whose name ends the printed text, the longest when several do."""
+    if place in known:
+        return place
+    found = sorted((name for name in known if place.endswith(name)), key=len, reverse=True)
+    if not found or (len(found) > 1 and len(found[0]) == len(found[1])):
+        raise ValueError(f"no single municipality ends {place}")
+    return found[0]
+
+
+def turnout_tail(path: Path) -> dict[str, tuple[str, str]]:
+    """The electorate and voters by place from turnout tables that end with the closing electorate, voters, and
+    abstainers, each as men, women, and total, after correction columns that may be blank."""
+    out: dict[str, tuple[str, str]] = {}
+    for place, figures in place_figures(path):
+        v = figures[-9:]
+        if unit(place) and len(v) == 9 and all(v[i] + v[i + 1] == v[i + 2] for i in (0, 3, 6)) and v[2] == v[5] + v[8]:
+            out.setdefault(place, (str(v[2]), str(v[5])))
+    cities = wards_listed(out)
+    return {place: figures for place, figures in out.items() if place not in cities}
+
+
 READERS: dict[str, tuple[Any, Any]] = {
     "東京都": (tokyo_votes, tokyo_registered),
     "栃木県": (excel_votes, excel_registered),
@@ -720,68 +1141,158 @@ READERS: dict[str, tuple[Any, Any]] = {
     "岩手県": (auto_votes, registered),
     "福島県": (auto_votes, registered),
     "青森県": (aomori_votes, table_registered),
+    "新潟県": (table_votes, turnout_tail),
+    "石川県": (table_votes, turnout),
+    "山梨県": (table_votes, turnout),
+    "岐阜県": (table_votes, turnout),
+    "静岡県": (table_votes, turnout),
+    "京都府": (table_votes, turnout),
+    "大阪府": (table_votes, turnout),
+    "兵庫県": (hyogo_votes, hyogo_turnout),
+    "長野県": (table_votes, turnout),
+    "富山県": (toyama_votes, toyama_turnout),
+    # Shizuoka's 2017 and 2021 count tables print valid and invalid ballots without cast ballots or voters.
+    "2021-06-20:静岡県": (ballots_votes, turnout),
+    "2017-06-25:静岡県": (ballots_votes, turnout),
 }
+
+
+def summaries() -> tuple[dict[str, dict[str, str | None]], dict[str, pl.DataFrame]]:
+    """The ministry's prefecture totals and candidates for each governor election, as jp.mic_chiji loaded them."""
+    fields = {measure: field for field, measure in MEASURES.items()}
+    with connect() as conn:
+        totals = conn.execute(
+            """select x.value, v.measure, v.value::text from external_id x join result_set r on r.id = x.entity_id
+               cross join lateral (select * from result_value v where v.result_set_k = r.k offset 0) v
+               where x.scheme = %s and v.option_k = 0""",
+            [f"{mic_chiji.SOURCE}.result_set"],
+        ).fetchall()
+        options = conn.execute(
+            """select x.value, o.ballot_position, o.ballot_label,
+                      (select v.value::text from result_value v join result_set r on r.k = v.result_set_k
+                       where r.id = s.entity_id and v.option_k = o.k and v.measure = 1)
+               from external_id x join contest_option o on o.contest_id = x.entity_id
+               join external_id s on s.scheme = %s and s.value = x.value
+               where x.scheme = %s""",
+            [f"{mic_chiji.SOURCE}.result_set", f"{mic_chiji.SOURCE}.contest"],
+        ).fetchall()
+    official: dict[str, dict[str, str | None]] = {}
+    for key, measure, value in totals:
+        if measure in fields:
+            official.setdefault(key, dict.fromkeys(MEASURES))[fields[measure]] = value
+    people = pl.DataFrame(options, schema=["key", "order", "name", "votes"], orient="row")
+    return official, {key: frame.sort("order") for (key,), frame in people.group_by("key")}
 
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    elections = pl.read_parquet(mic_chiji.PARSED / f"elections-v{mic_chiji.VERSION}.parquet")
-    people = pl.read_parquet(mic_chiji.PARSED / f"candidates-v{mic_chiji.VERSION}.parquet")
+    elections, people = summaries()
     rows = []
     for key, urls in RECORDS.items():
-        votes_path, turnout_path, *extra = (raw.cached(SOURCE, url).path for url in urls)
-        votes_reader, turnout_reader = READERS[key.split(":")[1]]
-        names, places, total = votes_reader(votes_path, *extra)
-        registered = turnout_reader(turnout_path)
-        official = elections.filter(pl.col("key") == key).row(0, named=True)
-        candidates = people.filter(pl.col("key") == key).sort("order")
-        extra = [Decimal(v) for p in [*places, total] for v in p["votes"][candidates.height :]]
-        if len(names) > candidates.height and not any(extra):
-            names = names[: candidates.height]
-            for p in [*places, total]:
-                p["votes"] = p["votes"][: candidates.height]
-        if len(names) != candidates.height:
-            raise ValueError(f"{key}: {len(names)} candidates in the record, {candidates.height} in the summary")
-        for name, mic in zip(names, candidates["name"], strict=True):
-            if name and re.sub(r"\s", "", name) != re.sub(r"\s", "", mic):
-                raise ValueError(f"{key}: candidate {name} is {mic} in the summary")
-        if set(registered) != {p["place"] for p in places}:
-            raise ValueError(f"{key}: turnout and count files list different municipalities")
-        for place in [p for p in places if p["voters"] is None]:
-            place["voters"] = registered[str(place["place"])][1]
-            place["unreturned"] = str(Decimal(place["voters"]) - Decimal(place["cast"]))
-        if total["voters"] is None:
-            total["voters"] = str(sum(Decimal(p["voters"]) for p in places))
-        for place in places:
-            votes = [Decimal(v) for v in place["votes"]]
-            v = {k: Decimal(str(place[k])) for k in ("total", "cut", "other", *FIELDS)}
-            if sum(votes) != v["total"] or v["total"] + v["cut"] + v["other"] != v["valid"]:
-                raise ValueError(f"{key} {place['place']}: candidate votes do not sum to valid votes")
-            if v["valid"] + v["invalid"] != v["cast"] or v["cast"] + v["unreturned"] != v["voters"]:
-                raise ValueError(f"{key} {place['place']}: ballots do not add up")
-            if registered[str(place["place"])][1] != place["voters"]:
-                raise ValueError(f"{key} {place['place']}: voters differ between the turnout and count files")
-            place["registered"] = registered[str(place["place"])][0]
-        for i, mic in enumerate(candidates["votes"]):
-            summed = sum(Decimal(p["votes"][i]) for p in places)
-            if summed != Decimal(total["votes"][i]) or abs(summed - Decimal(mic)) >= 1:
-                raise ValueError(f"{key}: candidate {i + 1} sums to {summed}, the summary prints {mic}")
-        for field in (*FIELDS[:3], "voters", "registered"):
-            summed = sum(Decimal(str(p[field])) for p in places)
-            if field != "registered" and summed != Decimal(str(total[field])):
-                raise ValueError(f"{key}: {field} sums to {summed}, the record's total is {total[field]}")
-            if official[field] is not None and summed != Decimal(official[field]):
-                raise ValueError(f"{key}: {field} sums to {summed}, the summary prints {official[field]}")
-        rows.extend({"key": key, "urls": list(urls), **p} for p in places)
+        rows.extend(checked_rows(key, urls, elections[key], people[key]))
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / f"municipalities-v{VERSION}.parquet")
+    print(build())
 
 
+def checked_rows(
+    key: str, urls: tuple[str, ...], official: dict[str, str | None], candidates: pl.DataFrame
+) -> list[dict[str, Any]]:
+    """Read one election's record and check that it adds up and matches the ministry's summary."""
+    votes_path, turnout_path, *extra = (raw.cached(SOURCE, url).path for url in urls)
+    votes_reader, turnout_reader = READERS.get(key) or READERS[key.split(":")[1]]
+    names, places, total = votes_reader(votes_path, *extra)
+    registered = turnout_reader(turnout_path)
+    extra = [Decimal(v) for p in [*places, total] for v in p["votes"][candidates.height :]]
+    if len(names) > candidates.height and not any(extra):
+        names = names[: candidates.height]
+        for p in [*places, total]:
+            p["votes"] = p["votes"][: candidates.height]
+    if len(names) != candidates.height:
+        raise ValueError(f"{key}: {len(names)} candidates in the record, {candidates.height} in the summary")
+    for name, mic in zip(names, candidates["name"], strict=True):
+        if name and re.sub(r"\s", "", name) != re.sub(r"\s", "", mic):
+            raise ValueError(f"{key}: candidate {name} is {mic} in the summary")
+    if key.split(":")[1] in COUNTY_COLUMN:
+        known = municipalities(key.split(":")[1])
+        for place in places:
+            place["place"] = unmangled(place["place"], known)
+        registered = {unmangled(place, known): figures for place, figures in registered.items()}
+    if set(registered) != {p["place"] for p in places}:
+        raise ValueError(f"{key}: turnout and count files list different municipalities")
+    for place in [p for p in places if p["voters"] is None]:
+        place["voters"] = registered[str(place["place"])][1]
+        place["unreturned"] = str(Decimal(place["voters"]) - Decimal(place["cast"]))
+    if total["voters"] is None:
+        total["voters"] = str(sum(Decimal(p["voters"]) for p in places))
+    for place in places:
+        votes = [Decimal(v) for v in place["votes"]]
+        v = {k: Decimal(str(place[k])) for k in ("total", "cut", "other", *FIELDS)}
+        if sum(votes) != v["total"] or v["total"] + v["cut"] + v["other"] != v["valid"]:
+            raise ValueError(f"{key} {place['place']}: candidate votes do not sum to valid votes")
+        if v["valid"] + v["invalid"] != v["cast"] or v["cast"] + v["unreturned"] != v["voters"]:
+            raise ValueError(f"{key} {place['place']}: ballots do not add up")
+        if registered[str(place["place"])][1] != place["voters"]:
+            raise ValueError(f"{key} {place['place']}: voters differ between the turnout and count files")
+        place["registered"] = registered[str(place["place"])][0]
+    for i, mic in enumerate(candidates["votes"]):
+        summed = sum(Decimal(p["votes"][i]) for p in places)
+        if summed != Decimal(total["votes"][i]) or abs(summed - Decimal(mic)) >= 1:
+            raise ValueError(f"{key}: candidate {i + 1} sums to {summed}, the summary prints {mic}")
+    for field in (*FIELDS[:3], "voters", "registered"):
+        summed = sum(Decimal(str(p[field])) for p in places)
+        if field != "registered" and summed != Decimal(str(total[field])):
+            raise ValueError(f"{key}: {field} sums to {summed}, the record's total is {total[field]}")
+        printed = official[field]
+        if field == "registered" and key in ELECTORATE:
+            if printed is None or summed - Decimal(printed) != ELECTORATE[key][0]:
+                raise ValueError(f"{key}: the electorate sums to {summed}, {printed} in the summary")
+        elif printed is not None and summed != Decimal(printed):
+            raise ValueError(f"{key}: {field} sums to {summed}, the summary prints {printed}")
+    return [{"key": key, "urls": list(urls), **p} for p in places]
+
+
+# Elections whose commission tables put the closing electorate above the ministry's summary, while every vote,
+# ballot, and voter count matches it: the difference, and the caveat the result set carries.
+ELECTORATE: dict[str, tuple[int, str]] = {
+    "2022-05-29:新潟県": (
+        28,
+        (
+            "The commission's turnout table puts the closing electorate at 1,844,647, 28 more than the 1,844,619 the "
+            "ministry's summary prints; the electorate here is the commission's, by municipality and ward. Votes, "
+            "ballots, and voters match the summary."
+        ),
+    ),
+    "2021-06-20:静岡県": (
+        7,
+        (
+            "The commission's corrected turnout table puts the electorate at 3,014,952, 7 more than the 3,014,945 the "
+            "ministry's summary prints; the electorate here is the commission's, by municipality and ward. Votes, "
+            "ballots, and voters match the summary."
+        ),
+    ),
+}
 NOTES = {
     "栃木県": "Final count and turnout tables, read from the Excel workbooks; the 2012-2020 workbooks are the "
     "commission's own files as archived by the Wayback Machine.",
     "青森県": "Candidate votes from the commission's candidate table, valid and invalid ballots from its count table "
     "(for 2019, the count table of its printed election record), and the electorate and voters from its turnout "
     "table, read from the PDFs' text layers.",
+    "山梨県": "Candidate votes from the commission's 得票表 (市町村別一覧表), ballots and voters from its 開票状況 by "
+    "counting district (one per municipality), and the electorate from its 投票状況, read from the PDFs' text layers.",
+    "静岡県": "Count and turnout tables from the commission's workbooks (2024 from its zip of the final count "
+    "workbooks); the 2017 and 2021 count tables print valid and invalid ballots only, so cast ballots are their sum "
+    "and voters come from the turnout table. Shizuoka and Hamamatsu by ward.",
+    "京都府": "Count tables (開票結了速報, candidates and ballots over two pages) and turnout tables, read from the PDFs' "
+    "text layers; Kyoto City by ward.",
+    "大阪府": "Count and turnout tables (最終), from the 2026 workbooks and the 2015 election record's PDF text layer; "
+    "Osaka and Sakai by ward.",
+    "兵庫県": "The count by counting district (section 6 of the count chapter) and the electorate and voters by "
+    "municipality and ward (section 2 of the voting chapter) of the commission's printed election record, read from "
+    "the PDFs' text layers; Kobe by ward.",
+    "長野県": "The commission's final count and turnout bulletins by municipality, read from the PDFs' text layers; "
+    "names the text layer runs together with the county column are matched to the municipality whose name ends them.",
+    "富山県": "The commission's count (候補者得票集計表) and turnout workbooks; voters come from the turnout table. In 2024 "
+    "Toyama City counted in two districts, read from the city total the workbooks print.",
 }
 METHOD = (
     "Votes by municipality, or by ward in designated cities, from the prefectural election commission's final "
@@ -808,7 +1319,13 @@ def place_code(place: str, codes: dict[str, str], wards: list[tuple[str, str]]) 
     return "jp.ward", found[0] if len(found) == 1 else None
 
 
-def emit() -> Path:
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package jp.pref_chiji/all from the parsed table. It reads the database, through Draft, so the rows
+    it rebuilds keep the ids the changeset path gave them and attach to jp.mic_chiji's contests and options."""
     frame = pl.read_parquet(PARSED / f"municipalities-v{VERSION}.parquet")
     with connect() as conn:
         prefectures = {
@@ -819,7 +1336,7 @@ def emit() -> Path:
                    where p.iso_code like 'JP-__'"""
             )
         }
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
@@ -892,6 +1409,8 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
+            if key in ELECTORATE:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=ELECTORATE[key][1])
             for option, kind, seats in conn.execute(
                 "select option_id, kind, seats from outcome where result_set_id = %s", [county_set]
             ).fetchall():
