@@ -240,6 +240,8 @@ def emit(cc: str, spec: dict | None = None) -> str:
                 )
             for row in entry.get("dates", []):
                 within = row.get("within")
+                if row.get("contests") is not None and not row.get("source"):
+                    raise ValueError(f"{pipeline}: {key} {row['date']} has a contest count but no source")
                 fields = {
                     "class_id": id,
                     "within_polity_id": (entities[within] if ":" in within else region(within)) if within else None,
