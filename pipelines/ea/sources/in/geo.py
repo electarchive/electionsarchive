@@ -392,7 +392,7 @@ def geo() -> Package:
         rank=1,
         noun="parliamentary constituency",
         kinds=KINDS,
-        code_system="in.lgd",
+        code_system="in_lgd",
     )
     p.add(
         "scheme",
@@ -402,7 +402,7 @@ def geo() -> Package:
         rank=2,
         noun="assembly constituency",
         kinds=KINDS,
-        code_system="in.lgd",
+        code_system="in_lgd",
     )
 
     def span(state: str, plan: str, name: str, scheme: str) -> tuple[date | None, date | None]:
