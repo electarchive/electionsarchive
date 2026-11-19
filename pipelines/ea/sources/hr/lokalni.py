@@ -26,6 +26,7 @@ import shapely.geometry
 from ea import package, raw
 from ea.changeset import slug
 from ea.package import Package
+from ea.sources.hr import granice
 
 SOURCE = "hr.lokalni"
 IZBORI = "hr.izbori"
@@ -176,6 +177,7 @@ def summary_urls(year: int) -> list[str]:
 def fetch() -> None:
     raw.fetch(SOURCE, GB_COUNTIES, suffix=".geojson")
     raw.fetch(SOURCE, GB_TOWNS, suffix=".geojson")
+    granice.fetch()
     for year in YEARS:
         raw.fetch(SOURCE, zip_url(year), suffix=".zip")
         raw.fetch(SOURCE, dao_url(year), suffix=".js")
@@ -736,7 +738,7 @@ def _shape(feature: dict[str, object]) -> shapely.Geometry:
     return shapely.set_srid(shapely.MultiPolygon(polygons), 4326)
 
 
-def _geometry(p: Package, area: str, shape: shapely.Geometry, source: str) -> None:
+def _geometry(p: Package, area: str, shape: shapely.Geometry, source: str, quality: str = "osm") -> None:
     p.add(
         "area_geometry",
         area_id=area,
@@ -746,7 +748,7 @@ def _geometry(p: Package, area: str, shape: shapely.Geometry, source: str) -> No
         label_point=shapely.to_wkb(
             shapely.set_srid(shapely.point_on_surface(shape), 4326), hex=True, include_srid=True
         ),
-        quality="osm",
+        quality=quality,
         source_id=source,
     )
 
@@ -780,6 +782,14 @@ def shaped() -> tuple[dict[str, shapely.Geometry], dict[tuple[str, str], shapely
             county = next(iter(counties_of))
         out.setdefault((county, folded), shape)
     return counties, out
+
+
+def official() -> dict[tuple[str, str], shapely.Geometry]:
+    """The towns and municipalities with local elections that the geoBoundaries extract omits, from the State
+    Geodetic Administration's statistical units. Their boundaries did not change between 2013 and 2021."""
+    _, found = shaped()
+    wanted = {(c.county, c.place) for c in all_contests() if c.level == "muni"}
+    return {k: shape for k, shape in sorted(granice.towns().items()) if k in wanted and k not in found}
 
 
 def geo() -> Package:
@@ -829,11 +839,34 @@ def geo() -> Package:
         _geometry(p, izbori_area("hr.zupanija", code), shape, county_source)
     for (county, folded), shape in sorted(towns_.items()):
         _geometry(p, izbori_area("hr.opcina", f"{county}:{folded}"), shape, town_source)
+    gaps = official()
+    if gaps:
+        dgu = key("source", "dgu-statistical-units")
+        p.add(
+            "source",
+            id=dgu,
+            kind="official_body",
+            publisher="Državna geodetska uprava",
+            title="Statistical units of the 2021 census (INSPIRE AreaStatisticalUnit, towns and municipalities)",
+            url=granice.CATALOG,
+            license="Open license of the Republic of Croatia (Otvorena dozvola)",
+            license_url="https://data.gov.hr/otvorena-dozvola",
+            attribution="Državna geodetska uprava (DGU), Državni zavod za statistiku (DZS)",
+            notes=(
+                "Used only for the towns and municipalities the geoBoundaries extract omits, the islands of Cres, "
+                "Krk, and Lošinj among them. Boundaries valid for 2021, in ETRS89 and simplified to about 20 meters "
+                "as one coverage, and applied back to 2013 because these units did not change."
+            ),
+        )
+        p.artifact(raw.cached(granice.SOURCE, granice.UNITS), dgu)
+        for (county, folded), shape in gaps.items():
+            _geometry(p, izbori_area("hr.opcina", f"{county}:{folded}"), shape, dgu, "official")
     return p
 
 
 def unshaped() -> list[str]:
     _, found = shaped()
+    found = {**found, **official()}
     return sorted(
         {
             f"{c.muni_kind} {muni_title(c.muni)} ({c.county})"
