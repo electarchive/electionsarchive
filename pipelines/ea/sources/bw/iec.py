@@ -7,7 +7,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.bw import text
+from ea.sources.bw import iec1999, text
 from ea.sources.bw.text import Unit
 
 SOURCE = "bw.iec"
@@ -122,7 +122,9 @@ PARTIES = {
     "BMD": "Botswana Movement for Democracy",
     "BNF": "Botswana National Front",
     "RAP": "Real Alternative Party",
+    "SDP": "Social Democratic Party",
     "BPF": "Botswana Patriotic Front",
+    "BPU": "Botswana Progressive Union",
     "BPP": "Botswana Peoples Party",
     "BTTO": "Botswana Tlhoko Tiro Organisation",
     "MELS": "MELS Movement of Botswana",
@@ -167,6 +169,7 @@ def _artifact(url: str) -> raw.Artifact:
 def fetch() -> None:
     for spec in [*GENERAL.values(), ASSEMBLY_2019, *BY.values()]:
         raw.fetch(SOURCE, spec.url, suffix=".pdf")
+    raw.fetch(SOURCE, iec1999.URL, suffix=".pdf")
 
 
 def pages(url: str, name: str) -> list[str]:
@@ -335,13 +338,15 @@ def _settle(unit: Unit) -> None:
 
 
 def packages() -> list[str]:
-    days = sorted([*(GENERAL[y].day for y in GENERAL), ASSEMBLY_2019.day, *BY])
+    days = sorted([iec1999.DAY, *(GENERAL[y].day for y in GENERAL), ASSEMBLY_2019.day, *BY])
     return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in days)]
 
 
 def parse() -> None:
     geo().write()
     registry().write()
+    iec1999.images()
+    iec1999.general().write()
     for year in GENERAL:
         general(year).write()
     assembly(2019).write()
@@ -367,7 +372,7 @@ def _source(p: Package) -> None:
 
 
 def councils() -> list[str]:
-    found: set[str] = set()
+    found: set[str] = set(iec1999.councils())
     for year in GENERAL:
         found |= {u.council for u in books(year)[1]}
     return sorted(found)
@@ -380,6 +385,8 @@ def constituencies() -> dict[str, str]:
             found[changeset.slug(unit.name)] = unit.name.title()
     for each in assembly_2019():
         found.setdefault(changeset.slug(each.unit.name), each.unit.name.title())
+    for code, name in iec1999.constituencies().items():
+        found.setdefault(code, name)
     return dict(sorted(found.items()))
 
 
@@ -391,6 +398,8 @@ def districts() -> dict[tuple[str, str], str]:
     for day in BY:
         for unit in by(day):
             found.setdefault((changeset.slug(unit.council), changeset.slug(unit.name)), unit.name.title())
+    for key_, name in iec1999.districts().items():
+        found.setdefault(key_, name)
     return dict(sorted(found.items()))
 
 
@@ -405,6 +414,7 @@ def geo() -> Package:
     _source(p)
     for spec in [*GENERAL.values(), ASSEMBLY_2019, *BY.values()]:
         p.artifact(_artifact(spec.url), IEC_SOURCE)
+    p.artifact(_artifact(iec1999.URL), IEC_SOURCE)
     for code, rank, kind, noun in (
         ("bw.council", 1, "administrative", "local council"),
         ("bw.constituency", 1, "electoral_district", "constituency"),
@@ -443,7 +453,7 @@ def used_parties() -> list[str]:
     for day in BY:
         for unit in by(day):
             found |= {code for _, code, _ in unit.candidates if code != "IND"}
-    return sorted(found)
+    return sorted(found | iec1999.parties())
 
 
 def registry() -> Package:
