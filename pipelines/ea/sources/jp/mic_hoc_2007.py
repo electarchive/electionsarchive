@@ -1,17 +1,25 @@
-"""Japan's 21st House of Councillors regular election of 29 July 2007, by prefecture.
+"""Japan's 21st House of Councillors regular election of 29 July 2007, by prefecture and, where the scans allow, by
+counting district.
 
 The ministry's 結果調 for 2007 gives every prefecture's district candidates, party and list-candidate votes for
-proportional representation, and turnout, as workbooks and a PDF book. Its tables by counting district are scanned
-images only (see `jp.mic_hoc_scans`), so this package holds the election at the prefecture level: one package,
-`jp.mic_hoc_2007/2007-07-29`, with the 47 district contests and the national list contest. Parties, people, the House,
-the electoral systems, the source, and the prefecture units are the ones the other House of Councillors pipelines
-key, so 2007 joins the same records; a party or person the archive lacks is minted here under the same key. Telling
-the two apart reads `external_id` from the database, so building the package needs one.
+proportional representation, and turnout, as workbooks and a PDF book. One package, `jp.mic_hoc_2007/2007-07-29`,
+holds the 47 district contests and the national list contest at the prefecture level from those. The tables by
+counting district are scanned images only; `jp.mic_hoc_scans` reads them, and a prefecture's district contest gets a
+second, finer result set by counting district when its reads pass every test in `counting`. Parties, people, the
+House, the electoral systems, the source, and the prefecture and municipal units are the ones the other House of
+Councillors pipelines key, so 2007 joins the same records; a party, person, or unit the archive lacks is minted here
+under the same key. Telling the two apart reads the database, so building the package needs one.
 """
 
+import re
+import subprocess
+from collections import Counter
+from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
 from uuid import uuid5
+
+from PIL import Image
 
 from ea import package, raw
 from ea.changeset import slug
@@ -19,7 +27,7 @@ from ea.package import Package
 from ea.sources.jp import mic, mic_hoc, mic_hoc_early, mic_hoc_scans
 from ea.sources.jp.mic import dhondt, party_key, party_label, plain
 from ea.sources.jp.mlit import PREFECTURES
-from ea.store import connect
+from ea.store import DATA, connect
 
 SOURCE = "jp.mic_hoc_2007"
 RAW = mic.SOURCE
@@ -56,9 +64,105 @@ VALID_GAP = (
     "candidate votes of Nara, a single-seat district, fall short of its whole-number valid count by 0.037"
 )
 COUNTING_NOTE = (
-    "The ministry publishes this election's results by counting district only as scanned images, so the results "
-    "here are by prefecture."
+    "The ministry publishes this election's results by counting district only as scanned images. District results "
+    "by counting district are read from them for the prefectures whose scanned tables match the ministry's official "
+    "prefecture totals exactly; the national list and the other prefectures are by prefecture only."
 )
+COUNTING_METHOD = (
+    "Votes by counting district (開票区), read from the ministry's scanned tables of district candidates by counting "
+    "district (候補者別開票区別得票数) in the 結果調, with two independent machine reads of every page and a third on "
+    "some. A prefecture is included only when every figure is the same in every read or in a clear majority of "
+    "them, each candidate's counting districts add up exactly to the ministry's prefecture total, and, where "
+    "ballots are included, each counting district's candidates add up to its valid votes and its valid and invalid "
+    "votes to its ballots cast. Each figure links to the scanned page it was read from."
+)
+PAGES = DATA / "pages" / SOURCE
+DIGITIZED = 8
+TURNOUT = (("s:ballots", BALLOTS), ("s:valid", VALID), ("s:invalid", INVALID))
+
+
+@dataclass(frozen=True)
+class Place:
+    label: str
+    scheme: str
+    code: str
+    piece: str | None
+    cells: dict[str, tuple[Decimal, mic_hoc_scans.Source]]
+
+
+def resolve(places: mic.Places, prefecture: str, label: str, previous: str | None) -> tuple[str, str, str | None]:
+    try:
+        return places.resolve(prefecture, label, previous)
+    except LookupError:
+        numbered = re.fullmatch(r"(\D+?)(\d+)", label)
+        if numbered is None:
+            raise
+        scheme, code, _ = places.resolve(prefecture, f"{numbered[1]}市", previous)
+        return scheme, code, numbered[2]
+
+
+def counting(facts: mic_hoc_scans.Official) -> dict[int, list[Place]]:
+    """The counting districts of every prefecture whose scanned district tables pass: each candidate cell is one value
+    in every read or in a clear majority of at least two, each candidate's column adds up exactly to the official
+    prefecture total, and every counting district resolves to a 2007 municipality, ward, or a numbered part of one.
+    Ballots, valid, and invalid votes come along when they pass the same tests, and then every counting district's
+    candidates must add up to its valid votes (less than one vote short, for apportioned fractions) and its valid and
+    invalid votes to its ballots, or the prefecture is left out."""
+    found: dict[int, list[mic_hoc_scans.Fragment]] = {}
+    for fragment in mic_hoc_scans.fragments(raw.keys(mic_hoc_scans.SOURCE), facts):
+        found.setdefault(fragment.document.prefecture, []).append(fragment)
+    with connect() as conn:
+        places = mic.Places(conn, HELD)
+    passed: dict[int, list[Place]] = {}
+    for number, fragments in sorted(found.items()):
+        prefecture = mic_hoc_scans.observe(number, fragments)
+        mic_hoc_scans.structure(prefecture)
+        mic_hoc_scans.solve(prefecture, facts)
+        leaves = list(prefecture.leaves)
+
+        def read(key: str, row: int) -> tuple[Decimal, mic_hoc_scans.Source] | None:
+            value = prefecture.values.get((key, row))
+            seen = Counter(v for v, _ in prefecture.observed.get((key, row), []) if v is not None)
+            if value is None or seen[value] < 2 or any(n >= seen[value] for v, n in seen.items() if v != value):
+                return None
+            return value, next(source for v, source in prefecture.observed[key, row] if v == value)
+
+        def tied(keys: list[str]) -> bool:
+            return all(
+                sum((prefecture.values.get((key, row)) or Decimal(0) for row in leaves), Decimal(0))
+                == facts.totals[number].get(key)
+                for key in keys
+            )
+
+        candidates = [f"s{candidate.order}" for candidate in facts.smd[number]]
+        turnout = [key for key, _ in TURNOUT]
+        reads = {(key, row): read(key, row) for key in candidates + turnout for row in leaves}
+        if not tied(candidates) or any(reads[key, row] is None for key in candidates for row in leaves):
+            continue
+        keys = candidates
+        if tied(turnout) and all(reads[key, row] is not None for key in turnout for row in leaves):
+            keys = candidates + turnout
+            for row in leaves:
+                votes = sum((prefecture.values[key, row] or Decimal(0) for key in candidates), Decimal(0))
+                cast, valid, invalid = (prefecture.values[key, row] or Decimal(0) for key in turnout)
+                if not -1 < votes - valid <= 0 or valid + invalid != cast:
+                    keys = []
+                    break
+        if not keys:
+            continue
+        rows: list[Place] = []
+        previous = None
+        try:
+            for row in leaves:
+                label = mic_hoc_scans.place_label(prefecture.rows[row])
+                scheme, code, piece = resolve(places, f"{number:02d}", label, previous)
+                previous = code
+                cells = {key: cell for key in keys if (cell := reads[key, row]) is not None}
+                rows.append(Place(label, scheme, code, piece, cells))
+        except LookupError:
+            continue
+        passed[number] = rows
+    return passed
 
 
 def files() -> list[str]:
@@ -153,6 +257,15 @@ def build() -> Package:
     }
     person_pairs = {(f"{mic_hoc.SOURCE}.person", key) for key in smd_people | pr_people}
     known = existing(party_pairs | person_pairs)
+    districts = counting(facts)
+    with connect() as conn:
+        held_units = {
+            str(row[0])
+            for row in conn.execute(
+                "select id from reporting_unit where scheme_code in ('jp.municipality', 'jp.ward', %s)",
+                [mic.PIECES],
+            ).fetchall()
+        }
 
     p = Package(
         KEY,
@@ -202,9 +315,81 @@ def build() -> Package:
         return entity((f"{mic_hoc.SOURCE}.person", key), "person", text)
 
     values: dict[tuple[str, str, str | None, int], Decimal] = {}
+    located: dict[tuple[str, str, str | None, int], tuple[str, tuple[float, float, float, float]]] = {}
 
     def value(result_set: str, unit: str, option: str | None, amount: Decimal | int, measure: int = 1) -> None:
         values[result_set, unit, option, measure] = Decimal(amount)
+
+    added: set[str] = set()
+
+    def unit_of(scheme: str, code: str, parent: str, area: str, relation: str, number: int) -> str:
+        id = str(uuid5(package.NAMESPACE, f"unit:{scheme}@None\x1f{code}"))
+        if id in held_units:
+            p.external.add(id)
+        elif id not in added:
+            added.add(id)
+            polity = str(uuid5(package.NAMESPACE, f"polity\x1fJP-{number:02d}"))
+            p.external |= {area, polity, scheme}
+            p.add(
+                "reporting_unit",
+                id=id,
+                polity_id=polity,
+                scheme_code=scheme,
+                code=code,
+                parent_id=parent,
+                area_relation=relation,
+                area_id=area,
+                kind="standard",
+                valid_from=None,
+            )
+        return id
+
+    def place_unit(number: int, place: Place) -> str:
+        area = str(uuid5(package.NAMESPACE, f"area:{place.scheme}@None\x1f{place.code}"))
+        whole = unit_of(place.scheme, place.code, prefecture(number)[0], area, "equals", number)
+        if place.piece is None:
+            return whole
+        return unit_of(mic.PIECES, f"{held}:{place.code}:{place.piece}", whole, area, "within", number)
+
+    pages: dict[tuple[str, int], tuple[str, str]] = {}
+    artifacts: dict[str, str] = {}
+
+    def page(stem: str, number: int) -> tuple[str, str]:
+        if (stem, number) in pages:
+            return pages[stem, number]
+        stored = raw.cached(RAW, f"{BASE}/pdf/{stem}.pdf")
+        if stored.url not in artifacts:
+            artifacts[stored.url] = p.artifact(stored, source)
+        artifact = artifacts[stored.url]
+        image = PAGES / f"{stored.sha256}-{number}.png"
+        if not image.exists():
+            PAGES.mkdir(parents=True, exist_ok=True)
+            subprocess.run(
+                ["pdftoppm", "-f", str(number), "-l", str(number), "-r", "100", "-gray", "-png", "-singlefile"]
+                + [str(stored.path), str(image.with_suffix(""))],
+                check=True,
+            )
+        width, height = Image.open(image).size
+        id = p.id("page", artifact, number)
+        p.add(
+            "source_page",
+            id=id,
+            artifact_id=artifact,
+            page_number=number,
+            image_key=f"pages/{SOURCE}/{image.name}",
+            width=width,
+            height=height,
+        )
+        pages[stem, number] = id, "landscape" if width > height else "portrait"
+        return pages[stem, number]
+
+    def scanned(
+        result_set: str, unit: str, option: str | None, cell: tuple[Decimal, mic_hoc_scans.Source], measure: int = 1
+    ) -> None:
+        amount, (stem, number, tile, _) = cell
+        value(result_set, unit, option, amount, measure)
+        id, orientation = page(stem, number)
+        located[result_set, unit, option, measure] = id, mic_hoc_scans.TILES[orientation][tile]
 
     def accounting(result_set: str, unit: str, tier: str, number: int) -> None:
         (electors, voters), (cast, valid, invalid) = accounts[tier][0][number], accounts[tier][1][number]
@@ -294,6 +479,16 @@ def build() -> Package:
                 seats=1 if candidate.elected else None,
             )
             value(counted, unit, option, candidate.votes)
+        if number in districts:
+            finer = result_set(f"{held}:{district}:counting", contest, False, COUNTING_METHOD)
+            for place in districts[number]:
+                where = place_unit(number, place)
+                for candidate in candidates:
+                    option = p.id("option", held, district, candidate.order)
+                    scanned(finer, where, option, place.cells[f"s{candidate.order}"])
+                for key, measure in TURNOUT:
+                    if key in place.cells:
+                        scanned(finer, where, None, place.cells[key], measure)
 
     contest = p.id("contest", held, "national")
     p.add(
@@ -378,17 +573,19 @@ def build() -> Package:
                     value(places, unit, option, votes)
 
     for (result_set_id, unit, option, measure), amount in values.items():
-        p.add(
-            "result_value",
-            result_set_id=result_set_id,
-            unit_id=unit,
-            option_id=option,
-            channel=0,
-            measure=measure,
-            count_round=0,
-            flags=0,
-            value=amount,
-        )
+        fact = {
+            "result_set_id": result_set_id,
+            "unit_id": unit,
+            "option_id": option,
+            "channel": 0,
+            "measure": measure,
+            "count_round": 0,
+        }
+        where = located.get((result_set_id, unit, option, measure))
+        p.add("result_value", **fact, flags=0 if where is None else DIGITIZED, value=amount)
+        if where is not None:
+            (x0, y0, x1, y1) = where[1]
+            p.add("value_locator", **fact, page_id=where[0], source_id=None, x0=x0, y0=y0, x1=x1, y1=y1)
     return p
 
 
