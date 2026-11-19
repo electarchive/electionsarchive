@@ -1,6 +1,6 @@
 """Pakistan's Election Commission: the 2002 and 2008 general elections, by constituency.
 
-The 2002 election covers the National Assembly. The 2008 election covers the National Assembly and the four
+The 2002 election covers the National Assembly and, in one package each, the four provincial assemblies. The 2008 election covers the National Assembly and the four
 provincial assemblies, read from the word positions of the Commission's second report volume."""
 
 import html
@@ -30,6 +30,62 @@ def key(kind: str, *parts: object) -> str:
 ECP_SOURCE = key("source", "ecp")
 ASSEMBLY = key("body", "national-assembly")
 SYSTEM = key("electoral_system", "national-assembly", "fptp")
+
+
+def province(iso: str) -> str:
+    return str(uuid5(package.NAMESPACE, f"polity\x1f{iso}"))
+
+
+class Volume(NamedTuple):
+    """One assembly of the 2002 elections: its constituency prefix, the volume that prints it, and its seats."""
+
+    prefix: str
+    url: str
+    iso: str  # the polity that holds the assembly: PK for the National Assembly, else the province
+    seats: int
+    name: str  # the assembly's name in 2002
+    slug: str  # the path under pk/ of a provincial election; empty for the National Assembly
+
+
+VOLUMES = [
+    Volume("NA", CONSTITUENCIES, "PK", 272, "National Assembly of Pakistan", ""),
+    Volume(
+        "PF",
+        "https://web.archive.org/web/20240701044521id_/https://ecp.gov.pk/storage/files/1/ge2002-n2.pdf",
+        "PK-KP",
+        99,
+        "North-West Frontier Province",
+        "khyber-pakhtunkhwa",
+    ),
+    Volume(
+        "PP",
+        "https://web.archive.org/web/20251202153110id_/https://ecp.gov.pk/storage/files/1/ge2002-n3.pdf",
+        "PK-PB",
+        297,
+        "Punjab",
+        "punjab",
+    ),
+    Volume("PS", "https://ecp.gov.pk/storage/files/1/ge2002-n4.pdf", "PK-SD", 130, "Sindh", "sindh"),
+    Volume(
+        "PB",
+        "https://web.archive.org/web/20240701044533id_/https://ecp.gov.pk/storage/files/1/ge2002-n5.pdf",
+        "PK-BA",
+        51,
+        "Balochistan",
+        "balochistan",
+    ),
+]
+
+
+def holder(volume: Volume) -> str:
+    return PAKISTAN if volume.iso == "PK" else province(volume.iso)
+
+
+def ident(volume: Volume, *parts: object) -> tuple[object, ...]:
+    """The key parts of a 2002 row; the National Assembly's keep the shape they had before the provincial
+    assemblies were added."""
+    return parts if volume.prefix == "NA" else (volume.prefix.lower(), *parts)
+
 
 METHOD = (
     "Counted and published by constituency by the Election Commission of Pakistan in its detailed results of the "
@@ -118,9 +174,9 @@ def text(url: str) -> str:
     return subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True).stdout
 
 
-HEADER = re.compile(r"^\s*NA-(\d+)[\s-]+(.+?)\s*$")
+HEADER = re.compile(r"^\s*(NA|P[FPSB])\s*-\s*(\d+)[\s-]+(.+?)\s*$")
 CANDIDATE = re.compile(r"^\s*(\d+)?\s*(\S.*?)\s{2,}(.+?)\s{2,}(\d+)\s*$")
-TOTAL = re.compile(r"^\s*(Valid Votes|Rejected Votes|Total Votes|Registered Voters)\s+(\d+)\s*$")
+TOTAL = re.compile(r"^\s*(Valid Votes|Rejected Votes|Total Votes|Registered Voters)(?: Votes)?\s+(\d+)\s*$")
 
 
 # Candidates whose printed line wraps in the volume, so that their votes sit on a line of their own, by
@@ -135,11 +191,25 @@ WRAPPED = {
 RUN_TOGETHER = {(157, 12572): ("Mr.Sahibzada Muhammad Aziz-ur-Rehman Hamdi", "Muttahidda Majlis-e-Amal Pakistan")}
 
 
-def constituencies() -> list[Constituency]:
+# Provincial lines whose name wraps onto a second line or whose party is run into the name, by assembly prefix,
+# constituency number and printed ballot number.
+PROVINCIAL_LINES = {
+    ("PF", 14, 4): ("Moulana Mohammad Mujahid Khan Al-Hussaini", "Muttahidda Majlis-e-Amal Pakistan"),
+    ("PP", 62, 5): ("Mr.Muhammad Saddique ul Hasnat Dogar Advocate", "Sunni Tehreek"),
+    ("PP", 240, 2): ("Sardar Hafiz Aurangzeb Alamgir Khan Khetran Advocate", "Independent"),
+    ("PP", 243, 5): ("Mr.Sher Muhammad Khan Khalol Khosa Advocate.", "Pakistan Peoples Party Parliamentarians"),
+    ("PP", 277, 3): ("Mr.Muhammad Akhtar Khadim Alias Khadim Hussain.", "Pakistan Muslim League (QA)"),
+    ("PS", 31, 4): ("Syed Shahabuddin Shah @ Syed Dindar Shah Rashdi", "Independent"),
+}
+
+
+def constituencies(assembly: Volume = VOLUMES[0]) -> list[Constituency]:
     found: list[Constituency] = []
-    for line in text(CONSTITUENCIES).splitlines():
+    for line in text(assembly.url).splitlines():
         if header := HEADER.match(line):
-            found.append(Constituency(int(header.group(1)), clean(header.group(2))))
+            if header.group(1) != assembly.prefix:
+                raise ValueError(f"{header.group(1)}-{header.group(2)} is printed in the {assembly.prefix} volume")
+            found.append(Constituency(int(header.group(2)), clean(header.group(3))))
         elif not found:
             continue
         elif total := TOTAL.match(line):
@@ -150,26 +220,35 @@ def constituencies() -> list[Constituency]:
             found[-1].candidates.append(
                 Candidate(position, clean(candidate.group(2)), party_name(candidate.group(3)), int(candidate.group(4)))
             )
+    wrapped = WRAPPED if assembly.prefix == "NA" else {}
+    run_together = RUN_TOGETHER if assembly.prefix == "NA" else {}
     for seat in found:
         for candidate in seat.candidates:
-            if (seat.number, candidate.votes) in RUN_TOGETHER:
-                candidate.name, candidate.party = RUN_TOGETHER[seat.number, candidate.votes]
+            if (assembly.prefix, seat.number, candidate.position) in PROVINCIAL_LINES:
+                candidate.name, party = PROVINCIAL_LINES[assembly.prefix, seat.number, candidate.position]
+                candidate.party = party_name(party)
+            if (seat.number, candidate.votes) in run_together:
+                candidate.name, candidate.party = run_together[seat.number, candidate.votes]
                 candidate.party = party_name(candidate.party)
-        for (number, position), (name, party, votes) in WRAPPED.items():
+        for (number, position), (name, party, votes) in wrapped.items():
             if seat.number == number:
                 seat.candidates.append(Candidate(position, name, party_name(party), votes))
         seat.candidates.sort(key=lambda c: c.position)
         numbers = [c.position for c in seat.candidates]
         if len(set(numbers)) != len(numbers):
-            raise ValueError(f"NA-{seat.number}: candidate numbering is {numbers}")
+            raise ValueError(f"{assembly.prefix}-{seat.number}: candidate numbering is {numbers}")
         for index, candidate in enumerate(seat.candidates, 1):
             candidate.position = index  # the volume skips a printed number in a few constituencies
         if len(seat.totals) != 4:
-            raise ValueError(f"NA-{seat.number}: totals are {seat.totals}")
+            raise ValueError(f"{assembly.prefix}-{seat.number}: totals are {seat.totals}")
         if sum(c.votes for c in seat.candidates) != seat.totals["Valid Votes"]:
-            raise ValueError(f"NA-{seat.number}: candidates sum to {sum(c.votes for c in seat.candidates)}")
-    if [seat.number for seat in found] != list(range(1, 273)):
-        raise ValueError("the volume does not list NA-1 to NA-272 once each, in order")
+            raise ValueError(
+                f"{assembly.prefix}-{seat.number}: candidates sum to {sum(c.votes for c in seat.candidates)}"
+            )
+    if [seat.number for seat in found] != list(range(1, assembly.seats + 1)):
+        raise ValueError(
+            f"the volume does not list {assembly.prefix}-1 to {assembly.prefix}-{assembly.seats} once each"
+        )
     return found
 
 
@@ -186,11 +265,11 @@ def printed_totals() -> dict[str, int]:
 DAY_2008 = date(2008, 2, 18)
 PAGE_2008 = "https://web.archive.org/web/20251122094303id_/https://ecp.gov.pk/general-elections-2008"
 VOLUME = "https://web.archive.org/web/20250406190549id_/https://ecp.gov.pk/storage/files/1/ge2008-2.pdf"
-PARTY_VOTES = "https://web.archive.org/web/20230712135121if_/https://ecp.gov.pk/storage/files/1/ge2008-nrp2.pdf"
-TURNOUT_NA = "https://web.archive.org/web/20230710144517if_/https://ecp.gov.pk/storage/files/1/ge2008-t1.pdf"
-TURNOUT_PA = "https://web.archive.org/web/20240513151720if_/https://ecp.gov.pk/storage/files/1/ge2008-t2.pdf"
-POSITION_NA = "https://web.archive.org/web/20240227123057if_/https://ecp.gov.pk/storage/files/1/ge2008-p1.pdf"
-POSITION_PA = "https://web.archive.org/web/20240227122941if_/https://ecp.gov.pk/storage/files/1/ge2008-p2.pdf"
+PARTY_VOTES = "https://web.archive.org/web/20251231160933id_/https://ecp.gov.pk/storage/files/1/ge2008-nrp2.pdf"
+TURNOUT_NA = "https://web.archive.org/web/20240627001835id_/https://ecp.gov.pk/storage/files/1/ge2008-t1.pdf"
+TURNOUT_PA = "https://web.archive.org/web/20240627001838id_/https://ecp.gov.pk/storage/files/1/ge2008-t2.pdf"
+POSITION_NA = "https://web.archive.org/web/20260208114539id_/https://ecp.gov.pk/storage/files/1/ge2008-p1.pdf"
+POSITION_PA = "https://web.archive.org/web/20260217104208id_/https://ecp.gov.pk/storage/files/1/ge2008-p2.pdf"
 # The notifications of the candidates returned on 1 March 2008, by assembly. The Sindh notification is not archived.
 RETURNED = {
     "NA": "https://web.archive.org/web/20240627001823id_/https://ecp.gov.pk/storage/files/1/ge2008-g1.pdf",
@@ -750,12 +829,21 @@ def elected_2008(seats: list[Seat2008]) -> dict[str, Candidate2008]:
     return found
 
 
+def election_key(volume: Volume) -> str:
+    return "2002-10-10" if volume.prefix == "NA" else f"2002-10-10-{volume.prefix.lower()}"
+
+
 def packages() -> list[str]:
-    return ["pk.ecp/registry", "pk.ecp/2002-10-10", "pk.ecp/2008-02-18", "pk.ecp/2008-06-26"]
+    return [
+        "pk.ecp/registry",
+        *(f"pk.ecp/{election_key(v)}" for v in VOLUMES),
+        "pk.ecp/2008-02-18",
+        "pk.ecp/2008-06-26",
+    ]
 
 
 def fetch() -> None:
-    for url in (CONSTITUENCIES, PARTIES, *FILES_2008):
+    for url in (*(v.url for v in VOLUMES), PARTIES, *FILES_2008):
         raw.fetch(SOURCE, url, suffix=".html" if url == PAGE_2008 else ".pdf")
     for url in BYE_FILES:
         raw.fetch(SOURCE, url, suffix=".html")
@@ -763,7 +851,8 @@ def fetch() -> None:
 
 def parse() -> None:
     registry().write()
-    build().write()
+    for volume in VOLUMES:
+        build(volume).write()
     build_2008().write()
     build_bye_2008().write()
 
@@ -790,7 +879,7 @@ def registry() -> Package:
         license="Official publication; reuse terms are not stated",
         attribution="Election Commission of Pakistan",
     )
-    for url in (CONSTITUENCIES, PARTIES):
+    for url in (*(v.url for v in VOLUMES), PARTIES):
         p.artifact(raw.cached(SOURCE, url), ECP_SOURCE)
     p.add(
         "source",
@@ -826,60 +915,76 @@ def registry() -> Package:
         "the general seats won, and are not part of the constituency results stored here.",
         lang="en",
     )
-    names = {party_name(c.party): None for seat in constituencies() for c in seat.candidates}
+    names = {party_name(c.party): None for v in VOLUMES for seat in constituencies(v) for c in seat.candidates}
     names |= {c.party: None for seat in seats_2008() for c in seat.candidates}
+    seen: set[str] = set()
     for name in sorted(names):
-        if name == "Independent":
+        if name == "Independent" or name.casefold() in seen:
             continue
+        seen.add(name.casefold())
         id = party_id(name)
         p.add("party", id=id, kind="party", polity_id=PAKISTAN)
         p.name(id, name, "en", "official")
     return p
 
 
-def build() -> Package:
-    p = Package(
-        "pk.ecp/2002-10-10",
-        SOURCE,
-        "The Pakistani National Assembly general election of 2002 by constituency, from the Election "
-        "Commission's detailed results",
-        depends=["pk.ecp/registry"],
-    )
-    p.external.add(PAKISTAN)
-    for url in (CONSTITUENCIES, PARTIES):
+def build(assembly: Volume = VOLUMES[0]) -> Package:
+    national = assembly.prefix == "NA"
+    polity = holder(assembly)
+    prefix = assembly.prefix
+    scheme = f"pk.{prefix.lower()}"
+    if national:
+        summary = (
+            "The Pakistani National Assembly general election of 2002 by constituency, from the Election "
+            "Commission's detailed results"
+        )
+        title = "2002 Pakistani general election"
+        path = "pk/2002-10-10-general"
+        what = "Pakistani National Assembly election"
+    else:
+        summary = (
+            f"The {assembly.name} provincial assembly general election of 2002 by constituency, from the Election "
+            "Commission's detailed results"
+        )
+        title = f"2002 {assembly.name} provincial election"
+        path = f"pk/{assembly.slug}/2002-10-10-general"
+        what = f"{assembly.name} Provincial Assembly election"
+    p = Package(f"pk.ecp/{election_key(assembly)}", SOURCE, summary, depends=["pk.ecp/registry"])
+    p.external.update({PAKISTAN, polity})
+    for url in (assembly.url, PARTIES) if national else (assembly.url,):
         p.uses(raw.cached(SOURCE, url))
-    election = key("election", "2002")
-    p.add("election", id=election, polity_id=PAKISTAN, kind="general", date_from=DAY, date_to=DAY, status="held")
-    p.add("slug", path="pk/2002-10-10-general", entity_id=election, is_current=True)
-    p.name(election, "2002 Pakistani general election", "en", "official")
-    for seat in constituencies():
-        contest = key("contest", seat.number)
-        label = f"NA-{seat.number} {seat.name}"
+    election = key("election", *(("2002",) if national else ("2002", prefix.lower())))
+    p.add("election", id=election, polity_id=polity, kind="general", date_from=DAY, date_to=DAY, status="held")
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    p.name(election, title, "en", "official")
+    for seat in constituencies(assembly):
+        contest = key("contest", *ident(assembly, seat.number))
+        label = f"{prefix}-{seat.number} {seat.name}"
         p.add(
             "contest",
             id=contest,
             election_id=election,
             kind="body_seats",
-            body_id=ASSEMBLY,
+            body_id=(ASSEMBLY if national else ASSEMBLIES[prefix].body),
             magnitude=1,
             round_number=1,
             electoral_system_id=SYSTEM,
             default_result_kind="counted",
         )
-        p.name(contest, f"2002 Pakistani National Assembly election, {label}", "en", "official")
-        p.add("slug", path=f"pk/2002-10-10-general/na-{seat.number}", entity_id=contest, is_current=True)
-        unit = key("unit", seat.number)
+        p.name(contest, f"2002 {what}, {label}", "en", "official")
+        p.add("slug", path=f"{path}/{prefix.lower()}-{seat.number}", entity_id=contest, is_current=True)
+        unit = key("unit", *ident(assembly, seat.number))
         p.add(
             "reporting_unit",
             id=unit,
             polity_id=PAKISTAN,
-            scheme_code="pk.na",
-            code=f"2002-10-10:NA-{seat.number}",
+            scheme_code=scheme,
+            code=f"2002-10-10:{prefix}-{seat.number}",
             area_relation="unlocated",
             kind="standard",
         )
         p.name(unit, label, "en", "official")
-        result_set = key("result_set", seat.number)
+        result_set = key("result_set", *ident(assembly, seat.number))
         p.add(
             "result_set",
             id=result_set,
@@ -903,9 +1008,9 @@ def build() -> Package:
             put(p, result_set, unit, None, measure, value)
             p.add("declared", result_set_id=result_set, option_id=None, measure=measure, value=value)
         for c in seat.candidates:
-            option = key("option", seat.number, c.position)
+            option = key("option", *ident(assembly, seat.number, c.position))
             independent = c.party == "Independent"
-            person = key("person", seat.number, c.position)
+            person = key("person", *ident(assembly, seat.number, c.position))
             p.add("person", id=person)
             p.name(person, c.name, "en", "official")
             p.add(
@@ -918,7 +1023,7 @@ def build() -> Package:
             )
             p.add(
                 "candidacy",
-                id=key("candidacy", seat.number, c.position),
+                id=key("candidacy", *ident(assembly, seat.number, c.position)),
                 person_id=person,
                 option_id=option,
                 role="head",
