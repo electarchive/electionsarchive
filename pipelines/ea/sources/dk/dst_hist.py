@@ -92,6 +92,8 @@ class Unit:
     invalid: int | None = None
     scheme: str = SCHEME
     where: dict[tuple[str | None, int], tuple[int, Box]] = field(default_factory=dict)  # (option, measure) -> page, box
+    invalids: list[int] | None = None  # invalid votes per question, when each question prints its own
+    wheres: list[dict[tuple[str | None, int], tuple[int, Box]]] | None = None  # where, per question
 
 
 @dataclass
@@ -329,9 +331,11 @@ def election(vote: Vote) -> Package:
             if unit.cast is not None and unit.invalid is not None:
                 put(p, result_set, uid, None, CAST, unit.cast)
                 put(p, result_set, uid, None, INVALID, unit.invalid)
+            elif unit.invalids is not None:
+                put(p, result_set, uid, None, INVALID, unit.invalids[index])
             put(p, result_set, uid, options["yes"], VOTES, yes)
             put(p, result_set, uid, options["no"], VOTES, no)
-            for (code, measure), (page, box) in unit.where.items():
+            for (code, measure), (page, box) in (unit.wheres[index] if unit.wheres else unit.where).items():
                 width, height = page_sizes(vote.volume)[page]
                 if page not in pages:
                     pages[page] = key("page", vote.day, page)
@@ -363,7 +367,7 @@ def election(vote: Vote) -> Package:
             (None, VALID, vote.totals[f"yes{index}"] + vote.totals[f"no{index}"]),
             (None, REGISTERED, vote.totals.get("registered")),
             (None, CAST, vote.totals.get("cast")),
-            (None, INVALID, vote.totals.get("invalid")),
+            (None, INVALID, vote.totals.get(f"invalid{index}", vote.totals.get("invalid"))),
             ("yes", VOTES, vote.totals[f"yes{index}"]),
             ("no", VOTES, vote.totals[f"no{index}"]),
         ):
@@ -435,6 +439,7 @@ def votes() -> list[Vote]:
     for volume, day in SCANNED.items():
         found.append(scanned(volume, day))
     found.append(printed_1986())
+    found.extend(table_vote(volume) for volume in FILE_TABLES)
     return found
 
 
@@ -493,7 +498,7 @@ def check(volume: str, units: list[Unit], totals: dict[str, int]) -> None:
     """Fail unless the districts add up to each other and to the printed national figures."""
     for unit in units:
         for yes, no in unit.answers:
-            if yes + no != unit.valid:
+            if unit.invalids is None and yes + no != unit.valid:
                 raise ValueError(f"{volume} {unit.name}: yes {yes} and no {no} do not make valid {unit.valid}")
     for index in range(len(units[0].answers)):
         for measure, value in (
@@ -502,6 +507,13 @@ def check(volume: str, units: list[Unit], totals: dict[str, int]) -> None:
         ):
             if value != totals[measure]:
                 raise ValueError(f"{volume} {measure}: districts add to {value}, the volume prints {totals[measure]}")
+    for index in range(len(units[0].answers)):
+        if f"invalid{index}" in totals:
+            value = sum((u.invalids or [])[index] for u in units)
+            if value != totals[f"invalid{index}"]:
+                raise ValueError(
+                    f"{volume} invalid{index}: districts add to {value}, the volume prints {totals[f'invalid{index}']}"
+                )
     for measure, value in (
         ("cast", sum(u.cast or 0 for u in units)),
         ("invalid", sum(u.invalid or 0 for u in units)),
@@ -1067,3 +1079,257 @@ def printed_1986() -> Vote:
     return Vote(
         "1986", DAY_1986, english, danish, [Question("question", english, danish)], units, totals, reading=reading
     )
+
+
+# The 1961, 1963, and 1969 volumes are scans with an embedded text layer. Each table is kept as a tab-separated file
+# with one line per printed row: its kind, region, county or metropolitan constituency, number and name, then the
+# printed counts, then the page and box of each count. A figure the layer misreads or lacks was settled from the
+# page image and the table's own sums. The rows are checked here: the counts of each row follow from each other, the
+# districts add up to their county, the counties to the three regions, and the regions to the national figures.
+
+FILE_TABLES = {
+    "1961": ("dst_hist_1961.tsv", 6),  # registered, yes, no, blank, other invalid, votes cast
+    "1963": ("dst_hist_1963.tsv", 13),  # registered, then yes, no, invalid for each of the four proposals
+    "1969": ("dst_hist_1969.tsv", 8),  # registered, cast, invalid, blank, other invalid, valid, yes, no
+}
+DAYS = {"1961": date(1961, 5, 30), "1963": date(1963, 6, 25), "1969": date(1969, 6, 24)}
+TABLE_TITLES = {
+    "1961": (
+        "1961 referendum on lowering the voting age for the Folketing to 21",
+        "Folkeafstemningen den 30. maj 1961 om ændring af valgretsalderen til folketinget",
+    ),
+    "1963": (
+        "1963 referendum on four land laws",
+        "Folkeafstemningen den 25. juni 1963 om fire lovforslag om jord og naturfredning",
+    ),
+    "1969": (
+        "1969 referendum on lowering the voting age for the Folketing to 18",
+        "Folkeafstemningen den 24. juni 1969 om nedsættelse af valgretsalderen til folketinget fra 21 til 18 år",
+    ),
+}
+PROPOSALS_1963 = (
+    (
+        "agricultural-properties",
+        "Bill on the acquisition of agricultural properties (white ballot)",
+        "Forslag til lov om erhvervelse af landbrugsejendomme (hvid stemmeseddel)",
+    ),
+    (
+        "state-smallholders",
+        (
+            "Bill amending the Act on the establishment and supplementing of smaller farms, the State Smallholders "
+            "Act (yellow ballot)"
+        ),
+        (
+            "Forslag til lov om ændringer i lov om oprettelse og supplering af mindre landbrug m.m., "
+            "statshusmandsloven (gul stemmeseddel)"
+        ),
+    ),
+    (
+        "municipal-pre-emption",
+        (
+            "Bill on the pre-emption right of municipalities to real estate and support for municipal land "
+            "purchases (red ballot)"
+        ),
+        "Forslag til lov om kommuners forkøbsret til fast ejendom samt støtte til kommuners jordkøb (rød stemmeseddel)",
+    ),
+    (
+        "nature-conservation",
+        "Bill amending the Nature Conservation Act (green ballot)",
+        "Forslag til lov om ændringer i lov om naturfredning (grøn stemmeseddel)",
+    ),
+)
+# the national figures each volume prints in its own summary table or text, in the order of the stored counts
+PRINTED_TOTALS = {
+    "1961": (2880337, 586113, 479146, 1527, 7772, 1074558),
+    "1963": (
+        3043170,
+        843756,
+        1354588,
+        11940 + 11980,
+        848494,
+        1347942,
+        14072 + 11615,
+        872042,
+        1328036,
+        10726 + 11434,
+        937259,
+        1261545,
+        11604 + 11787,
+    ),
+    "1969": (3309551, 2103848, 8436, 1938, 6498, 2095412, 448724, 1646688),
+}
+LAYOUT_NOTES = {
+    "1961": (
+        " The table prints the voters entitled to vote, the yes and no votes, the blank and other invalid votes, and "
+        "the votes cast for each district. The Faroe Islands and Greenland are listed after the three regions and "
+        "counted in the national figures. In every row the yes, no, blank, and other invalid votes add up to the votes "
+        "cast."
+    ),
+    "1963": (
+        " The table prints the voters entitled to vote and, for each of the four proposals, the yes, no, and invalid "
+        "votes of each district. Each proposal has its own ballot color and its own result. The national figures "
+        "match the summary table of the volume."
+    ),
+    "1969": (
+        " The table prints the voters entitled to vote, the votes cast, the invalid votes as blank and other, the "
+        "valid votes, and the yes and no votes for each district. The Faroe Islands and Greenland are listed with "
+        "their own figures and counted in the national figures; the volume notes that the Greenland figures are "
+        "provisional. In every row the invalid votes add up from the blank and other votes, the valid votes from the "
+        "yes and no votes, and the votes cast from the invalid and valid votes."
+    ),
+}
+READING = (
+    " The volume is a scan. Each figure was read from the volume's embedded text layer and is stored with the page and "
+    "the box where it is printed. Where the layer misread or omitted a figure, it was settled from the page image and "
+    "the table's own sums: the districts add up to each county or metropolitan constituency, these to the three "
+    "regions, and the regions to the national figures printed in the volume."
+)
+
+
+@dataclass
+class Entry:
+    kind: str  # total, dk, region, group, or leaf
+    region: str
+    group: str
+    number: str
+    name: str
+    values: tuple[int, ...]
+    boxes: tuple[tuple[int, Box] | None, ...]
+
+
+def table_entries(volume: str) -> list[Entry]:
+    name, width = FILE_TABLES[volume]
+    entries: list[Entry] = []
+    for row in Path(__file__).with_name(name).read_text(encoding="utf-8").splitlines():
+        cells = row.split("\t")
+        values = tuple(int(c) for c in cells[5 : 5 + width])
+        boxes: list[tuple[int, Box] | None] = []
+        for cell in cells[5 + width : 5 + 2 * width]:
+            if cell:
+                page, x0, y0, x1, y1 = (int(part) for part in cell.split(":"))
+                boxes.append((page, (x0, y0, x1, y1)))
+            else:
+                boxes.append(None)
+        entries.append(Entry(cells[0], cells[1], cells[2], cells[3], cells[4], values, tuple(boxes)))
+    return entries
+
+
+def table_check(volume: str, entries: list[Entry]) -> None:
+    """Fail unless each row's counts follow from each other and the rows add up from districts to the country."""
+    width = FILE_TABLES[volume][1]
+    for entry in entries:
+        v = entry.values
+        wrong = {
+            "1961": v[1] + v[2] + v[3] + v[4] != v[5],
+            "1963": False,
+            "1969": v[2] != v[3] + v[4] or v[5] != v[6] + v[7] or v[1] != v[2] + v[5],
+        }[volume]
+        if wrong:
+            raise ValueError(f"{volume} {entry.name}: the counts of the row do not follow from each other: {v}")
+
+    def agree(parent: Entry, rows: list[Entry]) -> None:
+        total = tuple(sum(row.values[i] for row in rows) for i in range(width))
+        if total != parent.values:
+            raise ValueError(f"{volume} {parent.name}: prints {parent.values}, the rows under it add to {total}")
+
+    leaves = [e for e in entries if e.kind == "leaf"]
+    groups = [e for e in entries if e.kind == "group"]
+    regions = [e for e in entries if e.kind == "region"]
+    for group in groups:
+        agree(group, [leaf for leaf in leaves if leaf.region and leaf.group == group.group])
+    for region in regions:
+        agree(region, [group for group in groups if group.region == region.name])
+    country = next(e for e in entries if e.kind == "total")
+    inside = next((e for e in entries if e.kind == "dk"), None)
+    outside = [leaf for leaf in leaves if not leaf.region]
+    if inside is None:
+        agree(country, regions)
+    else:
+        agree(inside, regions)
+        agree(country, [inside, *outside])
+    if country.values != PRINTED_TOTALS[volume]:
+        raise ValueError(
+            f"{volume}: the national row is {country.values}, the volume's summary prints {PRINTED_TOTALS[volume]}"
+        )
+
+
+def table_vote(volume: str) -> Vote:
+    """A referendum read from a volume's table of nomination districts, kept as a file beside this module."""
+    entries = table_entries(volume)
+    table_check(volume, entries)
+    english, danish = TABLE_TITLES[volume]
+    questions = (
+        [Question(code, en, da) for code, en, da in PROPOSALS_1963]
+        if volume == "1963"
+        else [Question("question", english, danish)]
+    )
+    units: list[Unit] = []
+    for entry in entries:
+        if entry.kind != "leaf":
+            continue
+        v, b = entry.values, entry.boxes
+
+        def at(option: str | None, measure: int, column: int) -> dict[tuple[str | None, int], tuple[int, Box]]:
+            box = b[column]
+            return {(option, measure): box} if box else {}
+
+        if volume == "1963":
+            wheres = [
+                {
+                    **at(None, REGISTERED, 0),
+                    **at("yes", VOTES, 1 + 3 * q),
+                    **at("no", VOTES, 2 + 3 * q),
+                    **at(None, INVALID, 3 + 3 * q),
+                }
+                for q in range(4)
+            ]
+            answers = [(v[1 + 3 * q], v[2 + 3 * q]) for q in range(4)]
+            units.append(
+                Unit(
+                    entry.group,
+                    entry.number,
+                    entry.name,
+                    v[0],
+                    answers[0][0] + answers[0][1],
+                    answers,
+                    scheme=SCHEME,
+                    where=wheres[0],
+                    invalids=[v[3 + 3 * q] for q in range(4)],
+                    wheres=wheres,
+                )
+            )
+            continue
+        if volume == "1961":
+            registered, yes, no, blank, other, cast = v
+            where = {
+                **at(None, REGISTERED, 0),
+                **at("yes", VOTES, 1),
+                **at("no", VOTES, 2),
+                **at(None, CAST, 5),
+            }
+            invalid = blank + other
+        else:
+            registered, cast, invalid, _blank, _other, _valid, yes, no = v
+            where = {
+                **at(None, REGISTERED, 0),
+                **at(None, CAST, 1),
+                **at(None, INVALID, 2),
+                **at(None, VALID, 5),
+                **at("yes", VOTES, 6),
+                **at("no", VOTES, 7),
+            }
+        units.append(
+            Unit(entry.group, entry.number, entry.name, registered, yes + no, [(yes, no)], cast, invalid, where=where)
+        )
+    top = next(e for e in entries if e.kind == "total").values
+    if volume == "1963":
+        totals = {"registered": top[0]}
+        for q in range(4):
+            totals |= {f"yes{q}": top[1 + 3 * q], f"no{q}": top[2 + 3 * q], f"invalid{q}": top[3 + 3 * q]}
+    elif volume == "1961":
+        totals = {"registered": top[0], "yes0": top[1], "no0": top[2], "invalid": top[3] + top[4], "cast": top[5]}
+    else:
+        totals = {"registered": top[0], "cast": top[1], "invalid": top[2], "yes0": top[6], "no0": top[7]}
+    check(volume, units, totals)
+    reading = READING + LAYOUT_NOTES[volume]
+    return Vote(volume, DAYS[volume], english, danish, questions, units, totals, reading=reading)
