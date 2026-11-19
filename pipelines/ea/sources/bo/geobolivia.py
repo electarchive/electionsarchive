@@ -37,9 +37,8 @@ FROM_2004 = date(2004, 1, 1)
 FROM_2015 = date(2015, 1, 1)
 # The referendum package holds the municipality of Fernández Alonso twice, under this spelling too.
 TWIN = ("7:fernandez-alonzo", "7:fernandez-alonso")
-# The plan of 2004's municipality of San Pablo de Huacareta (Huacareta in 2015) is left without an outline until the
-# referendum package settles which area code it keeps.
-LEFT_OUT = {"010502"}
+# Municipalities of the plan of 2004 that no area takes.
+LEFT_OUT: set[str] = set()
 # The least share of the smaller outline that must lie within the other, for a pair of outlines taken as one place.
 AGREEMENT = 0.6
 # Outlines are kept to a grid of about ten centimeters.
