@@ -343,8 +343,7 @@ def primaries() -> Package:
         "Órgano Electoral Plurinacional",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
-    p.external.add(BOLIVIA)
-    p.external.add(COUNTRY)
+    p.external |= {BOLIVIA, COUNTRY, DEPARTMENT}
     _check_names()
     for url in FILES:
         p.uses(_cached(url))
