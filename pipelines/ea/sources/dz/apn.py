@@ -17,6 +17,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.dz import boundaries
 
 SOURCE = "dz.apn"
 BASE = "https://www.joradp.dz/FTP/jo-francais"
@@ -770,6 +771,9 @@ def key(kind: str, *parts: object) -> str:
 
 
 def area(scheme: str, code: str) -> str:
+    """The area of a constituency: a wilaya is the boundaries package's area, a zone abroad is this package's."""
+    if scheme == "dz.wilaya":
+        return boundaries.area(scheme, code)
     return key("area", scheme, code)
 
 
@@ -824,16 +828,11 @@ def geo() -> Package:
         SOURCE,
         "Algeria's wilayas, as the proclamations of the People's National Assembly elections name them, and the "
         "zones of the community abroad that each election's proclamation defines",
+        depends=[f"{boundaries.SOURCE}/geo"],
     )
     p.external |= {ALGERIA, TERRITORY}
-    p.add("scheme", code="dz.wilaya", polity_id=ALGERIA, kind="administrative", rank=1, noun="wilaya")
+    # dz.wilaya and its areas come from the boundaries geo package, which this package depends on.
     p.add("scheme", code="dz.zone", polity_id=ALGERIA, kind="electoral_district", rank=1, noun="zone abroad")
-    for code, name in wilaya_names().items():
-        id = area("dz.wilaya", code)
-        p.add("area", id=id, scheme_code="dz.wilaya")
-        p.add("area_code", area_id=id, code=code)
-        p.add("area_parent", area_id=id, parent_id=TERRITORY)
-        p.name(id, name, "fr", "official")
     for year in ELECTIONS:
         for place in places(year):
             if place.kind == "zone":
@@ -952,7 +951,7 @@ def election(year: int) -> Package:
         f"{SOURCE}/apn-{year}",
         SOURCE,
         f"The {year} People's National Assembly election by constituency, from the Journal officiel",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{boundaries.SOURCE}/geo"],
     )
     p.external.add(ALGERIA)
     p.uses(raw.cached(SOURCE, issue_url(year)))
@@ -1039,8 +1038,8 @@ def election(year: int) -> Package:
             polity_id=ALGERIA,
             scheme_code=scheme,
             code=f"{day}:{place.code}",
-            area_relation="equals",
-            area_id=area(scheme, place.code),
+            area_relation="equals" if place.kind == "wilaya" else "unlocated",
+            area_id=area(scheme, place.code) if place.kind == "wilaya" else None,
             kind="standard",
         )
         result_set = key("result_set", year, place.code)
