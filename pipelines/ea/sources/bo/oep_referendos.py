@@ -1029,6 +1029,14 @@ def abroad() -> list[str]:
     return [*found, "Uruguay"]
 
 
+def cities() -> list[tuple[str, str]]:
+    """The units of the cities abroad of tables 15 to 18 of the 2016 bulletin, each with its country's unit."""
+    countries = {named(country): country for country in abroad()}
+    text = bulletins.lines(raw.cached(SOURCE, B2016).path)
+    grouped = bulletins.countries(bulletins.city_rows(text, bulletins.after(text, r"Cuadro N° 15")))
+    return [(f"{country}, {city}", countries[named(country)]) for country, _, rows in grouped for city, _ in rows]
+
+
 def shape(geometry: dict[str, Any]) -> shapely.MultiPolygon:
     polygon = shapely.make_valid(shapely.geometry.shape(geometry))
     parts = [part for part in shapely.get_parts(polygon) if part.geom_type in {"Polygon", "MultiPolygon"}]
@@ -1180,6 +1188,17 @@ def geo() -> Package:
             polity_id=BOLIVIA,
             scheme_code="bo.exterior",
             code=country,
+            area_relation="unlocated",
+            kind="abroad_mission",
+        )
+    for city, country in cities():
+        p.add(
+            "reporting_unit",
+            id=key("unit", "bo.exterior", city),
+            polity_id=BOLIVIA,
+            scheme_code="bo.exterior",
+            code=city,
+            parent_id=key("unit", "bo.exterior", country),
             area_relation="unlocated",
             kind="abroad_mission",
         )
