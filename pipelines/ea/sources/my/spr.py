@@ -4,6 +4,7 @@ import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field, replace
 from datetime import date
+from pathlib import Path
 from uuid import uuid5
 
 from ea import changeset, package, raw
@@ -82,15 +83,27 @@ STATE_DAYS = {
     "PILIHAN RAYA UMUM DEWAN NEGERI, NEGERI SEMBILAN KE-16": date(2026, 8, 1),
 }
 # Polling days of by-elections, keyed by the contest's seat code and year, each with the Commission's media statement
-# that gives it: the statement on the eve of polling, or the one that fixed the election's dates. A by-election not
-# listed here is dated to its year: the Commission's media statements do not reach back before 2023, and none
-# gives the polling day of the 2022 Bugaya or the 2023 Kuala Terengganu by-election.
+# that gives it: the statement on the eve of polling, or the one that fixed the election's dates. For 2019 through
+# 2022 and the 2023 Kuala Terengganu poll the source is the Commission's "Stats@PRK" infographic of the election,
+# which prints the nomination, early-voting, and polling days. A by-election not listed here is dated to its year:
+# the Commission's media statements do not reach back before 2023, and the infographics start in 2019.
 STATEMENTS = "https://spr.gov.my/wp-content/uploads"
+INFOGRAPHICS = f"{STATEMENTS}/2024/10"
 PULAI = (
     f"{STATEMENTS}/2025/10/KM-BIL-31-2023-MENJELANG-PROSES-PENGUNDIAN-PRK-PARLIMEN-P161-PULAI-DAN-DEWAN-NEGERI-"
     "N13-SIMPANG-JERAM-JOHOR.pdf"
 )
 BY_DAYS: dict[tuple[str, int], tuple[date, str]] = {
+    ("P.078", 2019): (date(2019, 1, 26), f"{INFOGRAPHICS}/SIRI-1-0312-PRK-CAMERON-HIGHLAND-01.webp"),
+    ("N.24", 2019): (date(2019, 3, 2), f"{INFOGRAPHICS}/SIRI-2-0312-PRK-SEMENYIH-01.webp"),
+    ("N.27", 2019): (date(2019, 4, 13), f"{INFOGRAPHICS}/SIRI-3-0312-APRIL-PRK-RANTAU-01.webp"),
+    ("P.186", 2019): (date(2019, 5, 11), f"{INFOGRAPHICS}/SIRI-4-0312-PRK-SANDAKAN-01.webp"),
+    ("P.165", 2019): (date(2019, 11, 16), f"{INFOGRAPHICS}/SIRI-5-0312-STATS-PRK-TANJUNG-PIAI-01.webp"),
+    ("P.176", 2020): (date(2020, 1, 18), f"{INFOGRAPHICS}/PRK-KIMANIS-2020_page-0001.webp"),
+    ("N.23", 2020): (date(2020, 7, 4), f"{INFOGRAPHICS}/PRK-CHINI-2020.webp"),
+    ("N.58", 2020): (date(2020, 8, 29), f"{INFOGRAPHICS}/PRK-SLIM-2020_page-0001.webp"),
+    ("N.66", 2022): (date(2022, 11, 19), f"{INFOGRAPHICS}/PRK-BUGAYA-2022.webp"),
+    ("P.036", 2023): (date(2023, 8, 12), f"{INFOGRAPHICS}/PRK-Kuala-Terengganu.webp"),
     ("P.161", 2023): (
         date(2023, 9, 9),
         PULAI,
@@ -163,7 +176,7 @@ def fetch() -> None:
     for slug in [*FILES.values(), ROLL, CENTRES]:
         raw.fetch(SOURCE, data_url(slug), suffix=".json")
     for _, url in BY_DAYS.values():
-        raw.fetch(SOURCE, url, suffix=".pdf")
+        raw.fetch(SOURCE, url, suffix=Path(url).suffix)
 
 
 @functools.cache
@@ -380,7 +393,7 @@ class Event:
     # The year-dated name a by-election was first loaded under. Its entities keep the ids derived from that name, so
     # dating it updates those rows in place rather than adding a second election, and its old address redirects.
     first: str | None = None
-    statement: str | None = None  # the media statement that gives the polling day
+    statement: str | None = None  # the Commission publication that gives the polling day
 
     @property
     def anchor(self) -> str:
@@ -447,7 +460,13 @@ def events() -> list[Event]:
             id, day, statement = first, None, None
             if dated is not None:
                 day, statement = dated
-                same = sum(d == day for d, _ in BY_DAYS.values()) > 1
+                # A day another event already holds, a general or state election or a second by-election, keeps
+                # the seat in the id.
+                same = (
+                    sum(d == day for d, _ in BY_DAYS.values()) > 1
+                    or day in GENERAL_DAYS.values()
+                    or day in STATE_DAYS.values()
+                )
                 id = f"{day}-{slug}" if same else str(day)
             body = "state seat" if row.assembly else "parliamentary seat"
             label = (
@@ -589,7 +608,7 @@ def registry() -> Package:
         id=STATEMENTS_ID,
         kind="official_body",
         publisher="Suruhanjaya Pilihan Raya Malaysia",
-        title="Kenyataan Media SPR (media statements of the Election Commission)",
+        title="Kenyataan Media dan Infografik SPR (media statements and infographics of the Election Commission)",
         url="https://spr.gov.my/arkib-kenyataan-media/",
         license="No license stated; published on the Election Commission's website",
         attribution="Suruhanjaya Pilihan Raya Malaysia (SPR)",
@@ -767,7 +786,7 @@ def election(event: Event, checked: Audit) -> Package:
             entity_id=id,
             kind="context",
             body_md="The Election Commission's results files give this election's year but not its polling day. The "
-            f"day is from the Commission's [media statement]({event.statement}) on the election.",
+            f"day is from the Commission's [publication]({event.statement}) on the election.",
             lang="en",
         )
     if precision == "year":
