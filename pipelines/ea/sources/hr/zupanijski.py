@@ -28,9 +28,6 @@ URLS = {
 DAYS = {1993: date(1993, 2, 7), 1997: date(1997, 4, 13)}
 BODY = z.key("body", "zupanijski_dom")
 SYSTEM = z.system("county_list_1993")
-# The 1993 counties whose territory changed markedly when the counties were redrawn in 1997: Zagreb County and the
-# City of Zagreb were split along new lines, and the Knin area moved from Zadar-Knin to Šibenik-Knin County.
-REDRAWN_1993 = {1, 13, 15, 21}
 TITLES = re.compile(
     r"^(akademik|dipl\.?|dipl\.\w+\.?|doc\.\S*|dr\.\S*|ing\.|mr\.\S*|oecc?\.|prim\.\S*|prof\.\S*|sc\.|vet\.)$",
     re.IGNORECASE,
@@ -190,7 +187,6 @@ def election(year: int) -> Package:
         number = county["number"]
         code = f"{number:02d}"
         tag = f"{day}:zupanijski_dom:{code}"
-        shaped = year == 1997 or number not in REDRAWN_1993
         area = z.area("hr.zupanija", code)
         native = f"{county['name']} županija" if county["name"] != "Grad Zagreb" else "Grad Zagreb"
         english = native if county["name"] != "Grad Zagreb" else "City of Zagreb"
@@ -206,13 +202,13 @@ def election(year: int) -> Package:
             3,
             SYSTEM,
             body=BODY,
-            district=area if shaped else None,
+            district=area,
         )
         note = METHOD
-        if not shaped:
+        if year == 1993:
             note += (
-                f" {native} of 1993 covered a different territory from the county of the same number drawn in "
-                "1997, so its results are not placed on the current county's map."
+                " The county is mapped as the 1992 territorial laws drew it (Narodne novine 90/1992), with the "
+                "shape it had from 30 December 1992 to 7 February 1997."
             )
         if county["valid_printed"] is not None:
             note += " The lists' votes match the total of valid votes the report prints."
@@ -224,8 +220,8 @@ def election(year: int) -> Package:
             polity_id=z.CROATIA,
             scheme_code="hr.zupanija",
             code=tag,
-            area_relation="equals" if shaped else "unlocated",
-            area_id=area if shaped else None,
+            area_relation="equals",
+            area_id=area,
             kind="standard",
         )
         p.name(unit, native, "hr", "official")
