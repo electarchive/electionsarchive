@@ -20,7 +20,7 @@ import shapely
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.fi import tilastokeskus
+from ea.sources.fi import mml, tilastokeskus
 
 SOURCE = "fi.statfin_kunta"
 API = "https://pxdata.stat.fi/PxWeb/api/v1"
@@ -62,6 +62,7 @@ def key(kind: str, *parts: object) -> str:
 
 SOURCE_ID = key("source", "statfin")
 BOUNDARIES = key("source", "statistics-finland-boundaries")
+SURVEY = key("source", "nls-municipal-division")
 SYSTEM = key("electoral_system", "council")
 COUNTRY = key("area", "fi.maa", "FI")
 
@@ -99,6 +100,7 @@ def fetch() -> None:
     layer = tilastokeskus.LAYERS[0]
     for year in layer.years:
         raw.fetch(tilastokeskus.SOURCE, tilastokeskus.url(layer, year), suffix=".json", check=tilastokeskus._valid)
+    mml.fetch()
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -293,7 +295,9 @@ def geo() -> Package:
     layer = tilastokeskus.LAYERS[0]
     for year in layer.years:
         p.artifact(raw.cached(tilastokeskus.SOURCE, tilastokeskus.url(layer, year)), BOUNDARIES)
+    mml.add_source(p, SURVEY)
     shapes = tilastokeskus.spans("fi.kunta")
+    older = mml.spans()
     for num, code in sorted(municipalities().items()):
         id = area(code)
         p.add("area", id=id, scheme_code="fi.kunta")
@@ -305,6 +309,8 @@ def geo() -> Package:
         p.name(id, names["fi"], "fi", "official")
         if names["sv"] and names["sv"] != names["fi"]:
             p.name(id, names["sv"], "sv", "official", False)
+        for since, until, shape in older.get(num, []):
+            tilastokeskus.outline(p, id, SURVEY, since, until, shape)
         for since, until, shape in shapes.get(num, []):
             _outline(p, id, since, until, shape)
     return p
