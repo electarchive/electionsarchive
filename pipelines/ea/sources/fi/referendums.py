@@ -15,7 +15,7 @@ from uuid import uuid5
 
 from ea import package, raw
 from ea.package import Package
-from ea.sources.fi import digitized, vaalit
+from ea.sources.fi import digitized, prohibition_1931, vaalit
 from ea.sources.fi.digitized import Box
 
 SOURCE = "fi.referendums"
@@ -457,6 +457,20 @@ METHOD_1931 = (
     "sexes together. Rejected ballots are the ballots cast less the valid ones; the volume prints them for the whole "
     "country only. The country's totals are those the volume prints in its text."
 )
+MUNICIPAL_METHOD_1931 = (
+    "The volume's table by municipality, on pages 15 to 26: each of the 38 towns and the rural municipalities of the "
+    "nine provinces, with the persons entitled to vote, the persons who voted, and the valid ballots and the votes "
+    "for each alternative, men and women apart and together. Only the two sexes together are stored. Rejected "
+    "ballots are the ballots cast less the valid ones. Each figure was read from the text layer of the scan, whose "
+    "columns were located on each page. Every row satisfies the volume's own sums (both sexes are men plus women, "
+    "the ballots cast are the valid and rejected ballots, and the valid ballots are the votes for the three "
+    "alternatives), and a misread figure that the sums settled was corrected; the figures of five rows that the text "
+    "layer lost were read from the page image and have no box. The towns and the rural municipalities of each "
+    "province add up to the subtotals of the summary tables, and the country's total to the volume's own. The "
+    "municipalities are those of 1931, many of them ceded to the Soviet Union in 1944, and are not yet matched to "
+    "the archive's areas. Names are as printed, with the Finnish and Swedish forms together where the volume gives "
+    "both."
+)
 PROVINCE_METHOD_1931 = (
     "The same tables' rows for each province as a whole, the towns and the rural municipalities together."
 )
@@ -629,7 +643,9 @@ def _option(b: Build, name: str, position: int, label: str, names: tuple[str, st
         b.p.name(option, text, lang, kind, lang == "en")
 
 
-def _result_set(b: Build, name: str, default: bool, completeness: float, method: str, source: str) -> str:
+def _result_set(
+    b: Build, name: str, default: bool, completeness: float, method: str, source: str, supersedes: str | None = None
+) -> str:
     result_set = key("result_set", b.day, name)
     b.p.add(
         "result_set",
@@ -642,6 +658,7 @@ def _result_set(b: Build, name: str, default: bool, completeness: float, method:
         status="active",
         is_default=default,
         completeness=completeness,
+        supersedes_id=supersedes,
     )
     b.p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
     return result_set
@@ -909,7 +926,7 @@ def election_1931() -> Package:
     b = _start(
         day,
         last,
-        "The prohibition referendum of 29 and 30 December 1931 by province, towns and rural municipalities apart, from "
+        "The prohibition referendum of 29 and 30 December 1931 by municipality, with the provinces, from "
         "the official statistics",
         (
             "1931 Finnish prohibition referendum",
@@ -966,8 +983,9 @@ def election_1931() -> Package:
             "Alternativ III: förbudslagen upphävs",
         ),
     )
-    towns = _result_set(b, "town-rural", True, 1.0, METHOD_1931, SOURCE_1931)
+    towns = _result_set(b, "town-rural", False, 1.0, METHOD_1931, SOURCE_1931)
     provinces = _result_set(b, "province", False, 1.0, PROVINCE_METHOD_1931, SOURCE_1931)
+    municipal = _result_set(b, "municipality", True, 1.0, MUNICIPAL_METHOD_1931, SOURCE_1931, supersedes=towns)
     p.add(
         "note",
         id=key("note", towns, "advisory"),
@@ -978,7 +996,7 @@ def election_1931() -> Package:
     )
 
     path = raw.cached(SOURCE, PDF_1931).path
-    pages = digitized.pages(path, 7, 11)
+    pages = digitized.pages(path, 7, prohibition_1931.LAST_PAGE)
     artifact = str(
         uuid5(package.NAMESPACE, f"source_artifact\x1f{SOURCE_1931}\x1f{raw.cached(SOURCE, PDF_1931).storage_key}")
     )
@@ -1092,6 +1110,36 @@ def election_1931() -> Package:
             tuple((whole[2 + q], add3(VOTES_1931["urban"][index][q], VOTES_1931["rural"][index][q])) for q in range(3)),
             (whole[5], add3(VOTES_1931["urban"][index][3], VOTES_1931["rural"][index][3])),
         )
+    for leaf in prohibition_1931.leaves(path):
+        slug = PROVINCES_1931[leaf.province][0]
+        unit = key("unit", day, slug, leaf.kind, leaf.seq)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=vaalit.FINLAND,
+            scheme_code=SCHEME,
+            code=f"{day}:{slug}:{leaf.kind}:{leaf.seq}",
+            area_relation="unlocated",
+            area_id=None,
+            kind="standard",
+        )
+        p.name(unit, leaf.name, "und", "official")
+        v = leaf.values
+        total = {c: v[c * 3 + BOTH] for c in range(7)}
+        b.values.append((municipal, unit, None, INVALID, total[prohibition_1931.CAST] - total[prohibition_1931.VALID]))
+        for measure, option, column, number in (
+            (REGISTERED, None, prohibition_1931.REGISTERED, 7),
+            (CAST, None, prohibition_1931.CAST, 8),
+            (VALID, None, prohibition_1931.VALID, 11),
+            (VOTES, "first", prohibition_1931.FIRST, 11),
+            (VOTES, "second", prohibition_1931.SECOND, 11),
+            (VOTES, "third", prohibition_1931.THIRD, 11),
+        ):
+            option_id = b.options[option] if option else None
+            b.values.append((municipal, unit, option_id, measure, total[column]))
+            box = leaf.boxes.get(column * 3 + BOTH)
+            if box is not None:
+                b.locators.append((municipal, unit, option_id, measure, page_id(leaf.page), *digitized.pixels(box)))
     totals = VOTES_COUNTRY_1931["whole"]
     declared = {
         (REGISTERED, None): REGISTERED_WHOLE_1931[BOTH],
@@ -1102,7 +1150,7 @@ def election_1931() -> Package:
         (VOTES, "second"): totals[1][BOTH],
         (VOTES, "third"): totals[2][BOTH],
     }
-    for result_set in (towns, provinces):
+    for result_set in (towns, provinces, municipal):
         for (measure, option), value in declared.items():
             p.add(
                 "declared",
