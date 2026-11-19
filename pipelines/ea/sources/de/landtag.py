@@ -30,7 +30,7 @@ VERSION = "6"
 SUMMARY = (
     "German state elections: 2026 (Baden-Württemberg, Berlin, Mecklenburg-Vorpommern, Rhineland-Palatinate, and "
     "Saxony-Anhalt) by constituency, every earlier Landtag election since 1946 by Land from the Bundeswahlleiterin "
-    "and the Länder statistical offices, and Thuringia's elections since 1990 and Saxony's since 2014 by constituency"
+    "and the Länder statistical offices, and Thuringia's elections since 1990 and Saxony's since 2009 by constituency"
 )
 # Rows the package format does not hold. The changesets that wrote them keep them: body sizes, the merger relations
 # of the former Länder, and the merge of the East German KPD into the party of 1990.
@@ -97,13 +97,44 @@ SN_RESULTS = {
     2024: (f"{SN_DOWNLOAD}/Landtag/statistik-sachsen_LW24_endgErgebniss.xlsx", "LW24_endgErgebnisse_SN&WK"),
 }
 SN_ELECTED = {
+    2009: f"{SN_LIBRARY}/SNHeft_derivate_00005761/B_VII_2-2_5j09_SN.pdf",
     2014: f"{SN_LIBRARY}/SNHeft_derivate_00005762/B_VII_2_2_5j_14_SN.pdf",
     2019: f"{SN_DOWNLOAD}/Landtag/LW19_gewaehlte_Direktbewerber.pdf",
     2024: f"{SN_DOWNLOAD}/Landtag/statistik-sachsen_LW24_gewaehlte_Direktbewerber.pdf",
 }
+# Pages of the 2009 final report (1-based): table 4 (the Land), 7 (registered voters and voters), and 8 (valid and
+# invalid votes), and the facing pages of tables 9 (constituency votes) and 10 (list votes) with their columns.
+SN_2009_PAGES = {"land": (29, 29), "registered": (32, 35), "valid": (36, 39)}
+SN_2009_FIRST = (
+    ("Insgesamt", "CDU", "DIE LINKE", "SPD", "NPD", "FDP"),
+    ("GRÜNE", "PBC", "BüSo", "DSU", "Freie Sachsen", "FP Deutschlands"),
+    ("HUMANWIRTSCHAFT", "SVP", "BILDUNG", "DOSE", "Förster", "Freie Bürger"),
+    ("Für unsere Region", "FW Sachsen", "Frieden", "Gerechtigkeit", "Nitzsche"),
+)
+SN_2009_LIST = (
+    ("Insgesamt", "CDU", "DIE LINKE", "SPD", "NPD", "FDP", "GRÜNE"),
+    (
+        "Die Tierschutzpartei",
+        "PBC",
+        "BüSo",
+        "DSU",
+        "REP",
+        "Freie Sachsen",
+        "FP Deutschlands",
+        "HUMANWIRTSCHAFT",
+        "PIRATEN",
+        "SVP",
+    ),
+)
+# Each table prints a group of constituencies on even pages that start with the number and on odd pages that end
+# with it.
+SN_2009_VOTES = {
+    1: [(40 + 4 * group + page, columns) for group in range(4) for page, columns in enumerate(SN_2009_FIRST)],
+    2: [(56 + 2 * group + page, columns) for group in range(4) for page, columns in enumerate(SN_2009_LIST)],
+}
 SN_WAHLKREISE = 60
 SN_PUBLISHER = "Statistisches Landesamt des Freistaates Sachsen"
-SN_TITLE = "Wahlen im Freistaat Sachsen: Landtagswahlen 2014 bis 2024, endgültige Ergebnisse nach Wahlkreisen"
+SN_TITLE = "Wahlen im Freistaat Sachsen: Landtagswahlen 2009 bis 2024, endgültige Ergebnisse nach Wahlkreisen"
 SN_URL = "https://www.wahlen.sachsen.de/landtagswahlen.html"
 # The 2014 report's font stores each character 29 code points down, except these.
 SN_2014_GLYPHS = {"l": "ä", "|": "ö", "\x81": "ü", "\x89": "ß", "\x8b": "©"}
@@ -1051,10 +1082,10 @@ def sn_glyphs(text: str) -> str:
 
 def sn_winners(year: int) -> list[dict[str, object]]:
     """The constituency winners, in the cell order every one of the Land's tables of elected members uses: number,
-    constituency, party, "family name, first names", and votes. The 2014 table is on pages 16 and 17 of the final
-    report."""
+    constituency, party, "family name, first names", and votes. The 2009 and 2014 tables are on pages 16 and 17 of
+    the final reports."""
     document = pymupdf.open(raw.cached(SOURCE, SN_ELECTED[year]).path)
-    pages = (15, 16) if year == 2014 else range(document.page_count)
+    pages = (15, 16) if year in (2009, 2014) else range(document.page_count)
     lines: list[str] = []
     for number in pages:
         for block in document[number].get_text("rawdict")["blocks"]:
@@ -1088,6 +1119,111 @@ def sn_winners(year: int) -> list[dict[str, object]]:
     return winners
 
 
+def sn_workbook(year: int) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    url, sheet = SN_RESULTS[year]
+    rows = pl.read_excel(raw.cached(SOURCE, url).path, sheet_name=sheet, has_header=False, infer_schema_length=0).rows()
+    header = list(rows[0])
+    end = header.index(None) if None in header else len(header)
+    columns = {name: column for column, name in enumerate(header[:end])}
+    cons: list[dict[str, Any]] = []
+    votes: list[dict[str, Any]] = []
+    for row in rows[1:]:
+        if "Ebene" in columns and row[columns["Ebene"]] != "WK":
+            continue
+        wk = f"{int(row[columns['WK-Nr']]):02d}"
+        counts = {
+            name: number(row[column])
+            for name, column in columns.items()
+            if name in ("Wahlberechtigte", "Wähler") or re.fullmatch(r".+_[12]", name)
+        }
+        cons.append(
+            {
+                "wk": wk,
+                "name": row[columns["WK-Name"]].strip(),
+                "registered": counts["Wahlberechtigte"],
+                "voters": counts["Wähler"],
+                "invalid1": counts["ungültige_1"],
+                "valid1": counts["gültige_1"],
+                "invalid2": counts["ungültige_2"],
+                "valid2": counts["gültige_2"],
+            }
+        )
+        for name, count in counts.items():
+            match = re.fullmatch(r"(.+)_([12])", name)
+            if match is None or match[1] in ("ungültige", "gültige") or not count:
+                continue
+            votes.append({"wk": wk, "ballot": int(match[2]), "label": match[1], "votes": count})
+    return cons, votes
+
+
+def sn_2009() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """The 2009 constituencies from the final report's tables 7 (registered voters and voters), 8 (valid and invalid
+    votes), 9 (constituency votes), and 10 (list votes), which print each constituency's votes in a row of absolute
+    numbers across facing pages; every row adds up to the total it prints."""
+    document = pymupdf.open(raw.cached(SOURCE, SN_ELECTED[2009]).path)
+
+    def lines(first: int, last: int) -> list[str]:
+        return [
+            line for page in range(first - 1, last) for line in document[page].get_text("text", sort=True).splitlines()
+        ]
+
+    def cells(text: str) -> list[int | None]:
+        return [number(cell) for cell in re.split(r"\s{2,}", text.strip())]
+
+    accounting: dict[str, dict[str, Any]] = {}
+    for line in lines(*SN_2009_PAGES["registered"]):
+        if match := re.fullmatch(r"\s*(\d+)\s+(.+?)\s+2009\s+(.+)", line):
+            registered, voters, _, _, _ = re.split(r"\s{2,}", match[3].strip())
+            accounting[f"{int(match[1]):02d}"] = {
+                # Leipzig 7 carries a footnote mark about the repeat vote of 2004.
+                "name": re.sub(r"\s+\d\)$", "", match[2].strip()),
+                "registered": number(registered),
+                "voters": number(voters),
+            }
+    for line in lines(*SN_2009_PAGES["valid"]):
+        if match := re.fullmatch(r"\s*(\d+)\s+(.+?)\s+2009\s+(.+)", line):
+            valid1, _, invalid1, _, valid2, _, invalid2, _ = re.split(r"\s{2,}", match[3].strip())
+            accounting[f"{int(match[1]):02d}"] |= {
+                "invalid1": number(invalid1),
+                "valid1": number(valid1),
+                "invalid2": number(invalid2),
+                "valid2": number(valid2),
+            }
+    counts: dict[tuple[int, str], dict[str, int | None]] = {}
+    for ballot, groups in SN_2009_VOTES.items():
+        for first, columns in groups:
+            for line in lines(first, first):
+                if first % 2 == 0:
+                    match = re.fullmatch(r"\s*(?P<wk>\d+)\s+\S.*?\s+absolut\s+(?P<text>.+)", line)
+                else:
+                    match = re.fullmatch(r"(?P<text>.+?)\s+absolut\s+\S.*?\s+(?P<wk>\d+)\s*", line)
+                    if match is None and ballot == 2 and "," not in line:
+                        match = re.fullmatch(r"\s*(?P<text>[\dx][\d x]*?)\s{2,}(?P<wk>\d+)\s*", line)
+                if match is None:
+                    continue
+                wk, text = match["wk"], match["text"]
+                found = cells(text)
+                if len(found) != len(columns):
+                    raise ValueError(f"SN 2009 page {first}: {len(found)} cells for {columns} in {line!r}")
+                counts.setdefault((ballot, f"{int(wk):02d}"), {}).update(zip(columns, found, strict=True))
+    cons = [{"wk": wk, **row} for wk, row in sorted(accounting.items())]
+    votes: list[dict[str, Any]] = []
+    for (ballot, wk), row in sorted(counts.items()):
+        total = row.pop("Insgesamt")
+        if total != sum(count or 0 for count in row.values()) or total != accounting[wk][f"valid{ballot}"]:
+            raise ValueError(f"SN 2009 {wk} ballot {ballot}: {row} against {total} and table 8")
+        votes += [{"wk": wk, "ballot": ballot, "label": label, "votes": count} for label, count in row.items() if count]
+    land: dict[str, int] = {}
+    for line in lines(*SN_2009_PAGES["land"]):
+        if match := re.fullmatch(r"\s*(\S.*?)\s{2,}(\d[\d ]*?)\s{2,}.*", line):
+            land.setdefault(match[1], int(match[2].replace(" ", "")))
+    for label in {vote["label"] for vote in votes if vote["ballot"] == 1}:
+        total = sum(vote["votes"] for vote in votes if vote["ballot"] == 1 and vote["label"] == label)
+        if land.get(label) != total:
+            raise ValueError(f"SN 2009 constituency votes for {label}: {total} against table 4's {land.get(label)}")
+    return cons, votes
+
+
 def parse_sn(elections: list[dict[str, Any]], results: list[dict[str, Any]]) -> None:
     """Saxony's constituency results from the Statistisches Landesamt's workbooks, and the winners from its tables of
     elected members; every constituency's votes add up to its valid votes, and the constituencies to the Land."""
@@ -1097,42 +1233,12 @@ def parse_sn(elections: list[dict[str, Any]], results: list[dict[str, Any]]) -> 
     labels: list[dict[str, object]] = []
     problems: list[str] = []
     days = {election["day"].year: election for election in elections if election["state"] == "SN"}
-    for year, (url, sheet) in SN_RESULTS.items():
+    for year in SN_ELECTED:
         election = days[year]
         day = election["day"]
-        rows = pl.read_excel(
-            raw.cached(SOURCE, url).path, sheet_name=sheet, has_header=False, infer_schema_length=0
-        ).rows()
-        header = list(rows[0])
-        end = header.index(None) if None in header else len(header)
-        columns = {name: column for column, name in enumerate(header[:end])}
-        for row in rows[1:]:
-            if "Ebene" in columns and row[columns["Ebene"]] != "WK":
-                continue
-            wk = f"{int(row[columns['WK-Nr']]):02d}"
-            counts = {
-                name: number(row[column])
-                for name, column in columns.items()
-                if name in ("Wahlberechtigte", "Wähler") or re.fullmatch(r".+_[12]", name)
-            }
-            cons.append(
-                {
-                    "day": day,
-                    "wk": wk,
-                    "name": row[columns["WK-Name"]].strip(),
-                    "registered": counts["Wahlberechtigte"],
-                    "voters": counts["Wähler"],
-                    "invalid1": counts["ungültige_1"],
-                    "valid1": counts["gültige_1"],
-                    "invalid2": counts["ungültige_2"],
-                    "valid2": counts["gültige_2"],
-                }
-            )
-            for name, count in counts.items():
-                match = re.fullmatch(r"(.+)_([12])", name)
-                if match is None or match[1] in ("ungültige", "gültige") or not count:
-                    continue
-                votes.append({"day": day, "wk": wk, "ballot": int(match[2]), "label": match[1], "votes": count})
+        year_cons, year_votes = sn_workbook(year) if year in SN_RESULTS else sn_2009()
+        cons += [{"day": day, **row} for row in year_cons]
+        votes += [{"day": day, **vote} for vote in year_votes]
         land = [row for row in cons if row["day"] == day]
         if len(land) != SN_WAHLKREISE:
             problems.append(f"SN {day}: {len(land)} constituencies")
