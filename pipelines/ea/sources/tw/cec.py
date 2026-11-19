@@ -84,6 +84,7 @@ def fetch() -> None:
         cec_local_by,
         cec_recall,
         cec_referendum,
+        cec_shapes,
         cec_township,
         cec_village,
     )
@@ -104,6 +105,7 @@ def fetch() -> None:
     cec_village.fetch()
     cec_referendum.fetch()
     cec_recall.fetch()
+    cec_shapes.fetch()
 
 
 def key(kind: str, *parts: object) -> str:
@@ -360,7 +362,15 @@ def profile(day: str) -> dict[str, object]:
 
 
 def geo() -> Package:
-    from ea.sources.tw import cec_by, cec_local_by, cec_recall, cec_referendum, cec_township, cec_village
+    from ea.sources.tw import (
+        cec_by,
+        cec_local_by,
+        cec_recall,
+        cec_referendum,
+        cec_shapes,
+        cec_township,
+        cec_village,
+    )
 
     p = Package(
         "tw.cec/geo",
@@ -445,6 +455,7 @@ def geo() -> Package:
         p.name(id, f"{county}第{district}選舉區", "zh", "official")
     cec_township.geo(p)
     cec_recall.geo(p)
+    cec_shapes.geo(p, {name: area("tw.county", name) for name in counties})
     return p
 
 
