@@ -6,6 +6,8 @@ report each dzongkhag, with votes counted on the electronic voting machines (EVM
 
 import json
 import re
+import subprocess
+import tempfile
 from collections import Counter
 from dataclasses import dataclass
 from datetime import date
@@ -13,8 +15,12 @@ from difflib import SequenceMatcher
 from pathlib import Path
 from uuid import uuid5
 
+import numpy as np
+from PIL import Image
+
 from ea import package, raw
 from ea.package import Package
+from ea.raw import Artifact
 from ea.sources.bt import tables
 from ea.sources.bt.tables import DZONGKHAGS, Row, Seat
 
@@ -39,6 +45,13 @@ FILES = {
     "nc2007": f"{UPLOADS}/2026/06/NC-FinalResults-2007.pdf",
     "nc2013": f"{UPLOADS}/2026/06/NCFinalResult2013.pdf",
     "nc2023": f"{UPLOADS}/2026/06/FinalResult_NC2023.pdf",
+}
+PRESS_2024 = "https://web.archive.org/web/20241212202143id_/https://www.ecb.bt/wp-content/uploads/2024/01/GE-Results-Eng-10012024.pdf"
+BROWSER_2024 = "browser://20261117-210702-144716"
+# The 2024 general-election results, one scanned page for each dzongkhag, in the Commission's dzongkhag order.
+PAGES_2024 = {
+    "Bumthang": "https://web.archive.org/web/20241222201610id_/https://www.ecb.bt/wp-content/uploads/2024/01/Bumthang.pdf",
+    **{name: f"{BROWSER_2024}/{name.replace(' ', '-')}.pdf" for name in DZONGKHAGS if name != "Bumthang"},
 }
 PARTY_NAMES = {
     "BKP": "Bhutan Kuen-Nyam Party",
@@ -71,6 +84,7 @@ ELECTIONS = (
     Election(date(2018, 10, 18), "na", "general", ("2018 National Assembly general election", "na")),
     Election(date(2023, 4, 20), "nc", "general", ("2023 National Council election", "nc")),
     Election(date(2023, 11, 30), "na", "primary", ("2023 National Assembly primary round", "na-primary")),
+    Election(date(2024, 1, 9), "na", "general", ("2024 National Assembly general election", "na")),
 )
 
 
@@ -100,6 +114,9 @@ def packages() -> list[str]:
 def fetch() -> None:
     for url in FILES.values():
         raw.fetch(SOURCE, url, suffix=".json" if "wp-json" in url else ".pdf")
+    # The 2024 pages came from copies of the Commission's files, saved outside the fetcher.
+    for url in (PRESS_2024, PAGES_2024["Bumthang"]):
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def path(name: str) -> Path:
@@ -363,6 +380,8 @@ def build(election: Election) -> Package:
         council(p, election, id, path_)
     elif election.stage == "primary":
         primary(p, election, id, path_)
+    elif day == date(2024, 1, 9):
+        assembly2024(p, election, id, path_)
     else:
         assembly(p, election, id, path_)
     return p
@@ -477,6 +496,241 @@ def assembly(p: Package, election: Election, eid: str, path_: str) -> None:
         "registered": sum(s.registered or 0 for s in seats),
     }
     verify(election, total, totals)
+
+
+DIGITIZED = 8
+PAGES = raw.DATA / "pages" / SOURCE
+
+
+def render(artifact: Artifact) -> tuple[Path, int, int]:
+    """The first page of a scanned file at 150 dpi, a PNG named for the file's hash, and its size."""
+    image = PAGES / f"{artifact.sha256}-1.png"
+    if not image.exists():
+        PAGES.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory() as folder:
+            subprocess.run(
+                [
+                    "pdftoppm",
+                    "-r",
+                    "150",
+                    "-png",
+                    "-f",
+                    "1",
+                    "-l",
+                    "1",
+                    "-singlefile",
+                    str(artifact.path),
+                    f"{folder}/p",
+                ],
+                check=True,
+            )
+            Image.open(f"{folder}/p.png").convert("RGB").save(image)
+    width, height = Image.open(image).size
+    return image, width, height
+
+
+@dataclass(frozen=True)
+class Block:
+    """One constituency's block on a page, as fractions of the page: its rows, its left panel of figures, and the
+    columns that hold each candidate's votes."""
+
+    top: float
+    bottom: float
+    left: float
+    split: float
+    right: float
+
+
+def blocks(image: Path) -> list[Block]:
+    """Find each constituency's block on a page from the pale blue heading band above it. Every block on a page has
+    the same height, so each runs from its band to the next band's top."""
+    pixels = np.asarray(Image.open(image).convert("RGB")).astype(int)
+    height, width = pixels.shape[:2]
+    red, green, blue = pixels[..., 0], pixels[..., 1], pixels[..., 2]
+    band = (blue - red > 25) & (blue > green) & (red > 150)
+    rows = np.flatnonzero(band.mean(axis=1) > 0.4)
+    starts: list[int] = []
+    ends: list[int] = []
+    for y in rows:
+        if starts and y - ends[-1] <= 10:
+            ends[-1] = int(y)
+        else:
+            starts.append(int(y))
+            ends.append(int(y))
+    found = [(top, bottom) for top, bottom in zip(starts, ends, strict=True) if bottom - top >= 20]
+    if len(found) < 2:
+        raise ValueError(f"{image.name}: expected at least two constituency bands, found {len(found)}")
+    pitch = found[1][0] - found[0][0]
+    columns = np.flatnonzero(band[found[0][0] + 2])
+    left, right = float(columns.min()), float(columns.max())
+    wide = right - left
+    return [
+        Block(
+            round((bottom + 2) / height, 4),
+            round(min(top + pitch, height) / height, 4),
+            round(left / width, 4),
+            round((left + 0.585 * wide) / width, 4),
+            round(right / width, 4),
+        )
+        for top, bottom in found
+    ]
+
+
+def press2024() -> tuple[dict[str, int], list[tuple[str, str]]]:
+    """The 10 January 2024 declaration: the voters and votes it totals, and the members it names with their parties."""
+    text = _text(raw.DATA / raw.cached(SOURCE, PRESS_2024).storage_key)
+    flat = re.sub(r"\s+", " ", text)
+    found = re.search(
+        r"Of the total ([\d,]+) eligible registered voters, ([\d,]+) voters cast their votes\. From the total votes cast, "
+        r"([\d,]+) votes were cast in person on the Electronic Voting Machines \(EVMs\) at the (\d+) polling stations "
+        r"and ([\d,]+) votes were cast through Postal Ballots",
+        flat,
+    )
+    if found is None:
+        raise ValueError("2024 declaration totals not found")
+    number = [int(group.replace(",", "")) for group in found.groups()]
+    totals = {"registered": number[0], "total": number[1], "evm": number[2], "stations": number[3], "postal": number[4]}
+    members = re.findall(r"^.*\s{2,}(\S+(?: \S+)*)\s{2,}(PDP|BTP)\s*$", text, re.MULTILINE)
+    return totals, [(clean(name), code) for name, code in members]
+
+
+def assembly2024(p: Package, election: Election, eid: str, path_: str) -> None:
+    day = election.day
+    seats = tables.na2024()
+    if len(seats) != 47:
+        raise ValueError(f"expected 47 constituencies, found {len(seats)}")
+    totals, members = press2024()
+    won = [
+        (seat_row.candidate, tables.party_code(seat_row.party))
+        for _, seat in seats
+        for seat_row in seat.rows
+        if seat_row.elected
+    ]
+    if Counter(code for _, code in members) != {"PDP": 30, "BTP": 17} or [code for _, code in members] != [
+        code for _, code in won
+    ]:
+        raise ValueError("the declaration's members and parties do not match the constituency pages")
+    for (named, _), (printed, _) in zip(members, won, strict=True):
+        if SequenceMatcher(None, tables.squash(named), tables.squash(printed)).ratio() < 0.6:
+            raise ValueError(f"the declaration names {named} where the page names {printed}")
+    layout = [(tables.dzongkhag_index(name), seat.name) for name, seat in seats]
+    codes = seat_codes(layout)
+    try:
+        # Each constituency's code is its place in the Commission's order, the order the 2018 table gives.
+        earlier = constituencies()
+    except LookupError:
+        earlier = layout
+    for (index, name), (before, label), code in zip(layout, earlier, codes, strict=True):
+        if index != before or SequenceMatcher(None, tables.squash(name), tables.squash(label)).ratio() < 0.8:
+            raise ValueError(f"{code}: {name} is not the constituency the 2018 table gives, {label}")
+    artifacts: dict[str, str] = {}
+    pictures: dict[str, tuple[str, list[Block]]] = {}
+    for name in DZONGKHAGS:
+        artifact = raw.cached(SOURCE, PAGES_2024[name])
+        artifacts[name] = p.artifact(artifact, ECB)
+        image, width, height = render(artifact)
+        page = key("page", day, name)
+        p.add(
+            "source_page",
+            id=page,
+            artifact_id=artifacts[name],
+            page_number=1,
+            image_key=f"pages/{SOURCE}/{image.name}",
+            width=width,
+            height=height,
+        )
+        pictures[name] = (page, blocks(image))
+    p.artifact(raw.cached(SOURCE, PRESS_2024), ECB)
+    places: dict[str, int] = {}
+    boxes: dict[tuple[str, str | None], tuple[str, tuple[float, float, float, float]]] = {}
+    for number, (dzongkhag, seat) in enumerate(seats):
+        index, canon = layout[number]
+        code = codes[number]
+        page, found = pictures[DZONGKHAGS[index]]
+        if dzongkhag != DZONGKHAGS[index]:
+            raise ValueError(f"{dzongkhag} is not a dzongkhag")
+        places[dzongkhag] = places.get(dzongkhag, 0) + 1
+        if places[dzongkhag] > len(found):
+            raise ValueError(f"{dzongkhag}: the page has {len(found)} constituencies, the table has more")
+        block = found[places[dzongkhag] - 1]
+        unit = seat_unit(p, day, "bt.demkhong", code, area("bt.demkhong", code), True, channels=True, roll=True)
+        label = demkhong_name(canon)
+        name_units(p, unit, label)
+        tag = f"{day}:{code}"
+        cid, rs = contest(
+            p,
+            eid,
+            tag,
+            kind="body_seats",
+            body_id=NA_BODY,
+            district_area_id=area("bt.demkhong", code),
+            magnitude=1,
+            electoral_system_id=SYSTEM_FPTP,
+        )
+        p.name(cid, f"{label} constituency", "en", "official")
+        p.add("slug", path=f"{path_}/{code}", entity_id=cid, is_current=True)
+        p.add(
+            "note",
+            id=key("note", rs),
+            entity_id=rs,
+            kind="methodology",
+            body_md=METHOD.format(unit="constituency")
+            + " The pages are scanned images, so every number was read from the page and carries its page and place on "
+            "it. Each constituency's votes were checked against the totals its page prints.",
+            lang="en",
+        )
+        won_rows = {i for i, row in enumerate(seat.rows, 1) if row.elected}
+        options = candidates(p, cid, rs, tag, seat.rows, won_rows)
+        height = (block.bottom - block.top) / len(seat.rows)
+        for position, row in enumerate(seat.rows, 1):
+            split(p, rs, unit, options[position], row)
+            top = round(block.top + (position - 1) * height, 4)
+            boxes[(options[position], unit.evm)] = (page, (block.split, top, block.right, round(top + height, 4)))
+            boxes[(options[position], unit.postal)] = boxes[(options[position], unit.evm)]
+        panel = (page, (block.left, block.top, block.split - 0.01, block.bottom))
+        assert unit.postal is not None and unit.total is not None
+        value(p, rs, unit.evm, None, REGISTERED, seat.evm_voters or 0)
+        value(p, rs, unit.postal, None, REGISTERED, seat.postal_voters or 0)
+        value(p, rs, unit.total, None, REGISTERED, seat.registered or 0)
+        for part in (unit.evm, unit.postal, unit.total):
+            boxes[(f"registered:{rs}", part)] = panel
+        locate(p, rs, boxes)
+    total = {
+        "evm": sum(r.evm or 0 for _, s in seats for r in s.rows),
+        "postal": sum(r.postal or 0 for _, s in seats for r in s.rows),
+        "total": sum(r.total for _, s in seats for r in s.rows),
+        "registered": sum(s.registered or 0 for _, s in seats),
+    }
+    if sum(s.stations or 0 for _, s in seats) != totals["stations"]:
+        raise ValueError("the polling stations do not add up to the declaration's")
+    verify(election, total, {k: v for k, v in totals.items() if k != "stations"})
+
+
+def locate(
+    p: Package, rs: str, boxes: dict[tuple[str, str | None], tuple[str, tuple[float, float, float, float]]]
+) -> None:
+    """Mark a result set's values as digitized and give each its page and box."""
+    for row in p.rows["result_value"]:
+        if row["result_set_id"] != rs or row["flags"] == DIGITIZED:
+            continue
+        row["flags"] = DIGITIZED
+        option = row["option_id"]
+        page, box = boxes[(f"registered:{rs}" if option is None else str(option), str(row["unit_id"]))]
+        p.add(
+            "value_locator",
+            result_set_id=rs,
+            unit_id=row["unit_id"],
+            option_id=option,
+            channel=0,
+            measure=row["measure"],
+            count_round=0,
+            page_id=page,
+            source_id=None,
+            x0=box[0],
+            y0=box[1],
+            x1=box[2],
+            y1=box[3],
+        )
 
 
 def pre2018_names() -> list[str]:

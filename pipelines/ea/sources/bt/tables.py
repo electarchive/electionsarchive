@@ -561,3 +561,54 @@ def nc2007(path: Path) -> tuple[list[Seat], dict[str, int]]:
             raise ValueError(f"{label}: candidates add up to {total}, not the {cast} votes cast")
         seats.append(seat)
     return seats, totals
+
+
+GE2024 = Path(__file__).with_name("ecb_ge2024.txt")
+
+
+def na2024(path: Path = GE2024) -> list[tuple[str, Seat]]:
+    """The 2024 National Assembly general election: each constituency with its dzongkhag, read from the
+    transcription of the Commission's scanned demkhong-wise pages. The pages are images with no text layer, so the
+    numbers are typed in `ecb_ge2024.txt` and checked here against the sums each page prints: the registered voters,
+    the voters who turned out, and the votes on the machines and by post. A constituency whose rows disagree with its
+    own page raises."""
+    found: list[tuple[str, Seat]] = []
+    printed: list[tuple[int, int, int]] = []
+    for line in path.read_text().splitlines():
+        if not line or line.startswith("#"):
+            continue
+        fields = line.split("|")
+        if fields[0] == "S":
+            figures = [int(field) for field in fields[4:]]
+            stations, evm_reg, postal_reg, registered, male, female, turnout, evm, postal = figures
+            if evm_reg + postal_reg != registered or male + female != turnout:
+                raise ValueError(f"{fields[2]}: the registered voters or the turnout do not add up")
+            seat = Seat(
+                name=fields[3].title(),
+                male=male,
+                female=female,
+                registered=registered,
+                stations=stations,
+                evm_voters=evm_reg,
+                postal_voters=postal_reg,
+                page=1,
+            )
+            printed.append((evm, postal, turnout))
+            found.append((fields[1], seat))
+        else:
+            seat = found[-1][1]
+            _, name, party, evm, postal, total, mark = fields
+            row = Row(len(seat.rows) + 1, "", party, name, int(evm), int(postal), int(total), 1, mark == "E")
+            if row.evm is None or row.evm + int(postal) != int(total):
+                raise ValueError(f"{seat.name}: {name}'s machine and postal votes do not add up")
+            seat.rows.append(row)
+    for (_, seat), page in zip(found, printed, strict=True):
+        if (
+            sum(r.evm or 0 for r in seat.rows),
+            sum(r.postal or 0 for r in seat.rows),
+            sum(r.total for r in seat.rows),
+        ) != page:
+            raise ValueError(f"{seat.name}: the candidates' votes do not add up to the page's totals")
+        if sum(bool(r.elected) for r in seat.rows) != 1 or not max(seat.rows, key=lambda r: r.total).elected:
+            raise ValueError(f"{seat.name}: the elected candidate is not the one with the most votes")
+    return found
