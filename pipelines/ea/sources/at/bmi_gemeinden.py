@@ -12,9 +12,10 @@ and the candidates against the valid votes; the municipalities of each district 
 municipalities and the votes cast abroad of each state against the state row; and the state rows against the
 figures the summary tables give for each state. A mismatch raises, so a misread number never reaches a package.
 
-Municipalities carry the code the Federal Ministry of the Interior gave them in 1995. Where a district held fewer
-municipalities at the election than in 1995 (some were split off since), its municipalities are linked to those
-areas as an approximation.
+Municipalities carry the code the Federal Ministry of the Interior gave them in 1995. Where a district's
+municipalities at the election differ from those of 1995 (some were merged or split since), its municipalities are
+linked to those areas as an approximation, and a municipality that matches none of 1995 (its code holds an `x`) lies
+within its district.
 """
 
 import math
@@ -28,8 +29,6 @@ from ea.package import Package
 
 TABLES = Path(__file__).with_name("bmi_tables")
 FIRST = ("cast", "invalid", "valid")
-COLUMNS = ("lfd", "name", "registered", "cast", "invalid", "valid", "A", "Ap", "B", "Bp", "C", "D")
-"""The columns between the rules of a page: candidates are lettered in the order the page prints them."""
 
 
 @dataclass(frozen=True)
@@ -60,6 +59,8 @@ class Brochure:
     """Transcription codes of the candidates of each round, in the order the pages print them."""
     pages: dict[int, Page] = field(default_factory=dict)
     rows: list[Row] = field(default_factory=list)
+    columns: tuple[str, ...] = ()
+    """The columns between the rules of a page; candidates are lettered A to D in the order the page prints them."""
     split: set[str] = field(default_factory=set)
     """Districts whose municipalities of the election are linked to the areas of 1995 only as an approximation."""
 
@@ -93,6 +94,8 @@ def brochure(key: str) -> Brochure:
         head = words[0]
         if head == "round":
             b.candidates[int(words[1])] = words[2:]
+        elif head == "columns":
+            b.columns = tuple(words[1:])
         elif head == "split":
             b.split.update(words[1:])
         elif head == "page":
@@ -102,7 +105,7 @@ def brochure(key: str) -> Brochure:
             at = words.index("dy")
             rules = tuple(float(x) for x in words[4:at])
             offsets = tuple(float(x) for x in words[at + 1 :])
-            if len(rules) != len(COLUMNS) + 1 or len(offsets) != len(COLUMNS):
+            if len(rules) != len(b.columns) + 1 or len(offsets) != len(b.columns):
                 raise ValueError(f"{key}: bad page line {line!r}")
             b.pages[int(words[1])] = Page(int(words[1]), angle, rules, offsets)
         elif head in ("state", "abroad", "district", "gem"):
@@ -209,9 +212,11 @@ def box(page: Page, size: tuple[int, int], x: tuple[float, float], y: tuple[floa
     )
 
 
-def cell(page: Page, column: str, band: tuple[float, float]) -> tuple[tuple[float, float], tuple[float, float]]:
+def cell(
+    b: Brochure, page: Page, column: str, band: tuple[float, float]
+) -> tuple[tuple[float, float], tuple[float, float]]:
     """The edges and band of a column's cell on the straightened page."""
-    index = COLUMNS.index(column)
+    index = b.columns.index(column)
     dy = page.offsets[index]
     return (page.rules[index], page.rules[index + 1]), (band[0] + dy, band[1] + dy)
 
@@ -265,7 +270,8 @@ def add_result_set(
         if row.kind == "gem":
             unit = key_fn("unit", c.key, "gem", row.code)
             district = row.code[:3]
-            if district in approximate:
+            matched = row.code.isdigit()
+            if district in approximate or not matched:
                 relation, place = "within", area_fn("at.bezirk", district)
             else:
                 relation, place = "equals", area_fn("at.gemeinde", row.code)
@@ -279,7 +285,7 @@ def add_result_set(
                 area_id=place,
                 kind="standard",
             )
-            if district in approximate:
+            if district in approximate and matched:
                 p.add(
                     "reporting_unit_area",
                     unit_id=unit,
@@ -314,10 +320,10 @@ def add_result_set(
                 continue
             if column in measures:
                 option_id, measure = None, measures[column]
-                edges, y = cell(page, column, row.bands[0] if column == "registered" else band)
+                edges, y = cell(b, page, column, row.bands[0] if column == "registered" else band)
             else:
                 option_id, measure = c.options[column], votes
-                edges, y = cell(page, letters[column], band)
+                edges, y = cell(b, page, letters[column], band)
             p.add(
                 "result_value",
                 result_set_id=c.result_set,
