@@ -644,5 +644,93 @@
  "misprints": [],
  "unprinted": [
   "valid"
+ ],
+ "alliances": [
+  {
+   "key": "skl+skyp",
+   "members": [
+    "skl",
+    "skyp"
+   ],
+   "districts": [
+    "Helsingin kaupungin vaalipiiri",
+    "Uudenmaan läänin vaalipiiri",
+    "Turun läänin eteläinen vaalipiiri",
+    "Kymen läänin vaalipiiri",
+    "Mikkelin läänin vaalipiiri",
+    "Pohjois-Karjalan läänin vaalipiiri",
+    "Keski-Suomen läänin vaalipiiri",
+    "Vaasan läänin vaalipiiri",
+    "Oulun läänin vaalipiiri",
+    "Lapin läänin vaalipiiri"
+   ],
+   "page": 5,
+   "name_en": "Finnish Christian League and Finnish People's Unity Party electoral alliance"
+  },
+  {
+   "key": "skl+skyp+rkp",
+   "members": [
+    "skl",
+    "skyp",
+    "rkp"
+   ],
+   "districts": [
+    "Turun läänin pohjoinen vaalipiiri"
+   ],
+   "page": 5,
+   "name_en": "Finnish Christian League and Finnish People's Unity Party and Swedish People's Party electoral alliance"
+  },
+  {
+   "key": "ml+rkp",
+   "members": [
+    "ml",
+    "rkp"
+   ],
+   "districts": [
+    "Hämeen läänin pohjoinen vaalipiiri",
+    "Kymen läänin vaalipiiri",
+    "Keski-Suomen läänin vaalipiiri"
+   ],
+   "page": 5,
+   "name_en": "Agrarian League and Swedish People's Party electoral alliance"
+  },
+  {
+   "key": "ml+lkp",
+   "members": [
+    "ml",
+    "lkp"
+   ],
+   "districts": [
+    "Pohjois-Karjalan läänin vaalipiiri"
+   ],
+   "page": 5,
+   "name_en": "Agrarian League and Liberal People's Party electoral alliance"
+  },
+  {
+   "key": "ml+skl+rkp",
+   "members": [
+    "ml",
+    "skl",
+    "rkp"
+   ],
+   "districts": [
+    "Kuopion läänin vaalipiiri"
+   ],
+   "page": 5,
+   "name_en": "Agrarian League and Finnish Christian League and Swedish People's Party electoral alliance"
+  },
+  {
+   "key": "lkp+rkp",
+   "members": [
+    "lkp",
+    "rkp"
+   ],
+   "districts": [
+    "Oulun läänin vaalipiiri",
+    "Lapin läänin vaalipiiri"
+   ],
+   "page": 5,
+   "name_en": "Liberal People's Party and Swedish People's Party electoral alliance"
+  }
  ]
 }

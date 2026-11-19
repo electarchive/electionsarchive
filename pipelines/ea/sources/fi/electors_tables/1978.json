@@ -681,5 +681,59 @@
     "Electoral alliances (introduction): KESK, LKP and RKP in Helsinki, Uusimaa, Turku South, Kymi and Vaasa; KESK and LKP in Turku North, Häme South and North, Mikkeli, North Karelia, Kuopio, Central Finland and Lapland; SKDL and STP in Turku South, Häme North, Kymi, Mikkeli and North Karelia.",
     "Changes in seat allocation since 1968: Helsinki 32->31, Uusimaa 28->39, Turku South 24->25, Häme South 22->23, Häme North 18->19, Kymi 23->22, Mikkeli 15->13, Kuopio 18->16, North Karelia 13->11, Vaasa 29->27, Central Finland 16->15, Oulu 27->26, Lapland 14->12; Turku North (20) and Åland (1) unchanged. First election of electors with voting age 18 and with advance voting."
   ],
-  "misprints": []
+  "misprints": [],
+  "alliances": [
+    {
+      "key": "ml+lkp+rkp",
+      "members": [
+        "ml",
+        "lkp",
+        "rkp"
+      ],
+      "districts": [
+        "Helsingin kaupungin vaalipiiri",
+        "Uudenmaan läänin vaalipiiri",
+        "Turun läänin eteläinen vaalipiiri",
+        "Kymen läänin vaalipiiri",
+        "Vaasan läänin vaalipiiri"
+      ],
+      "page": 5,
+      "name_en": "Agrarian League and Liberal People's Party and Swedish People's Party electoral alliance"
+    },
+    {
+      "key": "ml+lkp",
+      "members": [
+        "ml",
+        "lkp"
+      ],
+      "districts": [
+        "Turun läänin pohjoinen vaalipiiri",
+        "Hämeen läänin eteläinen vaalipiiri",
+        "Hämeen läänin pohjoinen vaalipiiri",
+        "Mikkelin läänin vaalipiiri",
+        "Pohjois-Karjalan läänin vaalipiiri",
+        "Kuopion läänin vaalipiiri",
+        "Keski-Suomen läänin vaalipiiri",
+        "Lapin läänin vaalipiiri"
+      ],
+      "page": 5,
+      "name_en": "Agrarian League and Liberal People's Party electoral alliance"
+    },
+    {
+      "key": "skdl+stp",
+      "members": [
+        "skdl",
+        "stp"
+      ],
+      "districts": [
+        "Turun läänin eteläinen vaalipiiri",
+        "Hämeen läänin pohjoinen vaalipiiri",
+        "Kymen läänin vaalipiiri",
+        "Mikkelin läänin vaalipiiri",
+        "Pohjois-Karjalan läänin vaalipiiri"
+      ],
+      "page": 5,
+      "name_en": "Finnish People's Democratic League and Socialist Workers' Party electoral alliance"
+    }
+  ]
 }

@@ -608,5 +608,32 @@
   "Electors in table 9 are printed under the heading 'Vaalipiireittäin — Valkretsvis — By electoral areas' (the table has no 'a)' label); the printed total column is used as seats.",
   "Electoral rolls were those of the 1954 parliamentary election plus persons who turned 21 in 1954-1955. Voting in hospitals, at missions abroad and on Finnish ships abroad was possible for the first time (law of 30 June 1955)."
  ],
- "misprints": []
+ "misprints": [],
+ "alliances": [
+  {
+   "key": "kok+vapaamieliset",
+   "members": [
+    "kok",
+    "vapaamieliset"
+   ],
+   "districts": [
+    "Helsingin kaupungin vaalipiiri",
+    "Uudenmaan läänin vaalipiiri",
+    "Turun läänin eteläinen vaalipiiri",
+    "Turun läänin pohjoinen vaalipiiri",
+    "Hämeen läänin eteläinen vaalipiiri",
+    "Hämeen läänin pohjoinen vaalipiiri",
+    "Kymen läänin vaalipiiri",
+    "Mikkelin läänin vaalipiiri",
+    "Kuopion läänin läntinen vaalipiiri",
+    "Kuopion läänin itäinen vaalipiiri",
+    "Vaasan läänin itäinen vaalipiiri",
+    "Vaasan läänin eteläinen vaalipiiri",
+    "Oulun läänin vaalipiiri",
+    "Lapin läänin vaalipiiri"
+   ],
+   "page": 31,
+   "name_en": "National Coalition Party and Liberal Union electoral alliance"
+  }
+ ]
 }

@@ -553,5 +553,35 @@
   "Kuopion läänin läntinen vaalipiiri (Table IV footnote): the sdp figure 13 734 includes 66 votes of 1 list left outside the electoral alliance.",
   "Of the 300 electors, 19 were women (sdp 9, kok 2, ml 1, edistys 7)."
  ],
- "misprints": []
+ "misprints": [],
+ "alliances": [
+  {
+   "key": "edistys+pienviljelijat",
+   "members": [
+    "edistys",
+    "pienviljelijat"
+   ],
+   "districts": [
+    "Turun läänin eteläinen vaalipiiri",
+    "Turun läänin pohjoinen vaalipiiri",
+    "Hämeen läänin eteläinen vaalipiiri",
+    "Hämeen läänin pohjoinen vaalipiiri",
+    "Mikkelin läänin vaalipiiri"
+   ],
+   "page": 60,
+   "name_en": "National Progressive Party and Small Farmers' Party electoral alliance"
+  },
+  {
+   "key": "ml+edistys",
+   "members": [
+    "ml",
+    "edistys"
+   ],
+   "districts": [
+    "Vaasan läänin itäinen vaalipiiri"
+   ],
+   "page": 60,
+   "name_en": "Agrarian League and National Progressive Party electoral alliance"
+  }
+ ]
 }
