@@ -5,6 +5,10 @@ constituency from party lists, 300 of them and 301 in 1982 and 1988. Statistics 
 Official Statistics of Finland (series XXIX A), and its library serves the scanned volumes. Each figure here was read
 from the page images of the constituency tables, checked against the rows and the national totals the volume prints,
 and keeps the page and box it came from. The 1988 volume also prints the direct popular vote held at the same poll.
+
+Each volume also prints a table by commune. Where it is digitized (`electors_communes/<year>.json`, read from the scan's
+text layer by `electors_scan`, with every figure checked against its row's sums and against the constituency rows),
+the communes are reporting units under each constituency's unit.
 """
 
 import functools
@@ -30,6 +34,8 @@ FINLAND = str(uuid5(package.NAMESPACE, "polity\x1fFI"))
 CONTENT = "https://otos.stat.fi/server/api/core/bitstreams/{}/content"
 ITEM = "https://otos.stat.fi/items/{}"
 TABLES = Path(__file__).with_name("electors_tables")
+COMMUNES = Path(__file__).with_name("electors_communes")
+COMMUNE_SCHEME = "fi.kuntalaskenta"
 SCHEME = "fi.vaalipiiri"
 VOTES, REGISTERED, CAST, VALID, INVALID = 1, 2, 3, 4, 5
 DIGITIZED = 8
@@ -163,6 +169,15 @@ def table(year: int) -> dict[str, Any]:
     return json.loads((TABLES / f"{year}.json").read_text())
 
 
+@functools.cache
+def communes(year: int) -> dict[str, dict[str, Any]] | None:
+    """The by-commune table of a poll by constituency name, or None when the volume's table is not yet digitized."""
+    path = COMMUNES / f"{year}.json"
+    if not path.exists():
+        return None
+    return {item["district"]: item for item in json.loads(path.read_text())["districts"]}
+
+
 def slug(text: str) -> str:
     plain = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
     return re.sub(r"[^a-z0-9]+", "-", plain.casefold()).strip("-")
@@ -200,6 +215,17 @@ def check(year: int) -> None:
             problems.append(f"party {k} electors")
     if sum(nat["electors"].values()) != data["electors"]:
         problems.append("electors")
+    by_commune = communes(year)
+    if by_commune is not None:
+        for row in data["districts"]:
+            item = by_commune[row["fi"]]
+            units = [*item["communes"], *([item["elsewhere"]] if item.get("elsewhere") else [])]
+            for field in ("registered", "cast", "invalid"):
+                if field in row and sum(u["totals"].get(field, 0) for u in units) != row[field]:
+                    problems.append(f"communes {row['fi']}: {field}")
+            for k in {*row["votes"], *(k for u in units for k in u["votes"])}:
+                if sum(u["votes"].get(k, 0) for u in units) != row["votes"].get(k, 0):
+                    problems.append(f"communes {row['fi']}: party {k}")
     left = [problem for problem in problems if problem not in allowed]
     if left:
         raise ValueError(f"{year}: the transcription disagrees with the printed totals: {left}")
@@ -439,7 +465,7 @@ def build(year: int) -> Package:
         f"The {year} popular vote for presidential electors by constituency, digitized from Statistics Finland's volume",
         depends=[f"{SOURCE}/registry", *(["fi.vaalit/registry"] if direct else [])],
     )
-    p.external.update({FINLAND, SCHEME})
+    p.external.update({FINLAND, SCHEME, *([COMMUNE_SCHEME] if communes(year) is not None else [])})
     source = p.id("source", year)
     p.add(
         "source",
@@ -493,9 +519,17 @@ def build(year: int) -> Package:
         f"Each constituency's figures include the ballots its voters cast in other constituencies. Electors are "
         f"stored as the seats each party won in the constituency, as the volume's table of electors elected prints "
         f"them. A figure's box comes from the scan's text layer where that layer reads it correctly; otherwise it is "
-        f"where the figure's row and column cross. The volume also prints figures by municipality, which are not yet "
-        f"stored."
+        f"where the figure's row and column cross."
     )
+    if communes(year) is None:
+        method += " The volume also prints figures by commune, which are not yet stored."
+    else:
+        method += (
+            " The volume's table by commune gives each commune's registered voters, ballots cast, rejected ballots, and "
+            "votes by party. They are stored as reporting units under each constituency and add up to the "
+            "constituency's figures together with the ballots sent in from other constituencies, which the volume "
+            "prints as a line of their own. Communes are stored as the volume names them, without a shape."
+        )
     if "written" in {party["key"] for party in data["parties"]}:
         method += (
             " Accepted handwritten candidate lists count only toward the valid ballots in the party table; their votes, "
@@ -514,6 +548,8 @@ def build(year: int) -> Package:
     values: list[tuple[str, str, str | None, int, int]] = []
     locators: list[tuple[str, str, str | None, int, str, float, float, float, float]] = []
     tables: dict[tuple[str, int], list[tuple[str, str, list[tuple[str | None, int, int]]]]] = {}
+    known: dict[tuple[str, str, str | None, int], Box] = {}
+    by_commune = communes(year)
     used: set[str] = set()
     for row in data["districts"]:
         code = district_code(row["fi"])
@@ -597,6 +633,8 @@ def build(year: int) -> Package:
             placed.setdefault(where, []).append((None, measure, row[field]))
         for where, cells in placed.items():
             tables.setdefault(where, []).append((result_set, unit, cells))
+        if by_commune is not None:
+            _communes(p, year, day, code, unit, result_set, options, by_commune[row["fi"]], known, tables)
     if direct:
         _direct(p, data, direct, election, base, source, tables)
     for (_, number), rows in sorted(tables.items()):
@@ -604,7 +642,16 @@ def build(year: int) -> Package:
         for (result_set, unit, cells), row_boxes in zip(rows, boxes, strict=True):
             for (option, measure, value), box in zip(cells, row_boxes, strict=True):
                 values.append((result_set, unit, option, measure, value))
-                locators.append((result_set, unit, option, measure, page_id(number), *box))
+                locators.append(
+                    (
+                        result_set,
+                        unit,
+                        option,
+                        measure,
+                        page_id(number),
+                        *known.get((result_set, unit, option, measure), box),
+                    )
+                )
     p.frame(
         "result_value",
         pl.DataFrame(
@@ -632,6 +679,61 @@ def build(year: int) -> Package:
     for code, reason in data.get("accept", {}).items():
         p.accept(code, reason)
     return p
+
+
+def _communes(
+    p: Package,
+    year: int,
+    day: date,
+    district: str,
+    parent: str,
+    result_set: str,
+    options: dict[str, str],
+    item: dict[str, Any],
+    known: dict[tuple[str, str, str | None, int], Box],
+    tables: dict[tuple[str, int], list[tuple[str, str, list[tuple[str | None, int, int]]]]],
+) -> None:
+    """The communes of one constituency as reporting units under its unit, with the figures the volume prints for each."""
+    taken: set[str] = set()
+    sent = item.get("elsewhere")
+    for member in [*item["communes"], *([sent] if sent else [])]:
+        key = "elsewhere" if member is sent else slug(member["fi"])
+        if key in taken:
+            key = f"{key}-{member['row']}"
+        taken.add(key)
+        unit = p.id("unit", year, district, key)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=FINLAND,
+            scheme_code=COMMUNE_SCHEME,
+            code=f"{day}:{district}:{key}",
+            parent_id=parent,
+            area_relation="unlocated",
+            area_id=None,
+            kind="aggregate" if member is sent else "standard",
+        )
+        p.name(unit, member["fi"], "fi", "official")
+        if member.get("sv"):
+            p.name(unit, member["sv"], "sv", "official", False)
+        if member is sent:
+            p.name(unit, "Ballots sent in from other constituencies", "en", "official", False)
+            p.name(unit, "Från andra valkretsar insända röster", "sv", "official", False)
+        cells: list[tuple[str | None, int, int]] = []
+        where: list[tuple[str | None, int, str]] = []
+        for field, measure in (("registered", REGISTERED), ("cast", CAST), ("invalid", INVALID)):
+            if field in member["totals"]:
+                cells.append((None, measure, member["totals"][field]))
+                where.append((None, measure, field))
+        for k, option in options.items():
+            if k in member["votes"]:
+                cells.append((option, VOTES, member["votes"][k]))
+                where.append((option, VOTES, k))
+        for (option, measure, field), (_, _, value) in zip(where, cells, strict=True):
+            box = member["boxes"].get(field)
+            if box is not None:
+                known[(result_set, unit, option, measure)] = (box[0], box[1], box[2], box[3])
+        tables.setdefault(("communes", member["page"]), []).append((result_set, unit, cells))
 
 
 def _direct(
