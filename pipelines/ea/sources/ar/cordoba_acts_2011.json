@@ -1,0 +1,878 @@
+[
+ {
+  "kind": "governor",
+  "scope": null,
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 766445,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Jose Manuel De la Sota"
+   },
+   {
+    "name": "Alicia Monica Pregno"
+   }
+  ]
+ },
+ {
+  "kind": "legislators",
+  "scope": null,
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 565229,
+  "seats": 19,
+  "people": [
+   {
+    "name": "Daniel Alejandro Passerini"
+   },
+   {
+    "name": "Graciela Susana Brarda"
+   },
+   {
+    "name": "Ricardo Roberto Sosa"
+   },
+   {
+    "name": "Maria Amelia Chiofalo"
+   },
+   {
+    "name": "Dante Fortunato Heredia"
+   },
+   {
+    "name": "Alicia Isabel Narducci"
+   },
+   {
+    "name": "Carlos Mario Gutierrez"
+   },
+   {
+    "name": "Adhelma Catalina Ponte"
+   },
+   {
+    "name": "Juan Manuel Cid"
+   },
+   {
+    "name": "Maria del Carmen Ceballos"
+   },
+   {
+    "name": "Jose Emilio Pihen"
+   },
+   {
+    "name": "Sandra Beatriz Trigo"
+   },
+   {
+    "name": "Luis Antonio Sanchez"
+   },
+   {
+    "name": "Marisa Gamaggio Sosa"
+   },
+   {
+    "name": "Adrian Jesus Brito"
+   },
+   {
+    "name": "Maria Laura Labat"
+   },
+   {
+    "name": "Dario Eduardo Ranco"
+   },
+   {
+    "name": "Nadia Vanesa Fernandez"
+   },
+   {
+    "name": "Carlos Alberto Presas"
+   }
+  ]
+ },
+ {
+  "kind": "legislators",
+  "scope": null,
+  "order": 2,
+  "lead": "Frente Cívico",
+  "group": [
+   "Partido Nuevo entre la Corrupción por la Honestidad y la Transparencia",
+   "Córdoba en Acción",
+   "Partido Socialista",
+   "Movimiento Libres del Sur",
+   "Movimiento Socialista de los Trabajadores",
+   "Nueva Izquierda"
+  ],
+  "votes": 378302,
+  "seats": 12,
+  "people": [
+   {
+    "name": "Ricardo Oscar Fonseca"
+   },
+   {
+    "name": "Liliana Rosa Montero"
+   },
+   {
+    "name": "Roberto Cesar Birri"
+   },
+   {
+    "name": "Maria Fernanda Leiva"
+   },
+   {
+    "name": "Ruben Alberto Borello"
+   },
+   {
+    "name": "Maria Alejandra Del Boca"
+   },
+   {
+    "name": "Nancy Fabiola Lizzul"
+   },
+   {
+    "name": "Edgar Santiago Clavijo"
+   },
+   {
+    "name": "Julio Alberto Agosti"
+   },
+   {
+    "name": "Graciela Santina Sanchez"
+   },
+   {
+    "name": "Marta Nicolasa Juarez"
+   },
+   {
+    "name": "Carlos Oscar Roffe"
+   }
+  ]
+ },
+ {
+  "kind": "legislators",
+  "scope": null,
+  "order": 3,
+  "lead": "Unión Cívica Radical",
+  "group": [],
+  "votes": 350214,
+  "seats": 11,
+  "people": [
+   {
+    "name": "Eduardo Yuni"
+   },
+   {
+    "name": "Beatriz Maria de los Pereyra"
+   },
+   {
+    "name": "Olga Maria Rista"
+   },
+   {
+    "name": "Luis Alberto Brouwer de Koning"
+   },
+   {
+    "name": "Rodrigo Alfredo De Loredo"
+   },
+   {
+    "name": "Amalia Andrea Vagni"
+   },
+   {
+    "name": "Orlando Victor Arduh"
+   },
+   {
+    "name": "Maria Elisa Caffaratti"
+   },
+   {
+    "name": "Anselmo Emilio Bruno"
+   },
+   {
+    "name": "Maria Alejandra Matar"
+   },
+   {
+    "name": "Carlos Alberto Felpeto"
+   }
+  ]
+ },
+ {
+  "kind": "legislators",
+  "scope": null,
+  "order": 4,
+  "lead": "Frente de Izquierda y los Trabajadores",
+  "group": [
+   "Izquierda Socialista",
+   "Partido Obrero",
+   "Partido de los Trabajadores Socialista"
+  ],
+  "votes": 45811,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Maria Liliana Olivero"
+   }
+  ]
+ },
+ {
+  "kind": "legislators",
+  "scope": null,
+  "order": 5,
+  "lead": "Encuentro Vecinal Córdoba",
+  "group": [],
+  "votes": 30818,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Aurelio Francisco Garcia Elorrio"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "capital",
+  "order": 1,
+  "lead": "Frente Cívico",
+  "group": [
+   "Partido Nuevo entre la Corrupción por la Honestidad y la Transparencia",
+   "Córdoba en Acción",
+   "Partido Socialista",
+   "Movimiento Libres del Sur",
+   "Movimiento Socialista de los Trabajadores",
+   "Nueva Izquierda"
+  ],
+  "votes": 202617,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Jose Maria Las Heras"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "calamuchita",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 11676,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Carlos Tomas Alesandri"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "colon",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 34076,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Juan Domingo Echepare"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "cruz del eje",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 9114,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Jose Omar Monier"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "general roca",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 7444,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Roberto Oscar Pagliano"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "general san martin",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 28072,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Hector Guillermo Muñoz"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "ischilin",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 5749,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Mario Alberto Vasquez"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "juarez celman",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 12446,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Norberto Luis Podversich"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "marcos juarez",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 24573,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Eduardo German Buttarelli"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "minas",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 1766,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Maria Graciela Manzanares"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "pocho",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 1325,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Hugo Oscar Cuello"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "punilla",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 28027,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Marcos Miguel Sestopal"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "rio cuarto",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 54368,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Hugo Leonides Cometto"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "rio primero",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 10734,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Pedro Alberto Schiavoni"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "rio seco",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 3910,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Gustavo Alberto Eslava"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "rio segundo",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 22071,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Francisco Jose Fortuna"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "roque saenz pena",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 10137,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Sergio Sebastian Busso"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "san alberto",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 8046,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Alfredo Altamirano"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "san javier",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 14413,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Oscar Felix Gonzalez"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "san justo",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 47935,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Manuel Fernando Calvo"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "santa maria",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 19145,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Walter Eduardo Saieg"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "sobremonte",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 1073,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Walter Osvaldo Solusolia"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "tercero arriba",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 22292,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Fernando Edmundo Salvi"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "totoral",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 4454,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Jose Luis De Lucca"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "tulumba",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 4294,
+  "seats": 1,
+  "people": [
+   {
+    "name": "David Esmeraldo Caro"
+   }
+  ]
+ },
+ {
+  "kind": "departmental",
+  "scope": "union",
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 22626,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Elba Carmen Perugini"
+   }
+  ]
+ },
+ {
+  "kind": "audit",
+  "scope": null,
+  "order": 1,
+  "lead": "Unión por Córdoba",
+  "group": [
+   "Partido Justicialista",
+   "Demócrata Cristiano",
+   "Partido Acción por la República",
+   "Acción Popular",
+   "Unión del Centro Democrático",
+   "Vecinalismo Independiente",
+   "Partido Recrear para el Crecimiento",
+   "Partido Demócrata"
+  ],
+  "votes": 566917,
+  "seats": 2,
+  "people": [
+   {
+    "name": "Eduardo Cesar Barrionuevo"
+   },
+   {
+    "name": "Adela Rosa Perolini"
+   }
+  ]
+ },
+ {
+  "kind": "audit",
+  "scope": null,
+  "order": 2,
+  "lead": "Frente Cívico",
+  "group": [
+   "Partido Nuevo entre la Corrupción por la Honestidad y la Transparencia",
+   "Córdoba en Acción",
+   "Partido Socialista",
+   "Movimiento Libres del Sur",
+   "Movimiento Socialista de los Trabajadores",
+   "Nueva Izquierda"
+  ],
+  "votes": 384349,
+  "seats": 1,
+  "people": [
+   {
+    "name": "Jose Alberto Medina"
+   }
+  ]
+ }
+]
