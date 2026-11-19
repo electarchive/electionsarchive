@@ -625,6 +625,18 @@ def geo() -> Package:
         license_url="https://creativecommons.org/licenses/by/4.0/",
         attribution="geoBoundaries (William & Mary geoLab)",
     )
+    # The constituencies come from the proclamations, so geo declares that source; the later packages depend on geo.
+    p.add(
+        "source",
+        id=SOURCE_ID,
+        kind="official_body",
+        publisher="Jurado Nacional de Elecciones",
+        title="Resoluciones de proclamación de las Elecciones Generales 2026",
+        url=PORTAL,
+        license="Official public record, no license stated",
+        license_url=PORTAL,
+        attribution="Jurado Nacional de Elecciones",
+    )
     first = p.artifact(raw.cached(SOURCE, DEPARTMENTS_URL), SHAPES_ID)
     p.artifact(raw.cached(SOURCE, PROVINCES_URL), SHAPES_ID)
     del first
@@ -675,17 +687,6 @@ def registry(data: Data) -> Package:
         depends=[f"{SOURCE}/geo"],
     )
     p.external.add(PERU)
-    p.add(
-        "source",
-        id=SOURCE_ID,
-        kind="official_body",
-        publisher="Jurado Nacional de Elecciones",
-        title="Resoluciones de proclamación de las Elecciones Generales 2026",
-        url=PORTAL,
-        license="Official public record, no license stated",
-        license_url=PORTAL,
-        attribution="Jurado Nacional de Elecciones",
-    )
     for url in RESOLUTIONS.values():
         p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
     p.add("office", id=PRESIDENCY, polity_id=PERU, kind="head_of_state")
