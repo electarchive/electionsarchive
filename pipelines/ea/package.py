@@ -1883,6 +1883,10 @@ PUBLISH: dict[str, tuple[LiteralString, dict[str, pl.DataType]]] = {
         "select t.area_id::text, t.code, t.valid_from, t.valid_to, c.pipeline from area_code t",
         {"area_id": U, "code": U, "valid_from": D, "valid_to": D, "pipeline": U},
     ),
+    "boundary_set": (
+        "select t.id::text, t.scheme_code, t.valid_from, t.valid_to, c.pipeline from boundary_set t",
+        {"id": U, "scheme_code": U, "valid_from": D, "valid_to": D, "pipeline": U},
+    ),
     "body": (
         f"select t.id::text, t.polity_id::text, t.kind::text, {LABEL.format('t')}, c.pipeline from body t",
         {"id": U, "polity_id": U, "kind": U, "name": U, "pipeline": U},
