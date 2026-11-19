@@ -162,9 +162,36 @@ class LocalElection:
     aliases: dict[str, str] | None = None
     summary: str | None = None
     path: str | None = None
+    relation: str | None = None
 
 
 NATIVE_LOCAL = "Аймаг, нийслэл, сум, дүүргийн Иргэдийн Төлөөлөгчдийн Хурлын {year} оны ээлжит сонгууль"
+SUPPLEMENTARY_2020 = "4d1fc4d8"
+SUPPLEMENTARY_2020_NOTE = (
+    "This is a supplementary vote in a constituency of the 2020-10-15 local council election, with the same council "
+    "and constituency number. In the first count of that constituency the candidates' votes left the seats tied. "
+    "This result set holds only the supplementary vote's own figures; the first count's result set is unchanged."
+)
+
+
+@functools.cache
+def supplementary_2020() -> LocalElection:
+    """The 62 constituencies of the 2020 council election that voted again on 2020-10-25. The package mints their
+    constituency areas, so the geo and registry packages stay as they are."""
+    return LocalElection(
+        "2020-10-25",
+        date(2020, 10, 25),
+        date(2020, 10, 25),
+        "day",
+        "The Commission's workbook prints no day; 25 October 2020 is the day the Commission held the supplementary "
+        "vote in the 62 constituencies whose first count on 15 October 2020 left the seats tied.",
+        "2020 Mongolian local council supplementary vote",
+        NATIVE_LOCAL.format(year=2020) + " (нэмэлт санал хураалт)",
+        local.blocks(SUPPLEMENTARY_2020, local.section_places(PLACE_LIST_2020)),
+        [sheets.url(SUPPLEMENTARY_2020), sheets.url(PLACE_LIST_2020)],
+        "by_election",
+        relation=SUPPLEMENTARY_2020_NOTE,
+    )
 
 
 @functools.cache
@@ -441,6 +468,7 @@ def packages() -> list[str]:
         *(f"{SOURCE}/{poll.key}" for poll in all_polls()),
         *(f"{SOURCE}/{day}" for day in parliament_keys()),
         *(f"{SOURCE}/{election.key}" for election in local_elections()),
+        f"{SOURCE}/{supplementary_2020().key}",
         *early_packages(),
         *section_packages(),
         *local_2012_packages(),
@@ -477,6 +505,7 @@ def parse() -> None:
     legislature_2024().write()
     for election_ in local_elections():
         councils(election_).write()
+    councils(supplementary_2020()).write()
     early_registry().write()
     early_legislature(early.DAY_2012).write()
     early_capital_list_2012().write()
@@ -927,9 +956,19 @@ def councils(spec: LocalElection) -> Package:
         spec.summary
         or f"The {spec.english} (capital, aimag, district, and soum councils) by polling section and constituency "
         "from the General Election Commission",
-        depends=[f"{SOURCE}/early"] if spec.summary else [f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[]
+        if spec.relation
+        else [f"{SOURCE}/early"]
+        if spec.summary
+        else [f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external |= {MONGOLIA, TERRITORY}
+    if spec.relation:
+        p.external |= {GEC_SOURCE, BLOCK_2024, *SCHEMES}
+        p.external |= {council_body(block.council) for block in blocks}
+        p.external |= {council_area(block.council) for block in blocks}
+        p.external |= {a for block in blocks for row in block.rows if (a := row_area(row))}
+        p.external |= inherited({c.party for block in blocks for c in block.candidates})
     if spec.summary:
         p.external |= {GEC_SOURCE, *SCHEMES}
         p.external |= {council_body(block.council) for block in blocks}
@@ -974,13 +1013,19 @@ def councils(spec: LocalElection) -> Package:
         tag = f"{block.council.key}:{block.number}"
         contest = key("contest", str(day), tag)
         native, _ = council_name(block.council)
+        constituency = area("mn.council_constituency", f"{day}:{tag}")
+        if spec.relation:
+            p.add("area", id=constituency, scheme_code="mn.council_constituency")
+            p.add("area_code", area_id=constituency, code=f"{day}:{tag}")
+            p.add("area_parent", area_id=constituency, parent_id=council_area(block.council))
+            p.name(constituency, f"{native}, {block.number}-р тойрог", "mn", "native")
         p.add(
             "contest",
             id=contest,
             election_id=election_id,
             kind="body_seats",
             body_id=council_body(block.council),
-            district_area_id=area("mn.council_constituency", f"{day}:{tag}"),
+            district_area_id=constituency,
             magnitude=block.seats,
             round_number=1,
             electoral_system_id=None if spec.summary else BLOCK_2024,
@@ -1009,6 +1054,15 @@ def councils(spec: LocalElection) -> Package:
             body_md=BLOCK_METHOD,
             lang="en",
         )
+        if spec.relation:
+            p.add(
+                "note",
+                id=key("note", result_set, "relation"),
+                entity_id=result_set,
+                kind="methodology",
+                body_md=spec.relation,
+                lang="en",
+            )
         options: list[str] = []
         for index, entry in enumerate(block.candidates):
             option = key("option", str(day), tag, index)
