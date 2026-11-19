@@ -883,7 +883,7 @@ CHECKS = {
                                            and l.unit_id = p.unit_id and l.option_id = k.option_id
                                            and l.channel = p.channel and l.count_round = p.count_round and l.measure = 1
                                           where p.measure = 7 and p.value > l.value * coalesce(k.ballot_lines, 1)""",
-    "result_set.default": """select contest_id, stage, count(*) as n from all_result_set where is_default
+    "result_set.default": """select election_id, contest_id, stage, count(*) as n from all_result_set where is_default
                              group by all having count(*) > 1""",
     "result_set.empty": """select r.id from result_set r where r.completeness > 0
                            and not exists (select 1 from result_value v where v.result_set_id = r.id)""",
@@ -2608,23 +2608,22 @@ class Draft(Changeset):
         columns = [column for column in frame.columns if column != "id" or keyed is not None]
         frame = frame.unique(subset=columns, maintain_order=True)
         required = _not_null(self.conn, table)
-        staged = sql.Identifier(f"draft_{table}")
-        listed = sql.SQL(", ").join(map(sql.Identifier, columns))
-        self.conn.execute(sql.SQL("drop table if exists {}").format(staged))
-        self.conn.execute(
-            sql.SQL("create temp table {} as select {} from public.{} limit 0").format(
-                staged, listed, sql.Identifier(table)
-            )
+        # The rows travel as one jsonb parameter rather than a temp table, so a draft builds on a read-only connection.
+        documents = {column for column in columns if _type(self.conn, table, column) in ("json", "jsonb")}
+        payload = json.dumps(
+            [
+                {
+                    column: json.loads(value) if column in documents and isinstance(value, str) else value
+                    for column, value in zip(columns, row, strict=True)
+                }
+                for row in frame.select(columns).iter_rows()
+            ],
+            default=str,
         )
-        self.conn.execute(sql.SQL("alter table {} add column draft_row int").format(staged))
-        with (
-            self.conn.cursor() as cursor,
-            cursor.copy(sql.SQL("copy {} ({}, draft_row) from stdin").format(staged, listed)) as copy,
-        ):
-            for number, row in enumerate(frame.select(columns).iter_rows()):
-                copy.write_row(
-                    [json.dumps(value) if isinstance(value, dict | list) else value for value in row] + [number]
-                )
+        staged = sql.SQL(
+            """(select r.*, j.draft_row from jsonb_array_elements(%s::jsonb) with ordinality j(doc, draft_row),
+                 jsonb_populate_record(null::public.{}, j.doc) r)"""
+        ).format(sql.Identifier(table))
         pipeline = str(self.manifest["pipeline"])
         if keyed is not None:
             found = self.conn.execute(
@@ -2638,7 +2637,8 @@ class Draft(Changeset):
                     staged=staged,
                     table=sql.Identifier(table),
                     on=sql.SQL(" and ").join(sql.SQL("p.{0} = s.{0}").format(sql.Identifier(c)) for c in keyed),
-                )
+                ),
+                [payload],
             ).fetchall()
         else:
             same = sql.SQL(" and ").join(
@@ -2673,9 +2673,8 @@ class Draft(Changeset):
                     table=sql.Identifier(table),
                     same=same,
                 ),
-                [pipeline],
+                [payload, pipeline],
             ).fetchall()
-        self.conn.execute(sql.SQL("drop table {}").format(staged))
         keep = [owner in (None, pipeline) for _, _, owner in found]
         if minted:
             frame = frame.with_columns(pl.Series("id", [str(id) for _, id, _ in found], dtype=pl.String))
