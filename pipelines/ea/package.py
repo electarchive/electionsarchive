@@ -479,6 +479,7 @@ class Package:
         self.sources: list[dict[str, object]] = []
         self.external: set[str] = set()
         self.accepted: dict[str, str] = {}
+        self.adopts: list[str] = []
 
     def id(self, kind: str, *parts: object) -> str:
         return str(uuid5(NAMESPACE, "\x1f".join([self.pipeline, kind, *(str(part) for part in parts)])))
@@ -594,6 +595,8 @@ class Package:
             "tables": counts,
             "digest": _digest(out, counts),
         }
+        if self.adopts:
+            manifest["adopts"] = sorted(self.adopts)
         (out / "package.json").write_text(json.dumps(manifest, indent=1) + "\n")
         print(f"{self.key}: " + ", ".join(f"{table} {n:,}" for table, n in counts.items()), flush=True)
         return out
