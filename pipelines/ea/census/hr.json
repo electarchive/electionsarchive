@@ -2216,12 +2216,28 @@
      "note": "Counted from the archive page: early election day."
     },
     {
+     "date": "2014-04-06",
+     "election_kind": "runoff",
+     "contests": 2,
+     "source": "dip_by_20140323",
+     "quote": "Rezultati izbora - drugi krug (pdf)",
+     "note": "Counted from the archive page: second-round results PDFs under rezultati/2/ for the mayoral race (vrsta 17); the page script lists the municipalities with a runoff."
+    },
+    {
      "date": "2014-06-15",
      "election_kind": "by_election",
      "contests": 5,
      "source": "dip_by_20140615",
      "quote": "PRIJEVREMENI IZBORI ZA ČLANOVE GRADSKOG VIJEĆA TE GRADONAČELNIKA I ZAMJENIKA GRADONAČELNIKA GRADA VUKOVARA, ČLANOVE OPĆINSKOG VIJEĆA TE OPĆINSKOG NAČELNIKA I ZAMJENIKA OPĆINSKOG NAČELNIKA OPĆINE SUNJA, GRADONAČELNIKA I ZAMJENIKA GRADONAČELNIKA GRADA SLUNJA, OPĆINSKOG NAČELNIKA I ZAMJENIKA OPĆINSKOG NAČELNIKA OPĆINA NETRETIĆ I BIBINJE (15.06.2014.)",
      "note": "Counted from the archive page: early election day."
+    },
+    {
+     "date": "2014-06-29",
+     "election_kind": "runoff",
+     "contests": 3,
+     "source": "dip_by_20140615",
+     "quote": "Rezultati izbora - drugi krug (pdf)",
+     "note": "Counted from the archive page: second-round results PDFs under rezultati/2/ for the mayoral race (vrsta 17); the page script lists the municipalities with a runoff."
     },
     {
      "date": "2014-09-14",
@@ -2264,12 +2280,28 @@
      "note": "Counted from the archive page: early election day."
     },
     {
+     "date": "2015-03-22",
+     "election_kind": "runoff",
+     "contests": 10,
+     "source": "dip_by_20150308",
+     "quote": "Rezultati izbora - drugi krug (pdf)",
+     "note": "Counted from the archive page: second-round results PDFs under rezultati/2/ for the mayoral race (vrsta 17); the page script lists the municipalities with a runoff."
+    },
+    {
      "date": "2015-07-12",
      "election_kind": "by_election",
      "contests": 2,
      "source": "dip_by_20150712",
      "quote": "PRIJEVREMENI IZBORI ZA ČLANOVE GRADSKOG VIJEĆA TE GRADONAČELNIKA I ZAMJENIKA GRADONAČELNIKA GRADA VRGORCA, ČLANOVE OPĆINSKOG VIJEĆA TE OPĆINSKOG NAČELNIKA I ZAMJENIKA OPĆINSKOG NAČELNIKA OPĆINE SEMELJCI (12.07.2015.)",
      "note": "Counted from the archive page: early election day."
+    },
+    {
+     "date": "2015-07-26",
+     "election_kind": "runoff",
+     "contests": 1,
+     "source": "dip_by_20150712",
+     "quote": "Rezultati izbora - drugi krug (pdf)",
+     "note": "Counted from the archive page: second-round results PDFs under rezultati/2/ for the mayoral race (vrsta 17); the page script lists the municipalities with a runoff."
     },
     {
      "date": "2015-12-20",
@@ -2286,6 +2318,14 @@
      "source": "dip_by_20160320",
      "quote": "PRIJEVREMENI IZBORI ZA ZAMJENIKA ŽUPANA ŠIBENSKO-KNINSKE ŽUPANIJE IZ REDA PRIPADNIKA SRPSKE NACIONALNE MANJINE, ZAMJENIKA OPĆINSKOG NAČELNIKA OPĆINE JAGODNJAK IZ REDA PRIPADNIKA HRVATSKOG NARODA, ČLANOVE GRADSKOG VIJEĆA TE GRADONAČELNIKA I ZAMJENIKA GRADONAČELNIKA GRADOVA NOVA GRADIŠKA I NOVALJA, ČLANOVE OPĆINSKOG VIJEĆA TE OPĆINSKOG NAČELNIKA I ZAMJENIKA OPĆINSKOG NAČELNIKA OPĆINA MATULJI, RAŽANAC, KOLAN, KALNIK, LIŽNJAN - LISIGNANO, CESTICA I GVOZD (20.03.2016.)",
      "note": "Counted from the archive page: early election day."
+    },
+    {
+     "date": "2016-04-03",
+     "election_kind": "runoff",
+     "contests": 4,
+     "source": "dip_by_20160320",
+     "quote": "Rezultati izbora - drugi krug (pdf)",
+     "note": "Counted from the archive page: second-round results PDFs under rezultati/2/ for the mayoral race (vrsta 17); the page script lists the municipalities with a runoff."
     },
     {
      "date": "2016-05-29",
