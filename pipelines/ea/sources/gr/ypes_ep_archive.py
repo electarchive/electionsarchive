@@ -8,13 +8,20 @@ Committee, and the elected members, and then prints the votes of every municipal
 This module builds the national result of each book held in the raw cache: the registered voters, ballots cast, valid,
 invalid, and blank ballots, each party's votes, and the seats each party won. The scans have no text layer. Every
 figure was keyed from the page and checked against the Tesseract reading of the same page, whose word boxes give each
-value's locator, and the parties' votes add up to the printed valid total. The district and commune tables are not
-built here.
+value's locator, and the parties' votes add up to the printed valid total. The commune tables are not built here.
 
 - **1984** (17 June): the general table's national row (page 16) gives the ballots and the votes of the five largest
   parties, and the first seat allocation (page 18) gives every party's votes. The allocation prints 2,477,245 votes for
   PASOK, a misprint: the general table prints 2,477,445, which the allocation's own remainder (243,726 after nine full
   quotas of 248,191) and the valid total both confirm, so the general table's figure is stored.
+
+- **1984 by electoral district**: the same pages (16 and 17, one table over two facing pages) print the polling
+  stations, registered voters, ballots, and each of the sixteen parties' votes for the 56 electoral districts (the
+  prefectures, with Athens and Piraeus each split in two) and for the votes cast abroad. They are keyed from the page
+  like the national row and read back against the Tesseract reading of both pages; each district's parties add up to
+  its valid ballots, and the districts add up to the printed state and general totals, with the two exceptions
+  noted on the result set. The districts are the constituencies of the Ministry's later results, so they attach to
+  the areas `gr.ypes_national` already holds.
 
 The 1981, 1989, and 1994 books are not yet in the raw cache. The 1999 and 2004 national results are built by
 `ypes_results`, and later ones by `ypes_national` and `ypes_ep`.
@@ -23,8 +30,10 @@ Each election is a package, `gr.ypes_ep_archive/ep-<year>`, built on `gr.ypes_ep
 `gr.ypes_ep_archive/registry` (the source, the scans, and the parties).
 """
 
+import json
 from dataclasses import dataclass
 from datetime import date
+from pathlib import Path
 from urllib.parse import quote
 from uuid import uuid5
 
@@ -39,6 +48,9 @@ GREECE = str(uuid5(package.NAMESPACE, "polity\x1fGR"))
 TERRITORY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fGRC"))
 GEO = f"{SOURCE}/geo"
 SCHEME = "gr.ep_archive_country"
+DISTRICT_SCHEME = "gr.ep_archive_district"
+TABLES = Path(__file__).with_name("ypes_ep_archive_tables")
+NATIONAL = "gr.ypes_national"
 REGISTRY = f"{SOURCE}/registry"
 ARCHIVE = "https://webapps.ypes.gr/elections_data/"
 VOTES, REGISTERED, CAST, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
@@ -168,6 +180,11 @@ METHOD = (
 )
 
 
+def district_area(code: int) -> str:
+    """The id `gr.ypes_national` gave the electoral district with this code."""
+    return str(uuid5(package.NAMESPACE, "\x1f".join([NATIONAL, "area", "gr.electoral_district", str(code)])))
+
+
 def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
 
@@ -237,9 +254,21 @@ def artifact_id(artifact: raw.Artifact) -> str:
 
 
 def geo() -> Package:
-    p = Package(GEO, SOURCE, "The scheme of the national unit that Greece's scanned European Parliament results use")
+    p = Package(
+        GEO,
+        SOURCE,
+        "The schemes of the national unit and the electoral districts that Greece's scanned European Parliament results use",
+    )
     p.external.add(GREECE)
     p.add("scheme", code=SCHEME, polity_id=GREECE, kind="administrative", rank=0, noun="country")
+    p.add(
+        "scheme",
+        code=DISTRICT_SCHEME,
+        polity_id=GREECE,
+        kind="electoral_district",
+        rank=1,
+        noun="electoral district",
+    )
     return p
 
 
@@ -277,6 +306,174 @@ def registry() -> Package:
     return p
 
 
+DISTRICT_NOTE = (
+    "The general table (pages 16 and 17) prints each electoral district's ballots and votes. The first 56 lines are the "
+    "prefectures, with Athens and Piraeus each split in two; a line for the votes cast abroad follows the printed "
+    "state total. The book prints each district's registered voters, including those who voted abroad, and a "
+    "footnote says the 58,722 abroad voters on the abroad line are already counted in their home districts, so the "
+    "abroad line carries no registered voters here. Where a cell is left empty on the page, no value is stored. "
+    "Kilkis's ΕΔΗΚ line (93) makes that district's party votes exceed its valid ballots (74,378) by one, and the "
+    "districts' ΕΔΗΚ votes add up to 16,580 where the book prints 16,579 for the state; both are the book's own figures."
+)
+PARTY_COLUMNS = 16
+KNOWN_ROW_EXCESS = {37: 1}  # district line -> its party votes minus its valid ballots, as the book prints them
+KNOWN_COLUMN_EXCESS = {5: 1}  # party number -> the districts' votes minus the state line, as the book prints them
+
+
+def table(e: Election) -> list[dict[str, object]]:
+    return json.loads((TABLES / f"{e.key}.json").read_text())
+
+
+def cell(raw_cell: object) -> Cell | None:
+    if raw_cell is None:
+        return None
+    assert isinstance(raw_cell, list)
+    value, page, left, top, width, height = (int(part) for part in raw_cell)
+    return Cell(value, page, (left, top, width, height))
+
+
+def verify_districts(e: Election, lines: list[dict[str, object]]) -> None:
+    """Fail when the districts disagree with the book's own sums, other than where the book disagrees with itself."""
+    if len(lines) != 59:
+        raise ValueError(f"{e.key}: expected 56 districts, the state line, the abroad line, and the total")
+    figures = ("registered", "cast", "valid", "invalid", "blank")
+
+    def line(row: dict[str, object], name: str) -> int:
+        raw_cell = row[name]
+        assert isinstance(raw_cell, list)
+        return int(raw_cell[0])
+
+    def party_votes(row: dict[str, object]) -> list[int]:
+        votes = row["votes"]
+        assert isinstance(votes, list) and len(votes) == PARTY_COLUMNS
+        return [0 if v is None else int(v[0]) for v in votes]
+
+    for number, row in enumerate(lines[:58], 1):
+        if line(row, "valid") + line(row, "invalid") + line(row, "blank") != line(row, "cast"):
+            raise ValueError(f"{e.key}: line {number}: valid, invalid, and blank ballots do not add up to the cast")
+        excess = sum(party_votes(row)) - line(row, "valid")
+        if excess != KNOWN_ROW_EXCESS.get(number, 0):
+            raise ValueError(f"{e.key}: line {number}: the parties' votes exceed the valid ballots by {excess}")
+    state, abroad, total = lines[56], lines[57], lines[58]
+    for name in figures:
+        added = sum(line(row, name) for row in lines[:56])
+        if added != line(state, name):
+            raise ValueError(f"{e.key}: the districts' {name} add up to {added:,}, the state line prints it otherwise")
+    for number in range(1, PARTY_COLUMNS + 1):
+        added = sum(party_votes(row)[number - 1] for row in lines[:56])
+        if added - party_votes(state)[number - 1] != KNOWN_COLUMN_EXCESS.get(number, 0):
+            raise ValueError(f"{e.key}: the districts' votes for party {number} differ from the state line")
+        if party_votes(state)[number - 1] + party_votes(abroad)[number - 1] != party_votes(total)[number - 1]:
+            raise ValueError(f"{e.key}: party {number}: state plus abroad is not the general total")
+    for name in ("cast", "valid", "invalid", "blank"):
+        if line(state, name) + line(abroad, name) != line(total, name):
+            raise ValueError(f"{e.key}: {name}: state plus abroad is not the general total")
+    for name, expected in zip(figures, (e.registered, e.cast, e.valid, e.invalid, e.blank), strict=True):
+        if line(total, name) != expected.value:
+            raise ValueError(f"{e.key}: the table's {name} total differs from the national figure keyed on page 16")
+    for item in e.parties:
+        if party_votes(total)[item.number - 1] != item.votes.value:
+            raise ValueError(f"{e.key}: party {item.number}: the table's general total differs from the national row")
+
+
+def districts(
+    p: Package,
+    e: Election,
+    election: str,
+    contest: str,
+    options: dict[int, str],
+    pages: dict[int, str],
+    sizes: dict[int, tuple[float, float]],
+) -> list[tuple[str, str, str | None, int, Cell]]:
+    """The district result set: one reporting unit for each electoral district and one for the votes abroad."""
+    lines = table(e)
+    verify_districts(e, lines)
+    rs = key("result_set", e.key, "districts")
+    p.add(
+        "result_set",
+        id=rs,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=YPES,
+        status="active",
+        is_default=False,
+        completeness=1.0,
+    )
+    p.add("note", id=key("note", rs), entity_id=rs, kind="methodology", body_md=METHOD, lang="en")
+    p.add("note", id=key("note", rs, "caveat"), entity_id=rs, kind="caveat", body_md=DISTRICT_NOTE, lang="en")
+    p.accept(
+        "accounting.votes_valid",
+        "Kilkis's printed party votes add up to one more than its printed valid ballots (74,379 and 74,378); "
+        "the book prints both.",
+    )
+    p.accept(
+        "accounting.declared",
+        "The districts' ΕΔΗΚ votes add up to 16,580 and the book's state line prints 16,579; the difference is "
+        "Kilkis's one vote, which the book prints.",
+    )
+    rows: list[tuple[str, str, str | None, int, Cell]] = []
+    for number, row in [*enumerate(lines[:56], 1), (57, lines[57])]:
+        abroad = number == 57
+        unit = key("unit", e.key, "district", number)
+        if abroad:
+            code = None
+        else:
+            code = row["code"]
+            assert isinstance(code, int)
+            p.external.add(district_area(code))
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=GREECE,
+            scheme_code=DISTRICT_SCHEME,
+            code=f"{e.day}:{number}",
+            area_relation="unlocated" if abroad else "equals",
+            area_id=None if code is None else district_area(code),
+            kind="abroad_mission" if abroad else "standard",
+        )
+        name = row["name"]
+        assert isinstance(name, str)
+        p.name(unit, name, "el", "official")
+        for field, measure in (
+            ("registered", REGISTERED),
+            ("cast", CAST),
+            ("valid", VALID),
+            ("invalid", INVALID),
+            ("blank", BLANK),
+        ):
+            if abroad and field == "registered":
+                continue
+            found = cell(row[field])
+            assert found is not None
+            rows.append((rs, unit, None, measure, found))
+        votes = row["votes"]
+        assert isinstance(votes, list)
+        for index, raw_cell in enumerate(votes, 1):
+            found = cell(raw_cell)
+            if found is not None:
+                rows.append((rs, unit, options[index], VOTES, found))
+    total = lines[58]
+    for field, measure in (
+        ("registered", REGISTERED),
+        ("cast", CAST),
+        ("valid", VALID),
+        ("invalid", INVALID),
+        ("blank", BLANK),
+    ):
+        found = cell(total[field])
+        assert found is not None
+        p.add("declared", result_set_id=rs, option_id=None, measure=measure, value=found.value)
+    votes = total["votes"]
+    assert isinstance(votes, list)
+    for index, raw_cell in enumerate(votes, 1):
+        found = cell(raw_cell)
+        assert found is not None
+        p.add("declared", result_set_id=rs, option_id=options[index], measure=VOTES, value=found.value)
+    return rows
+
+
 def build(e: Election) -> Package:
     verify(e)
     artifact = raw.cached(SOURCE, mirror(e))
@@ -292,6 +489,8 @@ def build(e: Election) -> Package:
     pages: dict[int, str] = {}
     sizes: dict[int, tuple[float, float]] = {}
     used = {c.page for c in (e.registered, e.cast, e.valid, e.invalid, e.blank)} | {x.votes.page for x in e.parties}
+    if (TABLES / f"{e.key}.json").exists():
+        used |= {16, 17}
     with pymupdf.open(artifact.path) as document:
         for number in sorted(used):
             rect = document[number - 1].rect
@@ -369,15 +568,16 @@ def build(e: Election) -> Package:
         kind="standard",
     )
 
-    rows: list[tuple[str | None, int, Cell]] = [
-        (None, REGISTERED, e.registered),
-        (None, CAST, e.cast),
-        (None, VALID, e.valid),
-        (None, INVALID, e.invalid),
-        (None, BLANK, e.blank),
+    rows: list[tuple[str, str, str | None, int, Cell]] = [
+        (rs, unit, None, REGISTERED, e.registered),
+        (rs, unit, None, CAST, e.cast),
+        (rs, unit, None, VALID, e.valid),
+        (rs, unit, None, INVALID, e.invalid),
+        (rs, unit, None, BLANK, e.blank),
     ]
+    options: dict[int, str] = {}
     for item in sorted(e.parties, key=lambda x: -x.votes.value):
-        option = key("option", e.key, item.number)
+        option = options[item.number] = key("option", e.key, item.number)
         p.add(
             "contest_option",
             id=option,
@@ -387,9 +587,13 @@ def build(e: Election) -> Package:
             ballot_position=item.number,
             ballot_label=f"{item.name} ({item.short})" if item.short else item.name,
         )
-        rows.append((option, VOTES, item.votes))
+        rows.append((rs, unit, option, VOTES, item.votes))
         if item.seats:
             p.add("outcome", result_set_id=rs, option_id=option, kind="won", seats=item.seats)
+
+    national = list(rows)
+    if (TABLES / f"{e.key}.json").exists():
+        rows += districts(p, e, election, contest, options, pages, sizes)
 
     frame = pl.DataFrame(
         [
@@ -405,7 +609,7 @@ def build(e: Election) -> Package:
                 (cell.box[0] + cell.box[2]) / sizes[cell.page][0],
                 (cell.box[1] + cell.box[3]) / sizes[cell.page][1],
             )
-            for option, measure, cell in rows
+            for rs, unit, option, measure, cell in rows
         ],
         schema=["result_set_id", "unit_id", "option_id", "measure", "value", "page_id", "x0", "y0", "x1", "y1"],
         orient="row",
@@ -436,6 +640,6 @@ def build(e: Election) -> Package:
             "y1",
         ).with_columns(source_id=pl.lit(None, pl.String)),
     )
-    for option, measure, cell in rows:
-        p.add("declared", result_set_id=rs, option_id=option, measure=measure, value=cell.value)
+    for set_id, _, option, measure, cell in national:
+        p.add("declared", result_set_id=set_id, option_id=option, measure=measure, value=cell.value)
     return p
