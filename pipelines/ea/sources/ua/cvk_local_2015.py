@@ -809,7 +809,7 @@ def registry() -> Package:
         SOURCE,
         "The electoral systems of Ukraine's local elections of 2015 and the parties that nominated candidates in them "
         "that the 2020 registry lacks, from the Central Election Commission",
-        depends=[f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/registry", "ua.cvk/registry"],
     )
     p.external.add(UKRAINE)
     p.add(
@@ -838,7 +838,7 @@ def registry() -> Package:
         p.add(
             "note", id=key("note", system(kind)), entity_id=system(kind), kind="methodology", body_md=method, lang="en"
         )
-    known = set(base.nominators())
+    known = set(base.nominators()) | set(base.earlier_parties())
     for code, name in sorted(nominators().items()):
         if code in known:
             continue
@@ -953,7 +953,7 @@ def first() -> Package:
         "village councils with each list's votes and seats or each district's deputy, and the heads of villages, "
         "settlements, and cities, with every candidate's votes where the city had a results page, from the Central "
         "Election Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", GEO, REGISTRY],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", GEO, REGISTRY, "ua.cvk/registry"],
     )
     p.external.add(UKRAINE)
     for url in [COUNCILS, HEADS, DEPARTED_DEPUTIES, DEPARTED_HEADS, *_links(COUNCILS, "pvm037")]:
@@ -1184,7 +1184,7 @@ def runoff() -> Package:
         SOURCE,
         f"The second round of {RUNOFF_DAY:%-d %B %Y} of the elections of Ukrainian city heads and Kyiv's mayor, from "
         "the Central Election Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", GEO, REGISTRY, f"{SOURCE}/{DAY}"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", GEO, REGISTRY, "ua.cvk/registry", f"{SOURCE}/{DAY}"],
     )
     p.external.add(UKRAINE)
     for url in [RUNOFF_HEADS, DEPARTED_RUNOFF_HEADS, *_links(RUNOFF_HEADS, "pvm038")]:

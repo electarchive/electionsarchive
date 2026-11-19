@@ -35,6 +35,7 @@ import shapely
 from ea import changeset, package, raw
 from ea.latin import ukrainian
 from ea.package import Package
+from ea.sources.ua import cvk as parliament
 from ea.sources.ua.cvk import clean, norm, number, text
 
 SOURCE = "ua.cvk_local"
@@ -692,8 +693,17 @@ def system(kind: str) -> str:
     return key("electoral_system", kind)
 
 
+@functools.cache
+def earlier_parties() -> dict[str, str]:
+    """The parties the Commission's parliamentary pipeline already registers under the ua.cvk.party scheme, by key."""
+    return {code: parliament.party(code) for code in parliament.party_names()}
+
+
 def party(name: str) -> str | None:
-    return None if norm(name) == SELF else key("party", norm(name))
+    if norm(name) == SELF:
+        return None
+    code = norm(name)
+    return earlier_parties().get(code) or key("party", code)
 
 
 @functools.cache
@@ -724,7 +734,7 @@ def registry() -> Package:
         SOURCE,
         "Ukraine's local councils and community heads, their electoral systems, and the parties that nominated "
         "candidates in the local elections of 2020, from the Central Election Commission",
-        depends=[f"{SOURCE}/geo"],
+        depends=[f"{SOURCE}/geo", f"{parliament.SOURCE}/registry"],
     )
     p.external.add(UKRAINE)
     p.add(
@@ -761,6 +771,8 @@ def registry() -> Package:
             "note", id=key("note", system(kind)), entity_id=system(kind), kind="methodology", body_md=method, lang="en"
         )
     for code, name in sorted(nominators().items()):
+        if code in earlier_parties():
+            continue
         id = key("party", code)
         p.add("party", id=id, kind="party", polity_id=UKRAINE)
         p.add("external_id", entity_id=id, scheme="ua.cvk.party", value=code)
@@ -931,7 +943,7 @@ def first() -> Package:
         "Ukraine's regular local elections of 25 October 2020: the oblast, raion, city-raion, and community councils "
         "with each list's votes and seats, and the heads of communities and Kyiv's mayor, from the Central Election "
         "Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{parliament.SOURCE}/registry"],
     )
     p.external.add(UKRAINE)
     for url in [OPEN_DATA, COUNCILS, HEADS, DEPARTED_HEADS, *lists("pvm037"), *lists("pvm040")]:
@@ -1179,7 +1191,7 @@ def runoff(day: date) -> Package:
         SOURCE,
         f"The second round of {day:%-d %B %Y} of the elections of heads of Ukrainian city communities, from the "
         "Central Election Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/{DAY}"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{parliament.SOURCE}/registry", f"{SOURCE}/{DAY}"],
     )
     p.external.add(UKRAINE)
     b = _election(p, day, "runoff")
