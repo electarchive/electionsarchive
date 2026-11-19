@@ -488,7 +488,7 @@ def geo() -> Package:
         kind="administrative",
         rank=2,
         noun="municipality",
-        code_system="elstat-kallikratis",
+        code_system="elstat_kallikratis",
     )
     p.add(
         "scheme",
@@ -497,7 +497,7 @@ def geo() -> Package:
         kind="administrative",
         rank=3,
         noun="municipal unit",
-        code_system="elstat-kallikratis",
+        code_system="elstat_kallikratis",
     )
     for scheme in (KALLIKRATIS_MUNICIPALITY, KALLIKRATIS_UNIT):
         p.add(
