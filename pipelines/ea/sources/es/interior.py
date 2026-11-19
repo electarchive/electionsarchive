@@ -484,7 +484,7 @@ def part_congress(process: str) -> Part:
         pl.col("province").alias("ckey"),
         pl.col("name").map_elements(title, return_dtype=pl.String),
         "seats",
-        pl.lit("es.interior.provincia").alias("scheme"),
+        pl.lit("es.interior_provincia").alias("scheme"),
         pl.col("province").alias("acode"),
         pl.when(pl.col("province").is_in(SINGLE))
         .then(pl.lit("congress-single"))
@@ -708,7 +708,7 @@ def part_municipal(process: str) -> Part:
         code.alias("ckey"),
         pl.col("name").map_elements(title, return_dtype=pl.String),
         "seats",
-        pl.lit("es.interior.municipio").alias("scheme"),
+        pl.lit("es.interior_municipio").alias("scheme"),
         code.alias("acode"),
         pl.lit("municipal").alias("system"),
         pl.lit("list_allocation").alias("kind"),
@@ -730,7 +730,7 @@ def part_municipal(process: str) -> Part:
             code.alias("ckey"),
             pl.col("name").map_elements(title, return_dtype=pl.String),
             "seats",
-            pl.lit("es.interior.municipio").alias("scheme"),
+            pl.lit("es.interior_municipio").alias("scheme"),
             code.alias("acode"),
             pl.when(pl.col("seats") == 1)
             .then(pl.lit("concejo-abierto"))
@@ -820,7 +820,7 @@ def part_cabildo(process: str) -> Part:
             ckey.alias("ckey"),
             pl.col("name").map_elements(title, return_dtype=pl.String),
             "seats",
-            pl.lit("es.interior.isla").alias("scheme"),
+            pl.lit("es.interior_isla").alias("scheme"),
             ckey.alias("acode"),
             pl.lit("cabildo").alias("system"),
             pl.lit("list_allocation").alias("kind"),
@@ -833,7 +833,7 @@ def part_cabildo(process: str) -> Part:
             "ckey",
             pl.col("ckey").map_elements(lambda key: islands.get(key, key), return_dtype=pl.String).alias("name"),
             "seats",
-            pl.lit("es.interior.isla").alias("scheme"),
+            pl.lit("es.interior_isla").alias("scheme"),
             pl.col("ckey").alias("acode"),
             pl.lit("cabildo").alias("system"),
             pl.lit("list_allocation").alias("kind"),
@@ -894,8 +894,8 @@ def part_senate(process: str) -> Part:
         pl.col("name").map_elements(title, return_dtype=pl.String),
         "seats",
         pl.when(pl.col("province").is_in(ISLANDS))
-        .then(pl.lit("es.interior.isla"))
-        .otherwise(pl.lit("es.interior.provincia"))
+        .then(pl.lit("es.interior_isla"))
+        .otherwise(pl.lit("es.interior_provincia"))
         .alias("scheme"),
         senate_key().alias("acode"),
         pl.when(pl.col("province").is_in(SINGLE))
@@ -1189,11 +1189,11 @@ BODIES = {
     "cabildo": ("council", "Island councils of the Canary Islands", "Cabildos insulares"),
 }
 SCHEMES = (
-    ("es.interior.comunidad", 1, "administrative", "autonomous community"),
-    ("es.interior.provincia", 2, "administrative", "province"),
-    ("es.interior.isla", 3, "electoral_district", "island"),
-    ("es.interior.municipio", 3, "administrative", "municipality"),
-    ("es.interior.mesa", 5, "precinct", "polling station"),
+    ("es.interior_comunidad", 1, "administrative", "autonomous community"),
+    ("es.interior_provincia", 2, "administrative", "province"),
+    ("es.interior_isla", 3, "electoral_district", "island"),
+    ("es.interior_municipio", 3, "administrative", "municipality"),
+    ("es.interior_mesa", 5, "precinct", "polling station"),
 )
 
 
@@ -1218,22 +1218,22 @@ def geo() -> Package:
         p.name(id, text, lang, "official")
 
     for code, text in sorted(communities.items()):
-        place("es.interior.comunidad", code, text, TERRITORY)
+        place("es.interior_comunidad", code, text, TERRITORY)
     for code, text in sorted(provinces.items()):
         place(
-            "es.interior.provincia",
+            "es.interior_provincia",
             code,
             text,
-            area("es.interior.comunidad", belongs[code]) if code in belongs else TERRITORY,
+            area("es.interior_comunidad", belongs[code]) if code in belongs else TERRITORY,
         )
     for code, text in sorted(islands.items()):
-        place("es.interior.isla", code, text, area("es.interior.provincia", code[:2]))
+        place("es.interior_isla", code, text, area("es.interior_provincia", code[:2]))
     for code in sorted(municipality_codes() | set(municipalities)):
         place(
-            "es.interior.municipio",
+            "es.interior_municipio",
             code,
             municipalities.get(code, code),
-            area("es.interior.provincia", code[:2]) if code[:2] in provinces else TERRITORY,
+            area("es.interior_provincia", code[:2]) if code[:2] in provinces else TERRITORY,
         )
     return p
 
@@ -1613,24 +1613,24 @@ class Build:
             uvotes = pl.concat([uvotes, cast]) if uvotes.height else cast
         scheme = (
             pl.when(pl.col("ucat").is_in(["mesa", "cera"]))
-            .then(pl.lit("es.interior.mesa"))
+            .then(pl.lit("es.interior_mesa"))
             .when(pl.col("ucat") == "municipality")
-            .then(pl.lit("es.interior.municipio"))
+            .then(pl.lit("es.interior_municipio"))
             .when(pl.col("ucode").str.len_chars() >= 3)
-            .then(pl.lit("es.interior.isla"))
-            .otherwise(pl.lit("es.interior.provincia"))
+            .then(pl.lit("es.interior_isla"))
+            .otherwise(pl.lit("es.interior_provincia"))
         )
         located = units.with_columns(scheme=scheme).with_columns(
             area_scheme=pl.when(pl.col("ucat") == "cera")
-            .then(pl.lit("es.interior.provincia"))
-            .when(pl.col("scheme") == "es.interior.mesa")
-            .then(pl.lit("es.interior.municipio"))
+            .then(pl.lit("es.interior_provincia"))
+            .when(pl.col("scheme") == "es.interior_mesa")
+            .then(pl.lit("es.interior_municipio"))
             .otherwise(pl.col("scheme")),
             acode=pl.when(pl.col("ucat") == "cera")
             .then(pl.col("province"))
-            .when(pl.col("scheme") == "es.interior.mesa")
+            .when(pl.col("scheme") == "es.interior_mesa")
             .then(pl.col("muni"))
-            .when(pl.col("scheme") == "es.interior.municipio")
+            .when(pl.col("scheme") == "es.interior_municipio")
             .then(pl.col("muni"))
             .otherwise(pl.col("ucode")),
         )
@@ -1650,7 +1650,7 @@ class Build:
                     "scheme_code": fresh["scheme"],
                     "code": [f"{d}:{code}" for code in fresh["ucode"]],
                     "area_relation": [
-                        "within" if scheme_ == "es.interior.mesa" else "equals" for scheme_ in fresh["scheme"]
+                        "within" if scheme_ == "es.interior_mesa" else "equals" for scheme_ in fresh["scheme"]
                     ],
                     "area_id": [area(a, c) for a, c in zip(fresh["area_scheme"], fresh["acode"], strict=True)],
                     "kind": ["aggregate" if cat == "cera" else "standard" for cat in fresh["ucat"]],
