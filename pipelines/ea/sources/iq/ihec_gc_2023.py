@@ -3,30 +3,29 @@
 The Commission published the final results for the 15 governorates outside the Kurdistan Region as a 17-page scan of
 the list tables (valid votes, seats by type, and votes and seats for each list) and one candidate file per governorate
 (list, candidate number, name, sex, votes, and whether the candidate won). The candidate files are PDFs printed from a
-spreadsheet whose text layer loses the dotted Arabic letters, so a candidate's name and a list's name are read from the
-rendered page with Tesseract; every number comes from the text layer and is checked against the scanned tables.
+spreadsheet whose text layer loses the glyphs it cannot map to a character (dotless skeletons, their separate dot
+glyphs, and ligatures), so a candidate's name is read from the printed glyphs through the embedded fonts' own
+substitution tables (see `glyphs`); every number comes from the text layer and is checked against the scanned tables.
 """
 
 import json
-import os
 import re
 import subprocess
-import tempfile
 import unicodedata
 from collections import Counter, defaultdict
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import date
+from functools import cache
 from pathlib import Path
 from uuid import uuid5
 from xml.etree import ElementTree
 
 import shapely
 import shapely.geometry
-from PIL import Image
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.iq import glyphs
 
 SOURCE = "iq.ihec_gc_2023"
 PAGE = "https://ihec.iq/29239-2/"
@@ -183,49 +182,8 @@ def rows(path: str) -> list[Row]:
     return found
 
 
-DPI = 300
+ROW_HEIGHT = 9.5
 NAME_COLUMN = (241, 381)
-ROW_INSET = (0.4, 8.96)
-
-
-def _read(cell: Image.Image) -> str:
-    """One table cell of the rendered page, read as a line of Arabic by Tesseract."""
-    padded = Image.new("L", (cell.width + 40, cell.height + 40), 255)
-    padded.paste(cell, (20, 20))
-    with tempfile.NamedTemporaryFile(suffix=".png") as file:
-        padded.save(file.name)
-        out = subprocess.run(
-            ["tesseract", file.name, "-", "-l", "ara", "--psm", "7"],
-            check=True,
-            capture_output=True,
-            text=True,
-            env={**os.environ, "OMP_THREAD_LIMIT": "1"},
-        )
-    return unicodedata.normalize("NFKC", out.stdout).strip()
-
-
-def _names(path: Path, found: list[Row]) -> dict[tuple[int, float], str]:
-    """The candidate names of one file, read from the rendered pages row by row."""
-    scale = DPI / 72
-    out: dict[tuple[int, float], str] = {}
-    with tempfile.TemporaryDirectory() as folder:
-        subprocess.run(["pdftoppm", "-r", str(DPI), "-gray", "-png", str(path), f"{folder}/page"], check=True)
-        pages = sorted(Path(folder).glob("page-*.png"))
-        cells: list[tuple[tuple[int, float], Image.Image]] = []
-        for number, page in enumerate(pages, start=1):
-            with Image.open(page) as image:
-                for row in (r for r in found if r.page == number):
-                    box = (
-                        int(NAME_COLUMN[0] * scale),
-                        int((row.y + ROW_INSET[0]) * scale),
-                        int(NAME_COLUMN[1] * scale),
-                        int((row.y + ROW_INSET[1]) * scale),
-                    )
-                    cells.append(((row.page, row.y), image.crop(box)))
-        with ThreadPoolExecutor(max_workers=os.cpu_count() or 1) as pool:
-            for (key, _), text in zip(cells, pool.map(lambda cell: _read(cell[1]), cells), strict=True):
-                out[key] = text
-    return out
 
 
 def _letters(text: str) -> str:
@@ -241,102 +199,39 @@ def _layer(words_in_row: list[tuple[float, float, float, float, str]]) -> str:
 
 
 def consistent(layer: str, read: str) -> bool:
-    """Whether the letters the text layer kept are, in order, among the letters Tesseract read."""
+    """Whether the letters the text layer kept are, in order, among the letters read from the glyphs."""
     letters = iter(_letters(read))
     return all(letter in letters for letter in layer)
 
 
-def _clean(text: str) -> str:
-    text = unicodedata.normalize("NFKC", text).replace("\u0651", "")
-    return re.sub(r"\s+", " ", re.sub("[^\u0621-\u064a ]", " ", text)).strip()
+@cache
+def _decoder() -> glyphs.Decoder:
+    return glyphs.Decoder(raw.cached(SOURCE, url(stem)).path for stem in GOVERNORATES)
 
 
-# Other renderings to try on a name that does not agree with the text layer: resolution, page segmentation, inset.
-RETRIES = ((400, "7", ROW_INSET), (300, "13", ROW_INSET), (500, "7", (0.2, 9.1)), (400, "13", (0.3, 9.0)))
-
-
-def _again(path: Path, page: int, y: float) -> list[str]:
-    reads = []
-    for dpi, psm, inset in RETRIES:
-        scale = dpi / 72
-        box = [int(NAME_COLUMN[0] * scale), int((y + inset[0]) * scale), int((NAME_COLUMN[1] - NAME_COLUMN[0]) * scale)]
-        height = int((inset[1] - inset[0]) * scale)
-        with tempfile.TemporaryDirectory() as folder:
-            subprocess.run(
-                ["pdftoppm", "-r", str(dpi), "-gray", "-png", "-f", str(page), "-l", str(page)]
-                + [
-                    "-x",
-                    str(box[0]),
-                    "-y",
-                    str(box[1]),
-                    "-W",
-                    str(box[2]),
-                    "-H",
-                    str(height),
-                    str(path),
-                    f"{folder}/c",
-                ],
-                check=True,
-            )
-            cell = Image.open(next(Path(folder).glob("c-*.png")))
-            padded = Image.new("L", (cell.width + 40, cell.height + 40), 255)
-            padded.paste(cell, (20, 20))
-            padded.save(f"{folder}/p.png")
-            out = subprocess.run(
-                ["tesseract", f"{folder}/p.png", "-", "-l", "ara", "--psm", psm],
-                check=True,
-                capture_output=True,
-                text=True,
-                env={**os.environ, "OMP_THREAD_LIMIT": "1"},
-            )
-        reads.append(unicodedata.normalize("NFKC", out.stdout).strip())
-    return reads
-
-
+@cache
 def names(stem: str) -> dict[tuple[int, float], str]:
-    """The candidate names of a governorate's file, read from the page images and checked against the text layer.
-
-    A name that disagrees with the letters the text layer kept is read again at other resolutions; one that still
-    disagrees takes the corrected reading in the data file beside this module, which a person made from the page.
-    """
-    artifact = raw.cached(SOURCE, url(stem))
-    cache = raw.parsed(SOURCE) / "names" / f"{artifact.path.stem}.json"
-    if cache.exists():
-        return {(int(page), float(y)): text for page, y, text in json.loads(cache.read_text(encoding="utf-8"))}
-    found = rows(str(artifact.path))
-    first = cache.parent / "first" / cache.name
-    if first.exists():
-        read = {(int(page), float(y)): text for page, y, text in json.loads(first.read_text(encoding="utf-8"))}
-    else:
-        read = _names(artifact.path, found)
-        first.parent.mkdir(parents=True, exist_ok=True)
-        first.write_text(
-            json.dumps([[page, y, text] for (page, y), text in read.items()], ensure_ascii=False), encoding="utf-8"
-        )
+    """The candidate names of a governorate's file, read from the printed glyphs and checked against the text layer."""
+    path = raw.cached(SOURCE, url(stem)).path
+    found = rows(str(path))
+    pages = _decoder().glyphs(path)
+    read: dict[tuple[int, float], str] = {}
+    for row in found:
+        cell = [
+            g
+            for g in pages[row.page - 1]
+            if NAME_COLUMN[0] <= g.x <= NAME_COLUMN[1] and row.y < g.y <= row.y + ROW_HEIGHT
+        ]
+        read[(row.page, row.y)] = glyphs.text(cell)
     layers: dict[tuple[int, float], str] = {}
-    for number, page in enumerate(words(str(artifact.path)), start=1):
+    for number, page in enumerate(words(str(path)), start=1):
         by_y: dict[float, list[tuple[float, float, float, float, str]]] = {}
         for word in page:
             by_y.setdefault(round(word[2], 1), []).append(word)
         layers.update({(number, y): _layer(line) for y, line in by_y.items()})
-    fixes = json.loads(Path(__file__).with_name("ihec_gc_2023_names.json").read_text(encoding="utf-8")).get(stem, {})
-    unresolved = []
-    for (page, y), text in list(read.items()):
-        if consistent(layers[(page, y)], text) and _clean(text):
-            read[(page, y)] = _clean(text)
-            continue
-        label = f"{page}|{y}"
-        options = [text, *_again(artifact.path, page, y)]
-        good = [o for o in options if _clean(o) and consistent(layers[(page, y)], o)]
-        read[(page, y)] = fixes.get(label) or (_clean(good[0]) if good else "")
-        if not read[(page, y)]:
-            unresolved.append(f"{label} {layers[(page, y)]!r} {[_clean(o) for o in options]}")
-    if unresolved:
-        raise ValueError(f"{stem}: no reading agrees with the text layer:\n" + "\n".join(unresolved))
-    cache.parent.mkdir(parents=True, exist_ok=True)
-    cache.write_text(
-        json.dumps([[page, y, text] for (page, y), text in read.items()], ensure_ascii=False), encoding="utf-8"
-    )
+    wrong = [f"{k}: {layers[k]!r} {v!r}" for k, v in read.items() if not v or not consistent(layers[k], v)]
+    if wrong:
+        raise ValueError(f"{stem}: names that disagree with the text layer:\n" + "\n".join(wrong))
     return read
 
 
@@ -648,11 +543,11 @@ def election() -> Package:
         id=key("note", election, "names"),
         entity_id=election,
         kind="caveat",
-        body_md="The candidate files are printed from a spreadsheet whose text layer loses the dotted Arabic letters, so "
-        "each candidate's name was read from the rendered page by optical character recognition and checked against "
-        "the letters the text layer kept. A name can still hold a misread letter, most often a final yeh (ي) read as "
-        "an alef maksura (ى) or the reverse. The list names, the votes, the seats, and who won come from the "
-        "Commission's tables and the text layer, not from character recognition.",
+        body_md="The candidate files are printed from a spreadsheet whose text layer loses the letters drawn as dotless "
+        "shapes with separate dots, so each candidate's name was read from the printed glyphs, through the embedded "
+        "font's own tables, and checked against the letters the text layer kept. A name is spelled as printed, final "
+        "yeh (ي) and alef maksura (ى) included. The list names, the votes, the seats, and who won come from the "
+        "Commission's tables and the text layer.",
         lang="en",
     )
     singles = Counter[tuple[str, int]]()
