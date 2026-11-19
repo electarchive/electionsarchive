@@ -38,6 +38,7 @@ EXTRA_2015 = (
     f"{SITE}/wp-content/uploads/2015_ComComunal_SanIgnacio_LaCocha_Definitivo.pdf",
     f"{SITE}/wp-content/uploads/2015_ComComunal_SanPablo_Lules_Definitivo.pdf",
 )
+MESAS_2015 = f"{SITE}/wp-content/uploads/2015_escrutinio_mesa_a_mesa_capital.pdf"
 GEOBOUNDARIES = "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/ARG"
 ARGENTINA = str(uuid5(package.NAMESPACE, "polity\x1fAR"))
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fARG"))
@@ -102,6 +103,7 @@ def fetch() -> None:
             raw.fetch(SOURCE, url, suffix=".pdf", check=_pdf)
         except httpx.HTTPStatusError as failure:
             print(f"{url}: {failure.response.status_code}", flush=True)
+    raw.fetch(SOURCE, MESAS_2015, suffix=".pdf", check=_pdf)
     for level in ("ADM1", "ADM2"):
         raw.fetch(SOURCE, f"{GEOBOUNDARIES}/{level}/geoBoundaries-ARG-{level}_simplified.geojson", suffix=".geojson")
 
@@ -289,6 +291,104 @@ def sheets_2007() -> list[Sheet]:
                 None if name == "gobernador" else name.upper(),
             )
         )
+    return out
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Mesa-by-mesa sheets for the capital
+
+
+@dataclass
+class MesaCount:
+    lists: list[tuple[int, str, int]] = field(default_factory=list)
+    positive: int = 0
+    blank: int = 0
+    null: int = 0
+    total: int = 0
+
+
+@dataclass
+class Mesa:
+    """One polling table's count in the capital: its circuit and, per category, each list's votes and the totals."""
+
+    number: int
+    circuit: str
+    voters: int
+    envelopes: int
+    categories: dict[str, MesaCount] = field(default_factory=dict)
+
+
+PAGE_NOISE = re.compile(r"^\s*(Fecha:|Junta Electoral Provincial|ELECCIONES PROVINCIALES|TUCUMAN\s*$)")
+MESA_HEAD = re.compile(
+    r"^\s*MESA\s*:\s*(\d+)\s+VOTANTES\s*:\s*(\d+)\s+SOBRES\s*:\s*(\d+)\s+DIFERENCIA\s*:\s*(-?\d+)\s*$"
+)
+MESA_PLACE = re.compile(
+    r"^\s*SECCION\s*:\s*CAPITAL\s+DEPARTAMENTO\s*:\s*CAPITAL\s*$|"
+    r"^\s*JURISDICCION\s*:\s*Municipio SAN MIGUEL DE TUCUMAN\s+CIRCUITO\s*:\s*(\w+)\s*$"
+)
+MESA_ENTRY = re.compile(r"^\s*(\d+) - (\S.*?)\s+(\d+)\s*$")
+MESA_TOTALS = {"VOTOS POSITIVOS": "positive", "VOTOS EN BLANCO": "blank", "VOTOS NULOS": "null", "VOTOS TOTAL": "total"}
+
+
+def mesa_sheets(file: str, text: str) -> list[Mesa]:
+    """Reads the capital's mesa-by-mesa count: four categories per table, each checked against its own totals."""
+    out: list[Mesa] = []
+    mesa: Mesa | None = None
+    count_: MesaCount | None = None
+    for line in text.splitlines():
+        if not line.strip() or PAGE_NOISE.match(line) or "LISTA" in line and "VOTOS" in line and "TOTAL" not in line:
+            continue
+        head = MESA_HEAD.match(line)
+        if head:
+            if mesa is not None:
+                _close(file, mesa)
+            mesa = Mesa(int(head.group(1)), "", int(head.group(2)), int(head.group(3)))
+            out.append(mesa)
+            count_ = None
+            continue
+        if mesa is None:
+            raise ValueError(f"{file}: text before the first table: {line!r}")
+        place = MESA_PLACE.match(line)
+        if place:
+            if place.group(1):
+                mesa.circuit = place.group(1)
+            continue
+        category = re.match(r"^\s*CATEGORIA\s*:\s*(\w+)\s*$", line)
+        if category:
+            name = CATEGORIES[category.group(1)]
+            count_ = mesa.categories[name] = MesaCount()
+            continue
+        if count_ is None:
+            raise ValueError(f"{file}: mesa {mesa.number}: unread line {line!r}")
+        total = re.match(r"^\s*(VOTOS [A-Z ]+?)\s+(\d+)\s*$", line)
+        if total and total.group(1) in MESA_TOTALS:
+            setattr(count_, MESA_TOTALS[total.group(1)], int(total.group(2)))
+            continue
+        entry = MESA_ENTRY.match(line)
+        if entry:
+            count_.lists.append((int(entry.group(1)), " ".join(entry.group(2).split()), int(entry.group(3))))
+            continue
+        raise ValueError(f"{file}: mesa {mesa.number}: unread line {line!r}")
+    if mesa is not None:
+        _close(file, mesa)
+    return out
+
+
+def _close(file: str, mesa: Mesa) -> None:
+    if not mesa.circuit or set(mesa.categories) != {"gobernador", "legislador", "intendente", "concejal"}:
+        raise ValueError(f"{file}: mesa {mesa.number} is incomplete")
+    for name, c in mesa.categories.items():
+        if sum(v for _, _, v in c.lists) != c.positive or c.positive + c.blank + c.null != c.total:
+            raise ValueError(f"{file}: mesa {mesa.number} {name} does not add up")
+
+
+@functools.cache
+def mesas_2015() -> list[Mesa]:
+    if MESAS_2015 not in raw.keys(SOURCE):
+        return []
+    out = mesa_sheets("capital", _text(raw.cached(SOURCE, MESAS_2015).path))
+    if len({m.number for m in out}) != len(out):
+        raise ValueError("a mesa number repeats")
     return out
 
 
@@ -509,6 +609,7 @@ def geo() -> Package:
         ("ar-t.seccion", 2, "electoral_district", "electoral section", None),
         ("ar-t.departamento", 3, "administrative", "department", None),
         ("ar-t.jurisdiccion", 4, "administrative", "jurisdiction", {"municipio": "municipality", "comuna": "commune"}),
+        ("ar-t.mesa", 5, "precinct", "polling table", None),
     ):
         p.add("scheme", code=code, polity_id=ARGENTINA, kind=kind, rank=rank, noun=noun, kinds=kinds, code_system=None)
     for code in ("ar-t.provincia", "ar-t.seccion", "ar-t.departamento"):
@@ -665,7 +766,7 @@ def sources_of(year: int) -> list[str]:
         return list(URLS_2007.values())
     if year == 2011:
         return [ZIP_2011]
-    return [u for u in urls_2015() if u in raw.keys(SOURCE)]
+    return [*(u for u in urls_2015() if u in raw.keys(SOURCE)), *([MESAS_2015] if mesas_2015() else [])]
 
 
 def _vote(p: Package, result_set: str, unit: str, option: str | None, measure: int, value: int) -> None:
@@ -680,6 +781,88 @@ def _vote(p: Package, result_set: str, unit: str, option: str | None, measure: i
         flags=0,
         value=value,
     )
+
+
+def mesa_sets(
+    p: Package,
+    tag: str,
+    contests: dict[tuple[object, ...], str],
+    sets: dict[tuple[object, ...], str],
+    options: dict[tuple[object, ...], str],
+    units: dict[str, str],
+    everything: list[Sheet],
+) -> None:
+    """Adds a mesa-by-mesa result set beside each capital contest's official total, which stays the default."""
+    tables = mesas_2015() if tag.startswith("2015") else []
+    if not tables:
+        return
+    capital = next(pl for (dept, kind, _), pl in places().items() if dept == "capital" and kind == "municipio")
+    by_scope: dict[tuple[object, ...], str] = {
+        ("legislador", "CAPITAL"): "legislador",
+        ("intendente", capital.code): "intendente",
+        ("concejal", capital.code): "concejal",
+    }
+    mesa_units: dict[int, str] = {}
+    for scope, category in by_scope.items():
+        sheet_set = sets[scope]
+        number_of = {k[len(scope)]: v for k, v in options.items() if k[: len(scope)] == scope}
+        set_id = key("result_set", tag, "mesa", *scope)
+        p.add(
+            "result_set",
+            id=set_id,
+            election_id=key("election", tag),
+            contest_id=contests[scope],
+            stage="official",
+            kind="counted",
+            source_id=SOURCE_ID,
+            status="active",
+            is_default=False,
+            completeness=None,
+        )
+        p.add(
+            "note",
+            id=key("note", set_id),
+            entity_id=set_id,
+            kind="methodology",
+            body_md="Counts are from the Junta Electoral Provincial's mesa-by-mesa definitive count of the capital "
+            "(escrutinio definitivo), one table per polling table of San Miguel de Tucumán, with the circuit each "
+            "belongs to in its unit code. The contest's default set stays the official total by jurisdiction.",
+            lang="en",
+        )
+        sheet_total = 0
+        for m in tables:
+            c = m.categories[category]
+            code = f"mesa:{m.circuit}:{m.number:04d}"
+            if m.number not in mesa_units:
+                mesa_units[m.number] = key("unit", tag, "ar-t.mesa", code)
+                p.add(
+                    "reporting_unit",
+                    id=mesa_units[m.number],
+                    polity_id=ARGENTINA,
+                    scheme_code="ar-t.mesa",
+                    code=f"{tag}:{code}",
+                    area_relation="within",
+                    area_id=capital.area,
+                    kind="standard",
+                )
+            unit_id = mesa_units[m.number]
+            for number, name, votes in c.lists:
+                if number not in number_of:
+                    raise ValueError(f"list {number} {name} of mesa {m.number} is not in the {scope} sheet")
+                _vote(p, set_id, unit_id, number_of[number], 1, votes)
+            _vote(p, set_id, unit_id, None, 3, c.total)
+            _vote(p, set_id, unit_id, None, 4, c.positive)
+            _vote(p, set_id, unit_id, None, 5, c.null)
+            _vote(p, set_id, unit_id, None, 6, c.blank)
+            sheet_total += c.positive
+        official = next(
+            r["value"]
+            for r in p.rows["result_value"]
+            if r["result_set_id"] == sheet_set and r["option_id"] is None and r["measure"] == 4
+        )
+        row = next(r for r in p.rows["result_set"] if r["id"] == set_id)
+        assert isinstance(official, int)
+        row["completeness"] = round(sheet_total / official, 6)
 
 
 def general(year: int) -> Package:
@@ -894,6 +1077,7 @@ def general(year: int) -> Package:
             body_id=None if office else council(place),
         )
         record(scope, s, unit("ar-t.jurisdiccion", place.code, place.area), True)
+    mesa_sets(p, tag, contests, sets, options, units, everything)
     for scope, (counted, tables) in progress.items():
         rows = p.rows["result_set"]
         row = next(r for r in rows if r["id"] == sets[scope])
