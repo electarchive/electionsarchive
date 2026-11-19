@@ -510,6 +510,16 @@ MAYORS = (
     "(vocales) ballots, whose votes the Board prints only by candidate number and in the definitive tables by "
     "circumscription. Colleges marked annulled print no votes and are stored as printed."
 )
+LISTS = (
+    "Counted by the Junta Central Electoral and published in the definitive results tables (relación general "
+    "definitiva del cómputo electoral) of its transparency portal, one table of seats per ballot: each municipality's "
+    "council (regidores), each circumscription of a municipality that has several, and each municipal district's "
+    "members (vocales). Each option is a ballot line, a party or an alliance led by it, with the votes the Board "
+    "totals for it and the seats it prints from the D'Hondt quotients; the votes of the alliance's member parties "
+    "are not printed per ballot and are stored under the lead party. The Board prints no registered voters, ballots "
+    "cast, valid, or null figures for these ballots, which the college files also leave out. The preferential votes "
+    "its candidate tables print by candidate number, without names, are not stored."
+)
 NO_NAME_2008 = (
     " The 2008 file names provinces and municipalities without codes; they are matched to the Board's codes in its "
     "2006 and 2010 files by name."
@@ -556,6 +566,8 @@ def fetch() -> None:
             raw.fetch(SOURCE, url, suffix=suffix)
         if d.key in WINNERS:
             raw.fetch(SOURCE, WINNERS[d.key], suffix=".xlsx")
+    for url in LISTS_2020:
+        raw.fetch(SOURCE, url, suffix=".pdf")
     from ea.sources.do import jce_parlacen
 
     jce_parlacen.fetch()
@@ -792,6 +804,190 @@ def relation_count(s: Sheet) -> Count:
     return Count(s, rows, tuple((code, code) for code in codes))
 
 
+# --- Council and district-member tables of 2020: a page per municipality, circumscription, or municipal district.
+
+DAY_2020 = "2020-03-15"
+COUNCIL_TABLE = entry(16974)
+VOCALES_TABLE = entry(16973)
+SEATS_TABLE = entry(16970)
+LISTS_2020 = (COUNCIL_TABLE, VOCALES_TABLE, SEATS_TABLE)
+ALLIED = re.compile(r"\s+Y\s+ALIADOS$")
+CANDIDATE_LINE = re.compile(
+    r"^(?P<indent> *)(?P<number>\d\d)\s+(?P<name>[A-Z][A-Z. ]*?)\s{2,}(?P<votes>\d[\d,]*(?:\s+\d[\d,]*)*)\s*$"
+)
+SEAT_LINE = re.compile(
+    r"^(?P<number>\d\d)\s+(?P<name>[^\d]+?)\s+(?P<figures>\d[\d,]*(?:\s+\d[\d,]*)*)\s+(?P<seats>\d+|-+)\s*$"
+)
+
+
+class Page(NamedTuple):
+    """One page of the 2020 council or district-member tables, and the place it counts."""
+
+    prov: int
+    mun: int
+    circ: int | None
+    dm: int | None
+    dm_name: str | None
+    lines: list[tuple[int, str, str, list[int]]]
+
+
+class Ballot(NamedTuple):
+    """One council or district-member ballot of 2020: each ballot line's total votes and its seats."""
+
+    level: str
+    prov: int
+    mun: int
+    circ: int | None
+    dm: int | None
+    votes: dict[str, int]
+    labels: dict[str, str]
+    seats: dict[str, int]
+
+
+def _pages(url: str) -> list[str]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], check=True, capture_output=True, text=True
+    ).stdout
+    return [page for page in text.split("\f") if "RELACION GENERAL DEFINITIVA" in page]
+
+
+def _header(page: str, where: str) -> tuple[int, int, int | None]:
+    prov, mun = re.search(r"Provincia\s*:\s*(\d+)", page), re.search(r"Municipio\s*:\s*(\d+)", page)
+    circ = re.search(r"Circunscripci\S+\s*:\s*(\d+)", page)
+    if prov is None or mun is None:
+        raise ValueError(f"{where}: a page without a province or municipality: {page[:300]!r}")
+    return int(prov[1]), int(mun[1]), int(circ[1]) if circ else None
+
+
+@functools.cache
+def candidate_pages(url: str) -> list[Page]:
+    """The candidate-number tables of the council (regidores) or the district members (vocales), a page each."""
+    pages: list[Page] = []
+    for page in _pages(url):
+        prov, mun, circ = _header(page, url)
+        dm = re.search(r"Distrito Municipal\s*:\s*(\d+)\s+(.+?)\s*$", page, flags=re.MULTILINE)
+        if (url == VOCALES_TABLE) != (dm is not None):
+            raise ValueError(f"{url} {prov}/{mun}: a page with the wrong kind of place")
+        lines: list[tuple[int, str, str, list[int]]] = []
+        started = False
+        for line in page.splitlines():
+            if line.startswith("Agrupaci"):
+                started = True
+                continue
+            found = CANDIDATE_LINE.match(line) if started else None
+            if found:
+                votes = [_int(n) for n in found["votes"].split()]
+                lines.append((len(found["indent"]), found["number"], found["name"].strip(), votes))
+        if not lines:
+            raise ValueError(f"{url} {prov}/{mun}: no party lines")
+        pages.append(Page(prov, mun, circ, int(dm[1]) if dm else None, dm[2] if dm else None, lines))
+    return pages
+
+
+def _lead_code(name: str) -> tuple[str, bool]:
+    plain = ALLIED.sub("", sigla(name))
+    return sigla(plain), plain != sigla(name)
+
+
+@functools.cache
+def party_numbers() -> dict[str, str]:
+    """The Board's number of each party, from the candidate tables: the acronym of each ballot line's lead party."""
+    found: dict[str, str] = {}
+    for url in (COUNCIL_TABLE, VOCALES_TABLE):
+        for page in candidate_pages(url):
+            floor = min(indent for indent, _, _, _ in page.lines)
+            for indent, number, name, _ in page.lines:
+                if indent != floor:
+                    continue
+                code, _ = _lead_code(name)
+                if found.setdefault(number, code) != code:
+                    raise ValueError(f"party {number} prints as {found[number]} and {code}")
+    return found
+
+
+def _check_seats(seats: dict[str, int], quotients: dict[str, list[int]], where: str) -> None:
+    """Checks that the printed seats are the highest quotients of the printed D'Hondt table, a tie at the last seat aside."""
+    total = sum(seats.values())
+    pool = sorted(((q, code) for code, qs in quotients.items() for q in qs), reverse=True)
+    if not 0 < total <= len(pool):
+        raise ValueError(f"{where}: {total} seats from {len(pool)} quotients")
+    edge = pool[total - 1][0]
+    sure = Counter(code for q, code in pool if q > edge)
+    tied = Counter(code for q, code in pool if q == edge)
+    for code, n in seats.items():
+        if not sure[code] <= n <= sure[code] + tied[code]:
+            raise ValueError(
+                f"{where}: {code} prints {n} seats; its quotients allow {sure[code]} to {sure[code] + tied[code]}"
+            )
+
+
+@functools.cache
+def ballots_2020() -> tuple[Ballot, ...]:
+    """Every ballot of the seat tables: alliance votes and printed seats, in the place the candidate tables give."""
+    numbers = party_numbers()
+    council_pages = {(p.prov, p.mun, p.circ): p for p in candidate_pages(COUNCIL_TABLE)}
+    vocales_pages = {(p.mun, fold(p.dm_name)): p for p in candidate_pages(VOCALES_TABLE)}
+    if len(council_pages) != len(candidate_pages(COUNCIL_TABLE)) or len(vocales_pages) != len(
+        candidate_pages(VOCALES_TABLE)
+    ):
+        raise ValueError("two candidate pages for one place")
+    out: list[Ballot] = []
+    seen: set[tuple[str, int, int | None, int | None]] = set()
+    for page in _pages(SEATS_TABLE):
+        level = "council" if "REGIDORES" in page else "vocales" if "VOCALES" in page else None
+        if level is None:
+            raise ValueError(f"seat page of neither kind: {page[:300]!r}")
+        prov, mun, circ = _header(page, SEATS_TABLE)
+        where = f"seats {level} {prov}/{mun}/{circ}"
+        if level == "council":
+            match = council_pages.get((prov, mun, circ))
+        else:
+            name = re.search(r"Distrito Municipal\s*:\s*(.+?)\s*$", page, flags=re.MULTILINE)
+            if name is None:
+                raise ValueError(f"{where}: no district")
+            where += f" {name[1]}"
+            match = vocales_pages.get((mun, fold(name[1])))
+        if match is None or match.prov != prov:
+            raise ValueError(f"{where}: no candidate table")
+        votes: dict[str, int] = {}
+        labels: dict[str, str] = {}
+        seats: dict[str, int] = {}
+        quotients: dict[str, list[int]] = {}
+        started = False
+        for line in page.splitlines():
+            if line.startswith("Partidos"):
+                started = True
+                continue
+            found = SEAT_LINE.match(line) if started else None
+            if found is None:
+                continue
+            if found["number"] not in numbers:
+                raise ValueError(f"{where}: party {found['number']} is on no candidate table")
+            code = numbers[found["number"]]
+            figures = [_int(n) for n in found["figures"].split()]
+            if len(figures) < 2 or figures[0] != figures[1]:
+                raise ValueError(f"{where}: {found['name']} total {figures[:2]} does not open its quotients")
+            if code in votes:
+                raise ValueError(f"{where}: {code} printed twice")
+            votes[code] = figures[0]
+            labels[code] = f"{code} Y ALIADOS" if _lead_code(found["name"])[1] else code
+            seats[code] = 0 if found["seats"].startswith("-") else int(found["seats"])
+            quotients[code] = figures[1:]
+        if not votes:
+            raise ValueError(f"{where}: no party lines")
+        _check_seats(seats, quotients, where)
+        place = (level, mun, circ, match.dm)
+        if place in seen:
+            raise ValueError(f"{where}: two seat pages")
+        seen.add(place)
+        out.append(Ballot(level, prov, mun, circ, match.dm, votes, labels, seats))
+    if len(out) != len(council_pages) + len(vocales_pages):
+        raise ValueError(
+            f"{len(out)} seat pages for {len(council_pages)} council and {len(vocales_pages)} district tables"
+        )
+    return tuple(out)
+
+
 @functools.cache
 def coded_names() -> dict[tuple[str, str], tuple[int, int]]:
     """Province and municipality codes by folded name, from the files of 2006 and 2010, for the uncoded 2008 file."""
@@ -968,6 +1164,9 @@ def places() -> Places:
             council = home.filter(pl.col("level") == "council").select("mun", "circ").unique()
             several = council.group_by("mun").len().filter(pl.col("len") > 1)["mun"].to_list()
             city_circs |= {(m, c_) for m, c_ in council.rows() if m in several}
+    for page in candidate_pages(COUNCIL_TABLE):
+        if page.circ is not None:
+            city_circs.add((page.mun, page.circ))
     missing = seen_muns - set(municipalities)
     if missing:
         raise ValueError(f"municipalities without a name: {sorted(missing)}")
@@ -1617,6 +1816,7 @@ class Contest(NamedTuple):
     level: str
     rows: pl.DataFrame
     parties: tuple[tuple[str, str], ...]
+    seats: dict[str, int] | None = None
 
 
 def _slugs(texts: dict[int, str]) -> dict[int, str]:
@@ -1741,10 +1941,74 @@ def contests(d: Day) -> list[Contest]:
                 )
         if s.level in ("local", "mayors"):
             out.extend(_local_contests(c, found, mun_slug, dm_slug, s.level))
+    if d.key == DAY_2020:
+        out.extend(_list_contests(found, mun_slug, dm_slug))
     keys = Counter(contest.key for contest in out)
     slugs = Counter(contest.slug for contest in out)
     if max(keys.values()) > 1 or max(slugs.values()) > 1:
         raise ValueError(f"{d.key}: repeated contest keys or slugs")
+    return out
+
+
+def _list_contests(found: Places, mun_slug: dict[int, str], dm_slug: dict[int, str]) -> list[Contest]:
+    """The council and district-member contests of 2020, a row for each ballot's total, from the seat tables."""
+    out: list[Contest] = []
+    for b in ballots_2020():
+        if b.level == "council":
+            several = b.circ is not None
+            text = found.municipalities[b.mun][1]
+            code = f"{b.mun}:{b.circ}" if several else str(b.mun)
+            grain = f"mc:{code}" if several else f"m:{b.mun}"
+            contest_key = f"council:{code}"
+            title_ = f"Regidores, {text}" + (f", circunscripción {b.circ}" if several else "")
+            slug = f"regidores-{mun_slug[b.mun]}" + (f"-{b.circ}" if several else "")
+            where = area("do.circunscripcion_municipal", code) if several else area("do.municipio", str(b.mun))
+            body = council("do.municipio", str(b.mun))
+        else:
+            assert b.dm is not None
+            grain, contest_key = f"d:{b.dm}", f"vocales:{b.dm}"
+            title_ = f"Vocales del distrito municipal, {found.districts[b.dm][1]}"
+            slug = f"vocales-{dm_slug[b.dm]}"
+            where = area("do.distrito_municipal", str(b.dm))
+            body = council("do.distrito_municipal", str(b.dm))
+        record: dict[str, object] = {
+            "prov": b.prov,
+            "prov_name": None,
+            "mun": b.mun,
+            "mun_name": None,
+            "dm": b.dm,
+            "dm_name": None,
+            "circ": b.circ,
+            "col": "",
+            "letter": None,
+            "level": b.level,
+            **dict.fromkeys(MEASURES),
+            **{f"p:{code}": v for code, v in b.votes.items()},
+            "grain": grain,
+            "adjustment": False,
+            "where": "home",
+        }
+        rows = pl.DataFrame([record], infer_schema_length=None).with_columns(
+            pl.col("prov", "mun", "dm", "circ", *MEASURES).cast(pl.Int64),
+            pl.col("prov_name", "mun_name", "dm_name", "letter", "col", "level").cast(pl.String),
+        )
+        out.append(
+            Contest(
+                contest_key,
+                "list_allocation",
+                title_,
+                slug,
+                where,
+                system("council"),
+                None,
+                body,
+                "list",
+                "lists",
+                rows,
+                tuple(b.labels.items()),
+                b.seats,
+            )
+        )
     return out
 
 
@@ -1845,11 +2109,19 @@ def _units(p: Package, d: Day, contest_list: list[Contest]) -> None:
     ).iter_rows():
         id = key("unit", code)
         if grain is not None:
-            scheme, area_code = (
-                ("do.provincia", f"{prov:02d}")
-                if grain.startswith("p:")
-                else ("do.circunscripcion", f"exterior:{circ}" if grain.startswith("x:") else f"{prov:02d}:{circ}")
-            )
+            if grain.startswith("m:"):
+                scheme, area_code = "do.municipio", str(mun)
+            elif grain.startswith("mc:"):
+                scheme, area_code = "do.circunscripcion_municipal", f"{mun}:{circ}"
+            elif grain.startswith("d:"):
+                scheme, area_code = "do.distrito_municipal", str(dm)
+            elif grain.startswith("p:"):
+                scheme, area_code = "do.provincia", f"{prov:02d}"
+            else:
+                scheme, area_code = (
+                    "do.circunscripcion",
+                    f"exterior:{circ}" if grain.startswith("x:") else f"{prov:02d}:{circ}",
+                )
             units.append(
                 {
                     "id": id,
@@ -2158,6 +2430,9 @@ def election(d: Day) -> Package:
             cited.add(s.url)
     for _, url, _ in d.totals:
         p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
+    if d.key == DAY_2020:
+        for url in LISTS_2020:
+            p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
     elected: dict[str, list[Winner]] = {}
     if d.key in WINNERS:
         p.artifact(raw.cached(SOURCE, WINNERS[d.key]), SOURCE_ID)
@@ -2215,7 +2490,7 @@ def election(d: Day) -> Package:
         )
         adjusted = bool(c.rows["adjustment"].any())
         method = (
-            (RELATION if c.rows["grain"].is_not_null().any() else METHOD)
+            (LISTS if c.level == "lists" else RELATION if c.rows["grain"].is_not_null().any() else METHOD)
             + (ADJUSTED if adjusted else "")
             + (CONGRESS if c.level == "congress" else "")
             + (MUNICIPAL if c.level == "municipal" else "")
@@ -2243,6 +2518,9 @@ def election(d: Day) -> Package:
             )
         if c.key in elected:
             _elected(p, d, c, result_set, options, elected.pop(c.key))
+        for code, n in (c.seats or {}).items():
+            if n:
+                p.add("outcome", result_set_id=result_set, option_id=options[code], kind="won", seats=n)
         frame, tally = _values(c, d, result_set, options)
         values.append(frame)
         tallies["ballots_sum"] += tally.ballots_sum
@@ -2493,7 +2771,44 @@ def compare_2020() -> list[str]:
     return report
 
 
+def compare_lists() -> list[str]:
+    """The seats of the 2020 council and district-member tables against the national seats the Board's summary prints."""
+    url = next(url for kind, url, _ in next(d for d in DAYS if d.key == DAY_2020).totals if kind == "local")
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], check=True, capture_output=True, text=True
+    ).stdout
+    block = text[text.index("REGIDORES/AS") : text.index("REGIDORES Y VOCALES ELECTOS")]
+    printed: dict[str, dict[str, int]] = {"council": {}, "vocales": {}}
+    for line in block.splitlines():
+        cells = re.findall(r"([A-Z][A-Z. ]*?)\s{2,}([\d,]+)(?=\s|$)", line)
+        if len(cells) == 2:
+            for level, (label, n) in zip(("council", "vocales"), cells, strict=True):
+                code = _lead_code(label)[0]
+                printed[level][code] = printed[level].get(code, 0) + _int(n)
+    report: list[str] = []
+    for level in ("council", "vocales"):
+        sums: Counter[str] = Counter()
+        for b in ballots_2020():
+            if b.level == level:
+                for code, n in b.seats.items():
+                    if n:
+                        sums[code] += n
+        total = printed[level].pop("TOTAL")
+        diffs = [
+            f"{label} printed {printed[level].get(label, 0):,}, tables {sums.get(label, 0):,}"
+            for label in sorted(set(sums) | set(printed[level]))
+            if sums.get(label, 0) != printed[level].get(label, 0)
+        ]
+        report.append(
+            f"{DAY_2020} {level} seats: summary prints {total:,}, tables {sum(sums.values()):,} to {len(sums)} ballot "
+            f"lines; differences: {'; '.join(diffs) if diffs else 'none'}"
+        )
+    return report
+
+
 def parse() -> None:
+    for line in compare_lists():
+        print(line, flush=True)
     for line in compare_local():
         print(line, flush=True)
     for line in compare_2020():
