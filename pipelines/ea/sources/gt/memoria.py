@@ -572,7 +572,8 @@ class Memoria(NamedTuple):
     """Deputies elected by national list."""
     layout: str = "tables"
     """"tables" prints each contest by municipality; "cards" prints one contest per page, by its own area; "files2003"
-    is a two-page file for each municipality; "scan" is a scan read by OCR in `gt.memoria_scan`."""
+    is a two-page file for each municipality; "scan" is a scan read by OCR in `gt.memoria_scan`; "scan1990" is the
+    1990-1991 report's scanned tables, read by OCR in `gt.memoria1990`."""
     districts: tuple[int, int] = (0, 0)
     """The pages of the district tables of a memoria that sets each one sideways."""
     parlacen: tuple[int, int] = (0, 0)
@@ -598,6 +599,9 @@ MEMORIA_LIST = (
     Memoria(2003, "", date(2003, 11, 9), date(2003, 12, 28), (0, 0), (0, 0), 31, "files2003"),
     Memoria(1999, "1999_Memoria_Elecciones", date(1999, 11, 7), date(1999, 12, 26), (0, 0), (0, 0), 22, "scan"),
     Memoria(1995, "1995-1996_Memoria_Elecciones", date(1995, 11, 12), date(1996, 1, 7), (0, 0), (0, 0), 16, "scan"),
+    Memoria(
+        1990, "1990-1991_Elecciones_Generales", date(1990, 11, 11), date(1991, 1, 6), (0, 0), (0, 0), 29, "scan1990"
+    ),
 )
 NATION = "GT"
 """The unit code of a contest the memoria prints only as a national total."""
@@ -616,6 +620,13 @@ def _constituent() -> ModuleType:
     from ea.sources.gt import memoria1984
 
     return memoria1984
+
+
+def _report1990() -> ModuleType:
+    """The reader of the 1990-1991 memoria, which imports this module."""
+    from ea.sources.gt import memoria1990
+
+    return memoria1990
 
 
 def _files2003() -> ModuleType:
@@ -785,6 +796,8 @@ def read(year: int) -> tuple[dict[str, Contest], list[Block]]:
         return _files2003().read(), []
     if m.layout == "scan":
         return _scans().read(year), []
+    if m.layout == "scan1990":
+        return _report1990().read(), []
     path = raw.cached(SOURCE, url(m)).path
     if m.layout == "cards":
         return _read_cards(path, m), []
@@ -1266,9 +1279,13 @@ def election(year: int, day: date) -> Package:
             status="active",
             is_default=True,
         )
-        note = (_scans().note(year, contest) if m.layout == "scan" else SOURCE_NOTE) + (
-            ZERO_NOTE if year in (2015, 2019) else LEFT_OUT
-        )
+        note = (
+            _scans().note(year, contest)
+            if m.layout == "scan"
+            else _report1990().note(contest)
+            if m.layout == "scan1990"
+            else SOURCE_NOTE
+        ) + (ZERO_NOTE if year in (2015, 2019) else LEFT_OUT)
         if contest.zero:
             zeros.extend(contest.zero)
             note += f" Left out as printed with every cell zero: {', '.join(sorted(contest.zero))}."
