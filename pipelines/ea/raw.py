@@ -208,6 +208,33 @@ def store(source: str, url: str, content: bytes, *, suffix: str, retrieved_at: d
     return _artifact(source, url, entry)
 
 
+def store_many(
+    source: str, items: list[tuple[str, bytes]], *, suffix: str, retrieved_at: datetime, media_type: str
+) -> None:
+    """Store many pages under their keys, writing the index once for the whole batch."""
+    folder = DATA / "raw" / source
+    folder.mkdir(parents=True, exist_ok=True)
+    entries: dict[str, dict[str, str | int | None]] = {}
+    for url, content in items:
+        digest = hashlib.sha256(content).hexdigest()
+        name = f"{digest}{suffix}"
+        if not (folder / name).exists():
+            partial = folder / f".{uuid4()}.part"
+            partial.write_bytes(content)
+            partial.replace(folder / name)
+        entries[url] = {
+            "sha256": digest,
+            "file": name,
+            "retrieved_at": retrieved_at.isoformat(),
+            "media_type": media_type,
+            "bytes": len(content),
+        }
+    with locked(source) as index:
+        index.update(entries)
+    for url, entry in entries.items():
+        _push(source, url, entry)
+
+
 def fetch(
     source: str,
     url: str,
