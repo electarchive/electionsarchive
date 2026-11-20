@@ -1,14 +1,20 @@
+import hashlib
+import html
 import io
+import json
 import re
+import unicodedata
 import zipfile
+from collections import Counter
 from datetime import date
+from difflib import SequenceMatcher
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
-from ea import raw
-from ea.changeset import Changeset
+from ea import package, raw
+from ea.package import NAMESPACE, Draft, canonical
 from ea.sources.mx import ine
 from ea.sources.mx.ine import (
     ABROAD,
@@ -69,10 +75,150 @@ ACUERDOS = {
         ),
     ),
 }
+# INE's document repository now refuses scripts (403), so each acuerdo is read from the Internet Archive's copy of
+# its address; the source keeps INE's address.
+ACUERDO_COPIES = {
+    2018: "20250610042556",
+    2024: "20240825114438",
+}
+
+
+KEY = f"{SOURCE}/all"
+
+# The Senate's own rosters of the senators who took their seats, read from the Internet Archive's copies because
+# senado.gob.mx answers scripts with a bot check. The LXIV Legislature's page for each state (captured in the first
+# week of September 2018) prints each senator's principle of election; the LXVI Legislature's roster by
+# parliamentary group (captured on 6 September 2024) prints each senator's state. The state codes are INE's.
+SENATE = "Senado de la República"
+ARCHIVED = "https://web.archive.org/web/{stamp}id_/{url}"
+ROSTER_2018 = "http://www.senado.gob.mx/64/senadores/por_entidad_federativa/{slug}"
+ROSTER_PAGES_2018 = {
+    1: ("aguascalientes", "20180907120015"),
+    2: ("baja_california", "20180907161803"),
+    3: ("baja_california_sur", "20180906013223"),
+    4: ("campeche", "20180907160550"),
+    5: ("coahuila", "20180907160558"),
+    6: ("colima", "20180907160453"),
+    7: ("chiapas", "20180907124010"),
+    8: ("chihuahua", "20180907161807"),
+    9: ("ciudad_de_mexico", "20180907160553"),
+    10: ("durango", "20180907160418"),
+    11: ("guanajuato", "20180907160458"),
+    12: ("guerrero", "20180907160423"),
+    13: ("hidalgo", "20180905022943"),
+    14: ("jalisco", "20180907161818"),
+    15: ("mexico", "20180907160604"),
+    16: ("michoacan", "20180907161822"),
+    17: ("morelos", "20180907161828"),
+    18: ("nayarit", "20180907161833"),
+    19: ("nuevo_leon", "20180907160503"),
+    20: ("oaxaca", "20180907160509"),
+    21: ("puebla", "20180906013348"),
+    22: ("queretaro", "20180907160609"),
+    23: ("quintana_roo", "20180907161838"),
+    24: ("san_luis_potosi", "20180907160614"),
+    25: ("sinaloa", "20180907161843"),
+    26: ("sonora", "20180907161848"),
+    27: ("tabasco", "20180907160619"),
+    28: ("tamaulipas", "20180907160428"),
+    29: ("tlaxcala", "20180907160624"),
+    30: ("veracruz", "20180907160629"),
+    31: ("yucatan", "20180907160433"),
+    32: ("zacatecas", "20180907160513"),
+}
+ROSTER_2024 = "https://www.senado.gob.mx/66/senadores/por_grupo_parlamentario"
+ROSTER_STAMP_2024 = "20240906164727"
+ROSTER_STATES_2024 = {
+    "Coahuila de Zaragoza": 5,
+    "Estado de México": 15,
+    "Michoacán de Ocampo": 16,
+    "Veracruz de Ignacio de la Llave": 30,
+}
+# The LVIII Legislature's roster by parliamentary group prints, for each senator, the principle of election and the
+# state. The Internet Archive's earliest copy of each group's page, captured from November 2000 to August 2001; the
+# Convergencia group's lists only a list senator. Each group's party, as INE's columns name it.
+ROSTER_2000 = "http://www.senado.gob.mx:80/comunicacion/senadores/{group}.html"
+GROUP_PAGES_2000 = {
+    "pri": ("PRI", "20001109041100"),
+    "pan": ("PAN", "20010124045800"),
+    "prd": ("PRD", "20001211205200"),
+    "pvem": ("PVEM", "20010825140022"),
+    "pcd": ("MC", "20001211195400"),
+}
+STATES_2000 = {"DISTRITO_FEDERAL": 9, "ESTADO_DE_MEXICO": 15}
+ROSTERS = {
+    2000: (
+        "Integrantes por grupo parlamentario de la LVIII Legislatura",
+        "http://www.senado.gob.mx/comunicacion/senadores/",
+        (
+            "Read from the Internet Archive's earliest copies of the page for each parliamentary group, captured "
+            "from November 2000 to August 2001; each prints the senator's principle of election and state."
+        ),
+    ),
+    2018: (
+        "Senadoras y senadores de la LXIV Legislatura por entidad federativa (principio de elección)",
+        "http://www.senado.gob.mx/64/senadores/por_entidad_federativa",
+        (
+            "Read from the Internet Archive's copies of the page for each state, captured from 5 to 7 September "
+            "2018, in the first week of the legislature; senado.gob.mx refuses scripted requests."
+        ),
+    ),
+    2024: (
+        "Senadoras y senadores de la LXVI Legislatura por grupo parlamentario",
+        ROSTER_2024,
+        (
+            "Read from the Internet Archive's copy of 6 September 2024, in the first week of the legislature; "
+            "senado.gob.mx refuses scripted requests."
+        ),
+    ),
+}
+PRINCIPLES = {"Mayoria Relativa": "majority", "Primera Minoria": "minority"}
+SEATED = (
+    "The seats are the declared ones, as the Senate's roster of the senators who took their seats records them: "
+    "for {state} it lists {names} ({source}). Among the candidates INE registered, these are two of {winner}'s "
+    "and one of {runner_up}'s, so {winner} holds the two majority seats and {runner_up} the first-minority seat, "
+    "the seats the ranking of this count also gives."
+)
+SEATED_GROUPS = (
+    "The seats are the declared ones, as the Senate's roster of the senators who took their seats records them: "
+    "for {state} it lists {names} ({source}), with their principle of election. By their parliamentary groups, the "
+    "two elected by majority sit for {winner} and the one elected by first minority for {runner_up}, the seats the "
+    "ranking of this count also gives."
+)
+
+
+def roster_urls(year: int) -> dict[int, str]:
+    if year == 2000:
+        return {
+            i: ARCHIVED.format(stamp=stamp, url=ROSTER_2000.format(group=group))
+            for i, (group, (_, stamp)) in enumerate(GROUP_PAGES_2000.items())
+        }
+    if year == 2018:
+        return {
+            code: ARCHIVED.format(stamp=stamp, url=ROSTER_2018.format(slug=slug))
+            for code, (slug, stamp) in ROSTER_PAGES_2018.items()
+        }
+    return {0: ARCHIVED.format(stamp=ROSTER_STAMP_2024, url=ROSTER_2024)}
 
 
 def siceef_url(name: str) -> str:
     return f"{ine.SICEEF}{name}.csv"
+
+
+def acuerdo_url(year: int) -> str:
+    return ARCHIVED.format(stamp=ACUERDO_COPIES[year], url=ACUERDOS[year][0])
+
+
+def ine_file(url: str) -> raw.Artifact:
+    """INE's file at `url` in the cache, or the Internet Archive's copy of it where the cache holds only that (as
+    for Senadores1994 and the acuerdos)."""
+    try:
+        return raw.cached(RAW, url)
+    except LookupError:
+        copies = sorted(key for key in raw.keys(RAW) if key.startswith(ARCHIVED[:24]) and key.endswith(f"id_/{url}"))
+        if not copies:
+            raise
+        return raw.cached(RAW, copies[-1])
 
 
 def fetch() -> None:
@@ -81,14 +227,17 @@ def fetch() -> None:
     for url, *_ in COMPUTOS.values():
         raw.fetch(RAW, url, suffix=".zip")
     raw.fetch(RAW, SEATS_PAGE, suffix=".html")
-    for url, *_ in ACUERDOS.values():
-        raw.fetch(RAW, url, suffix=".pdf")
+    for year in ACUERDOS:
+        raw.fetch(RAW, acuerdo_url(year), suffix=".pdf")
+    for year in ROSTERS:
+        for url in roster_urls(year).values():
+            raw.fetch(SOURCE, url, suffix=".html")
 
 
 def read_siceef(name: str) -> tuple[list[str], list[dict[str, str]]]:
     import csv
 
-    text = raw.cached(RAW, siceef_url(name)).path.read_bytes().decode("latin-1")
+    text = ine_file(siceef_url(name)).path.read_bytes().decode("latin-1")
     reader = csv.DictReader(io.StringIO(text))
     rows = [
         {
@@ -364,18 +513,31 @@ def candidaturas(year: int) -> dict[tuple[int, str], str]:
     return result
 
 
-def emit() -> Path:
+SUMMARY = (
+    "Elections to the Senate of Mexico (1991-2024): the 32 state contests and the national list, by casilla, with "
+    "the party-list seats as declared and the state seats of 2000, 2018 and 2024 as the Senate's rosters record them"
+)
+
+
+TURNOUT = (
+    "INE's district count files print more ballots than the nominal roll for these casillas; the counts are stored "
+    "as the files print them"
+)
+
+
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package mx.senado/all from the parsed tables. It reads the database, through Draft, so the rows it
+    rebuilds keep the ids the changeset path gave them; `declare` then gives the state contests of 2018 and 2024
+    their declared seats, as `package_from_export` does."""
     from ea.changeset import slug
 
     with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary="Elections to the Senate of Mexico (1991-2024): the 32 state contests and the national list, by "
-            "casilla, with the party-list seats as declared",
-            polity="MX",
-        )
+        cs = Draft(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="MX")
+        cs.accept("accounting.turnout", TURNOUT)
         for scheme in ("mx.entidad", "mx.municipio", "mx.seccion", "mx.casilla"):
             if conn.execute("select 1 from scheme where code = %s", (scheme,)).fetchone() is None:
                 raise ValueError("publish mx.mge before mx.senado")
@@ -397,7 +559,7 @@ def emit() -> Path:
             attribution="Instituto Nacional Electoral, cómputos distritales",
         )
         for name_ in (*SICEEF_STATE.values(), *SICEEF_LIST.values()):
-            cs.artifact(raw.cached(RAW, siceef_url(name_)), ine_source)
+            cs.artifact(ine_file(siceef_url(name_)), ine_source)
         for url, *_ in COMPUTOS.values():
             cs.artifact(raw.cached(RAW, url), ine_source)
         seats_source = cs.source(ine.INE, SEATS_TITLE)
@@ -424,7 +586,7 @@ def emit() -> Path:
                 url=url,
                 license=ine.PUBLIC,
             )
-            cs.artifact(raw.cached(RAW, url), source)
+            cs.artifact(ine_file(url), source)
 
         body = cs.key("mx.body", "senado")
         cs.add("body", id=body, polity_id=mexico, kind="upper_house")
@@ -989,4 +1151,394 @@ def emit() -> Path:
             "result_value",
             pl.concat(frames).with_columns(count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)),
         )
-        return cs.write()
+        out = cs.write()
+    return declare(out)
+
+
+def fold(text: str) -> list[str]:
+    plain = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().upper()
+    words = re.sub(r"[^A-Z ]", " ", plain).split()
+    return ["MARIA" if word == "MA" else word for word in words]
+
+
+def same_word(a: str, b: str) -> bool:
+    return a == b or len(a) > 3 and len(b) > 3 and SequenceMatcher(None, a, b).ratio() >= 0.85
+
+
+def same_person(seated: list[str], registered: list[str]) -> bool:
+    """A senator's printed name names a registered candidate when all its words but one match words of the
+    candidate's name (the rosters drop second surnames and the candidate lists carry a few misspellings)."""
+    found = sum(any(same_word(word, other) for other in registered) for word in seated)
+    return found >= min(3, len(seated)) and found >= len(seated) - 1
+
+
+def roster(year: int) -> dict[int, tuple[str, str, list[tuple[str, str | None]]]]:
+    """Each state's seated senators as the Senate's roster prints them: {code: (state, url, [(name, principle)])}.
+    The 2024 roster prints no principle of election."""
+    found: dict[int, tuple[str, str, list[tuple[str, str | None]]]] = {}
+    if year == 2018:
+        for code, url in roster_urls(year).items():
+            text = raw.cached(SOURCE, url).path.read_bytes().decode("utf-8")
+            info = text[text.index('<a name="info"></a>') :]
+            state = re.search(r'alt=="([^"]+)"', info)
+            if state is None:
+                raise ValueError(f"2018: no state heading on {url}")
+            senators = re.findall(
+                r'<a href="/64/senador/[^"]+">Sen\. ([^<]+)</a></strong>\s*</h3><br>\s*<p class="text-left">\s*'
+                r"(Mayoria Relativa|Primera Minoria)",
+                info,
+            )
+            found[code] = (
+                html.unescape(state.group(1)),
+                url,
+                [(html.unescape(n).strip(), PRINCIPLES[p]) for n, p in senators],
+            )
+        return found
+    (url,) = roster_urls(year).values()
+    text = raw.cached(SOURCE, url).path.read_bytes().decode("utf-8")
+    slugs = {slug: code for code, (slug, _) in ROSTER_PAGES_2018.items()}
+    for name, state in re.findall(
+        r'data_id-senador="\d+".*?class="nombre-sen[^"]*"><a [^>]*>([^<]+)</a>.*?<span class="estado">([^<]*)</span>',
+        text,
+        flags=re.DOTALL,
+    ):
+        state = html.unescape(state).strip()
+        if state == "Lista Nacional":
+            continue
+        code = ROSTER_STATES_2024.get(state) or slugs["_".join(fold(state)).lower()]
+        found.setdefault(code, (state, url, []))[2].append((html.unescape(name).strip(), None))
+    return found
+
+
+def computos_zip(year: int) -> Path:
+    """INE's cómputos archive for the year. mx.computos caches the same files under the same addresses, so a
+    checkout whose mx.ine cache lacks them reads that copy."""
+    url = COMPUTOS[year][0]
+    try:
+        return raw.cached(RAW, url).path
+    except LookupError:
+        return raw.cached("mx.computos", url).path
+
+
+def registered(year: int) -> dict[tuple[int, str], list[list[str]]]:
+    """The candidates each party registered in each state, propietarios and suplentes, from INE's candidate file:
+    {(state, party): [name words]}. A formula without a propietario prints "Sin candidatura" in its place."""
+    import csv
+
+    _, inner, _ = COMPUTOS[year]
+    with zipfile.ZipFile(computos_zip(year)) as outer, zipfile.ZipFile(io.BytesIO(outer.read(inner))) as sen:
+        name = next(n for n in sen.namelist() if n.endswith(CANDIDATURAS[year]))
+        text = sen.read(name).decode("latin-1").split("\n", 1)[1]
+    found: dict[tuple[int, str], list[list[str]]] = {}
+    for row in csv.DictReader(io.StringIO(text), delimiter="|"):
+        key = (int(row.get("ESTADO") or row["ID_ENTIDAD"]), row["PARTIDO_CI"])
+        names = found.setdefault(key, [])
+        for column in ("CANDIDATURA_PROPIETARIA", "CANDIDATURA_SUPLENTE"):
+            for person in row[column].split(","):
+                words = fold(person)
+                if words and person.strip() != "Sin candidatura" and words not in names:
+                    names.append(words)
+    return found
+
+
+Seated = dict[str, list[tuple[str, str | None]]]
+
+
+def principle(text: str) -> str | None:
+    words = fold(text)
+    return {("MAYORIA", "RELATIVA"): "majority", ("PRIMERA", "MINORIA"): "minority"}.get(tuple(words[:2]))
+
+
+def group_seats(day: str, keys: pl.DataFrame, lists: pl.DataFrame) -> dict[int, tuple[str, list[str], Seated | str]]:
+    """Match each state's seated senators of 2000, as the LVIII Legislature's pages by parliamentary group print
+    them, to the list of the state's contest that holds their group's party. Gives {code: (state, [pages],
+    {option_id: [(name, principle)]})}, or the reason in place of the seats when the pages do not settle them."""
+    tops = set(lists["id"].to_list())
+    prefix = f"{day}:senate:"
+    parties: dict[int, dict[str, set[str]]] = {}
+    for value, entity in (
+        keys.filter((pl.col("scheme") == "mx.option") & pl.col("value").str.starts_with(prefix))
+        .select("value", "entity_id")
+        .iter_rows()
+    ):
+        code, _, columns = str(value).removeprefix(prefix).partition(":")
+        if code.isdigit() and entity in tops:
+            parties.setdefault(int(code), {})[str(entity)] = {
+                party for column in columns.split("+") for party in members(column)
+            }
+    slugs = {slug: code for code, (slug, _) in ROSTER_PAGES_2018.items()}
+    senators: dict[int, list[tuple[str, str, str, str, str]]] = {}
+    for url, (party, _) in zip(roster_urls(2000).values(), GROUP_PAGES_2000.values(), strict=True):
+        text = raw.cached(SOURCE, url).path.read_bytes().decode("latin-1")
+        text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", text)))
+        for name, printed, state in re.findall(
+            r"SEN\. (.+?) Elecci[oó]n: (.+?) Entidad Federativa: (.*?) (?:Fecha|SUPLENTE|Estudios)", text
+        ):
+            elected = principle(printed)
+            if elected is None:
+                continue
+            key = "_".join(fold(state))
+            code = STATES_2000.get(key) or slugs[key.lower()]
+            senators.setdefault(code, []).append((name.strip(), elected, party, url, state.strip()))
+    found: dict[int, tuple[str, list[str], Seated | str]] = {}
+    for code, rows in sorted(senators.items()):
+        pages = sorted({row[3] for row in rows})
+        # The pages spell a few states differently ("Colíma", "Estado de México"); the note takes the usual one.
+        state = Counter(row[4] for row in rows).most_common(1)[0][0]
+        if len(rows) != 3:
+            found[code] = (state, pages, f"the roster lists {len(rows)} senators")
+            continue
+        held: Seated = {}
+        for name, elected, party, _, _ in rows:
+            lists_of = [option for option, held_by in parties[code].items() if party in held_by]
+            if len(lists_of) != 1:
+                held = {}
+                found[code] = (state, pages, f"{name}'s party {party} is on {len(lists_of)} lists")
+                break
+            held.setdefault(lists_of[0], []).append((name, elected))
+        if held:
+            found[code] = (state, pages, held)
+    return found
+
+
+def seated(year: int, options: dict[int, list[tuple[str, str]]]) -> dict[int, tuple[str, list[str], Seated | str]]:
+    """Match each state's seated senators to the lists of its contest ({code: [(option_id, ballot_label)]}),
+    through the propietarios and suplentes INE registered for each party of a list. Gives {code: (state, url,
+    {option_id: [(name, principle)]})}, or the reason in place of the seats when the roster does not settle them:
+    it lists other than three senators (one on leave in its first week), or a senator names no registered
+    candidate. Where the casilla reading splits one coalition's formula into several lists, each naming the
+    coalition's candidates, the senator sits on the list with the fewest registered candidates, the one of the
+    formula's own party."""
+    people = registered(year)
+    found: dict[int, tuple[str, list[str], Seated | str]] = {}
+    for code, (state, url, senators) in roster(year).items():
+        if len(senators) != 3:
+            found[code] = (state, [url], f"the roster lists {len(senators)} senators")
+            continue
+        pools = {
+            option: [
+                person
+                for party in dict.fromkeys(label.partition(": ")[0].split("-"))
+                for person in people.get((code, party), [])
+            ]
+            for option, label in options[code]
+        }
+        held: Seated = {}
+        for name, elected in senators:
+            lists = sorted(
+                (len(pool), option)
+                for option, pool in pools.items()
+                if any(same_person(fold(name), person) for person in pool)
+            )
+            if not lists or len(lists) > 1 and lists[0][0] == lists[1][0]:
+                held = {}
+                found[code] = (state, [url], f"{name} names a registered candidate on {len(lists)} lists")
+                break
+            held.setdefault(lists[0][1], []).append((name, elected))
+        if held:
+            found[code] = (state, [url], held)
+    return found
+
+
+def derived_id(table: str, row: dict[str, object]) -> str:
+    """The id the changeset path and Draft give a row of a table without a natural key (note, citation): an md5
+    of the table, the pipeline, and the row's columns as Postgres prints them."""
+    parts = [table, SOURCE]
+    for column in sorted(row):
+        value = row[column]
+        parts += [column, chr(30) if value is None else str(value)]
+    digest = hashlib.md5(chr(31).join(parts).encode()).hexdigest()
+    return str(UUID(digest[:12] + "8" + digest[13:16] + "8" + digest[17:]))
+
+
+def jsonb_text(value: dict[str, str]) -> str:
+    """A flat JSON object as Postgres prints a jsonb value: shorter keys first."""
+    return json.dumps(dict(sorted(value.items(), key=lambda item: (len(item[0]), item[0]))), ensure_ascii=False)
+
+
+def artifact_row(source: str, artifact: raw.Artifact) -> dict[str, object]:
+    """A source_artifact row with the id Draft gives a new one."""
+    return {
+        "id": str(uuid5(NAMESPACE, f"artifact\x1f{source}\x1f{artifact.storage_key}")),
+        "source_id": source,
+        "url": artifact.url,
+        "sha256": artifact.sha256,
+        "retrieved_at": artifact.retrieved_at,
+        "storage_key": artifact.storage_key,
+        "media_type": artifact.media_type,
+        "bytes": artifact.bytes,
+    }
+
+
+def recite(artifacts: pl.DataFrame) -> pl.DataFrame:
+    """Point each source_artifact row whose file the raw cache lacks at the copy of its address the cache holds.
+    The published rows cite two such files: a copy of the seats page, which carries a token that changes with each
+    request, so no later copy matches it, and an empty response from INE's repository for the 2024 acuerdo, read
+    since from the Internet Archive's copy."""
+    rows = []
+    for row in artifacts.to_dicts():
+        if not (DATA / str(row["storage_key"])).exists():
+            artifact = ine_file(str(row["url"]))
+            print(f"{row['url']}: cites {artifact.storage_key} in place of {row['storage_key']}", flush=True)
+            row = artifact_row(str(row["source_id"]), artifact)
+        rows.append(row)
+    return pl.DataFrame(rows, schema=artifacts.schema)
+
+
+def declare(out: Path) -> Path:
+    """Give the state contests of 2018 and 2024 the seats the Senate's rosters record, in place of the seats derived
+    from the casilla count, in the package built at `out`: replace the outcome rows where the two differ, cite the
+    roster on each result set, and say so in its methodology note. A state whose roster does not settle its three
+    seats keeps the derived seats and its note."""
+    keys = pl.read_parquet(out / "external_id.parquet")
+    lists = pl.read_parquet(out / "contest_option.parquet").filter(
+        pl.col("parent_option_id").is_null() & (pl.col("kind") == "list")
+    )
+    tables = {
+        table: pl.read_parquet(out / f"{table}.parquet")
+        for table in ("outcome", "note", "source", "source_artifact", "citation")
+    }
+    tables["source_artifact"] = recite(tables["source_artifact"])
+    contests = dict(keys.filter(pl.col("scheme") == "mx.contest").select("value", "entity_id").iter_rows())
+    sets = dict(keys.filter(pl.col("scheme") == "mx.result_set").select("value", "entity_id").iter_rows())
+    outcomes, notes = tables["outcome"], tables["note"]
+    added: dict[str, list[dict[str, object]]] = {"source": [], "source_artifact": [], "citation": []}
+    replaced_sets: list[str] = []
+    replaced_notes: dict[str, str] = {}
+    new_outcomes: list[dict[str, object]] = []
+    for year, (title, page, about) in ROSTERS.items():
+        day = DAYS[year].isoformat()
+        source = str(uuid5(NAMESPACE, f"source\x1f{SENATE}\x1f{title}"))
+        added["source"].append(
+            {
+                "id": source,
+                "kind": "official_body",
+                "publisher": SENATE,
+                "title": title,
+                "url": page,
+                "license": ine.PUBLIC,
+                "notes": about,
+            }
+        )
+        for url in roster_urls(year).values():
+            added["source_artifact"].append(artifact_row(source, raw.cached(SOURCE, url)))
+        options = {
+            code: list(
+                lists.filter(pl.col("contest_id") == str(contests[f"{day}:senate:{code:02d}"]))
+                .select("id", "ballot_label")
+                .iter_rows()
+            )
+            for code in range(1, 33)
+        }
+        labels = {option: label for rows in options.values() for option, label in rows}
+        unsettled, changed = [], []
+        found = group_seats(day, keys, lists) if year == 2000 else seated(year, options)
+        for code, (state, pages, held) in sorted(found.items()):
+            if isinstance(held, str):
+                unsettled.append(f"{state} ({held})")
+                continue
+            result_set = str(sets[f"{day}:senate:{code:02d}:state"])
+            seats = {option: len(people) for option, people in held.items()}
+            if sorted(seats.values()) != [1, 2]:
+                raise ValueError(f"{year} {state}: the roster seats {seats}")
+            before = dict(
+                outcomes.filter(pl.col("result_set_id") == result_set).select("option_id", "seats").iter_rows()
+            )
+            if before != seats:
+                # The notes say the declared seats are the ones the count's ranking gives; a state where they
+                # differ needs its own wording.
+                changed.append(state)
+                continue
+            winner = next(option for option, n in seats.items() if n == 2)
+            runner_up = next(option for option, n in seats.items() if n == 1)
+            principles = {option: {elected for _, elected in people} for option, people in held.items()}
+            if principles[winner] - {"majority", None} or principles[runner_up] - {"minority", None}:
+                raise ValueError(f"{year} {state}: the roster's principles of election {principles}")
+            replaced_sets.append(result_set)
+            new_outcomes += [
+                {"result_set_id": result_set, "option_id": option, "kind": "elected", "seats": n}
+                for option, n in seats.items()
+            ]
+            names = [name for people in held.values() for name, _ in people]
+            text = (SEATED_GROUPS if year == 2000 else SEATED).format(
+                state=state,
+                source=title,
+                names=", ".join(names[:-1]) + f" and {names[-1]}",
+                winner=labels[winner].partition(": ")[0],
+                runner_up=labels[runner_up].partition(": ")[0],
+            )
+            note = notes.filter(
+                (pl.col("entity_id") == result_set)
+                & (pl.col("kind") == "methodology")
+                & pl.col("body_md").str.starts_with("The state's count")
+            )
+            if note.height != 1:
+                raise ValueError(f"{year} {state}: {note.height} methodology notes on the state's result set")
+            body = str(note["body_md"][0])
+            kept = body[: body.index(" The seats follow from this count")]
+            replaced_notes[str(note["id"][0])] = f"{kept} {text}"
+            for url in pages:
+                locator = {"url": url, "state": state}
+                added["citation"].append(
+                    {
+                        "id": derived_id(
+                            "citation",
+                            {"entity_id": result_set, "source_id": source, "locator": jsonb_text(locator)},
+                        ),
+                        "entity_id": result_set,
+                        "source_id": source,
+                        "locator": canonical(locator),
+                    }
+                )
+        print(
+            f"{year}: {32 - len(unsettled) - len(changed)} state contests take the roster's seats; left derived: "
+            f"{unsettled}, and where the roster's seats differ from the derived ones: {changed}",
+            flush=True,
+        )
+    tables["outcome"] = pl.concat(
+        [
+            outcomes.filter(~pl.col("result_set_id").is_in(replaced_sets)),
+            pl.DataFrame(new_outcomes).select(
+                pl.col(column).cast(kind) if column in new_outcomes[0] else pl.lit(None, kind).alias(column)
+                for column, kind in outcomes.schema.items()
+            ),
+        ]
+    )
+    rows = notes.to_dicts()
+    for row in rows:
+        if row["id"] in replaced_notes:
+            row["body_md"] = replaced_notes[row["id"]]
+            row["id"] = derived_id(
+                "note", {"entity_id": row["entity_id"], "kind": row["kind"], "body_md": row["body_md"]}
+            )
+    tables["note"] = pl.DataFrame(rows, schema=notes.schema)
+    for table, new in added.items():
+        frame = tables[table]
+        extra = pl.DataFrame(new).select(
+            pl.col(column).cast(kind) if column in new[0] else pl.lit(None, kind).alias(column)
+            for column, kind in frame.schema.items()
+        )
+        tables[table] = pl.concat([frame.filter(~pl.col("id").is_in(extra["id"].to_list())), extra])
+    manifest = json.loads((out / "package.json").read_text())
+    before = {code: n for code, n, _ in package.check(out)}
+    for table, frame in tables.items():
+        frame.write_parquet(out / f"{table}.parquet", statistics=False)
+    counts = {**manifest["tables"], **{table: frame.height for table, frame in tables.items()}}
+    with connect() as conn:
+        # As a Draft package does, the manifest cites each file with its url and sha256, which the inbox verifies
+        # the cache against.
+        cited = package._cited(conn, package._adopted(conn, SOURCE)[1], tables["source_artifact"])
+    built = package._seal(KEY, SOURCE, SUMMARY, out, counts, manifest["adopts"], cited, None)
+    after = {code: n for code, n, _ in package.check(out)}
+    if after != before:
+        raise ValueError(f"{KEY}: the declared seats move the check findings from {before} to {after}")
+    built["accepted"] = manifest["accepted"]
+    (out / "package.json").write_text(json.dumps(built, indent=1) + "\n")
+    return out
+
+
+def package_from_export() -> Path:
+    """Build mx.senado/all from the archive's published rows (`ea package export`) with the one change `build`
+    makes to them, the declared seats of 2018 and 2024 (`declare`). It reads none of INE's casilla files, so it
+    runs where they are not cached."""
+    return declare(package.export(SOURCE))
