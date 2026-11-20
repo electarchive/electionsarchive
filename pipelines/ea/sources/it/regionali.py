@@ -1,4 +1,6 @@
 import csv
+import gzip
+import html
 import io
 import json
 import re
@@ -11,8 +13,9 @@ from uuid import UUID
 
 import polars as pl
 
-from ea import raw
-from ea.changeset import Changeset, slug
+from ea import package, raw
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.it import interno, istat
 from ea.sources.it.interno import BLANK, INVALID, REGISTERED, VOTERS, VOTES, proper
 from ea.sources.it.storico import EXISTING, NEW, cased
@@ -20,7 +23,11 @@ from ea.store import DATA, connect
 
 SOURCE = "it.regionali"
 VERSION = "2"
+KEY = f"{SOURCE}/all"
 PARSED = DATA / "parsed" / SOURCE
+# The package format has no table for these rows, so they stay with the changesets this pipeline published before it
+# moved to packages, which its package adopts.
+CHANGESET_ONLY = ("candidacy_nomination",)
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/regionali"
 DAYS = [
     date(1970, 6, 7),
@@ -277,6 +284,9 @@ ALIASES = {
     ("18", "NOCERA TIRINESE"): "Nocera Terinese",
     ("19", "CASTRONUOVO DI SICILIA"): "Castronovo di Sicilia",
 }
+# it.interno, it.eligendo, and it.eligendo_referendum each hold a source with the ministry's publisher and title, so a
+# lookup by name returns whichever the database lists last. This pipeline's result sets cite it.eligendo's.
+MINISTRY = UUID("334003ae-d1bb-51ca-8f2d-e31ff156a658")
 MARCHE_DATA = "https://web.archive.org/web/20241007073555id_/https://dati.elezioni.marche.it/static_json"
 
 
@@ -374,6 +384,87 @@ REGIONAL = {
         unaccounted=1,
     ),
 }
+ELIGENDO = "https://web.archive.org/web/{}id_/https://eleapi.interno.gov.it/siel/PX/{}/DE/{}/TE/{}/RE/{}"
+MINISTRY_PUBLISHER = "Ministero dell'Interno"
+MINISTRY_SITE = "https://elezioni.interno.gov.it/"
+CAMPANIA_SITE = "https://elezioni.regione.campania.it/siel/risultati.html"
+NOT_COUNTED = (
+    "The president and the runner-up for president, who sit on the council without being elected from a list, are not "
+    "counted."
+)
+ELECTED_NOTE = (
+    "Seats are the councillors the Interior Ministry's results site lists as elected, counted by the list they were "
+    f"elected from, majority bonus included. {NOT_COUNTED}"
+)
+ALLOCATED_NOTE = (
+    "Seats are the {} allocation of council seats by list on its results site, once every polling section was "
+    "counted, majority bonus included; the official proclamation rests with the regional central electoral office. "
+    f"{NOT_COUNTED}"
+)
+
+
+@dataclass(frozen=True)
+class Seated:
+    """Seats by list from a results site: the list of elected councillors (elettiR), the region-wide results with
+    each list's seats in the ministry's format (scrutiniR), or a region's results page (table); and the list seats the
+    council's size leaves once the president and the runner-up for president take theirs, which the seats must fill."""
+
+    endpoint: str
+    url: str
+    expected: int
+    publisher: str = MINISTRY_PUBLISHER
+    title: str = "Eligendo: elezioni regionali, risultati e seggi per lista"
+    site: str = MINISTRY_SITE
+    note: str = ALLOCATED_NOTE.format("Interior Ministry's")
+    body: dict[str, object] | None = None
+
+
+def eligendo(endpoint: str, captured: str, day: str, kind: str, region: str) -> tuple[str, str]:
+    """A Wayback capture of the Interior Ministry's results API; kind is the election type code (07 for regional
+    elections, 12 for Tuscany's, which can go to a runoff)."""
+    return endpoint, ELIGENDO.format(captured, endpoint, day, kind, region)
+
+
+# A region-wide capture can predate the proclamation: the ministry's for Tuscany of 15 October 2025 gives 38 list
+# seats, so Tuscany comes from its list of elected councillors instead.
+ELECTED = {
+    ("07", date(2024, 10, 27)): Seated(
+        *eligendo("elettiR", "20241109173440", "20241027", "07", "07"),
+        29,
+        title="Eligendo: elezioni regionali, consiglieri eletti",
+        note=ELECTED_NOTE,
+    ),
+    ("09", date(2025, 10, 12)): Seated(
+        *eligendo("elettiR", "20251031204510", "20251012", "12", "09"),
+        39,
+        title="Eligendo: elezioni regionali, consiglieri eletti",
+        note=ELECTED_NOTE,
+    ),
+    ("13", date(2024, 3, 10)): Seated(*eligendo("scrutiniR", "20240624063011", "20240310", "07", "13"), 29),
+    ("17", date(2024, 4, 21)): Seated(*eligendo("scrutiniR", "20240610053857", "20240421", "07", "17"), 19),
+    ("18", date(2025, 10, 5)): Seated(*eligendo("scrutiniR", "20251007050359", "20251005", "07", "18"), 29),
+    ("05", date(2025, 11, 23)): Seated(*eligendo("scrutiniR", "20260510162251", "20251123", "07", "05"), 49),
+    ("16", date(2025, 11, 23)): Seated(*eligendo("scrutiniR", "20251228183525", "20251123", "07", "16"), 49),
+    ("08", date(2024, 11, 17)): Seated(
+        "table",
+        "https://alservizi.regione.emilia-romagna.it/elezioni2024/Risultati",
+        48,
+        publisher="Regione Emilia-Romagna",
+        title="Elezioni regionali 2024: riepilogo regionale dei risultati (alservizi.regione.emilia-romagna.it)",
+        site="https://www.regione.emilia-romagna.it/elezioni/elezioni-regionali-del-17-e-18-novembre-2024/risultati",
+        note=ALLOCATED_NOTE.format("Emilia-Romagna Region's"),
+    ),
+    ("15", date(2025, 11, 23)): Seated(
+        "scrutiniR",
+        "https://elezioni.regione.campania.it/siel/sieljson.asmx/GetJson",
+        49,
+        publisher="Regione Campania",
+        title="Elezioni regionali 2025: risultati (elezioni.regione.campania.it)",
+        site=CAMPANIA_SITE,
+        note=ALLOCATED_NOTE.format("Campania Region's"),
+        body={"livello": "scrutinio_reg", "circ": "0", "com": "0", "sezione": "0"},
+    ),
+}
 PLACES = ("REGIONE", "CIRCOSCRIZIONE", "PROVINCIA", "COMUNE", "SEZIONE")
 COUNTS = ("registered", "voters", "blank", "null", "contested")
 RESULTS = re.compile(
@@ -398,6 +489,102 @@ def person_name(row: dict[str, str]) -> tuple[str, str]:
 
 def url(day: date) -> str:
     return f"{ARCHIVE}/regionali-{day:%Y%m%d}.zip"
+
+
+def elected(region: str, day: date, counted: dict[str, int]) -> dict[str, int]:
+    """Seats by list from a results site: the list of elected councillors, checked against the councillors it names,
+    or the region-wide results, checked against each coalition's seats. Either way the seats must fill the council but
+    for the president and the runner-up."""
+    held = ELECTED[region, day]
+    body = raw.cached(SOURCE, held.url, held.body).path.read_bytes()
+    if held.endpoint == "table":
+        seats = tabled(region, day, body.decode(), counted)
+    else:
+        data = json.loads(gzip.decompress(body) if body[:2] == b"\x1f\x8b" else body)
+        if "d" in data:
+            # The Campania Region's web service wraps the ministry's document as a string under "d".
+            data = json.loads(data["d"]) if isinstance(data["d"], str) else data["d"]
+        seats = allocated(region, day, data, counted) if held.endpoint == "scrutiniR" else named(region, day, data)
+    if sum(seats.values()) != held.expected:
+        raise ValueError(f"{region} {day}: {sum(seats.values())} list seats, where the council leaves {held.expected}")
+    return seats
+
+
+def named(region: str, day: date, data: dict) -> dict[str, int]:
+    if data["int"]["f_elet"] != "ELETTI" or int(data["int"]["cod_reg"]) != int(region):
+        raise ValueError(f"{region} {day}: not the list of elected councillors for this region")
+    seats: dict[str, int] = {}
+    for coalition in data["coal"]:
+        lists = coalition["liste"] or []
+        named = [person["cod_lis"] for person in coalition["cand"] or []]
+        if sum(entry["n_eletti"] for entry in lists) != coalition["n_eletti"] or len(named) != coalition["n_eletti"]:
+            raise ValueError(f"{region} {day}: {coalition['cogn']}'s lists do not add up to its elected councillors")
+        for entry in lists:
+            if named.count(entry["pos"]) != entry["n_eletti"]:
+                raise ValueError(f"{region} {day}: {entry['desc_lis']} names a different number of councillors")
+            if entry["n_eletti"]:
+                seats[entry["desc_lis"].strip()] = entry["n_eletti"]
+    return seats
+
+
+def matched(region: str, day: date, label: str, votes: int, counted: dict[str, int]) -> str:
+    """The open data's label for a list: the same label, or the one list with the same votes where the open data
+    shortens the label."""
+    if label in counted:
+        return label
+    matches = [other for other, count in counted.items() if count == votes]
+    if len(matches) != 1:
+        raise ValueError(f"{region} {day}: {label} matches no list of the open data by its votes")
+    return matches[0]
+
+
+def tabled(region: str, day: date, page: str, counted: dict[str, int]) -> dict[str, int]:
+    """Seats by list from a region's results page that prints each coalition's candidate, lists, and total seats
+    once every section is counted; each coalition's list seats and its candidate's seat must make its total."""
+    scrutinized = re.findall(r"scrutinate:\s*(\d+)\s+su\s+(\d+)", re.sub(r"<[^>]+>", " ", page))
+    if not scrutinized or any(done != of for done, of in scrutinized):
+        raise ValueError(f"{region} {day}: the results page does not count every section")
+    seats: dict[str, int] = {}
+    owned = 0
+    for row in re.findall(r"(?is)<tr[^>]*>(.*?)</tr>", page):
+        cells = [
+            re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
+            for cell in re.findall(r"(?is)<t[hd][^>]*>(.*?)</t[hd]>", row)
+        ]
+        if len(cells) < 4 or cells[0] == "Candidato e liste":
+            continue
+        won = int(cells[-1]) if cells[-1].isdigit() else 0
+        if cells[0] == "TOTALI COALIZIONE":
+            if owned != won:
+                raise ValueError(f"{region} {day}: a coalition's seats do not add up to its total")
+        elif cells[0]:
+            owned = won
+        else:
+            owned += won
+            if won:
+                seats[matched(region, day, cells[1], int(cells[2].replace(".", "")), counted)] = won
+    return seats
+
+
+def allocated(region: str, day: date, data: dict, counted: dict[str, int]) -> dict[str, int]:
+    """Seats by list from the region-wide results once the allocation is final. Each list is matched to the open data
+    by its label, or by its votes where the open data shortens the label."""
+    head = data["int"]
+    if head["f_elet"] != "SCRUTINI" or int(head["cod_reg"]) != int(region):
+        raise ValueError(f"{region} {day}: not the region-wide results for this region")
+    if head["fine_rip"] != "S" or head["sz_cons"] != head["sz_tot"] or head["sg_ass_r"]:
+        raise ValueError(f"{region} {day}: the seat allocation is not final, or seats go to a regional list")
+    seats: dict[str, int] = {}
+    for candidate in data["cand"]:
+        lists = candidate["liste"] or []
+        if sum(entry["seggi"] or 0 for entry in lists) != (candidate["sg_ass_c"] or 0):
+            raise ValueError(f"{region} {day}: {candidate['cogn']}'s lists do not add up to the coalition's seats")
+        for entry in lists:
+            if entry["seggi"]:
+                seats[matched(region, day, entry["desc_lis_c"].strip(), entry["voti"], counted)] = entry["seggi"]
+    if sum(seats.values()) != head["sg_ass_c"]:
+        raise ValueError(f"{region} {day}: list seats do not add up to the seats allocated to coalitions")
+    return seats
 
 
 def folded(text: str) -> str:
@@ -480,6 +667,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, held.candidates, suffix=".json")
         raw.fetch(SOURCE, held.lists, suffix=".json")
         raw.fetch(SOURCE, held.allocation, suffix=".pdf")
+    for seated in ELECTED.values():
+        raw.fetch(SOURCE, seated.url, suffix=".html" if seated.endpoint == "table" else ".json", body=seated.body)
 
 
 def regional(code: str, day: date, held: Regional) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, pl.DataFrame]:
@@ -696,9 +885,14 @@ def parse() -> None:
     )
     pl.concat(seats).write_parquet(PARSED / "seats.parquet")
     linked.write_parquet(PARSED / "links.parquet")
+    build()
 
 
-def emit() -> Path:
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
     accounting = pl.read_parquet(PARSED / "accounting.parquet")
     lists = pl.read_parquet(PARSED / "lists.parquet")
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
@@ -717,25 +911,32 @@ def emit() -> Path:
     candidate_totals = candidates.group_by("day", "region", "surname", "forename", "given", "family").agg(
         pl.col("candidate_votes").sum()
     )
-    elected = seats.filter(
+    flagged = seats.filter(
         (pl.col("day").dt.year() >= 1995) | pl.col("seats").sum().over("day", "region").is_in(COUNCIL_SIZES)
     )
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary="Italian regional council and presidential elections 1970–2025 from the Interior Ministry's open data and the regions' own results, by municipality",
             polity="IT",
         )
-        cs.manifest["scope"] = {"polity": "IT", "replaces": {"area_parent": ["it.interno"]}}
+        cs.accept(
+            "accounting.turnout",
+            "In 64 municipality rows of the Interior Ministry's open data files, the voters printed exceed the "
+            "registered electors printed; the figures are kept as published.",
+        )
+
+        def fresh(entity: UUID) -> bool:
+            return entity in cs.minted or entity in cs.own_entities
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
 
-        ministry = cs.source("Ministero dell'Interno", "Eligendo: archivio storico delle elezioni, open data")
-        if ministry in cs.minted:
+        if cs.source("Ministero dell'Interno", "Eligendo: archivio storico delle elezioni, open data") in cs.minted:
             raise ValueError("publish it.interno before it.regionali")
+        ministry = cs.survivors.get(MINISTRY, MINISTRY)
         for day in DAYS:
             cs.artifact(raw.cached(SOURCE, url(day)), ministry)
         regional_sources: dict[tuple[str, date], UUID] = {}
@@ -751,6 +952,18 @@ def emit() -> Path:
             )
             for link in (held.candidates, held.lists, held.allocation):
                 cs.artifact(raw.cached(SOURCE, link), regional_sources[place])
+        seat_sources: dict[tuple[str, date], UUID] = {}
+        for place, seated in ELECTED.items():
+            seat_sources[place] = cs.source(seated.publisher, seated.title)
+            cs.add(
+                "source",
+                id=seat_sources[place],
+                kind="official_body",
+                publisher=seated.publisher,
+                title=seated.title,
+                url=seated.site,
+            )
+            cs.artifact(raw.cached(SOURCE, seated.url, seated.body), seat_sources[place])
         italy = cs.polity("IT")
         if italy in cs.minted:
             raise ValueError("publish it.interno before it.regionali")
@@ -798,11 +1011,11 @@ def emit() -> Path:
         ):
             unit = cs.unit("it.comune", code)
             units[code] = str(unit)
-            if unit not in cs.minted:
+            if not fresh(unit):
                 continue
             _, label, region, until = ended[code]
             area = cs.area("it.comune", code)
-            if area in cs.minted:
+            if fresh(area):
                 cs.add("area", id=area, scheme_code="it.comune")
                 cs.add("area_code", area_id=area, code=code, valid_from=None, valid_to=until)
                 cs.add("area_parent", area_id=area, parent_id=cs.area("it.regione", region), valid_from=None)
@@ -849,7 +1062,7 @@ def emit() -> Path:
             if area in cs.minted or unit in cs.minted:
                 raise ValueError("publish it.istat and it.storico before it.regionali")
             units[f"regione:{code}"] = str(unit)
-            if region in cs.minted:
+            if fresh(region):
                 cs.add("polity", id=region, kind="region", iso_code=iso)
                 cs.add("slug", path=f"it/{slug_}", entity_id=region)
                 cs.add("polity_parent", polity_id=region, parent_id=italy)
@@ -883,8 +1096,18 @@ def emit() -> Path:
                 source = ministry if own is None else regional_sources[code, day]
                 accounting_set = result_set(f"{code}:{day}:election", election, None, source)
                 links.append((day, code, "election", "", str(accounting_set), None))
-                won = elected.filter(pl.col("day") == day, pl.col("region") == code)
+                won = flagged.filter(pl.col("day") == day, pl.col("region") == code)
                 size = int(won["seats"].sum()) if won.height else None
+                counted = list_totals.filter(pl.col("day") == day, pl.col("region") == code)
+                listed = (
+                    elected(code, day, dict(counted.select("list", "list_votes").iter_rows()))
+                    if (code, day) in ELECTED
+                    else None
+                )
+                if listed is not None:
+                    if won.height or own is not None:
+                        raise ValueError(f"{code} {day}: seats from more than one source")
+                    size = sum(listed.values())
                 if own is not None:
                     size = own.size
                 contest = cs.key(f"{SOURCE}.contest", f"{code}:{day}:list")
@@ -903,6 +1126,9 @@ def emit() -> Path:
                 notes = [AGGREGATED]
                 if own is not None:
                     notes = [own.counted, own.allocated]
+                elif listed is not None:
+                    notes.append(ELECTED[code, day].note)
+                    cs.add("citation", entity_id=contest, source_id=seat_sources[code, day])
                 elif day.year >= 1995:
                     notes.append(LIST_PART if size is None else LIST_SEATS)
                 elif size is not None:
@@ -911,10 +1137,15 @@ def emit() -> Path:
                     notes.append(NO_SEATS)
                 cs.add("note", entity_id=contest, kind="context", body_md=" ".join(notes))
                 list_set = result_set(f"{code}:{day}:list", election, contest, source)
-                seats_by_list = dict(won.select("list", "seats").iter_rows()) if own is None else own.seats
-                counted = list_totals.filter(pl.col("day") == day, pl.col("region") == code)
+                seats_by_list = (
+                    own.seats
+                    if own is not None
+                    else listed
+                    if listed is not None
+                    else dict(won.select("list", "seats").iter_rows())
+                )
                 regional_lists = sorted(set(seats_by_list) - set(counted["list"]))
-                if regional_lists and (own is not None or day.year < 1995):
+                if regional_lists and (own is not None or listed is not None or day.year < 1995):
                     raise ValueError(f"{code} {day}: seats for lists without votes: {regional_lists}")
                 for label_ in regional_lists:
                     option = cs.key(f"{SOURCE}.option", f"{code}:{day}:regional:{label_}")
@@ -1055,4 +1286,7 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        for table in CHANGESET_ONLY:
+            for staged in (cs.rows, cs.frames, cs.chunks):
+                staged.pop(table, None)
         return cs.write()
