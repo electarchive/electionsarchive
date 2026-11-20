@@ -51,8 +51,10 @@ PROVINCES = {
     "111": "014",
     "112": "012",
 }
-# Names the Region's pages print that differ from the ones production holds.
-LOM_ALIASES = {"SAN GIORGIO DI MANTOVA": "SAN GIORGIO BIGARELLO"}
+# Municipalities renamed since 2017 that kept their ISTAT code: Campospinoso (018026) took in Albaredo Arnaboldi in
+# 2023 and became Campospinoso Albaredo, so its 2017 count belongs to the same unit. Names the Region's pages print
+# that differ from the ones production holds.
+LOM_ALIASES = {"SAN GIORGIO DI MANTOVA": "SAN GIORGIO BIGARELLO", "CAMPOSPINOSO": "CAMPOSPINOSO ALBAREDO"}
 SAR_DETAIL = f"{SAR}/referendum2011/quesito1/dettaglio/"
 ELECTORS, VOTERS, VALID, INVALID, BLANK, VOTES = 2, 3, 4, 5, 6, 1
 
@@ -322,15 +324,13 @@ def lom_count(path: str, name: str) -> Count:
     )
 
 
-def lom_units(places: list[tuple[str, str, str, str]]) -> tuple[list[Count], list[tuple[str, str]]]:
-    """Each municipality's count with its production unit. A municipality merged out of existence since has no unit
-    of its own; it is returned with the area of the municipality that absorbed it."""
+def lom_units(places: list[tuple[str, str, str, str]]) -> list[Count]:
+    """Each municipality's count with its production unit."""
     table = units("lombardia_comuni.tsv")
     by_name: dict[tuple[str, str], list[dict[str, str]]] = {}
     for row in table:
         by_name.setdefault((row["code"][:3], norm(row["name"])), []).append(row)
     counts: list[Count] = []
-    merged: list[tuple[str, str]] = []
     for _, name, code, path in places:
         count = lom_count(path, name)
         prefix = PROVINCES[code[:3]]
@@ -342,14 +342,13 @@ def lom_units(places: list[tuple[str, str, str, str]]) -> tuple[list[Count], lis
         if len(found) > 1:
             found = [r for r in found if not r["valid_to"]] or found
         if not found:
-            merged.append((name, prefix))
-            count.unit = ""
-        elif len(found) == 1:
+            raise ValueError(f"{name} has no unit in production")
+        if len(found) == 1:
             count.unit, count.area = found[0]["unit_id"], found[0]["area_id"]
         else:
             raise ValueError(f"{name} matches {len(found)} municipalities")
         counts.append(count)
-    return counts, merged
+    return counts
 
 
 def lombardy() -> Package:
@@ -371,29 +370,9 @@ def lombardy() -> Package:
             p.artifact(artifact, source_id("lombardia"))
         else:
             p.uses(artifact)
-    counts, merged = lom_units(places)
-    for name, prefix in merged:
-        # Campospinoso, in the province of Pavia, merged into Campospinoso Albaredo in 2019.
-        if (name, prefix) != ("CAMPOSPINOSO", "018"):
-            raise ValueError(f"{name} has no unit in production")
-    host = next(r for r in units("lombardia_comuni.tsv") if norm(r["name"]) == "CAMPOSPINOSO ALBAREDO")
+    counts = lom_units(places)
     for count in counts:
-        if count.unit:
-            p.external.add(count.unit)
-            continue
-        count.unit = key("unit", "campospinoso")
-        p.add(
-            "reporting_unit",
-            id=count.unit,
-            polity_id=ITALY,
-            scheme_code="it.comune",
-            code="018025",
-            area_relation="within",
-            area_id=host["area_id"],
-            kind="standard",
-        )
-        p.name(count.unit, "Campospinoso", "it", "official")
-        p.external.add(host["area_id"])
+        p.external.add(count.unit)
     total = lom_count("data/results/tallies/0/1/1.json", "Lombardia")
     method = (
         "Counted by the municipal electoral offices and published by the Region as one JSON tally per municipality. "
