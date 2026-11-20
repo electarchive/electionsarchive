@@ -185,6 +185,51 @@ LAYOUTS = {
         (12, 12),
         (12, 28),
     ),
+    1927: Layout(
+        1000,
+        1409,
+        {"L": (300, 37.76), "R": (280, 37.53)},
+        {
+            "registered": ("L", 335, 412),
+            "voters": ("L", 413, 480),
+            "valid": ("L", 500, 572),
+            "DNVP": ("L", 582, 672),
+            "NS": ("L", 733, 810),
+            "DVP": ("L", 836, 910),
+            "Z": ("R", 95, 165),
+            "DDP": ("R", 185, 260),
+            "SPD": ("R", 280, 355),
+            "KPD": ("R", 375, 452),
+            "ANDERE": ("R", 480, 555),
+        },
+        {"L": (150, 980, 945, 1300), "R": (85, 965, 575, 1290)},
+        (11, 11),
+        (11, 26),
+    ),
+    1928: Layout(
+        1000,
+        1447.3,
+        {"L": (300, 24.41), "R": (272, 24.47)},
+        {
+            "registered": ("L", 380, 452),
+            "voters": ("L", 455, 520),
+            "valid": ("L", 585, 658),
+            "SPD": ("L", 640, 705),
+            "DNVP": ("L", 733, 800),
+            "Z": ("L", 832, 900),
+            "DVP": ("R", 95, 165),
+            "KPD": ("R", 220, 290),
+            "DDP": ("R", 298, 365),
+            "WP": ("R", 398, 470),
+            "NS": ("R", 500, 560),
+            "LANDVOLK": ("R", 586, 655),
+            "AUFWERTUNG": ("R", 680, 745),
+            "ANDERE": ("R", 776, 845),
+        },
+        {"L": (100, 962, 930, 1427), "R": (80, 875, 920, 1362)},
+        (8, 8),
+        (8, 16),
+    ),
     1932: Layout(
         900,
         1344.3,
@@ -266,7 +311,7 @@ def read() -> tuple[list[dict[str, str]], dict[tuple[str, str], list[dict[str, s
             raise ValueError(f"{key}: party votes do not add up to the valid votes")
         if sum(int(r["seats"]) for r in rows) != int(election["seats"]):
             raise ValueError(f"{key}: seats do not add up")
-        if not int(election["valid"]) <= int(election["voters"]) <= int(election["registered"]):
+        if not int(election["valid"]) <= int(election["voters"]) <= int(election["registered"] or election["voters"]):
             raise ValueError(f"{key}: valid votes, voters, and electorate are out of order")
         layout = LAYOUTS[int(election["edition"])]
         for row in rows:
@@ -481,6 +526,8 @@ def emit() -> Path:
                 ("election", 3, "voters"),
                 ("list", 4, "valid"),
             ):
+                if not election[column]:
+                    continue
                 values.append((sets[set_key], unit, None, measure, int(election[column])))
                 side, x0, x1 = layout.columns[column]
                 y = ys[side]
