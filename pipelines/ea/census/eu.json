@@ -425,30 +425,6 @@
       "url": "https://historicalarchives.europarl.europa.eu/en/presidents",
       "kind": "official_body"
     },
-    "ep-sdp-1999": {
-      "title": "Background note on the Parliament's votes on the President and College of the Commission, 26 August 1999 (b990826)",
-      "publisher": "European Parliament",
-      "url": "http://www.europarl.europa.eu/dg3/sdp/backg/en/1999/b990826.htm",
-      "kind": "official_body"
-    },
-    "ep-press-2009-barroso": {
-      "title": "Press release 20090911IPR60583: Parliament elects José Manuel Barroso as Commission President",
-      "publisher": "European Parliament",
-      "url": "https://www.europarl.europa.eu/news/en/press-room/20090911IPR60583",
-      "kind": "official_body"
-    },
-    "ep-press-2014-juncker": {
-      "title": "Press release 20140714IPR52341: Parliament elects Jean-Claude Juncker as Commission President",
-      "publisher": "European Parliament",
-      "url": "https://web.archive.org/web/2025id_/https://www.europarl.europa.eu/news/en/press-room/20140714IPR52341/parliament-elects-jean-claude-juncker-as-commission-president",
-      "kind": "official_body"
-    },
-    "ep-press-2024-vdl": {
-      "title": "Press release 20240710IPR22812: Parliament re-elects Ursula von der Leyen as Commission President",
-      "publisher": "European Parliament",
-      "url": "https://web.archive.org/web/2025id_/https://www.europarl.europa.eu/news/en/press-room/20240710IPR22812/parliament-re-elects-ursula-von-der-leyen-as-commission-president",
-      "kind": "official_body"
-    },
     "eprs-2024-762359": {
       "title": "Election of the President of the European Commission (EPRS briefing, PE 762.359, 2024)",
       "publisher": "European Parliamentary Research Service",
@@ -495,6 +471,48 @@
       "title": "Regulation (EU) 2019/788 of 17 April 2019 on the European citizens' initiative (OJ L 130, 17.5.2019)",
       "publisher": "Publications Office of the European Union (EUR-Lex)",
       "url": "https://eur-lex.europa.eu/eli/reg/2019/788/oj",
+      "kind": "official_body"
+    },
+    "ep-pv-1994": {
+      "title": "European Parliament, minutes of 21 July 1994 (PE 181.986), approval of the nominee for President of the Commission",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/doceo/document/PV-4-1994-07-21_EN.pdf",
+      "kind": "official_body"
+    },
+    "ep-pv-1999": {
+      "title": "European Parliament, minutes of 5 May 1999, approval of the President-designate of the Commission",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/doceo/document/PV-4-1999-05-05_EN.pdf",
+      "kind": "official_body"
+    },
+    "ep-pv-2004": {
+      "title": "European Parliament, minutes of 22 July 2004, election of the President of the Commission",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/doceo/document/PV-6-2004-07-22_EN.html",
+      "kind": "official_body"
+    },
+    "ep-pv-2009": {
+      "title": "European Parliament, minutes of 16 September 2009, election of the President of the Commission",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/doceo/document/PV-7-2009-09-16_EN.html",
+      "kind": "official_body"
+    },
+    "ep-pv-2014": {
+      "title": "European Parliament, minutes of 15 July 2014, election of the President of the Commission",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/doceo/document/PV-8-2014-07-15_EN.html",
+      "kind": "official_body"
+    },
+    "ep-pv-2019": {
+      "title": "European Parliament, minutes of 16 July 2019, election of the President of the Commission",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/doceo/document/PV-9-2019-07-16_EN.html",
+      "kind": "official_body"
+    },
+    "ep-pv-2024": {
+      "title": "European Parliament, minutes of 18 July 2024, election of the President of the Commission",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/doceo/document/PV-10-2024-07-18_EN.html",
       "kind": "official_body"
     }
   },
@@ -2810,46 +2828,50 @@
           "date": "1994-07-21",
           "election_kind": "indirect",
           "contests": 1,
-          "source": "ep-sdp-1999",
-          "note": "Jacques Santer approved, 260 for, 238 against, 23 abstentions."
+          "source": "ep-pv-1994",
+          "note": "Jacques Santer approved by roll-call vote: 521 members voting, 260 for, 238 against, 23 abstentions."
         },
         {
           "date": "1999-05-05",
           "election_kind": "indirect",
           "contests": 1,
-          "source": "ep-sdp-1999",
-          "note": "Romano Prodi approved, 392 for, 72 against, 41 abstentions."
+          "source": "ep-pv-1999",
+          "note": "Romano Prodi approved by roll-call vote (Rule 32(2)); the minutes record the approval and place the counts in the annex of roll-call votes, which is not yet fetched: 392 for, 72 against, 41 abstentions as previously recorded."
         },
         {
           "date": "2004-07-22",
           "election_kind": "indirect",
-          "note": "José Manuel Barroso approved, 413 for, 251 against, 44 abstentions; not yet checked against the Parliament's minutes."
+          "note": "José Manuel Barroso elected: 711 members voting, 664 votes cast (blank slips and abstentions 44, void 3), 413 for, 251 against.",
+          "contests": 1,
+          "source": "ep-pv-2004"
         },
         {
           "date": "2009-09-16",
           "election_kind": "indirect",
           "contests": 1,
-          "source": "ep-press-2009-barroso",
-          "note": "José Manuel Barroso elected, 382 for, 219 against, 117 abstentions."
+          "source": "ep-pv-2009",
+          "note": "José Manuel Barroso elected: 718 members voting, 382 for, 219 against, 117 abstentions."
         },
         {
           "date": "2014-07-15",
           "election_kind": "indirect",
           "contests": 1,
-          "source": "ep-press-2014-juncker",
-          "quote": "422 members voted in favour, 250 against, 47 abstained. The total number of votes cast was 729, 10 of which were non valid."
+          "source": "ep-pv-2014",
+          "note": "Jean-Claude Juncker elected: 729 members voting (10 blank or void), majority of component members 376, 422 for, 250 against, 47 abstentions."
         },
         {
           "date": "2019-07-16",
           "election_kind": "indirect",
-          "note": "Ursula von der Leyen elected, 383 for, 327 against, 22 abstentions; not yet checked against the Parliament's minutes."
+          "note": "Ursula von der Leyen elected: 733 members voting, majority of component members 374, 383 for, 327 against, 22 abstentions, 1 invalid ballot.",
+          "contests": 1,
+          "source": "ep-pv-2019"
         },
         {
           "date": "2024-07-18",
           "election_kind": "indirect",
           "contests": 1,
-          "source": "ep-press-2024-vdl",
-          "quote": "401 MEPs voted in favour, 284 against, and 22 cast blank or invalid votes."
+          "source": "ep-pv-2024",
+          "note": "Ursula von der Leyen elected: 707 members voting, majority of component members 360, 401 for, 284 against, 15 abstentions, 7 invalid ballots."
         }
       ]
     },
