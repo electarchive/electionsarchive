@@ -2592,6 +2592,20 @@ EXPORT_REASON = "published through the changeset path before this export"
 KEPT = {"changeset_id", "recorded_from", "valid"}
 
 
+def _longest(path: Path) -> int:
+    """The length of the longest line in a file, in bytes."""
+    longest = start = offset = 0
+    with path.open("rb") as file:
+        while chunk := file.read(1 << 24):
+            at = chunk.find(b"\n")
+            while at >= 0:
+                longest = max(longest, offset + at - start)
+                start = offset + at + 1
+                at = chunk.find(b"\n", at + 1)
+            offset += len(chunk)
+    return max(longest, offset - start)
+
+
 def _select(schema: dict[str, pl.DataType], absent: Iterable[str] = ()) -> sql.Composable:
     return sql.SQL(", ").join(
         sql.SQL("null")
@@ -2618,10 +2632,28 @@ def _dump(
         staging.unlink()
         return 0
     columns = ", ".join(f"'{c}': '{_duck(kind)}'" for c, kind in schema.items())
-    con.execute(
-        f"copy (select * from read_csv('{staging}', header = false, delim = ',', quote = '\"', escape = '\"',"
-        f" allow_quoted_nulls = false, columns = {{{columns}}})) to '{out}' (format parquet)"
-    )
+
+    def copy(options: str = "", parquet: str = "") -> None:
+        con.execute(
+            f"copy (select * from read_csv('{staging}', header = false, delim = ',', quote = '\"', escape = '\"',"
+            f" allow_quoted_nulls = false{options}, columns = {{{columns}}})) to '{out}' (format parquet{parquet})"
+        )
+
+    try:
+        copy()
+    except duckdb.InvalidInputException as error:
+        # A detailed outline is one line of several megabytes of hex, past DuckDB's default 2 MB line limit.
+        if "Maximum line size" not in str(error):
+            raise
+        # One thread holds one buffer of that size, and small row groups keep the writer from holding hundreds of
+        # megabytes of outlines, so the copy stays within the memory limit.
+        line = _longest(staging) + 2
+        found = con.execute("select current_setting('threads')").fetchone()
+        con.execute("set threads = 1")
+        try:
+            copy(f", max_line_size = {line}, buffer_size = {line}", ", row_group_size 1024")
+        finally:
+            con.execute(f"set threads = {4 if found is None else int(found[0])}")
     staging.unlink()
     found = con.execute(f"select count(*) from read_parquet('{out}')").fetchone()
     rows = 0 if found is None else int(found[0])
