@@ -383,3 +383,75 @@ READERS: dict[str, Callable[[list[Page]], list[Council]]] = {
     "july-winners": july_winners,
     "july-acclaimed": july_acclaimed,
 }
+
+
+# --- the final report's table of lists ---------------------------------------------------------------------------------
+
+
+REPORT_TABLE_PAGE = 77
+TAZKIYA = "تزكية"
+
+
+class Nomination(NamedTuple):
+    """One list of the final report's table: the council, the list's name, and the nomination type printed beside it."""
+
+    council: Cell
+    list_name: Cell
+    nomination: Cell
+    votes: str
+    seats: int
+    page: int
+
+
+def report_nominations(document: pymupdf.Document) -> list[Nomination]:
+    """The lists of the report's table of results by council (from its page 77), each with its nomination type.
+
+    A page prints a row for each list: the council and its seats at the right (once for a council, centered on its
+    lists), then the list's name, its nomination type, its votes or "tazkiya", and its seats.
+    """
+    out: list[Nomination] = []
+    started = False
+    for index in range(REPORT_TABLE_PAGE - 1, document.page_count):
+        text = document[index].get_text()
+        if "صفة" not in text or "الترشح" not in text:
+            if started:
+                break
+            continue
+        started = True
+        words = [
+            (w[0], w[1], w[2], w[3], clean(w[4]))
+            for w in document[index].get_text("words")
+            if clean(w[4]) and 95 < (w[1] + w[3]) / 2 < 735
+        ]
+        anchors = sorted((w for w in words if re.fullmatch(r"\d+", w[4]) and w[0] >= 70 and w[2] <= 95), key=middle)
+        names = sorted((w for w in words if w[0] >= 385 and w[2] < 480), key=middle)
+        clusters: list[list[Word]] = []
+        for word in names:
+            if clusters and middle(word) - middle(clusters[-1][-1]) < 12:
+                clusters[-1].append(word)
+            else:
+                clusters.append([word])
+        centers = [sum(middle(w) for w in c) / len(c) for c in clusters]
+        for anchor, group in zip(anchors, group_rows(words, anchors), strict=True):
+            council = min(range(len(clusters)), key=lambda i: abs(centers[i] - middle(anchor)))
+            list_words = [w for w in group if 225 <= w[0] < 350]
+            type_words = [w for w in group if 150 <= w[0] < 215]
+            if not list_words or not type_words:
+                raise ValueError(f"page {index + 1}: a list row reads {[w[4] for w in group]}")
+            vote_words = [w for w in group if 100 <= w[0] < 150]
+            out.append(
+                Nomination(
+                    cell(index + 1, clusters[council]),
+                    cell(index + 1, list_words, line_text(list_words)),
+                    cell(index + 1, type_words, line_text(type_words)),
+                    line_text(vote_words),
+                    int(anchor[4]),
+                    index + 1,
+                )
+            )
+    return out
+
+
+def line_text(words: list[Word]) -> str:
+    """The words of a cell in reading order: top line first, each line from the right."""
+    return clean(" ".join(w[4] for w in sorted(words, key=lambda w: (round(middle(w) / 6), -w[0]))))

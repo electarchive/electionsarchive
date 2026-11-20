@@ -228,6 +228,13 @@ def party(name: str) -> str:
     return key("party", name)
 
 
+def party_of(nomination: str) -> str | None:
+    """The registry's party behind a nomination type; independents and coalitions are not parties."""
+    tag = BY_ARABIC[nomination]
+    named = AFFILIATIONS[tag][2]
+    return party(named) if named else None
+
+
 def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
@@ -731,6 +738,83 @@ def party_list(name: str, labels: dict[str, str]) -> str | None:
     return None
 
 
+def _row_key(voted: bool, row: Row | councils17.Nomination) -> tuple[str, str, int]:
+    """What a list is told by in both tables: its folded name, its votes ("tazkiya" when acclaimed), and its seats."""
+    if isinstance(row, councils17.Nomination):
+        votes = row.votes if row.votes == councils17.TAZKIYA else str(councils17.number(row.votes))
+        return councils17.fold(row.list_name.text), votes, row.seats
+    return (
+        councils17.fold(row.list_name.text),
+        str(councils17.number(_cell_text(row.votes))) if voted else councils17.TAZKIYA,
+        councils17.number(_cell_text(row.seats)),
+    )
+
+
+def nominations(sheet: list[Authority]) -> tuple[dict[tuple[str, int], councils17.Nomination], list[str]]:
+    """The nomination type of each list of the 13 May councils, from the final report's table: by the council's
+    identifier and the list's position, with the lists the report leaves out or that cannot be paired safely.
+
+    The report's table does not print every council, and prints a council's name over several lines, so a list is
+    paired by its name, votes, and seats. Lists that agree on all three (the acclaimed Fatah lists) are paired by the
+    council's name when their nomination types differ, and any type is the same one when they do not."""
+    report = councils17.report_nominations(councils17.fix_ligatures(council_path("report")))
+    groups: dict[tuple[str, str, int], list[councils17.Nomination]] = {}
+    for n in report:
+        groups.setdefault(_row_key(False, n), []).append(n)
+    rows: dict[tuple[str, str, int], list[tuple[Authority, int]]] = {}
+    for a in sheet:
+        for position, r in enumerate(a.rows, 1):
+            rows.setdefault(_row_key(a.voted, r), []).append((a, position))
+    out: dict[tuple[str, int], councils17.Nomination] = {}
+    unpaired: list[tuple[Authority, int]] = []
+    spare: list[councils17.Nomination] = []
+    for k in set(rows) | set(groups):
+        mine, theirs = rows.get(k, []), groups.get(k, [])
+        if len({n.nomination.text for n in theirs}) <= 1 and theirs and len(mine) <= len(theirs):
+            for a, position in mine:
+                out[(a.ident, position)] = theirs[0]
+            spare += theirs[len(mine) :]
+            continue
+        unpaired += mine
+        spare += theirs
+        if theirs and mine:
+            scores = sorted(
+                (
+                    (SequenceMatcher(None, councils17.fold(a.name), councils17.fold(n.council.text)).ratio(), i, j)
+                    for i, (a, _) in enumerate(mine)
+                    for j, n in enumerate(theirs)
+                ),
+                reverse=True,
+            )
+            used_a: set[int] = set()
+            used_n: set[int] = set()
+            for score, i, j in scores:
+                if i in used_a or j in used_n or score < 0.6:
+                    continue
+                used_a.add(i)
+                used_n.add(j)
+                out[(mine[i][0].ident, mine[i][1])] = theirs[j]
+    left = [(a, position) for a, position in unpaired if (a.ident, position) not in out]
+    paired: set[int] = set()
+    for a, position in left:
+        r = a.rows[position - 1]
+        votes, seats = _row_key(a.voted, r)[1:]
+        for i, n in enumerate(spare):
+            if i not in paired and _row_key(False, n)[1:] == (votes, seats):
+                ours, theirs = councils17.fold(r.list_name.text), councils17.fold(n.list_name.text)
+                if SequenceMatcher(None, ours, theirs).ratio() >= 0.85 or ours.startswith(theirs):
+                    paired.add(i)
+                    out[(a.ident, position)] = n
+                    break
+    missing = sorted(
+        f"{a.ident}: {a.rows[position - 1].list_name.text}"
+        for a in sheet
+        for position in range(1, len(a.rows) + 1)
+        if (a.ident, position) not in out
+    )
+    return out, missing
+
+
 def sainte_lague(votes: list[int], seats: int) -> list[int]:
     total = sum(votes)
     eligible = [v if v * 100 >= THRESHOLD * total else 0 for v in votes]
@@ -851,6 +935,7 @@ def councils(day: date) -> Package:
                 height=round(rect.height),
             )
     sheet = authorities_of(day)
+    nominated, unnominated = nominations(sheet) if day == MAY else ({}, [])
     totals: Counter[str] = Counter()
     ordinal: Counter[str] = Counter()
     prefix = f"ps/{day}-local"
@@ -932,7 +1017,22 @@ def councils(day: date) -> Package:
                 kind="list",
                 ballot_position=position,
                 ballot_label=row.list_name.text,
+                party_id=party_of(nominated[(a.ident, position)].nomination.text)
+                if (a.ident, position) in nominated
+                else None,
             )
+            if (a.ident, position) in nominated:
+                n = nominated[(a.ident, position)]
+                p.add(
+                    "note",
+                    id=p.id("note", option),
+                    entity_id=option,
+                    kind="context",
+                    body_md=f"Nomination type: {n.nomination.text}, as the Commission's final report prints it for "
+                    f"this list (page {n.page} of the report).",
+                    lang="en",
+                )
+                totals["nominated"] += 1
             seats = councils17.number(_cell_text(row.seats))
             p.add("outcome", result_set_id=result_set, option_id=option, kind="won" if seats else "lost", seats=seats)
             totals["seats"] += seats
@@ -973,7 +1073,14 @@ def councils(day: date) -> Package:
         id=p.id("note", election_id, "councils"),
         entity_id=election_id,
         kind="caveat",
-        body_md=_council_note(day, sheet, totals),
+        body_md=_council_note(day, sheet, totals)
+        + (
+            f" The final report's table of lists gives a nomination type (Fatah, independent, coalition, or a party) "
+            f"for {totals['nominated']} of the {totals['nominated'] + len(unnominated)} lists; it leaves out the "
+            f"other {len(unnominated)}, which carry no nomination type here."
+            if day == MAY
+            else ""
+        ),
         lang="en",
     )
     return p
