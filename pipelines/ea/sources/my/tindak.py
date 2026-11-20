@@ -30,6 +30,37 @@ from ea.sources.my import spr
 SOURCE = "my.tindak"
 ARCHIVE = "https://github.com/TindakMalaysia/HISTORICAL-ELECTION-RESULTS/archive/refs/heads/main.zip"
 REPOSITORY = "https://github.com/TindakMalaysia/HISTORICAL-ELECTION-RESULTS"
+# The Malaysian Election Corpus, an open (CC0) compilation of the Election Commission's results, archived on Harvard
+# Dataverse. It carries the 2004 state elections of the Peninsular states that Tindak Malaysia's repository lacks.
+MECO_DOI = "https://doi.org/10.7910/DVN/O4CRXK"
+MECO_FILE = "https://dataverse.harvard.edu/api/access/datafile/{}"
+# State -> (ballots file id, stats file id) of the corpus's tab-separated state files, and the state's name there.
+MECO = {
+    "JHR": (13269617, 13269595),
+    "KDH": (13269625, 13269575),
+    "KTN": (13269586, 13269599),
+    "MLK": (13269580, 13269598),
+    "NSN": (13269609, 13269577),
+    "PHG": (13269629, 13269620),
+    "PLS": (13269565, 13269606),
+    "PNG": (13269631, 13269627),
+    "PRK": (13269559, 13269624),
+    "SGR": (13269604, 13269607),
+    "TRG": (13269571, 13269557),
+}
+MECO_STATES = {
+    "JHR": "JOHOR",
+    "KDH": "KEDAH",
+    "KTN": "KELANTAN",
+    "MLK": "MELAKA",
+    "NSN": "NEGERI SEMBILAN",
+    "PHG": "PAHANG",
+    "PLS": "PERLIS",
+    "PNG": "PULAU PINANG",
+    "PRK": "PERAK",
+    "SGR": "SELANGOR",
+    "TRG": "TERENGGANU",
+}
 ROOT = "HISTORICAL-ELECTION-RESULTS-main"
 MALAYSIA = spr.MALAYSIA
 VOTES, REGISTERED, VALID, INVALID = 1, 2, 4, 5
@@ -78,6 +109,7 @@ class Event:
     precision: str  # "day" or "year"
     files: tuple[str, ...]  # paths under the repository root
     note: str | None = None
+    meco: tuple[str, ...] = ()  # corpus state codes whose assembly contests of the election day are read as well
 
 
 def _y(year: int) -> tuple[date, date]:
@@ -326,8 +358,8 @@ EVENTS = [
             "2004-ELECTION-RESULTS/MALAYSIA_2004_PARLIAMENT_RESULTS.csv",
             "2004-ELECTION-RESULTS/2004_SABAH_DUN_RESULTS.csv",
         ),
-        "Parliamentary seats and the concurrent Sabah state assembly seats. The concurrent assembly elections of "
-        "the Peninsular states are not in the source yet.",
+        "Parliamentary seats and the concurrent state assembly seats of Sabah and of the eleven Peninsular states.",
+        meco=tuple(MECO),
     ),
     _sarawak(2006, "2006-SARAWAK-STATE-ELECTIONS/SARAWAK_2006_DUN_Results.csv"),
 ]
@@ -353,11 +385,19 @@ def key(kind: str, *parts: object) -> str:
 
 
 SOURCE_ID = key("source", SOURCE)
+MECO_ID = key("source", "meco")
 SYSTEM = key("electoral_system", "fptp")
+
+
+def meco_urls(event: Event) -> list[str]:
+    return [MECO_FILE.format(i) for state in event.meco for i in MECO[state]]
 
 
 def fetch() -> None:
     raw.fetch(SOURCE, ARCHIVE, suffix=".zip")
+    for event in EVENTS:
+        for url in meco_urls(event):
+            raw.fetch(SOURCE, url, suffix=".tab")
 
 
 @functools.cache
@@ -406,7 +446,7 @@ class Contest:
     file: str
     line: int
     state: str
-    parliament: tuple[str, str]
+    parliament: tuple[str, str] | None  # None for a state seat whose source does not name its parliamentary seat
     assembly: tuple[str, str] | None
     winning: str
     uncontested: bool
@@ -417,10 +457,13 @@ class Contest:
     rejected: int | None
     valid: int | None
     candidates: list[Candidate] = field(default_factory=list)
+    source_id: str = SOURCE_ID
 
     @property
     def seat(self) -> tuple[str, str]:
-        return self.assembly or self.parliament
+        seat = self.assembly or self.parliament
+        assert seat is not None
+        return seat
 
     @property
     def tacit(self) -> bool:
@@ -428,7 +471,7 @@ class Contest:
 
     @property
     def id(self) -> str:
-        return key("contest", self.event, self.state, *self.parliament, *(self.assembly or ()))
+        return key("contest", self.event, self.state, *(self.parliament or ()), *(self.assembly or ()))
 
 
 def _column(header: list[str], *tests: str) -> int | None:
@@ -532,10 +575,75 @@ def read(event: Event, path: str) -> list[Contest]:
     return out
 
 
+def meco_rows(url: str) -> list[dict[str, str]]:
+    text = raw.cached(SOURCE, url).path.read_text(encoding="utf-8")
+    return list(csv.DictReader(io.StringIO(text), delimiter="\t"))
+
+
+def read_meco(event: Event, state: str) -> list[Contest]:
+    """The assembly contests of one state on the election's polling day, from the corpus's ballots and stats files."""
+    ballots_url, stats_url = (MECO_FILE.format(i) for i in MECO[state])
+    day = event.first.isoformat()
+    stats = {row["seat"]: row for row in meco_rows(stats_url) if row["date"] == day}
+    ballots: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in meco_rows(ballots_url):
+        if row["date"] == day:
+            ballots[row["seat"]].append(row)
+    if set(stats) != set(ballots):
+        raise ValueError(f"{state}: stats and ballots name different seats on {day}")
+    out: list[Contest] = []
+    for line, (seat, rows) in enumerate(ballots.items(), start=1):
+        row = stats[seat]
+        if int(row["n_candidates"]) != len(rows):
+            raise ValueError(f"{state} {seat}: {len(rows)} candidates against n_candidates {row['n_candidates']}")
+        number_, name = seat.split(" ", 1)
+        uncontested = any(r["result"] == "won_uncontested" for r in rows)
+        won = [r for r in rows if r["result"].startswith("won")]
+        if len(won) != 1:
+            raise ValueError(f"{state} {seat}: {len(won)} winners")
+
+        def figure(name_: str, row: dict[str, str] = row, uncontested: bool = uncontested) -> int | None:
+            return None if uncontested else number(row[name_])
+
+        contest = Contest(
+            event=event.id,
+            file=ballots_url,
+            line=line,
+            state=MECO_STATES[state],
+            parliament=None,
+            assembly=(code(number_, "assembly"), name.upper()),
+            winning=(won[0]["party"] or "").upper(),
+            uncontested=uncontested,
+            registered=number(row["voters_total"]),
+            majority=figure("majority"),
+            turnout=None if uncontested else float(row["voter_turnout"]),
+            issued=figure("ballots_issued"),
+            rejected=figure("votes_rejected"),
+            valid=figure("votes_valid"),
+            source_id=MECO_ID,
+        )
+        for r in sorted(rows, key=lambda r: int(r["ballot_order"])):
+            party = clean(r["party"]).upper()
+            bloc = clean(r["coalition"]).upper()
+            contest.candidates.append(
+                Candidate(
+                    name=clean(r["name_on_ballot"]),
+                    party=None if party in ("BEBAS", "") else PARTIES.get(party, party),
+                    bloc=None if party in ("BEBAS", "") or bloc in (party, "ALONE", "") else bloc,
+                    symbol=None,
+                    sex=None,
+                    votes=None if uncontested else number(r["votes"]),
+                )
+            )
+        out.append(contest)
+    return out
+
+
 @functools.cache
 def contests(event_id: str) -> list[Contest]:
     event = next(e for e in EVENTS if e.id == event_id)
     out = [contest for path in event.files for contest in read(event, path)]
+    out += [contest for state in event.meco for contest in read_meco(event, state)]
     seen: set[str] = set()
     for contest in out:
         if contest.id in seen:
@@ -570,6 +678,7 @@ def fold(name: str) -> str:
 
 def parliament_area(event: Event, contest: Contest) -> tuple[str, bool]:
     """The parliamentary constituency's area id, and whether `my.spr` made it."""
+    assert contest.parliament is not None
     if event.first >= REUSE_FROM:
         found = loaded().get(("my.parlimen", contest.state, contest.parliament[0], fold(contest.parliament[1])))
         if found is not None:
@@ -583,7 +692,7 @@ def assembly_area(event: Event, contest: Contest) -> tuple[str, bool]:
         found = loaded().get(("my.dun", contest.state, contest.assembly[0], fold(contest.assembly[1])))
         if found is not None:
             return found, True
-    return key("area", "my.dun", contest.state, *contest.assembly, *contest.parliament), False
+    return key("area", "my.dun", contest.state, *contest.assembly, *(contest.parliament or ())), False
 
 
 def by_id(event_id: str) -> Event:
@@ -604,13 +713,22 @@ def geo() -> Package:
         **SOURCE_ROW,
     )
     p.artifact(raw.cached(SOURCE, ARCHIVE), SOURCE_ID)
+    p.add("source", id=MECO_ID, **MECO_ROW)
+    for event in EVENTS:
+        for url in meco_urls(event):
+            p.artifact(raw.cached(SOURCE, url), MECO_ID)
     made: dict[str, tuple[str, str]] = {}
     for event in EVENTS:
         for contest in contests(event.id):
-            pid, reused = parliament_area(event, contest)
-            if reused:
+            pid = None
+            if contest.parliament is not None:
+                pid, reused = parliament_area(event, contest)
+            if pid is None:
+                reused = False
+            elif reused:
                 p.external.add(pid)
             elif pid not in made:
+                assert contest.parliament is not None
                 made[pid] = (contest.state, contest.parliament[0])
                 p.add("area", id=pid, scheme_code="my.parlimen")
                 p.add("area_code", area_id=pid, code=contest.parliament[0])
@@ -628,12 +746,17 @@ def geo() -> Package:
                 p.add("area", id=nid, scheme_code="my.dun")
                 p.add("area_code", area_id=nid, code=contest.assembly[0])
                 p.name(nid, spr.title(contest.assembly[1]), "ms", "official")
-                p.add("area_parent", area_id=nid, parent_id=pid)
+                if pid is None:
+                    parent = spr.state_area(contest.state)
+                    p.external.add(parent)
+                    p.add("area_parent", area_id=nid, parent_id=parent)
+                else:
+                    p.add("area_parent", area_id=nid, parent_id=pid)
     for path, (event_id, first, last) in SHAPES.items():
         drawn = shapes(path)
         event = by_id(event_id)
         for contest in contests(event_id):
-            if contest.assembly is not None:
+            if contest.assembly is not None or contest.parliament is None:
                 continue
             pid, reused = parliament_area(event, contest)
             shape = drawn.get((contest.state, fold(contest.parliament[1])))
@@ -683,6 +806,18 @@ SOURCE_ROW = {
     "license_url": "https://creativecommons.org/licenses/by/4.0/",
     "attribution": "Tindak Malaysia, HISTORICAL-ELECTION-RESULTS (CC BY 4.0), after the reports of the Election "
     "Commission of Malaysia",
+}
+
+
+MECO_ROW = {
+    "kind": "academic",
+    "publisher": "Thevesh Thevananthan",
+    "title": "Malaysian Election Corpus (MECo): federal and state-level election results since 1955, compiled from "
+    "the Election Commission's reports",
+    "url": MECO_DOI,
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Thevesh Thevananthan, Malaysian Election Corpus (CC0 1.0), Harvard Dataverse",
 }
 
 
@@ -817,6 +952,15 @@ METHOD = (
 )
 
 
+METHOD_MECO = (
+    "Counted per constituency and published by the Election Commission of Malaysia in its report on the election. "
+    "The figures are those of the Malaysian Election Corpus (CC0), which compiles them from the Commission's report "
+    "and Gazette notices: each candidate's votes, the electorate, the rejected ballots, and the total of valid votes. "
+    "The corpus also gives ballots issued, the turnout percentage, and the winner's majority; those are checked here "
+    "and not stored. The winner is the candidate with the most votes, checked against the winner the corpus names."
+)
+
+
 def election(event: Event, checked: Audit) -> Package:
     p = Package(
         f"{SOURCE}/{event.id}",
@@ -826,6 +970,8 @@ def election(event: Event, checked: Audit) -> Package:
     )
     p.external.update([MALAYSIA, "my.keputusan"])
     p.uses(raw.cached(SOURCE, ARCHIVE))
+    for url in meco_urls(event):
+        p.uses(raw.cached(SOURCE, url))
     id = key("election", event.id)
     path = f"my/{event.id}"
     p.add(
@@ -906,12 +1052,19 @@ def election(event: Event, checked: Audit) -> Package:
             contest_id=contest.id,
             stage="official",
             kind="tacit" if contest.tacit else "counted",
-            source_id=SOURCE_ID,
+            source_id=contest.source_id,
             status="active",
             is_default=True,
             completeness=None if contest.tacit else 1.0,
         )
-        p.add("note", id=p.id("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
+        p.add(
+            "note",
+            id=p.id("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=METHOD_MECO if contest.source_id == MECO_ID else METHOD,
+            lang="en",
+        )
         for index, caveat in enumerate(checked.caveats.get(contest.id, [])):
             p.add(
                 "note",
