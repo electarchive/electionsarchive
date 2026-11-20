@@ -418,25 +418,6 @@ PR	1928-05-20	ANDERE	Deutsch-Soziale Partei (Richard Kunze)	38592	0	Q1206490	7	R
 PR	1928-05-20	ANDERE	Partei für Recht u. Mieterschutz	2375	0		7	R	party
 PR	1928-05-20	ANDERE	Evangelische Volksgemeinschaft (Evangelische Partei Deutschlands)	15971	0		7	L	party
 PR	1928-05-20	ANDERE	Evangelischer Volksdienst (Christlich-soziale Gesinnungsgemeinschaft)	10290	0		7	R	party
-BY	1928-05-20	SPD	Sozialdemokratische Partei Deutschlands	802727	34	Q49768
-BY	1928-05-20	DNVP	Deutschnationale Volkspartei	306643	13	Q158227
-BY	1928-05-20	Z	Bayerische Volkspartei	1044752	46	Q302884	8
-BY	1928-05-20	DVP	Deutsche Volkspartei	109518	4	Q316533
-BY	1928-05-20	KPD	Kommunistische Partei Deutschlands	125738	5	Q153401
-BY	1928-05-20	DDP	Deutsche Demokratische Partei	108734	0	Q328195
-BY	1928-05-20	WP	Reichspartei des deutschen Mittelstandes (Wirtschaftspartei)	105794	0	Q541230
-BY	1928-05-20	NS	Nationalsozialistische Deutsche Arbeiterpartei (Hitlerpartei)	203098	9	Q7320	9	R
-BY	1928-05-20	NS	Der völkische Block (Deutschvölkische Freiheitsbewegung)	7917	0	Q541427	9	L
-BY	1928-05-20	LANDVOLK	Bayerischer Bauern- u. Mittelstandsbund	380841	17	Q812330	10	L
-BY	1928-05-20	LANDVOLK	Fränkisches Landvolk	3952	0		10	R	party
-BY	1928-05-20	AUFWERTUNG	Volksrechtpartei (Reichspartei für Volksrecht u. Aufwertung, Christlich-soziale Reichspartei, Beamtengruppe Kratofiel)	44064	0		11	L	list_vehicle
-BY	1928-05-20	AUFWERTUNG	Aufwertungs- u. Aufbaupartei, Freier Bund e. V.	3606	0		11	L	party
-BY	1928-05-20	AUFWERTUNG	Volksblock der Inflationsgeschädigten (Allgemeine Volkspartei, Bayerischer Aufwertungsblock)	5764	0		11	R	list_vehicle
-BY	1928-05-20	ANDERE	Deutsche Haus- u. Grundbesitzerpartei	4317	0		12	L	party
-BY	1928-05-20	ANDERE	Christlicher Volksdienst	43866	0	Q314832	12	L
-BY	1928-05-20	ANDERE	Bayernpartei gegen Berliner Zentralisation	5525	0		12	L	party
-BY	1928-05-20	ANDERE	Alte Kommunistische Partei	3132	0		12	R	party
-BY	1928-05-20	ANDERE	Unabhängige Sozialdemokratische Partei Deutschlands	359	0	Q310296	12	R
 WU	1928-05-20	SPD	Sozialdemokratische Partei Deutschlands	267077	22	Q49768
 WU	1928-05-20	DNVP	Deutschnationale Volkspartei (Württembergische Bürgerpartei)	64131	4	Q158227	17
 WU	1928-05-20	Z	Deutsche Zentrumspartei	219846	17	Q157537	13
@@ -568,3 +549,45 @@ MS	1929-06-23	NS	Nationalsozialisten (Deutsche Arbeiterpartei) (Hitlerbewegung)	
 MS	1929-06-23	LANDVOLK	Mecklenburgische Bauernpartei	8087	1		41		party
 MS	1929-06-23	ANDERE	Einheitsliste (Deutschnationale Volkspartei, Wirtschaftspartei, Landbund u. Deutschvölkische Freiheitsbewegung)	140151	23		42	R	list_vehicle
 MS	1929-06-23	ANDERE	Gruppe für Volkswohlfahrt	7461	1		42	R	party
+TH	1929-12-08	SPD	Sozialdemokratische Partei Deutschlands	258042	18	Q49768			
+TH	1929-12-08	DNVP	Deutschnationale Volkspartei	31736	2	Q158227			
+TH	1929-12-08	Z	Deutsche Zentrumspartei	9651	0	Q157537	20		
+TH	1929-12-08	DVP	Deutsche Volkspartei	70567	5	Q316533			
+TH	1929-12-08	KPD	Kommunistische Partei Deutschlands	85209	6	Q153401			
+TH	1929-12-08	DDP	Deutsche Demokratische Partei	23393	1	Q328195			
+TH	1929-12-08	WP	Reichspartei des deutschen Mittelstandes (Wirtschaftspartei)	76535	6	Q541230			
+TH	1929-12-08	NS	Nationalsozialistische Deutsche Arbeiterpartei (Hitlerbewegung)	90159	6	Q7320	15		
+TH	1929-12-08	LANDVOLK	Christlich-nationale Bauern- u. Landvolkpartei	131214	9	Q315407	26		
+TH	1929-12-08	AUFWERTUNG	Volksrechtpartei (Reichspartei für Volksrecht u. Aufwertung)	9631	0	Q896602	17		
+TH	1929-12-08	ANDERE	Liste der Kommunisten (Opposition)	12222	0	Q487129	27	R	
+TH	1929-12-08	ANDERE	Haus- u. Grundbesitzerpartei	427	0		27	R	party
+BY	1928-05-20	SPD	Sozialdemokratische Partei Deutschlands	802951	34	Q49768			
+BY	1928-05-20	DNVP	Deutschnationale Volkspartei	306649	13	Q158227			
+BY	1928-05-20	Z	Bayerische Volkspartei	1045963	46	Q302884	9		
+BY	1928-05-20	DVP	Deutsche Volkspartei	109524	4	Q316533			
+BY	1928-05-20	KPD	Kommunistische Partei Deutschlands	125842	5	Q153401			
+BY	1928-05-20	DDP	Deutsche Demokratische Partei	108771	0	Q328195			
+BY	1928-05-20	WP	Reichspartei des deutschen Mittelstandes (Wirtschaftspartei)	105808	0	Q541230			
+BY	1928-05-20	NS	Nationalsozialistische Deutsche Arbeiterpartei (Hitlerbewegung)	203115	9	Q7320	10	L	
+BY	1928-05-20	NS	Der völkische Block (Deutschvölkische Freiheitsbewegung)	7915	0	Q541427	10	L	
+BY	1928-05-20	LANDVOLK	Bayerischer Bauern- u. Mittelstandsbund	382104	17	Q812330	11	L	
+BY	1928-05-20	LANDVOLK	Fränkisches Landvolk	3952	0		11	L	party
+BY	1928-05-20	AUFWERTUNG	Volksrechtpartei (Reichspartei für Volksrecht u. Aufwertung, Christlich-soziale Reichspartei, Beamtengruppe Kratofiel)	43778	0		12	L	list_vehicle
+BY	1928-05-20	AUFWERTUNG	Aufwertungs- u. Aufbaupartei, Freier Bund e. V.	3606	0		12	L	party
+BY	1928-05-20	AUFWERTUNG	Volksblock der Inflationsgeschädigten (Allgemeine Volkspartei, Bayerischer Aufwertungsblock)	5765	0		12	L	list_vehicle
+BY	1928-05-20	ANDERE	Deutsche Haus- u. Grundbesitzerpartei	4317	0		13	L	party
+BY	1928-05-20	ANDERE	Christlicher Volksdienst	43867	0	Q314832	13	L	
+BY	1928-05-20	ANDERE	Bayernpartei gegen Berliner Zentralisation	5525	0		13	L	party
+BY	1928-05-20	ANDERE	Alte Kommunistische Partei	3132	0		13	L	party
+BY	1928-05-20	ANDERE	Unabhängige Sozialdemokratische Partei Deutschlands	360	0	Q310296	13	L	
+OL	1931-05-17	SPD	Sozialdemokratische Partei Deutschlands	54893	11	Q49768			
+OL	1931-05-17	DNVP	Deutschnationale Volkspartei	12653	2	Q158227			
+OL	1931-05-17	Z	Deutsche Zentrumspartei	46255	9	Q157537	20		
+OL	1931-05-17	DVP	Deutsche Volkspartei	10774	2	Q316533			
+OL	1931-05-17	KPD	Kommunistische Partei Deutschlands	18942	3	Q153401			
+OL	1931-05-17	DDP	Deutsche Staatspartei	8515	1	Q2283759	14		
+OL	1931-05-17	WP	Reichspartei des deutschen Mittelstandes (Wirtschaftspartei)	4275	0	Q541230			
+OL	1931-05-17	NS	Nationalsozialistische Deutsche Arbeiterpartei (Hitlerbewegung)	97802	19	Q7320	15		
+OL	1931-05-17	LANDVOLK	Oldenburgisches Landvolk	5404	1		34		party
+OL	1931-05-17	ANDERE	Christlich-sozialer Volksdienst	2946	0	Q314832	35	R	
+OL	1931-05-17	ANDERE	Unabhängige Sozialdemokratische Partei	224	0	Q310296	35	R	
