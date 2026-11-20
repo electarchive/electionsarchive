@@ -30,7 +30,7 @@ KREISE = (
     "&typename=adm_stadtkreise_a&outputFormat=GeoJSON&srsName=EPSG:4326"
 )
 KREISE_PAGE = "https://data.stadt-zuerich.ch/dataset/geo_stadtkreise"
-SWITZERLAND = str(uuid5(package.NAMESPACE, "polity\x1fCH"))
+SWITZERLAND = "01a13b73-f75e-7177-8281-2867f60d0ee8"
 # Rows production already holds: the commune of Zurich (BFS number 0261) and its reporting unit.
 CITY_AREA = "01a13b73-f784-72a8-85f0-2a23e50a492d"
 CITY_UNIT = "01a13b76-7ce2-7282-94c4-9507aafcb958"
