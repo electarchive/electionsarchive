@@ -1,4 +1,4 @@
-"""Seanad Éireann general elections: the five vocational panels, count by count.
+"""Seanad Éireann general elections: the five vocational panels and the two university constituencies, count by count.
 
 The Houses of the Oireachtas publish a results handbook after each Seanad general election. For each panel it prints
 the candidates in alphabetical order with their number of votes, their value (each vote counts 1,000 so that
@@ -8,7 +8,9 @@ disregard of fractions add up to the value of the valid votes after every count,
 are seats keep a value at the last count.
 
 Votes are stored in whole votes, so a value of 82,166 is 82.166 votes. The package for an election holds the
-election, one contest and one result set per panel, and a result per count.
+election, one contest and one result set per panel, and a result per count. The same handbook prints the counts of
+the National University of Ireland and the University of Dublin, which `seanad_university` parses; their contests
+join the election and sit in the scheme of the two university constituencies.
 """
 
 import re
@@ -21,6 +23,7 @@ from uuid import uuid5
 
 from ea import package, raw
 from ea.package import NAMESPACE, Package
+from ea.sources.ie import seanad_university as university
 
 SOURCE = "ie.seanad"
 HOST = "https://data.oireachtas.ie/ie/oireachtas/electoralProcess/electionResults/seanad"
@@ -31,6 +34,7 @@ SEANAD = "029ddab0-50cc-5934-84c7-5769974e033a"
 LICENSE = "Oireachtas (Open Data) PSI Licence"
 LICENSE_URL = "https://www.oireachtas.ie/en/open-data/license/"
 SCHEME = "ie.seanad_panel"
+UNIVERSITY_SCHEME = "ie.seanad_university"
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED, QUOTA = 1, 2, 3, 4, 5, 21, 26
 PER_VOTE = 1000
 
@@ -467,7 +471,7 @@ def proper_names(document: str, panels: dict[str, Panel]) -> None:
             candidate.surname = options[0]
 
 
-def parse_handbook(year: int) -> tuple[Summary, dict[str, Panel]]:
+def parse_handbook(year: int) -> tuple[Summary, dict[str, Panel], dict[str, university.Constituency]]:
     handbook = HANDBOOKS[year]
     document = text(raw.cached(SOURCE, handbook.url))
     figures = summary(document)
@@ -481,7 +485,7 @@ def parse_handbook(year: int) -> tuple[Summary, dict[str, Panel]]:
             raise ValueError(f"{key}: more valid votes than papers")
     if (figures.electorate, figures.poll) != (handbook.electorate, handbook.poll):
         raise ValueError("the summary disagrees with the handbook's electorate and poll")
-    return figures, panels
+    return figures, panels, university.parse(document)
 
 
 def key(kind: str, *parts: object) -> str:
@@ -489,6 +493,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 SYSTEM = key("electoral_system", "panels")
+UNIVERSITY_SYSTEM = key("electoral_system", "university")
 METHOD = (
     "Each of the five panels elects its senators by the single transferable vote. The electorate is the members of "
     "the newly elected Dáil, the outgoing Seanad, and the county and city councillors, who vote by post, with one "
@@ -499,8 +504,25 @@ METHOD = (
 )
 
 
+UNIVERSITY_METHOD = (
+    "Each university constituency elects three senators by the single transferable vote. The electorate is the "
+    "university's graduates (and, in the University of Dublin, its scholars), who vote by post. The count is in whole "
+    "papers: the quota is the valid poll divided by one more than the seats, plus one, and a surplus is transferred "
+    "from the papers last received by the elected candidate (Seanad Electoral (University Members) Act 1937, Third "
+    "Schedule)."
+)
+
+
 def unit(panel: str) -> str:
     return key("reporting_unit", panel)
+
+
+def university_area(code: str) -> str:
+    return key("area", UNIVERSITY_SCHEME, code)
+
+
+def university_unit(code: str) -> str:
+    return key("reporting_unit", UNIVERSITY_SCHEME, code)
 
 
 def packages() -> list[str]:
@@ -527,7 +549,8 @@ def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "The reporting units of the Seanad panels: each panel is counted as one electorate with no territory",
+        "The reporting units of the Seanad panels and the university constituencies: each is counted as one "
+        "electorate, and none has a territory",
     )
     p.external.add(IRELAND)
     p.add(
@@ -549,6 +572,33 @@ def geo() -> Package:
             code=panel,
             area_relation="unlocated",
             area_id=None,
+            kind="aggregate",
+        )
+        p.name(id, title, "en", "official")
+    p.add(
+        "scheme",
+        code=UNIVERSITY_SCHEME,
+        polity_id=IRELAND,
+        kind="synthetic",
+        rank=1,
+        noun="university constituency",
+        code_system=None,
+    )
+    for code, (title, irish, _) in university.UNIVERSITIES.items():
+        area = university_area(code)
+        p.add("area", id=area, scheme_code=UNIVERSITY_SCHEME)
+        p.add("area_code", area_id=area, code=code)
+        p.name(area, title, "en", "official")
+        p.name(area, irish, "ga", "official")
+        id = university_unit(code)
+        p.add(
+            "reporting_unit",
+            id=id,
+            polity_id=IRELAND,
+            scheme_code=UNIVERSITY_SCHEME,
+            code=code,
+            area_relation="equals",
+            area_id=area,
             kind="aggregate",
         )
         p.name(id, title, "en", "official")
@@ -585,6 +635,24 @@ def registry() -> Package:
     )
     p.name(SYSTEM, "Single transferable vote on the Seanad vocational panels", "en", "official")
     p.add(
+        "electoral_system",
+        id=UNIVERSITY_SYSTEM,
+        polity_id=IRELAND,
+        valid_from=date(1937, 12, 29),
+        valid_to=None,
+        rules={"formula": "stv", "quota": "droop", "surplus": "last_parcel"},
+        rules_version=1,
+    )
+    p.name(UNIVERSITY_SYSTEM, "Single transferable vote in the Seanad university constituencies", "en", "official")
+    p.add(
+        "note",
+        id=key("note", UNIVERSITY_SYSTEM),
+        entity_id=UNIVERSITY_SYSTEM,
+        kind="methodology",
+        body_md=UNIVERSITY_METHOD,
+        lang="en",
+    )
+    p.add(
         "note",
         id=key("note", SYSTEM),
         entity_id=SYSTEM,
@@ -601,16 +669,17 @@ def decimal(value: int) -> Decimal:
 
 def panels_package(year: int) -> Package:
     handbook = HANDBOOKS[year]
-    figures, panels = parse_handbook(year)
+    figures, panels, universities = parse_handbook(year)
     start, end = handbook.period
     stamp = f"{end}" if handbook.precision == "day" else f"{end:%Y-%m}"
     p = Package(
         f"{SOURCE}/panels-{year}",
         SOURCE,
-        f"The {year} Seanad general election on the five vocational panels, count by count",
+        f"The {year} Seanad general election on the five vocational panels and the two university constituencies, "
+        "count by count",
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
-    p.external |= {IRELAND, SEANAD, SCHEME}
+    p.external |= {IRELAND, SEANAD, SCHEME, UNIVERSITY_SCHEME}
     source = key("source", "handbook", year)
     p.artifact(raw.cached(SOURCE, handbook.url), source)
     election = key("election", year)
@@ -744,4 +813,124 @@ def panels_package(year: int) -> Package:
                 )
             kind = "elected" if position - 1 in data.elected else "eliminated" if candidate.values[-1] == 0 else "lost"
             p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
+    for code, data in universities.items():
+        university_contest(p, year, election, base, source, code, data)
     return p
+
+
+def university_contest(
+    p: Package, year: int, election: str, base: str, source: str, code: str, data: university.Constituency
+) -> None:
+    title, _, _ = university.UNIVERSITIES[code]
+    slug = title.lower().replace(" ", "-")
+    contest = key("contest", year, code)
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="body_seats",
+        body_id=SEANAD,
+        district_area_id=university_area(code),
+        magnitude=data.seats,
+        round_number=1,
+        electoral_system_id=UNIVERSITY_SYSTEM,
+        default_result_kind="counted",
+    )
+    p.name(contest, f"{year} Seanad election, {title}", "en", "official")
+    p.add("slug", path=f"{base}/{slug}", entity_id=contest, is_current=True)
+    p.add("external_id", entity_id=contest, scheme=f"{SOURCE}.contest", value=f"{year}:{code}")
+    p.add("note", id=key("note", contest), entity_id=contest, kind="methodology", body_md=UNIVERSITY_METHOD, lang="en")
+    papers = f"The poll was {data.poll:,} papers, of which {data.spoiled:,} were spoiled"
+    if data.rejected_at_opening is not None:
+        papers += f" and {data.rejected_at_opening:,} were rejected at opening"
+    context = f"{papers}. {data.valid:,} were valid."
+    if data.retained:
+        context += (
+            " The handbook's table repeats the votes of a candidate who has been excluded in every later column, "
+            "so its totals grow by the votes handed on at each count. The figures here are as printed."
+        )
+    p.add("note", id=key("note", contest, "papers"), entity_id=contest, kind="context", body_md=context, lang="en")
+    result_set = key("result_set", year, code)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=source,
+        status="active",
+        is_default=True,
+        completeness=1,
+    )
+    place = university_unit(code)
+    accounting = (
+        (REGISTERED, data.electorate),
+        (BALLOTS, data.poll),
+        (VALID, data.valid),
+        (INVALID, data.poll - data.valid),
+        (QUOTA, data.quota),
+    )
+    for measure, amount in accounting:
+        p.add(
+            "result_value",
+            result_set_id=result_set,
+            unit_id=place,
+            option_id=None,
+            channel=0,
+            measure=measure,
+            count_round=0,
+            flags=0,
+            value=amount,
+        )
+    for count, amount in enumerate(data.non_effective, 1):
+        p.add(
+            "result_value",
+            result_set_id=result_set,
+            unit_id=place,
+            option_id=None,
+            channel=0,
+            measure=EXHAUSTED,
+            count_round=count,
+            flags=0,
+            value=amount,
+        )
+    for position, candidate in enumerate(data.candidates, 1):
+        ref = f"{year}:{code}:{fold(candidate.surname, candidate.forename)}"
+        person = key("person", ref)
+        p.add("person", id=person)
+        p.name(person, candidate.name, "en", "official")
+        option = key("contest_option", ref)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="candidate",
+            party_id=None,
+            ballot_position=position,
+            ballot_label=f"{candidate.surname.upper()}, {candidate.forename}",
+        )
+        p.add(
+            "candidacy",
+            id=key("candidacy", ref),
+            person_id=person,
+            option_id=option,
+            role="head",
+            ballot_name=candidate.name,
+            member_of_party_id=None,
+            is_independent=None,
+        )
+        for count, amount in enumerate(candidate.values, 1):
+            p.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=place,
+                option_id=option,
+                channel=0,
+                measure=VOTES,
+                count_round=count,
+                flags=0,
+                value=amount,
+            )
+        kind = "elected" if position - 1 in data.elected else "eliminated" if candidate.excluded is not None else "lost"
+        p.add("outcome", result_set_id=result_set, option_id=option, kind=kind)
