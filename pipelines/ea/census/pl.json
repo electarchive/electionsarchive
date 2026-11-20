@@ -1318,19 +1318,21 @@
       "dates": [
         {
           "date": "1947-01-19",
-          "contests": 52,
+          "contests": 53,
           "source": "isap",
-          "quote": "MP/1947/19: results notice, 52 constituencies"
+          "quote": "MP/1947/19: results notice, 52 constituencies and the deputies elected from the state lists"
         },
         {
           "date": "1952-10-26",
+          "contests": 67,
           "source": "isap",
-          "quote": "DU/1952/247: order of the elections to the Sejm"
+          "quote": "MP/1952/1414: results notice, deputies elected in 67 constituencies"
         },
         {
           "date": "1957-01-20",
+          "contests": 116,
           "source": "isap",
-          "quote": "MP/1957/30: results notice of the Sejm elections"
+          "quote": "MP/1957/30: results notice, 116 constituencies"
         },
         {
           "date": "1961-04-16",
