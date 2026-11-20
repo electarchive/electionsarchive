@@ -138,7 +138,7 @@ def parse() -> None:
                         )
                         if (
                             not precinct
-                            or re.fullmatch(r"(?i)water|unassign\w*|z+", precinct)
+                            or re.fullmatch(r"(?i)null|water|unassign\w*|z+", precinct)
                             or shape.shapeType == shapefile.NULL
                             or not shape.points
                         ):
