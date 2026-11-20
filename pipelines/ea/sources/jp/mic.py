@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 import unicodedata
@@ -13,8 +14,9 @@ import fastexcel
 import polars as pl
 import psycopg
 
-from ea import raw
-from ea.changeset import Changeset, slug
+from ea import package, raw
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.jp.mlit import BLOCKS, PREFECTURES
 from ea.store import DATA, connect
 
@@ -416,6 +418,7 @@ def parse() -> None:
     pl.DataFrame(seats).write_parquet(PARSED / f"seats-v{VERSION}.parquet")
     pl.DataFrame(lists).write_parquet(PARSED / f"lists-v{VERSION}.parquet")
     pl.DataFrame(turnout).write_parquet(PARSED / f"turnout-v{VERSION}.parquet")
+    print(build())
 
 
 def book_text(url: str) -> str:
@@ -827,10 +830,42 @@ def dhondt(votes: dict[str, Decimal], seats: int) -> dict[str, int]:
     return won
 
 
-HOR_SMD_FROM = date(2022, 12, 28)
+KEY = f"{SOURCE}/all"
+SUMMARY = (
+    "Japan's House of Representatives general elections 2009-2026 from the Ministry of Internal Affairs and "
+    "Communications: district candidates and party lists by counting district, with declared winners, block seats, "
+    "list members, and the list members elected"
+)
+DISTRICTS = "jp.hor_smd"
 
 
-def emit() -> Path:
+def district_code(prefecture: str, district: int) -> str:
+    """The jp.hor_smd code of a single-member district: the prefecture's two digits and the district's two."""
+    return f"{prefecture}{district:02d}"
+
+
+def district_areas(conn: psycopg.Connection, day: date) -> dict[str, str]:
+    """The jp.hor_smd area of each district code in force on an election day. Each annex 1 table of the Public
+    Offices Election Act (1994, 2002, 2013, 2017, and 2022) has its own areas, so a district takes the shape it had
+    when it voted."""
+    found: dict[str, str] = {}
+    for code, area in conn.execute(
+        """select c.code, a.id::text from area a join area_code c on c.area_id = a.id
+           where a.scheme_code = %s and c.valid @> %s::date""",
+        [DISTRICTS, day],
+    ).fetchall():
+        if found.setdefault(str(code), str(area)) != str(area):
+            raise ValueError(f"{DISTRICTS} {code} names two areas on {day}")
+    return found
+
+
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package jp.mic/all from the parsed tables. It reads the database, through Draft, so the rows it
+    rebuilds keep the ids the changeset path gave them."""
     candidates = pl.read_parquet(PARSED / f"candidates-v{VERSION}.parquet")
     smd = pl.read_parquet(PARSED / f"smd-v{VERSION}.parquet")
     pr = pl.read_parquet(PARSED / f"pr-v{VERSION}.parquet")
@@ -841,15 +876,7 @@ def emit() -> Path:
     english = {native: name for native, name in PREFECTURES}
     blocks = {native: (f"{number:02d}", name) for number, (native, name, _) in enumerate(BLOCKS, 1)}
     with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary="Japan's House of Representatives general elections 2009-2026 from the Ministry of Internal "
-            "Affairs and Communications: district candidates and party lists by counting district, with declared "
-            "winners, block seats, list members, and the list members elected",
-            polity="JP",
-        )
+        cs = Draft(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="JP")
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official", preferred: bool = True) -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=preferred)
@@ -930,6 +957,7 @@ def emit() -> Path:
             for _, url in found.smd + found.pr + found.turnout:
                 cs.artifact(raw.cached(SOURCE, url), source)
             places = Places(conn, day)
+            areas = district_areas(conn, day)
 
             def place_unit(prefecture: str, place: str, previous: str | None) -> tuple[UUID, str]:
                 code = codes[prefecture]
@@ -954,15 +982,16 @@ def emit() -> Path:
             ):
                 key = f"{held}:{codes[str(prefecture)]}:{district}"
                 contest = cs.key(f"{SOURCE}.contest", key)
+                code = district_code(codes[str(prefecture)], int(district))
+                if code not in areas:
+                    raise LookupError(f"{held}: the archive holds no {DISTRICTS} area {code} on election day")
                 cs.add(
                     "contest",
                     id=contest,
                     election_id=election,
                     kind="body_seats",
                     body_id=house,
-                    district_area_id=cs.area("jp.hor_smd", f"{codes[str(prefecture)]}{int(district):02d}", day)
-                    if day >= HOR_SMD_FROM
-                    else None,
+                    district_area_id=UUID(areas[code]),
                     magnitude=1,
                     electoral_system_id=smd_system,
                     default_result_kind="counted",
@@ -1209,3 +1238,58 @@ def emit() -> Path:
                 value=amount_,
             )
         return cs.write()
+
+
+SMD_KEY = re.compile(r"^(\d{4}-\d{2}-\d{2}):(\d{2}):(\d+)$")
+
+
+def package_from_export() -> Path:
+    """Build jp.mic/all from the archive's published rows (`ea package export`) with the one change `build` makes
+    to them: every single-member contest's district_area_id names the jp.hor_smd area of its district in force on
+    election day, where the changeset path linked only the contests held under the 2022 table. It reads no raw files,
+    so it runs where the ministry's tables are not cached."""
+    out = package.export(SOURCE)
+    manifest = json.loads((out / "package.json").read_text())
+    before = {code: n for code, n, _ in package.check(out)}
+    contests = pl.read_parquet(out / "contest.parquet")
+    keys = pl.read_parquet(out / "external_id.parquet").filter(pl.col("scheme") == f"{SOURCE}.contest")
+    smd = {
+        str(entity): found
+        for value, entity in keys.select("value", "entity_id").iter_rows()
+        if (found := SMD_KEY.match(str(value)))
+    }
+    with connect() as conn:
+        areas = {day: district_areas(conn, date.fromisoformat(day)) for day in ELECTIONS.values()}
+        # The export cites its files by storage key alone; as a Draft package does, the manifest cites each with its
+        # url and sha256, which the inbox verifies the cache against.
+        artifacts = pl.read_parquet(out / "source_artifact.parquet")
+        cited = package._cited(conn, package._adopted(conn, SOURCE)[1], artifacts)
+    linked: dict[str, str] = {}
+    for contest, found in smd.items():
+        held, prefecture, district = found[1], found[2], int(found[3])
+        code = district_code(prefecture, district)
+        if code not in areas[held]:
+            raise LookupError(f"{held}: the archive holds no {DISTRICTS} area {code} on election day")
+        linked[contest] = areas[held][code]
+    kinds = dict(contests.select("id", "kind").iter_rows())
+    if sorted(kinds[contest] for contest in linked) != ["body_seats"] * len(linked):
+        raise ValueError("a jp.mic.contest key of the single-member form names a contest that is not body_seats")
+    if len(linked) != contests.filter(pl.col("kind") == "body_seats").height:
+        raise ValueError("a single-member contest has no jp.mic.contest key")
+    before_links = dict(contests.select("id", "district_area_id").iter_rows())
+    if moved := [c for c, area in linked.items() if before_links[c] is not None and before_links[c] != area]:
+        raise ValueError(f"{len(moved)} contests already name another district area, such as {moved[0]}")
+    contests = contests.with_columns(
+        district_area_id=pl.col("id").replace_strict(linked, default=pl.col("district_area_id"), return_dtype=pl.String)
+    )
+    contests.write_parquet(out / "contest.parquet", statistics=False)
+    counts = dict(manifest["tables"])
+    built = package._seal(KEY, SOURCE, SUMMARY, out, counts, manifest["adopts"], cited, None)
+    after = {code: n for code, n, _ in package.check(out)}
+    if after != before:
+        raise ValueError(f"{KEY}: the change moves the check findings from {before} to {after}")
+    built["accepted"] = manifest["accepted"]
+    (out / "package.json").write_text(json.dumps(built, indent=1) + "\n")
+    added = sum(1 for contest in linked if before_links[contest] is None)
+    print(f"{KEY}: {len(linked)} single-member contests name their district area, {added} newly linked", flush=True)
+    return out
