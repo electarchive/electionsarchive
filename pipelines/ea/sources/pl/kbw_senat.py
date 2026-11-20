@@ -1,23 +1,25 @@
-import hashlib
 import io
 import os
 import re
-import subprocess
-import tempfile
 import zipfile
 from collections import Counter
 from datetime import date
 from pathlib import Path
+from typing import NamedTuple
 from uuid import UUID
 
+import numpy as np
 import polars as pl
 import shapely
+import xlrd
+from pyproj import Transformer
 
-from ea import raw
+from ea import boundaries, package, raw
 from ea.changeset import Changeset, slug
 from ea.names import display
+from ea.package import Draft
 from ea.sources.pl.kbw_sejm import ITEMS
-from ea.store import connect
+from ea.store import Connection, connect
 
 SOURCE = "pl.kbw_senat"
 VERSION = "1"
@@ -95,30 +97,107 @@ def urls(year: int, kind: str) -> list[str]:
     return [f"{BASE}/{year}/{file}" for file in ([files] if isinstance(files, str) else files)]
 
 
+def arcgis(layer: str, fields: str) -> str:
+    return f"{layer}/query?where=1%3D1&outFields={fields}&returnGeometry=true&outSR=4326&f=geojson"
+
+
+class City(NamedTuple):
+    """A city that constituencies split by its auxiliary units: its gmina, the city's own layer of those units, and
+    the field that names each unit."""
+
+    gmina: str
+    url: str
+    suffix: str
+    field: str
+    publisher: str
+    title: str
+    page: str
+    license: str
+
+
+NO_LICENSE = "Official public record, no license stated"
+CITIES = {
+    "Wrocław": City(
+        "026401",
+        "https://geoportal.wroclaw.pl/www/pliki/osiedla/granice-osiedli.zip",
+        ".zip",
+        "NAZWAOSIED",
+        "Urząd Miejski Wrocławia",
+        "Granice osiedli Wrocławia (uchwała Rady Miejskiej Wrocławia nr XX/419/16)",
+        "https://geoportal.wroclaw.pl/zasoby/?zasob=granice_osiedla",
+        "No restrictions on use or processing (brak ograniczeń), as the publisher states",
+    ),
+    "Łódź": City(
+        "106101",
+        arcgis("https://mapa.lodz.pl/3/rest/services/ObwodyWyborcze/MapServer/7", "NAME"),
+        ".geojson",
+        "NAME",
+        "Urząd Miasta Łodzi",
+        "Jednostki pomocnicze (osiedla) Łodzi, mapa obwodów wyborczych",
+        "https://nowa.mapa.lodz.pl/",
+        NO_LICENSE,
+    ),
+    "Kraków": City(
+        "126101",
+        arcgis("https://msip.um.krakow.pl/arcgis/rest/services/JP/dane_refenc/MapServer/9", "nr_dzielni,nazwa"),
+        ".geojson",
+        "nr_dzielni",
+        "Urząd Miasta Krakowa, Miejski System Informacji Przestrzennej",
+        "Dzielnice administracyjne Krakowa",
+        "https://msip.krakow.pl/",
+        NO_LICENSE,
+    ),
+}
+
+
 def fetch() -> None:
     for year in ELECTIONS:
         for kind in FILES[year]:
             for address in urls(year, kind):
                 raw.fetch(SOURCE, address, suffix=Path(address).suffix)
+    for city in CITIES.values():
+        raw.fetch(SOURCE, city.url, suffix=city.suffix)
 
 
-def modern(body: bytes) -> bytes:
+def text(cell: xlrd.sheet.Cell) -> str | None:
+    """A cell as `pl.read_excel` gives it as text: a number to at most 9 decimal places, without trailing zeros."""
+    if cell.ctype in (xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK):
+        return None
+    if cell.ctype == xlrd.XL_CELL_NUMBER:
+        return f"{cell.value:.9f}".rstrip("0").rstrip(".")
+    return str(cell.value)
+
+
+def legacy(body: bytes) -> dict[str, pl.DataFrame]:
+    """Each sheet of an Excel 2-4 workbook, which `pl.read_excel` cannot open, read with xlrd into the frame
+    `pl.read_excel(..., infer_schema_length=0)` gives for a newer one: the used range, its first row as the header
+    (a blank header named `__UNNAMED__<column>`, a repeated one suffixed `_<n>`), its rows that hold a value, and
+    text cells."""
+    frames = {}
+    book = xlrd.open_workbook(file_contents=body)
+    for sheet in book.sheets():
+        grid = [[text(sheet.cell(row, col)) for col in range(sheet.ncols)] for row in range(sheet.nrows)]
+        used = [(row, col) for row, cells in enumerate(grid) for col, cell in enumerate(cells) if cell is not None]
+        if not used:
+            continue
+        top, bottom = min(row for row, _ in used), max(row for row, _ in used)
+        left, right = min(col for _, col in used), max(col for _, col in used)
+        rows = [cells[left : right + 1] for cells in grid[top : bottom + 1]]
+        header: list[str] = []
+        seen: Counter[str] = Counter()
+        for col, cell in enumerate(rows[0]):
+            label = f"__UNNAMED__{col}" if cell is None else cell
+            header.append(label if not seen[label] else f"{label}_{seen[label]}")
+            seen[label] += 1
+        body_rows = [cells for cells in rows[1:] if any(cell is not None for cell in cells)]
+        frames[sheet.name] = pl.DataFrame(body_rows, schema=dict.fromkeys(header, pl.String), orient="row")
+    return frames
+
+
+def sheets(body: bytes) -> dict[str, pl.DataFrame]:
     if body.startswith((b"PK", b"\xd0\xcf\x11\xe0")):
-        return body
-    folder = PARSED / "converted"
-    folder.mkdir(parents=True, exist_ok=True)
-    target = folder / f"{hashlib.sha256(body).hexdigest()}.xlsx"
-    if not target.exists():
-        with tempfile.TemporaryDirectory() as scratch:
-            source = Path(scratch) / "book.xls"
-            source.write_bytes(body)
-            subprocess.run(
-                ["soffice", "--headless", "--convert-to", "xlsx", "--outdir", scratch, str(source)],
-                check=True,
-                capture_output=True,
-            )
-            target.write_bytes((Path(scratch) / "book.xlsx").read_bytes())
-    return target.read_bytes()
+        return pl.read_excel(io.BytesIO(body), sheet_id=0, infer_schema_length=0)
+    return legacy(body)
 
 
 def decoded(body: bytes) -> str:
@@ -167,8 +246,7 @@ def tables(year: int, kind: str) -> dict[str, pl.DataFrame]:
             elif member.lower().endswith((".xls", ".xlsx")):
                 if member.endswith(".XLS") and member[:-4] + ".xlsx" in members:
                     continue
-                sheets = pl.read_excel(io.BytesIO(modern(body)), sheet_id=0, infer_schema_length=0)
-                for sheet, frame in sheets.items():
+                for sheet, frame in sheets(body).items():
                     frames[f"{member}:{sheet}"] = clean(frame)
     return frames
 
@@ -487,6 +565,8 @@ LOADERS = {year: (load_recent if year >= 2011 else load_old) for year in ELECTIO
 
 
 def parse() -> None:
+    """Parse the years in SENAT_YEAR (every year when it is unset), then build the package pl.kbw_senat/all from
+    every year's parsed tables."""
     years = [int(year) for year in os.environ["SENAT_YEAR"].split(",")] if "SENAT_YEAR" in os.environ else ELECTIONS
     for year in years:
         folder = PARSED / str(year)
@@ -503,6 +583,7 @@ def parse() -> None:
         for name, frame in loaded.items():
             frame.write_parquet(folder / f"{name}.parquet")
             print(f"{year} {name}: {frame.height} rows")
+    print(build())
 
 
 VINTAGES = {2011: (2023, date(2011, 10, 9), None), 2001: (2007, date(2001, 9, 23), date(2011, 10, 9))}
@@ -529,106 +610,280 @@ def area_code(vintage: int, number: int) -> str:
     return f"{vintage}:{number}"
 
 
-def emit_okregi() -> Path:
-    with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary=(
-                "Poland's Senate constituencies of 2001-2007 (40) and since 2011 (100) as unions of the gminy and "
-                "Warsaw districts each holds in the Krajowe Biuro Wyborcze's polling-district files, with PRG "
-                "boundaries; constituencies that split a city by its auxiliary units have no shape"
-            ),
-            polity="PL",
+def gmina_areas(conn: Connection) -> dict[str, UUID]:
+    """The gmina area of each 6-digit TERYT prefix (the code without its type digit) that names one area. A gmina
+    whose type changed, as a rural gmina that gained a town, holds both of its dated codes."""
+    found: dict[str, set[UUID]] = {}
+    for code, area in conn.execute(
+        "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'pl.gmina'"
+    ).fetchall():
+        found.setdefault(code[:6], set()).add(area)
+    return {prefix: next(iter(areas)) for prefix, areas in found.items() if len(areas) == 1}
+
+
+KEY = f"{SOURCE}/all"
+SUMMARY = (
+    "Poland's Senate elections of 1991-2023 by constituency, gmina, and polling district (2005 by powiat, 1991 by "
+    "constituency), with candidates and elected senators, and the Senate constituencies of 2001-2007 (40) and since "
+    "2011 (100), from the Krajowe Biuro Wyborcze's data files"
+)
+# Annex 2 of the Kodeks wyborczy names Łódź's osiedle Stoki, which the city has since renamed Stoki-Sikawa-Podgórze.
+ALIASES = {"stoki": "stoki-sikawa-podgórze"}
+# How far, in meters, a constituency's own units may reach past the city layer to the PRG outline of the city.
+REACH = 50
+# The smallest part, in square meters, a constituency keeps when it splits a city.
+SLIVER = 100
+PLANE = "EPSG:2180"
+
+
+def unit_name(text: str) -> str:
+    """An osiedle or dzielnica as Annex 2 and the city layers both write it: lower case, no `Osiedle` or `Dzielnica`
+    prefix, no periods, and no spaces around hyphens (`Krzyki - Partynice` and `Krzyki-Partynice` are one)."""
+    text = re.sub(r"^(osiedle|dzielnica)\s+", "", text.strip().lower().replace(".", ""))
+    text = re.sub(r"\s+", " ", re.sub(r"\s*-\s*", "-", text))
+    return ALIASES.get(text, text)
+
+
+def city_parts(boundary: str, city: str) -> list[str]:
+    """The osiedla or dzielnice of a city that a constituency's description in Annex 2 lists."""
+    marker = f"część obszaru miasta na prawach powiatu {city}:"
+    if marker not in boundary:
+        return []
+    return [unit_name(part) for part in boundary.split(marker, 1)[1].split(",") if part.strip()]
+
+
+def polygons(shape: shapely.Geometry) -> shapely.MultiPolygon:
+    """The polygons of an overlay's result, without the lines and points where two outlines only touch."""
+    found = boundaries.polygonal(shape)
+    if found is None:
+        raise ValueError("an outline came out empty")
+    return found
+
+
+def project(shape: shapely.Geometry, transformer: Transformer) -> shapely.Geometry:
+    return shapely.transform(shape, lambda xy: np.column_stack(transformer.transform(xy[:, 0], xy[:, 1])))
+
+
+def split_city(
+    cs: Draft, name: str, city: City, outline: shapely.Geometry, sides: dict[int, list[str]]
+) -> tuple[dict[int, shapely.Geometry], UUID]:
+    """Split the PRG outline of a city between its two constituencies along the city's own layer of osiedla or
+    dzielnice. The first constituency takes the part of the outline its units cover, reaching up to REACH meters past
+    them to the outline's edge but never into the other constituency's units, and the second takes the rest, so the
+    two tile the city's outline exactly and meet their neighbors on the PRG boundaries."""
+    source = cs.source(city.publisher, city.title)
+    cs.add(
+        "source",
+        id=source,
+        kind="official_body",
+        publisher=city.publisher,
+        title=city.title,
+        url=city.page,
+        license=city.license,
+    )
+    artifact = raw.cached(SOURCE, city.url)
+    cs.artifact(artifact, source)
+    units: dict[str, shapely.Geometry] = {}
+    for properties, shape in boundaries.read(artifact.path):
+        units[unit_name(properties[city.field])] = shape
+    listed = [part for parts in sides.values() for part in parts]
+    if sorted(listed) != sorted(units) or len(set(listed)) != len(listed):
+        raise ValueError(
+            f"{name}: Annex 2 lists {sorted(set(listed) - set(units))} that the city layer lacks, and the layer has "
+            f"{sorted(set(units) - set(listed))} that Annex 2 does not list"
         )
-        poland = cs.polity("PL")
-        source = add_source(cs)
-        if conn.execute("select 1 from scheme where code = 'pl.okreg_senat'").fetchone() is None:
-            cs.add(
-                "scheme",
-                code="pl.okreg_senat",
-                polity_id=poland,
-                kind="electoral_district",
-                rank=2,
-                noun="Senate constituency",
-            )
-        rows = conn.execute(
-            "select c.code, ST_AsBinary(g.geom), g.source_id from area a join area_code c on c.area_id = a.id"
-            " join area_geometry g on g.area_id = a.id where a.scheme_code in ('pl.gmina', 'pl.dzielnica_warszawy')"
+    forward = Transformer.from_crs("EPSG:4326", PLANE, always_xy=True)
+    back = Transformer.from_crs(PLANE, "EPSG:4326", always_xy=True)
+    first, second = sorted(sides)
+    mine, theirs = (project(shapely.union_all([units[part] for part in sides[n]]), forward) for n in (first, second))
+    # Only the reach is drawn in meters; the outline is cut in its own coordinates, so the city's edge keeps the PRG
+    # vertices its neighbors share.
+    outline = shapely.set_precision(outline, 1e-7)
+    reach = project(shapely.difference(shapely.buffer(mine, REACH), theirs), back)
+    # A sliver where the reach grazes the outline's edge goes to the other constituency.
+    taken = shapely.MultiPolygon(
+        [
+            part
+            for part in shapely.get_parts(polygons(shapely.intersection(outline, reach)))
+            if shapely.area(project(part, forward)) >= SLIVER
+        ]
+    )
+    shapes = {first: taken, second: polygons(shapely.difference(outline, taken))}
+    whole = project(outline, forward)
+    for number, own, other in ((first, mine, theirs), (second, theirs, mine)):
+        flat = project(shapes[number], forward)
+        print(
+            f"{name}: constituency {number} {shapely.area(flat) / 1e6:.2f} km², its units "
+            f"{shapely.area(shapely.intersection(own, whole)) / 1e6:.2f} km² within the city, "
+            f"{shapely.area(shapely.intersection(flat, other)) / 1e4:.2f} ha of the other constituency's units, "
+            f"parts of {', '.join(f'{shapely.area(part) / 1e4:.2f}' for part in shapely.get_parts(flat))} ha"
+        )
+    gap = shapely.difference(whole, shapely.union(mine, theirs))
+    print(
+        f"{name}: city outline {shapely.area(whole) / 1e6:.2f} km², {shapely.area(gap) / 1e4:.2f} ha outside the layer"
+    )
+    return shapes, source
+
+
+def build_okregi(cs: Draft) -> set[str]:
+    """The Senate constituencies of 2001-2007 and since 2011, with their outlines. An outline the changeset path built
+    from the PRG gminy each constituency holds is carried as stored. The six constituencies since 2011 that split
+    Wrocław, Łódź, and Kraków by osiedla or dzielnice (Annex 2 of the Kodeks wyborczy) take the PRG outline of the
+    city's part, split along the city's own layer, plus the PRG outlines of their other gminy. Returns the codes of
+    the constituencies with an outline."""
+    conn = cs.conn
+    poland = cs.polity("PL")
+    source = add_source(cs)
+    cs.add(
+        "scheme",
+        code="pl.okreg_senat",
+        polity_id=poland,
+        kind="electoral_district",
+        rank=2,
+        noun="Senate constituency",
+    )
+    stored = {
+        code: row
+        for code, *row in conn.execute(
+            """select c.code, g.geom::text, g.label_point::text, g.quality::text, g.source_id
+               from area a join area_code c on c.area_id = a.id join area_geometry g on g.area_id = a.id
+               join changeset ch on ch.id = g.changeset_id
+               where a.scheme_code = 'pl.okreg_senat' and ch.pipeline = %s and g.valid_from is null""",
+            [SOURCE],
         ).fetchall()
-        prefixes = Counter(code[:6] for code, _, _ in rows)
-        shapes = {code[:6]: shapely.from_wkb(geom) for code, geom, _ in rows if prefixes[code[:6]] == 1}
-        [prg] = {source_id for _, _, source_id in rows}
-        regions = {
-            code: area
-            for code, area in conn.execute(
-                "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'pl.wojewodztwo'"
-            ).fetchall()
-        }
-        [(outline,)] = conn.execute(
-            "select ST_AsBinary(g.geom) from area a join area_geometry g on g.area_id = a.id where a.scheme_code = 'pl.nation'"
+    }
+    by_area = dict(
+        conn.execute(
+            """select g.area_id, ST_AsBinary(g.geom) from area a join area_geometry g on g.area_id = a.id
+               where a.scheme_code = 'pl.gmina' and g.valid_to is null"""
         ).fetchall()
-        nation = shapely.from_wkb(outline)
-        for vintage, (year, start, end) in VINTAGES.items():
-            for address in urls(year, "unit_candidates"):
-                cs.artifact(raw.cached(SOURCE, address), source)
-            districts = pl.read_parquet(PARSED / str(year) / "districts.parquet")
-            members = (
-                pl.read_parquet(PARSED / str(year) / "units.parquet")
-                .filter(pl.col("gmina").str.contains(r"^\d{6}$"))
-                .select("district", "gmina")
-                .unique()
-            )
-            split = set(members.group_by("gmina").len().filter(pl.col("len") > 1)["gmina"])
-            total = 0.0
-            for entry in districts.sort("district").iter_rows(named=True):
-                number = entry["district"]
-                parts = members.filter(pl.col("district") == number)["gmina"].to_list()
-                area = cs.area("pl.okreg_senat", area_code(vintage, number))
-                cs.add("area", id=area, scheme_code="pl.okreg_senat")
-                cs.add("area_code", area_id=area, code=area_code(vintage, number), valid_from=None)
-                seat = f" ({entry['seat']})" if entry["seat"] else ""
-                for text, lang, kind in (
-                    (f"Okręg wyborczy nr {number} do Senatu{seat}, {vintage}", "pl", "official"),
-                    (f"Senate constituency {number}{seat}, {vintage}", "en", "english"),
-                ):
-                    cs.add("name", entity_id=area, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
-                voivodeships = {code[:2] for code in parts}
-                if len(voivodeships) == 1:
-                    cs.add("area_parent", area_id=area, parent_id=regions[voivodeships.pop()], valid_from=None)
-                if split & set(parts):
-                    continue
-                missing = [code for code in parts if code not in shapes]
-                shape = shapely.set_srid(
-                    shapely.union_all([shapes[code] for code in parts if code in shapes], grid_size=1e-7), 4326
-                )
-                if missing:
-                    print(f"{vintage} constituency {number}: no shape for gminy {missing}")
-                total += shapely.area(shape)
+    )
+    outlines = {code: shapely.from_wkb(by_area[area]) for code, area in gmina_areas(conn).items() if area in by_area}
+    regions = {
+        code: area
+        for code, area in conn.execute(
+            "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'pl.wojewodztwo'"
+        ).fetchall()
+    }
+    [(nation_wkb,)] = conn.execute(
+        "select ST_AsBinary(g.geom) from area a join area_geometry g on g.area_id = a.id where a.scheme_code = 'pl.nation'"
+    ).fetchall()
+    nation = shapely.from_wkb(nation_wkb)
+    shaped: set[str] = set()
+    for vintage, (year, start, end) in VINTAGES.items():
+        for address in urls(year, "unit_candidates"):
+            cs.artifact(raw.cached(SOURCE, address), source)
+        districts = pl.read_parquet(PARSED / str(year) / "districts.parquet")
+        members = (
+            pl.read_parquet(PARSED / str(year) / "units.parquet")
+            .filter(pl.col("gmina").str.contains(r"^\d{6}$"))
+            .select("district", "gmina")
+            .unique()
+        )
+        split = set(members.group_by("gmina").len().filter(pl.col("len") > 1)["gmina"])
+        cut: dict[int, tuple[shapely.Geometry, UUID]] = {}
+        if vintage == 2011:
+            for name, city in CITIES.items():
+                if city.gmina not in split:
+                    raise ValueError(f"{name} is not split between constituencies in {year}")
+                sides = {
+                    number: parts
+                    for number, boundary in districts.select("district", "boundary").iter_rows()
+                    if (parts := city_parts(boundary, name))
+                }
+                holding = set(members.filter(pl.col("gmina") == city.gmina)["district"])
+                if set(sides) != holding or len(sides) != 2:
+                    raise ValueError(
+                        f"{name}: Annex 2 splits it among {sorted(sides)}, the polling districts {holding}"
+                    )
+                halves, layer = split_city(cs, name, city, outlines[city.gmina], sides)
+                cut.update({number: (shape, layer) for number, shape in halves.items()})
+        total = 0.0
+        for entry in districts.sort("district").iter_rows(named=True):
+            number = entry["district"]
+            code = area_code(vintage, number)
+            parts = members.filter(pl.col("district") == number)["gmina"].to_list()
+            area = cs.area("pl.okreg_senat", code)
+            cs.add("area", id=area, scheme_code="pl.okreg_senat")
+            cs.add("area_code", area_id=area, code=code, valid_from=None)
+            seat = f" ({entry['seat']})" if entry["seat"] else ""
+            for text, lang, kind in (
+                (f"Okręg wyborczy nr {number} do Senatu{seat}, {vintage}", "pl", "official"),
+                (f"Senate constituency {number}{seat}, {vintage}", "en", "english"),
+            ):
+                cs.add("name", entity_id=area, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
+            voivodeships = {code[:2] for code in parts}
+            if len(voivodeships) == 1:
+                cs.add("area_parent", area_id=area, parent_id=regions[voivodeships.pop()], valid_from=None)
+            if code in stored:
+                geom, label, quality, geom_source = stored[code]
                 cs.add(
                     "area_geometry",
                     area_id=area,
                     valid_from=None,
-                    geom=shapely.to_wkb(shape, hex=True, include_srid=True),
-                    label_point=shapely.to_wkb(
-                        shapely.set_srid(max(shapely.get_parts(shape), key=shapely.area).representative_point(), 4326),
-                        hex=True,
-                        include_srid=True,
-                    ),
-                    quality="official",
-                    source_id=prg,
+                    geom=geom,
+                    label_point=label,
+                    quality=quality,
+                    source_id=geom_source,
                 )
-            print(f"{vintage}: shaped constituencies cover {total / shapely.area(nation):.4f} of Poland")
+                total += shapely.area(shapely.from_wkb(geom))
+                shaped.add(code)
+                continue
+            if number not in cut:
+                if not split & set(parts):
+                    raise ValueError(f"constituency {code} has no stored outline")
+                continue
+            city_part, layer = cut[number]
+            others = [gmina for gmina in parts if gmina not in split]
+            missing = [gmina for gmina in others if gmina not in outlines]
+            if missing:
+                raise ValueError(f"constituency {code}: no outline for gminy {missing}")
+            shape = city_part
+            if others:
+                shape = polygons(shapely.union_all([city_part, *(outlines[gmina] for gmina in others)], grid_size=1e-7))
+            shape = shapely.set_srid(shape, 4326)
+            total += shapely.area(shape)
+            shaped.add(code)
             cs.add(
-                "boundary_set",
-                scheme_code="pl.okreg_senat",
-                vintage=str(vintage),
-                valid_from=start,
-                valid_to=end,
-                as_of=ELECTIONS[year],
+                "area_geometry",
+                area_id=area,
+                valid_from=None,
+                geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+                label_point=shapely.to_wkb(
+                    shapely.set_srid(max(shapely.get_parts(shape), key=shapely.area).representative_point(), 4326),
+                    hex=True,
+                    include_srid=True,
+                ),
+                quality="official",
+                source_id=layer,
             )
-        return cs.write()
+            cs.add(
+                "note",
+                entity_id=area,
+                kind="methodology",
+                body_md=CITY_NOTE.format(
+                    city=next(name for name, city in CITIES.items() if city.gmina in parts),
+                    others=" and of the other gminy it holds" if others else "",
+                ),
+            )
+        print(f"{vintage}: shaped constituencies cover {total / shapely.area(nation):.4f} of Poland")
+        cs.add(
+            "boundary_set",
+            scheme_code="pl.okreg_senat",
+            vintage=str(vintage),
+            valid_from=start,
+            valid_to=end,
+            as_of=ELECTIONS[year],
+        )
+    return shaped
+
+
+CITY_NOTE = (
+    "The outline is the part of {city}'s PRG outline that the osiedla or dzielnice Annex 2 of the Kodeks wyborczy "
+    "assigns to this constituency cover in the city's own layer of those units{others}. The city's two constituencies "
+    "share its PRG outline with no gap or overlap. The city layer shows the units' current boundaries, which may "
+    "differ slightly from those of 2011."
+)
 
 
 VOTES, REGISTERED, BALLOTS, VALID_BALLOTS, INVALID = 1, 2, 3, 4, 5
@@ -670,10 +925,54 @@ OLD_CODES = (
 )
 
 
-def emit() -> Path:
-    if os.environ["SENAT_YEAR"] == "okregi":
-        return emit_okregi()
-    year = int(os.environ["SENAT_YEAR"])
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package pl.kbw_senat/all from the parsed tables. It reads the database, through Draft, so the rows it
+    rebuilds keep the ids the changeset path gave them. The constituencies come first and the years newest first, the
+    order the changeset path first wrote them in, so a party shared by several years is named from the year that
+    first wrote it."""
+    with connect() as conn:
+        cs = Draft(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="PL")
+        cs.accept(
+            "accounting.votes_valid",
+            "Constituency 44 (Warszawa and abroad) in 2019 and 2023 has polling districts abroad whose rows print no "
+            "counts, so the valid votes summed from the polling districts fall short of the candidate votes the "
+            "candidate file prints for the constituency; both are stored as printed, as the notes say.",
+        )
+        cs.accept(
+            "accounting.turnout",
+            "Two polling districts, in constituencies 43 (Warszawa) and 91 (Poznań), print more ballots taken from "
+            "the urn than voters entitled to vote (2,037 against 2,031 and 1,410 against 1,409); the counts are "
+            "stored as the Krajowe Biuro Wyborcze's files print them.",
+        )
+        cs.accept(
+            "accounting.ballots_sum",
+            "Two 2001 polling districts in constituency 6 (Lublin) print more valid votes than ballots taken from the "
+            "urn (7,514 against 7,453 and 715 against 365), so they store no invalid figure.",
+        )
+        shaped = build_okregi(cs)
+        # People of this pipeline whose row another pipeline has since written (a crosswalk match that added a
+        # gender, say) keep that row.
+        taken = {
+            id
+            for (id,) in conn.execute(
+                """select p.id from person p join changeset c on c.id = p.changeset_id
+                   join entity e on e.id = p.id join changeset o on o.id = e.changeset_id
+                   where o.pipeline = %s and c.pipeline <> %s""",
+                [SOURCE, SOURCE],
+            )
+        }
+        written: set[UUID] = set()
+        for year in sorted(ELECTIONS, reverse=True):
+            build_year(cs, year, shaped, written, taken)
+        return cs.write()
+
+
+def build_year(cs: Draft, year: int, shaped: set[str], written: set[UUID], taken: set[UUID]) -> None:
+    conn = cs.conn
     day = ELECTIONS[year]
     folder = PARSED / str(year)
     districts, candidates, units, unit_votes = (
@@ -681,343 +980,298 @@ def emit() -> Path:
     )
     single = year >= 2011
     vintage = 2011 if single else 2001 if year >= 2001 else None
-    with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary=(
-                f"Senate election of {year} by constituency"
-                + (", powiat" if year == 2005 else ", gmina, and polling district" if units.height else "")
-                + ", with candidates and elected senators, from the Krajowe Biuro Wyborcze's data files"
-            ),
-            polity="PL",
+
+    def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
+        cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
+
+    poland = cs.polity("PL")
+    senat = cs.key("pl.body", "senat")
+    election = cs.key("pl.election", f"{day}:general")
+    if senat in cs.minted or election in cs.minted:
+        raise ValueError("publish pl.parlament and the pl.kbw_sejm election first")
+    source = add_source(cs)
+    for kind in FILES[year]:
+        for address in urls(year, kind):
+            cs.artifact(raw.cached(SOURCE, address), source)
+    key_name = "senat" if single else "senat-block-2001" if year >= 2001 else "senat-block-1991"
+    system = cs.key("pl.electoral_system", key_name)
+    if system in cs.minted:
+        cs.add(
+            "electoral_system",
+            id=system,
+            polity_id=poland,
+            rules={"formula": "fptp" if single else "block"},
+            rules_version=1,
+        )
+        name(
+            system,
+            "Senate single-member plurality system"
+            if single
+            else f"Senate block vote ({'2001-2007' if year >= 2001 else '1991-1997'})",
+        )
+        cs.add(
+            "note",
+            entity_id=system,
+            kind="methodology",
+            body_md=FPTP if single else BLOCK_2001 if year >= 2001 else BLOCK_1991,
         )
 
-        def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
-            cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
+    by_item = dict(
+        conn.execute(
+            """select x.value, x.entity_id from external_id x join party p on p.id = x.entity_id
+               where x.scheme = 'wikidata' and p.polity_id = %s
+               and not exists (select from entity_merge m where m.entity_id = p.id)""",
+            (poland,),
+        ).fetchall()
+    )
+    parties: dict[str, UUID] = {}
 
-        poland = cs.polity("PL")
-        senat = cs.key("pl.body", "senat")
-        election = cs.key("pl.election", f"{day}:general")
-        if senat in cs.minted or election in cs.minted:
-            raise ValueError("publish pl.parlament and the pl.kbw_sejm election first")
-        if vintage and conn.execute("select 1 from scheme where code = 'pl.okreg_senat'").fetchone() is None:
-            raise ValueError("publish the Senate constituencies first (SENAT_YEAR=okregi)")
-        source = add_source(cs)
-        for kind in FILES[year]:
-            for address in urls(year, kind):
-                cs.artifact(raw.cached(SOURCE, address), source)
-        if conn.execute("select 1 from scheme where code = 'pl.okreg_senat'").fetchone() is None:
-            cs.add(
-                "scheme",
-                code="pl.okreg_senat",
-                polity_id=poland,
-                kind="electoral_district",
-                rank=2,
-                noun="Senate constituency",
-            )
-        key_name = "senat" if single else "senat-block-2001" if year >= 2001 else "senat-block-1991"
-        system = cs.key("pl.electoral_system", key_name)
-        if system in cs.minted:
-            cs.add(
-                "electoral_system",
-                id=system,
-                polity_id=poland,
-                rules={"formula": "fptp" if single else "block"},
-                rules_version=1,
-            )
-            name(
-                system,
-                "Senate single-member plurality system"
-                if single
-                else f"Senate block vote ({'2001-2007' if year >= 2001 else '1991-1997'})",
-            )
-            cs.add(
-                "note",
-                entity_id=system,
-                kind="methodology",
-                body_md=FPTP if single else BLOCK_2001 if year >= 2001 else BLOCK_1991,
-            )
-
-        by_item = dict(
-            conn.execute(
-                """select x.value, x.entity_id from external_id x join party p on p.id = x.entity_id
-                   where x.scheme = 'wikidata' and p.polity_id = %s
-                   and not exists (select from entity_merge m where m.entity_id = p.id)""",
-                (poland,),
-            ).fetchall()
-        )
-        existing = {row[0] for row in conn.execute("select id from party where polity_id = %s", (poland,))}
-        parties: dict[str, UUID] = {}
-
-        def party_for(committee: str) -> UUID:
-            label = " ".join(committee.split())
-            if label in parties:
-                return parties[label]
-            item = next((code for text, code in ITEMS.items() if label.upper().rstrip('"').endswith(text)), None)
-            if item is not None and item in by_item:
-                party = parties[label] = by_item[item]
-                return party
-            party = parties[label] = cs.key("pl.party", slug(label))
-            if party not in existing:
-                cs.add("party", id=party, kind="party", polity_id=poland)
-                name(party, label, "pl")
-                existing.add(party)
+    def party_for(committee: str) -> UUID:
+        label = " ".join(committee.split())
+        if label in parties:
+            return parties[label]
+        # A committee the pipeline already keyed keeps its party, so a Wikidata party loaded later does not move
+        # its candidates.
+        item = next((code for text, code in ITEMS.items() if label.upper().rstrip('"').endswith(text)), None)
+        if item is not None and item in by_item and ("pl.party", slug(label)) not in cs.own_keys:
+            party = parties[label] = by_item[item]
             return party
+        party = parties[label] = cs.key("pl.party", slug(label))
+        if party in cs.minted and party not in written:
+            cs.add("party", id=party, kind="party", polity_id=poland)
+            name(party, label, "pl")
+            written.add(party)
+        return party
 
-        cs.scope_units("pl.obwod", f"{day}:%")
-        areas = {
-            code[:6]: area
-            for code, area in conn.execute(
-                "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'pl.gmina'"
-            ).fetchall()
-        }
-        prefixes = Counter(
-            code[:6]
-            for (code,) in conn.execute(
-                "select c.code from area a join area_code c on c.area_id = a.id where a.scheme_code = 'pl.gmina'"
-            ).fetchall()
-        )
-        powiats = dict(
-            conn.execute(
-                "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'pl.powiat'"
-            ).fetchall()
-        )
-        shaped = (
-            {
-                code
-                for (code,) in conn.execute(
-                    "select c.code from area a join area_code c on c.area_id = a.id join area_geometry g on g.area_id = a.id"
-                    " where a.scheme_code = 'pl.okreg_senat'"
-                ).fetchall()
-            }
-            if vintage
-            else set()
-        )
-        unit_rows: dict[UUID, dict[str, str | None]] = {}
-        values: list[tuple[str, str, str | None, int, int]] = []
+    areas = gmina_areas(conn)
+    powiats = dict(
+        conn.execute(
+            "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'pl.powiat'"
+        ).fetchall()
+    )
+    unit_rows: dict[UUID, dict[str, str | None]] = {}
+    values: list[tuple[str, str, str | None, int, int]] = []
 
-        def gmina_unit(code: str) -> UUID:
-            unit = cs.unit("pl.gmina", code)
-            if unit not in unit_rows:
-                area = areas.get(code) if prefixes[code] == 1 and len(code) == 6 else None
-                unit_rows[unit] = {
-                    "scheme_code": "pl.gmina",
-                    "code": code,
-                    "parent_id": None,
-                    "area_relation": "equals" if area is not None else "unlocated",
-                    "area_id": None if area is None else str(area),
-                    "kind": "standard" if code.isdigit() else "aggregate",
-                }
-            return unit
-
-        def powiat_unit(code: str) -> UUID:
-            short = code[:4] if code.isdigit() else code
-            unit = cs.unit("pl.powiat", short)
-            if unit not in unit_rows:
-                area = powiats.get(short)
-                unit_rows[unit] = {
-                    "scheme_code": "pl.powiat",
-                    "code": short,
-                    "parent_id": None,
-                    "area_relation": "equals" if area is not None else "unlocated",
-                    "area_id": None if area is None else str(area),
-                    "kind": "standard" if code.isdigit() else "aggregate",
-                }
-            return unit
-
-        accounting = units.with_columns(unusable=pl.col("cast") - pl.col("valid"))
-        figures = ((REGISTERED, "electors"), (BALLOTS, "cast"), (VALID_BALLOTS, "valid"), (INVALID, "unusable"))
-
-        def put(result_set: UUID, unit: UUID, row: dict[str, int | None]) -> None:
-            for measure, column_name in figures:
-                figure = row.get(column_name)
-                if figure is not None:
-                    values.append((str(result_set), str(unit), None, measure, figure))
-
-        def summed(frame: pl.DataFrame) -> dict[str, int | None]:
-            return {
-                column_name: None if frame[column_name].null_count() == frame.height else int(frame[column_name].sum())
-                for _, column_name in figures
-            }
-
-        def make_set(contest: UUID, key: str, label: str, default: bool, completeness: float, note: str) -> UUID:
-            result_set = cs.key(f"{SOURCE}.result_set", f"{key}:{label}")
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=election,
-                contest_id=contest,
-                stage="official",
-                kind="counted",
-                status="active",
-                source_id=source,
-                is_default=default,
-                completeness=completeness,
-            )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
-            return result_set
-
-        path = f"pl/{day}-general"
-        for entry in districts.sort("district").iter_rows(named=True):
-            number = entry["district"]
-            key = f"{day}:senat:{number}"
-            seat = f" ({entry['seat']})" if entry["seat"] else ""
-            code = area_code(vintage, number) if vintage else None
-            area = cs.area("pl.okreg_senat", code) if code is not None and code in shaped else None
-            contest = cs.key(f"{SOURCE}.contest", key)
-            cs.add(
-                "contest",
-                id=contest,
-                election_id=election,
-                kind="body_seats",
-                body_id=senat,
-                district_area_id=area,
-                magnitude=entry["magnitude"],
-                electoral_system_id=system,
-                default_result_kind="counted",
-            )
-            name(contest, f"Senate constituency {number}{seat}")
-            name(contest, f"Okręg wyborczy nr {number} do Senatu{seat}", "pl", "native")
-            cs.add("slug", path=f"{path}/senat/{number}", entity_id=contest)
-            people = candidates.filter(pl.col("district") == number).sort("votes", descending=True)
-            options: dict[int, UUID] = {}
-            for position, row in enumerate(people.sort("number").iter_rows(named=True), 1):
-                tag = f"{key}:{row['number']}"
-                option = options[row["number"]] = cs.key(f"{SOURCE}.option", tag)
-                cs.add(
-                    "contest_option",
-                    id=option,
-                    contest_id=contest,
-                    kind="candidate",
-                    party_id=None if row["committee"] is None else party_for(row["committee"]),
-                    ballot_position=position,
-                    ballot_label=display(row["name"], "pl"),
-                )
-                person = cs.key(f"{SOURCE}.person", tag)
-                cs.add("person", id=person, gender=row["sex"] if row["sex"] in ("male", "female") else None)
-                name(person, display(row["name"], "pl"))
-                cs.add(
-                    "candidacy",
-                    id=cs.key(f"{SOURCE}.candidacy", tag),
-                    person_id=person,
-                    option_id=option,
-                    role="head",
-                    ballot_name=row["name"],
-                    is_independent=False,
-                )
-            district_unit = cs.unit("pl.okreg_senat", f"{day}:{number}")
-            unit_rows[district_unit] = {
-                "scheme_code": "pl.okreg_senat",
-                "code": f"{day}:{number}",
+    def gmina_unit(code: str) -> UUID:
+        unit = cs.unit("pl.gmina", code)
+        if unit not in unit_rows:
+            area = areas.get(code) if len(code) == 6 else None
+            unit_rows[unit] = {
+                "scheme_code": "pl.gmina",
+                "code": code,
                 "parent_id": None,
                 "area_relation": "equals" if area is not None else "unlocated",
                 "area_id": None if area is None else str(area),
-                "kind": "standard",
+                "kind": "standard" if code.isdigit() else "aggregate",
             }
-            here = accounting.filter(pl.col("district") == number)
-            note = DISTRICT_METHOD + ("" if single else BLOCK_NOTE)
-            if not here.height:
-                note = note.split(" Accounting")[0] + NO_UNITS + ("" if single else BLOCK_NOTE)
-            elif year == 2005:
-                note += POWIAT_NOTE
-            official = int(people["votes"].sum())
-            district_set = make_set(contest, key, "district", True, 1, note)
-            if here.height:
-                put(district_set, district_unit, summed(here))
-            winners = 0
-            for row in people.iter_rows(named=True):
-                values.append((str(district_set), str(district_unit), str(options[row["number"]]), VOTES, row["votes"]))
-                if row["elected"]:
-                    winners += 1
-                    cs.add(
-                        "outcome",
-                        result_set_id=district_set,
-                        option_id=options[row["number"]],
-                        kind="elected",
-                        seats=None,
-                    )
-            if winners != entry["magnitude"]:
-                raise ValueError(f"{key}: {winners} elected for {entry['magnitude']} seats")
-            if not here.height:
-                continue
-            votes = unit_votes.filter(pl.col("district") == number)
-            got = int(votes["votes"].sum())
-            completeness = min(got / official, 1) if official else 1
-            extra = OLD_CODES if year < 1999 else ""
-            if got != official:
-                extra += (
-                    f" The polling-district rows add up to {got:,} candidate votes against the constituency total of "
-                    f"{official:,}; both are stored as printed."
+        return unit
+
+    def powiat_unit(code: str) -> UUID:
+        short = code[:4] if code.isdigit() else code
+        unit = cs.unit("pl.powiat", short)
+        if unit not in unit_rows:
+            area = powiats.get(short)
+            unit_rows[unit] = {
+                "scheme_code": "pl.powiat",
+                "code": short,
+                "parent_id": None,
+                "area_relation": "equals" if area is not None else "unlocated",
+                "area_id": None if area is None else str(area),
+                "kind": "standard" if code.isdigit() else "aggregate",
+            }
+        return unit
+
+    accounting = units.with_columns(unusable=pl.col("cast") - pl.col("valid"))
+    figures = ((REGISTERED, "electors"), (BALLOTS, "cast"), (VALID_BALLOTS, "valid"), (INVALID, "unusable"))
+
+    def put(result_set: UUID, unit: UUID, row: dict[str, int | None]) -> None:
+        for measure, column_name in figures:
+            figure = row.get(column_name)
+            # Two 2001 polling districts print more valid votes than ballots taken from the urn, so they have no
+            # invalid figure; their gmina and constituency still take the difference of the sums.
+            if figure is not None and not (measure == INVALID and figure < 0):
+                values.append((str(result_set), str(unit), None, measure, figure))
+
+    def summed(frame: pl.DataFrame) -> dict[str, int | None]:
+        return {
+            column_name: None if frame[column_name].null_count() == frame.height else int(frame[column_name].sum())
+            for _, column_name in figures
+        }
+
+    def make_set(contest: UUID, key: str, label: str, default: bool, completeness: float, note: str) -> UUID:
+        result_set = cs.key(f"{SOURCE}.result_set", f"{key}:{label}")
+        cs.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            status="active",
+            source_id=source,
+            is_default=default,
+            completeness=completeness,
+        )
+        cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
+        return result_set
+
+    path = f"pl/{day}-general"
+    for entry in districts.sort("district").iter_rows(named=True):
+        number = entry["district"]
+        key = f"{day}:senat:{number}"
+        seat = f" ({entry['seat']})" if entry["seat"] else ""
+        code = area_code(vintage, number) if vintage else None
+        area = cs.area("pl.okreg_senat", code) if code is not None and code in shaped else None
+        contest = cs.key(f"{SOURCE}.contest", key)
+        cs.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="body_seats",
+            body_id=senat,
+            district_area_id=area,
+            magnitude=entry["magnitude"],
+            electoral_system_id=system,
+            default_result_kind="counted",
+        )
+        name(contest, f"Senate constituency {number}{seat}")
+        name(contest, f"Okręg wyborczy nr {number} do Senatu{seat}", "pl", "native")
+        cs.add("slug", path=f"{path}/senat/{number}", entity_id=contest)
+        people = candidates.filter(pl.col("district") == number).sort("votes", descending=True)
+        options: dict[int, UUID] = {}
+        for position, row in enumerate(people.sort("number").iter_rows(named=True), 1):
+            tag = f"{key}:{row['number']}"
+            option = options[row["number"]] = cs.key(f"{SOURCE}.option", tag)
+            cs.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                party_id=None if row["committee"] is None else party_for(row["committee"]),
+                ballot_position=position,
+                ballot_label=display(row["name"], "pl"),
+            )
+            person = cs.key(f"{SOURCE}.person", tag)
+            if person not in taken:
+                cs.add("person", id=person, gender=row["sex"] if row["sex"] in ("male", "female") else None)
+            name(person, display(row["name"], "pl"))
+            cs.add(
+                "candidacy",
+                id=cs.key(f"{SOURCE}.candidacy", tag),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=row["name"],
+                is_independent=False,
+            )
+        district_unit = cs.unit("pl.okreg_senat", f"{day}:{number}")
+        unit_rows[district_unit] = {
+            "scheme_code": "pl.okreg_senat",
+            "code": f"{day}:{number}",
+            "parent_id": None,
+            "area_relation": "equals" if area is not None else "unlocated",
+            "area_id": None if area is None else str(area),
+            "kind": "standard",
+        }
+        here = accounting.filter(pl.col("district") == number)
+        note = DISTRICT_METHOD + ("" if single else BLOCK_NOTE)
+        if not here.height:
+            note = note.split(" Accounting")[0] + NO_UNITS + ("" if single else BLOCK_NOTE)
+        elif year == 2005:
+            note += POWIAT_NOTE
+        official = int(people["votes"].sum())
+        district_set = make_set(contest, key, "district", True, 1, note)
+        if here.height:
+            put(district_set, district_unit, summed(here))
+        winners = 0
+        for row in people.iter_rows(named=True):
+            values.append((str(district_set), str(district_unit), str(options[row["number"]]), VOTES, row["votes"]))
+            if row["elected"]:
+                winners += 1
+                cs.add(
+                    "outcome",
+                    result_set_id=district_set,
+                    option_id=options[row["number"]],
+                    kind="elected",
+                    seats=None,
                 )
-            if year == 2005:
-                powiat_set = make_set(contest, key, "powiat", False, completeness, POWIAT_METHOD + extra)
-                for row in here.iter_rows(named=True):
-                    put(powiat_set, powiat_unit(row["gmina"]), row)
-                for row in votes.iter_rows(named=True):
-                    values.append(
-                        (
-                            str(powiat_set),
-                            str(powiat_unit(row["gmina"])),
-                            str(options[row["number"]]),
-                            VOTES,
-                            row["votes"],
-                        )
-                    )
-                continue
-            gmina_set = make_set(contest, key, "gmina", False, completeness, GMINA_METHOD + extra)
-            obwod_set = make_set(contest, key, "obwod", False, completeness, OBWOD_METHOD + extra)
-            for code_, frame in here.group_by("gmina"):
-                put(gmina_set, gmina_unit(str(code_[0])), summed(frame))
-            for row in votes.group_by("gmina", "number").agg(pl.col("votes").sum()).iter_rows(named=True):
-                values.append(
-                    (str(gmina_set), str(gmina_unit(row["gmina"])), str(options[row["number"]]), VOTES, row["votes"])
-                )
-            lookup: dict[tuple[str, str], UUID] = {}
+        if winners != entry["magnitude"]:
+            raise ValueError(f"{key}: {winners} elected for {entry['magnitude']} seats")
+        if not here.height:
+            continue
+        votes = unit_votes.filter(pl.col("district") == number)
+        got = int(votes["votes"].sum())
+        completeness = min(got / official, 1) if official else 1
+        extra = OLD_CODES if year < 1999 else ""
+        if got != official:
+            extra += (
+                f" The polling-district rows add up to {got:,} candidate votes against the constituency total of "
+                f"{official:,}; both are stored as printed."
+            )
+        if year == 2005:
+            powiat_set = make_set(contest, key, "powiat", False, completeness, POWIAT_METHOD + extra)
             for row in here.iter_rows(named=True):
-                unit_code = f"{day}:{row['gmina']}:{row['commission']}"
-                unit = lookup[(row["gmina"], row["commission"])] = cs.unit("pl.obwod", unit_code)
-                unit_rows[unit] = {
-                    "scheme_code": "pl.obwod",
-                    "code": unit_code,
-                    "parent_id": str(gmina_unit(row["gmina"])),
-                    "area_relation": "unlocated",
-                    "area_id": None,
-                    "kind": "standard" if row["gmina"].isdigit() else "aggregate",
-                }
-                put(obwod_set, unit, row)
+                put(powiat_set, powiat_unit(row["gmina"]), row)
             for row in votes.iter_rows(named=True):
                 values.append(
                     (
-                        str(obwod_set),
-                        str(lookup[(row["gmina"], row["commission"])]),
+                        str(powiat_set),
+                        str(powiat_unit(row["gmina"])),
                         str(options[row["number"]]),
                         VOTES,
                         row["votes"],
                     )
                 )
+            continue
+        gmina_set = make_set(contest, key, "gmina", False, completeness, GMINA_METHOD + extra)
+        obwod_set = make_set(contest, key, "obwod", False, completeness, OBWOD_METHOD + extra)
+        for code_, frame in here.group_by("gmina"):
+            put(gmina_set, gmina_unit(str(code_[0])), summed(frame))
+        for row in votes.group_by("gmina", "number").agg(pl.col("votes").sum()).iter_rows(named=True):
+            values.append(
+                (str(gmina_set), str(gmina_unit(row["gmina"])), str(options[row["number"]]), VOTES, row["votes"])
+            )
+        lookup: dict[tuple[str, str], UUID] = {}
+        for row in here.iter_rows(named=True):
+            unit_code = f"{day}:{row['gmina']}:{row['commission']}"
+            unit = lookup[(row["gmina"], row["commission"])] = cs.unit("pl.obwod", unit_code)
+            unit_rows[unit] = {
+                "scheme_code": "pl.obwod",
+                "code": unit_code,
+                "parent_id": str(gmina_unit(row["gmina"])),
+                "area_relation": "unlocated",
+                "area_id": None,
+                "kind": "standard" if row["gmina"].isdigit() else "aggregate",
+            }
+            put(obwod_set, unit, row)
+        for row in votes.iter_rows(named=True):
+            values.append(
+                (
+                    str(obwod_set),
+                    str(lookup[(row["gmina"], row["commission"])]),
+                    str(options[row["number"]]),
+                    VOTES,
+                    row["votes"],
+                )
+            )
 
-        minted = [
-            {"id": str(unit), "polity_id": str(poland), **row}
-            for unit, row in unit_rows.items()
-            if unit in cs.minted or row["scheme_code"] == "pl.okreg_senat"
-        ]
-        cs.frame(
-            "reporting_unit", pl.DataFrame(minted, schema_overrides={"parent_id": pl.String, "area_id": pl.String})
-        )
-        cs.frame(
-            "result_value",
-            pl.DataFrame(
-                values,
-                schema={
-                    "result_set_id": pl.String,
-                    "unit_id": pl.String,
-                    "option_id": pl.String,
-                    "measure": pl.Int16,
-                    "value": pl.Int64,
-                },
-                orient="row",
-            ).with_columns(channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)),
-        )
-        return cs.write()
+    minted = [
+        {"id": str(unit), "polity_id": str(poland), **row}
+        for unit, row in unit_rows.items()
+        if unit in cs.minted or row["scheme_code"] == "pl.okreg_senat"
+    ]
+    cs.frame("reporting_unit", pl.DataFrame(minted, schema_overrides={"parent_id": pl.String, "area_id": pl.String}))
+    cs.frame(
+        "result_value",
+        pl.DataFrame(
+            values,
+            schema={
+                "result_set_id": pl.String,
+                "unit_id": pl.String,
+                "option_id": pl.String,
+                "measure": pl.Int16,
+                "value": pl.Int64,
+            },
+            orient="row",
+        ).with_columns(channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)),
+    )
