@@ -24,6 +24,7 @@ from ea.store import DATA
 
 GERMANY = "01a13bb5-c550-7079-8650-a96e2b145352"
 STATES = {
+    "08": ("DE-BW", "01a13bb5-c563-741b-83f7-4b7aeca76288", "01a13bb5-c563-741b-83f7-4b7b14460236"),
     "12": ("DE-BB", "01a13bb5-c563-741b-83f7-4b829f1533bb", "01a13bb5-c563-741b-83f7-4b836b8e1aa9"),
     "13": ("DE-MV", "01a13bb5-c563-741b-83f7-4b845c3bd9f1", "01a13bb5-c563-741b-83f7-4b85f8bf5685"),
     "14": ("DE-SN", "01a13bb5-c563-741b-83f7-4b86faa1ed93", "01a13bb5-c563-741b-83f7-4b87a8e71a4b"),
@@ -32,9 +33,18 @@ STATES = {
 }
 KINDS = {"P": "party", "PV": "party", "LV": "bloc", "WG": "independent_group"}
 # Entries that name no party: an independent candidate, or all voters' groups or all independents of a municipality
-# printed as one sum.
-NO_PARTY = {"EB", "OW", "OE", "OS"}
-OPTION_KINDS = {"EB": "candidate", "OW": "others", "OE": "others", "OS": "others"}
+# printed as one sum, a category of local lists, the votes of a council elected by majority vote, or votes the source
+# does not split by list.
+NO_PARTY = {"EB", "OW", "OE", "OS", "OC", "MW", "NA"}
+OPTION_KINDS = {
+    "EB": "candidate",
+    "OW": "others",
+    "OE": "others",
+    "OS": "others",
+    "OC": "others",
+    "MW": "others",
+    "NA": "others",
+}
 
 
 class Entry(NamedTuple):
@@ -44,6 +54,7 @@ class Entry(NamedTuple):
     kind: str  # P party, PV political association, LV joint list, WG voters' group, EB independent candidate, OW/OE/OS sums of voters' groups, independents, other parties
     votes: int | None
     seats: int | None
+    party: str | None = None  # a party production already holds, used instead of minting one
 
 
 class Result(NamedTuple):
@@ -232,7 +243,7 @@ def registry(land: Land, votes: Iterable[Vote]) -> Package:
     for vote in votes:
         for result in vote.results:
             for entry in result.entries:
-                if entry.kind in NO_PARTY:
+                if entry.kind in NO_PARTY or entry.party:
                     continue
                 labels.setdefault(party_key(entry, result.ags), (entry.label, entry.kind))
     for folded, (text, kind) in sorted(labels.items()):
@@ -382,14 +393,16 @@ def election(land: Land, vote: Vote, name: str) -> Package:
             option = key(land, "option", name, ags, position)
             partyless = entry.kind in NO_PARTY
             folded = party_key(entry, ags)
-            if not partyless:
+            if entry.party and not partyless:
+                p.external.add(entry.party)
+            elif not partyless:
                 parties.add(folded)
             p.add(
                 "contest_option",
                 id=option,
                 contest_id=contest,
                 kind=OPTION_KINDS.get(entry.kind, "list"),
-                party_id=None if partyless else party(land, folded),
+                party_id=None if partyless else entry.party or party(land, folded),
                 ballot_position=position,
                 ballot_label=label(entry.label),
             )
