@@ -3338,6 +3338,20 @@
           "checked_at": "2026-11-13",
           "source": "sardegna_elezioni",
           "evidence": "the region's results site; years not yet read"
+        },
+        {
+          "platform": "Regione Siciliana, portale elezioni (elezioni comunali)",
+          "url": "https://www.elezioni.regione.sicilia.it/comunali{YYYY}/primoTurno/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-20",
+          "checked_at": "2026-11-20",
+          "first_date": "2009-06-06",
+          "last_date": "2026-05-24",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "source": "sicilia_elezioni",
+          "evidence": "a report per municipality for each round from 2009 to 2026 (first rounds under comunali{YYYY}/primoTurno/ from 2009 to 2024 and comunali2025/ and comunali2026/primoTurno/, runoffs under comunali{YYYY}/ from 2009 to 2024): registered voters, voters, each mayoral candidate's votes, each list's votes and council seats; the voters and electors tie to the portal's turnout table for every municipality read"
         }
       ],
       "est_votes": 28000000,
@@ -4570,6 +4584,20 @@
           "checked_at": "2026-11-13",
           "source": "sardegna_elezioni",
           "evidence": "the region's results site; years not yet read"
+        },
+        {
+          "platform": "Regione Siciliana, portale elezioni (elezioni comunali)",
+          "url": "https://www.elezioni.regione.sicilia.it/comunali{YYYY}/primoTurno/",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-20",
+          "checked_at": "2026-11-20",
+          "first_date": "2009-06-06",
+          "last_date": "2026-05-24",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "source": "sicilia_elezioni",
+          "evidence": "a report per municipality for each round from 2009 to 2026 (first rounds under comunali{YYYY}/primoTurno/ from 2009 to 2024 and comunali2025/ and comunali2026/primoTurno/, runoffs under comunali{YYYY}/ from 2009 to 2024): registered voters, voters, each mayoral candidate's votes, each list's votes and council seats; the voters and electors tie to the portal's turnout table for every municipality read"
         }
       ],
       "est_votes": 28000000,
