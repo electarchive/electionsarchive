@@ -1,16 +1,17 @@
 import re
 import struct
 import subprocess
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import TypedDict
 from uuid import UUID
 
-from ea import raw
-from ea.changeset import Changeset
+from ea import package, raw
+from ea.package import Draft
 from ea.store import DATA, connect
 
 SOURCE = "id.mpr_president"
+KEY = f"{SOURCE}/all"
 VERSION = "1"
 URL = (
     "https://www.mpr.go.id/dokumen/risalah/file/24%20Risalah%20Perubahan%20Undang-Undang%20Dasar%20Negara%20Republik"
@@ -18,6 +19,10 @@ URL = (
 )
 TITLE = "Risalah Perubahan Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Tahun Sidang 1999"
 PUBLISHER = "Sekretariat Jenderal Majelis Permusyawaratan Rakyat Republik Indonesia"
+SUMMARY = (
+    "Indonesia's 1999 elections of the President and the Vice President by the People's Consultative Assembly, from "
+    "the MPR's minutes"
+)
 MEASURES = {"votes": 1, "ballots": 3, "blank": 6, "present": 20}
 METHODOLOGY = (
     "Under Article 6(2) of the 1945 Constitution as it stood in 1999, the People's Consultative Assembly (MPR) "
@@ -93,6 +98,14 @@ def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".pdf")
 
 
+def parse() -> None:
+    print(build())
+
+
+def emit() -> None:
+    package.run("load", [KEY])
+
+
 def locate(path: Path, page: int, anchor: str, value: int) -> tuple[float, float, float, float]:
     xml = subprocess.run(
         ["pdftotext", "-f", str(page), "-l", str(page), "-bbox", str(path), "-"],
@@ -120,19 +133,103 @@ def locate(path: Path, page: int, anchor: str, value: int) -> tuple[float, float
     return x0 / width, y0 / height, x1 / width, y1 / height
 
 
-def emit() -> Path:
-    cached = raw.cached(SOURCE, URL)
+class Book:
+    """One Risalah volume: its cached PDF, or, where the cache lacks it, the archive's record of the file, its page
+    renders, and the boxes `locate` found in it. The 1999 volume (169 MB) is cached only where it was first fetched,
+    and mpr.go.id refuses scripted requests from elsewhere, so a rebuild there reads what the first build recorded."""
+
+    def __init__(self, cs: Draft, url: str, source: UUID) -> None:
+        self.cs = cs
+        if url in raw.keys(SOURCE):
+            self.cached: raw.Artifact | None = raw.cached(SOURCE, url)
+            artifact = self.cached
+        else:
+            self.cached = None
+            row = cs.conn.execute(
+                """select a.sha256, a.storage_key, a.retrieved_at, a.media_type, a.bytes
+                   from source_artifact a join changeset c on c.id = a.changeset_id
+                   where c.pipeline = %s and a.url = %s""",
+                [SOURCE, url],
+            ).fetchone()
+            if row is None:
+                raise LookupError(f"{url} is neither in the {SOURCE} raw cache nor recorded; run `ea fetch {SOURCE}`")
+            sha256, storage_key, retrieved_at, media_type, size = row
+            if not isinstance(retrieved_at, datetime):
+                raise TypeError(f"{url}: retrieved_at is {retrieved_at!r}")
+            artifact = raw.Artifact(
+                source=SOURCE,
+                url=url,
+                sha256=str(sha256),
+                path=DATA / str(storage_key),
+                retrieved_at=retrieved_at,
+                media_type=None if media_type is None else str(media_type),
+                bytes=int(size),
+            )
+        self.sha256 = artifact.sha256
+        self.id = cs.artifact(artifact, source)
+        self.pages: dict[int, UUID] = {}
+        self.recorded: dict[int, tuple[int, int]] = {}
+        self.boxes: dict[tuple[int, int], list[tuple[float, float, float, float]]] = {}
+        if self.cached is None:
+            for number, width, height in cs.conn.execute(
+                "select page_number, width, height from source_page where artifact_id = %s", [self.id]
+            ).fetchall():
+                self.recorded[int(number)] = (int(width), int(height))
+            for number, value, x0, y0, x1, y1 in cs.conn.execute(
+                """select p.page_number, v.value, l.x0, l.y0, l.x1, l.y1 from value_locator l
+                   join source_page p on p.id = l.page_id
+                   join result_set r on r.k = l.result_set_k
+                   join result_value v on v.result_set_k = l.result_set_k and v.unit_k = l.unit_k
+                    and v.option_k = l.option_k and v.channel = l.channel and v.measure = l.measure
+                    and v.count_round = l.count_round
+                   where p.artifact_id = %s""",
+                [self.id],
+            ).fetchall():
+                self.boxes.setdefault((int(number), int(value)), []).append(
+                    (float(x0), float(y0), float(x1), float(y1))
+                )
+
+    def page(self, number: int) -> UUID:
+        if number not in self.pages:
+            image = DATA / "pages" / SOURCE / f"{self.sha256}-{number}.png"
+            if image.exists():
+                width, height = struct.unpack(">II", image.read_bytes()[16:24])
+            elif self.cached is not None:
+                image.parent.mkdir(parents=True, exist_ok=True)
+                subprocess.run(
+                    ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                    + [str(self.cached.path), str(image.with_suffix(""))],
+                    check=True,
+                )
+                width, height = struct.unpack(">II", image.read_bytes()[16:24])
+            else:
+                width, height = self.recorded[number]
+            self.pages[number] = self.cs.page(self.id, number)
+            self.cs.add(
+                "source_page",
+                id=self.pages[number],
+                artifact_id=self.id,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{image.name}",
+                width=width,
+                height=height,
+            )
+        return self.pages[number]
+
+    def locate(self, number: int, anchor: str, value: int) -> tuple[float, float, float, float]:
+        if self.cached is not None:
+            return locate(self.cached.path, number, anchor, value)
+        found = self.boxes.get((number, value), [])
+        if len(found) != 1:
+            raise ValueError(f"page {number}: {len(found)} recorded boxes for {anchor} {value}")
+        return found[0]
+
+
+def build() -> Path:
+    """Write the package id.mpr_president/all. It reads the database, through Draft, so the rows it rebuilds keep
+    the ids the changeset path gave them."""
     with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary=(
-                "Indonesia's 1999 elections of the President and the Vice President by the People's Consultative "
-                "Assembly, from the MPR's minutes"
-            ),
-            polity="ID",
-        )
+        cs = Draft(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="ID")
 
         def name(entity: UUID, text: str, lang: str = "id", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
@@ -155,42 +252,7 @@ def emit() -> Path:
             license="Public record: official minutes of the MPR, no license stated",
             license_url="https://www.mpr.go.id/risalah",
         )
-        artifact = cs.artifact(cached, source)
-        pages: dict[int, UUID] = {}
-
-        def page(number: int) -> UUID:
-            if number not in pages:
-                image = DATA / "pages" / SOURCE / f"{cached.sha256}-{number}.png"
-                if not image.exists():
-                    image.parent.mkdir(parents=True, exist_ok=True)
-                    subprocess.run(
-                        [
-                            "pdftoppm",
-                            "-r",
-                            "100",
-                            "-png",
-                            "-f",
-                            str(number),
-                            "-l",
-                            str(number),
-                            "-singlefile",
-                            str(cached.path),
-                            str(image.with_suffix("")),
-                        ],
-                        check=True,
-                    )
-                width, height = struct.unpack(">II", image.read_bytes()[16:24])
-                pages[number] = cs.page(artifact, number)
-                cs.add(
-                    "source_page",
-                    id=pages[number],
-                    artifact_id=artifact,
-                    page_number=number,
-                    image_key=f"pages/{SOURCE}/{image.name}",
-                    width=width,
-                    height=height,
-                )
-            return pages[number]
+        book = Book(cs, URL, source)
 
         cs.add("scheme", code="id.assembly", polity_id=indonesia, kind="electoral_district", rank=0, noun="assembly")
         unit = cs.unit("id.assembly", "mpr")
@@ -280,8 +342,8 @@ def emit() -> Path:
                     "count_round": 0,
                 }
                 cs.add("result_value", **fact, flags=0, value=number)
-                x0, y0, x1, y1 = locate(cached.path, at, anchor, number)
-                cs.add("value_locator", **fact, page_id=page(at), source_id=None, x0=x0, y0=y0, x1=x1, y1=y1)
+                x0, y0, x1, y1 = book.locate(at, anchor, number)
+                cs.add("value_locator", **fact, page_id=book.page(at), source_id=None, x0=x0, y0=y0, x1=x1, y1=y1)
 
             value(None, "present", vote["attendance"][1], vote["attendance"][0], "Hadir")
             for measure, anchor, number in vote["totals"]:
