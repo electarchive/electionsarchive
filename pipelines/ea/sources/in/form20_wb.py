@@ -555,6 +555,8 @@ def seats(state: str) -> list[Seat]:
         held = [sheets[n] for n in c.segments if n in sheets]
         missing = [n for n in c.segments if n not in sheets]
         missing += [n for n, among in ASSAM_UNPLACED.items() if state == "AS" and c.number in among]
+        if not held:  # no sheet of this constituency has been saved, so it has no candidates to list
+            continue
         if state == "KA" and len(held) != 8:
             missing = [-1] * (8 - len(held))
         counts = {len(x.heads) for x in held}
