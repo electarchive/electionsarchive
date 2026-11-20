@@ -11,6 +11,7 @@ department and mayoral blocks; 2019 one contest per page. The scanned memoria of
 Assembly election is read in `gt.memoria1984`.
 """
 
+import json
 import re
 import subprocess
 from collections import Counter, defaultdict
@@ -1030,8 +1031,35 @@ def _organizations(year: int) -> dict[str, tuple[str, str, str]]:
     return found
 
 
+PINNED: dict[str, dict[str, list[list]]] = json.loads((Path(__file__).parent / "memoria_registry.json").read_text())
+"""The pages and organizations of a scanned memoria's registry as loaded, by year: [page, width, height] and [the
+municipality code of a civic committee or "", label, printed label, kind]. OCR builds read some pages and committee
+labels differently, and the election packages of other builds still cite the registry's rows, so the registry of a
+pinned year is written from this list and an election that cites a page or organization outside it fails to build."""
+
+
+def _pinned(year: int) -> tuple[dict[int, tuple[int, int]], dict[str, tuple[str, str, str]]]:
+    """A pinned registry's page sizes by page, and its organizations by id with their label, printed label, and kind."""
+    pin = PINNED[str(year)]
+    pages = {int(page): (int(width), int(height)) for page, width, height in pin["pages"]}
+    organizations = {
+        key("party", "committee", code, found) if code else key("party", found): (found, printed, kind)
+        for code, found, printed, kind in pin["organizations"]
+    }
+    return pages, organizations
+
+
+def _cited_pages(contests: dict[str, Contest]) -> set[int]:
+    return {w.page for contest in contests.values() for row in contest.rows.values() for w in row if w} | {
+        who.page for contest in contests.values() for who in contest.members
+    }
+
+
 def registry(year: int) -> Package:
+    """The year's organizations and the pages its numbers cite; a pinned year's are written without reading it, and
+    it prints no contest only as a national total."""
     m = BY_YEAR[year]
+    pinned = str(year) in PINNED
     p = Package(
         f"{SOURCE}/{year}-registry",
         SOURCE,
@@ -1040,7 +1068,6 @@ def registry(year: int) -> Package:
         depends=["gt.tse/geo"],
     )
     p.external |= {GUATEMALA}
-    contests, _ = read(year)
     source = key("source", year)
     p.add(
         "source",
@@ -1054,12 +1081,17 @@ def registry(year: int) -> Package:
         attribution="Tribunal Supremo Electoral (TSE), Guatemala",
     )
     artifact_ids = {a.path: p.artifact(a, source) for a in artifacts(m)}
-    pages = {w.page for contest in contests.values() for row in contest.rows.values() for w in row if w} | {
-        who.page for contest in contests.values() for who in contest.members
-    }
-    for page in sorted(pages):
+    if pinned:
+        sizes, organizations = _pinned(year)
+    else:
+        contests, _ = read(year)
+        organizations = _organizations(year)
+        sizes = {}
+        for page in _cited_pages(contests):
+            artifact, local = located(m, page)
+            sizes[page] = SIZES[(artifact.path, local)]
+    for page, (width, height) in sorted(sizes.items()):
         artifact, local = located(m, page)
-        width, height = SIZES[(artifact.path, local)]
         p.add(
             "source_page",
             id=key("page", year, page),
@@ -1069,7 +1101,7 @@ def registry(year: int) -> Package:
             width=width,
             height=height,
         )
-    if NATION in _units(year):
+    if not pinned and NATION in _units(year):
         p.external.add(COUNTRY)
         p.add(
             "scheme",
@@ -1080,10 +1112,25 @@ def registry(year: int) -> Package:
             noun="country",
             code_system="tse",
         )
-    for id, (_, printed, kind) in sorted(_organizations(m.year).items()):
+    for id, (_, printed, kind) in sorted(organizations.items()):
         p.add("party", id=id, kind=kind, polity_id=GUATEMALA)
         p.name(id, printed, "es", "abbreviation")
     return p
+
+
+def _check_pinned(year: int, contests: dict[str, Contest]) -> None:
+    """Fail when a pinned year's contests cite a page or an organization its pinned registry lacks."""
+    if str(year) not in PINNED:
+        return
+    pages, organizations = _pinned(year)
+    cited = _cited_pages(contests)
+    if NATION in _units(year):
+        raise ValueError(f"{year}: a contest printed only as a national total needs the gt.pais scheme in its registry")
+    if cited - set(pages):
+        raise ValueError(f"{year}: pages {sorted(cited - set(pages))} are not in memoria_registry.json")
+    absent = sorted(set(_organizations(year)) - set(organizations))
+    if absent:
+        raise ValueError(f"{year}: organizations {absent} are not in memoria_registry.json")
 
 
 SOURCE_NOTE = (
@@ -1180,6 +1227,7 @@ def _family(contest: Contest) -> str:
 def election(year: int, day: date) -> Package:
     m = BY_YEAR[year]
     contests, _ = read(year)
+    _check_pinned(year, contests)
     first = day == m.general
     chosen = [c for c in contests.values() if (_family(c) == "general") == first]
     depends = ["gt.tse/geo", "gt.tse/registry", f"{SOURCE}/{year}-registry"]
