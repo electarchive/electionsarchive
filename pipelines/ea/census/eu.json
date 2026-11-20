@@ -461,6 +461,18 @@
       "url": "https://www.ombudsman.europa.eu/webpub/25years/en/index.html",
       "kind": "official_body"
     },
+    "eno-anjinho-2024": {
+      "title": "(EO) Teresa Anjinho elected as new European Ombudsman (2025-2029), Daily News of 17 December 2024",
+      "publisher": "European Network of Ombudsmen",
+      "url": "https://eno.ombudsman.europa.eu/home/news/archives-2024/maincontent/eo-teresa-anjinho-elected-as-new.html",
+      "kind": "official_body"
+    },
+    "statewatch-ombudsman-2005": {
+      "title": "EU: European Parliament re-elects Ombudsman",
+      "publisher": "Statewatch",
+      "url": "https://statewatch.org/news/2005/january/eu-european-parliament-re-elects-ombudsman",
+      "kind": "news_agency"
+    },
     "teu": {
       "title": "Consolidated version of the Treaty on European Union (OJ C 202, 7.6.2016), Articles 15 and 17",
       "publisher": "Publications Office of the European Union (EUR-Lex)",
@@ -2923,7 +2935,10 @@
           "date": "2005-01-01",
           "precision": "year",
           "election_kind": "indirect",
-          "note": "P. Nikiforos Diamandouros re-elected after the 2004 European election; not on the Ombudsman's timeline, not yet checked."
+          "contests": 1,
+          "source": "statewatch-ombudsman-2005",
+          "quote": "The European Parliament has voted to re-elect P. Nikiforos Diamandouros as European Ombudsman with 564 votes out of a total of 643 votes cast.",
+          "note": "Re-elected after the 2004 European election; the year is the source's publication year, and the day is not yet checked against the plenary minutes."
         },
         {
           "date": "2010-01-01",
@@ -2938,10 +2953,12 @@
           "note": "Emily O'Reilly re-elected after the 2014 European election; not on the Ombudsman's timeline, not yet checked."
         },
         {
-          "date": "2024-12-01",
-          "precision": "month",
+          "date": "2024-12-17",
+          "precision": "day",
           "election_kind": "indirect",
-          "note": "Teresa Anjinho elected (press release 20241212IPR25958); not yet checked."
+          "contests": 1,
+          "source": "eno-anjinho-2024",
+          "quote": "Teresa Anjinho has been elected European Ombudsman by the European Parliament with 344 votes in favour. Ms Anjinho will take office on 27 February 2025."
         }
       ]
     },
