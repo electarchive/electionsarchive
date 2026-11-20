@@ -11,6 +11,9 @@ from the files within reach:
   by polling station from the minutes of the polling boards (Form 16).
 - 2024: the decision of 18 May 2024, which gives the votes and seats of the lists that won seats in each unit.
 
+The decisions of 2020 and 2024 also name the deputies elected in each unit, by list; these are stored as list-member
+candidacies with elected outcomes. The decision of 2016 names none.
+
 Each Assembly is elected in six electoral units of 20 seats by closed lists and D'Hondt, and in 2011 to 2016 also in
 districts abroad. The decisions of 2016 and 2020 are scans; their cells were located and read by optical character
 recognition, checked against the printed national totals and seat counts, and stored in ``sec_scans.json`` with the
@@ -525,6 +528,112 @@ def conclusion_2024() -> dict[int, list[tuple[str, int, int]]]:
             raise ValueError(f"unit {unit}: cannot place {label!r}")
         found[unit].append((hits[0], int(match[2].replace(".", "")), int(match[3])))
     return found
+
+
+@dataclass(frozen=True)
+class Deputy:
+    """One deputy the Commission declared elected, in the order its decision lists them within the unit."""
+
+    unit: int
+    list_id: str
+    row: int  # the number the decision gives the deputy (in 2020 within the unit, in 2024 within the list)
+    mk: str  # the name in Macedonian, as printed
+    sq: str  # the name in the Latin alphabet of the Albanian text, as printed
+    page: int
+
+
+def elected_2020() -> list[Deputy]:
+    """The deputies of 2020, as transcribed from the decision's tables of each unit's elected candidates."""
+    stored = json.loads((Path(__file__).parent / "sec_scans.json").read_text(encoding="utf-8"))
+    return [
+        Deputy(
+            unit=int(row["unit"]),
+            list_id=str(row["list"]),
+            row=int(row["row"]),
+            mk=str(row["mk"]),
+            sq=str(row["sq"]),
+            page=int(row["page"]),
+        )
+        for row in stored["2020_elected"]
+    ]
+
+
+ELECTED_2024 = {
+    "ТВОЈА МАКЕДОНИЈА": "vmro",
+    "КОАЛИЦИЈА ЗА ЕВРОПСКА ИДНИНА": "sdsm",
+    "ЕВРОПСКИ ФРОНТ": "dui",
+    "КОАЛИЦИЈА ВЛЕН": "vlen",
+    "ЛЕВИЦА": "levica",
+    "ДВИЖЕЊЕ ЗНАМ": "znam",
+}
+
+
+def elected_2024() -> list[Deputy]:
+    """The deputies of 2024, from the decision's sections on the mandates of each unit.
+
+    Each section names a list and then numbers its deputies, one per line as "Macedonian / Albanian".
+    """
+    found: list[Deputy] = []
+    page = 1
+    unit = 0
+    current: str | None = None
+    inside = False
+    lines = subprocess.run(
+        ["pdftotext", "-layout", str(path("pdf24")), "-"], check=True, capture_output=True
+    ).stdout.decode("utf-8")
+    for number, text in enumerate(lines.split("\f"), 1):
+        page = number
+        rows = text.splitlines()
+        for i, line in enumerate(rows):
+            if "Утврдени мандати за пратеници" in line:
+                head = re.search(r"број (\d)", " ".join(rows[i : i + 4]))
+                if head is None:
+                    raise ValueError(f"page {page}: no unit for the mandates")
+                unit, inside, current = int(head[1]), True, None
+                continue
+            if re.search(r"Изборна единица (?:број )?\d / Nj", line) or "По спроведување на постапката" in line:
+                inside = False
+            if not inside:
+                continue
+            member = re.match(r"^\s+(\d{1,2})\.\s+(\S.*?)\s+/\s+(\S.*?)\s*$", line)
+            if member:
+                if current is None:
+                    raise ValueError(f"unit {unit}: a deputy before any list")
+                found.append(Deputy(unit, current, int(member[1]), clean(member[2]), clean(member[3]), page))
+                continue
+            label = line.upper().replace("“", "").replace("”", "").replace("„", "")
+            hits = {value for name, value in ELECTED_2024.items() if name in label}
+            if len(hits) == 1:
+                current = hits.pop()
+    return found
+
+
+def deputies(
+    p: Package, year: int, rs: str, options: dict[str, str], members: list[Deputy], seats: dict[str, int]
+) -> None:
+    """A list-member candidacy and an elected outcome for each deputy the decision names."""
+    day = DAYS[year]
+    counted: Counter[str] = Counter()
+    for deputy in members:
+        counted[deputy.list_id] += 1
+        tag = (day, deputy.unit, deputy.list_id, counted[deputy.list_id])
+        person = key("person", *tag)
+        p.add("person", id=person)
+        p.name(person, deputy.mk.title() if deputy.mk.isupper() else deputy.mk, "mk", "official")
+        p.name(person, deputy.sq.title() if deputy.sq.isupper() else deputy.sq, "sq", "official", False)
+        candidacy = key("candidacy", *tag)
+        p.add(
+            "candidacy",
+            id=candidacy,
+            person_id=person,
+            option_id=options[deputy.list_id],
+            role="list_member",
+            ballot_name=deputy.mk,
+        )
+        p.add("outcome", result_set_id=rs, option_id=options[deputy.list_id], candidacy_id=candidacy, kind="elected")
+    for list_id, n in counted.items():
+        if n > seats.get(list_id, 0):
+            raise ValueError(f"{year} {list_id}: {n} deputies for {seats.get(list_id, 0)} seats")
 
 
 # Geography.
@@ -1086,7 +1195,8 @@ def build_2020(p: Package, election: str, path_: str, lists: dict[str, Ballot]) 
     year = 2020
     p.artifact(raw.cached(SOURCE, FILES["form16"]), SEC)
     table = scans()["2020"]
-    stored = pages(p, year, "scan20", {cast(int, row["page"]) for row in table})
+    elected = elected_2020()
+    stored = pages(p, year, "scan20", {cast(int, row["page"]) for row in table} | {d.page for d in elected})
     found = stations_2020()
     codes = [str(n) for n in range(1, 7)]
     districts = district_units(p, year, codes)
@@ -1122,6 +1232,29 @@ def build_2020(p: Package, election: str, path_: str, lists: dict[str, Ballot]) 
             total += cast(int, row["votes"])
             if cast(int, row["seats"]) > 0:
                 p.add("outcome", result_set_id=official, option_id=option, kind="won", seats=row["seats"])
+        deputies(
+            p,
+            year,
+            official,
+            options,
+            [d for d in elected if d.unit == number],
+            {str(row["list"]): cast(int, row["seats"]) for row in mine},
+        )
+        note(
+            p,
+            official,
+            "methodology",
+            "The elected deputies are transcribed from the decision's table of the candidates elected in the unit "
+            f"(page {min(d.page for d in elected if d.unit == number)}"
+            + (
+                f" to {max(d.page for d in elected if d.unit == number)}"
+                if len({d.page for d in elected if d.unit == number}) > 1
+                else ""
+            )
+            + "), with their names as printed in Macedonian and in the Latin alphabet of the Albanian text. The "
+            "decision lists them by list but gives no places on the lists.",
+            "deputies",
+        )
         summed = 0
         for s in here:
             assert s.municipality is not None
@@ -1170,6 +1303,7 @@ def build_2024(p: Package, election: str, path_: str, lists: dict[str, Ballot]) 
     stored = raw.cached(SOURCE, FILES["pdf24"])
     p.artifact(stored, SEC)
     found = conclusion_2024()
+    elected = elected_2024()
     codes = [str(n) for n in range(1, 7)]
     districts = district_units(p, year, codes)
     rows: list[dict[str, object]] = []
@@ -1201,4 +1335,28 @@ def build_2024(p: Package, election: str, path_: str, lists: dict[str, Ballot]) 
             option = options[list_id]
             rows.append(fact(rs, districts[code], option, VOTES, votes))
             p.add("outcome", result_set_id=rs, option_id=option, kind="won", seats=seats)
+        named = [d for d in elected if d.unit == number]
+        deputies(p, year, rs, options, named, {list_id: seats for list_id, _, seats in mine})
+        withheld = 20 - len(named)
+        note(
+            p,
+            rs,
+            "methodology",
+            "The elected deputies are those the decision names for the unit, with their names in Macedonian and in "
+            "the Latin alphabet of the Albanian text. The decision numbers them within each list but gives no places "
+            "on the lists."
+            + (
+                f" It names {len(named)} of the unit's 20 deputies: the seat{'s' if withheld > 1 else ''} that the "
+                "repeated voting could still move were left to a later decision of the Commission."
+                if withheld
+                else ""
+            ),
+            "deputies",
+        )
+    p.accept(
+        "outcomes.list_members",
+        "The decision of 18 May 2024 names 19 deputies in each of units 5 and 6: the seat of the European Front "
+        "that repeated voting at some polling stations could still move was left to a later decision, so that "
+        "list names one deputy fewer than its declared seats in each unit.",
+    )
     return finish(p, rows, [])
