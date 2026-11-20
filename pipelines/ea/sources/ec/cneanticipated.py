@@ -144,7 +144,7 @@ def nation() -> dict[str, int]:
 
 
 class Builder(cne2017.Builder):
-    def result_set(self, contest: str, token: str) -> str:
+    def result_set(self, contest: str, token: str, superseded: bool = False, supersedes: str | None = None) -> str:
         result_set = key("result_set", self.day, token)
         self.p.add(
             "result_set",

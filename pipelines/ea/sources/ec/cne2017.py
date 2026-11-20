@@ -10,6 +10,7 @@ import json
 import re
 from collections import Counter
 from datetime import date
+from typing import NamedTuple
 from uuid import uuid5
 
 import shapely
@@ -83,6 +84,27 @@ PROVINCE_ENGLISH = {
     "28": "Latin America, the Caribbean, and Africa",
 }
 CANTON_ALIASES = {"FRANCISCO DE ORELLANA": "FCO DE ORELLANA"}
+# the words the book abbreviates in a parish's name
+ABBREVIATIONS = {
+    "GRAL": "GENERAL",
+    "CRNL": "CORONEL",
+    "CRNEL": "CORONEL",
+    "STA": "SANTA",
+    "STO": "SANTO",
+    "DR": "DOCTOR",
+    "ARQ": "ARQUITECTO",
+    "S": "SAN",
+}
+
+
+def spellings(name: str) -> set[str]:
+    """A parish name as the book might print it: whole, with its abbreviated words spelled out, and each side of a slash."""
+    found: set[str] = set()
+    for part in (name, *name.split("/"), name.replace("/", " ")):
+        text = book2017.norm(part)
+        found.add(text)
+        found.add(" ".join(ABBREVIATIONS.get(word, word) for word in text.split()))
+    return {text for text in found if text}
 
 
 def new_code(name: str) -> str:
@@ -91,13 +113,16 @@ def new_code(name: str) -> str:
 
 class Places:
     def __init__(self) -> None:
-        self.provinces, self.cantons, _ = cne.places()
+        self.provinces, self.cantons, self.parishes = cne.places()
         self.province_codes = {book2017.norm(name): code for code, name in self.provinces.items()}
         self.province_codes.update(PROVINCE_ALIASES)
         self.by_name: dict[str, dict[str, str]] = {}
         for code, (name, province) in self.cantons.items():
             self.by_name.setdefault(province, {})[book2017.norm(name)] = code
         self.names = {code: name for code, (name, _) in self.cantons.items()}
+        self.by_canton: dict[str, list[tuple[str, set[str]]]] = {}
+        for code, (name, canton) in self.parishes.items():
+            self.by_canton.setdefault(canton, []).append((code, spellings(name)))
         for (province, text), name in NEW.items():
             code = new_code(name)
             self.by_name.setdefault(province, {})[text] = code
@@ -119,6 +144,21 @@ class Places:
             return self.by_name[province][text]
         except KeyError:
             raise KeyError(f"no canton {name!r} in province {province}") from None
+
+    def parish(self, canton: str, name: str) -> str:
+        """The code of the canton's parish that a name in the book spells, as the Council's files spell it."""
+        found = spellings(name)
+        codes = [code for code, names in self.by_canton.get(canton, []) if names & found]
+        if len(codes) != 1:
+            raise KeyError(f"{len(codes)} parishes of canton {canton} match {name!r}")
+        return codes[0]
+
+    def is_zone(self, canton: str) -> bool:
+        """Whether a canton in the book is a special electoral zone, which has no parishes of its own."""
+        return canton.startswith("ZONA ESPECIAL ELECTORAL")
+
+    def parish_code(self, province: str, canton: str, name: str) -> str:
+        return self.parish(self.canton(province, canton), name)
 
     def province_name(self, code: str) -> str:
         return PROVINCE_NAMES.get(code) or cne.title(self.provinces[code])
@@ -366,6 +406,7 @@ class Builder:
         circumscription: str = "",
         partial: bool = False,
         area_id: str | None = None,
+        parent: str | None = None,
     ) -> str:
         token = (scope, code, circumscription)
         if token in self.units:
@@ -378,6 +419,7 @@ class Builder:
             polity_id=ECUADOR,
             scheme_code=scheme,
             code=f"{self.day}:{scope}:{code}{tail}",
+            parent_id=parent,
             area_relation="within" if partial else "equals",
             area_id=area_id or area(scheme, code),
             kind="standard",
@@ -415,8 +457,8 @@ class Builder:
         self.p.add("slug", path=self.path(f"{self.base}/{tail}"), entity_id=contest, is_current=True)
         return contest
 
-    def result_set(self, contest: str, token: str) -> str:
-        result_set = key("result_set", self.day, token)
+    def result_set(self, contest: str, token: str, superseded: bool = False, supersedes: str | None = None) -> str:
+        result_set = key("result_set", self.day, token + ("/parish" if supersedes else ""))
         self.p.add(
             "result_set",
             id=result_set,
@@ -425,9 +467,10 @@ class Builder:
             stage="official",
             kind="counted",
             source_id=CNE_SOURCE,
-            status="active",
-            is_default=True,
+            status="superseded" if superseded else "active",
+            is_default=not superseded,
             completeness=1.0,
+            supersedes_id=supersedes,
         )
         self.p.add(
             "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en"
@@ -533,6 +576,11 @@ def circumscription(head: str) -> str:
     return "resto" if "RESTO" in head else ""
 
 
+class Parishes(NamedTuple):
+    rows: list[tuple[str, book2017.Row]]  # each parish's unit and row
+    covered: set[str]  # the canton units whose votes the parish rows carry
+
+
 def lists(
     b: Builder,
     group: book2017.Group,
@@ -543,8 +591,13 @@ def lists(
     body: str,
     rows: list[tuple[str, book2017.Row]],
     national: bool = False,
+    parishes: Parishes | None = None,
 ) -> None:
-    """One list-allocation contest: its lists, the seats and members each won, and its rows of votes."""
+    """One list-allocation contest: its lists, the seats and members each won, and its rows of votes.
+
+    Where the book also prints the circumscription's parishes, a second set holds the cantons and their parishes and
+    supersedes the first, which keeps the canton rows alone.
+    """
     p = b.p
     seats = len(group.winners)
     contest = b.contest(
@@ -557,7 +610,8 @@ def lists(
         magnitude=seats,
         electoral_system_id=SYSTEM_LISTS,
     )
-    result_set = b.result_set(contest, token)
+    result_set = b.result_set(contest, token, superseded=bool(parishes))
+    finer = b.result_set(contest, token, supersedes=result_set) if parishes else None
     options: dict[str, str] = {}
     for position, entry in enumerate(group.entries, 1):
         option = options[entry.number] = key("option", b.day, token, entry.number)
@@ -570,8 +624,7 @@ def lists(
             ballot_label=f"{cne.clean(entry.name)} ({entry.sigla}, list {entry.number})",
         )
     won = Counter(w.number for w in group.winners)
-    for number, count in won.items():
-        p.add("outcome", result_set_id=result_set, option_id=options[number], kind="won", seats=count)
+    candidacies = []
     for winner in group.winners:
         name = cne.title(winner.name)
         person = key("person", b.day, token, winner.name)
@@ -586,21 +639,89 @@ def lists(
             role="list_member",
             ballot_name=name,
         )
-        p.add(
-            "outcome",
-            result_set_id=result_set,
-            option_id=options[winner.number],
-            candidacy_id=candidacy,
-            kind="elected",
-        )
+        candidacies.append((winner, candidacy))
     count = len(group.entries)
-    for unit, row in rows:
+    declared = {e.number: e.votes for e in group.entries}
+    for target in (result_set, finer):
+        if target is None:
+            continue
+        for number, seats_won in won.items():
+            p.add("outcome", result_set_id=target, option_id=options[number], kind="won", seats=seats_won)
+        for winner, candidacy in candidacies:
+            p.add(
+                "outcome",
+                result_set_id=target,
+                option_id=options[winner.number],
+                candidacy_id=candidacy,
+                kind="elected",
+            )
+        for unit, row in rows:
+            if not (target == finer and parishes is not None and unit in parishes.covered):
+                for entry, votes in zip(group.entries, row.numbers[:count], strict=True):
+                    cne._put(p, target, unit, options[entry.number], VOTES, votes)
+            if len(row.numbers) >= count + 5:
+                n = row.numbers
+                figures(p, target, unit, n[count + 3], n[count + 4], n[count + 1], n[count + 2])
+        declare(p, target, options, declared, {} if national else group.info)
+    if finer is None or not parishes:
+        return
+    p.add(
+        "note",
+        id=key("note", finer, "parish"),
+        entity_id=finer,
+        kind="methodology",
+        body_md=(
+            "This set reads the book's parish rows, which print each parish's votes for every list. Each list's votes "
+            "sit on the parish units, or on the canton unit of a special zone that has no parishes, and the canton "
+            "units keep the electors, ballots cast, null ballots, and blank ballots the book prints only by canton. "
+            "It supersedes the set that holds the canton rows alone."
+        ),
+        lang="en",
+    )
+    for unit, row in parishes.rows:
         for entry, votes in zip(group.entries, row.numbers[:count], strict=True):
-            cne._put(p, result_set, unit, options[entry.number], VOTES, votes)
-        if len(row.numbers) >= count + 5:
-            n = row.numbers
-            figures(p, result_set, unit, n[count + 3], n[count + 4], n[count + 1], n[count + 2])
-    declare(p, result_set, options, {e.number: e.votes for e in group.entries}, {} if national else group.info)
+            cne._put(p, finer, unit, options[entry.number], VOTES, votes)
+
+
+def parish_rows(
+    b: Builder,
+    group: book2017.Group,
+    province: str,
+    circ: str,
+    cantons: list[tuple[str, book2017.Row]],
+    shared: Counter[str],
+) -> Parishes:
+    """The reporting unit of each parish row in a circumscription's table, under the canton unit that holds it."""
+    place = b.place
+    unit_of = {id: row for id, row in cantons}
+    by_canton = {place.canton(province, row.name): id for id, row in cantons}
+    count = len(group.entries)
+    found: list[tuple[str, book2017.Row]] = []
+    covered: set[str] = set()
+    for canton in book2017.parish_tables(group):
+        code = place.canton(province, canton.row.name)
+        parent = by_canton[code]
+        if unit_of[parent].numbers[: count + 1] != canton.row.numbers[: count + 1]:
+            raise ValueError(f"{group.head}: the parish table's {canton.row.name} differs from the canton table's")
+        if place.is_zone(canton.row.name):
+            continue  # a special zone has no parishes of its own; its row is the canton's
+        covered.add(parent)
+        for row in canton.parishes:
+            parish = place.parish_code(province, canton.row.name, row.name)
+            partial = shared[parish] > 1
+            title = cne.title(place.parishes[parish][0])
+            unit = b.unit(
+                "parish",
+                parish,
+                title,
+                "ec.parroquia",
+                circ if partial else "",
+                partial,
+                area("ec.parroquia", parish),
+                parent,
+            )
+            found.append((unit, row))
+    return Parishes(found, covered)
 
 
 def assembly(b: Builder) -> None:
@@ -613,6 +734,15 @@ def assembly(b: Builder) -> None:
             if circumscription(group.head):
                 for row in group.units:
                     seen[(province, place.canton(province, row.name))] += 1
+    shared: Counter[str] = Counter()  # the circumscriptions each parish appears in
+    for group in groups:
+        if group.parishes and group.page not in (158, 314):
+            shared.update(
+                place.parish_code(place.province(group.head), c.row.name, r.name)
+                for c in book2017.parish_tables(group)
+                for r in c.parishes
+                if not place.is_zone(c.row.name)
+            )
     for group in groups:
         head = group.head
         if group.page == 158:
@@ -668,7 +798,8 @@ def assembly(b: Builder) -> None:
                 english = f"2017 Ecuadorian National Assembly election, {name} provincial seats"
                 spanish = f"Asambleístas provinciales de {name} 2017"
                 tail = f"provincial/{cne.slug(name)}"
-            lists(b, group, f"province/{province}/{circ}", english, spanish, tail, ASSEMBLY, rows)
+            finer = parish_rows(b, group, province, circ, rows, shared) if circ else None
+            lists(b, group, f"province/{province}/{circ}", english, spanish, tail, ASSEMBLY, rows, parishes=finer)
         else:
             province = place.province(head)
             rows = [(b.canton_unit(province, r.name), r) for r in group.units]
