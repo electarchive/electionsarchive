@@ -160,31 +160,7 @@ Where voters on a list ballot can also mark candidates on that list (Belgian and
 
 Preference votes don't enter a list's total, and they don't change who a list elects. A source's own preference totals go in `declared` against the candidate option under measure 7, like any other declared total. A pipeline that stores candidates as the counted options themselves, with no list total of their own, keeps their votes on measure 1 and doesn't use `preference_option_id`. Some pipelines written before the column existed still hold preference votes on a child option with no candidacy pointing at it.
 
-The column is not in the migrations yet. The schema owner adds it as an additive migration, with the matching `candidacy` entry in `packages/db/src/core.ts` and `preference_option_id` in the `candidacy` column loop of `_publish_table` in `pipelines/ea/apply.py`:
-
-```sql
-set lock_timeout = '5s';
-alter table candidacy
-  add column preference_option_id uuid references contest_option (id),
-  add constraint candidacy_preference_option_key unique (preference_option_id) deferrable initially deferred,
-  add constraint candidacy_preference_option_check check (preference_option_id is distinct from option_id);
-comment on column candidacy.preference_option_id is
-  'The candidate option, under this candidacy''s list option, that carries its preference votes (measure 7); the list''s own votes stay on the list option';
-alter table candidacy_history add column preference_option_id uuid;
-create or replace function candidacy_capture() returns trigger language plpgsql as $$
-begin
-  insert into candidacy_history (
-    id, person_id, option_id, role, list_position, ballot_name, member_of_party_id, is_independent, is_incumbent,
-    ballot_lines, changeset_id, recorded_from, recorded, superseded_by, preference_option_id
-  )
-  select
-    o.id, o.person_id, o.option_id, o.role, o.list_position, o.ballot_name, o.member_of_party_id, o.is_independent,
-    o.is_incumbent, o.ballot_lines, o.changeset_id, o.recorded_from, tstzrange(o.recorded_from, now()),
-    ea_current_changeset(), o.preference_option_id
-  from old_rows o;
-  return null;
-end $$;
-```
+Two migrations add the column. `20261124000000_candidacy_preference_option` adds `preference_option_id` to `candidacy` and `candidacy_history`, with its foreign key to `contest_option` and its check, and both are `not valid`, and extends `candidacy_capture()` to copy the column into history. `20261124010000_candidacy_preference_option_key` validates those two constraints, builds the unique index, and attaches it as the deferrable unique constraint `candidacy_preference_option_key`. The second migration runs in its own transaction, so `candidacy` stays readable while its rows are scanned; only the final step takes a brief exclusive lock. On a live database you can build the index with `create unique index concurrently` after the first migration, and the second migration's `if not exists` then skips the build. `packages/db/src/core.ts` declares the column, and the `option_drop` publish in `pipelines/ea/apply.py` refuses to drop an option that a candidacy names in `preference_option_id`.
 
 The `person_party_membership` table is keyed by person, party, and valid time, so memberships can overlap.
 
