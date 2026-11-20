@@ -3,7 +3,9 @@
 The Council's results book for the early elections and popular consultations of 2023 prints the presidential vote for
 each province by canton and, in the runoff, for each overseas country. The first round's tables cover the national
 territory only, and the runoff's add the overseas circumscriptions. The tables are read from the book's text layer,
-and each is checked against the totals printed under or beside it before it is stored.
+and each is checked against the totals printed under or beside it before it is stored. The Yasuní popular consultation
+of 20 August 2023, which the book prints by province, is stored with the first round as a ballot question. The Chocó
+Andino consultation of the same day is loaded by `ec.consultas`.
 """
 
 import functools
@@ -55,6 +57,19 @@ METHOD = (
     "electors on the roll, ballots cast are the voters who took part, and null and blank ballots are counted "
     "separately. Each voter casts one vote for a ticket, so valid votes are the votes the tickets received."
 )
+
+
+SYSTEM_QUESTION = key("electoral_system", "early-2023", "question")
+YASUNI_METHOD = (
+    "Counted by the National Electoral Council and published in its results book for the early elections of 2023, "
+    "which prints the votes for yes and no in each province. Valid votes are the votes for the two answers; the "
+    "book prints no figures for blank and null ballots on this question."
+)
+YASUNI_ES = (
+    "¿Está usted de acuerdo con que el gobierno ecuatoriano mantenga el crudo del ITT, conocido como bloque 43, "
+    "indefinidamente bajo el subsuelo?"
+)
+YASUNI_ROW = re.compile(r"^(?:([A-ZÁÉÍÓÚÑ ]+?) )?([\d.]+) \d+,\d+% ([\d.]+) \d+,\d+% ([\d.]+)$")
 
 
 class Table(NamedTuple):
@@ -121,6 +136,103 @@ def tables(day: str, marker: str) -> list[Table]:
     if pending:
         raise ValueError(f"{day}: a table under {heading!r} has no total row")
     return result
+
+
+def yasuni_rows() -> tuple[list[tuple[str, int, int, int]], tuple[int, int, int]]:
+    """The Yasuní consultation's rows by province (name, yes, no, valid) and the book's national row."""
+    for page in range(len(book2017.pages(BOOK)), 0, -1):
+        text = page_text(page)
+        if "RESULTADOS ELECTORALES POR PROVINCIA" in text and "YASUN" in text:
+            break
+    else:
+        raise ValueError("no Yasuní results by province")
+    lines = [line.strip() for line in text.split("\n")]
+    found: list[tuple[str, int, int, int]] = []
+    total: tuple[int, int, int] | None = None
+    for i, line in enumerate(lines):
+        line = re.sub(r"^\d+,\d+% ", "", line)
+        match = YASUNI_ROW.match(line)
+        if match is None:
+            continue
+        name = match[1] or ""
+        if not name:
+            # a long name wraps around its figures: SANTO DOMINGO DE / ... / LOS TSÁCHILAS
+            name = f"{lines[i - 1]} {lines[i + 1]}"
+        numbers = [int(match[k].replace(".", "")) for k in (2, 3, 4)]
+        if name.strip() == "TOTAL NACIONAL":
+            total = (numbers[0], numbers[1], numbers[2])
+        else:
+            found.append((name.strip(), numbers[0], numbers[1], numbers[2]))
+    if total is None:
+        raise ValueError("the Yasuní table has no national row")
+    return found, total
+
+
+def yasuni(b: Builder) -> None:
+    p = b.p
+    token = "yasuni"
+    english = "2023 Ecuadorian popular consultation on the Yasuní ITT oil block"
+    contest = b.contest(
+        token,
+        english,
+        "Consulta popular del Yasuní 2023",
+        "consultation/yasuni",
+        "ballot_question",
+        district_area_id=COUNTRY,
+        electoral_system_id=SYSTEM_QUESTION,
+    )
+    p.add("ballot_question", contest_id=contest, type="referendum")
+    p.add(
+        "note",
+        id=key("note", contest, "question"),
+        entity_id=contest,
+        kind="context",
+        body_md=YASUNI_ES,
+        lang="es",
+    )
+    yes, no = (key("option", DAY1, token, name) for name in ("yes", "no"))
+    for position, (option, es, en) in enumerate(((yes, "Sí", "Yes"), (no, "No", "No")), 1):
+        p.add("contest_option", id=option, contest_id=contest, kind="answer", ballot_position=position, ballot_label=es)
+        p.name(option, es, "es", "ballot")
+        p.name(option, en, "en", "english", False)
+    result_set = key("result_set", DAY1, token)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=b.election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=cne.CNE_SOURCE,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=YASUNI_METHOD,
+        lang="en",
+    )
+    rows, (total_yes, total_no, total_valid) = yasuni_rows()
+    if len(rows) != 24:
+        raise ValueError(f"the Yasuní table has {len(rows)} provinces, not 24")
+    seen = [0, 0, 0]
+    for name, y, n, valid in rows:
+        if y + n != valid:
+            raise ValueError(f"Yasuní {name}: {y:,} + {n:,} is not the printed {valid:,}")
+        unit = b.province_unit(b.place.province(f"PROVINCIA - {name}"))
+        cne._put(p, result_set, unit, yes, VOTES, y)
+        cne._put(p, result_set, unit, no, VOTES, n)
+        cne._put(p, result_set, unit, None, VALID, valid)
+        seen = [seen[0] + y, seen[1] + n, seen[2] + valid]
+    if seen != [total_yes, total_no, total_valid]:
+        raise ValueError(f"Yasuní provinces add up to {seen}, not the printed {[total_yes, total_no, total_valid]}")
+    p.add("outcome", result_set_id=result_set, option_id=yes if total_yes > total_no else no, kind="won")
+    for option, measure, value in ((yes, VOTES, total_yes), (no, VOTES, total_no), (None, VALID, total_valid)):
+        p.add("declared", result_set_id=result_set, option_id=option, measure=measure, value=value)
 
 
 def nation() -> dict[str, int]:
@@ -306,6 +418,19 @@ def build(day: str) -> Package:
     for name, value in mine.items():
         if value != extras[name]:
             raise ValueError(f"{day}: summed {name} {value:,} differs from the printed {extras[name]:,}")
+    if not runoff:
+        p.add(
+            "electoral_system", id=SYSTEM_QUESTION, polity_id=ECUADOR, rules={"formula": "referendum"}, rules_version=1
+        )
+        p.add(
+            "note",
+            id=key("note", SYSTEM_QUESTION),
+            entity_id=SYSTEM_QUESTION,
+            kind="methodology",
+            body_md="The answer with more valid votes than the other carries the question.",
+            lang="en",
+        )
+        yasuni(b)
     if gaps:
         p.accept(
             "accounting.ballots_sum",
