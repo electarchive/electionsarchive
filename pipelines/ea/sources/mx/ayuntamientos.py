@@ -9,14 +9,16 @@ from uuid import UUID
 import fastexcel
 import polars as pl
 
-from ea import raw
-from ea.changeset import Changeset, slug
+from ea import package, raw
+from ea.changeset import slug
 from ea.names import display
+from ea.package import Draft
 from ea.sources.mx import ine
 from ea.store import DATA, connect
 
 SOURCE = "mx.ayuntamientos"
 VERSION = "1"
+KEY = f"{SOURCE}/all"
 PARSED = DATA / "parsed" / SOURCE
 IEPC_DGO = "Instituto Electoral y de Participación Ciudadana del Estado de Durango (IEPC)"
 IEPC_DGO_PAGE = "https://www.iepcdurango.mx/instituto_electoral/estadistica"
@@ -310,6 +312,7 @@ def parse() -> None:
         pl.DataFrame(part).write_parquet(out / f"{name}.parquet")
     pl.DataFrame(members).write_parquet(out / "members.parquet")
     print(key, {name: len(part) for name, part in frames.items()}, "members", len(members))
+    build()
 
 
 def groups_of(present: list[str]) -> list[list[str]]:
@@ -325,7 +328,13 @@ def groups_of(present: list[str]) -> list[list[str]]:
     return groups
 
 
-def emit() -> Path:
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package mx.ayuntamientos/all from the parsed tables. It reads the database through Draft, so the
+    rows it rebuilds keep the ids the changeset path gave them."""
     key, election = config()
     state, day, iso = election["state"], election["day"], election["iso"]
     year = day.year
@@ -338,7 +347,7 @@ def emit() -> Path:
     annulled = pl.read_parquet(folder / "annulled.parquet")
     members = pl.read_parquet(folder / "members.parquet")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
