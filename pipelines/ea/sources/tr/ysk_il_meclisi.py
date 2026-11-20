@@ -583,6 +583,30 @@ def build(year: int) -> Package:
             f"In {len(over):,} boxes the service gives more voters than registered voters, by at most {max(over):,}; "
             "the boxes are stored as the service publishes them.",
         )
+    off = [
+        (row, listed)
+        for row in data.boxes
+        if (
+            listed := sum(
+                number(value)
+                for column, value in row.items()
+                if column.endswith("_ALDIGI_OY") and not column.startswith("bagimsiz") and value
+            )
+            + number(row.get("bagimsiz_TOPLAM_OY") or 0)
+        )
+        != number(row.get("gecerli_OY_TOPLAMI") or 0)
+    ]
+    if off:
+        found = "; ".join(
+            f"{title(str(row['ilce_ADI']))}, {title(str(row['il_ADI']))}, box {row['sandik_NO']}: the lists and "
+            f"independents have {listed:,} votes, and the box's valid votes are {number(row['gecerli_OY_TOPLAMI']):,}"
+            for row, listed in off
+        )
+        p.accept(
+            "accounting.votes_valid",
+            f"In {len(off)} {'box' if len(off) == 1 else 'boxes'} the service's own figures disagree: {found}. "
+            "The box is stored as the service publishes it.",
+        )
     compare(year, data, counted)
     print(f"{year}: {len(contests)} contests, {len(new_units)} new units, {len(data.boxes) - len(new_units)} held")
     return p
