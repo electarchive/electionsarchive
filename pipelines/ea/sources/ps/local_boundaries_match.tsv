@@ -1,0 +1,242 @@
+unit	name	polled	polygons	names	how
+أريحا:العوجا	العوجا	1	wb:198	EL 'AUJA	transliteration
+الخليل:إذنا	إذنا	1	wb:307	IDNA	transliteration
+الخليل:الريحية	الريحية	1	wb:315	ER RIHIYA	name
+الخليل:الشيوخ	الشيوخ	1	wb:306	ESH SHUYUKH	name
+الخليل:الظاهرية	الظاهرية	1	wb:317	EDH DHAHIRIYA	name
+الخليل:بنينعيم	بني نعيم	0	wb:314	BANI NA'IM	name
+الخليل:بيتأولا	بيت أولا	1	wb:303	BEIT AULA	name
+الخليل:بيتكاحل	بيت كاحل	1	wb:309	BEIT KAHIL	name
+الخليل:ترقوميا	ترقوميا	0	wb:308	TARQUMIYA	transliteration
+الخليل:تفوح	تفوح	1	wb:311	TAFFUH	transliteration
+الخليل:حلحول	حلحول	1	wb:304	HALHUL	transliteration
+الخليل:خاراس	خاراس	1	wb:301	KHARAS	transliteration
+الخليل:دورا	دورا	1	wb:312	DURA	name
+الخليل:صوريف	صوريف	1	wb:294	SURIF	name
+الخليل:نوبا	نوبا	1	wb:296	NUBA	transliteration
+الخليل:يطا	يطا	1	wb:316	YATTA	name
+القدس:ابوديس	ابو ديس	0	wb:280	ABU DIS	name
+القدس:الجيب	الجيب	0	wb:253	EL JIB	name
+القدس:الراموضاحيةالبريد	الرام وضاحية البريد	0	wb:338	ER RAM	curated
+القدس:القبيبة	القبيبة	0	wb:263	EL QUBEIBA	name
+القدس:النبيصموئيل	النبي صموئيل	0	wb:265	NABI SAMWIL	name
+القدس:بدو	بدو	1	wb:262	BIDDU	curated
+القدس:بيتإجزا	بيت إجزا	0	wb:255	BEIT IJZA	name
+القدس:بيتإكسا	بيت إكسا	0	wb:266	BEIT IKSA	name
+القدس:بيتدقو	بيت دقو	0	wb:252	BEIT DUQQU	name
+القدس:بيتسوريك	بيت سوريك	0	wb:269	BEIT SURIK	name
+القدس:بيتعنان	بيت عنان	0	wb:250	BEIT INAN	name
+القدس:بيرنبالا	بير نبالا	0	wb:249	BIR NABALA	name
+القدس:جبع	جبع	0	wb:339	JABA'	name
+القدس:حزما	حزما	1	wb:260	HIZMA	curated
+القدس:رافات	رافات	0	wb:240	RAFAT	name
+القدس:عناتا	عناتا	0	wb:264	ANATA	curated
+القدس:قطنة	قطنة	1	wb:261	QATANNA	curated
+القدس:قلنديا	قلنديا	1	wb:251	QALANDIYA	transliteration
+القدس:كفرعقب	كفر عقب	0	wb:241	KAFR AQAB	transliteration
+القدس:مخماس	مخماس	0	wb:243	MUKHMAS	name
+بيت لحم:الجبعة	الجبعة	1	wb:295	EL JAB'A	name
+بيت لحم:الخضر	الخضر	1	wb:292	EL KHADR	transliteration
+بيت لحم:بتير	بتير	1	wb:284	BATTIR	name
+بيت لحم:بيتساحور	بيت ساحور	1	wb:287	BEIT SAHUR	name
+بيت لحم:بيتفجار	بيت فجار	1	wb:298	BEIT FAJJAR	name
+بيت لحم:بيتلحم	بيت لحم	1	wb:286	BETHLEHEM	name
+بيت لحم:حوسان	حوسان	0	wb:289	HUSAN	transliteration
+بيت لحم:نحالين	نحالين	1	wb:293	NAHHALIN	name
+بيت لحم:واديفوكين	وادي فوكين	0	wb:290	FUKIN	name
+جنين:أمالتوت	أم التوت	0	wb:32	UMM ET TUT	name
+جنين:الجديدة	الجديدة	1	wb:61	JUDEIDA	name
+جنين:الجلمة	الجلمة	1	wb:5	JALAMA	name
+جنين:الرامة	الرامة	0	wb:58	ER RAMA	name
+جنين:الزبابدة	الزبابدة	0	wb:44	EZ ZABABIDA	name
+جنين:العطارة	العطارة	0	wb:67	EL ATTARA	curated
+جنين:الفندقومية	الفندقومية	1	wb:66	EL FANDUAQUMIYA	name
+جنين:المغير	المغير	0	wb:30	EL MUGHAIYIR	name
+جنين:اليامون	اليامون	1	wb:8	EL YAMUN	name
+جنين:برقين	برقين	1	wb:11	BURQIN	name
+جنين:تعنك	تعنك	0	wb:1	TRINNIK	name
+جنين:جبع	جبع	0	wb:62	JABA	transliteration
+جنين:جلبون	جلبون	1	wb:20	JALBUN	name
+جنين:جلقموس	جلقموس	1	wb:33	JALQAMUS	name
+جنين:جنين	جنين	1	wb:16	JENIN	name
+جنين:ديرابوضعيف	دير ابو ضعيف	1	wb:23	DEIR ABU DA'IF	name
+جنين:ديرغزالة	دير غزالة	0	wb:15	DEIR GHAZZALA	curated
+جنين:رابا	رابا	1	wb:35	RABA	name
+جنين:رمانة	رمانة	0	wb:319	RUMMANA	name
+جنين:زبوبا	زبوبا	1	wb:2	ZUBUBA	name
+جنين:سيريس	سيريس	1	wb:64	SIRIS	name
+جنين:سيلةالحارثية	سيلة الحارثية	1	wb:10	SILAT EL HARITHIYA	name
+جنين:سيلةالظهر	سيلة الظهر	1	wb:63	SILAT ED DAHAR	name
+جنين:صانور	صانور	0	wb:50	SANUR	name
+جنين:صير	صير	0	wb:52	SIR	transliteration
+جنين:عانين	عانين	1	wb:13	ANIN	name
+جنين:عجة	عجة	1	wb:48	AJJA	curated
+جنين:عرابة	عرابة	0	wb:27	ARRABA	name
+جنين:عرانة	عرانة	0	wb:12	ARRANA	name
+جنين:فحمة	فحمة	0	wb:47	FAHMA	name
+جنين:فراسين	فراسين	0	wb:321	FIRASIN	name
+جنين:فقوعة	فقوعة	1	wb:7	FAQQU'A	name
+جنين:قباطية	قباطية	1	wb:29	QABATIYA	transliteration
+جنين:كفردان	كفر دان	1	wb:14	KAFR DAN	name
+جنين:كفرراعي	كفر راعي	1	wb:38	KAFR RAT	name
+جنين:كفرقود	كفر قود	0	wb:25	KAFR QUD	name
+جنين:كفيرت	كفيرت	1	wb:31	KUFEIRAT	transliteration
+جنين:مركة	مركة	0	wb:40	MIRKA	name
+جنين:مسلية	مسلية	0	wb:45	MISILYA	name
+جنين:ميثلون	ميثلون	1	wb:56	MEITHALUN	name
+جنين:يعبد	يعبد	1	wb:17	YA'BAD	name
+دير البلح:ديرالبلح	دير البلح	1	gz:17	Deir al Balah	name
+رام الله والبيرة:أمصفا	أم صفا	0	wb:196	UMM SAFA	name
+رام الله والبيرة:ابوشخيدم	ابو شخيدم	0	wb:332	ABU SHUKHEIDIM	transliteration
+رام الله والبيرة:البيرة	البيرة	1	wb:222	EL BIRA	name
+رام الله والبيرة:الجانية	الجانية	0	wb:216	EL JANIYA	name
+رام الله والبيرة:الطيبة	الطيبة	0	wb:214	ET TAIYIBA	curated
+رام الله والبيرة:الطيرة	الطيرة	0	wb:245	ET TIRA	name
+رام الله والبيرة:المدية	المدية	0	wb:220	EL MIDIYA	name
+رام الله والبيرة:المزرعةالقبلية	المزرعة القبلية	0	wb:208	EL MAZRA'A QIBLIYA	name
+رام الله والبيرة:المغير	المغير	0	wb:184	EL MUGHAIYIR	transliteration
+رام الله والبيرة:النبيصالح	النبي صالح	0	wb:324	EN NABI SALIH	name
+رام الله والبيرة:بدرس	بدرس	0	wb:211	BUDRUS	name
+رام الله والبيرة:برقة	برقة	0	wb:235	BURQA	name
+رام الله والبيرة:برهام	برهام	1	wb:203	BURHAM	name
+رام الله والبيرة:بلعين	بلعين	1	wb:228	BIL'IN	name
+رام الله والبيرة:بيتسيرا	بيت سيرا	1	wb:237	BEIT SIRA	name
+رام الله والبيرة:بيتعورالتحتا	بيت عور التحتا	0	wb:334	BEIT UR TAHTA	transliteration
+رام الله والبيرة:بيتلقيا	بيت لقيا	1	wb:244	BEIT LIQYA	name
+رام الله والبيرة:بيتونيا	بيتونيا	1	wb:233	BEITUNIYA	curated
+رام الله والبيرة:بيتين	بيتين	0	wb:229	BEITIN	curated
+رام الله والبيرة:بيرزيت	بيرزيت	1	wb:204	BIR ZIET	name
+رام الله والبيرة:ترمسعيا	ترمسعيا	0	wb:183	TURMUS AIYA	name
+رام الله والبيرة:جفنا	جفنا	0	wb:331	JIFNA	transliteration
+رام الله والبيرة:جلجيليا	جلجيليا	0	wb:186	JILJILIYA	name
+رام الله والبيرة:خربةأبوفلاح	خربة أبو فلاح	1	wb:193	KH. ABU FALAH	name
+رام الله والبيرة:خربثاالمصباح	خربثا المصباح	1	wb:238	KH. EL MISBAR	name
+رام الله والبيرة:خربثابنيحارث	خربثا بني حارث	0	wb:217	KHARBATA	name
+رام الله والبيرة:دوراالقرع	دورا القرع	1	wb:212	DURA EL QAR'	name
+رام الله والبيرة:ديرأبومشعل	دير أبو مشعل	1	wb:200	DEIR ABU MASH'AL	name
+رام الله والبيرة:ديرإبزيع	دير إبزيع	1	wb:230	DEIR IBZI	name
+رام الله والبيرة:ديرالسودان	دير السودان	0	wb:188	DEIR ES SUDAN	name
+رام الله والبيرة:ديرجرير	دير جرير	0	wb:330	DEIR JARIR	name
+رام الله والبيرة:ديردبوان	دير دبوان	1	wb:227	DEIR DIBWAN	name
+رام الله والبيرة:ديرعمار	دير عمار	0	wb:210	DEIR AMMAR	transliteration
+رام الله والبيرة:ديرقديس	دير قديس	0	wb:215	DEIR QIDDIS	name
+رام الله والبيرة:ديرنظام	دير نظام	0	wb:325	DEIR NIDHAM	name
+رام الله والبيرة:رامالله	رام الله	0	wb:224	RAMALLAH	name
+رام الله والبيرة:رمون	رمون	1	wb:221	RAMMUN	curated
+رام الله والبيرة:سنجل	سنجل	1	wb:178	SINJIL	transliteration
+رام الله والبيرة:شبتين	شبتين	0	wb:207	SHABTIN	name
+رام الله والبيرة:شقبا	شقبا	0	wb:201	SHUQBA	name
+رام الله والبيرة:صرداوابوقش	صردا وابو قش	1	wb:219;wb:218	SURDA;ABU QASH	curated
+رام الله والبيرة:صفا	صفا	0	wb:335	SAFFA	name
+رام الله والبيرة:عابود	عابود	0	wb:189	ABUD	name
+رام الله والبيرة:عبوين	عبوين	0	wb:176	ABWEIN	name
+رام الله والبيرة:عجول	عجول	0	wb:190	AJJUL	name
+رام الله والبيرة:عينسينيا	عين سينيا	0	wb:336	EIN SINIYA	name
+رام الله والبيرة:عينعريك	عين عريك	0	wb:232	EIN ARIK	name
+رام الله والبيرة:عينقينيا	عين قينيا	1	wb:225	EIN QINIYA	transliteration
+رام الله والبيرة:عينيبرود	عين يبرود	0	wb:213	EIN YABRUD	name
+رام الله والبيرة:قبيا	قبيا	0	wb:191	QIBIYA	name
+رام الله والبيرة:قراوةبنيزيد	قراوة بني زيد	0	wb:177	QARAWAT BANI ZEID	name
+رام الله والبيرة:كفرعين	كفر عين	0	wb:180	KAFR 'EIN	name
+رام الله والبيرة:كفرنعمة	كفر نعمة	0	wb:223	KAFR NI'MA	name
+رام الله والبيرة:كوبر	كوبر	1	wb:333	KUBER	name
+رام الله والبيرة:مزارعالنوباني	مزارع النوباني	1	wb:175	MAZARI' EN NUBANI	name
+رام الله والبيرة:نعلين	نعلين	1	wb:209	NI'LIN	name
+رام الله والبيرة:يبرود	يبرود	0	wb:205	YABRUD	name
+سلفيت:إسكاكا	إسكاكا	1	wb:157	ISKAKA	transliteration
+سلفيت:بديا	بديا	1	wb:144	BIDDIYA	name
+سلفيت:بروقين	بروقين	1	wb:164	BURUQIN	transliteration
+سلفيت:حارس	حارس	1	wb:152	HARIS	transliteration
+سلفيت:ديرإستيا	دير إستيا	1	wb:132	DEIR ISTIYA	transliteration
+سلفيت:ديربلوط	دير بلوط	1	wb:169	DEIR BALLUT	name
+سلفيت:رافات	رافات	1	wb:165	RAFAT	name
+سلفيت:سرطة	سرطة	1	wb:156	SARTA	transliteration
+سلفيت:سلفيت	سلفيت	1	wb:160	SALFIT	name
+سلفيت:فرخة	فرخة	0	wb:166	FARKHA	transliteration
+سلفيت:قيرة	قيرة	0	wb:146	QIRA	curated
+سلفيت:كفرالديك	كفر الديك	0	wb:168	KAFR DIK	name
+سلفيت:كفلحارس	كفل حارس	1	wb:142	KIFL HARITH	curated
+سلفيت:مردا	مردا	0	wb:147	MARDA	transliteration
+سلفيت:مسحة	مسحة	1	wb:148	MASHA	name
+سلفيت:ياسوف	ياسوف	1	wb:149	YASUF	transliteration
+طوباس:تياسير	تياسير	1	wb:59	TAYASIR	transliteration
+طوباس:طمون	طمون	1	wb:79	TAMMUN	transliteration
+طوباس:طوباس	طوباس	1	wb:34	TUBAS	name
+طوباس:عقابا	عقابا	1	wb:57	AQQABA	curated
+طولكرم:الراس	الراس	0	wb:90	ER RAS	name
+طولكرم:باقةالشرقية	باقة الشرقية	1	wb:320	BAQA ESH SHARQIYA	name
+طولكرم:بلعا	بلعا	1	wb:60	BAL'A	name
+طولكرم:بيتليد	بيت ليد	1	wb:84	BEIT LID	name
+طولكرم:ديرالغصون	دير الغصون	1	wb:54	DEIR EL GHUSUN	name
+طولكرم:رامين	رامين	1	wb:77	RAMIN	name
+طولكرم:سفارين	سفارين	0	wb:86	SAFFARIN	name
+طولكرم:شوفة	شوفة	1	wb:81	SHUFA	name
+طولكرم:صيدا	صيدا	0	wb:41	SEIDA	name
+طولكرم:طولكرم	طولكرم	1	wb:74	TULKARM	name
+طولكرم:عتيل	عتيل	1	wb:51	ATTIL	name
+طولكرم:علار	علار	1	wb:322	ILLAR	name
+طولكرم:عنبتا	عنبتا	1	wb:69	ANABTA	name
+طولكرم:فرعون	فرعون	0	wb:80	FAR'UN	transliteration
+طولكرم:قفين	قفين	1	wb:24	QAFFIN	name
+طولكرم:كفراللبد	كفر اللبد	0	wb:76	KAFR EL LABAD	name
+طولكرم:كفرجمال	كفر جمال	0	wb:100	KAFR JAMMAL	name
+طولكرم:كفرزيباد	كفر زيباد	0	wb:102	KAFR ZIBAD	name
+طولكرم:كفرصور	كفر صور	0	wb:91	KAFR SUR	name
+طولكرم:كفرعبوش	كفر عبوش	0	wb:107	KAFR ABBUSH	name
+طولكرم:كور	كور	0	wb:96	KUR	name
+طولكرم:نزلةعيسى	نزلة عيسى	1	wb:28	NAZLAT 'ISA	name
+قلقيلية:إماتين	إماتين	0	wb:120	IMMATIN	transliteration
+قلقيلية:الفندق	الفندق	1	wb:125	AL FUNDUQ	transliteration
+قلقيلية:جنصافوط	جنصافوط	1	wb:129	JINSAFUT	transliteration
+قلقيلية:جيت	جيت	1	wb:104	JIT	transliteration
+قلقيلية:جيوس	جيوس	0	wb:115	JAIYUS	transliteration
+قلقيلية:حبلة	حبلة	1	wb:131	HABLA	transliteration
+قلقيلية:خربةصير	خربة صير	0	wb:118	KH. SIR	curated
+قلقيلية:سنيريا	سنيريا	1	wb:141	SANNIRIYA	name
+قلقيلية:فلامية	فلامية	0	wb:109	FALAMAH	name
+قلقيلية:كفرثلث	كفر ثلث	0	wb:137	KAFR THULTH	name
+قلقيلية:كفرقدوم	كفر قدوم	1	wb:94	KAFR QADDUM	name
+نابلس:أللبنالشرقية	أللبن الشرقية	0	wb:163	LUBBAN SHARQIYA	name
+نابلس:أوصرين	أوصرين	1	wb:143	USARIN	transliteration
+نابلس:إجنسنيا	إجنسنيا	0	wb:87	IJNISINYA	name
+نابلس:الساوية	الساوية	0	wb:154	ES SAWIYA	curated
+نابلس:الناقورة	الناقورة	0	wb:89	EN NAQURA	name
+نابلس:برقة	برقة	1	wb:328	BURQA	name
+نابلس:بورين	بورين	1	wb:114	BURIN	name
+نابلس:بيتإمرين	بيت إمرين	1	wb:75	BEIT UMRIN	name
+نابلس:بيتإيبا	بيت إيبا	1	wb:95	BEIT IBA	name
+نابلس:بيتا	بيتا	1	wb:140	BEITA	transliteration
+نابلس:بيتدجن	بيت دجن	0	wb:103	BEIT DAJAN	name
+نابلس:بيتفوريك	بيت فوريك	1	wb:122	BEIT FURIK	name
+نابلس:بيتوزن	بيت وزن	1	wb:327	BEIT WAZAN	name
+نابلس:تل	تل	1	wb:113	TELL	curated
+نابلس:تلفيت	تلفيت	0	wb:161	TALFIT	transliteration
+نابلس:جالود	جالود	0	wb:167	JALUD	name
+نابلس:جماعين	جماعين	1	wb:133	JAMM'IN	transliteration
+نابلس:جوريش	جوريش	1	wb:153	JURISH	transliteration
+نابلس:حوارة	حوارة	1	wb:134	HUWWARA	curated
+نابلس:دوما	دوما	0	wb:171	DUMA	name
+نابلس:ديرالحطب	دير الحطب	0	wb:98	DEIR HATAB	name
+نابلس:ديرشرف	دير شرف	1	wb:88	DEIR SHARAF	transliteration
+نابلس:روجيب	روجيب	1	wb:119	RUJIB	transliteration
+نابلس:زواتا	زواتا	1	wb:92	ZAWATA	curated
+نابلس:سالم	سالم	0	wb:111	SALIM	transliteration
+نابلس:سبسطية	سبسطية	0	wb:83	SABASTIYA	name
+نابلس:عزموط	عزموط	0	wb:93	AZMUT	curated
+نابلس:عصيرةالشمالية	عصيرة الشمالية	0	wb:82	ASIRA ESH SHAMALIYA	name
+نابلس:عصيرةالقبلية	عصيرة القبلية	1	wb:128	ASIRA EL QIBLIYA	name
+نابلس:عقربا	عقربا	0	wb:139	AQRABA	name
+نابلس:عمورية	عمورية	0	wb:172	AMMURIYA	name
+نابلس:عورتا	عورتا	0	wb:127	'AWRTA	transliteration
+نابلس:عوريف	عوريف	1	wb:136	URIF	name
+نابلس:عينبوس	عينبوس	1	wb:138	EINAB	curated
+نابلس:قبلان	قبلان	1	wb:150	QABALAN	transliteration
+نابلس:قريوت	قريوت	1	wb:170	QARYUT	transliteration
+نابلس:قصرة	قصرة	1	wb:162	QUSRA	transliteration
+نابلس:قوصين	قوصين	1	wb:97	QUSSIEN	transliteration
+نابلس:كفرقليل	كفر قليل	1	wb:117	KAFR QALLIL	name
+نابلس:مادما	مادما	1	wb:124	MADAMA	name
+نابلس:مجدلبنيفاضل	مجدل بني فاضل	0	wb:159	MAJDAL BANI FADIL	name
+نابلس:نابلس	نابلس	0	wb:99	NABLUS	name
+نابلس:ياصيد	ياصيد	1	wb:71	YASID	transliteration
+نابلس:يتما	يتما	1	wb:151	YATMA	transliteration
