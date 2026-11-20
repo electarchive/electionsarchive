@@ -2014,6 +2014,10 @@ PUBLISH: dict[str, tuple[LiteralString, dict[str, pl.DataType]]] = {
         "select t.entity_id::text, t.scheme, t.value, c.pipeline from external_id t",
         {"entity_id": U, "scheme": U, "value": U, "pipeline": U},
     ),
+    "slug": (
+        "select t.path, t.entity_id::text, t.is_current, c.pipeline from slug t",
+        {"path": U, "entity_id": U, "is_current": B, "pipeline": U},
+    ),
 }
 REFRESH = 86400
 REBUILD = 3600
@@ -2023,6 +2027,7 @@ class Reference(NamedTuple):
     ids: frozenset[str]
     packages: frozenset[str]
     columns: dict[str, Columns]
+    root: Path | None = None
 
 
 def _columns(conn: Connection, table: str) -> Columns:
@@ -2152,9 +2157,9 @@ def _reference(path: Path) -> Reference:
         if folder.is_dir() and not folder.name.startswith("."):
             for table in PUBLISH:
                 file = folder / f"{table}.parquet"
-                if table not in ("area_code", "external_id") and file.exists():
+                if table not in ("area_code", "external_id", "slug") and file.exists():
                     ids |= set(pl.read_parquet(file, columns=["id"])["id"].to_list())
-    return Reference(frozenset(ids), frozenset(body["packages"]), columns)
+    return Reference(frozenset(ids), frozenset(body["packages"]), columns, path.parent)
 
 
 def _ready(source: Connection | Reference, key: str, batch: set[str], minted: set[str]) -> list[str]:
@@ -2185,6 +2190,7 @@ def _ready(source: Connection | Reference, key: str, batch: set[str], minted: se
             )
     if not isinstance(source, Reference):
         found += _clashes(source, path, str(manifest["pipeline"]))
+    found += _held(source, path, str(manifest["pipeline"]))
     geometry = path / "area_geometry.parquet"
     if not isinstance(source, Reference) and geometry.exists():
         rows = pl.read_parquet(geometry, columns=["area_id", "valid_from", "valid_to"])
@@ -2290,6 +2296,177 @@ def _declared_twice(keys: list[str]) -> list[str]:
     ] + ([f"ready.unit_twice: {pairs.height:,} repeated units in all"] if pairs.height > 20 else [])
 
 
+def _rows(path: Path, table: str, columns: list[str]) -> pl.DataFrame:
+    """A package table's columns, or an empty frame when the package holds no such table."""
+    file = path / f"{table}.parquet"
+    if not file.exists():
+        return pl.DataFrame(schema={c: pl.Boolean if c == "is_current" else pl.Utf8 for c in columns})
+    present = set(pl.read_parquet_schema(file))
+    frame = pl.read_parquet(file, columns=[c for c in columns if c in present])
+    return frame.with_columns(
+        *(pl.lit(None, pl.Boolean if c == "is_current" else pl.Utf8).alias(c) for c in columns if c not in present)
+    ).select(columns)
+
+
+def _stored(source: Connection | Reference, table: str, columns: list[str], pairs: pl.DataFrame) -> pl.DataFrame:
+    """The database's (or reference partitions') rows of external_id or slug that share a key column value with
+    `pairs`, each with the pipeline of its changeset."""
+    keys = ["scheme", "value"]
+    wanted = [*columns, "pipeline"]
+    if pairs.is_empty():
+        return pl.DataFrame(schema={c: pl.Boolean if c == "is_current" else pl.Utf8 for c in wanted})
+    if isinstance(source, Reference):
+        if source.root is None:
+            return pl.DataFrame(schema={c: pl.Boolean if c == "is_current" else pl.Utf8 for c in wanted})
+        files = [
+            file
+            for folder in source.root.iterdir()
+            if folder.is_dir() and not folder.name.startswith(".")
+            for file in [folder / f"{table}.parquet"]
+            if file.exists()
+        ]
+        if not files:
+            return pl.DataFrame(schema={c: pl.Boolean if c == "is_current" else pl.Utf8 for c in wanted})
+        held = pl.concat([pl.scan_parquet(file).select(wanted) for file in files], how="vertical_relaxed")
+        if table == "slug":
+            return (
+                pl.concat(
+                    [
+                        held.join(pairs.select("path").unique().lazy(), on="path"),
+                        held.join(pairs.select("entity_id").unique().lazy(), on="entity_id"),
+                    ]
+                )
+                .unique()
+                .collect()
+            )
+        return held.join(pairs.select(keys).unique().lazy(), on=keys).collect()
+    if table == "external_id":
+        rows = source.execute(
+            """select e.entity_id::text, e.scheme, e.value, c.pipeline
+               from unnest(%s::text[], %s::text[]) as n(scheme, value)
+               join external_id e on e.scheme = n.scheme and e.value = n.value
+               join changeset c on c.id = e.changeset_id""",
+            [pairs["scheme"].to_list(), pairs["value"].to_list()],
+        ).fetchall()
+    else:
+        rows = source.execute(
+            """select s.path, s.entity_id::text, s.is_current, c.pipeline from slug s
+               join changeset c on c.id = s.changeset_id
+               where s.path = any(%s::text[]) or s.entity_id = any(%s::uuid[])""",
+            [pairs["path"].to_list(), pairs["entity_id"].drop_nulls().unique().to_list()],
+        ).fetchall()
+    schema = {c: pl.Boolean if c == "is_current" else pl.Utf8 for c in wanted}
+    return pl.DataFrame(rows, schema=schema, orient="row")
+
+
+def _held(source: Connection | Reference, path: Path, pipeline: str) -> list[str]:
+    """External ids and slugs a package adds that clash with rows another pipeline already holds.
+
+    `external_id` is keyed by (scheme, value) and a slug by its path, and an entity has one current slug, so the load
+    refuses any of these. Rows the same pipeline wrote are left out: a re-emit replaces them. Run against the
+    database or against the reference partitions downloaded beside the snapshot (`external_id.parquet`,
+    `slug.parquet`); a partition the reference lacks cannot be checked.
+    """
+    found: list[str] = []
+    ids = _rows(path, "external_id", ["entity_id", "scheme", "value"]).filter(pl.col("value").is_not_null())
+    held = _stored(source, "external_id", ["entity_id", "scheme", "value"], ids).filter(pl.col("pipeline") != pipeline)
+    taken = held.join(ids.select("scheme", "value").unique(), on=["scheme", "value"])
+    if taken.height:
+        found.append(
+            f"ready.external_id: {taken.height:,} external ids (scheme, value) are held under another pipeline's "
+            f"changeset, so the load refuses them; list the entity as external and drop the row: "
+            f"{[(r['scheme'], r['value'], r['pipeline']) for r in taken.head(5).iter_rows(named=True)]}"
+        )
+    slugs = _rows(path, "slug", ["path", "entity_id", "is_current"]).filter(pl.col("path").is_not_null())
+    held = _stored(source, "slug", ["path", "entity_id", "is_current"], slugs).filter(pl.col("pipeline") != pipeline)
+    owned = held.join(slugs.select("path", "entity_id").rename({"entity_id": "mine"}), on="path").filter(
+        pl.col("entity_id") != pl.col("mine")
+    )
+    if owned.height:
+        found.append(
+            f"ready.slug: {owned.height:,} slug paths are held for another entity: "
+            f"{[(r['path'], r['entity_id'], r['pipeline']) for r in owned.head(5).iter_rows(named=True)]}"
+        )
+    current = slugs.filter(pl.col("is_current").fill_null(True))
+    second = (
+        held.filter(pl.col("is_current").fill_null(False))
+        .join(current.select("path", "entity_id").rename({"path": "mine"}), on="entity_id")
+        .filter(pl.col("path") != pl.col("mine"))
+    )
+    if second.height:
+        found.append(
+            f"ready.slug: {second.height:,} entities already hold a current slug under another pipeline and get a "
+            f"second one: {[(r['entity_id'], r['path'], r['mine']) for r in second.head(5).iter_rows(named=True)]}"
+        )
+    return found
+
+
+def _repeated(keys: list[str]) -> list[str]:
+    """What two packages of one run add twice, or one entity with two current slugs across the run.
+
+    The load refuses an external id (scheme, value) written by two packages, a slug path for two entities, a second
+    current slug for an entity, and an entity id two packages both add (`Package.id` hashes the pipeline, so
+    packages of one pipeline derive the same ids for the same thing). Each entity comes from one package, and the
+    others list it as external.
+    """
+    found: list[str] = []
+    external, slug, entity = [], [], []
+    for key in keys:
+        path = _resolve(key)
+        external.append(
+            _rows(path, "external_id", ["entity_id", "scheme", "value"]).with_columns(pl.lit(key).alias("package"))
+        )
+        slug.append(_rows(path, "slug", ["path", "entity_id", "is_current"]).with_columns(pl.lit(key).alias("package")))
+        for table in ENTITY_TABLES:
+            if table in TABLES and TABLES[table][0] == ("id",):
+                ids = _rows(path, table, ["id"]).drop_nulls().unique()
+                entity.append(ids.with_columns(pl.lit(key).alias("package"), pl.lit(table).alias("table")))
+    both = pl.concat(external).filter(pl.col("value").is_not_null()).unique(["package", "scheme", "value", "entity_id"])
+    twice = (
+        both.group_by("scheme", "value")
+        .agg(pl.col("package").unique().sort(), pl.col("entity_id").n_unique().alias("n"))
+        .filter(pl.col("package").list.len() > 1)
+    )
+    found += [
+        f"ready.external_id: external id {row['scheme']} {row['value']} is added by {', '.join(row['package'])}; "
+        "the load refuses a second row for one (scheme, value)"
+        for row in twice.sort("scheme", "value").head(20).iter_rows(named=True)
+    ]
+    rows = pl.concat(slug).filter(pl.col("path").is_not_null()).unique(["package", "path", "entity_id"])
+    split = (
+        rows.group_by("path")
+        .agg(pl.col("entity_id").n_unique().alias("n"), pl.col("package").unique().sort())
+        .filter(pl.col("n") > 1)
+    )
+    found += [
+        f"ready.slug: path {row['path']} is added for {row['n']} entities by {', '.join(row['package'])}"
+        for row in split.sort("path").head(20).iter_rows(named=True)
+    ]
+    current = rows.filter(pl.col("is_current").fill_null(True))
+    more = (
+        current.group_by("entity_id")
+        .agg(pl.col("path").unique().sort().alias("paths"), pl.col("package").unique().sort())
+        .filter(pl.col("paths").list.len() > 1)
+    )
+    found += [
+        f"ready.slug: entity {row['entity_id']} gets {len(row['paths'])} current slugs ({', '.join(row['paths'][:3])}) "
+        f"from {', '.join(row['package'])}; an entity has one"
+        for row in more.sort("entity_id").head(20).iter_rows(named=True)
+    ]
+    added = pl.concat(entity, how="vertical_relaxed").unique(["package", "table", "id"])
+    dup = (
+        added.group_by("id")
+        .agg(pl.col("package").unique().sort(), pl.col("table").first())
+        .filter(pl.col("package").list.len() > 1)
+    )
+    found += [
+        f"ready.entity_twice: {row['table']} {row['id']} is added by {', '.join(row['package'])}; emit it from "
+        "one package and list it as external in the others"
+        for row in dup.sort("id").head(20).iter_rows(named=True)
+    ]
+    return found
+
+
 def readiness(keys: list[str], reference: Path | None = None) -> None:
     minted = _minted(_resolve(key) for key in keys)
     if reference is not None:
@@ -2299,6 +2476,7 @@ def readiness(keys: list[str], reference: Path | None = None) -> None:
         with store.connect() as conn:
             found = [f"{key}: {problem}" for key in keys for problem in _ready(conn, key, set(keys), minted)]
     found += _declared_twice(keys)
+    found += _repeated(keys)
     for line in found:
         print(line, flush=True)
     if found:
