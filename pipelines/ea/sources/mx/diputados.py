@@ -1,5 +1,6 @@
 import csv
 import io
+import json
 import re
 from datetime import date
 from pathlib import Path
@@ -25,6 +26,12 @@ KINDS = ("MR", "RP")
 MR_1991 = "https://web.archive.org/web/20220530194439id_/http://siceef.ine.mx/BD/DiputadosMR1991.csv"
 DOF_1991 = "https://dof.gob.mx/nota_detalle.php?codigo=4748643&fecha=01/10/1991"
 DOF_1991_ERRATA = "https://dof.gob.mx/nota_detalle.php?codigo=4750567&fecha=04/10/1991"
+# INE's count site for the 2015 extraordinary election in Aguascalientes district 1 is offline; the Internet Archive's
+# copy of its summary (cut of 9 December 2015) gives the district's total vote and actas to check the file against.
+AGS_2015_COUNT = (
+    "https://web.archive.org/web/20160520000120id_/"
+    "http://computos2015-ags.ine.mx:80/JSON/DIPUTADO/NACIONAL/diputados_nacional.json"
+)
 DIFFERS = {
     (2006, "7", "6", "2", "8", "B"),
     (2006, "7", "6", "86", "1238", "E01"),
@@ -67,6 +74,8 @@ def fetch() -> None:
             raw.fetch(RAW, file_url(kind, year), suffix=".csv")
         for url in (config["acuerdo"][0], *config.get("also", ())):
             raw.fetch(RAW, url, suffix=".pdf" if url.endswith(".pdf") else ".html")
+        for rerun in config.get("extraordinary", {}).values():
+            raw.fetch(RAW, rerun["count"], suffix=".json")
 
 
 def read(kind: str, year: int) -> tuple[list[str], list[dict[str, str]]]:
@@ -121,6 +130,8 @@ def table(kind: str, year: int) -> tuple[pl.DataFrame, pl.DataFrame]:
                 "registered": ine.number(row[roll]) if roll else None,
                 "status": ine.clean(row.get("ESTATUS_ACTA") or ""),
                 "tepjf": ine.clean(row.get("TEPJF") or ""),
+                # An acta of an extraordinary election, which INE's files print in place of the annulled count.
+                "extraordinary": (row.get("RUTA_ACTA") or "").startswith(f"JE{year}E"),
             }
         )
         for option, value in counts.items():
@@ -238,6 +249,38 @@ ELECTIONS: dict[int, dict] = {
             "NA": (2, 2, 2, 2, 2),
             "MORENA": (2, 2, 5, 8, 4),
             "PES": (2, 1, 1, 2, 2),
+        },
+        # INE's district count file holds, for this district, the actas of the extraordinary election (paths
+        # JE2015E) and not the annulled June count.
+        "extraordinary": {
+            ("01", 1): {
+                "day": date(2015, 12, 6),
+                "count": AGS_2015_COUNT,
+                "site": "http://computos2015-ags.ine.mx/",
+                "title": (
+                    "Cómputos distritales 2015, elección extraordinaria de la diputación de mayoría relativa del "
+                    "Distrito 01 de Aguascalientes (Jesús María)"
+                ),
+                "page": 59,
+                "casilla_note": (
+                    " For this district the file holds the actas of the extraordinary election of 6 December 2015, "
+                    "which INE's archived count summary for that election confirms (109,084 votes in 445 actas)."
+                ),
+                "annulled": (
+                    "The Sala Regional Monterrey of the electoral tribunal annulled this district's election "
+                    "(SM-JIN-35/2015) and the Sala Superior confirmed the ruling (SUP-REC-503/2015), so no deputy was "
+                    "elected here on 7 June; the Consejo General's acuerdo on the list seats records the annulment "
+                    "(page 59). The seat was filled by the extraordinary election of 6 December 2015. INE's district "
+                    "count file holds only the extraordinary election's actas for this district, so the annulled June "
+                    "count is not stored here."
+                ),
+                "rerun": (
+                    "Held after the electoral tribunal annulled the 7 June 2015 election of the deputy for "
+                    "Aguascalientes district 1 (Sala Regional Monterrey, SM-JIN-35/2015, confirmed by the Sala "
+                    "Superior in SUP-REC-503/2015). Its result does not enter the 2015 list-seat allocation, which "
+                    "counts the June vote."
+                ),
+            },
         },
     },
     2012: {
@@ -496,6 +539,12 @@ RP_SEATS_METHOD = (
 REGISTERED, BALLOTS, VALID, INVALID, VOTES = ine.REGISTERED, ine.BALLOTS, ine.VALID, ine.INVALID, ine.VOTES
 
 
+def count_summary(path: Path) -> dict[str, object]:
+    """The summary an INE count site serves as a script, `var data = {...}`, read as data."""
+    text = path.read_text(encoding="utf-8").strip()
+    return json.loads(text.removeprefix("var data =").strip().removesuffix(";"))
+
+
 def locator(at: int | str) -> dict[str, int | str]:
     """A page of an acuerdo's PDF, or a section of one the Diario Oficial prints as text."""
     return {"page": at} if isinstance(at, int) else {"section": at}
@@ -673,6 +722,70 @@ def emit() -> Path:
                 "join name n on n.entity_id = a.id and n.is_preferred where a.scheme_code = 'mx.entidad'"
             ).fetchall()
         }
+
+        def district_contest(
+            key: str, election: UUID, path: str, year: int, ss: str, dd: int, tag: tuple[str, str] = ("", "")
+        ) -> UUID:
+            contest = cs.key("mx.contest", key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="body_seats",
+                body_id=body,
+                magnitude=1,
+                electoral_system_id=mr_system,
+                default_result_kind="counted",
+            )
+            name(contest, f"{year} Chamber of Deputies, {states[ss]}, district {dd}{tag[0]}")
+            name(contest, f"Diputación federal {year}, {states[ss]}, distrito {dd}{tag[1]}", "es", "native")
+            cs.add("slug", path=f"{path}/{slug(states[ss])}-district-{dd}", entity_id=contest)
+            return contest
+
+        # Extraordinary elections, by day: the election and its path.
+        reruns: dict[date, tuple[UUID, str]] = {}
+
+        def rerun_election(rerun: dict, election: UUID, year: int, ss: str, dd: int) -> tuple[UUID, str]:
+            held: date = rerun["day"]
+            if held in reruns:
+                return reruns[held]
+            by_election = cs.key("mx.election", f"{held}:extraordinary")
+            path = f"mx/{held}-by-election"
+            if by_election in cs.minted:
+                cs.add(
+                    "election",
+                    id=by_election,
+                    polity_id=mexico,
+                    kind="by_election",
+                    date_from=held,
+                    date_to=held,
+                    status="held",
+                    rerun_of_id=election,
+                )
+                name(by_election, f"{year} extraordinary election of the deputy for {states[ss]} district {dd}")
+                name(
+                    by_election,
+                    f"Elección extraordinaria de diputación federal de {year}, {states[ss]}, distrito {dd}",
+                    "es",
+                    "native",
+                )
+                cs.add("slug", path=path, entity_id=by_election)
+                cs.add("note", entity_id=by_election, kind="methodology", body_md=rerun["rerun"])
+            count = cs.source(ine.INE, rerun["title"])
+            cs.add(
+                "source",
+                id=count,
+                kind="official_body",
+                publisher=ine.INE,
+                title=rerun["title"],
+                url=rerun["site"],
+                license=ine.INE_LICENSE,
+            )
+            cs.artifact(raw.cached(RAW, rerun["count"]), count)
+            cs.add("citation", entity_id=by_election, source_id=count, locator={"section": "totVot"})
+            reruns[held] = (by_election, path)
+            return reruns[held]
+
         nation_unit = cs.unit("mx.nation", "MX")
         unit_rows: dict[UUID, tuple[str, str, UUID | None, str, UUID, str]] = {
             nation_unit: ("mx.nation", "MX", None, "equals", cs.area("mx.nation", "MX"), "standard")
@@ -821,28 +934,49 @@ def emit() -> Path:
                 .agg(pl.col("votes").sum())
             )
 
+            # A district whose file rows are the actas of an extraordinary election, and only such a district, is one
+            # the configuration names.
+            extraordinary: dict[tuple[str, int], dict] = config.get("extraordinary", {})
+            marked = located.group_by("state", "district").agg(
+                every=pl.col("extraordinary").all(), some=pl.col("extraordinary").any()
+            )
+            for state, district, every, some in marked.iter_rows():
+                listed = (f"{int(state):02d}", int(district)) in extraordinary
+                if every != listed or some != listed:
+                    raise ValueError(f"{year} {state}-{district}: extraordinary actas do not match the configuration")
+
             winners: dict[str, int] = {}
+            rerun_winners: dict[str, int] = {}
+            rerun_alliances: dict[date, dict[str, UUID]] = {}
             decided = 0
             by_district = {key: group for key, group in totals.group_by(["state", "district"])}
             for (state, district), group in sorted(
                 by_district.items(), key=lambda item: (int(item[0][0]), int(item[0][1]))
             ):
                 ss, dd = f"{int(state):02d}", int(district)
-                contest_key = f"{day}:dip:mr:{ss}{dd:02d}"
-                contest = cs.key("mx.contest", contest_key)
-                cs.add(
-                    "contest",
-                    id=contest,
-                    election_id=election,
-                    kind="body_seats",
-                    body_id=body,
-                    magnitude=1,
-                    electoral_system_id=mr_system,
-                    default_result_kind="counted",
-                )
-                name(contest, f"{year} Chamber of Deputies, {states[ss]}, district {dd}")
-                name(contest, f"Diputación federal {year}, {states[ss]}, distrito {dd}", "es", "native")
-                cs.add("slug", path=f"{path}/{slug(states[ss])}-district-{dd}", entity_id=contest)
+                held, held_election, held_path, held_alliances, tally = day, election, path, alliances, winners
+                tag = ("", "")
+                rerun = extraordinary.get((ss, dd))
+                if rerun is not None:
+                    # The annulled June contest keeps its place without results; the extraordinary election holds
+                    # the file's count.
+                    june = district_contest(f"{day}:dip:mr:{ss}{dd:02d}", election, path, year, ss, dd)
+                    cs.add("note", entity_id=june, kind="methodology", body_md=rerun["annulled"])
+                    cs.add("citation", entity_id=june, source_id=acuerdo, locator=locator(rerun["page"]))
+                    held = rerun["day"]
+                    held_election, held_path = rerun_election(rerun, election, year, ss, dd)
+                    held_alliances = rerun_alliances.setdefault(held, {})
+                    tally = rerun_winners
+                    tag = (" (extraordinary election)", " (elección extraordinaria)")
+                    summary = count_summary(raw.cached(RAW, rerun["count"]).path)
+                    actas = located.filter((pl.col("state") == state) & (pl.col("district") == district))
+                    printed = (int(str(summary["totVot"]).replace(",", "")), int(str(summary["totActMR"])))
+                    if (actas["total"].sum(), actas.height) != printed:
+                        raise ValueError(
+                            f"{year} {ss}-{dd}: {actas['total'].sum()} votes in {actas.height} actas, {printed}"
+                        )
+                contest_key = f"{held}:dip:mr:{ss}{dd:02d}"
+                contest = district_contest(contest_key, held_election, held_path, year, ss, dd, tag)
                 totals_by = {r["option"]: r["votes"] for r in group.iter_rows(named=True) if r["votes"] > 0}
                 standing = {tuple(sorted(g)): sum(totals_by[c] for c in g) for g in groups_of(columns, list(totals_by))}
                 # Equal totals below first place take the order of their column names, so a rebuild orders them alike.
@@ -858,10 +992,15 @@ def emit() -> Path:
                     cs.area("mx.entidad", ss),
                     "aggregate",
                 )
-                district_set = make_set(contest, f"mr:{ss}{dd:02d}:district", True, ine_source, 1, MR_METHOD)
+                district_set = make_set(
+                    contest, f"mr:{ss}{dd:02d}:district", True, ine_source, 1, MR_METHOD, held, held_election
+                )
                 left_out = [f" {text}" for key, text in EXCLUDED.items() if key[:4] == (year, "MR", state, district)]
-                casilla_note = "".join([CASILLA_NOTE, config.get("casilla_note", ""), *left_out])
-                casilla_set = make_set(contest, f"mr:{ss}{dd:02d}:casilla", False, ine_source, 1, casilla_note)
+                held_note = [] if rerun is None else [rerun["casilla_note"]]
+                casilla_note = "".join([CASILLA_NOTE, config.get("casilla_note", ""), *left_out, *held_note])
+                casilla_set = make_set(
+                    contest, f"mr:{ss}{dd:02d}:casilla", False, ine_source, 1, casilla_note, held, held_election
+                )
                 options: dict[str, str] = {}
                 for position, (lines, _) in enumerate(ordered, 1):
                     members = sorted({m for c in lines for m in columns[c]} - {INDEPENDENT})
@@ -872,14 +1011,16 @@ def emit() -> Path:
                         contest_id=contest,
                         kind="candidate",
                         party_id=party(members[0]) if len(members) == 1 else None,
-                        alliance_id=alliance_of(members) if len(members) > 1 else None,
+                        alliance_id=alliance_of(members, held, held_election, held_alliances)
+                        if len(members) > 1
+                        else None,
                         ballot_position=position,
                         ballot_label="–".join(members) if members else "Candidatura independiente",
                     )
                     if position == 1:
                         cs.add("outcome", result_set_id=district_set, option_id=head, kind="elected", seats=1)
                         label = "–".join(members) if members else INDEPENDENT
-                        winners[label] = winners.get(label, 0) + 1
+                        tally[label] = tally.get(label, 0) + 1
                     for column in lines:
                         if len(lines) == 1:
                             options[column] = str(head)
@@ -894,7 +1035,9 @@ def emit() -> Path:
                             kind="candidate",
                             parent_option_id=head,
                             party_id=party(mine[0]) if len(mine) == 1 else None,
-                            alliance_id=alliance_of(members) if len(mine) > 1 else None,
+                            alliance_id=alliance_of(members, held, held_election, held_alliances)
+                            if len(mine) > 1
+                            else None,
                             ballot_label="–".join(mine),
                         )
                         options[column] = str(line)
@@ -924,20 +1067,7 @@ def emit() -> Path:
             for (ss, dd), text in config.get("missing", {}).items():
                 if (str(int(ss)), str(dd)) in by_district:
                     raise ValueError(f"{year} {states[ss]} {dd}: listed as missing but the file has it")
-                contest = cs.key("mx.contest", f"{day}:dip:mr:{ss}{dd:02d}")
-                cs.add(
-                    "contest",
-                    id=contest,
-                    election_id=election,
-                    kind="body_seats",
-                    body_id=body,
-                    magnitude=1,
-                    electoral_system_id=mr_system,
-                    default_result_kind="counted",
-                )
-                name(contest, f"{year} Chamber of Deputies, {states[ss]}, district {dd}")
-                name(contest, f"Diputación federal {year}, {states[ss]}, distrito {dd}", "es", "native")
-                cs.add("slug", path=f"{path}/{slug(states[ss])}-district-{dd}", entity_id=contest)
+                contest = district_contest(f"{day}:dip:mr:{ss}{dd:02d}", election, path, year, ss, dd)
                 cs.add("note", entity_id=contest, kind="methodology", body_md=text)
                 print(year, "contest without results", states[ss], dd, contest)
 
@@ -1056,6 +1186,8 @@ def emit() -> Path:
             print(
                 year, "district winners", dict(sorted(winners.items(), key=lambda item: -item[1])), decided, seat_total
             )
+            if rerun_winners:
+                print(year, "extraordinary winners", rerun_winners)
 
         minted = [
             {
