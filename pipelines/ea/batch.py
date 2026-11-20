@@ -10,6 +10,7 @@ from collections.abc import Generator
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 from datetime import UTC, datetime
+from functools import cache
 from pathlib import Path
 from typing import NotRequired, TypedDict, cast
 
@@ -28,6 +29,7 @@ JOBS = ROOT / "jobs"
 ACCOUNTS = ROOT / "accounts.json"
 APPROVALS = ROOT / "approvals.json"
 SNAPSHOT = ROOT / "snapshot.json"
+PEERS = ROOT / "peers"
 PUSH = os.environ.get("EA_BATCH_PUSH", "ea-fsn2:electionsarchive/data/ops/batch.json")
 PROXY_KEY = "anthropic-batch-proxy"
 PRICES = {"claude-haiku-5-5": (0.05, 0.25), "claude-sonnet-5-5": (1.0, 5.0), "claude-opus-5-5": (5.0, 25.0)}
@@ -73,6 +75,27 @@ class Account(TypedDict):
     billed: NotRequired[float]
     billed_at: NotRequired[float]
     error: NotRequired[Failure]
+    accepted: NotRequired[float]
+
+
+class Spend(TypedDict):
+    id: str
+    account: str
+    at: float
+    cost: float
+
+
+class Shared(TypedDict):
+    name: str
+    since: float
+    billed: float | None
+    error: Failure | None
+    accepted: NotRequired[float | None]
+
+
+class Peer(TypedDict):
+    accounts: list[Shared]
+    batches: NotRequired[list[Spend]]
 
 
 def client(account: str) -> anthropic.Anthropic:
@@ -131,14 +154,75 @@ def accounts() -> dict[str, Account]:
     return json.loads(ACCOUNTS.read_text()) if ACCOUNTS.exists() else {}
 
 
-def committed(name: str, account: Account) -> float:
-    ledger = sum(
-        cost(sent)
+@cache
+def peers() -> tuple[Peer, ...]:
+    if not PUSH:
+        return ()
+    folder, _, own = PUSH.rpartition("/")
+    PEERS.mkdir(parents=True, exist_ok=True)
+    subprocess.run(
+        [
+            "rsync",
+            "-rq",
+            "--timeout=20",
+            "--delete",
+            "-e",
+            "ssh -o BatchMode=yes -o ConnectTimeout=8",
+            f"--exclude={own}",
+            "--exclude=batch-live.json",
+            "--include=batch*.json",
+            "--exclude=*",
+            f"{folder}/",
+            f"{PEERS}/",
+        ],
+        stdin=subprocess.DEVNULL,
+        capture_output=True,
+        check=False,
+    )
+    found: list[Peer] = []
+    for file in sorted(PEERS.glob("batch*.json")):
+        try:
+            found.append(json.loads(file.read_text()))
+        except OSError, ValueError:
+            continue
+    return tuple(found)
+
+
+def spends() -> list[Spend]:
+    return [
+        {"id": sent["id"], "account": sent["account"], "at": sent["at"], "cost": round(cost(sent), 4)}
         for job in jobs()
         for sent in job["batches"]
-        if sent["account"] == name and sent["at"] >= account["since"]
-    )
-    return max(ledger, account.get("billed", 0.0))
+    ]
+
+
+def ledger() -> list[Spend]:
+    found = {item["id"]: item for peer in peers() for item in peer.get("batches", [])}
+    found.update((item["id"], item) for item in spends())
+    return list(found.values())
+
+
+def shared(name: str) -> list[Shared]:
+    return [item for peer in peers() for item in peer.get("accounts", []) if item["name"] == name]
+
+
+def committed(name: str, account: Account) -> float:
+    spent = sum(item["cost"] for item in ledger() if item["account"] == name and item["at"] >= account["since"])
+    billed = [item["billed"] or 0.0 for item in shared(name) if item["since"] == account["since"]]
+    return max(spent, account.get("billed", 0.0), *billed)
+
+
+def refusal(name: str, account: Account) -> Failure | None:
+    copies = shared(name)
+    errors = [item["error"] for item in copies if item["error"] is not None]
+    if "error" in account:
+        errors.append(account["error"])
+    latest = max(errors, key=lambda error: error["at"], default=None)
+    if latest is None:
+        return None
+    accepted = [account.get("accepted", 0.0), *(item.get("accepted") or 0.0 for item in copies)]
+    accepted.extend(item["at"] for item in ledger() if item["account"] == name)
+    return None if max(accepted) >= latest["at"] else latest
 
 
 def approvals() -> dict[str, float]:
@@ -202,10 +286,11 @@ def collect(job: Job) -> list[str]:
 
 def flag(name: str, message: str | None) -> None:
     books = accounts()
-    if name not in books or (message is None and "error" not in books[name]):
+    if name not in books:
         return
     if message is None:
-        del books[name]["error"]
+        books[name].pop("error", None)
+        books[name]["accepted"] = time.time()
     else:
         books[name]["error"] = {"at": time.time(), "message": message[:300]}
     ACCOUNTS.write_text(json.dumps(books, indent=1))
@@ -234,7 +319,7 @@ def pick(projected: float) -> str:
     room: list[tuple[float, str]] = []
     refused: list[str] = []
     for name, account in accounts().items():
-        if "error" in account:
+        if refusal(name, account) is not None:
             refused.append(name)
             continue
         left = account["usd"] * MARGIN - committed(name, account)
@@ -546,9 +631,9 @@ def status() -> str:
     for name, record in accounts().items():
         used = committed(name, record)
         lines.append(f"{name}: ${used:.2f} of ${record['usd']:.2f} (stops at {MARGIN:.0%})")
-        if "error" in record:
+        if (failure := refusal(name, record)) is not None:
             lines.append(
-                f"  {name} failed {datetime.fromtimestamp(record['error']['at']):%Y-%m-%d %H:%M}: {record['error']['message']}"
+                f"  {name} failed {datetime.fromtimestamp(failure['at']):%Y-%m-%d %H:%M}: {failure['message']}"
             )
     for prefix, usd in approvals().items():
         used = sum(cost(sent) for job in jobs(prefix) for sent in job["batches"])
@@ -631,6 +716,7 @@ def summary() -> dict[str, object]:
                 "billed": record.get("billed"),
                 "billed_at": record.get("billed_at"),
                 "error": record.get("error"),
+                "accepted": record.get("accepted"),
             }
             for name, record in books.items()
         ],
@@ -643,11 +729,7 @@ def summary() -> dict[str, object]:
             for prefix, usd in granted.items()
         ],
         "jobs": listed,
-        "batches": [
-            {"id": item["id"], "account": item["account"], "at": item["at"], "cost": round(cost(item), 4)}
-            for job in jobs()
-            for item in job["batches"]
-        ],
+        "batches": spends(),
     }
 
 
