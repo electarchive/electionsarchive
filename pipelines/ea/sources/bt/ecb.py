@@ -45,6 +45,8 @@ FILES = {
     "nc2007": f"{UPLOADS}/2026/06/NC-FinalResults-2007.pdf",
     "nc2013": f"{UPLOADS}/2026/06/NCFinalResult2013.pdf",
     "nc2023": f"{UPLOADS}/2026/06/FinalResult_NC2023.pdf",
+    # The Commission's Election Statistics 2018 book, as the Internet Archive captured it from the Commission's site.
+    "nc2018": "https://web.archive.org/web/20230630174627id_/https://www.ecb.bt/rnp/PE2018.pdf",
 }
 PRESS_2024 = "https://web.archive.org/web/20241212202143id_/https://www.ecb.bt/wp-content/uploads/2024/01/GE-Results-Eng-10012024.pdf"
 BROWSER_2024 = "browser://20261117-210702-144716"
@@ -80,6 +82,7 @@ ELECTIONS = (
     Election(date(2013, 4, 23), "nc", "general", ("2013 National Council election", "nc")),
     Election(date(2013, 5, 31), "na", "primary", ("2013 National Assembly primary round", "na-primary")),
     Election(date(2013, 7, 13), "na", "general", ("2013 National Assembly general election", "na")),
+    Election(date(2018, 4, 20), "nc", "general", ("2018 National Council election", "nc")),
     Election(date(2018, 9, 15), "na", "primary", ("2018 National Assembly primary round", "na-primary")),
     Election(date(2018, 10, 18), "na", "general", ("2018 National Assembly general election", "na")),
     Election(date(2023, 4, 20), "nc", "general", ("2023 National Council election", "nc")),
@@ -113,7 +116,9 @@ def packages() -> list[str]:
 
 def fetch() -> None:
     for url in FILES.values():
-        raw.fetch(SOURCE, url, suffix=".json" if "wp-json" in url else ".pdf")
+        raw.fetch(
+            SOURCE, url, suffix=".json" if "wp-json" in url else ".pdf"
+        )  # the 2018 book comes from the Internet Archive
     # The 2024 pages came from copies of the Commission's files, saved outside the fetcher.
     for url in (PRESS_2024, PAGES_2024["Bumthang"]):
         raw.fetch(SOURCE, url, suffix=".pdf")
@@ -907,10 +912,17 @@ def primary(p: Package, election: Election, eid: str, path_: str) -> None:
 
 def council(p: Package, election: Election, eid: str, path_: str) -> None:
     day = election.day
+    invalid: dict[str, tables.Rejected] = {}
     if day.year == 2007:
         seats, totals = tables.nc2007(path("nc2007"))
     elif day.year == 2013:
         seats, totals = tables.nc2013(path("nc2013")), {}
+    elif day.year == 2018:
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(path("nc2018")), "-"], check=True, capture_output=True, text=True
+        ).stdout
+        seats, invalid, book = tables.nc2018(text)
+        totals = {"secured": book["total"], "registered": book["registered"]}
     else:
         seats, totals = tables.nc2023(path("nc2023")), {}
     seats = sorted(seats, key=lambda seat: tables.dzongkhag_index(seat.name))
@@ -971,6 +983,11 @@ def council(p: Package, election: Election, eid: str, path_: str) -> None:
             evm, postal, count = seat.no
             split(p, rs, unit, no, Row(0, "", "", "No", evm, postal, count, 0))
         roll(p, rs, unit, seat)
+        if seat.name in invalid and unit.postal is not None:
+            rejected = invalid[seat.name]
+            # Postal ballots the counters found invalid when they opened the inner envelopes. The Commission's postal
+            # votes for the candidates are not reduced by them, so the count is kept apart from the votes.
+            value(p, rs, unit.postal, None, 5, rejected.conventional + rejected.booth)
     rows = [r for s in seats for r in s.rows]
     total = {
         "total": sum(r.total for r in rows) + sum(s.no[2] for s in seats if s.no),
@@ -978,6 +995,8 @@ def council(p: Package, election: Election, eid: str, path_: str) -> None:
     }
     if totals:
         totals = {"total": totals["secured"], "registered": totals["registered"]}
+    if day.year == 2018:
+        total["registered"] = sum((s.evm_voters or 0) + (s.postal_voters or 0) for s in seats)
     verify(election, total, totals)
 
 
