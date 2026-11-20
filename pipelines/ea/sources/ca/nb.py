@@ -336,13 +336,16 @@ def legacy_district(rows: list[list[str]], number: int | None = None, name: str 
         code_cell = row[columns["code"]] if "code" in columns else ""
         if "code" in columns and re.fullmatch(r"\d+_\d+", code_cell):
             code, kind = code_cell.split("_")[1], "standard"
-        elif row[0].isdigit():
+        elif re.fullmatch(r"\d+[A-Za-z]?", row[0]):
             code, kind = _clean(f"{section} {row[0]}"), "standard" if not section else "aggregate"
         else:
             code, kind = _clean(f"{section} {label} {text}"), "aggregate"
             label = ""
+            count = 1
+            base = code
             while code in seen:
-                code += "'"
+                count += 1
+                code = f"{base} {count}"
         if code in seen:
             code = _clean(f"{code} {text}")
         seen.add(code)
@@ -424,8 +427,8 @@ def modern_districts(rows: list[list[str]]) -> list[District]:
             if label.lower().startswith("total"):
                 totals = Poll("TOTAL", label, None, votes, sum(votes), None, None, "total")
                 break
-            code = re.sub(r"^P\d+-", "", label)
-            standard = re.fullmatch(r"P\d+-\d+", label) is not None
+            code = re.sub(r"^P?\d+-", "", label)
+            standard = re.fullmatch(r"P?\d+-\d+[A-Za-z]?", label) is not None
             polls.append(
                 Poll(
                     code if standard else label,
