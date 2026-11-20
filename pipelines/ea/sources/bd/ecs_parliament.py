@@ -5,6 +5,7 @@ import html
 import json
 import re
 import subprocess
+import sys
 import unicodedata
 from dataclasses import dataclass, field
 from datetime import date
@@ -12,7 +13,7 @@ from uuid import uuid5
 
 from ea import changeset, package, raw
 from ea.package import Package
-from ea.sources.bd import report1991, report1996, report2014
+from ea.sources.bd import general2026, portal2026, report1991, report1996, report2014
 from ea.sources.bd.bijoy import unicode
 
 SOURCE = "bd.ecs_parliament"
@@ -865,12 +866,14 @@ def seats(year: int) -> list[Seat]:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{spec.day}" for spec in GENERAL.values())]
+    days = [*(spec.day for spec in GENERAL.values()), general2026.DAY]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in days)]
 
 
 def fetch() -> None:
     for url in (REPORT_1991, REPORT_1996, REPORT_2001, REPORT_2008, REPORT_2014):
         raw.fetch(SOURCE, url, suffix=".pdf")
+    portal2026.fetch(SOURCE)
 
 
 def parse() -> None:
@@ -878,6 +881,7 @@ def parse() -> None:
     registry().write()
     for year in GENERAL:
         election(year).write()
+    general2026.build(sys.modules[__name__]).write()
 
 
 def emit() -> None:
@@ -912,6 +916,10 @@ def constituencies() -> dict[str, tuple[str, str | None]]:
             code = changeset.slug(seat.name)
             known = found.get(code, (seat.name, None))
             found[code] = (known[0], seat.name_bn or known[1])
+    for entry in general2026.seats().values():
+        name = english(general2026.bengali_name(entry["name"]))
+        known = found.get(changeset.slug(name), (name, None))
+        found[changeset.slug(name)] = (known[0], known[1] or unicodedata.normalize("NFC", entry["name"]))
     return dict(sorted(found.items()))
 
 
@@ -1032,6 +1040,7 @@ def used_parties() -> list[str]:
     for year in GENERAL:
         if year != 1996:
             found |= {c.party for seat in seats(year) for c in seat.candidates if not c.none_of_above}
+    found |= general2026.parties_used()
     return sorted(found - {"Independent"})
 
 
@@ -1067,6 +1076,8 @@ def registry() -> Package:
             p.name(id, report1991.BENGALI[name], "bn", "official")
         elif name in report2014.BENGALI:
             p.name(id, report2014.BENGALI[name], "bn", "official")
+        elif name in general2026.bengali_parties():
+            p.name(id, unicodedata.normalize("NFC", general2026.bengali_parties()[name]), "bn", "official")
     return p
 
 
