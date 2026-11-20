@@ -681,14 +681,17 @@ def _value(p: Package, result_set: str, unit: str, option: str | None, measure: 
     )
 
 
-def ward_unit(p: Package, seen: set[str], day: date, since: date, ward: str, kind: str) -> str:
+def ward_unit(
+    p: Package, seen: set[str], day: date, since: date, ward: str, kind: str, by_election_wards: set[str]
+) -> str:
     """The one reporting unit of a ward on a by-election date, shared by its ward and proportional contests.
 
     A ward that holds a ward by-election and also votes in its council's proportional by-election on the same date
     is one place where votes are counted, so both contests report on the same unit; the unit's scheme and code may
     occur once for its validity.
     """
-    unit = key("unit", day, "ward", ward)
+    # A ward with a ward by-election keeps the id its ward total was first loaded under.
+    unit = key("unit", day, "ward", ward, "total") if ward in by_election_wards else key("unit", day, "ward", ward)
     if unit not in seen:
         seen.add(unit)
         p.add(
@@ -722,6 +725,7 @@ def election(day: date) -> Package:
     p.name(id, f"{day} South African municipal by-elections", "en", "official")
     p.add("slug", path=path, entity_id=id, is_current=True)
     wards, councils = reports(day)
+    ward_codes = {ward.ward for _, ward in wards}
     council_wards = {ward_code for _, council in councils for ward_code in council.wards}
     seen: set[str] = set()
     off = 0
@@ -766,7 +770,9 @@ def election(day: date) -> Package:
                 ballot_position=None,
                 ballot_label=clean(candidate.name),
             )
-        total = ward_unit(p, seen, day, since, ward.ward, "standard" if ward.ward in council_wards else "aggregate")
+        total = ward_unit(
+            p, seen, day, since, ward.ward, "standard" if ward.ward in council_wards else "aggregate", ward_codes
+        )
         if ward.registered:
             _value(p, result_set, total, None, 2, ward.registered)
         for vd, (valid, spoilt, cast) in sorted(ward.districts.items()):
@@ -841,7 +847,7 @@ def election(day: date) -> Package:
         )
         options = {}
         for ward_code, votes in sorted(council.wards.items()):
-            unit = ward_unit(p, seen, day, since, ward_code, "standard")
+            unit = ward_unit(p, seen, day, since, ward_code, "standard", ward_codes)
             figures = council.totals.get(ward_code, {})
             _value(p, result_set, unit, None, 2, figures.get("Registered Voters"))
             _value(p, result_set, unit, None, 4, figures.get("Total Valid Votes"))
