@@ -12,7 +12,7 @@ SOURCE = "ua.match"
 VERSION = "1"
 MOST = 200_000
 LOOKALIKES = str.maketrans("aceiopxyk’ʼ`", "асеіорхук'''")
-ROWS = """select cy.person_id::text, coalesce(cy.ballot_name, n.text), e.date_from, p.birth_date,
+ROWS = """select cy.person_id::text, coalesce(cy.ballot_name, n.text), e.date_from, coalesce(k.office_id, k.body_id, k.id)::text, p.birth_date,
                  (select min(x.value) from external_id x where x.entity_id = cy.person_id and x.scheme = 'wikidata')
           from candidacy cy
           join changeset c on c.id = cy.changeset_id
@@ -37,7 +37,9 @@ def fold(name: str | None) -> str | None:
 def plan(rows: pl.DataFrame) -> pl.DataFrame:
     """Group the persons who bear the same full name and the same birth date, survivor first.
 
-    A group stays apart when two of its persons stood on the same day or hold two Wikidata items.
+    A group stays apart when two of its persons stood for the same office on the same day or hold two Wikidata items.
+    Two persons who stood for different offices on the same day still join, since one person may stand for a council
+    and a community's head, or for councils of different levels, on one ballot.
     """
     named = rows.with_columns(key=pl.col("name").map_elements(fold, return_dtype=pl.String)).drop_nulls("key")
     nodes = named.select("person").unique().sort("person").with_row_index("node")
@@ -53,7 +55,7 @@ def plan(rows: pl.DataFrame) -> pl.DataFrame:
     label = pl.Series("group", components(nodes.height, edges), pl.UInt32)
     labeled = named.with_columns(group=label.gather(named["node"]))
     crowded = (
-        labeled.group_by("group", "day")
+        labeled.group_by("group", "day", "office")
         .agg(pl.col("person").n_unique().alias("people"))
         .filter(pl.col("people") > 1)
         .select("group")
@@ -65,7 +67,7 @@ def plan(rows: pl.DataFrame) -> pl.DataFrame:
     kept = grouped.filter(pl.col("persons") > 1).join(crowded, on="group", how="anti").filter(pl.col("items") <= 1)
     print(
         f"candidacies {rows.height}, groups {grouped.filter(pl.col('persons') > 1).height}, kept {kept.height}, "
-        f"stood on the same day {crowded.height}, two Wikidata items {grouped.filter(pl.col('items') > 1).height}"
+        f"stood for the same office on the same day {crowded.height}, two Wikidata items {grouped.filter(pl.col('items') > 1).height}"
     )
     return (
         labeled.join(kept.select("group"), on="group")
@@ -86,7 +88,14 @@ def emit() -> Path:
         conn.execute("set statement_timeout = 0")
         rows = pl.DataFrame(
             conn.execute(ROWS).fetchall(),
-            schema={"person": pl.String, "name": pl.String, "day": pl.Date, "birth": pl.Date, "item": pl.String},
+            schema={
+                "person": pl.String,
+                "name": pl.String,
+                "day": pl.Date,
+                "office": pl.String,
+                "birth": pl.Date,
+                "item": pl.String,
+            },
             orient="row",
         )
         groups = plan(rows)
