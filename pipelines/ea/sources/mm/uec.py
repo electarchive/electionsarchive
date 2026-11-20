@@ -244,6 +244,9 @@ def pair(seat: Seat) -> list[Candidate | None]:
 
 
 def fetch() -> None:
+    from ea.sources.mm import uec_general
+
+    uec_general.fetch()
     for url in PAGES.values():
         raw.fetch(SOURCE, url, suffix=".html")
     for seat in checked().values():
@@ -255,12 +258,17 @@ def fetch() -> None:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/registry", f"{SOURCE}/{DAY}"]
+    from ea.sources.mm import uec_general
+
+    return [f"{SOURCE}/registry", f"{SOURCE}/{DAY}", *uec_general.packages()]
 
 
 def parse() -> None:
+    from ea.sources.mm import uec_general
+
     registry().write()
     build().write()
+    uec_general.parse()
 
 
 def emit() -> None:
