@@ -23,6 +23,21 @@ value's locator, and the parties' votes add up to the printed valid total. The c
   noted on the result set. The districts are the constituencies of the Ministry's later results, so they attach to
   the areas `gr.ypes_national` already holds.
 
+- **1984 by municipality, eparchy, and commune**: pages 25 to 54 print, for each electoral district, the valid ballots
+  and every party's votes for each municipality (Δήμος), for the communes of each eparchy taken together (Κοινότητες
+  Επαρχίας), for the few communes of Athens' second district printed one by one, and for the parishes (Ενορίες) of
+  Athens, Piraeus, and Thessaloniki, with totals for each eparchy, each of those three municipalities, and each
+  district. The pages were read twice: by OCR of every row (Tesseract, with the printed percentages and sums used to
+  pick between readings) and by a multimodal model transcribing the vote columns from page crops, and the two
+  were reconciled cell by cell against the printed percentages. The result is `ypes_ep_archive_tables/ep-1984-municipalities.json`.
+  Every leaf row's parties are checked against the printed eparchy, municipality, and district totals; the
+  differences that remain are the book's own and are listed in `KNOWN_GROUP_DIFFERENCES`. A note on page 24 says
+  these tables were recomputed by machine after the court decisions, so their sums can differ slightly from the
+  general table on pages 16 and 17. The municipalities, eparchies, and communes become areas of their own (schemes
+  `gr.ep_archive_municipality`, `gr.ep_archive_eparchy`, and `gr.ep_archive_community`) under the electoral district
+  areas of `gr.ypes_national`; the book prints no boundaries, so they have no shapes yet. The polling-station tables
+  that follow (pages 57 to 370) are not built yet.
+
 The 1981, 1989, and 1994 books are not yet in the raw cache. The 1999 and 2004 national results are built by
 `ypes_results`, and later ones by `ypes_national` and `ypes_ep`.
 
@@ -31,7 +46,7 @@ Each election is a package, `gr.ypes_ep_archive/ep-<year>`, built on `gr.ypes_ep
 """
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 from pathlib import Path
 from urllib.parse import quote
@@ -42,6 +57,7 @@ import pymupdf
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.store import DATA
 
 SOURCE = "gr.ypes_ep_archive"
 GREECE = str(uuid5(package.NAMESPACE, "polity\x1fGR"))
@@ -49,6 +65,10 @@ TERRITORY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fGRC"))
 GEO = f"{SOURCE}/geo"
 SCHEME = "gr.ep_archive_country"
 DISTRICT_SCHEME = "gr.ep_archive_district"
+EPARCHY_SCHEME = "gr.ep_archive_eparchy"
+MUNICIPALITY_SCHEME = "gr.ep_archive_municipality"
+COMMUNITY_SCHEME = "gr.ep_archive_community"
+PARISH_SCHEME = "gr.ep_archive_parish"
 TABLES = Path(__file__).with_name("ypes_ep_archive_tables")
 NATIONAL = "gr.ypes_national"
 REGISTRY = f"{SOURCE}/registry"
@@ -221,6 +241,7 @@ def parse() -> None:
     for election in ELECTIONS:
         if available(election):
             verify(election)
+    render_pages()
     geo().write()
     registry().write()
     for election in ELECTIONS:
@@ -269,6 +290,15 @@ def geo() -> Package:
         rank=1,
         noun="electoral district",
     )
+    p.add("scheme", code=EPARCHY_SCHEME, polity_id=GREECE, kind="administrative", rank=2, noun="eparchy")
+    p.add("scheme", code=MUNICIPALITY_SCHEME, polity_id=GREECE, kind="administrative", rank=3, noun="municipality")
+    p.add("scheme", code=COMMUNITY_SCHEME, polity_id=GREECE, kind="administrative", rank=3, noun="community")
+    p.add("scheme", code=PARISH_SCHEME, polity_id=GREECE, kind="precinct", rank=4, noun="parish")
+    for place in places():
+        p.external.add(district_area(place.code))
+        p.add("area", id=place.id, scheme_code=place.scheme)
+        p.add("area_parent", area_id=place.id, parent_id=place.parent)
+        p.name(place.id, place.name, "el", "official")
     return p
 
 
@@ -474,6 +504,307 @@ def districts(
     return rows
 
 
+MUNICIPALITIES = TABLES / "ep-1984-municipalities.json"
+LEAVES = ("municipality", "communes", "community", "parish")
+# (district, printed total) -> the leaf rows' sums minus the printed total, as the book prints them: index 0 is the
+# valid ballots and 1 to 16 the parties. Each is the book's own figure, checked against the page.
+KNOWN_GROUP_DIFFERENCES: dict[tuple[int, str], dict[int, int]] = {
+    (1, "Σύνολο Εκλ. Περιφερείας Α΄ Αθηνών"): {
+        0: -2566, 1: -158, 2: -142, 3: -52, 4: -26, 5: -1, 6: -10, 7: -3, 8: -2, 9: -2, 11: -2, 13: -2, 15: -1, 16: -1
+    },
+    (2, "Σύνολο Εκλ. Περιφερείας Β΄ Αθηνών"): {9: -6, 11: 6},
+    (4, "Σύνολο Εκλ. Περιφερείας Β΄ Πειραιώς"): {
+        0: -3559, 1: -1348, 2: -1657, 3: -229, 4: -113, 5: -13, 6: -22, 7: -16, 8: -6, 9: -114, 10: -1, 11: -13,
+        12: -7, 13: -1, 14: -7, 15: -4, 16: -8,
+    },
+    (21, "Σύνολο Επαρχίας Άρτης"): {8: -3},
+    (21, "Σύνολο Εκλ. Περιφερείας Άρτης"): {8: 3},
+    (34, "Σύνολο Δήμου Θεσσαλονίκης"): {
+        0: -490, 1: -179, 2: -186, 3: -66, 4: -32, 6: -7, 7: -3, 8: -1, 9: -11, 10: -1, 11: -1, 12: -2, 13: -1
+    },
+    (53, "Σύνολο Επαρχίας Τεμένους"): {3: 5, 10: -5},
+    (53, "Σύνολο Εκλ. Περιφερείας Ηρακλείου"): {1: 3, 3: -3, 10: -3},
+}  # fmt: skip
+
+
+@dataclass(frozen=True)
+class Row:
+    district: int  # the district's line on the general table, 1 to 56
+    code: int  # the district's code in gr.ypes_national
+    name: str
+    kind: str  # municipality, communes, community, parish, eparchy_total, municipality_total, or district
+    valid: Cell
+    votes: tuple[Cell, ...]
+    eparchy: str | None = None  # the eparchy's name, for rows inside an eparchy total
+    municipality: str | None = None  # the municipality's name, for parishes inside a municipality total
+
+    @property
+    def figures(self) -> list[int]:
+        return [self.valid.value, *(c.value for c in self.votes)]
+
+
+@dataclass(frozen=True)
+class Place:
+    id: str
+    scheme: str
+    key: str
+    name: str
+    parent: str
+    code: int
+
+
+def eparchy_name(label: str) -> str:
+    for prefix in ("Σύνολο Επαρχίας ", "Κοινότητες Επαρχίας "):
+        if label.startswith(prefix):
+            return label.removeprefix(prefix)
+    raise ValueError(f"not an eparchy row: {label}")
+
+
+def municipal_rows() -> list[Row]:
+    """The rows of pages 25 to 54, each leaf tied to the eparchy and municipality totals that print its sums."""
+    raw_rows = json.loads(MUNICIPALITIES.read_text())
+    rows: list[Row] = []
+    for district in range(1, 57):
+        mine = [r for r in raw_rows if r["district"] == district]
+        built: list[Row] = []
+        open_rows: list[int] = []
+        for r in mine:
+            valid = cell(r["valid"])
+            assert valid is not None
+            votes = tuple(c for c in (cell(v) for v in r["votes"]) if c is not None)
+            assert len(votes) == PARTY_COLUMNS
+            row = Row(district, int(r["code"]), str(r["name"]), str(r["kind"]), valid, votes)
+            if row.kind in LEAVES:
+                open_rows.append(len(built))
+            elif row.kind == "municipality_total":
+                take = len(open_rows)
+                while take > 0 and built[open_rows[take - 1]].kind == "parish":
+                    take -= 1
+                name = "Δήμος " + row.name.removeprefix("Σύνολο Δήμου ")
+                for i in open_rows[take:]:
+                    built[i] = replace(built[i], municipality=name)
+                del open_rows[take:]
+                open_rows.append(len(built))
+                row = replace(row, municipality=name)
+            elif row.kind == "eparchy_total":
+                # the shortest run of open rows above whose valid ballots add up to the total's
+                want, acc, take = row.valid.value, 0, None
+                for at in range(len(open_rows) - 1, -1, -1):
+                    acc += built[open_rows[at]].valid.value
+                    if acc == want:
+                        take = at
+                        break
+                if take is None:
+                    raise ValueError(f"{district}: no run of rows adds up to {row.name}")
+                name = eparchy_name(row.name)
+                for i in open_rows[take:]:
+                    built[i] = replace(built[i], eparchy=name)
+                    for j, other in enumerate(built):
+                        if (
+                            other.kind == "parish"
+                            and other.municipality == built[i].municipality
+                            and built[i].municipality
+                        ):
+                            built[j] = replace(other, eparchy=name)
+                del open_rows[take:]
+                row = replace(row, eparchy=name)
+            elif row.kind == "district":
+                open_rows.clear()
+            else:
+                raise ValueError(f"{district}: unknown row kind {row.kind}")
+            built.append(row)
+        rows += built
+    return rows
+
+
+def verify_municipal(rows: list[Row]) -> None:
+    """Fail when a printed total disagrees with its rows other than where the book disagrees with itself."""
+    for district in range(1, 57):
+        mine = [r for r in rows if r.district == district]
+        if sum(1 for r in mine if r.kind == "district") != 1:
+            raise ValueError(f"{district}: expected one district total")
+        for total in mine:
+            if total.kind == "eparchy_total":
+                members = [r for r in mine if r.eparchy == total.eparchy and r.kind in (*LEAVES, "municipality_total")]
+                members = [r for r in members if not (r.kind == "parish" and r.municipality)]
+            elif total.kind == "municipality_total":
+                members = [r for r in mine if r.kind == "parish" and r.municipality == total.municipality]
+            elif total.kind == "district":
+                members = [
+                    r
+                    for r in mine
+                    if (r.kind == "eparchy_total")
+                    or (r.kind == "municipality_total" and r.eparchy is None)
+                    or (r.kind in LEAVES and r.eparchy is None and r.municipality is None)
+                ]
+            else:
+                continue
+            added = [sum(column) for column in zip(*(m.figures for m in members), strict=True)]
+            found = {i: a - b for i, (a, b) in enumerate(zip(added, total.figures, strict=True)) if a != b}
+            if found != KNOWN_GROUP_DIFFERENCES.get((district, total.name), {}):
+                raise ValueError(f"{district}: {total.name}: the rows differ from the printed total by {found}")
+
+
+def places() -> list[Place]:
+    """The eparchies, municipalities, and communes the municipal tables print, under the electoral districts."""
+    if not MUNICIPALITIES.exists():
+        return []
+    out: dict[str, Place] = {}
+    for r in municipal_rows():
+        district = district_area(r.code)
+        parent = district
+        if r.eparchy:
+            ep = key("area", EPARCHY_SCHEME, r.district, r.eparchy)
+            out.setdefault(ep, Place(ep, EPARCHY_SCHEME, r.eparchy, f"Επαρχία {r.eparchy}", district, r.code))
+            parent = ep
+        if r.municipality:
+            mu = key("area", MUNICIPALITY_SCHEME, r.district, r.municipality)
+            out.setdefault(mu, Place(mu, MUNICIPALITY_SCHEME, r.municipality, r.municipality, parent, r.code))
+        if r.kind == "municipality":
+            mu = key("area", MUNICIPALITY_SCHEME, r.district, r.name)
+            out.setdefault(mu, Place(mu, MUNICIPALITY_SCHEME, r.name, r.name, parent, r.code))
+        elif r.kind == "community":
+            co = key("area", COMMUNITY_SCHEME, r.district, r.name)
+            out.setdefault(co, Place(co, COMMUNITY_SCHEME, r.name, r.name, parent, r.code))
+    return list(out.values())
+
+
+MUNICIPAL_METHOD = (
+    "The Ministry of Interior's results book prints, after the general table, the valid ballots and every party's "
+    "votes for each municipality, for the communes of each eparchy together, and for the parishes of Athens, Piraeus, "
+    "and Thessaloniki (pages 25 to 54). The book is a scan without a text layer. Each row was read by OCR and, "
+    "independently, transcribed by a multimodal model; the readings were reconciled cell by cell against the "
+    "percentages the book prints beside each party's votes, and every row was checked against the eparchy, "
+    "municipality, and district totals the book prints. The totals themselves are not stored as values; they are "
+    "the sums of the rows."
+)
+MUNICIPAL_NOTE = (
+    "A note on page 24 of the book says that these tables were produced by machine after the courts' decisions and "
+    "that their sums were recomputed, so they can differ slightly from the general table on pages 16 and 17. They "
+    "do: most districts' party totals differ from the general table by a few votes. The book also disagrees with "
+    "itself in places, and the figures are stored as printed. About a quarter of the rows print valid ballots that "
+    "differ from the sum of their parties' votes, usually by one to ten votes and in a few Athens parishes by "
+    "several hundred, while every party's printed percentage agrees with its printed votes. Β΄ Πειραιώς prints a "
+    "district total 3,559 valid ballots above the sum of its seven municipalities, Θεσσαλονίκη's municipal total is "
+    "490 above the sum of its parishes, and Α΄ Αθηνών's parishes add up to 2,566 fewer valid ballots than its "
+    "printed total; no row on the page carries the difference. The votes cast abroad are not in these tables. The "
+    "communes of each eparchy are printed together, as one figure for the eparchy outside its municipalities, and "
+    "are stored that way. One row, the communes of the eparchy of Σουφλί, is cut off on the scan and is the eparchy "
+    "total less the municipality of Σουφλί."
+)
+
+
+def municipal(
+    p: Package,
+    e: Election,
+    election: str,
+    contest: str,
+    options: dict[int, str],
+) -> list[tuple[str, str, str | None, int, Cell]]:
+    """The result set of municipalities, eparchies' communes, and parishes, with no values for the printed totals."""
+    rows = municipal_rows()
+    verify_municipal(rows)
+    rs = key("result_set", e.key, "municipalities")
+    state = table(e)[56]
+    state_valid = cell(state["valid"])
+    assert state_valid is not None
+    leaves = [r for r in rows if r.kind in LEAVES]
+    p.add(
+        "result_set",
+        id=rs,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=YPES,
+        status="active",
+        is_default=False,
+        completeness=round(min(1.0, sum(r.valid.value for r in leaves) / state_valid.value), 4),
+    )
+    p.add("note", id=key("note", rs), entity_id=rs, kind="methodology", body_md=MUNICIPAL_METHOD, lang="en")
+    p.add("note", id=key("note", rs, "caveat"), entity_id=rs, kind="caveat", body_md=MUNICIPAL_NOTE, lang="en")
+    for code, reason in (
+        (
+            "accounting.votes_valid",
+            (
+                "In the municipal tables the book prints valid ballots that differ from the sum of the parties' printed "
+                "votes in about a quarter of the rows; each party's printed percentage agrees with its votes, so both are "
+                "stored as printed."
+            ),
+        ),
+        (
+            "accounting.declared",
+            (
+                "The municipal set declares the general table's state line (page 16); the municipal tables were "
+                "recomputed separately (the book's note on page 24) and leave out rows the district totals include, so "
+                "their sums differ from it."
+            ),
+        ),
+    ):
+        earlier = p.accepted.get(code)
+        p.accept(code, f"{earlier} {reason}" if earlier else reason)
+    p.add("declared", result_set_id=rs, option_id=None, measure=VALID, value=state_valid.value)
+    votes = state["votes"]
+    assert isinstance(votes, list)
+    for index, raw_cell in enumerate(votes, 1):
+        found = cell(raw_cell)
+        assert found is not None
+        p.add("declared", result_set_id=rs, option_id=options[index], measure=VOTES, value=found.value)
+    out: list[tuple[str, str, str | None, int, Cell]] = []
+    for r in leaves:
+        district = district_area(r.code)
+        if r.kind == "municipality":
+            scheme, area, relation = MUNICIPALITY_SCHEME, key("area", MUNICIPALITY_SCHEME, r.district, r.name), "equals"
+        elif r.kind == "community":
+            scheme, area, relation = COMMUNITY_SCHEME, key("area", COMMUNITY_SCHEME, r.district, r.name), "equals"
+        elif r.kind == "communes":
+            assert r.eparchy is not None
+            scheme, area, relation = EPARCHY_SCHEME, key("area", EPARCHY_SCHEME, r.district, r.eparchy), "within"
+        else:
+            if r.municipality:
+                area = key("area", MUNICIPALITY_SCHEME, r.district, r.municipality)
+            else:
+                area = district
+            scheme, relation = PARISH_SCHEME, "within"
+        unit = key("unit", e.key, "municipal", r.district, r.kind, r.name)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=GREECE,
+            scheme_code=scheme,
+            code=f"{e.day}:{r.district}:{r.kind}:{r.name}",
+            area_relation=relation,
+            area_id=area,
+            kind="standard",
+        )
+        p.name(unit, r.name, "el", "official")
+        out.append((rs, unit, None, VALID, r.valid))
+        for index, found in enumerate(r.votes, 1):
+            out.append((rs, unit, options[index], VOTES, found))
+    return out
+
+
+def municipal_pages() -> set[int]:
+    if not MUNICIPALITIES.exists():
+        return set()
+    return {c.page for r in municipal_rows() for c in (r.valid, *r.votes)}
+
+
+def render_pages() -> None:
+    """Write the 100 dpi page images the municipal and general tables cite, for upload beside the packages."""
+    for e in ELECTIONS:
+        if not available(e):
+            continue
+        artifact = raw.cached(SOURCE, mirror(e))
+        out = DATA / "pages" / SOURCE
+        out.mkdir(parents=True, exist_ok=True)
+        with pymupdf.open(artifact.path) as document:
+            for number in sorted(municipal_pages() | {16, 17, 18}):
+                target = out / f"{artifact.sha256}-{number}.png"
+                if not target.exists():
+                    document[number - 1].get_pixmap(dpi=DPI // 3).save(target)
+
+
 def build(e: Election) -> Package:
     verify(e)
     artifact = raw.cached(SOURCE, mirror(e))
@@ -491,6 +822,8 @@ def build(e: Election) -> Package:
     used = {c.page for c in (e.registered, e.cast, e.valid, e.invalid, e.blank)} | {x.votes.page for x in e.parties}
     if (TABLES / f"{e.key}.json").exists():
         used |= {16, 17}
+    if e.key == "ep-1984":
+        used |= municipal_pages()
     with pymupdf.open(artifact.path) as document:
         for number in sorted(used):
             rect = document[number - 1].rect
@@ -594,6 +927,9 @@ def build(e: Election) -> Package:
     national = list(rows)
     if (TABLES / f"{e.key}.json").exists():
         rows += districts(p, e, election, contest, options, pages, sizes)
+    if e.key == "ep-1984" and MUNICIPALITIES.exists():
+        p.external |= {district_area(r.code) for r in municipal_rows()}
+        rows += municipal(p, e, election, contest, options)
 
     frame = pl.DataFrame(
         [
