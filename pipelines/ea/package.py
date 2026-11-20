@@ -1132,6 +1132,26 @@ def _missing(conn: Connection, external: object) -> list[str]:
     ]
 
 
+def _vacate_units(conn: Connection, key: str, pipeline: str, batch: frozenset[str]) -> int:
+    """Free the scheme, code, and validity that a package's staged units take over from older packages of the run.
+
+    A new build may move a unit into another package of the same pipeline (an election package's units into the
+    geo package) and widen its validity. The insert comes before the old package's turn to drop the unit, and the
+    old row (a different id) would block it. Such a row of a package in this run is renamed, so the key is free;
+    the old package's own turn deletes it, since its new version no longer declares it. If the old package still
+    declares the row, its upsert restores the code and the duplicate shows up in `ea package ready`.
+    """
+    return conn.execute(
+        """update reporting_unit t set code = t.code || '~' || t.id::text
+           where t.id not in (select id from pkg_reporting_unit)
+             and exists (select from changeset c where c.id = t.changeset_id and c.pipeline = %s
+                         and c.scope->>'package' <> %s and c.scope->>'package' = any(%s))
+             and exists (select from pkg_reporting_unit s where s.scheme_code = t.scheme_code and s.code = t.code
+                         and daterange(s.valid_from, s.valid_to, '[)') && t.valid)""",
+        [pipeline, key, sorted(batch)],
+    ).rowcount
+
+
 def _drop(conn: Connection, table: str, staged: dict[str, tuple[str, list[str]]], owned: list[str]) -> int:
     key_columns = TABLES[table][0]
     if table not in staged:
@@ -1477,6 +1497,8 @@ def _facts(
                 counts.setdefault(table, [0, 0])[1] = _drop(conn, table, staged, owned)
         except errors.ForeignKeyViolation:
             deferred.append(table)
+    if "reporting_unit" in staged:
+        _vacate_units(conn, key, str(manifest["pipeline"]), batch)
     for table in TABLES:
         if table not in staged:
             continue
