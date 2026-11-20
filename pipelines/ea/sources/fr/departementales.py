@@ -133,8 +133,8 @@ def read(year: int, round_: int) -> tuple[list[dict[str, object]], list[dict[str
     return totals, binomes
 
 
-def cantonales(year: int) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
-    path = raw.cached(SOURCE, CANTONALES[year]).path
+def cantonales(year: int, url: str | None = None) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    path = raw.cached(SOURCE, url or CANTONALES[year]).path
     winners: dict[tuple[str, int], str] = {}
     for row in pl.read_excel(path, sheet_name="Elus", engine="calamine", infer_schema_length=0).iter_rows(named=True):
         if row["Dpt"] is None:
@@ -156,6 +156,8 @@ def cantonales(year: int) -> tuple[list[dict[str, object]], list[dict[str, objec
         for row in rows[1:]:
             if row[0] is None:
                 continue
+            if str(row[0]).startswith("Date de l'export"):
+                break
             dep = department(row[0])
             number_ = str(row[2]).strip()
             if len(number_) > 2:
@@ -177,6 +179,8 @@ def cantonales(year: int) -> tuple[list[dict[str, object]], list[dict[str, objec
             winner = winners.pop((canton, round_), None)
             found = 0
             for order, offset in enumerate(range(first, len(row), 7), 1):
+                if len(row) - offset < 5:
+                    break
                 sex, surname, forename, nuance, votes = row[offset : offset + 5]
                 if surname is None or str(surname).strip() == "":
                     continue
