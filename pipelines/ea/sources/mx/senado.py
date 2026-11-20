@@ -5,6 +5,7 @@ import json
 import re
 import unicodedata
 import zipfile
+from collections import Counter
 from datetime import date
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -133,7 +134,27 @@ ROSTER_STATES_2024 = {
     "Michoacán de Ocampo": 16,
     "Veracruz de Ignacio de la Llave": 30,
 }
+# The LVIII Legislature's roster by parliamentary group prints, for each senator, the principle of election and the
+# state. The Internet Archive's earliest copy of each group's page, captured from November 2000 to August 2001; the
+# Convergencia group's lists only a list senator. Each group's party, as INE's columns name it.
+ROSTER_2000 = "http://www.senado.gob.mx:80/comunicacion/senadores/{group}.html"
+GROUP_PAGES_2000 = {
+    "pri": ("PRI", "20001109041100"),
+    "pan": ("PAN", "20010124045800"),
+    "prd": ("PRD", "20001211205200"),
+    "pvem": ("PVEM", "20010825140022"),
+    "pcd": ("MC", "20001211195400"),
+}
+STATES_2000 = {"DISTRITO_FEDERAL": 9, "ESTADO_DE_MEXICO": 15}
 ROSTERS = {
+    2000: (
+        "Integrantes por grupo parlamentario de la LVIII Legislatura",
+        "http://www.senado.gob.mx/comunicacion/senadores/",
+        (
+            "Read from the Internet Archive's earliest copies of the page for each parliamentary group, captured "
+            "from November 2000 to August 2001; each prints the senator's principle of election and state."
+        ),
+    ),
     2018: (
         "Senadoras y senadores de la LXIV Legislatura por entidad federativa (principio de elección)",
         "http://www.senado.gob.mx/64/senadores/por_entidad_federativa",
@@ -158,9 +179,20 @@ SEATED = (
     "and one of {runner_up}'s, so {winner} holds the two majority seats and {runner_up} the first-minority seat, "
     "the seats the ranking of this count also gives."
 )
+SEATED_GROUPS = (
+    "The seats are the declared ones, as the Senate's roster of the senators who took their seats records them: "
+    "for {state} it lists {names} ({source}), with their principle of election. By their parliamentary groups, the "
+    "two elected by majority sit for {winner} and the one elected by first minority for {runner_up}, the seats the "
+    "ranking of this count also gives."
+)
 
 
 def roster_urls(year: int) -> dict[int, str]:
+    if year == 2000:
+        return {
+            i: ARCHIVED.format(stamp=stamp, url=ROSTER_2000.format(group=group))
+            for i, (group, (_, stamp)) in enumerate(GROUP_PAGES_2000.items())
+        }
     if year == 2018:
         return {
             code: ARCHIVED.format(stamp=stamp, url=ROSTER_2018.format(slug=slug))
@@ -483,7 +515,7 @@ def candidaturas(year: int) -> dict[tuple[int, str], str]:
 
 SUMMARY = (
     "Elections to the Senate of Mexico (1991-2024): the 32 state contests and the national list, by casilla, with "
-    "the party-list seats as declared and the state seats of 2018 and 2024 as the Senate's rosters record them"
+    "the party-list seats as declared and the state seats of 2000, 2018 and 2024 as the Senate's rosters record them"
 )
 
 
@@ -1212,7 +1244,64 @@ def registered(year: int) -> dict[tuple[int, str], list[list[str]]]:
 Seated = dict[str, list[tuple[str, str | None]]]
 
 
-def seated(year: int, options: dict[int, list[tuple[str, str]]]) -> dict[int, tuple[str, str, Seated | str]]:
+def principle(text: str) -> str | None:
+    words = fold(text)
+    return {("MAYORIA", "RELATIVA"): "majority", ("PRIMERA", "MINORIA"): "minority"}.get(tuple(words[:2]))
+
+
+def group_seats(day: str, keys: pl.DataFrame, lists: pl.DataFrame) -> dict[int, tuple[str, list[str], Seated | str]]:
+    """Match each state's seated senators of 2000, as the LVIII Legislature's pages by parliamentary group print
+    them, to the list of the state's contest that holds their group's party. Gives {code: (state, [pages],
+    {option_id: [(name, principle)]})}, or the reason in place of the seats when the pages do not settle them."""
+    tops = set(lists["id"].to_list())
+    prefix = f"{day}:senate:"
+    parties: dict[int, dict[str, set[str]]] = {}
+    for value, entity in (
+        keys.filter((pl.col("scheme") == "mx.option") & pl.col("value").str.starts_with(prefix))
+        .select("value", "entity_id")
+        .iter_rows()
+    ):
+        code, _, columns = str(value).removeprefix(prefix).partition(":")
+        if code.isdigit() and entity in tops:
+            parties.setdefault(int(code), {})[str(entity)] = {
+                party for column in columns.split("+") for party in members(column)
+            }
+    slugs = {slug: code for code, (slug, _) in ROSTER_PAGES_2018.items()}
+    senators: dict[int, list[tuple[str, str, str, str, str]]] = {}
+    for url, (party, _) in zip(roster_urls(2000).values(), GROUP_PAGES_2000.values(), strict=True):
+        text = raw.cached(SOURCE, url).path.read_bytes().decode("latin-1")
+        text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", text)))
+        for name, printed, state in re.findall(
+            r"SEN\. (.+?) Elecci[oó]n: (.+?) Entidad Federativa: (.*?) (?:Fecha|SUPLENTE|Estudios)", text
+        ):
+            elected = principle(printed)
+            if elected is None:
+                continue
+            key = "_".join(fold(state))
+            code = STATES_2000.get(key) or slugs[key.lower()]
+            senators.setdefault(code, []).append((name.strip(), elected, party, url, state.strip()))
+    found: dict[int, tuple[str, list[str], Seated | str]] = {}
+    for code, rows in sorted(senators.items()):
+        pages = sorted({row[3] for row in rows})
+        # The pages spell a few states differently ("Colíma", "Estado de México"); the note takes the usual one.
+        state = Counter(row[4] for row in rows).most_common(1)[0][0]
+        if len(rows) != 3:
+            found[code] = (state, pages, f"the roster lists {len(rows)} senators")
+            continue
+        held: Seated = {}
+        for name, elected, party, _, _ in rows:
+            lists_of = [option for option, held_by in parties[code].items() if party in held_by]
+            if len(lists_of) != 1:
+                held = {}
+                found[code] = (state, pages, f"{name}'s party {party} is on {len(lists_of)} lists")
+                break
+            held.setdefault(lists_of[0], []).append((name, elected))
+        if held:
+            found[code] = (state, pages, held)
+    return found
+
+
+def seated(year: int, options: dict[int, list[tuple[str, str]]]) -> dict[int, tuple[str, list[str], Seated | str]]:
     """Match each state's seated senators to the lists of its contest ({code: [(option_id, ballot_label)]}),
     through the propietarios and suplentes INE registered for each party of a list. Gives {code: (state, url,
     {option_id: [(name, principle)]})}, or the reason in place of the seats when the roster does not settle them:
@@ -1221,10 +1310,10 @@ def seated(year: int, options: dict[int, list[tuple[str, str]]]) -> dict[int, tu
     coalition's candidates, the senator sits on the list with the fewest registered candidates, the one of the
     formula's own party."""
     people = registered(year)
-    found: dict[int, tuple[str, str, Seated | str]] = {}
+    found: dict[int, tuple[str, list[str], Seated | str]] = {}
     for code, (state, url, senators) in roster(year).items():
         if len(senators) != 3:
-            found[code] = (state, url, f"the roster lists {len(senators)} senators")
+            found[code] = (state, [url], f"the roster lists {len(senators)} senators")
             continue
         pools = {
             option: [
@@ -1235,7 +1324,7 @@ def seated(year: int, options: dict[int, list[tuple[str, str]]]) -> dict[int, tu
             for option, label in options[code]
         }
         held: Seated = {}
-        for name, principle in senators:
+        for name, elected in senators:
             lists = sorted(
                 (len(pool), option)
                 for option, pool in pools.items()
@@ -1243,11 +1332,11 @@ def seated(year: int, options: dict[int, list[tuple[str, str]]]) -> dict[int, tu
             )
             if not lists or len(lists) > 1 and lists[0][0] == lists[1][0]:
                 held = {}
-                found[code] = (state, url, f"{name} names a registered candidate on {len(lists)} lists")
+                found[code] = (state, [url], f"{name} names a registered candidate on {len(lists)} lists")
                 break
-            held.setdefault(lists[0][1], []).append((name, principle))
+            held.setdefault(lists[0][1], []).append((name, elected))
         if held:
-            found[code] = (state, url, held)
+            found[code] = (state, [url], held)
     return found
 
 
@@ -1343,7 +1432,8 @@ def declare(out: Path) -> Path:
         }
         labels = {option: label for rows in options.values() for option, label in rows}
         unsettled, changed = [], []
-        for code, (state, url, held) in sorted(seated(year, options).items()):
+        found = group_seats(day, keys, lists) if year == 2000 else seated(year, options)
+        for code, (state, pages, held) in sorted(found.items()):
             if isinstance(held, str):
                 unsettled.append(f"{state} ({held})")
                 continue
@@ -1355,16 +1445,22 @@ def declare(out: Path) -> Path:
                 outcomes.filter(pl.col("result_set_id") == result_set).select("option_id", "seats").iter_rows()
             )
             if before != seats:
+                # The notes say the declared seats are the ones the count's ranking gives; a state where they
+                # differ needs its own wording.
                 changed.append(state)
+                continue
+            winner = next(option for option, n in seats.items() if n == 2)
+            runner_up = next(option for option, n in seats.items() if n == 1)
+            principles = {option: {elected for _, elected in people} for option, people in held.items()}
+            if principles[winner] - {"majority", None} or principles[runner_up] - {"minority", None}:
+                raise ValueError(f"{year} {state}: the roster's principles of election {principles}")
             replaced_sets.append(result_set)
             new_outcomes += [
                 {"result_set_id": result_set, "option_id": option, "kind": "elected", "seats": n}
                 for option, n in seats.items()
             ]
-            winner = next(option for option, n in seats.items() if n == 2)
-            runner_up = next(option for option, n in seats.items() if n == 1)
             names = [name for people in held.values() for name, _ in people]
-            text = SEATED.format(
+            text = (SEATED_GROUPS if year == 2000 else SEATED).format(
                 state=state,
                 source=title,
                 names=", ".join(names[:-1]) + f" and {names[-1]}",
@@ -1381,20 +1477,22 @@ def declare(out: Path) -> Path:
             body = str(note["body_md"][0])
             kept = body[: body.index(" The seats follow from this count")]
             replaced_notes[str(note["id"][0])] = f"{kept} {text}"
-            locator = {"url": url, "state": state}
-            added["citation"].append(
-                {
-                    "id": derived_id(
-                        "citation", {"entity_id": result_set, "source_id": source, "locator": jsonb_text(locator)}
-                    ),
-                    "entity_id": result_set,
-                    "source_id": source,
-                    "locator": canonical(locator),
-                }
-            )
+            for url in pages:
+                locator = {"url": url, "state": state}
+                added["citation"].append(
+                    {
+                        "id": derived_id(
+                            "citation",
+                            {"entity_id": result_set, "source_id": source, "locator": jsonb_text(locator)},
+                        ),
+                        "entity_id": result_set,
+                        "source_id": source,
+                        "locator": canonical(locator),
+                    }
+                )
         print(
-            f"{year}: {32 - len(unsettled)} state contests take the roster's seats, which differ from the derived "
-            f"seats in {len(changed)} {changed}; left derived: {unsettled}",
+            f"{year}: {32 - len(unsettled) - len(changed)} state contests take the roster's seats; left derived: "
+            f"{unsettled}, and where the roster's seats differ from the derived ones: {changed}",
             flush=True,
         )
     tables["outcome"] = pl.concat(
