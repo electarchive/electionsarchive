@@ -1,32 +1,42 @@
 import io
 import json
+import os
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 import shapefile
 import shapely
 
-from ea import raw
-from ea.changeset import Changeset
+from ea import package, raw
+from ea.package import Draft
 from ea.store import DATA, connect
 
 SOURCE = "jp.mlit"
 VERSION = "2"
+KEY = f"{SOURCE}/all"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://nlftp.mlit.go.jp/ksj/gml/data/N03"
 LANDING = "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2026.html"
 PUBLISHER = "Ministry of Land, Infrastructure, Transport and Tourism"
-TITLE = "National Land Numerical Information, administrative areas (N03), 2007-2026"
+TITLE = "National Land Numerical Information, administrative areas (N03), 2000-2026"
+# The source keeps the id it was minted under with its first title, which covered 2007-2026.
+FIRST_TITLE = "National Land Numerical Information, administrative areas (N03), 2007-2026"
 LAW = "https://laws.e-gov.go.jp/law/325AC1000000100"
 LAW_XML = "https://laws.e-gov.go.jp/api/1/lawdata/325AC1000000100"
 LAW_PUBLISHER = "Digital Agency, e-Gov Law Search"
 LAW_TITLE = "Public Offices Election Act (Act No. 100 of 1950)"
 TOLERANCE = 0.0001
 CHANGED = 0.002
+# The 2005 files carry no date in their names or metadata. Their municipalities are those of 2006-01-01: the towns
+# merged away that day (Sadowara into Miyazaki, Hisai into Tsu, Sashiki into Nanjo) are gone and Nanjo is present,
+# while Atsushiokano and Shiokawa, merged into Kitakata on 2006-01-04, are still there.
 VINTAGES = {
+    "2000": ("2000", "001001", date(2000, 10, 1), True),
+    "2006": ("2005", "05", date(2006, 1, 1), True),
     "2007": ("2007", "070401", date(2007, 4, 1), True),
     "2009": ("2008", "090320", date(2009, 3, 20), True),
     "2010": ("2009", "100329", date(2010, 3, 29), True),
@@ -204,7 +214,8 @@ def read(
                     continue
                 if prefectures[row["N03_001"].replace("繩", "縄")] != code[:2]:
                     raise ValueError(f"{vintage} {code}: prefecture {row['N03_001']}")
-                parts = [row.get(f"N03_00{n}", "") for n in (3, 4, 5)]
+                # The 2000 files print Okinawa City, like the prefecture, with the older form of 縄.
+                parts = [row.get(f"N03_00{n}", "").replace("繩", "縄") for n in (3, 4, 5)]
                 if ward(code):
                     city, name = (parts[1], parts[2]) if parts[2] else (parts[0], parts[1])
                     entry = (cities[code[:2], city], name)
@@ -215,9 +226,18 @@ def read(
                     raise ValueError(f"{vintage} {code}: {known[:2]} and {entry}")
                 known[2].append(shapely.from_geojson(json.dumps(shape.__geo_interface__)))
     return [
-        (code, parent, name, shapely.make_valid(shapely.union_all(parts)))
+        (code, parent, name, shapely.make_valid(union(parts)))
         for code, (parent, name, parts) in sorted(features.items())
     ]
+
+
+def union(parts: list[shapely.Geometry]) -> shapely.Geometry:
+    """The union of a municipality's polygons. Some polygons in the 2005 files cross themselves, so those are
+    repaired first; repairing only on failure leaves the other vintages exactly as they were."""
+    try:
+        return shapely.union_all(parts)
+    except shapely.errors.GEOSException:
+        return shapely.union_all(shapely.make_valid(parts))
 
 
 def polygons(geometry: shapely.Geometry) -> shapely.Geometry:
@@ -312,7 +332,11 @@ def parse() -> None:
     )
     versions: list[dict[str, object]] = []
     spans: list[dict[str, object]] = []
-    for (layer, code), group in frames.sort("vintage").group_by(["layer", "code"], maintain_order=True):
+    groups = list(frames.sort("vintage").group_by(["layer", "code"], maintain_order=True))
+    # GEOS releases the GIL, so the areas are compared on every core; the nation alone takes minutes.
+    with ThreadPoolExecutor(os.cpu_count()) as pool:
+        shifts = list(pool.map(lambda item: moves(list(item[1]["geom"])), groups))
+    for ((layer, code), group), moved_in in zip(groups, shifts, strict=True):
         present = group["vintage"].to_list()
         first, last = order.index(present[0]), order.index(present[-1])
         if present != order[first : last + 1]:
@@ -332,12 +356,10 @@ def parse() -> None:
             )
         kept: shapely.Geometry | None = None
         current: dict[str, object] | None = None
-        for vintage, parent, name, kind_, wkb in group.select("vintage", "parent", "name", "kind", "geom").rows():
+        for (vintage, parent, name, kind_, wkb), moved in zip(
+            group.select("vintage", "parent", "name", "kind", "geom").rows(), moved_in, strict=True
+        ):
             geometry = shapely.from_wkb(wkb)
-            moved = kept is None or (
-                shapely.area(shapely.symmetric_difference(kept, geometry))
-                > CHANGED * max(shapely.area(kept), shapely.area(geometry))
-            )
             same = current is not None and (current["parent"], current["name"], current["kind"]) == (
                 parent,
                 name,
@@ -370,8 +392,28 @@ def parse() -> None:
                 "new_geometry": moved,
             }
             versions.append(current)
-    pl.DataFrame(spans).write_parquet(PARSED / "spans.parquet")
-    pl.DataFrame(versions).write_parquet(PARSED / "versions.parquet")
+    pl.DataFrame(spans, infer_schema_length=None).write_parquet(PARSED / "spans.parquet")
+    pl.DataFrame(versions, infer_schema_length=None).write_parquet(PARSED / "versions.parquet")
+    print(build())
+
+
+def moves(shapes: list[bytes]) -> list[bool]:
+    """Whether each vintage of an area takes a new geometry: its first, and any whose symmetric difference from the
+    geometry last taken covers more than CHANGED of the larger of the two. The difference is read from the
+    intersection, which GEOS computes several times faster than the difference itself."""
+    flags: list[bool] = []
+    kept: shapely.Geometry | None = None
+    for wkb in shapes:
+        geometry = shapely.from_wkb(wkb)
+        moved = kept is None
+        if kept is not None:
+            sizes = shapely.area(kept), shapely.area(geometry)
+            difference = sum(sizes) - 2 * shapely.area(shapely.intersection(kept, geometry))
+            moved = difference > CHANGED * max(sizes)
+        if moved:
+            kept = geometry
+        flags.append(moved)
+    return flags
 
 
 def runs(rows: list[dict[str, object]], field: str) -> list[tuple[object, object, object]]:
@@ -384,20 +426,26 @@ def runs(rows: list[dict[str, object]], field: str) -> list[tuple[object, object
     return [(value, start, end) for value, start, end in merged]
 
 
-def emit() -> Path:
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package jp.mlit/all from the parsed tables. It reads the database, through Draft, so the rows it
+    rebuilds keep the ids the changeset path gave them."""
     versions = pl.read_parquet(PARSED / "versions.parquet").sort("layer", "code", "vintage")
     spans = pl.read_parquet(PARSED / "spans.parquet")
     order = list(VINTAGES)
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary="Japan, its prefectures, municipalities, designated-city wards, and House of Representatives "
-            "proportional blocks from MLIT N03 administrative areas, 2007-2026",
+            "proportional blocks from MLIT N03 administrative areas, 2000-2026",
             polity="JP",
         )
-        source = cs.source(PUBLISHER, TITLE)
+        source = cs.source(PUBLISHER, FIRST_TITLE)
         cs.add(
             "source",
             id=source,
@@ -446,6 +494,11 @@ def emit() -> Path:
                 "valid_to_precision": "unknown" if end is not None else "day",
             }
 
+        # The package format carries the precision of a date range on names only; the area tables keep the
+        # precision the changeset path stored and take the database's default on new rows.
+        def dates(start: object, end: object) -> dict[str, object]:
+            return {"valid_from": start, "valid_to": end}
+
         japan = cs.polity("JP")
         cs.add("polity", id=japan, kind="sovereign_state", iso_code="JP")
         name(japan, "Japan", "en")
@@ -479,7 +532,7 @@ def emit() -> Path:
         ).iter_rows():
             if layer == "block":
                 start = BLOCKS_FROM
-            cs.add("area_code", area_id=areas[layer, area_code], code=code, **span(start, end, layer == "block"))
+            cs.add("area_code", area_id=areas[layer, area_code], code=code, **dates(start, end))
         nation = areas["nation", "JP"]
         cs.add("polity_territory", polity_id=japan, area_id=nation)
         for (layer, code), group in versions.group_by(["layer", "code"], maintain_order=True):
@@ -498,7 +551,7 @@ def emit() -> Path:
                 )
             if layer == "municipality":
                 for kind_, start, end in runs(rows, "kind"):
-                    cs.add("area_kind", area_id=area, kind=kind_, source_id=source, **span(start, end))
+                    cs.add("area_kind", area_id=area, kind=kind_, source_id=source, **dates(start, end))
             if layer != "nation":
                 for parent, start, end in runs(rows, "parent"):
                     owner = (
@@ -506,7 +559,7 @@ def emit() -> Path:
                         if layer in ("prefecture", "block")
                         else areas["municipality" if layer == "ward" else "prefecture", str(parent)]
                     )
-                    cs.add("area_parent", area_id=area, parent_id=owner, **span(start, end))
+                    cs.add("area_parent", area_id=area, parent_id=owner, **dates(start, end))
             shapes = [row for row in rows if row["new_geometry"]]
             for index, row in enumerate(shapes):
                 cs.add(
@@ -516,7 +569,7 @@ def emit() -> Path:
                     label_point=row["label_point"],
                     quality="official",
                     source_id=source,
-                    **span(
+                    **dates(
                         row["valid_from"],
                         shapes[index + 1]["valid_from"] if index + 1 < len(shapes) else rows[-1]["valid_to"],
                     ),
@@ -529,7 +582,7 @@ def emit() -> Path:
                     "area_membership",
                     area_id=areas["prefecture", f"{member:02d}"],
                     parent_id=block,
-                    **span(BLOCKS_FROM, None, True),
+                    **dates(BLOCKS_FROM, None),
                 )
         name(nation, "Japan", "en", "english")
         for number, (native, english) in enumerate(PREFECTURES, 1):
@@ -542,12 +595,26 @@ def emit() -> Path:
             name(polity, native, "ja")
             name(polity, english, "en", "english")
             name(areas["prefecture", code], english, "en", "english")
+        # A boundary set keeps the id the changeset path gave it when its dates move, and a new one takes an id
+        # derived from its scheme and vintage.
+        sets = {
+            (str(scheme), str(vintage)): id
+            for scheme, vintage, id in conn.execute(
+                """select b.scheme_code, b.vintage, b.id from boundary_set b
+                   join changeset c on c.id = b.changeset_id where c.pipeline = %s""",
+                [SOURCE],
+            )
+        }
         for index, vintage in enumerate(order):
             start = VINTAGES[vintage][2]
             end = VINTAGES[order[index + 1]][2] if index + 1 < len(order) else None
             for scheme in ("jp.prefecture", "jp.municipality", "jp.ward", "jp.hor_block"):
                 cs.add(
                     "boundary_set",
+                    id=sets.get(
+                        (scheme, start.isoformat()),
+                        uuid5(package.NAMESPACE, f"boundary_set\x1f{scheme}\x1f{start.isoformat()}"),
+                    ),
                     scheme_code=scheme,
                     vintage=start.isoformat(),
                     valid_from=None if index == 0 else start,
