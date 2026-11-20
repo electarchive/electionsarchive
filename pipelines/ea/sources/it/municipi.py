@@ -7,6 +7,7 @@ archive already holds, plus a `geo` package for the areas and a `registry` packa
 """
 
 import csv
+import hashlib
 import io
 import json
 import os
@@ -106,6 +107,9 @@ def fetch() -> None:
     index = json.loads((MANUAL / "index.json").read_text())
     for url, entry in index.items():
         content = (MANUAL / entry["file"]).read_bytes()
+        digest = hashlib.sha256(content).hexdigest()
+        if entry.get("sha256") and digest != entry["sha256"]:
+            raise ValueError(f"{entry['file']} ({url}) does not match its sha256")
         suffix = Path(entry["file"]).suffix
         raw.store(
             SOURCE,
