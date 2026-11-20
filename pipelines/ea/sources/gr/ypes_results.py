@@ -37,6 +37,7 @@ A = "browser://20261116-222821-308b6c/"
 B = "browser://20261116-224930-393d08/"
 C = "browser://20261117-133413-6c56bf/"
 D = "browser://20261119-211248-684d3e/"
+E = "browser://20261120-002242-eef882/"
 OLD = "http://ekloges-prev.singularlogic.eu/"
 GEO = f"{SOURCE}/national-geo"  # `ypes` builds the local elections' geo and registry
 REGISTRY = f"{SOURCE}/national-registry"
@@ -75,8 +76,8 @@ ELECTIONS = [
         "ps-2015-09",
         date(2015, 9, 20),
         "parliament",
-        (D + "gr-2015-09-parliament-upper-levels.txt", OLD + "v2015b/dyn/v/epik_1.js"),
-        stations=tuple(D + f"gr-2015-09-parliament-stations-part{n}.txt" for n in range(1, 9)),
+        (E + "ps-2015-09-upper-levels-v2015b.txt",),  # its national file is `dyn1/v/epik_1.js`
+        stations=tuple(E + f"ps-2015-09-ep{n}-stations-v2015b.txt" for n in range(1, 57)),
     ),
     Election(
         "ps-2019",
@@ -175,6 +176,9 @@ def split(text: str, url: str) -> dict[str, str]:
             return {str(k): str(v) for k, v in bundle.items()}  # a bundle of files, keyed by their addresses
     if text.startswith("### "):  # files saved from a browser, each under a `### <path>` line
         parts = re.split(r"^### (\S+)\n", text, flags=re.MULTILINE)
+        return dict(zip(parts[1::2], parts[2::2], strict=True))
+    if text.startswith("// http"):  # files saved from a browser, each under a `// <address>` line
+        parts = re.split(r"^// (http\S+)\n", text, flags=re.MULTILINE)
         return dict(zip(parts[1::2], parts[2::2], strict=True))
     parts = re.split(r"<!-- (\S+) -->\n?", text)
     if len(parts) == 1:
