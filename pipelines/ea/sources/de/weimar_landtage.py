@@ -4,6 +4,7 @@ import subprocess
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
+from typing import NamedTuple
 from uuid import UUID
 
 import polars as pl
@@ -21,9 +22,31 @@ VOTES = Path(__file__).with_name("weimar_landtage_votes.tsv")
 WEIMAR = date(1918, 11, 9)
 GLEICHSCHALTUNG = date(1933, 3, 31)
 ITEMS = {
+    1926: "per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1926_45",
+    1927: "per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fur-das-deutsc_1927_46",
+    1928: "per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fur-das-deutsc_1928_47",
+    1929: "per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1929_48",
+    1930: "per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1930_49",
+    1931: "per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1931_50",
     1932: "per_statistisches-jahrbuch-fur-das-deutsche-reich_statistisches-jahrbuch-fr-das-deutsc_1932_51",
 }
-LEAVES = {(1932, 544): 587, (1932, 545): 588}
+# (edition, printed page): archive.org leaf. Each table spans a left and a right page.
+LEAVES = {
+    (1926, 454): 501,
+    (1926, 455): 502,
+    (1927, 500): 551,
+    (1927, 501): 552,
+    (1928, 582): 633,
+    (1928, 583): 634,
+    (1929, 486): 537,
+    (1929, 487): 538,
+    (1930, 564): 613,
+    (1930, 565): 614,
+    (1931, 548): 595,
+    (1931, 549): 596,
+    (1932, 544): 587,
+    (1932, 545): 588,
+}
 SCHEME = "de.land_1920"
 STATES: dict[str, tuple[str | None, str, str, str, str, str, date | None]] = {
     "PR": (
@@ -106,6 +129,7 @@ STATES: dict[str, tuple[str | None, str, str, str, str, str, date | None]] = {
         "Landtag von Mecklenburg-Strelitz",
         date(1934, 1, 1),
     ),
+    "WA": (None, "waldeck", "Waldeck", "Freistaat Waldeck", "Landtag of Waldeck", "Waldeckischer Landtag", date(1929, 4, 1)),
     "SL": (
         None,
         "schaumburg-lippe",
@@ -117,37 +141,80 @@ STATES: dict[str, tuple[str | None, str, str, str, str, str, date | None]] = {
     ),
 }
 CITY_STATES = {"HH", "HB", "LU"}
-LEFT_COLUMNS = {
-    "registered": (349, 404),
-    "voters": (411, 467),
-    "valid": (518, 568),
-    "SPD": (585, 633),
-    "NSDAP": (684, 728),
-    "KPD": (762, 802),
-}
-RIGHT_COLUMNS = {
-    "Z": (55, 110),
-    "DNVP": (150, 200),
-    "DVP": (228, 291),
-    "WP": (342, 382),
-    "DSTP": (415, 473),
-    "LANDVOLK": (500, 560),
-    "AUFWERTUNG": (598, 651),
-    "ANDERE": (680, 738),
-}
 WIKIDATA_NAMES = {
     "Q487129": "Kommunistische Partei Deutschlands (Opposition)",
     "Q689018": "Sozialistische Arbeiterpartei Deutschlands",
     "Q2596896": "Württembergischer Bauern- und Weingärtnerbund",
     "Q314832": "Christlich-sozialer Volksdienst",
 }
-LEFT_FOOTNOTES = {"3", "4", "5", "9", "12"}
-WIDTH, HEIGHT = 900, 1344.3
+
+
+class Layout(NamedTuple):
+    """Where an edition's table sits on its two pages, in the units of a page `width` by `height` wide: the first
+    state's vote line and the row pitch on each side (L, R), each column's side and horizontal span, the footnote block
+    on each side, and how far a box reaches above and below a vote line for a total and for a party (votes and seats)."""
+
+    width: float
+    height: float
+    rows: dict[str, tuple[float, float]]
+    columns: dict[str, tuple[str, float, float]]
+    notes: dict[str, tuple[float, float, float, float]]
+    total: tuple[float, float]
+    party: tuple[float, float]
+
+
+LAYOUTS = {
+    1926: Layout(
+        1000,
+        1457.6,
+        {"L": (302, 40.88), "R": (270, 40.76)},
+        {
+            "registered": ("L", 318, 402),
+            "voters": ("L", 405, 470),
+            "valid": ("L", 500, 570),
+            "DNVP": ("L", 565, 662),
+            "NS": ("L", 698, 768),
+            "DVP": ("L", 796, 872),
+            "Z": ("R", 95, 178),
+            "DDP": ("R", 180, 262),
+            "SPD": ("R", 275, 352),
+            "KPD": ("R", 370, 447),
+            "ANDERE": ("R", 462, 540),
+        },
+        {"L": (85, 1020, 915, 1315), "R": (60, 1020, 570, 1295)},
+        (12, 12),
+        (12, 28),
+    ),
+    1932: Layout(
+        900,
+        1344.3,
+        {"L": (284.6, 22.93), "R": (275.8, 22.99)},
+        {
+            "registered": ("L", 349, 404),
+            "voters": ("L", 411, 467),
+            "valid": ("L", 518, 568),
+            "SPD": ("L", 585, 633),
+            "NSDAP": ("L", 684, 728),
+            "KPD": ("L", 762, 802),
+            "Z": ("R", 55, 110),
+            "DNVP": ("R", 150, 200),
+            "DVP": ("R", 228, 291),
+            "WP": ("R", 342, 382),
+            "DSTP": ("R", 415, 473),
+            "LANDVOLK": ("R", 500, 560),
+            "AUFWERTUNG": ("R", 598, 651),
+            "ANDERE": ("R", 680, 738),
+        },
+        {"L": (120, 990, 850, 1200), "R": (40, 968, 790, 1200)},
+        (9, 9),
+        (9, 20),
+    ),
+}
 NOTE = (
     "Figures are from the table of the latest Landtag elections in the Statistisches Jahrbuch für das Deutsche Reich "
-    "1932 (pages 544 and 545). It prints the electorate, the voters, and the valid votes, but not the invalid votes. "
-    "Parties the table groups in one column are shown separately where its footnotes break the column down, and the "
-    "seats are those it gives each party according to the result."
+    "{edition} (pages {left} and {right}). It prints the electorate, the voters, and the valid votes, but not the "
+    "invalid votes. Parties the table groups in one column are shown separately where its footnotes break the column "
+    "down, and the seats are those it gives each party according to the result."
 )
 
 
@@ -177,30 +244,59 @@ def image(edition: int, page: int) -> tuple[str, int, int]:
     return f"pages/{SOURCE}/{png.name}", width, height
 
 
-def box(x: tuple[float, float], y: tuple[float, float]) -> tuple[float, float, float, float]:
-    return (x[0] / WIDTH, y[0] / HEIGHT, x[1] / WIDTH, y[1] / HEIGHT)
+def box(layout: Layout, x: tuple[float, float], y: tuple[float, float]) -> tuple[float, float, float, float]:
+    return (x[0] / layout.width, y[0] / layout.height, x[1] / layout.width, y[1] / layout.height)
+
+
+def read() -> tuple[list[dict[str, str]], dict[tuple[str, str], list[dict[str, str]]]]:
+    """The elections and each election's party rows, after checking that the rows add up to the printed totals."""
+    elections = list(csv.DictReader(ELECTIONS.open(), delimiter="\t"))
+    votes = list(csv.DictReader(VOTES.open(), delimiter="\t"))
+    by_election: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
+    for row in votes:
+        by_election[row["state"], row["day"]].append(row)
+    seen = set()
+    for election in elections:
+        key = (election["state"], election["day"])
+        if key in seen:
+            raise ValueError(f"{key}: printed twice")
+        seen.add(key)
+        rows = by_election[key]
+        if sum(int(r["votes"]) for r in rows) != int(election["valid"]):
+            raise ValueError(f"{key}: party votes do not add up to the valid votes")
+        if sum(int(r["seats"]) for r in rows) != int(election["seats"]):
+            raise ValueError(f"{key}: seats do not add up")
+        if not int(election["valid"]) <= int(election["voters"]) <= int(election["registered"]):
+            raise ValueError(f"{key}: valid votes, voters, and electorate are out of order")
+        layout = LAYOUTS[int(election["edition"])]
+        for row in rows:
+            split = sum(other["column"] == row["column"] for other in rows) > 1
+            if split != bool(row["side"]):
+                raise ValueError(f"{key} {row['label']}: a footnote row needs the side its figures are printed on")
+            if row["column"] not in layout.columns:
+                raise ValueError(f"{key}: the {election['edition']} layout lacks the column {row['column']}")
+    if set(by_election) - seen:
+        raise ValueError(f"party rows for elections not in the elections table: {sorted(set(by_election) - seen)}")
+    return elections, by_election
 
 
 def emit() -> Path:
-    elections = list(csv.DictReader(ELECTIONS.open(), delimiter="\t"))
-    votes = list(csv.DictReader(VOTES.open(), delimiter="\t"))
-    by_state: dict[str, list[dict[str, str]]] = defaultdict(list)
-    for row in votes:
-        by_state[row["state"]].append(row)
-    for election in elections:
-        rows = by_state[election["state"]]
-        if sum(int(r["votes"]) for r in rows) != int(election["valid"]):
-            raise ValueError(f"{election['state']}: party votes do not add up to the valid votes")
-        if sum(int(r["seats"]) for r in rows) != int(election["seats"]):
-            raise ValueError(f"{election['state']}: seats do not add up")
+    elections, by_election = read()
+    following: dict[tuple[str, str], date] = {}
+    for code in STATES:
+        days = sorted(date.fromisoformat(e["day"]) for e in elections if e["state"] == code)
+        ended = STATES[code][6]
+        end = GLEICHSCHALTUNG if ended is None else min(ended, GLEICHSCHALTUNG)
+        for day, after in zip(days, [*days[1:], end], strict=False):
+            following[code, str(day)] = after
     with connect() as conn:
         cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Landtag elections of the German states under the Weimar Republic, by state, from the "
-            "Statistisches Jahrbuch für das Deutsche Reich: the latest election in each of the 17 states as of August "
-            "1932, with the defunct states as historical polities",
+            summary="Landtag elections of the German states under the Weimar Republic, by state, from the tables of the "
+            "latest election in each state in the Statistisches Jahrbuch für das Deutsche Reich, editions 1926 to 1932, "
+            "with the defunct states as historical polities",
             polity="DE",
         )
 
@@ -288,10 +384,13 @@ def emit() -> Path:
                 valid_to=ended,
             )
 
-        parties: dict[tuple[str, str], UUID] = {}
+        parties: dict[tuple[str, str], UUID | None] = {}
         added: set[UUID] = set()
-        for row in votes:
+        for row in (row for rows in by_election.values() for row in rows):
             label, wikidata, code = row["label"], row["wikidata"], row["state"]
+            if row["kind"] == "others":
+                parties[code, label] = None
+                continue
             if wikidata:
                 party = cs.key("wikidata", wikidata)
                 if party in cs.minted and party not in added:
@@ -300,8 +399,7 @@ def emit() -> Path:
             else:
                 party = cs.key("de.party", f"{code}:{label}")
                 if party in cs.minted and party not in added:
-                    joint = " u. " in label or label.startswith(("Nationale Einheitsliste", "Bürgerliche"))
-                    cs.add("party", id=party, kind="list_vehicle" if joint else "party", polity_id=polities[code])
+                    cs.add("party", id=party, kind=row["kind"], polity_id=polities[code])
                     name(party, label, "de")
             added.add(party)
             parties[code, label] = party
@@ -313,13 +411,19 @@ def emit() -> Path:
             day = date.fromisoformat(election["day"])
             edition = int(election["edition"])
             iso, slug, english, native, *_ = STATES[code]
+            layout = LAYOUTS[edition]
             row_index = int(election["row"])
-            left_y = 284.6 + 22.93 * row_index
-            right_y = 275.8 + 22.99 * row_index
-            left_page = pages[edition, int(election["page"])]
-            right_page = pages[edition, int(election["page"]) + 1]
+            ys = {side: y0 + pitch * row_index for side, (y0, pitch) in layout.rows.items()}
+            page = int(election["page"])
+            side_pages = {"L": pages[edition, page], "R": pages[edition, page + 1]}
             seats = int(election["seats"])
-            cs.add("body_size", body_id=bodies[code], seats=seats, valid_from=day, valid_to=GLEICHSCHALTUNG)
+            cs.add(
+                "body_size",
+                body_id=bodies[code],
+                seats=seats,
+                valid_from=day,
+                valid_to=following[code, election["day"]],
+            )
             election_id = cs.key(f"{SOURCE}.election", f"{code}:{day}")
             cs.add(
                 "election",
@@ -327,7 +431,7 @@ def emit() -> Path:
                 polity_id=polities[code],
                 kind="general",
                 date_from=day,
-                date_to=day,
+                date_to=date.fromisoformat(election["until"]) if election["until"] else day,
                 status="held",
             )
             kind = "Bürgerschaftswahl" if code in CITY_STATES else "Landtagswahl"
@@ -350,7 +454,12 @@ def emit() -> Path:
             )
             name(contest, f"{day.year} {label} state election, seat allocation")
             cs.add("slug", path=f"{path}/landtag", entity_id=contest)
-            cs.add("note", entity_id=contest, kind="context", body_md=NOTE)
+            cs.add(
+                "note",
+                entity_id=contest,
+                kind="context",
+                body_md=NOTE.format(edition=edition, left=page, right=page + 1),
+            )
             sets = {}
             for key, contest_id in (("election", None), ("list", contest)):
                 sets[key] = str(cs.key(f"{SOURCE}.result_set", f"{code}:{day}:{key}"))
@@ -373,37 +482,32 @@ def emit() -> Path:
                 ("list", 4, "valid"),
             ):
                 values.append((sets[set_key], unit, None, measure, int(election[column])))
+                side, x0, x1 = layout.columns[column]
+                y = ys[side]
+                span = (y - layout.total[0], y + layout.total[1])
                 locators.append(
-                    (
-                        sets[set_key],
-                        unit,
-                        None,
-                        measure,
-                        str(left_page),
-                        *box(LEFT_COLUMNS[column], (left_y - 9, left_y + 9)),
-                    )
+                    (sets[set_key], unit, None, measure, str(side_pages[side]), *box(layout, (x0, x1), span))
                 )
-            for position, row in enumerate(by_state[code], 1):
+            for position, row in enumerate(by_election[code, election["day"]], 1):
                 option = cs.key(f"{SOURCE}.option", f"{code}:{day}:{row['label']}")
                 cs.add(
                     "contest_option",
                     id=option,
                     contest_id=contest,
-                    kind="list",
+                    kind="others" if row["kind"] == "others" else "list",
                     party_id=parties[code, row["label"]],
                     ballot_label=row["label"],
                     ballot_position=position,
                 )
                 values.append((sets["list"], unit, str(option), 1, int(row["votes"])))
-                split = sum(other["column"] == row["column"] for other in by_state[code]) > 1
-                if split and row["footnote"] in LEFT_FOOTNOTES:
-                    where = (left_page, box((120, 850), (990, 1200)))
-                elif split:
-                    where = (right_page, box((40, 790), (968, 1200)))
-                elif row["column"] in LEFT_COLUMNS:
-                    where = (left_page, box(LEFT_COLUMNS[row["column"]], (left_y - 9, left_y + 20)))
+                if row["side"]:
+                    x0, y0, x1, y1 = layout.notes[row["side"]]
+                    where = (side_pages[row["side"]], box(layout, (x0, x1), (y0, y1)))
                 else:
-                    where = (right_page, box(RIGHT_COLUMNS[row["column"]], (right_y - 9, right_y + 20)))
+                    side, x0, x1 = layout.columns[row["column"]]
+                    y = ys[side]
+                    span = (y - layout.party[0], y + layout.party[1])
+                    where = (side_pages[side], box(layout, (x0, x1), span))
                 locators.append((sets["list"], unit, str(option), 1, str(where[0]), *where[1]))
                 if int(row["seats"]):
                     cs.add("outcome", result_set_id=sets["list"], option_id=option, kind="won", seats=int(row["seats"]))
