@@ -9,6 +9,9 @@ but prints only national totals, so the district contests come from the newspape
   elected in each of the 75 single-member districts that voted;
 - 21 November 1995 (No. 171), page 3: the first round of 5 November 1995 in the 32 districts that elected a member
   outright, with each district's electorate and participants;
+- 8 December 1995 (No. 183), page 1: the Commission's report of the repeat votes of 3 December 1995, naming the
+  member elected in each of the six districts that voted again (the second round in districts 1 and 15, and the
+  repeated voting at precincts of districts 3, 12, 36, and 51);
 - 9 November 1999 (No. 304), page 5: the protocol of 7 November 1999 with the electorate and participants of every
   one of the 75 districts that voted on 31 October 1999, and the 49 members elected in the first round.
 
@@ -70,7 +73,13 @@ class Issue:
 ISSUE_1992 = Issue(10350, "SakartvelosRespublika_1992_N222.pdf", 1, "No. 222 (501), 28 October 1992")
 ISSUE_1995 = Issue(125585, "Saqartvelos_Respublika_1995_N171.pdf", 3, "No. 171 (2087), 21 November 1995")
 ISSUE_1999 = Issue(170809, "Saqartvelos_Respublika_1999_N304.pdf", 5, "No. 304 (3345), 9 November 1999")
+ISSUE_1995_DECEMBER = Issue(125640, "Saqartvelos_Respublika_1995_N183.pdf", 1, "No. 183 (2099), 8 December 1995")
 ISSUES = (ISSUE_1992, ISSUE_1995, ISSUE_1999)
+ISSUE_1995_DECEMBER_COPY = (
+    "https://web.archive.org/web/20240520010343id_/https://dspace.nplg.gov.ge/bitstream/1234/125640/1/"
+    "Saqartvelos_Respublika_1995_N183.pdf"
+)
+"""The library's scan of No. 183 as the Wayback Machine captured it; the library itself refuses automated requests."""
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -189,6 +198,16 @@ FIRST_ROUND_1995 = (
     (82, "შუახევის", 12_522, 10_566, "ქიძინიძე ლევანი"),
     (83, "ხელვაჩაურის", 55_709, 47_166, "აბაშიძე ვახტანგი"),
     (84, "ხულოს", 21_520, 20_310, "ვანიძე ალექსანდრე"),
+)
+
+# 3 December 1995 votes: (district, district as printed, member elected as printed).
+VOTES_DECEMBER_1995 = (
+    (1, "მთაწმინდის", "მამუკა არეშიძე"),
+    (3, "საბურთალოს", "ილია ხუციშვილი"),
+    (12, "გურჯაანის", "მარსელ მამავარიანი"),
+    (15, "ლაგოდეხის", "ამირან ცინცაძე"),
+    (36, "ბორჯომის", "ვლადიმერ ქარსელაძე"),
+    (51, "ზესტაფონის", "ზურაბ ჩხეიძე"),
 )
 
 # 1999: (district, district as printed, electorate, participants).
@@ -381,8 +400,11 @@ def package_key(year: int) -> str:
     return f"{SOURCE}/{PARLIAMENT_ELECTIONS[year].removeprefix('ge/')}-districts"
 
 
+DECEMBER_KEY = f"{SOURCE}/1995-12-03-parliament-districts"
+
+
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(year) for year in PARLIAMENT_ELECTIONS)]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(year) for year in PARLIAMENT_ELECTIONS), DECEMBER_KEY]
 
 
 def unit(district: int) -> str:
@@ -854,11 +876,113 @@ def build(year: int) -> Package:
     return p
 
 
+DECEMBER_METHOD = (
+    "The member elected in each of the six single-member districts that voted again on 3 December 1995, from the "
+    "Central Election Commission's report of its session of 7 December 1995, printed in Sakartvelos Respublika No. "
+    "183 of 8 December 1995, page 1. In districts 1 (Mtatsminda) and 15 (Lagodekhi) the second round was held at "
+    "every precinct; in districts 3, 12, 36, and 51 the voting was repeated at some precincts. The report names the "
+    "member elected and prints no votes, electorate, or turnout, so the result records the declared winner only. The "
+    "first-round results of districts 1 and 15 and the 19 November 1995 runoff are not stored here, so the contests "
+    "do not point to an earlier round. The page is a scan with no text layer; the names were read from the page "
+    "image."
+)
+
+
+def december() -> Package:
+    election = cec_1990s.key("election", PARLIAMENT_ELECTIONS[1995])
+    issue = ISSUE_1995_DECEMBER
+    p = Package(
+        DECEMBER_KEY,
+        SOURCE,
+        "Georgia's 1995 Parliament single-member districts that voted again on 3 December 1995: the members elected, "
+        "from the Central Election Commission as printed in Sakartvelos Respublika",
+        depends=[
+            f"{SOURCE}/registry",
+            f"{cec_1990s.SOURCE}/{PARLIAMENT_ELECTIONS[1995].removeprefix('ge/')}",
+            f"{cec_1990s.SOURCE}/registry",
+        ],
+    )
+    p.external |= {GEORGIA, COUNTRY}
+    _source(p)
+    art = raw.cached(SOURCE, ISSUE_1995_DECEMBER_COPY)
+    artifact_id = p.artifact(art, CEC)
+    page = key("page", "1995-12", issue.page)
+    p.add(
+        "source_page",
+        id=page,
+        artifact_id=artifact_id,
+        page_number=issue.page,
+        image_key=f"pages/{SOURCE}/{art.sha256}-{issue.page}.png",
+        width=round(2352 * POINTS),
+        height=round(3265 * POINTS),
+    )
+    for district, name, winner in VOTES_DECEMBER_1995:
+        contest = key("contest", 1995, district, "round-2")
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="body_seats",
+            body_id=cec_1990s.PARLIAMENT,
+            magnitude=1,
+            round_number=2,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"1995 single-member district No. {district}, second round", "en", "english")
+        p.name(contest, f"№{district} {name} საარჩევნო ოლქი, მეორე ტური", "ka", "official")
+        p.add(
+            "slug", path=f"{PARLIAMENT_ELECTIONS[1995]}/district-{district}-round-2", entity_id=contest, is_current=True
+        )
+        rs = key("result_set", 1995, district, "round-2")
+        p.add(
+            "result_set",
+            id=rs,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=CEC,
+            status="active",
+            is_default=True,
+            completeness=0.0,
+        )
+        p.add("note", id=key("note", rs), entity_id=rs, kind="methodology", body_md=DECEMBER_METHOD, lang="en")
+        p.add(
+            "citation",
+            id=key("citation", rs),
+            entity_id=rs,
+            source_id=CEC,
+            locator={
+                "url": issue.url,
+                "landing": issue.landing,
+                "issue": issue.printed,
+                "pdf_pages": [issue.page],
+                "copy": ISSUE_1995_DECEMBER_COPY,
+            },
+        )
+        person = key("person", 1995, district, "round-2")
+        p.add("person", id=person)
+        p.name(person, winner, "ka", "official")
+        option = key("option", 1995, district, "round-2")
+        p.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=winner)
+        p.add(
+            "candidacy",
+            id=key("candidacy", 1995, district, "round-2"),
+            person_id=person,
+            option_id=option,
+            role="head",
+            ballot_name=winner,
+        )
+        p.add("outcome", result_set_id=rs, option_id=option, kind="elected")
+    return p
+
+
 def parse() -> None:
     geo().write()
     registry().write()
     for year in PARLIAMENT_ELECTIONS:
         build(year).write()
+    december().write()
 
 
 def emit() -> None:
