@@ -2660,5 +2660,968 @@
 0.88115
 ]
 }
-]
+],
+"2020_elected": [
+{
+"unit": 1,
+"row": 1,
+"list": "mozheme",
+"page": 4,
+"mk": "НИКОЛА ДИМИТРОВ",
+"sq": "NIKOLLA DIMITROV"
+},
+{
+"unit": 1,
+"row": 2,
+"list": "mozheme",
+"page": 4,
+"mk": "МИЛА ЦАРОВСКА",
+"sq": "MILLA CAROVSKA"
+},
+{
+"unit": 1,
+"row": 3,
+"list": "mozheme",
+"page": 4,
+"mk": "ДАМЈАН МАНЧЕВСКИ",
+"sq": "DAMJAN MANÇEVSKI"
+},
+{
+"unit": 1,
+"row": 4,
+"list": "mozheme",
+"page": 4,
+"mk": "МОНИКА ЗАЈКОВА",
+"sq": "MONIKA ZAJKOVA"
+},
+{
+"unit": 1,
+"row": 5,
+"list": "mozheme",
+"page": 4,
+"mk": "ДАРКО КАЕВСКИ",
+"sq": "DARKO KAEVSKI"
+},
+{
+"unit": 1,
+"row": 6,
+"list": "mozheme",
+"page": 4,
+"mk": "ГОРАН МИСОВСКИ",
+"sq": "GORAN MISOVSKI"
+},
+{
+"unit": 1,
+"row": 7,
+"list": "mozheme",
+"page": 4,
+"mk": "КАСТРИОТ РЕЏЕПИ",
+"sq": "KASTRIOT REXHEPI"
+},
+{
+"unit": 1,
+"row": 8,
+"list": "mozheme",
+"page": 4,
+"mk": "МАРИЈА ГЕОРГИЕВСКА",
+"sq": "MARIJA GEORGIEVSKA"
+},
+{
+"unit": 1,
+"row": 9,
+"list": "vmro",
+"page": 4,
+"mk": "ГОРДАНА СИЉАНОВСКА-ДАВКОВА",
+"sq": "GORDANA SILJANOVSKA-DAVKOVA"
+},
+{
+"unit": 1,
+"row": 10,
+"list": "vmro",
+"page": 4,
+"mk": "ТИМЧО МУЦУНСКИ",
+"sq": "TIMÇO MUCUNSKI"
+},
+{
+"unit": 1,
+"row": 11,
+"list": "vmro",
+"page": 4,
+"mk": "СИНИША СТОЈАНОСКИ",
+"sq": "SINISHA STOJANOSKI"
+},
+{
+"unit": 1,
+"row": 12,
+"list": "vmro",
+"page": 4,
+"mk": "БЕТИ СТАМЕНКОСКА-ТРАЈКОВСКА",
+"sq": "BETI STAMENKOSKA-TRAJKOVSKA"
+},
+{
+"unit": 1,
+"row": 13,
+"list": "vmro",
+"page": 4,
+"mk": "ЉУПЧО ДИМОВСКИ",
+"sq": "LUPÇO DIMOVSKI"
+},
+{
+"unit": 1,
+"row": 14,
+"list": "vmro",
+"page": 4,
+"mk": "ЉУПЧО ПРЕНЏОВ",
+"sq": "LUPÇO PRENXHOV"
+},
+{
+"unit": 1,
+"row": 15,
+"list": "vmro",
+"page": 4,
+"mk": "ВЕЛИКА СТОЈКОВА-СЕРАФИМОВСКА",
+"sq": "VELIKA STOJKOVA – SERAFIMOVSKA"
+},
+{
+"unit": 1,
+"row": 16,
+"list": "dui",
+"page": 4,
+"mk": "ИЗЕТ МЕЏИТИ",
+"sq": "IZET MEXHITI"
+},
+{
+"unit": 1,
+"row": 17,
+"list": "dui",
+"page": 4,
+"mk": "АРБЕН ЗИБЕРИ",
+"sq": "ARBEN ZIBERI"
+},
+{
+"unit": 1,
+"row": 18,
+"list": "aa",
+"page": 4,
+"mk": "СКЕНДЕР РЕЏЕПИ",
+"sq": "SKENDER REXHEPI"
+},
+{
+"unit": 1,
+"row": 19,
+"list": "aa",
+"page": 4,
+"mk": "АБДУЛА САЛИУ",
+"sq": "ABDULLA SALIU"
+},
+{
+"unit": 1,
+"row": 20,
+"list": "levica",
+"page": 4,
+"mk": "ДИМИТАР АПАСИЕВ",
+"sq": "DIMITAR APASIEV"
+},
+{
+"unit": 2,
+"row": 1,
+"list": "vmro",
+"page": 5,
+"mk": "ВЛАДО МИСАЈЛОВСКИ",
+"sq": "VLLADO MISAJLLOVSKI"
+},
+{
+"unit": 2,
+"row": 2,
+"list": "vmro",
+"page": 5,
+"mk": "РАШЕЛА МИЗРАХИ",
+"sq": "RASHELLA MIZRAHI"
+},
+{
+"unit": 2,
+"row": 3,
+"list": "vmro",
+"page": 5,
+"mk": "БРАНЕ ПЕТРУШЕВСКИ",
+"sq": "BRANE PETRUSHEVSKI"
+},
+{
+"unit": 2,
+"row": 4,
+"list": "vmro",
+"page": 5,
+"mk": "ИВАН СТОИЉКОВИЌ",
+"sq": "IVAN STOILKOVIQ"
+},
+{
+"unit": 2,
+"row": 5,
+"list": "vmro",
+"page": 5,
+"mk": "ЖАКЛИНА ПЕШЕВСКА",
+"sq": "ZHAKLINA PESHEVSKA"
+},
+{
+"unit": 2,
+"row": 6,
+"list": "vmro",
+"page": 5,
+"mk": "ДАРКО КОСТОВСКИ",
+"sq": "DARKO KOSTOVSKI"
+},
+{
+"unit": 2,
+"row": 7,
+"list": "vmro",
+"page": 5,
+"mk": "БОЈАН СТОЈАНОСКИ",
+"sq": "BOJAN STOJANOSKI"
+},
+{
+"unit": 2,
+"row": 8,
+"list": "mozheme",
+"page": 5,
+"mk": "ОЛИВЕР СПАСОВСКИ",
+"sq": "OLIVER SPASOVSKI"
+},
+{
+"unit": 2,
+"row": 9,
+"list": "mozheme",
+"page": 5,
+"mk": "САЊА ЛУКАРЕВСКА",
+"sq": "SANJA LLUKAREVSKA"
+},
+{
+"unit": 2,
+"row": 10,
+"list": "mozheme",
+"page": 5,
+"mk": "МУХЕМЕД ЗЕЌИРИ",
+"sq": "MUHAMED ZEQIRI"
+},
+{
+"unit": 2,
+"row": 11,
+"list": "mozheme",
+"page": 5,
+"mk": "ДАНИЕЛА МАРКОСКА",
+"sq": "DANIELLA MARKOSKA"
+},
+{
+"unit": 2,
+"row": 12,
+"list": "mozheme",
+"page": 5,
+"mk": "МАРТИН КОСТОВСКИ",
+"sq": "MARTIN KOSTOVSKI"
+},
+{
+"unit": 2,
+"row": 13,
+"list": "mozheme",
+"page": 6,
+"mk": "ЉАТИФЕ ШИКОВСКА",
+"sq": "LATIFE SHIKOVSKA"
+},
+{
+"unit": 2,
+"row": 14,
+"list": "mozheme",
+"page": 6,
+"mk": "БАСТРИ БАЈРАМИ",
+"sq": "BASTRI BAJRAMI"
+},
+{
+"unit": 2,
+"row": 15,
+"list": "dui",
+"page": 6,
+"mk": "АРБЕР АДЕМИ",
+"sq": "ARBËR ADEMI"
+},
+{
+"unit": 2,
+"row": 16,
+"list": "dui",
+"page": 6,
+"mk": "БЕРАТ АЈДАРИ",
+"sq": "BERAT AJDARI"
+},
+{
+"unit": 2,
+"row": 17,
+"list": "dui",
+"page": 6,
+"mk": "МЕРИТА КОЛЧИ-КОЏАЏИКУ",
+"sq": "MERITA KOLLÇI-KOXHAXHIKU"
+},
+{
+"unit": 2,
+"row": 18,
+"list": "aa",
+"page": 6,
+"mk": "АФРИМ ГАШИ",
+"sq": "AFRIM GASHI"
+},
+{
+"unit": 2,
+"row": 19,
+"list": "aa",
+"page": 6,
+"mk": "ЕЉМИ АЗИРИ",
+"sq": "ELMI AZIRI"
+},
+{
+"unit": 2,
+"row": 20,
+"list": "aa",
+"page": 6,
+"mk": "САФИЈЕ САДИКИ ШАИНИ",
+"sq": "SAFIJE SADIKI SHAINI"
+},
+{
+"unit": 3,
+"row": 1,
+"list": "vmro",
+"page": 6,
+"mk": "ИГОР ЈАНУШЕВ",
+"sq": "IGOR JANUSHEV"
+},
+{
+"unit": 3,
+"row": 2,
+"list": "vmro",
+"page": 6,
+"mk": "ИВАН ЈОРДАНОВ",
+"sq": "IVAN JORDANOV"
+},
+{
+"unit": 3,
+"row": 3,
+"list": "vmro",
+"page": 6,
+"mk": "БЛАГИЦА ЛАСОВСКА",
+"sq": "BLLAGICA LLASOVSKA"
+},
+{
+"unit": 3,
+"row": 4,
+"list": "vmro",
+"page": 6,
+"mk": "ИВАНКА ВАСИЛЕВСКА",
+"sq": "IVANKA VASILLEVSKA"
+},
+{
+"unit": 3,
+"row": 5,
+"list": "vmro",
+"page": 6,
+"mk": "СТОЈАН МИЛАНОВ",
+"sq": "STOJAN MILLANOV"
+},
+{
+"unit": 3,
+"row": 6,
+"list": "vmro",
+"page": 7,
+"mk": "ИГОР ЗДРАВКОВСКИ",
+"sq": "IGOR ZDRAVKOVSKI"
+},
+{
+"unit": 3,
+"row": 7,
+"list": "vmro",
+"page": 7,
+"mk": "МИЛЕ ЛЕФКОВ",
+"sq": "MILE LEFKOV"
+},
+{
+"unit": 3,
+"row": 8,
+"list": "vmro",
+"page": 7,
+"mk": "НИКОЛА МИЦЕВСКИ",
+"sq": "NIKOLLA MICEVSKI"
+},
+{
+"unit": 3,
+"row": 9,
+"list": "vmro",
+"page": 7,
+"mk": "ДАНИЕЛА ХРИСТОВА",
+"sq": "DANIELLA HRISTOVA"
+},
+{
+"unit": 3,
+"row": 10,
+"list": "vmro",
+"page": 7,
+"mk": "МАРИЈА ПЕТРУШЕВСКА",
+"sq": "MARIJA PETRUSHEVSKA"
+},
+{
+"unit": 3,
+"row": 11,
+"list": "mozheme",
+"page": 7,
+"mk": "ЉУПЧО НИКОЛОВСКИ",
+"sq": "LUPÇO NIKOLLOVSKI"
+},
+{
+"unit": 3,
+"row": 12,
+"list": "mozheme",
+"page": 7,
+"mk": "ЈАГОДА ШАХПАСКА",
+"sq": "JAGODA SHAHPASKA"
+},
+{
+"unit": 3,
+"row": 13,
+"list": "mozheme",
+"page": 7,
+"mk": "САШКО НИКОЛОВ",
+"sq": "SASHO NIKOLLOV"
+},
+{
+"unit": 3,
+"row": 14,
+"list": "mozheme",
+"page": 7,
+"mk": "МАЈА МОРАЧИН",
+"sq": "MAJA MORAÇANIN"
+},
+{
+"unit": 3,
+"row": 15,
+"list": "mozheme",
+"page": 7,
+"mk": "НЕНАД КОЦИЌ",
+"sq": "NENAD KOCIQ"
+},
+{
+"unit": 3,
+"row": 16,
+"list": "mozheme",
+"page": 7,
+"mk": "СОЊА МИХАИЛОВСКА",
+"sq": "SONJA MIHAILLOVSKA"
+},
+{
+"unit": 3,
+"row": 17,
+"list": "mozheme",
+"page": 7,
+"mk": "ЉУПЧО БАЛКОВСКИ",
+"sq": "LUPÇO BALLKOVSKI"
+},
+{
+"unit": 3,
+"row": 18,
+"list": "mozheme",
+"page": 7,
+"mk": "МАРИЈА АНГЕЛОВА",
+"sq": "MARIJA ANGELLOVA"
+},
+{
+"unit": 3,
+"row": 19,
+"list": "mozheme",
+"page": 7,
+"mk": "ИЛИЈА НИКОЛОВСКИ",
+"sq": "ILIJA NIKOLLOVSKI"
+},
+{
+"unit": 3,
+"row": 20,
+"list": "levica",
+"page": 7,
+"mk": "БОРИСЛАВ КРМОВ",
+"sq": "BORISLLAV KËRMOV"
+},
+{
+"unit": 4,
+"row": 1,
+"list": "mozheme",
+"page": 8,
+"mk": "ЗОРАН ЗАЕВ",
+"sq": "ZORAN ZAEV"
+},
+{
+"unit": 4,
+"row": 2,
+"list": "mozheme",
+"page": 8,
+"mk": "СОЊА МИРАКОВСКА",
+"sq": "SONJA MIRAKOVSKA"
+},
+{
+"unit": 4,
+"row": 3,
+"list": "mozheme",
+"page": 8,
+"mk": "МИЛЕ ТАЛЕВСКИ",
+"sq": "MILE TALEVSKI"
+},
+{
+"unit": 4,
+"row": 4,
+"list": "mozheme",
+"page": 8,
+"mk": "ДАНИЕЛА КОЛЕВА",
+"sq": "DANIELA KOLEVA"
+},
+{
+"unit": 4,
+"row": 5,
+"list": "mozheme",
+"page": 8,
+"mk": "ПАНЧО МИНОВ",
+"sq": "PANÇO MINOV"
+},
+{
+"unit": 4,
+"row": 6,
+"list": "mozheme",
+"page": 8,
+"mk": "МАРИЈА КОСТАДИНОВА",
+"sq": "MARIJA KOSTADINOVA"
+},
+{
+"unit": 4,
+"row": 7,
+"list": "mozheme",
+"page": 8,
+"mk": "КОСТАДИН КОСТАДИНОВ",
+"sq": "KOSTADIN KOSTADINOV"
+},
+{
+"unit": 4,
+"row": 8,
+"list": "mozheme",
+"page": 8,
+"mk": "ЛОЛИТА РИСТОВА",
+"sq": "LOLITA RISTOVA"
+},
+{
+"unit": 4,
+"row": 9,
+"list": "mozheme",
+"page": 8,
+"mk": "ПАВЛЕ ТРАЈАНОВ",
+"sq": "PAVLE TRAJANOV"
+},
+{
+"unit": 4,
+"row": 10,
+"list": "mozheme",
+"page": 8,
+"mk": "КОЛЕ ЧАРАКЧИЕВ",
+"sq": "KOLE ÇARAKÇIEV"
+},
+{
+"unit": 4,
+"row": 11,
+"list": "vmro",
+"page": 8,
+"mk": "АЛЕКСАНДАР НИКОЛОВСКИ",
+"sq": "ALEKSANDAR NIKOLLOVSKI"
+},
+{
+"unit": 4,
+"row": 12,
+"list": "vmro",
+"page": 8,
+"mk": "АНЕ ЛАШКОСКА",
+"sq": "ANE LLASHKOSKA"
+},
+{
+"unit": 4,
+"row": 13,
+"list": "vmro",
+"page": 8,
+"mk": "ДАЈАНЧО ЕФТИМОВ",
+"sq": "DAJANÇO EFTIMOV"
+},
+{
+"unit": 4,
+"row": 14,
+"list": "vmro",
+"page": 8,
+"mk": "ЕЛИ ПАНОВА",
+"sq": "ELI PANOVA"
+},
+{
+"unit": 4,
+"row": 15,
+"list": "vmro",
+"page": 8,
+"mk": "ЗОРАНЧО ЈОВАНЧЕВ",
+"sq": "ZORANÇO JOVANÇEV"
+},
+{
+"unit": 4,
+"row": 16,
+"list": "vmro",
+"page": 8,
+"mk": "ПЕТАР РИСТЕСКИ",
+"sq": "PETAR RISTESKI"
+},
+{
+"unit": 4,
+"row": 17,
+"list": "vmro",
+"page": 8,
+"mk": "ЗДРАВКО ТРАЈАНОВ",
+"sq": "ZDRAVKO TRAJANOV"
+},
+{
+"unit": 4,
+"row": 18,
+"list": "vmro",
+"page": 8,
+"mk": "АНГЕЛИНКА ПЕТКОВА",
+"sq": "ANGELINKA PETKOVA"
+},
+{
+"unit": 4,
+"row": 19,
+"list": "vmro",
+"page": 8,
+"mk": "ЗЛАТКО ПЕНКОВ",
+"sq": "ZLLATKO PENKOV"
+},
+{
+"unit": 4,
+"row": 20,
+"list": "vmro",
+"page": 8,
+"mk": "ЈАДРАНКА ПОЦКОВА",
+"sq": "JADRANKA POCKOVA"
+},
+{
+"unit": 5,
+"row": 1,
+"list": "mozheme",
+"page": 9,
+"mk": "РАДМИЛА ШЕКЕРИНСКА-ЈАНКОВСКА",
+"sq": "RADMILLA SHEKERINSKA-JANKOVSKA"
+},
+{
+"unit": 5,
+"row": 2,
+"list": "mozheme",
+"page": 9,
+"mk": "ЈОВАН МИТРЕВСКИ",
+"sq": "JOVAN MITREVSKI"
+},
+{
+"unit": 5,
+"row": 3,
+"list": "mozheme",
+"page": 9,
+"mk": "БИСЕРА КОСТАДИНОВСКА СТОЈЧЕВСКА",
+"sq": "BISERA KOSTADINOVSKA STOJÇEVSKA"
+},
+{
+"unit": 5,
+"row": 4,
+"list": "mozheme",
+"page": 9,
+"mk": "ЛАЗЕ ТАНЕВСКИ",
+"sq": "LLAZE TANEVSKI"
+},
+{
+"unit": 5,
+"row": 5,
+"list": "mozheme",
+"page": 9,
+"mk": "БЕТИ РАБАЏИЕВСКА НАУМОВСКА",
+"sq": "BETI RABAXHIEVSKA NAUMOVSKA"
+},
+{
+"unit": 5,
+"row": 6,
+"list": "mozheme",
+"page": 9,
+"mk": "ЕНЕС ИБРАХИМ",
+"sq": "ENES IBRAHIM"
+},
+{
+"unit": 5,
+"row": 7,
+"list": "mozheme",
+"page": 9,
+"mk": "БОБИ МОЈСОСКИ",
+"sq": "BOBI MOJSOSKI"
+},
+{
+"unit": 5,
+"row": 8,
+"list": "mozheme",
+"page": 9,
+"mk": "ЖАКЛИНА ЛАЗАРЕВСКА",
+"sq": "ZHAKLINA LLAZAREVSKA"
+},
+{
+"unit": 5,
+"row": 9,
+"list": "vmro",
+"page": 9,
+"mk": "ИГОР ДУРЛОВСКИ",
+"sq": "IGOR DURRLOVSKI"
+},
+{
+"unit": 5,
+"row": 10,
+"list": "vmro",
+"page": 9,
+"mk": "АНТОНИЈО МИЛОШОВСКИ",
+"sq": "ANTONIJO MILLOSHOVSKI"
+},
+{
+"unit": 5,
+"row": 11,
+"list": "vmro",
+"page": 9,
+"mk": "СИЛВАНА АНГЕЛЕВСКА",
+"sq": "SILLVANA ANGELLEVSKA"
+},
+{
+"unit": 5,
+"row": 12,
+"list": "vmro",
+"page": 9,
+"mk": "КИРИЛ ПЕЦАКОВ",
+"sq": "KIRILL PECAKOV"
+},
+{
+"unit": 5,
+"row": 13,
+"list": "vmro",
+"page": 9,
+"mk": "ЈОВАН ЈАУЛЕСКИ",
+"sq": "JOVAN JAULLESKI"
+},
+{
+"unit": 5,
+"row": 14,
+"list": "vmro",
+"page": 9,
+"mk": "ОЛГА ЛОЗАНОВСКА",
+"sq": "OLLGA LLOZANOVSKA"
+},
+{
+"unit": 5,
+"row": 15,
+"list": "vmro",
+"page": 9,
+"mk": "ЃОРЃИЈА САЈКОСКИ",
+"sq": "GJORGJIJA SAJKOSKI"
+},
+{
+"unit": 5,
+"row": 16,
+"list": "vmro",
+"page": 9,
+"mk": "ЛИДИЈА ПЕТКОСКА",
+"sq": "LIDIJA PETKOSKA"
+},
+{
+"unit": 5,
+"row": 17,
+"list": "dui",
+"page": 9,
+"mk": "ТАЛАТ ЏАФЕРИ",
+"sq": "TALAT XHAFERI"
+},
+{
+"unit": 5,
+"row": 18,
+"list": "dui",
+"page": 9,
+"mk": "ИСМАИЛ ЈАХОСКИ",
+"sq": "ISMAIL JAHOSKI"
+},
+{
+"unit": 5,
+"row": 19,
+"list": "dui",
+"page": 9,
+"mk": "АРБАНА ПАШОЛИ",
+"sq": "ARBANA PASHOLLI"
+},
+{
+"unit": 5,
+"row": 20,
+"list": "aa",
+"page": 9,
+"mk": "СУРИЈА РАШИДИ",
+"sq": "SYRIJA RASHIDI"
+},
+{
+"unit": 6,
+"row": 1,
+"list": "dui",
+"page": 10,
+"mk": "АЛИ АХМЕТИ",
+"sq": "ALI AHMETI"
+},
+{
+"unit": 6,
+"row": 2,
+"list": "dui",
+"page": 10,
+"mk": "ФЉОРИН БЕСИМИ",
+"sq": "FLORIN BESIMI"
+},
+{
+"unit": 6,
+"row": 3,
+"list": "dui",
+"page": 10,
+"mk": "АРТА БИЛАЛИ ЗЕНДЕЛИ",
+"sq": "ARTA BILALLI ZENDELI"
+},
+{
+"unit": 6,
+"row": 4,
+"list": "dui",
+"page": 10,
+"mk": "НАСЕР НУРЕДИНИ",
+"sq": "NASER NUREDINI"
+},
+{
+"unit": 6,
+"row": 5,
+"list": "dui",
+"page": 10,
+"mk": "БАЈРАМ РЕЏЕПИ",
+"sq": "BAJRAM REXHEPI"
+},
+{
+"unit": 6,
+"row": 6,
+"list": "dui",
+"page": 10,
+"mk": "ВЈОЛЦА АДЕМИ",
+"sq": "VJOLLCA ADEMI"
+},
+{
+"unit": 6,
+"row": 7,
+"list": "dui",
+"page": 10,
+"mk": "БАЈРАМ КАДРИЈА",
+"sq": "BAJRAM KADRIJA"
+},
+{
+"unit": 6,
+"row": 8,
+"list": "aa",
+"page": 10,
+"mk": "ЗИАДИН СЕЛА",
+"sq": "ZIADIN SELA"
+},
+{
+"unit": 6,
+"row": 9,
+"list": "aa",
+"page": 10,
+"mk": "АТНАН НЕЗИРИ",
+"sq": "ATNAN NEZIRI"
+},
+{
+"unit": 6,
+"row": 10,
+"list": "aa",
+"page": 10,
+"mk": "ИЛИРЕ ДАУТИ",
+"sq": "ILIRE DAUTI"
+},
+{
+"unit": 6,
+"row": 11,
+"list": "aa",
+"page": 10,
+"mk": "ХУСНИ ИСМАИЛИ",
+"sq": "HUSNI ISMAILI"
+},
+{
+"unit": 6,
+"row": 12,
+"list": "aa",
+"page": 10,
+"mk": "ХАЛИЛ СНОПЧЕ",
+"sq": "HALIL SNOPÇE"
+},
+{
+"unit": 6,
+"row": 13,
+"list": "aa",
+"page": 10,
+"mk": "АРТИНА ЌАЗИМИ",
+"sq": "ARTINA QAZIMI"
+},
+{
+"unit": 6,
+"row": 14,
+"list": "mozheme",
+"page": 10,
+"mk": "БИЉАЛ КАСАМИ",
+"sq": "BILALL KASAMI"
+},
+{
+"unit": 6,
+"row": 15,
+"list": "mozheme",
+"page": 10,
+"mk": "ФАНИЦА НИКОЛОВСКА",
+"sq": "FANICA NIKOLLOVSKA"
+},
+{
+"unit": 6,
+"row": 16,
+"list": "mozheme",
+"page": 10,
+"mk": "БЕЈЏАН ИЉАС",
+"sq": "BEJXHAN ILJAS"
+},
+{
+"unit": 6,
+"row": 17,
+"list": "mozheme",
+"page": 10,
+"mk": "ФАДИЛ ЗЕНДЕЛИ",
+"sq": "FADIL ZENDELI"
+},
+{
+"unit": 6,
+"row": 18,
+"list": "vmro",
+"page": 10,
+"mk": "ДАФИНА СТОЈАНОВСКА",
+"sq": "DAFINA STOJANOVSKA"
+},
+{
+"unit": 6,
+"row": 19,
+"list": "vmro",
+"page": 10,
+"mk": "АЛЕКСАНДАР ВЕЉАНОВСКИ",
+"sq": "ALEKSANDAR VELJANOVSKI"
+},
+{
+"unit": 6,
+"row": 20,
+"list": "dpa",
+"page": 10,
+"mk": "МЕНДУХ ТАЌИ",
+"sq": "MENDUH TAQI"
+}
+],
+"method_elected": "The elected deputies of 2020 were transcribed from the tables of each unit's elected candidates in the decision (pages 4 to 10), in the order and spelling printed, with the page of each row; each list's count of names matches its declared seats."
 }
