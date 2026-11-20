@@ -434,3 +434,33 @@ def declared_president(runoff: bool) -> list[int]:
     votes = [value for _, value in sorted(chart) if value >= 1000]
     info = box(page)
     return [*votes, info["null"], info["blank"], info["cast"], info["registered"]]
+
+
+class Canton(NamedTuple):
+    row: Row  # the canton's own row in a "CANTÓN/PARROQUIA" table
+    parishes: list[Row]  # its parishes, whose rows add up to the canton's row
+
+
+def parish_tables(group: Group) -> list[Canton]:
+    """The cantons of a circumscription's parish table, each with its parish rows.
+
+    The table prints a canton's row and then the rows of its parishes in the circumscription, so a canton row is the
+    row whose figures the rows after it add up to. A canton with one parish prints the same figures twice. A name that
+    wraps is read as in ``rows``.
+    """
+    width = len(group.entries) + 1
+    rest = group.parishes
+    found: list[Canton] = []
+    i = 0
+    while i < len(rest):
+        head = rest[i]
+        total = [0] * width
+        j = i + 1
+        while j < len(rest) and total != list(head.numbers):
+            total = [a + b for a, b in zip(total, rest[j].numbers, strict=True)]
+            j += 1
+        if total != list(head.numbers) or j == i + 1:
+            raise ValueError(f"page {head.page}: the rows after {head.name!r} do not add up to its figures")
+        found.append(Canton(head, rest[i + 1 : j]))
+        i = j
+    return found
