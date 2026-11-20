@@ -3,12 +3,13 @@ import subprocess
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.package import NAMESPACE, Draft
+from ea.sources.licenses import UNLICENSED
 from ea.store import DATA, connect
 
 SOURCE = "de.weimar_landtage"
@@ -115,6 +116,109 @@ STATES: dict[str, tuple[str | None, str, str, str, str, str, date | None]] = {
     ),
 }
 CITY_STATES = {"HH", "HB", "LU"}
+VERFASSUNGEN = "https://www.verfassungen.de"
+WIKIPEDIA = "https://de.wikipedia.org/wiki"
+# The texts the successor links and the Weimar names cite: laws and constitutions as transcribed on verfassungen.de,
+# each titled with the gazette that printed it where the page names one, and two German Wikipedia articles, pinned
+# to the revision fetched. "Land (Deutschland)" lists the territories each Land of 1947 was formed from.
+TEXTS: dict[str, tuple[str, str, str]] = {
+    "laender": ("Wikipedia (de)", "Land (Deutschland)", f"{WIKIPEDIA}/Land_(Deutschland)"),
+    "niedersachsen": ("Wikipedia (de)", "Niedersachsen", f"{WIKIPEDIA}/Niedersachsen"),
+    "mecklenburg": (
+        "Deutsches Reich",
+        (
+            "Gesetz über die Vereinigung von Mecklenburg-Strelitz mit Mecklenburg-Schwerin vom 15. Dezember 1933, "
+            "RGBl. 1933 I S. 1065"
+        ),
+        f"{VERFASSUNGEN}/mv/vereinigung33.htm",
+    ),
+    "gross-hamburg": (
+        "Deutsches Reich",
+        (
+            "Gesetz über Groß-Hamburg und andere Gebietsbereinigungen (Groß-Hamburg-Gesetz) vom 26. Januar 1937, "
+            "RGBl. 1937 I S. 91"
+        ),
+        f"{VERFASSUNGEN}/hh/grosshamburg37.htm",
+    ),
+    "proklamation-2": (
+        "Militärregierung Deutschland, Amerikanische Zone",
+        "Proklamation Nr. 2 vom 19. September 1945",
+        f"{VERFASSUNGEN}/bw/wuerttemberg-baden/proklamation2-45.htm",
+    ),
+    "lippe": (
+        "Land Nordrhein-Westfalen",
+        (
+            "Gesetz über die Vereinigung des Landes Lippe mit dem Land Nordrhein-Westfalen (1948), Landtag "
+            "Nordrhein-Westfalen Drucksache 01/644"
+        ),
+        f"{VERFASSUNGEN}/nrw/lippe/eingliederungsgesetz47.htm",
+    ),
+    "BY": (
+        "Freistaat Bayern",
+        "Verfassungsurkunde des Freistaats Bayern vom 14. August 1919, GVBl. 1919 Nr. 58",
+        f"{VERFASSUNGEN}/by/verf19.htm",
+    ),
+    "SN": (
+        "Freistaat Sachsen",
+        "Verfassung des Freistaates Sachsen vom 1. November 1920, SächsGBl. 1920 Nr. 26 S. 445",
+        f"{VERFASSUNGEN}/sac/verf20.htm",
+    ),
+    "TH": (
+        "Deutsches Reich",
+        "Gesetz, betreffend das Land Thüringen, vom 30. April 1920",
+        f"{VERFASSUNGEN}/th/thueringengesetz20.htm",
+    ),
+    "HH": (
+        "Freie und Hansestadt Hamburg",
+        "Verfassung der Freien und Hansestadt Hamburg vom 7. Januar 1921, HmbGVBl. 1921 S. 9",
+        f"{VERFASSUNGEN}/hh/verf21.htm",
+    ),
+    "HB": (
+        "Freie Hansestadt Bremen",
+        "Verfassung der Freien Hansestadt Bremen vom 18. Mai 1920, BremGBl. 1920 Nr. 46 S. 183",
+        f"{VERFASSUNGEN}/hb/verf20.htm",
+    ),
+}
+# Where each defunct state went, dated to its end in STATES: (state, kind, successor, date precision, text). A
+# successor is a state code here, a Land's ISO code, or the de.polity key of a Land of 1945 to 1952 that de.landtag
+# holds. Prussia's successors are the Länder that "Land (Deutschland)" forms from Prussian territory as of 21 January
+# 1947, a month before Control Council Law No. 46 dissolved it; Berlin, then under four-power rule, and the Saar,
+# outside the Control Council's authority since 1946, are left out. The People's State of Hesse split at the zone
+# border: Proclamation No. 2 put its part east of the Rhine in Greater Hesse, and Rhenish Hesse went to
+# Rhineland-Palatinate. Anhalt joined the Prussian Province of Saxony in July 1945. Württemberg and Baden are linked
+# by de.landtag, to the three Länder of 1945 to 1952 that merged into Baden-Württemberg.
+SUCCESSORS: list[tuple[str, str, str, str, str]] = [
+    *(
+        ("PR", "split_into", land, "day", "laender")
+        for land in (
+            "DE-SH",
+            "DE-NI",
+            "DE-NW",
+            "DE-HE",
+            "DE-RP",
+            "wuerttemberg-hohenzollern",
+            "DE-BB",
+            "DE-MV",
+            "DE-SN",
+            "DE-ST",
+            "DE-TH",
+        )
+    ),
+    ("HE", "split_into", "DE-HE", "day", "proklamation-2"),
+    ("HE", "split_into", "DE-RP", "day", "laender"),
+    ("MS", "merged_into", "DE-MV", "day", "mecklenburg"),
+    ("MST", "merged_into", "DE-MV", "day", "mecklenburg"),
+    ("OL", "merged_into", "DE-NI", "day", "niedersachsen"),
+    ("BS", "merged_into", "DE-NI", "day", "niedersachsen"),
+    ("SL", "merged_into", "DE-NI", "day", "niedersachsen"),
+    ("LI", "merged_into", "DE-NW", "day", "lippe"),
+    ("LU", "merged_into", "PR", "day", "gross-hamburg"),
+    ("AN", "merged_into", "DE-ST", "month", "laender"),
+]
+# The official names of the states that are Länder today, from their constitutions (Thuringia's from the Reich law
+# that formed it on 1 May 1920), as historical names for the Weimar years: the date each took effect, or the
+# Republic's start, to the Gleichschaltung of the states.
+WEIMAR_NAMES = {"BY": WEIMAR, "SN": WEIMAR, "TH": date(1920, 5, 1), "HH": WEIMAR, "HB": WEIMAR}
 LEFT_COLUMNS = {
     "registered": (349, 404),
     "voters": (411, 467),
@@ -157,6 +261,15 @@ def url(edition: int, leaf: int) -> str:
 def fetch() -> None:
     for (edition, _), leaf in LEAVES.items():
         raw.fetch(SOURCE, url(edition, leaf), suffix=".jp2")
+    for _, _, link in TEXTS.values():
+        raw.fetch(SOURCE, cached_url(link), suffix=".wiki" if link.startswith(WIKIPEDIA) else ".html")
+
+
+def cached_url(link: str) -> str:
+    """The file cached for a text: a Wikipedia article's wikitext, which the cache pins to its revision, or the page."""
+    if link.startswith(WIKIPEDIA):
+        return f"https://de.wikipedia.org/w/index.php?title={link.removeprefix(f'{WIKIPEDIA}/')}&action=raw"
+    return link
 
 
 def image(edition: int, page: int) -> tuple[str, int, int]:
@@ -165,10 +278,11 @@ def image(edition: int, page: int) -> tuple[str, int, int]:
     png = PAGES / f"{artifact.sha256}.png"
     if not png.exists():
         subprocess.run(["magick", str(artifact.path), "-resize", "1500x", str(png)], check=True)
-    out = subprocess.run(
-        ["magick", "identify", "-format", "%w %h", str(png)], check=True, capture_output=True, text=True
-    )
-    width, height = map(int, out.stdout.split())
+    # The PNG header holds the size (IHDR, bytes 16 to 24), so reading it needs no image tool.
+    header = png.read_bytes()[:24]
+    if header[:8] != b"\x89PNG\r\n\x1a\n" or header[12:16] != b"IHDR":
+        raise ValueError(f"{png} is not a PNG")
+    width, height = int.from_bytes(header[16:20]), int.from_bytes(header[20:24])
     return f"pages/{SOURCE}/{png.name}", width, height
 
 
@@ -189,7 +303,7 @@ def emit() -> Path:
         if sum(int(r["seats"]) for r in rows) != int(election["seats"]):
             raise ValueError(f"{election['state']}: seats do not add up")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
@@ -281,6 +395,54 @@ def emit() -> Path:
                 kind="standard",
                 valid_from=WEIMAR,
                 valid_to=ended,
+            )
+
+        texts: dict[str, UUID] = {}
+        for key, (publisher, title, link) in TEXTS.items():
+            texts[key] = cs.source(publisher, title)
+            wikipedia = link.startswith(WIKIPEDIA)
+            if texts[key] in cs.minted:
+                cs.add(
+                    "source",
+                    id=texts[key],
+                    kind="community" if wikipedia else "official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=link,
+                    license="CC BY-SA 4.0" if wikipedia else UNLICENSED,
+                    license_url="https://creativecommons.org/licenses/by-sa/4.0/" if wikipedia else None,
+                    notes=None if wikipedia else "Text as printed, transcribed on verfassungen.de.",
+                )
+            cs.artifact(raw.cached(SOURCE, cached_url(link)), texts[key])
+        for code, kind, successor, precision, text in SUCCESSORS:
+            source_polity = polities[code]
+            if successor in STATES:
+                target = polities[successor]
+            else:
+                target = cs.polity(successor) if successor.startswith("DE-") else cs.key("de.polity", successor)
+                if target in cs.minted:
+                    raise ValueError(f"run de.bundeswahlleiterin and de.landtag first: {successor} must exist")
+            cs.add(
+                "polity_relation",
+                id=uuid5(NAMESPACE, f"polity_relation\x1f{source_polity}\x1f{kind}\x1f{target}"),
+                from_polity_id=source_polity,
+                to_polity_id=target,
+                kind=kind,
+                date=STATES[code][6],
+                date_precision=precision,
+                source_id=texts[text],
+            )
+        for code, since in WEIMAR_NAMES.items():
+            cs.add(
+                "name",
+                entity_id=polities[code],
+                text=STATES[code][3],
+                lang="de",
+                kind="historical",
+                valid_from=since,
+                valid_to=GLEICHSCHALTUNG,
+                is_preferred=False,
+                source_id=texts[code],
             )
 
         parties: dict[tuple[str, str], UUID] = {}
