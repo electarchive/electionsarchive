@@ -1257,7 +1257,11 @@ def geo() -> Package:
 
 
 def registry() -> Package:
-    p = Package(f"{SOURCE}/registry", SOURCE, "The electoral system of Bolivia's referendums and recalls")
+    p = Package(
+        f"{SOURCE}/registry",
+        SOURCE,
+        "The electoral system of Bolivia's referendums and recalls, and the documents their results come from",
+    )
     p.external |= {BOLIVIA}
     p.add(
         "electoral_system",
@@ -1279,7 +1283,46 @@ def registry() -> Package:
         ),
         lang="en",
     )
+    add_sources(p)
     return p
+
+
+def document_title(url: str) -> str:
+    """A document's title; a volume of the Atlas that prints several elections drops the election."""
+    titles = {spec.title for spec in ELECTIONS.values() if spec.pdf == url}
+    if len(titles) == 1:
+        return titles.pop()
+    return titles.pop().split(" (", 1)[0]
+
+
+def add_sources(p: Package) -> None:
+    """Every document the election packages cite, emitted once here so that no two packages add the same source."""
+    for url in dict.fromkeys(spec.pdf for spec in ELECTIONS.values()):
+        source = p.id("source", url)
+        p.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher="Tribunal Supremo Electoral de Bolivia",
+            title=document_title(url),
+            url=url,
+            license=LICENSE,
+            attribution=ATTRIBUTION,
+        )
+        p.artifact(raw.cached(SOURCE, url), source)
+    digital = p.id("source", DIGITAL)
+    p.add(
+        "source",
+        id=digital,
+        kind="official_body",
+        publisher="Órgano Electoral Plurinacional de Bolivia",
+        title="Atlas Electoral de Bolivia (digital), counts by polling table",
+        url=DIGITAL,
+        license=LICENSE,
+        attribution=ATTRIBUTION,
+    )
+    for n in PROCESSES:
+        p.artifact(raw.cached(SOURCE, process_url(n)), digital)
 
 
 # The elections.
@@ -1295,17 +1338,8 @@ def build(day: date) -> Package:
     )
     p.external |= {BOLIVIA, COUNTRY}
     source = p.id("source", spec.pdf)
-    p.add(
-        "source",
-        id=source,
-        kind="official_body",
-        publisher="Tribunal Supremo Electoral de Bolivia",
-        title=spec.title,
-        url=spec.pdf,
-        license=LICENSE,
-        attribution=ATTRIBUTION,
-    )
-    p.artifact(raw.cached(SOURCE, spec.pdf), source)
+    p.external.add(source)
+    p.uses(raw.cached(SOURCE, spec.pdf))
     election = p.id("election", day)
     p.add(
         "election",
@@ -1325,18 +1359,9 @@ def build(day: date) -> Package:
     files = [n for n, name in PROCESSES.items() if name in sections]
     digital = p.id("source", DIGITAL)
     if files:
-        p.add(
-            "source",
-            id=digital,
-            kind="official_body",
-            publisher="Órgano Electoral Plurinacional de Bolivia",
-            title="Atlas Electoral de Bolivia (digital), counts by polling table",
-            url=DIGITAL,
-            license=LICENSE,
-            attribution=ATTRIBUTION,
-        )
+        p.external.add(digital)
         for n in files:
-            p.artifact(raw.cached(SOURCE, process_url(n)), digital)
+            p.uses(raw.cached(SOURCE, process_url(n)))
     found = places()
     over = []
     short = []
