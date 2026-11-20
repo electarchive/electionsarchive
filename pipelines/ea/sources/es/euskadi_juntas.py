@@ -1,6 +1,8 @@
+import html
 import re
 from collections import Counter, defaultdict
 from datetime import date
+from difflib import SequenceMatcher
 from pathlib import Path
 from uuid import UUID
 
@@ -46,6 +48,19 @@ ELECTIONS = {
 TERRITORIES = {"01": "Álava", "20": "Gipuzkoa", "48": "Bizkaia"}
 NATIVE = {"01": "Araba/Álava", "20": "Gipuzkoa", "48": "Bizkaia"}
 TITLE = "Resultados de las elecciones a Juntas Generales (euskadi.eus)"
+JUNTAS_BASE = "https://www.bngipuzkoa.eus/WAS/CORP/DJGPortalWEB/"
+JUNTAS_PUBLISHER = "Juntas Generales de Gipuzkoa"
+JUNTAS_TITLE = "Junteras y junteros por legislatura (bngipuzkoa.eus)"
+BOG_PUBLISHER = "Diputación Foral de Gipuzkoa"
+BOG_TITLE = "Boletín Oficial de Gipuzkoa"
+BOG_PORTAL = "https://egoitza.gipuzkoa.eus/es/bog"
+BOG = "https://egoitza.gipuzkoa.eus/gao-bog/castell/bog/"
+# Notices of the Juntas Electorales de Zona in the Boletín Oficial de Gipuzkoa that bear on a circunscripción's
+# members: the titulares proclaimed elected, or the candidacies proclaimed for the election.
+PROCLAIMED = {(2007, "20", "debaurola"): (f"{BOG}2007/06/21/c0707047.htm", date(2007, 6, 21), "Bergara")}
+CANDIDACIES = {
+    (2011, "20", "bidasoaoiartzun"): (f"{BOG}2011/04/26/c1104967.htm", date(2011, 4, 26), "Donostia-San Sebastián")
+}
 KEYWORDS = (
     "ayala",
     "aiara",
@@ -70,9 +85,119 @@ def url(year: int) -> str:
     return f"{euskadi.BASE}J{year % 100:02d}_c.zip"
 
 
+def roster_url(term: int) -> str:
+    return f"{JUNTAS_BASE}composicion_junteros_listado.jsp?idioma=es&legislatura={term}"
+
+
+def roster_links(term: int) -> list[str]:
+    """The personal pages that the Juntas Generales de Gipuzkoa's list of a term's junteros links to."""
+    text = raw.cached(SOURCE, roster_url(term)).path.read_bytes().decode("latin-1")
+    codes = re.findall(rf"composicion_junteros_ficha\.jsp\?legislatura={term}&amp;codigo=(\d+)", text)
+    return [
+        f"{JUNTAS_BASE}composicion_junteros_ficha.jsp?legislatura={term}&codigo={code}" for code in dict.fromkeys(codes)
+    ]
+
+
 def fetch() -> None:
     for year in ELECTIONS:
         raw.fetch(SOURCE, url(year), suffix=".zip")
+    for term in range(1, len(ELECTIONS) + 1):
+        raw.fetch(SOURCE, roster_url(term), suffix=".html")
+        links = roster_links(term)
+        got = raw.fetch_many(SOURCE, links, suffix=".html", workers=4)
+        if len(got) != len(links):
+            raise ValueError(f"term {term}: {len(links) - len(got)} junteros' pages could not be fetched")
+    for notice, _, _ in [*PROCLAIMED.values(), *CANDIDACIES.values()]:
+        raw.fetch(SOURCE, notice, suffix=".html")
+
+
+def page_text(link: str) -> str:
+    text = raw.cached(SOURCE, link).path.read_bytes().decode("latin-1").replace("\xad", "")
+    text = re.sub(r"(?i)<br\s*/?>|</p>|</li>|</tr>|</h\d>", "\n", text)
+    return html.unescape(re.sub(r"<[^>]+>", " ", text))
+
+
+def roster(term: int, year: int) -> list[dict]:
+    """The junteros of a term in Gipuzkoa as the Juntas Generales list them: the circunscripción, the date each took
+    a seat, and whom each replaced when they came in as a substitute. The pages come in Basque or Spanish."""
+    out = []
+    for link in roster_links(term):
+        text = re.sub(r"\s+", " ", page_text(link))
+        name = re.search(r"(?:Ficha personal|Fitxa pertsonala) (.+?) (?:Candidatura electoral|Hauteskundetako)", text)
+        circ = re.search(
+            r"(?:Circunscripción electoral|Hauteskunde barrutia) ?: ?(.*?) ?(?:Grupo Juntero|Batzarkide)", text
+        )
+        seated = re.search(r"(?:Fecha alta|Alta) ?: ?(\d[\d-]+)( \([^)]*\))?", text)
+        if name is None or circ is None or seated is None:
+            raise ValueError(f"unexpected juntero page {link}")
+        replaced = re.match(r" \(\s*[^:]*:\s*(.*?)\s*\)", seated.group(2) or "")
+        day = seated.group(1)
+        out.append(
+            {
+                "year": year,
+                "th": "20",
+                "name": name.group(1).strip(),
+                "circ": circ.group(1).strip(),
+                "seated": date.fromisoformat(day if day[4] == "-" else f"{day[6:]}-{day[3:5]}-{day[:2]}"),
+                "replaced": replaced.group(1) if replaced else None,
+                "url": link,
+            }
+        )
+    return out
+
+
+def numbered(text: str) -> list[tuple[str, str]]:
+    """The numbered names of a candidacies or proclamation notice, each with the heading it falls under: titulares,
+    or suplentes after an 'Ordezkoak/Suplentes' or 'Suplentes' heading until the next list starts again at 1."""
+    out: list[tuple[str, str]] = []
+    mode, fresh = "titular", False
+    flat = re.sub(r"\s+", " ", text)
+    for marker, number, person in re.findall(
+        r"(Suplentes\s*:)|(\d+)\.\s*(?:D\.ª|D\.|Dña\.|Doña|Don)\s+(.+?)\s+(?:jn|and)\b", flat
+    ):
+        if marker:
+            mode, fresh = "suplente", True
+            continue
+        if number == "1":
+            if fresh:
+                fresh = False
+            elif mode == "suplente":
+                mode = "titular"
+        out.append((mode, person))
+    return out
+
+
+PARTICLES = {"de", "del", "la", "las", "los", "y", "e", "san"}
+
+
+def surnames(name: str) -> list[str]:
+    part = name.split(",", 1)[0]
+    return [fold(word) for word in part.split() if fold(word) and fold(word) not in PARTICLES]
+
+
+def alike(word: str, words: list[str]) -> bool:
+    return any(SequenceMatcher(None, word, other).ratio() >= 0.75 for other in words)
+
+
+def names_match(member: str, text: str, given: bool = False) -> bool:
+    """Whether a 'SURNAMES, GIVEN' name names the person in a notice's 'Given Surnames', allowing the spelling of a
+    second surname to differ (Arteaga and Urteaga, Aranceta and Aranzeta). With `given`, the first given name must
+    match too; the notices sometimes give another of a person's given names (Miren for María Soledad)."""
+    words = [fold(word) for word in text.split() if fold(word)]
+    own = surnames(member)
+    if not own or own[0] not in words:
+        return False
+    rest = words[: words.index(own[0])] + words[words.index(own[0]) + 1 :]
+    if not all(alike(word, rest) for word in own[1:]):
+        return False
+    first = [fold(word) for word in member.partition(",")[2].split() if fold(word)]
+    return not given or not first or alike(first[0], rest)
+
+
+def name_score(a: str, b: str) -> float:
+    """How alike two 'Surnames, Given' names are, the surnames weighing double."""
+    (sa, _, ga), (sb, _, gb) = a.partition(","), b.partition(",")
+    return 2 * SequenceMatcher(None, fold(sa), fold(sb)).ratio() + SequenceMatcher(None, fold(ga), fold(gb)).ratio()
 
 
 def circ_key(text: str) -> str:
@@ -158,6 +283,8 @@ def parse() -> None:
         mesa_units, mesa_votes = tidy(results(files["mes"]), year, ("mun", "district", "section", "mesa", "name"))
         tables["mesa"].extend(mesa_units)
         tables["mesa_votes"].extend(mesa_votes)
+    for term, year in enumerate(ELECTIONS, 1):
+        tables["roster"].extend(roster(term, year))
     for name, rows in tables.items():
         frame = pl.DataFrame(rows, infer_schema_length=None)
         frame.write_parquet(PARSED / f"{name}.parquet")
@@ -225,7 +352,8 @@ SYSTEM = (
 CIRC_METHOD = (
     "List votes, seats, registered voters, ballots cast, blank ballots, and null ballots by circunscripción from the "
     "Basque Government's results files. Valid ballots here are the votes to candidacies, with blank ballots stored "
-    "apart. The seats are the number of members the Elec file names for each list."
+    "apart. The seats are the number of members the Elec file names for each list, less any that this note shows "
+    "were not elected (a substitute who took a seat later in the term, or a suplente)."
 )
 MISMATCH = (
     " The file names {declared} members for this circunscripción, and a D'Hondt allocation of {declared} seats at the "
@@ -245,6 +373,137 @@ LISTS_DIFFER = (
     " In the source, the list votes of this circunscripción add up to {lists:,}, against {candidacies:,} votes to "
     "candidacies in its own totals."
 )
+SEATED = (
+    " The Juntas Generales de Gipuzkoa's list of the term's junteros gives this circunscripción {seats} seats (its "
+    "junteros less those another later replaced), the same number of members the file names."
+)
+SETTLED = (
+    " The file names {listed} members for this circunscripción, against the {seats} seats the Juntas Generales de "
+    "Gipuzkoa's list of the term's junteros gives it (its junteros less those another later replaced). {why} The "
+    "elected members stored here are the other {seats}, and the others are stored as list candidates."
+)
+SUBSTITUTE = "{name} ({party}) took a seat on {day} in place of {replaced}"
+SUPLENTE = (
+    "{name} is a suplente of the {party} list, not one of its titulares, in the candidacies the Junta Electoral de "
+    "Zona de {zone} proclaimed (Boletín Oficial de Gipuzkoa, {day})"
+)
+PROCLAMATION = (
+    " They are the titulares the Junta Electoral de Zona de {zone} proclaimed elected (Boletín Oficial de Gipuzkoa, "
+    "{day})."
+)
+
+
+def natural(name: str) -> str:
+    """'SURNAMES, GIVEN' as 'Given Surnames'."""
+    surname, _, given = name.partition(",")
+    return " ".join(part.strip() for part in (given, surname) if part.strip())
+
+
+def long_date(day: date) -> str:
+    return f"{day:%B} {day.day}, {day.year}"
+
+
+def joined(items: list[str]) -> str:
+    """A series whose items hold commas of their own, so separated by semicolons."""
+    return (
+        items[0] if len(items) == 1 else "; ".join(items[:-1]) + ("; and " if len(items) > 2 else " and ") + items[-1]
+    )
+
+
+def section(text: str, circ: str) -> str:
+    """The part of a Junta Electoral de Zona notice that covers one circunscripción."""
+    parts = re.split(r"Circunscripción\s*«", text)
+    (part,) = [part for part in parts[1:] if fold(part.split("»", 1)[0]).startswith(circ)]
+    return part
+
+
+def settle(members: pl.DataFrame, rosters: pl.DataFrame) -> tuple[pl.DataFrame, dict[tuple[int, str, str], dict]]:
+    """Mark which of the Elec file's members were elected. In some Gipuzkoa circunscripciones the file also names
+    those who took a seat later in the term, so it names more members than there are seats. There the members are
+    settled against the Juntas Generales de Gipuzkoa's own list of each term's junteros: a member it shows taking a
+    seat in place of someone is a substitute, and a member that the candidacies proclaimed in the Boletín Oficial de
+    Gipuzkoa list as a suplente is one too. The seats of a circunscripción are its junteros less those whom another
+    later replaced."""
+    rows = [{**row, "status": "elected"} for row in members.iter_rows(named=True)]
+    found: dict[tuple[int, str, str], dict] = {}
+    for year in ELECTIONS:
+        elec = [row for row in rows if row["year"] == year and row["th"] == "20"]
+        pages = rosters.filter(pl.col("year") == year).to_dicts()
+        pairs = sorted(
+            (
+                (name_score(page["name"], row["name"]), i, j)
+                for i, page in enumerate(pages)
+                for j, row in enumerate(elec)
+            ),
+            reverse=True,
+        )
+        taken_pages: set[int] = set()
+        match: dict[int, dict] = {}
+        for score, i, j in pairs:
+            if score >= 2 and i not in taken_pages and j not in match:
+                taken_pages.add(i)
+                match[j] = pages[i]
+        votes = Counter((page["circ"], elec[j]["circ"]) for j, page in match.items())
+        label: dict[str, str] = {}
+        for (text, circ), _ in votes.most_common():
+            label.setdefault(text, circ)
+        seats: Counter[str] = Counter()
+        for text, circ in label.items():
+            group = [page for page in pages if page["circ"] == text]
+            replaced = [page["replaced"] for page in group if page["replaced"]]
+            gone = [page for page in group if any(names_match(page["name"], other, given=True) for other in replaced)]
+            seats[circ] += len(group) - len(gone)
+        for circ in dict.fromkeys(row["circ"] for row in elec):
+            group = [j for j, row in enumerate(elec) if row["circ"] == circ]
+            key = (year, "20", circ)
+            found[key] = {"listed": len(group), "seats": seats[circ], "why": [], "urls": []}
+            if len(group) <= seats[circ]:
+                continue
+            for j in group:
+                page = match.get(j)
+                if page is not None and page["replaced"] is not None:
+                    elec[j]["status"] = "substitute"
+                    found[key]["why"].append(
+                        SUBSTITUTE.format(
+                            name=title(natural(elec[j]["name"])),
+                            party=elec[j]["party"],
+                            day=long_date(page["seated"]),
+                            replaced=natural(page["replaced"]),
+                        )
+                    )
+                    found[key]["urls"].append(page["url"])
+            left = [j for j in group if elec[j]["status"] == "elected"]
+            if len(left) > seats[circ] and key in CANDIDACIES:
+                notice, day, zone = CANDIDACIES[key]
+                entries = numbered(section(page_text(notice), circ))
+                for j in left:
+                    roles = {mode for mode, person in entries if names_match(elec[j]["name"], person)}
+                    if roles == {"suplente"}:
+                        elec[j]["status"] = "suplente"
+                        found[key]["why"].append(
+                            SUPLENTE.format(
+                                name=title(natural(elec[j]["name"])),
+                                party=elec[j]["party"],
+                                zone=zone,
+                                day=long_date(day),
+                            )
+                        )
+                found[key]["notice"] = notice
+            left = [j for j in group if elec[j]["status"] == "elected"]
+            if len(left) != seats[circ]:
+                raise ValueError(f"{key}: {len(left)} members left against {seats[circ]} seats")
+            if key in PROCLAIMED:
+                notice, day, zone = PROCLAIMED[key]
+                text = re.split(r"Suplentes\s*:", page_text(notice))[0]
+                titulares = [person for mode, person in numbered(text) if mode == "titular"]
+                matched = [j for j in left if any(names_match(elec[j]["name"], person) for person in titulares)]
+                if len(titulares) != len(left) or len(matched) != len(left):
+                    raise ValueError(f"{key}: the members left differ from the proclaimed titulares")
+                found[key]["proclaimed"] = PROCLAMATION.format(zone=zone, day=long_date(day))
+                found[key]["notice"] = notice
+    return pl.DataFrame(rows), found
+
+
 SMALL = {"de", "del", "la", "las", "los", "y", "e"}
 
 
@@ -374,7 +633,7 @@ def emit() -> Path:
     mun_votes = pl.read_parquet(PARSED / "mun_votes.parquet")
     mesas = pl.read_parquet(PARSED / "mesa.parquet")
     mesa_votes = pl.read_parquet(PARSED / "mesa_votes.parquet")
-    members = pl.read_parquet(PARSED / "elected.parquet")
+    members, settled = settle(pl.read_parquet(PARSED / "elected.parquet"), pl.read_parquet(PARSED / "roster.parquet"))
     with connect() as conn:
         cs = Draft(
             conn,
@@ -432,6 +691,35 @@ def emit() -> Path:
         )
         for year in ELECTIONS:
             cs.artifact(raw.cached(SOURCE, url(year)), source)
+        juntas = cs.source(JUNTAS_PUBLISHER, JUNTAS_TITLE)
+        cs.add(
+            "source",
+            id=juntas,
+            kind="official_body",
+            publisher=JUNTAS_PUBLISHER,
+            title=JUNTAS_TITLE,
+            url=f"{JUNTAS_BASE}composicion_junteros_listado.jsp",
+            license=None,
+            license_url=None,
+            attribution="Fuente: Juntas Generales de Gipuzkoa, bngipuzkoa.eus.",
+        )
+        for term in range(1, len(ELECTIONS) + 1):
+            for link in [roster_url(term), *roster_links(term)]:
+                cs.artifact(raw.cached(SOURCE, link), juntas)
+        bog = cs.source(BOG_PUBLISHER, BOG_TITLE)
+        cs.add(
+            "source",
+            id=bog,
+            kind="official_body",
+            publisher=BOG_PUBLISHER,
+            title=BOG_TITLE,
+            url=BOG_PORTAL,
+            license=None,
+            license_url=None,
+            attribution="Fuente: Boletín Oficial de Gipuzkoa.",
+        )
+        for notice, _, _ in [*PROCLAIMED.values(), *CANDIDACIES.values()]:
+            cs.artifact(raw.cached(SOURCE, notice), bog)
 
         parties: dict[str, UUID] = {}
         for label in sorted(circ_votes["party"].unique()):
@@ -573,7 +861,7 @@ def emit() -> Path:
                     values.append((str(result_set), str(unit), None, measure, value, 0))
 
         sizes = (
-            members.filter(~((pl.col("year") == 1979) & (pl.col("th") == "01")))
+            members.filter(~((pl.col("year") == 1979) & (pl.col("th") == "01")) & (pl.col("status") == "elected"))
             .group_by("year", "th")
             .agg(seats=pl.len())
         )
@@ -602,7 +890,8 @@ def emit() -> Path:
                 where = (pl.col("year") == year) & (pl.col("th") == province) & (pl.col("circ") == key_circ)
                 rows = circ_votes.filter(where).sort("votes", descending=True)
                 declared = members.filter(where)
-                seats_by_party = Counter(declared["party"].to_list())
+                elected = declared.filter(pl.col("status") == "elected")
+                seats_by_party = Counter(elected["party"].to_list())
                 key = f"{day}:{province}:{key_circ}"
                 label = title(entry["label"])
                 circ_code = f"{stamp}:{province}:{key_circ}"
@@ -615,7 +904,7 @@ def emit() -> Path:
                     kind="list_allocation",
                     body_id=bodies[province],
                     district_area_id=district,
-                    magnitude=declared.height,
+                    magnitude=elected.height,
                     electoral_system_id=systems[threshold(year)],
                     default_result_kind="counted",
                 )
@@ -656,11 +945,23 @@ def emit() -> Path:
                 if official != entry["cand"]:
                     note += LISTS_DIFFER.format(lists=official, candidacies=entry["cand"])
                 part = {r["party"]: r["votes"] for r in rows.iter_rows(named=True)}
-                computed = dhondt(part, entry["cand"] + entry["blank"], declared.height, threshold(year))
+                computed = dhondt(part, entry["cand"] + entry["blank"], elected.height, threshold(year))
+                check = settled.get((year, province, key_circ))
+                if check is not None and check["why"]:
+                    note += SETTLED.format(
+                        listed=check["listed"], seats=check["seats"], why=joined(check["why"]) + "."
+                    ) + check.get("proclaimed", "")
+                elif check is not None and check["listed"] == check["seats"]:
+                    note += SEATED.format(seats=check["seats"])
                 if computed != seats_by_party:
                     split = ", ".join(f"{p} {n}" for p, n in sorted(computed.items()))
-                    note += MISMATCH.format(declared=declared.height, share=int(threshold(year) * 100), computed=split)
+                    note += MISMATCH.format(declared=elected.height, share=int(threshold(year) * 100), computed=split)
                 circ_set = make_set("circ", True, 1, note)
+                if check is not None and (check["why"] or check["listed"] == check["seats"]):
+                    term = list(ELECTIONS).index(year) + 1
+                    cs.add("citation", entity_id=circ_set, source_id=juntas, locator={"url": roster_url(term)})
+                    if "notice" in check:
+                        cs.add("citation", entity_id=circ_set, source_id=bog, locator={"url": check["notice"]})
                 circ_unit = cs.unit(scheme, circ_code)
                 unit_rows[circ_unit] = (
                     circ_unit,
@@ -713,7 +1014,8 @@ def emit() -> Path:
                         member_of_party_id=party,
                         is_independent=False,
                     )
-                    cs.add("outcome", result_set_id=circ_set, option_id=option, kind="elected")
+                    if member["status"] == "elected":
+                        cs.add("outcome", result_set_id=circ_set, option_id=option, kind="elected")
 
                 inside = (pl.col("year") == year) & (pl.col("th") == province)
                 places = muns.filter(inside & (pl.col("circ") == key_circ))
