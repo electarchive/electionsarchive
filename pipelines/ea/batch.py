@@ -643,6 +643,11 @@ def summary() -> dict[str, object]:
             for prefix, usd in granted.items()
         ],
         "jobs": listed,
+        "batches": [
+            {"id": item["id"], "account": item["account"], "at": item["at"], "cost": round(cost(item), 4)}
+            for job in jobs()
+            for item in job["batches"]
+        ],
     }
 
 
