@@ -1,4 +1,6 @@
-"""North Macedonia: the Assembly elections of 2014, 2016, 2020, and 2024 from the State Election Commission.
+"""North Macedonia: the Assembly elections of 2002 to 2024 from the State Election Commission.
+
+The elections of 2002, 2006, 2008, and 2011 are read from the Commission's reports to the Assembly by ``sec_early``.
 
 The Commission publishes its decisions and result tables as PDF and spreadsheet files. Four elections can be built
 from the files within reach:
@@ -56,11 +58,20 @@ FILES = {
     "pdf24": f"{ARCHIVE}/2025/09/zakluchok-za-konechni-rezultati-i-utvrduvaњe-na-mandati-po-izborni-ediniczi-"
     "parlamentarni-izbori-2024mk-al.pdf",
 }
+# The reports of 2002 to 2011, which sec_early reads.
+FILES |= {
+    "scan02": f"{ARCHIVE}/2021/10/Извештај-за-избори-за-пратеници-2002.pdf",
+    "scan06": f"{ARCHIVE}/2021/10/Извештај-за-избори-на-пратеници-2006.pdf",
+    "sum06": f"{ARCHIVE}/2021/10/Резултати-конечни-збирни-од-парламентарни-избори-2006.pdf",
+    "doc08": f"{ARCHIVE}/2021/10/Извештај-од-предвремени-парламентарни-избори-2008_ДИК.doc",
+    "fix08": f"{ARCHIVE}/2021/10/Извештај-од-предвремени-парламентарни-избори-2008_ДИК_3.doc",
+    "doc11": f"{ARCHIVE}/2021/10/Извештај-од-предвремени-парламентарни-избори-2011_ДИК.doc",
+}
 SHAPES = (
     "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/MKD/ADM2/"
     "geoBoundaries-MKD-ADM2.geojson"
 )
-SUFFIX = {"csv14": ".csv", "json14": ".json", "json16": ".json"}
+SUFFIX = {"csv14": ".csv", "json14": ".json", "json16": ".json", "doc08": ".doc", "fix08": ".doc", "doc11": ".doc"}
 VOTES, REGISTERED, BALLOTS, VALID, INVALID = 1, 2, 3, 4, 5
 DIGITIZED = 8
 S_DISTRICT, S_MUNI, S_STATION = "mk.izborna_edinica", "mk.opstina", "mk.izbiracko_mesto"
@@ -69,8 +80,14 @@ DAYS = {
     2016: date(2016, 12, 11),
     2020: date(2020, 7, 15),
     2024: date(2024, 5, 8),
+    # Built from the Commission's reports by sec_early, whose packages carry their own lists' parties.
+    2002: date(2002, 9, 15),
+    2006: date(2006, 7, 5),
+    2008: date(2008, 6, 1),
+    2011: date(2011, 6, 5),
 }
 PLAN = date(2013, 1, 31)  # the 80-municipality plan
+UNITS_FROM = date(2002, 1, 1)  # the six electoral units, first drawn by the law on the election of deputies of 2002
 RULES = {"formula": "dhondt", "lists": {"order": "closed", "vacancy": "next_on_list"}}
 
 
@@ -196,7 +213,7 @@ MUNICIPALITIES = {
 MERGED_INTO_KICHEVO = {"Drugovo", "Oslomej", "Vraneshtitsa", "Zajas"}
 ALIASES = {"дебрца": "Дебарца", "маврово и ростуше": "Маврово и Ростуша"}
 BY_FOLD = {name.casefold(): name for name in MUNICIPALITIES} | ALIASES
-# The electoral units of 2011-2020 as unions of whole municipalities, each municipality in the unit that holds most of
+# The electoral units of 2002-2020 as unions of whole municipalities, each municipality in the unit that holds most of
 # its polling stations (the 2014 and 2020 station files agree). Chair, Kumanovo, Staro Nagorichane, Bitola, Krivogashtani,
 # and Kichevo are split between two units in the station files, so their outlines are approximate edges of the units.
 UNIT_MUNICIPALITIES = {
@@ -358,6 +375,10 @@ def lists_2024() -> list[Ballot]:
 
 
 def ballots(year: int) -> list[Ballot]:
+    if year < 2014:
+        from ea.sources.mk import sec_early
+
+        return sec_early.ballots(year)
     return {2014: lists_2014, 2016: lists_2016, 2020: lists_2020, 2024: lists_2024}[year]()
 
 
@@ -620,7 +641,8 @@ def deputies(
         person = key("person", *tag)
         p.add("person", id=person)
         p.name(person, deputy.mk.title() if deputy.mk.isupper() else deputy.mk, "mk", "official")
-        p.name(person, deputy.sq.title() if deputy.sq.isupper() else deputy.sq, "sq", "official", False)
+        if deputy.sq:
+            p.name(person, deputy.sq.title() if deputy.sq.isupper() else deputy.sq, "sq", "official", False)
         candidacy = key("candidacy", *tag)
         p.add(
             "candidacy",
@@ -732,8 +754,8 @@ def geo() -> Package:
         "boundary_set",
         id=key("boundary_set", S_DISTRICT, 2011),
         scheme_code=S_DISTRICT,
-        vintage="2011",
-        valid_from=date(2011, 1, 1),
+        vintage="2002",
+        valid_from=UNITS_FROM,
         as_of=shapes.retrieved_at.date(),
     )
     for unit, names in UNIT_MUNICIPALITIES.items():
@@ -748,7 +770,7 @@ def geo() -> Package:
         p.add(
             "area_geometry",
             area_id=district_area(str(unit)),
-            valid_from=date(2011, 1, 1),
+            valid_from=UNITS_FROM,
             geom=shapely.to_wkb(multi, hex=True, include_srid=True),
             label_point=shapely.to_wkb(
                 shapely.set_srid(shapely.point_on_surface(multi), 4326), hex=True, include_srid=True
@@ -797,7 +819,7 @@ def registry() -> Package:
         lang="en",
     )
     seen: dict[str, Ballot] = {}
-    for year in DAYS:
+    for year in [year for year in DAYS if year >= 2014]:
         for ballot in ballots(year):
             seen.setdefault(ballot.party, ballot)
             if seen[ballot.party].kind != ballot.kind:
@@ -851,6 +873,10 @@ def build(year: int) -> Package:
     p.name(election, f"{year} {adjective} parliamentary election", "en", "official")
     p.name(election, f"Избори за пратеници во Собранието, {year}", "mk", "native", False)
     lists = {ballot.id: ballot for ballot in ballots(year)}
+    if year < 2014:
+        from ea.sources.mk import sec_early
+
+        return sec_early.build(p, year, election, path_, lists)
     return {2014: build_2014, 2016: build_2016, 2020: build_2020, 2024: build_2024}[year](p, election, path_, lists)
 
 
