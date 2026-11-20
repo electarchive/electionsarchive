@@ -6,11 +6,12 @@ from pathlib import Path
 from typing import TypedDict
 from uuid import UUID
 
-from ea import raw
-from ea.changeset import Changeset
+from ea import package, raw
+from ea.package import Draft
 from ea.store import DATA, connect
 
 SOURCE = "id.mpr_president"
+KEY = f"{SOURCE}/all"
 VERSION = "1"
 URL = (
     "https://www.mpr.go.id/dokumen/risalah/file/24%20Risalah%20Perubahan%20Undang-Undang%20Dasar%20Negara%20Republik"
@@ -18,7 +19,123 @@ URL = (
 )
 TITLE = "Risalah Perubahan Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Tahun Sidang 1999"
 PUBLISHER = "Sekretariat Jenderal Majelis Permusyawaratan Rakyat Republik Indonesia"
-MEASURES = {"votes": 1, "ballots": 3, "blank": 6, "present": 20}
+SUMMARY = (
+    "Indonesia's 1999 elections of the President and the Vice President and its 2001 election of the Vice President "
+    "by the People's Consultative Assembly"
+)
+MEASURES = {"votes": 1, "ballots": 3, "valid": 4, "invalid": 5, "blank": 6, "present": 20}
+WAYBACK = "https://web.archive.org/web/{}id_/{}"
+BOOK_2001 = (
+    "https://www.mpr.go.id/dokumen/risalah/file/34%202.%20Risalah%20Perubahan%20Undang-Undang%20Dasar%20Negara"
+    "%20Republik%20Indonesia%20Tahun%201945%20Tahun%20Sidang%202001%20-%20Buku%20Dua.pdf"
+)
+BOOK_2001_TITLE = (
+    "Risalah Perubahan Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Tahun Sidang 2001, Buku Dua"
+)
+BOOK_2001_CAPTURE = "20251124113248"
+ARTICLE = "Pemilihan Wakil Presiden Indonesia 2001"
+ARTICLE_URL = "https://id.wikipedia.org/wiki/Pemilihan_Wakil_Presiden_Indonesia_2001"
+ARTICLE_RAW = "https://id.wikipedia.org/w/index.php?title=Pemilihan_Wakil_Presiden_Indonesia_2001&action=raw"
+# The reports filed on the days of the vote, each read from its Wayback capture, with the phrases the build checks
+# each counted figure against.
+REPORTS = [
+    (
+        "Liputan6.com",
+        "Tiga Kandidat Wapres Bersaing di Voting Kedua",
+        "https://www.liputan6.com/news/read/17148/tiga-kandidat-wapres-bersaing-di-voting-kedua",
+        "20220626135357",
+        [
+            "Hamzah yang dicalonkan Fraksi Persatuan Pembangunan memperoleh 238 suara",
+            "Akbar Tandjung dari Fraksi Partai Golkar sebanyak 177 suara",
+            "mengantungi 122 suara",
+            "memperoleh 41 suara",
+            "meraih 31 suara",
+            "Dari 613 anggota MPR yang memberikan suara, empat dinyatakan abstain",
+        ],
+    ),
+    (
+        "Tempo",
+        "Pemilihan Wapres Tertunda 40 Menit",
+        "https://nasional.tempo.co/read/35358/pemilihan-wapres-tertunda-40-menit",
+        "20220705102101",
+        [
+            (
+                "Agum Gumelar 41 suara, Susilo Bambang Yudhoyono 122 suara, Akbar Tandjung 177 suara, Hamzah Haz 238 "
+                "suara dan Siswono Yudhohusodo 31 suara"
+            ),
+            "Sedangkan suara yang abstain sebanyak 4 suara. Total suara yang masuk sebanyak 613",
+            "Akbar di tempat kedua dengan 203 suara dan Susilo Bambang Yudhoyono di tempat ketiga dengan 147 suara",
+            "Jumlah suara yang masuk adalah 604 ditambah tiga suara abstain dan dua suara yang dianggap tidak sah",
+            "Kamis (26/7)",
+            "Rabu (25/7) malam",
+        ],
+    ),
+    (
+        "Liputan6.com",
+        "Hamzah Haz Terpilih sebagai Wapres ke Sembilan",
+        "https://www.liputan6.com/news/read/17180/hamzah-haz-terpilih-sebagai-wapres-ke-sembilan",
+        "20220702165951",
+        [
+            "setelah meraih 340 suara pada pemilihan babak ketiga dalam Sidang Paripurna MPR, Kamis (26/7) pagi",
+            "Akbar Tandjung memperoleh 237 suara",
+            "tercatat 29 suara abstain",
+        ],
+    ),
+]
+CANDIDATES_2001 = {
+    "Q76344": "Hamzah Haz",
+    "Q2581168": "Akbar Tanjung",
+    "Q57405": "Susilo Bambang Yudhoyono",
+    "Q4694586": "Agum Gumelar",
+    "Q13097173": "Siswono Yudo Husodo",
+}
+# Each ballot of the 2001 vote: its day, the votes for each candidate with the outcome, and the totals the sources
+# agree on.
+BALLOTS_2001: list[tuple[date, dict[str, tuple[int, str]], dict[str, int]]] = [
+    (
+        date(2001, 7, 25),
+        {
+            "Q76344": (238, "advanced"),
+            "Q2581168": (177, "advanced"),
+            "Q57405": (122, "advanced"),
+            "Q4694586": (41, "eliminated"),
+            "Q13097173": (31, "eliminated"),
+        },
+        {"ballots": 613, "valid": 609, "blank": 4},
+    ),
+    (
+        date(2001, 7, 25),
+        {"Q76344": (254, "advanced"), "Q2581168": (203, "advanced"), "Q57405": (147, "eliminated")},
+        {"valid": 604, "invalid": 2, "blank": 3},
+    ),
+    (date(2001, 7, 26), {"Q76344": (340, "elected"), "Q2581168": (237, "lost")}, {"valid": 577, "blank": 29}),
+]
+FIRST_2001 = date(2001, 7, 25)
+PATH_2001 = "id/2001-07-25-vice-presidential"
+TERM_END = date(2004, 10, 20)
+ORDINALS = {1: "pertama", 2: "kedua", 3: "ketiga"}
+METHODOLOGY_2001 = (
+    "Under Article 6(2) of the 1945 Constitution and MPR decree VI/MPR/1999, the People's Consultative Assembly "
+    "(MPR) elected a Vice President by secret ballot when the office fell vacant. A candidate needed more than half "
+    "of the votes; failing that, the members voted again between the three leading candidates and then between the "
+    "two leading candidates (Article 19 of the decree). Each ballot is its own contest, chained to the one before."
+)
+NOTE_2001 = (
+    "The minutes of the MPR's 2001 special session are not among the Risalah the MPR Secretariat General publishes: "
+    "its 2001 session-year volumes skip from 17 July to 29 August 2001. Counts are transcribed from Indonesian "
+    "Wikipedia's article on the election (revision pinned) and checked against the reports Liputan6.com and Tempo "
+    "filed on 25 to 27 July 2001. For the first ballot, all three give the five counts, 613 ballots, and 4 "
+    "abstentions. For the second, Tempo prints Hamzah Haz's count as 304, which its own total of 604 votes for the "
+    "three candidates rules out; the article's 254 fits that total. For the third, Liputan6.com gives 5 invalid "
+    "ballots of 611 and the article 4 of 610, so invalid ballots and the total are left out. Abstentions are blank "
+    "ballots."
+)
+SUCCESSION_NOTE = (
+    "The vice presidency fell vacant on 23 July 2001, when the MPR's special session removed Abdurrahman Wahid and "
+    "Vice President Megawati Soekarnoputri became President by MPR decree III/MPR/2001, with no vote. Her term, and "
+    "that of Hamzah Haz, whom the MPR elected Vice President on 26 July 2001, ran to the end of the 1999 to 2004 term "
+    "on 20 October 2004."
+)
 METHODOLOGY = (
     "Under Article 6(2) of the 1945 Constitution as it stood in 1999, the People's Consultative Assembly (MPR) "
     "elected the President and the Vice President by the most votes. MPR decree VI/MPR/1999 set the procedure: "
@@ -90,7 +207,64 @@ SIZE = re.compile(r'<page width="([\d.]+)" height="([\d.]+)"')
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, ARTICLE_RAW, suffix=".wiki")
+    for _, _, url, capture, _ in REPORTS:
+        raw.fetch(SOURCE, WAYBACK.format(capture, url), suffix=".html")
+    # mpr.go.id refuses scripted requests from some hosts; the Wayback capture holds the same volume.
+    raw.fetch(SOURCE, WAYBACK.format(BOOK_2001_CAPTURE, BOOK_2001), suffix=".pdf")
     raw.fetch(SOURCE, URL, suffix=".pdf")
+
+
+def article_counts(text: str) -> dict[str, list[int]]:
+    """The counts in the article's results table: for each candidate's row, the vote counts of the ballots it
+    stood in, and for the abstention, valid, invalid, and ballots rows, one count per ballot."""
+    table = text[text.index("== Hasil Pemilihan ==") :]
+    rows: dict[str, list[int]] = {}
+    for block in table.split("\n|-")[1:]:
+        cells = [cell.strip() for cell in block.split("\n|") if cell.strip()]
+        if not cells:
+            continue
+        label = re.sub(r"^colspan=\"?\d\"?\s*\|", "", cells[0]).strip()
+        label = re.sub(r"\[\[(?:[^|\]]*\|)?([^\]]*)\]\]", r"\1", label)
+        numbers = [
+            int(re.sub(r"^colspan=\"?\d\"?\s*\|", "", cell).strip())
+            for cell in cells[1:]
+            if re.fullmatch(r"(colspan=\"?\d\"?\s*\|)?\s*\d+", cell)
+        ]
+        if numbers:
+            rows[label] = numbers
+    return rows
+
+
+def check_2001() -> None:
+    """Raise unless the article's table and the reports print every count the 2001 ballots store."""
+    rows = article_counts(raw.cached(SOURCE, ARTICLE_RAW).path.read_text())
+    for item, name in CANDIDATES_2001.items():
+        expected = [votes[item][0] for _, votes, _ in BALLOTS_2001 if item in votes]
+        if rows.get(name) != expected:
+            raise ValueError(f"{ARTICLE}: {name} has {rows.get(name)}, not {expected}")
+    for label, measure in (("Abstain", "blank"), ("Suara sah", "valid")):
+        expected = [totals[measure] for _, _, totals in BALLOTS_2001]
+        if rows.get(label) != expected:
+            raise ValueError(f"{ARTICLE}: {label} is {rows.get(label)}, not {expected}")
+    if rows.get("Suara tidak sah", [None, None])[1] != BALLOTS_2001[1][2]["invalid"]:
+        raise ValueError(f"{ARTICLE}: the second ballot's invalid count differs")
+    if rows.get("Suara terdaftar", [None])[0] != BALLOTS_2001[0][2]["ballots"]:
+        raise ValueError(f"{ARTICLE}: the first ballot's total differs")
+    for publisher, title, url, capture, phrases in REPORTS:
+        page = raw.cached(SOURCE, WAYBACK.format(capture, url)).path.read_text(errors="replace")
+        text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", page))
+        missing = [phrase for phrase in phrases if phrase not in text]
+        if missing:
+            raise ValueError(f"{publisher}, {title}: missing {missing}")
+
+
+def parse() -> None:
+    print(build())
+
+
+def emit() -> None:
+    package.run("load", [KEY])
 
 
 def locate(path: Path, page: int, anchor: str, value: int) -> tuple[float, float, float, float]:
@@ -120,19 +294,12 @@ def locate(path: Path, page: int, anchor: str, value: int) -> tuple[float, float
     return x0 / width, y0 / height, x1 / width, y1 / height
 
 
-def emit() -> Path:
+def build() -> Path:
+    """Write the package id.mpr_president/all. It reads the database, through Draft, so the rows it rebuilds keep
+    the ids the changeset path gave them."""
     cached = raw.cached(SOURCE, URL)
     with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary=(
-                "Indonesia's 1999 elections of the President and the Vice President by the People's Consultative "
-                "Assembly, from the MPR's minutes"
-            ),
-            polity="ID",
-        )
+        cs = Draft(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="ID")
 
         def name(entity: UUID, text: str, lang: str = "id", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
@@ -322,4 +489,203 @@ def emit() -> Path:
                         ended_via=via,
                         contest_id=contest,
                     )
+
+        check_2001()
+        article = cs.source("Wikipedia", ARTICLE)
+        cs.add(
+            "source",
+            id=article,
+            kind="community",
+            publisher="Wikipedia",
+            title=ARTICLE,
+            url=ARTICLE_URL,
+            license="Creative Commons Attribution-ShareAlike 4.0",
+            license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+        )
+        cs.artifact(raw.cached(SOURCE, ARTICLE_RAW), article)
+        reports: list[UUID] = []
+        for publisher, title, url, capture, _ in REPORTS:
+            report = cs.source(publisher, title)
+            cs.add("source", id=report, kind="news_agency", publisher=publisher, title=title, url=url)
+            cs.artifact(raw.cached(SOURCE, WAYBACK.format(capture, url)), report)
+            reports.append(report)
+        book_2001 = cs.source(PUBLISHER, BOOK_2001_TITLE)
+        cs.add(
+            "source",
+            id=book_2001,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=BOOK_2001_TITLE,
+            url=BOOK_2001,
+            license="Public record: official minutes of the MPR, no license stated",
+            license_url="https://www.mpr.go.id/risalah",
+        )
+        cs.artifact(raw.cached(SOURCE, WAYBACK.format(BOOK_2001_CAPTURE, BOOK_2001)), book_2001)
+
+        repeated = cs.key("id.electoral_system", "mpr:wakil-presiden-ulang")
+        cs.add(
+            "electoral_system",
+            id=repeated,
+            polity_id=indonesia,
+            rules={"formula": "repeated_ballot", "majorities": [{"fromRound": 1, "share": 0.5, "strict": True}]},
+            rules_version=1,
+        )
+        name(repeated, "Election of the Vice President by the MPR in repeated ballots", "en", "english")
+        cs.add("note", entity_id=repeated, kind="methodology", body_md=METHODOLOGY_2001)
+        for item, common in CANDIDATES_2001.items():
+            if item not in persons:
+                persons[item] = cs.key("wikidata", item)
+                if persons[item] in cs.minted:
+                    cs.add("person", id=persons[item])
+                    name(persons[item], common)
+
+        parent = cs.key("id.election", f"{FIRST_2001}:wakil-presiden")
+        cs.add(
+            "election",
+            id=parent,
+            polity_id=indonesia,
+            kind="indirect",
+            date_from=FIRST_2001,
+            date_to=BALLOTS_2001[-1][0],
+            date_precision="day",
+            status="held",
+        )
+        name(parent, "2001 Indonesian vice presidential election", "en", "english")
+        name(parent, "Pemilihan Wakil Presiden Republik Indonesia 2001")
+        cs.add("slug", path=PATH_2001, entity_id=parent)
+        cs.add("note", entity_id=parent, kind="caveat", body_md=NOTE_2001)
+        cs.add("note", entity_id=parent, kind="context", body_md=SUCCESSION_NOTE)
+        days: dict[date, UUID] = {}
+        previous: UUID | None = None
+        for number, (day, votes, totals) in enumerate(BALLOTS_2001, 1):
+            if sum(count for count, _ in votes.values()) != totals["valid"]:
+                raise ValueError(f"ballot {number}: the votes do not add up to {totals['valid']}")
+            if "ballots" in totals and totals["ballots"] != sum(
+                totals.get(m, 0) for m in ("valid", "invalid", "blank")
+            ):
+                raise ValueError(f"ballot {number}: the parts do not add up to {totals['ballots']}")
+            if day not in days:
+                days[day] = cs.key("id.election", f"{day}:wakil-presiden:day")
+                cs.add(
+                    "election",
+                    id=days[day],
+                    polity_id=indonesia,
+                    parent_id=parent,
+                    kind="indirect",
+                    date_from=day,
+                    date_to=day,
+                    date_precision="day",
+                    status="held",
+                )
+                name(
+                    days[day],
+                    f"2001 Indonesian vice presidential election, {day:%B} {day.day} ballots",
+                    "en",
+                    "english",
+                )
+                name(days[day], f"Pemilihan Wakil Presiden Republik Indonesia 2001, pemungutan suara {day.day} Juli")
+                cs.add("slug", path=f"{PATH_2001}/{day}", entity_id=days[day])
+            contest_key = f"{FIRST_2001}:wakil-presiden:{number}"
+            contest = cs.key("id.contest", contest_key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=days[day],
+                kind="office",
+                office_id=offices["wakil-presiden"],
+                body_id=assembly,
+                district_area_id=nation,
+                term="remainder",
+                magnitude=1,
+                round_number=number,
+                previous_round_id=previous,
+                electoral_system_id=repeated,
+                default_result_kind="counted",
+            )
+            name(contest, f"2001 Indonesian vice presidential election, ballot {number}", "en", "english")
+            name(contest, f"Pemilihan Wakil Presiden Republik Indonesia 2001, putaran {ORDINALS[number]}")
+            cs.add("slug", path=f"{PATH_2001}/{day}/ballot-{number}", entity_id=contest)
+            previous = contest
+            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=days[day],
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=article,
+                is_default=True,
+                completeness=1,
+            )
+            for report in reports:
+                cs.add("citation", entity_id=result_set, source_id=report, locator={"ballot": number})
+            facts: list[tuple[UUID | None, str, int]] = [(None, measure, value) for measure, value in totals.items()]
+            for item, (count, outcome) in votes.items():
+                option = cs.key("id.option", f"{contest_key}:{item}")
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=None,
+                    ballot_position=None,
+                    ballot_label=CANDIDATES_2001[item],
+                )
+                cs.add(
+                    "candidacy",
+                    id=cs.key("id.candidacy", f"{contest_key}:{item}"),
+                    person_id=persons[item],
+                    option_id=option,
+                    role="head",
+                    ballot_name=CANDIDATES_2001[item],
+                    is_independent=False,
+                )
+                cs.add("outcome", result_set_id=result_set, option_id=option, kind=outcome, seats=None)
+                facts.append((option, "votes", count))
+            for option, measure, count in facts:
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=option,
+                    channel=0,
+                    measure=MEASURES[measure],
+                    count_round=0,
+                    flags=0,
+                    value=count,
+                )
+
+        president = cs.key(f"{SOURCE}.tenure", f"{VOTES[0]['day']}:presiden")
+        vice_president = cs.key(f"{SOURCE}.tenure", f"{VOTES[1]['day']}:wakil-presiden")
+        succession = cs.key(f"{SOURCE}.tenure", "2001-07-23:presiden")
+        cs.add(
+            "tenure",
+            id=succession,
+            person_id=persons["Q76179"],
+            office_id=offices["presiden"],
+            from_date=date(2001, 7, 23),
+            to_date=TERM_END,
+            acquired_via="succession",
+            ended_via="term_end",
+            contest_id=None,
+            succeeds_tenure_id=president,
+        )
+        cs.add("citation", entity_id=succession, source_id=book_2001, locator={"pdf_pages": [20, 21, 22]})
+        elected = cs.key(f"{SOURCE}.tenure", f"{FIRST_2001}:wakil-presiden")
+        cs.add(
+            "tenure",
+            id=elected,
+            person_id=persons["Q76344"],
+            office_id=offices["wakil-presiden"],
+            from_date=BALLOTS_2001[-1][0],
+            to_date=TERM_END,
+            acquired_via="elected",
+            ended_via="term_end",
+            contest_id=previous,
+            succeeds_tenure_id=vice_president,
+        )
+        cs.add("citation", entity_id=elected, source_id=book_2001, locator={"pdf_pages": [20, 21]})
+        cs.add("citation", entity_id=elected, source_id=article, locator={"section": "lead"})
         return cs.write()
