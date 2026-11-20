@@ -333,6 +333,12 @@
       "url": "https://www.vie-publique.fr/en-bref/303820-nouvelle-caledonie-elections-provinciales-le-28-juin-2026",
       "kind": "official_body"
     },
+    "hc-nc-2019": {
+      "title": "Provinciales 2019: résultats définitifs de l'élection des membres du congrès et des assemblées de province du 12 mai 2019",
+      "publisher": "Haut-commissariat de la République en Nouvelle-Calédonie",
+      "url": "https://www.nouvelle-caledonie.gouv.fr/Actions-de-l-Etat/Elections/Elections-2019/Provinciales-2019/RESULTATS",
+      "kind": "official_body"
+    },
     "vp-nc-2021": {
       "title": "Nouvelle-Calédonie : 3e référendum d'autodétermination du 12 décembre 2021",
       "publisher": "vie-publique.fr (Direction de l'information légale et administrative)",
@@ -4570,6 +4576,12 @@
     {
       "dates": [
         {
+          "date": "2019-05-12",
+          "source": "hc-nc-2019",
+          "quote": "Définitifs de l’élection des membres du congrès et des assemblées de province du 12 mai 2019",
+          "contests": 3
+        },
+        {
           "date": "2026-06-28",
           "source": "vp-nc-2026",
           "quote": "Nouvelle-Calédonie : élections provinciales le 28 juin 2026",
@@ -4619,8 +4631,8 @@
           "format": "HTML and PDF",
           "access": "open",
           "checked_at": "2026-11-13T00:00:00Z",
-          "first_date": "2014-05-11",
-          "evidence": "Results by province and commune."
+          "first_date": "2019-05-12",
+          "evidence": "Results by polling station as PDF tables for 2019 and 2026, and the proclamation of the 2019 results."
         }
       ],
       "est_votes": 120000,
