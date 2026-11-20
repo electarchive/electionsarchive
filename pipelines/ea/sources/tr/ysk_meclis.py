@@ -35,6 +35,47 @@ KEYS = {
     (2009, "denizli-akkoy-pamukkale-golemezli"): "denizli-pamukkale-golemezli",
     (2009, "kirikkale-bahsili-bahsili-karaahmetli"): "kirikkale-bahsili-karaahmetli",
 }
+# Municipalities whose name in the results service differs from the one on the contest the archive holds, as the
+# service's key, then the contest's. Each is the only unmatched municipality of its district on both sides, or is
+# told apart by its name.
+RENAMED_2009 = {
+    "afyonkarahisar-sinanpasa-savran": "afyonkarahisar-sinanpasa-serban",
+    "antalya-alanya-obakoy": "antalya-alanya-oba",
+    "antalya-kumluca-cavuskoy": "antalya-kumluca-adrasan",
+    "balikesir-bigadic-iskele": "balikesir-bigadic-iskelekoy",
+    "burdur-aglasun-canakli": "burdur-aglasun-mamak",
+    "bursa-mudanya-zeytinbagi": "bursa-mudanya-tirilye",
+    "canakkale-merkez-intepe": "canakkale-merkez-erenkoy",
+    "cankiri-orta-elmali": "cankiri-orta-elmalik",
+    "corum-bogazkale-evren": "corum-bogazkale-yekbas",
+    "denizli-akkoy": "denizli-pamukkale",
+    "diyarbakir-baglar-alatosun": "diyarbakir-baglar-karacadag",
+    "elazig-palu-beyhani": "elazig-palu-beyhan",
+    "erzincan-tercan-altunkent": "erzincan-tercan-kargin",
+    "gaziantep-araban-elifkoy": "gaziantep-araban-elif",
+    "gaziantep-nurdagi-sakcagoze": "gaziantep-nurdagi-sakcagozu",
+    "gumushane-merkez-arzular": "gumushane-merkez-arzularkabakoy",
+    "kayseri-tomarza-emirusagi": "kayseri-tomarza-avsarobasi",
+    "kirklareli-babaeski-mandira": "kirklareli-babaeski-buyukmandira",
+    "kirklareli-vize-cakili": "kirklareli-vize-cakilli",
+    "konya-beysehir-kurucaova": "konya-beysehir-kurucuova",
+    "konya-beysehir-bayafsar": "konya-beysehir-bayavsar",
+    "konya-eregli-sazgecit": "konya-eregli-hortu",
+    "konya-ilgin-asagicigil": "konya-ilgin-cigil",
+    "konya-selcuklu-tepekoy": "konya-selcuklu-tepekent",
+    "malatya-hekimhan-ipekyolu": "malatya-hekimhan-girmana",
+    "manisa-soma-yagcilli": "manisa-soma-yagcili",
+    "kahramanmaras-caglayancerit-duzbag": "kahramanmaras-caglayancerit-helete",
+    "mus-malazgirt-golkoru": "mus-malazgirt-gulkoru",
+    "nigde-ulukisla-aktoprak": "nigde-ulukisla-kilan",
+    "siirt-baykan-ziyaret": "siirt-baykan-veyselkarani",
+    "siirt-aydinlar": "siirt-tillo",
+    "trabzon-besikduzu-turkelli": "trabzon-besikduzu-oguz",
+    "sanliurfa-suruc-onbirnisan": "sanliurfa-suruc-aligor",
+    "sanliurfa-viransehir-eyupnebi": "sanliurfa-viransehir-eyyupnebi",
+    "yozgat-sorgun-karakiz": "yozgat-sorgun-yeniyer",
+}
+KEYS |= {(2009, key): contest for key, contest in RENAMED_2009.items()}
 ANNULLED = {(2014, "agri"), (2014, "tokat-yesilyurt")}
 PARTIES = {
     "AB PARTİ": "adalet-birlik-partisi",
