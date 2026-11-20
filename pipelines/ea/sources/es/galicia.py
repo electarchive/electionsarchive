@@ -10,7 +10,8 @@ from uuid import UUID
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import slug
+from ea.package import Draft
 from ea.store import DATA, connect
 
 SOURCE = "es.galicia"
@@ -399,7 +400,7 @@ def emit() -> Path:
     names = dict(pl.read_parquet(PARSED / "party.parquet").iter_rows())
     dropped = pl.read_parquet(PARSED / "mesa_dropped.parquet")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
@@ -409,6 +410,11 @@ def emit() -> Path:
                 "Galicia's acordos in the Diario Oficial de Galicia"
             ),
             polity="ES",
+        )
+        cs.accept(
+            "accounting.ballots_sum",
+            "the Xunta's mesa files give ballots cast that differ from the valid, null, and blank ballots in some mesas, "
+            "as each mesa result set's note counts; the figures are stored as published",
         )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
@@ -450,8 +456,10 @@ def emit() -> Path:
         parties: dict[str, UUID] = {}
         for key, label in sorted(place_votes.select("key", "party").unique(subset="key", keep="last").iter_rows()):
             parties[key] = cs.key(f"{SOURCE}.party", key)
-            cs.add("party", id=parties[key], kind="party", polity_id=galicia)
-            name(parties[key], names.get(key) or abbreviation(label), "es")
+            # A party merged into another pipeline's party is that pipeline's row; only the pipeline's own are written.
+            if parties[key] in cs.minted:
+                cs.add("party", id=parties[key], kind="party", polity_id=galicia)
+                name(parties[key], names.get(key) or abbreviation(label), "es")
 
         body = cs.key("es.body", "galician-parliament")
         cs.add("body", id=body, polity_id=galicia, kind="unicameral")
