@@ -1256,13 +1256,12 @@ def caveats(seat: Seat2008, has_winner: bool, notified: dict[str, Notified | Non
             "The Commission's notification of the candidate returned from this poll is not among the files used "
             "here, so no winner is stored for this constituency."
         )
-    elif not has_winner:
-        if notified.get(seat.code) is None:
-            found.append(
-                "The Commission's notification of 1 March 2008 names no returned candidate here: the return was "
-                "stayed, or the result was still to be consolidated or recounted by order, so no winner is stored "
-                "for this constituency."
-            )
+    elif not has_winner and notified.get(seat.code) is None:
+        found.append(
+            "The Commission's notification of 1 March 2008 names no returned candidate here: the return was "
+            "stayed, or the result was still to be consolidated or recounted by order, so no winner is stored "
+            "for this constituency."
+        )
     if any(c.retired for c in seat.candidates):
         found.append("The volume marks a candidate as retired: they withdrew, but stayed on the ballot.")
     return found
