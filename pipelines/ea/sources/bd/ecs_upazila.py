@@ -23,19 +23,15 @@ from collections import Counter, defaultdict
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from datetime import date
-from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
 from uuid import uuid5
 
 import polars as pl
-import pymupdf
-from PIL import Image
 
 from ea import package, raw
 from ea.package import Package
 from ea.sources.bd import sheet
-from ea.store import DATA
 
 SOURCE = "bd.ecs_upazila"
 BANGLADESH = str(uuid5(package.NAMESPACE, "polity\x1fBD"))
@@ -278,7 +274,6 @@ def crawl() -> tuple[dict[int, str], dict[str, tuple[int, str]], list[Contest]]:
 @dataclass
 class Reading:
     votes: list[int]
-    boxes: list[tuple[float, float, float, float]]
 
 
 def layouts(contests: list[Contest]) -> dict[str, sheet.Layout | str]:
@@ -337,7 +332,7 @@ def readings(contests: list[Contest]) -> tuple[dict[int, Reading], dict[str, int
         votes, corrected = found_votes
         if corrected:
             why["read after changing its least certain digit to close the gap (kept)"] += 1
-        out[i] = Reading(votes, [sheet.normalized(lay, n.box) for n in lay.votes])
+        out[i] = Reading(votes)
     return out, dict(why)
 
 
@@ -576,21 +571,20 @@ def election(
         cite(c.candidates_url)
         document = c.document
         assert document is not None
-        stored = raw.cached(SOURCE, document)
-        artifact = cite(document)
-        page = key("page", stored.sha256)
-        image_key = f"pages/{SOURCE}/{stored.sha256}/1.png"
-        width, height = page_image(stored.path, image_key)
-        p.add(
-            "source_page",
-            id=page,
-            artifact_id=artifact,
-            page_number=1,
-            image_key=image_key,
-            width=width,
-            height=height,
-        )
+        # Each result sheet is its own source, so that a candidate's votes point at the sheet they were read from.
         tag = (day, c.upazila, c.post)
+        sheet_source = key("source", "sheet", *tag)
+        p.add(
+            "source",
+            id=sheet_source,
+            kind="official_body",
+            publisher="Bangladesh Election Commission",
+            title=f"Result sheet of the {spec.english} election in {name} upazila, {day:%-d %B %Y}",
+            url=document,
+            license="No license stated; published by the electoral authority for public use",
+            attribution="Bangladesh Election Commission",
+        )
+        p.artifact(raw.cached(SOURCE, document), sheet_source)
         contest = key("contest", *tag)
         p.add(
             "contest",
@@ -626,9 +620,7 @@ def election(
         )
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
         unit = upazila_unit(c.upazila)
-        for position, (candidate, votes, box) in enumerate(
-            zip(c.candidates, reading.votes, reading.boxes, strict=True), start=1
-        ):
+        for position, (candidate, votes) in enumerate(zip(c.candidates, reading.votes, strict=True), start=1):
             option = key("option", *tag, candidate["id"])
             person = key("person", *tag, candidate["id"])
             party = clean(candidate["party_name"])
@@ -665,12 +657,12 @@ def election(
                     "channel": 0,
                     "measure": VOTES,
                     "count_round": 0,
-                    "page_id": page,
-                    "source_id": None,
-                    "x0": box[0],
-                    "y0": box[1],
-                    "x1": box[2],
-                    "y1": box[3],
+                    "page_id": None,
+                    "source_id": sheet_source,
+                    "x0": None,
+                    "y0": None,
+                    "x1": None,
+                    "y1": None,
                 }
             )
         valid, invalid = int(c.sheet["clear_total_vote"]), int(c.sheet["cancel_total_vote"])
@@ -767,16 +759,3 @@ def election(
         ),
     )
     return p
-
-
-def page_image(path: Path, image_key: str) -> tuple[int, int]:
-    """Render the sheet to `data/<image_key>` at 100 dpi and return its size in pixels."""
-    target = DATA / image_key
-    if not target.exists():
-        target.parent.mkdir(parents=True, exist_ok=True)
-        pix = pymupdf.open(path)[0].get_pixmap(dpi=100)
-        partial = target.with_suffix(".part")
-        pix.save(str(partial), output="png")
-        partial.replace(target)
-    with Image.open(target) as image:
-        return image.size
