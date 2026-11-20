@@ -37,46 +37,6 @@ POOLED = (
     "Several independent candidates stood in this municipality, and the box rows name them only by column number, so "
     "the independents' votes are one option here."
 )
-# Municipalities whose name in the results service differs from the one on the contest the archive holds, as the
-# service's key, then the contest's. Each is the only unmatched municipality of its district on both sides, or is
-# told apart by its name.
-RENAMED = {
-    "afyonkarahisar-sinanpasa-savran": "afyonkarahisar-sinanpasa-serban",
-    "antalya-alanya-obakoy": "antalya-alanya-oba",
-    "antalya-kumluca-cavuskoy": "antalya-kumluca-adrasan",
-    "balikesir-bigadic-iskele": "balikesir-bigadic-iskelekoy",
-    "burdur-aglasun-canakli": "burdur-aglasun-mamak",
-    "bursa-mudanya-zeytinbagi": "bursa-mudanya-tirilye",
-    "canakkale-merkez-intepe": "canakkale-merkez-erenkoy",
-    "cankiri-orta-elmali": "cankiri-orta-elmalik",
-    "corum-bogazkale-evren": "corum-bogazkale-yekbas",
-    "denizli-akkoy": "denizli-pamukkale",
-    "diyarbakir-baglar-alatosun": "diyarbakir-baglar-karacadag",
-    "elazig-palu-beyhani": "elazig-palu-beyhan",
-    "erzincan-tercan-altunkent": "erzincan-tercan-kargin",
-    "gaziantep-araban-elifkoy": "gaziantep-araban-elif",
-    "gaziantep-nurdagi-sakcagoze": "gaziantep-nurdagi-sakcagozu",
-    "gumushane-merkez-arzular": "gumushane-merkez-arzularkabakoy",
-    "kayseri-tomarza-emirusagi": "kayseri-tomarza-avsarobasi",
-    "kirklareli-babaeski-mandira": "kirklareli-babaeski-buyukmandira",
-    "kirklareli-vize-cakili": "kirklareli-vize-cakilli",
-    "konya-beysehir-kurucaova": "konya-beysehir-kurucuova",
-    "konya-beysehir-bayafsar": "konya-beysehir-bayavsar",
-    "konya-eregli-sazgecit": "konya-eregli-hortu",
-    "konya-ilgin-asagicigil": "konya-ilgin-cigil",
-    "konya-selcuklu-tepekoy": "konya-selcuklu-tepekent",
-    "malatya-hekimhan-ipekyolu": "malatya-hekimhan-girmana",
-    "manisa-soma-yagcilli": "manisa-soma-yagcili",
-    "kahramanmaras-caglayancerit-duzbag": "kahramanmaras-caglayancerit-helete",
-    "mus-malazgirt-golkoru": "mus-malazgirt-gulkoru",
-    "nigde-ulukisla-aktoprak": "nigde-ulukisla-kilan",
-    "siirt-baykan-ziyaret": "siirt-baykan-veyselkarani",
-    "siirt-aydinlar": "siirt-tillo",
-    "trabzon-besikduzu-turkelli": "trabzon-besikduzu-oguz",
-    "sanliurfa-suruc-onbirnisan": "sanliurfa-suruc-aligor",
-    "sanliurfa-viransehir-eyupnebi": "sanliurfa-viransehir-eyyupnebi",
-    "yozgat-sorgun-karakiz": "yozgat-sorgun-yeniyer",
-}
 Row = dict[str, object]
 
 
@@ -160,7 +120,7 @@ def build() -> Package:
             for r in places
         ]
     )
-    keys = {place[1:]: RENAMED.get(key, key) for place, key in place_keys(place_frame).items()}
+    keys = {place[1:]: key for place, key in place_keys(place_frame).items()}
     belde_place = defaultdict(list)
     for il, ilce, belde in keys:
         if belde:
