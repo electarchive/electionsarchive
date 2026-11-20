@@ -181,6 +181,7 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
             "party_scope_id": U,
             "seat_id": U,
             "boundary_set_id": U,
+            "allocation_parent_id": U,
         },
     ),
     "contest_option": (
@@ -367,7 +368,7 @@ JSON_COLUMNS = {"kinds", "rules", "locator"}
 # as null.
 OPTIONAL: dict[str, frozenset[str]] = {
     "candidacy": frozenset({"preference_option_id"}),
-    "contest": frozenset({"term", "party_scope_id", "seat_id", "boundary_set_id"}),
+    "contest": frozenset({"term", "party_scope_id", "seat_id", "boundary_set_id", "allocation_parent_id"}),
     "contest_option": frozenset({"alliance_id"}),
 }
 
@@ -733,6 +734,7 @@ REFERENCES = [
     ("contest", "party_scope_id", "party"),
     ("contest", "seat_id", "seat"),
     ("contest", "boundary_set_id", "boundary_set"),
+    ("contest", "allocation_parent_id", "contest"),
     ("contest_option", "contest_id", "contest"),
     ("contest_option", "parent_option_id", "contest_option"),
     ("contest_option", "party_id", "party"),
