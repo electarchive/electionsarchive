@@ -18,8 +18,13 @@ RAW = ine.SOURCE
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 
-YEARS = (1991, 1994, 1997, 2000, 2003, 2006, 2009, 2012, 2015)
 KINDS = ("MR", "RP")
+# siceef.ine.mx no longer serves the 1991 district file to scripts; the Internet Archive's copy of 30 May 2022 is
+# the file as INE published it (its casillas add to 24,143,540 votes, against the 24,149,001 the acuerdo declares
+# for the lists).
+MR_1991 = "https://web.archive.org/web/20220530194439id_/http://siceef.ine.mx/BD/DiputadosMR1991.csv"
+DOF_1991 = "https://dof.gob.mx/nota_detalle.php?codigo=4748643&fecha=01/10/1991"
+DOF_1991_ERRATA = "https://dof.gob.mx/nota_detalle.php?codigo=4750567&fecha=04/10/1991"
 DIFFERS = {
     (2006, "7", "6", "2", "8", "B"),
     (2006, "7", "6", "86", "1238", "E01"),
@@ -30,22 +35,43 @@ DIFFERS = {
     (2012, "15", "10", "34", "1306", "B"),
     (2012, "21", "6", "115", "1306", "B"),
 }
+# Rows no reading makes consistent, left out of the count; the district's casilla set says so in its note.
+EXCLUDED = {
+    (1991, "MR", "21", "4", "69", "10", "C"): (
+        "INE's file prints one acta of this district, a contiguous casilla of section 10 in Huaquechula marked "
+        "annulled, whose lines add to 221 votes against a printed total of 18; no reading of the row is consistent, "
+        "so it is left out of the casilla and district counts."
+    ),
+}
+# The 1991 file prints the type of contiguous and extraordinary casillas without their number, so these rows repeat
+# the state, district, municipality, section, and casilla of an earlier row. Each is a separate acta with its own
+# counts (no two are identical), kept in file order as -r2, -r3, as mx.senado codes its 1991 casillas.
+REPEATS = {(1991, "MR"): 197}
 
 
 def siceef_url(kind: str, year: int) -> str:
     return f"{ine.SICEEF}Diputados{kind}{year}.csv"
 
 
+def kinds(year: int) -> tuple[str, ...]:
+    return tuple(ELECTIONS[year].get("files", dict.fromkeys(KINDS)))
+
+
+def file_url(kind: str, year: int) -> str:
+    return ELECTIONS[year].get("files", {}).get(kind) or siceef_url(kind, year)
+
+
 def fetch() -> None:
-    for year in YEARS:
-        for kind in KINDS:
-            raw.fetch(RAW, siceef_url(kind, year), suffix=".csv")
-    for config in ELECTIONS.values():
-        raw.fetch(RAW, config["acuerdo"][0], suffix=".pdf")
+    for year, config in ELECTIONS.items():
+        for kind in kinds(year):
+            raw.fetch(RAW, file_url(kind, year), suffix=".csv")
+        for url in (config["acuerdo"][0], *config.get("also", ())):
+            raw.fetch(RAW, url, suffix=".pdf" if url.endswith(".pdf") else ".html")
 
 
 def read(kind: str, year: int) -> tuple[list[str], list[dict[str, str]]]:
-    text = raw.cached(RAW, siceef_url(kind, year)).path.read_bytes().decode("utf-8-sig", errors="replace")
+    encoding = ELECTIONS[year].get("encoding", "utf-8-sig")
+    text = raw.cached(RAW, file_url(kind, year)).path.read_bytes().decode(encoding, errors="replace")
     reader = csv.DictReader(io.StringIO(text))
     rows = [
         {
@@ -73,12 +99,20 @@ def table(kind: str, year: int) -> tuple[pl.DataFrame, pl.DataFrame]:
     total = "TOTAL_VOTOS"
     roll = "LISTA_NOMINAL" if "LISTA_NOMINAL" in columns else None
     units, votes = [], []
+    seen: dict[tuple[object, ...], int] = {}
+    excluded: set[tuple[object, ...]] = set()
     for row in rows:
         counts = {option: ine.number(row[option]) for option in options}
         key = (year, *unit_key(row))
+        if (year, kind, *key[1:]) in EXCLUDED:
+            excluded.add((year, kind, *key[1:]))
+            continue
         if (sum(counts.values()) != ine.number(row[total])) != (key in DIFFERS):
             raise ValueError(f"{year} {kind} {key}: options add to {sum(counts.values())}, total {row[total]}")
         unit = {k: ine.clean(row[k]).lstrip("0") or "0" if k != "casilla" else ine.clean(row[k]) for k in ine.KEYS}
+        seen[key] = seen.get(key, 0) + 1
+        if seen[key] > 1:
+            unit["casilla"] = f"{unit['casilla']}~{seen[key]}"
         unit["circunscripcion"] = ine.clean(row["circunscripcion"])
         units.append(
             unit
@@ -102,6 +136,11 @@ def table(kind: str, year: int) -> tuple[pl.DataFrame, pl.DataFrame]:
                     "votes": value,
                 }
             )
+    repeats = sum(count - 1 for count in seen.values())
+    if repeats != REPEATS.get((year, kind), 0):
+        raise ValueError(f"{year} {kind}: {repeats} rows repeat an earlier casilla")
+    if excluded != {key for key in EXCLUDED if key[:2] == (year, kind)}:
+        raise ValueError(f"{year} {kind}: excluded rows {sorted(excluded)}")
     frame = pl.DataFrame(units, schema_overrides={"registered": pl.Int64})
     duplicates = frame.group_by(ine.KEYS).len().filter(pl.col("len") > 1)
     if duplicates.height:
@@ -111,8 +150,8 @@ def table(kind: str, year: int) -> tuple[pl.DataFrame, pl.DataFrame]:
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    for year in YEARS:
-        for kind in KINDS:
+    for year in sorted(ELECTIONS):
+        for kind in kinds(year):
             try:
                 units, votes = table(kind, year)
             except ValueError as error:
@@ -132,6 +171,11 @@ EXTRA_PARTIES = {
     "PSD": ("Q1803295", "Partido Socialdemócrata", "Social Democratic Party"),
 }
 PARTIES = ine.PARTIES | EXTRA_PARTIES
+# Parties of 1991 that mx.senado keys by abbreviation; the Chamber's 1991 lists name the same parties.
+ABBREVIATED = {
+    "PRT": ("Partido Revolucionario de los Trabajadores", "Revolutionary Workers' Party"),
+    "PEM": ("Partido Ecologista de México", "Ecologist Party of Mexico"),
+}
 INDEPENDENT = "IND"
 CPEUM = "Constitución Política de los Estados Unidos Mexicanos"
 CPEUM_URL = "https://www.diputados.gob.mx/LeyesBiblio/pdf/CPEUM.pdf"
@@ -295,6 +339,81 @@ ELECTIONS: dict[int, dict] = {
             "NA": (2, 2, 2, 2, 1),
         },
     },
+    1991: {
+        "day": date(1991, 8, 18),
+        "files": {"MR": MR_1991},
+        "encoding": "latin-1",
+        "place": "state",
+        "columns": {
+            abbrev: (abbrev,) for abbrev in ("PAN", "PRI", "PPS", "PRD", "PFCRN", "PARM", "PDM", "PRT", "PEM", "PT")
+        },
+        "acuerdo": (
+            DOF_1991,
+            (
+                "Acuerdo del Consejo General del Instituto Federal Electoral relativo al cómputo total de la elección "
+                "de todas las listas de diputados electos según el principio de representación proporcional y "
+                "asignación a los partidos políticos nacionales de los 200 diputados que les corresponden por el "
+                "principio de representación proporcional (Diario Oficial de la Federación, 1 de octubre de 1991)"
+            ),
+            {"votes": "considerando I", "seats": "considerando VI"},
+        ),
+        "also": (DOF_1991_ERRATA,),
+        "national_method": (
+            "National vote for the party lists as the Consejo General of the Instituto Federal Electoral declared it in "
+            "its acuerdo on the proportional allocation (considerando I), the sum of the five circunscripción counts "
+            "after the arithmetic corrections the acuerdo makes to the totals of the 1st and 5th circunscripción "
+            "actas. The acuerdo gives no separate count of votes for unregistered candidates."
+        ),
+        "seats_method": (
+            "Seats by party as the Consejo General assigned them to this circunscripción, from the summary of the "
+            "assignment in considerando VI of its acuerdo (Diario Oficial de la Federación, 1 October 1991); the "
+            "fe de erratas of 4 October 1991 corrects only working figures and wording."
+        ),
+        "casilla_note": (
+            " In 1991 the file prints the type of contiguous and extraordinary casillas without their number, so some "
+            "rows repeat another row's section and casilla; each is a separate acta with its own counts, kept in file "
+            "order as -r2, -r3. The 1991 sections are numbered within each municipality and the file's municipality "
+            "codes predate today's, so each casilla is placed only in its state."
+        ),
+        "missing": {
+            ("05", 5): (
+                "INE's 1991 district count file has no rows for this district, so the contest has no results yet."
+            ),
+        },
+        "rp_system": "deputies-rp-1991",
+        "circunscripciones": {
+            1: "Distrito Federal, Puebla, Tlaxcala",
+            2: (
+                "Aguascalientes, Chihuahua, Coahuila, Durango, Guanajuato, Hidalgo, Querétaro, San Luis Potosí, "
+                "Zacatecas"
+            ),
+            3: "Campeche, Chiapas, Nuevo León, Quintana Roo, Tabasco, Tamaulipas, Veracruz, Yucatán",
+            4: "Baja California, Baja California Sur, Colima, Jalisco, Michoacán, Nayarit, Sinaloa, Sonora",
+            5: "Guerrero, Estado de México, Morelos, Oaxaca",
+        },
+        "votes": {
+            "PAN": 4097795,
+            "PRI": 14215695,
+            "PPS": 415517,
+            "PRD": 1914649,
+            "PFCRN": 1010921,
+            "PARM": 495953,
+            "PDM": 250490,
+            "PRT": 137144,
+            "PEM": 338324,
+            "PT": 263951,
+            "null": 1008562,
+            "total": 24149001,
+        },
+        "seats": {
+            "PAN": (14, 22, 13, 19, 11),
+            "PRI": (5, 6, 7, 6, 6),
+            "PPS": (3, 2, 3, 1, 3),
+            "PRD": (9, 5, 7, 9, 11),
+            "PFCRN": (6, 3, 5, 3, 6),
+            "PARM": (3, 2, 5, 2, 3),
+        },
+    },
 }
 TURNOUT = (
     "INE's district count files print more votes than the nominal roll for these casillas; the counts are stored as "
@@ -332,6 +451,28 @@ RP_SYSTEM = (
     "300 seats from both tiers, and none may hold a share of the Chamber more than 8 points above its share of the "
     "national vote. The model records the formula and the threshold; the two limits are in the declared seats."
 )
+RP_SYSTEMS = {
+    "deputies-rp-1991": (
+        "Mexican federal regional closed-list proportional system (1991)",
+        {
+            "formula": "hare",
+            "threshold": {"percent": 1.5, "level": "party", "scope": "national"},
+            "lists": {"order": "closed", "vacancy": "next_on_list"},
+        },
+        (
+            "In 1991 the 200 list seats were filled from closed lists in five regional constituencies "
+            "(circunscripciones plurinominales) of 40 seats each, under the 1990 electoral code (COFIPE). A party took "
+            "part if it reached 1.5 percent of the vote and ran district candidates in at least 200 districts. The "
+            "constitution's governability rules (article 54, fraction IV) were applied first: a party with between 60 "
+            "and 70 percent of the national vote whose district seats fell short of that share, the PRI in 1991, "
+            "received list seats up to its share of the Chamber, spread over the circunscripciones by its votes there. "
+            "The other parties shared each circunscripción's remaining seats by the formula of first proportionality: "
+            "a rectified quotient for the first two seats, then a unit quotient, then the largest remainders. The "
+            "model records the threshold and a largest-remainder formula; the governability rule and the 1991 formula "
+            "are in the declared seats."
+        ),
+    ),
+}
 MR_METHOD = (
     "Polling-station (casilla) counts from INE's district count files, summed to each district. The winner is the "
     "line or coalition candidate with the most votes in the district count, which is the count on which the "
@@ -353,6 +494,11 @@ RP_SEATS_METHOD = (
     "its acuerdo."
 )
 REGISTERED, BALLOTS, VALID, INVALID, VOTES = ine.REGISTERED, ine.BALLOTS, ine.VALID, ine.INVALID, ine.VOTES
+
+
+def locator(at: int | str) -> dict[str, int | str]:
+    """A page of an acuerdo's PDF, or a section of one the Diario Oficial prints as text."""
+    return {"page": at} if isinstance(at, int) else {"section": at}
 
 
 def groups_of(columns: dict[str, tuple[str, ...]], present: list[str]) -> list[list[str]]:
@@ -486,10 +632,29 @@ def emit() -> Path:
             cs.add("electoral_system", id=rp_system, polity_id=mexico, rules=RP_RULES, rules_version=1)
             name(rp_system, "Mexican federal regional closed-list proportional system")
             cs.add("note", entity_id=rp_system, kind="methodology", body_md=RP_SYSTEM)
+        rp_systems = {"deputies-rp": rp_system}
+
+        def system_of(key: str) -> UUID:
+            if key not in rp_systems:
+                label, rules, text = RP_SYSTEMS[key]
+                rp_systems[key] = cs.key("mx.electoral_system", key)
+                if rp_systems[key] in cs.minted:
+                    cs.add("electoral_system", id=rp_systems[key], polity_id=mexico, rules=rules, rules_version=1)
+                    name(rp_systems[key], label)
+                    cs.add("note", entity_id=rp_systems[key], kind="methodology", body_md=text)
+            return rp_systems[key]
 
         parties: dict[str, UUID] = {}
 
         def party(abbrev: str) -> UUID:
+            if abbrev in ABBREVIATED and abbrev not in parties:
+                native, english = ABBREVIATED[abbrev]
+                parties[abbrev] = cs.key("mx.party", abbrev)
+                if parties[abbrev] in cs.minted:
+                    cs.add("party", id=parties[abbrev], kind="party", polity_id=mexico)
+                    name(parties[abbrev], native, "es")
+                    name(parties[abbrev], english, "en", "english")
+                    name(parties[abbrev], abbrev, "es", "abbreviation")
             if abbrev not in parties:
                 item, native, english = PARTIES[abbrev]
                 parties[abbrev] = cs.key("mx.party", item)
@@ -536,13 +701,14 @@ def emit() -> Path:
             day: date = config["day"]
             columns: dict[str, tuple[str, ...]] = config["columns"]
             url, title, pages = config["acuerdo"]
-            for kind in KINDS:
-                cs.artifact(raw.cached(RAW, siceef_url(kind, year)), ine_source)
+            for kind in kinds(year):
+                cs.artifact(raw.cached(RAW, file_url(kind, year)), ine_source)
             acuerdo = cs.source(ine.INE, title)
             cs.add(
                 "source", id=acuerdo, kind="official_body", publisher=ine.INE, title=title, url=url, license=ine.PUBLIC
             )
-            cs.artifact(raw.cached(RAW, url), acuerdo)
+            for document in (url, *config.get("also", ())):
+                cs.artifact(raw.cached(RAW, document), acuerdo)
 
             election = cs.key("mx.election", f"{day}:general")
             path = f"mx/{day}-general"
@@ -603,12 +769,22 @@ def emit() -> Path:
                 raise ValueError(f"{year}: columns without a party: {sorted(unknown)}")
 
             placed = []
+            codes: set[str] = set()
+            by_state = config.get("place") == "state"
             for row in casillas.iter_rows(named=True):
                 state = f"{int(row['state']):02d}"
                 district = int(row["district"]) if row["district"].isdigit() else 0
                 section = int(row["section"])
                 letter = row["casilla"][:1] or "X"
-                code = f"{year}:{state}-{district:02d}-{section:04d}-{ine.casilla_code(year, re.sub(r'^S(?:MR|RP)', 'S', row['casilla']) or 'X')}"
+                printed, _, repeat = row["casilla"].partition("~")
+                code = f"{year}:{state}-{district:02d}-{section:04d}-{ine.casilla_code(year, re.sub(r'^S(?:MR|RP)', 'S', printed) or 'X')}"
+                # As in mx.senado: a section number that recurs in the district under another municipality (1991
+                # numbers sections within each municipality) carries the municipality, and a repeated row its order.
+                if code in codes:
+                    code = f"{code}-m{int(row['municipality'] or 0)}"
+                if repeat:
+                    code = f"{code}-r{repeat}"
+                codes.add(code)
                 channel, kind, area = 0, "standard", None
                 if letter in "MV" or section == 0:
                     channel, kind = ine.ABROAD, "aggregate"
@@ -616,7 +792,7 @@ def emit() -> Path:
                     channel, kind = ine.EARLY, "aggregate"
                 elif letter == "P":
                     channel, kind = ine.PRISON, "prison"
-                else:
+                elif not by_state:
                     area = sections.get(f"{state}{section:04d}")
                     if area is None and row["municipality"] not in ("", "0"):
                         area = towns.get(f"{state}{int(row['municipality']):03d}")
@@ -683,7 +859,9 @@ def emit() -> Path:
                     "aggregate",
                 )
                 district_set = make_set(contest, f"mr:{ss}{dd:02d}:district", True, ine_source, 1, MR_METHOD)
-                casilla_set = make_set(contest, f"mr:{ss}{dd:02d}:casilla", False, ine_source, 1, CASILLA_NOTE)
+                left_out = [f" {text}" for key, text in EXCLUDED.items() if key[:4] == (year, "MR", state, district)]
+                casilla_note = "".join([CASILLA_NOTE, config.get("casilla_note", ""), *left_out])
+                casilla_set = make_set(contest, f"mr:{ss}{dd:02d}:casilla", False, ine_source, 1, casilla_note)
                 options: dict[str, str] = {}
                 for position, (lines, _) in enumerate(ordered, 1):
                     members = sorted({m for c in lines for m in columns[c]} - {INDEPENDENT})
@@ -742,7 +920,28 @@ def emit() -> Path:
                     )
                 )
                 decided += 1
+            # Districts the count file lacks keep their contest, with no result set, so coverage can name the gap.
+            for (ss, dd), text in config.get("missing", {}).items():
+                if (str(int(ss)), str(dd)) in by_district:
+                    raise ValueError(f"{year} {states[ss]} {dd}: listed as missing but the file has it")
+                contest = cs.key("mx.contest", f"{day}:dip:mr:{ss}{dd:02d}")
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats",
+                    body_id=body,
+                    magnitude=1,
+                    electoral_system_id=mr_system,
+                    default_result_kind="counted",
+                )
+                name(contest, f"{year} Chamber of Deputies, {states[ss]}, district {dd}")
+                name(contest, f"Diputación federal {year}, {states[ss]}, distrito {dd}", "es", "native")
+                cs.add("slug", path=f"{path}/{slug(states[ss])}-district-{dd}", entity_id=contest)
+                cs.add("note", entity_id=contest, kind="methodology", body_md=text)
+                print(year, "contest without results", states[ss], dd, contest)
 
+            list_system = system_of(config.get("rp_system", "deputies-rp"))
             national = cs.key("mx.contest", f"{day}:dip:rp")
             cs.add(
                 "contest",
@@ -751,18 +950,18 @@ def emit() -> Path:
                 kind="list_allocation",
                 body_id=body,
                 magnitude=200,
-                electoral_system_id=rp_system,
+                electoral_system_id=list_system,
                 default_result_kind="counted",
             )
             name(national, f"{year} Chamber of Deputies, proportional representation lists")
             name(national, f"Diputaciones federales {year}, representación proporcional", "es", "native")
             cs.add("slug", path=f"{path}/proportional", entity_id=national)
             declared = config["votes"]
-            unregistered, null, total = declared["unregistered"], declared["null"], declared["total"]
+            unregistered, null, total = declared.get("unregistered"), declared["null"], declared["total"]
             listed = {
                 abbrev: count for abbrev, count in declared.items() if abbrev not in ("unregistered", "null", "total")
             }
-            if sum(listed.values()) + unregistered + null != total:
+            if sum(listed.values()) + (unregistered or 0) + null != total:
                 raise ValueError(f"{year}: the declared figures do not add to {total}")
             rp_options: dict[str, UUID] = {}
             for position, abbrev in enumerate(sorted(listed, key=lambda a: -listed[a]), 1):
@@ -776,22 +975,28 @@ def emit() -> Path:
                     ballot_position=position,
                     ballot_label=abbrev if abbrev != INDEPENDENT else "Candidaturas independientes",
                 )
-            rp_write_in = cs.key("mx.option", f"{day}:dip:rp:unregistered")
-            cs.add(
-                "contest_option",
-                id=rp_write_in,
-                contest_id=national,
-                kind="write_in",
-                ballot_label="Candidatos no registrados",
-            )
             national_set = make_set(
-                national, "rp:national", True, acuerdo, 1, RP_NATIONAL_METHOD.format(page=pages["votes"])
+                national,
+                "rp:national",
+                True,
+                acuerdo,
+                1,
+                config.get("national_method") or RP_NATIONAL_METHOD.format(page=pages["votes"]),
             )
-            cs.add("citation", entity_id=national_set, source_id=acuerdo, locator={"page": pages["votes"]})
+            cs.add("citation", entity_id=national_set, source_id=acuerdo, locator=locator(pages["votes"]))
             unit = str(nation_unit)
             for abbrev, count in listed.items():
                 rows.append((str(national_set), unit, str(rp_options[abbrev]), VOTES, count, 0))
-            rows.append((str(national_set), unit, str(rp_write_in), VOTES, unregistered, 0))
+            if unregistered is not None:
+                rp_write_in = cs.key("mx.option", f"{day}:dip:rp:unregistered")
+                cs.add(
+                    "contest_option",
+                    id=rp_write_in,
+                    contest_id=national,
+                    kind="write_in",
+                    ballot_label="Candidatos no registrados",
+                )
+                rows.append((str(national_set), unit, str(rp_write_in), VOTES, unregistered, 0))
             for measure, value in ((BALLOTS, total), (VALID, total - null), (INVALID, null)):
                 rows.append((str(national_set), unit, None, measure, value, 0))
             seat_total = 0
@@ -804,18 +1009,24 @@ def emit() -> Path:
                     kind="list_allocation",
                     body_id=body,
                     magnitude=40,
-                    electoral_system_id=rp_system,
+                    electoral_system_id=list_system,
                     allocation_parent_id=national,
                     default_result_kind="counted",
                 )
                 name(contest, f"{year} Chamber of Deputies, proportional representation, circunscripción {number}")
                 name(contest, f"Diputaciones federales {year}, circunscripción {number}", "es", "native")
                 cs.add("slug", path=f"{path}/proportional-{number}", entity_id=contest)
-                cs.add("note", entity_id=contest, kind="methodology", body_md=f"States: {CIRCUNSCRIPCIONES[number]}.")
+                members = config.get("circunscripciones", CIRCUNSCRIPCIONES)[number]
+                cs.add("note", entity_id=contest, kind="methodology", body_md=f"States: {members}.")
                 seat_set = make_set(
-                    contest, f"rp:{number}", True, acuerdo, 1, RP_SEATS_METHOD.format(page=pages["seats"])
+                    contest,
+                    f"rp:{number}",
+                    True,
+                    acuerdo,
+                    1,
+                    config.get("seats_method") or RP_SEATS_METHOD.format(page=pages["seats"]),
                 )
-                cs.add("citation", entity_id=seat_set, source_id=acuerdo, locator={"page": pages["seats"]})
+                cs.add("citation", entity_id=seat_set, source_id=acuerdo, locator=locator(pages["seats"]))
                 circ_options: dict[str, UUID] = {}
                 for position, abbrev in enumerate(listed, 1):
                     circ_options[abbrev] = cs.key("mx.option", f"{day}:dip:rp:{number}:{abbrev}")
