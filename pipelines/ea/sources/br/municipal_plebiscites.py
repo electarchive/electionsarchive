@@ -52,6 +52,18 @@ TOWNS = {
 }
 
 
+# Units that the 2012 municipal election pipeline already holds for the day of the polls, by municipality code:
+# those polls reuse them rather than minting a second unit for the same day.
+HELD = {
+    date(2012, 10, 7): {
+        "00159": "b9ca19d8-08e2-5fb5-bf2b-7155cb282467",
+        "00370": "b5076639-bcd6-5e9d-89d7-f009826fd140",
+        "00531": "a1b75fb8-cbed-56b5-8bc1-a8a242940736",
+        "00612": "4223fcd5-3ce9-5e89-8ff5-e0a8abc324b8",
+    }
+}
+
+
 @dataclass
 class Poll:
     """One question put to the electors of one municipality, from one report."""
@@ -346,6 +358,11 @@ def plebiscites(day: Day) -> Package:
         if code not in towns:
             town = TOWNS[code]
             p.external.add(town.area)
+            held = HELD.get(day.date, {}).get(code)
+            if held:
+                p.external.add(held)
+                towns[code] = held
+                return held
             unit = towns[code] = key("unit", SCHEME, code, day.date)
             p.add(
                 "reporting_unit",
@@ -469,5 +486,5 @@ def plebiscites(day: Day) -> Package:
         winner = YES if total["yes"] > total["no"] else NO
         for label, option in options.items():
             p.add("outcome", result_set_id=result_set, option_id=option, kind="won" if label == winner else "lost")
-    print(f"{p.key}: {len(day.polls)} questions, {len(p.rows['reporting_unit'])} reporting units", flush=True)
+    print(f"{p.key}: {len(day.polls)} questions, {len(p.rows.get('reporting_unit', []))} reporting units", flush=True)
     return p
