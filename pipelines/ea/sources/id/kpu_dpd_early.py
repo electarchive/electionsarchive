@@ -90,6 +90,19 @@ PAPUA_FINAL = (
     ),
     COURT,
 )
+SULTRA_E3 = (
+    "https://web.archive.org/web/20260930235817id_/https://www.kpu.go.id/dmdocuments/DPD.pdf",
+    E3_LIVE[1] + ", archived copy",
+    KPU,
+)
+SULTRA_RULING = (
+    "https://s.mkri.id/public/content/persidangan/putusan/putusan_sidang_29_PHPU_A_VII_2009.pdf",
+    (
+        "Putusan Mahkamah Konstitusi Nomor 29/PHPU.A-VII/2009 tentang Perselisihan Hasil Pemilihan Umum Anggota DPD "
+        "Provinsi Sulawesi Tenggara (read 8 June 2009)"
+    ),
+    COURT,
+)
 COUNTS = {2004: 32, 2009: 33}
 VOTES_2004 = (
     "https://web.archive.org/web/20040611230329id_/http://www.kpu.go.id:80/suara/hasilsuara_dpd_sah.php",
@@ -105,6 +118,11 @@ def fetch() -> None:
     raw.fetch(SOURCE, VOTES_2004[0], suffix=".php")
     for url, _, _ in (E3_LIVE, PAPUA_INTERIM, PAPUA_FINAL):
         raw.fetch(SOURCE, url, suffix=".pdf")
+    for url, _, _ in (SULTRA_E3, SULTRA_RULING):
+        try:
+            raw.fetch(SOURCE, url, suffix=".pdf")
+        except Exception as error:  # the archived copy is stored from the archive's own fetch when the host refuses
+            print(f"skipped {url}: {error}")
     for url, suffix in ((E3[0], ".pdf"), (RULING[0], ".pdf"), (LIST_2004[0], ".htm")):
         try:
             raw.fetch(SOURCE, url, suffix=suffix)
@@ -246,6 +264,7 @@ def parse() -> None:
     else:
         _members()
     papua_2009().write()
+    sultra_2009().write()
     try:
         raw.cached(SOURCE, VOTES_2004[0])
     except LookupError:
@@ -770,6 +789,188 @@ def papua_2009() -> Package:
             seats=1 if top else None,
         )
         p.add("result_value", **fact, result_set_id=revised, flags=DERIVED, value=int(str(row["votes"])))
+    return p
+
+
+SULTRA_KEY = "2009-04-09:dpd:74"
+SULTRA_AREA = "9003683a-707c-5780-a14e-40c436ef98ac"
+SULTRA_UNIT = "ed721e6e-32df-5f4a-907a-749410258421"
+SULTRA_E3_NOTE = (
+    "The four members declared elected in Sulawesi Tenggara and their valid votes, from Model E 3 DPD as published by "
+    "KPU in May 2009 (the list of elected candidates under KPU decree 255/Kpts/KPU/Tahun 2009). Losing candidates "
+    "and the provincial total are not in this form, so the set is incomplete. Hoesein Effendy is listed fourth with "
+    "29,052 votes, before the Constitutional Court raised Kamaruddin's total."
+)
+SULTRA_COURT_NOTE = (
+    "The Constitutional Court (ruling 29/PHPU.A-VII/2009, deliberated 7 June and read 8 June 2009) partly granted "
+    "the petition of candidate Drs. H. Kamaruddin (ballot number 23), annulled KPU decree 255/Kpts/KPU/Tahun 2009 "
+    "as to his votes, and set them at 29,385 instead of 28,985. That is more than Hoesein Effendy's 29,052, so "
+    "Kamaruddin takes the fourth seat. This set lists every candidate of the province as KPU's decree table, "
+    "quoted in the ruling, gave them, with only Kamaruddin's figure replaced. The province's total of valid votes "
+    "is not stated, so the set has no total."
+)
+
+
+def sultra_2009() -> Package:
+    p = Package(
+        "id.kpu_dpd_early/dpd-2009-sultra",
+        SOURCE,
+        "The 2009 Regional Representative Council election in Sulawesi Tenggara, with KPU's declared members and the "
+        "winners after the Constitutional Court's ruling on Kamaruddin's votes",
+    )
+    p.external |= {INDONESIA, ELECTION_2009, DPD_BODY, SULTRA_AREA, SULTRA_UNIT}
+    sources: dict[str, str] = {}
+    artifacts: dict[str, str] = {}
+    for url, title, publisher in (SULTRA_E3, SULTRA_RULING):
+        sources[url] = p.id("source", url)
+        court = publisher == COURT
+        p.add(
+            "source",
+            id=sources[url],
+            kind="official_body",
+            publisher=publisher,
+            title=title,
+            url=url,
+            license=f"Public record: official {'court ruling' if court else 'publication'}, no license stated",
+            license_url="https://www.mkri.id" if court else "https://www.kpu.go.id",
+        )
+        artifacts[url] = p.artifact(raw.cached(SOURCE, url), sources[url])
+    e3_path = raw.cached(SOURCE, SULTRA_E3[0]).path
+    pages = _text(e3_path, "-layout").split("\f")
+    number = next(
+        i
+        for i, body in enumerate(pages, 1)
+        if (found := re.search(r"DAERAH PEMILIHAN PROVINSI\s*:\s*(.+)", body))
+        and found[1].strip() == "SULAWESI TENGGARA"
+    )
+    elected = {
+        m[2].strip(): (_figure(m[3]), int(m[1]))
+        for m in re.finditer(
+            r"^\s*([1-4])\s{2,}([A-Z].+?)\s{2,}([\d,]+)\s+([1-4])\s*$", pages[number - 1], re.MULTILINE
+        )
+    }
+    if len(elected) != 4:
+        raise ValueError(f"expected four members on E 3 page {number}, found {elected}")
+    ruling = _text(raw.cached(SOURCE, SULTRA_RULING[0]).path, "-layout")
+    table = ruling.split("Peringkat", 1)[1].split("Jumlah", 1)[0]
+    # KPU's table comes first; the petitioner's own claimed figures follow it
+    rows = re.findall(r"^\s*\d{1,2}\s+(\S.+?)\s{2,}(\d{1,3}\.\d{3})\s+(\d{1,2})\s*$", table, re.MULTILINE)[:62]
+    candidates = {re.sub(r"\s+", " ", name).strip(): (_figure(votes), int(rank)) for name, votes, rank in rows}
+    if len(candidates) != 62:
+        raise ValueError(f"{len(candidates)} candidates in the ruling's table, not 62")
+    amar = ruling.split("5. AMAR PUTUSAN", 1)[1]
+    if not re.search(r"sejumlah\s+29\.385", amar):
+        raise ValueError("the ruling no longer sets Kamaruddin's votes at 29,385")
+    kamaruddin = "KAMARUDDIN, H., Drs."
+    if candidates[kamaruddin][0] != 28985:
+        raise ValueError("the ruling's table no longer gives Kamaruddin 28,985")
+    court = {name: votes for name, (votes, _) in candidates.items()}
+    court[kamaruddin] = 29385
+    ranked = sorted(court, key=lambda name: -court[name])
+    for name, (votes, _) in elected.items():
+        if court[next(k for k in court if k.split(",")[0] == name.split(",")[0])] != votes:
+            raise ValueError(f"{name}: E 3 {votes} disagrees with the ruling's table")
+    winners = set(ranked[:4])
+    contest = p.id("contest", SULTRA_KEY)
+    p.add(
+        "contest",
+        id=contest,
+        election_id=ELECTION_2009,
+        kind="body_seats",
+        body_id=DPD_BODY,
+        district_area_id=SULTRA_AREA,
+        term="full",
+        magnitude=4,
+        round_number=1,
+        default_result_kind="counted",
+    )
+    p.name(contest, "2009 Regional Representative Council election in Sulawesi Tenggara", "en", "english")
+    p.name(contest, "Pemilihan Umum Anggota DPD Tahun 2009 Provinsi Sulawesi Tenggara", "id", "official")
+    p.add("slug", path="id/2009-04-09-legislative/dpd-sulawesi-tenggara", entity_id=contest, is_current=True)
+    declared = p.id("result_set", SULTRA_KEY, "certified")
+    revised = p.id("result_set", SULTRA_KEY, "court_revised")
+    for id, stage, url, default in (
+        (declared, "certified", SULTRA_E3[0], False),
+        (revised, "court_revised", SULTRA_RULING[0], True),
+    ):
+        p.add(
+            "result_set",
+            id=id,
+            election_id=ELECTION_2009,
+            contest_id=contest,
+            stage=stage,
+            kind="counted",
+            source_id=sources[url],
+            status="active",
+            is_default=default,
+            completeness=0,
+        )
+    for id, body in ((declared, SULTRA_E3_NOTE), (revised, SULTRA_COURT_NOTE)):
+        p.add("note", id=p.id("note", id, "methodology"), entity_id=id, kind="methodology", body_md=body, lang="en")
+    image = DATA / "pages" / SOURCE / f"{raw.cached(SOURCE, SULTRA_E3[0]).sha256}-{number}.png"
+    if not image.exists():
+        image.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(
+            ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+            + [str(e3_path), str(image.with_suffix(""))],
+            check=True,
+        )
+    width, height = struct.unpack(">II", image.read_bytes()[16:24])
+    page = p.id("page", SULTRA_E3[0], number)
+    p.add(
+        "source_page",
+        id=page,
+        artifact_id=artifacts[SULTRA_E3[0]],
+        page_number=number,
+        image_key=f"pages/{SOURCE}/{image.name}",
+        width=width,
+        height=height,
+    )
+    for ballot in ranked:
+        tag = f"{SULTRA_KEY}:{slug(ballot)}"
+        option = p.id("option", tag)
+        person = p.id("person", tag)
+        p.add("contest_option", id=option, contest_id=contest, kind="candidate", party_id=None, ballot_label=ballot)
+        p.add("person", id=person)
+        p.name(person, ballot, "id", "official")
+        p.add(
+            "candidacy",
+            id=p.id("candidacy", tag),
+            person_id=person,
+            option_id=option,
+            role="head",
+            ballot_name=ballot,
+            is_independent=True,
+        )
+        fact = {"unit_id": SULTRA_UNIT, "option_id": option, "channel": 0, "measure": 1, "count_round": 0}
+        e3_name = next((k for k in elected if k.split(",")[0] == ballot.split(",")[0]), None)
+        if e3_name is not None:
+            p.add("outcome", result_set_id=declared, option_id=option, kind="elected", seats=1)
+            p.add("result_value", **fact, result_set_id=declared, flags=0, value=elected[e3_name][0])
+            box = _box(e3_path, number, f"{elected[e3_name][0]:,}")
+            if box is not None:
+                x0, y0, x1, y1 = box
+                p.add(
+                    "value_locator",
+                    **fact,
+                    result_set_id=declared,
+                    page_id=page,
+                    source_id=None,
+                    x0=x0,
+                    y0=y0,
+                    x1=x1,
+                    y1=y1,
+                )
+        top = ballot in winners
+        p.add(
+            "outcome",
+            result_set_id=revised,
+            option_id=option,
+            kind="elected" if top else "lost",
+            seats=1 if top else None,
+        )
+        p.add("result_value", **fact, result_set_id=revised, flags=0, value=court[ballot])
+        p.add("value_locator", **fact, result_set_id=revised, page_id=None, source_id=sources[SULTRA_RULING[0]])
     return p
 
 
