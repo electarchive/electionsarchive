@@ -28,6 +28,10 @@ FRANCE = "01a13b8a-b1bc-7045-aa86-d470ebdf31b2"
 METROPOLIS = str(uuid5(package.NAMESPACE, "polity\x1fFR-69M"))
 NATION = "01a13b8a-b1cf-7371-8194-5f2639c265b0"
 SCHEME = "fr.circonscription_metropolitaine"
+# The Métropole itself, a territorial collectivity with departmental powers; INSEE's code for it is 69M.
+WHOLE_SCHEME = "fr.metropole"
+WHOLE_CODE = "69M"
+SIREN = "200046977"
 PAGES = "https://www.resultats-elections.interieur.gouv.fr/metropolitaines2026/ensemble_geographique/84/69M"
 GRANDLYON = (
     "https://data.grandlyon.com/geoserver/metropole-de-lyon/ows?SERVICE=WFS&VERSION=2.0.0&request=GetFeature"
@@ -184,6 +188,7 @@ def key(kind: str, *parts: object) -> str:
 
 SOURCE_ID = key("source", "interieur")
 GEO_SOURCE = key("source", "grandlyon")
+WHOLE = key("area", WHOLE_SCHEME, WHOLE_CODE)
 SYSTEM = key("electoral_system", "metropole", 2020)
 BODY = key("body", "council")
 
@@ -461,7 +466,7 @@ def geo() -> Package:
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
-        "The Métropole de Lyon as a polity and its 14 metropolitan constituencies, with outlines from the "
+        "The Métropole de Lyon as a polity and an area, and its 14 metropolitan constituencies, with outlines from the "
         "Métropole's open data",
     )
     p.external |= {FRANCE, NATION}
@@ -499,15 +504,44 @@ def geo() -> Package:
     p.add("polity_parent", polity_id=METROPOLIS, parent_id=FRANCE, valid_from=date(2015, 1, 1))
     p.name(METROPOLIS, "Métropole de Lyon", "fr", "official")
     p.name(METROPOLIS, "Lyon Metropolis", "en", "english", False)
-    for district in _districts():
+    p.add("external_id", entity_id=METROPOLIS, scheme="fr.siren", value=SIREN)
+    p.add(
+        "scheme",
+        code=WHOLE_SCHEME,
+        polity_id=FRANCE,
+        kind="administrative",
+        rank=1,
+        noun="metropolis",
+        code_system=None,
+    )
+    districts = _districts()
+    # The polity holds one territory: the whole Métropole, whose outline is the union of its 14 constituencies.
+    whole = _outline(shapely.union_all([district.shape for district in districts]))
+    p.add("area", id=WHOLE, scheme_code=WHOLE_SCHEME)
+    p.add("area_code", area_id=WHOLE, code=WHOLE_CODE)
+    p.add("area_parent", area_id=WHOLE, parent_id=NATION, valid_from=date(2015, 1, 1))
+    p.name(WHOLE, "Métropole de Lyon", "fr", "official")
+    p.name(WHOLE, "Lyon Metropolis", "en", "english", False)
+    p.add("polity_territory", polity_id=METROPOLIS, area_id=WHOLE, valid_from=date(2015, 1, 1))
+    p.add(
+        "area_geometry",
+        area_id=WHOLE,
+        valid_from=date(2015, 1, 1),
+        geom=shapely.to_wkb(whole, hex=True, include_srid=True),
+        label_point=shapely.to_wkb(
+            shapely.set_srid(shapely.point_on_surface(whole), 4326), hex=True, include_srid=True
+        ),
+        quality="official",
+        source_id=GEO_SOURCE,
+    )
+    for district in districts:
         code, shape = district.code, district.shape
         id = area(code)
         p.add("area", id=id, scheme_code=SCHEME)
         p.add("area_code", area_id=id, code=code)
-        p.add("area_parent", area_id=id, parent_id=NATION)
+        p.add("area_parent", area_id=id, parent_id=WHOLE)
         p.add("external_id", entity_id=id, scheme="fr.metropole_lyon.circonscription", value=f"690{int(code[-2:]):02d}")
         p.name(id, district.name, "fr", "official")
-        p.add("polity_territory", polity_id=METROPOLIS, area_id=id)
         p.add(
             "area_geometry",
             area_id=id,
