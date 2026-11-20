@@ -172,7 +172,7 @@ def build() -> Package:
         depends=[f"{inec2022.SOURCE}/geo", f"{inec2022.SOURCE}/registry", f"{SOURCE}/geo"],
     )
     p.external |= {NIGERIA, inec2022.COUNTRY}
-    source = p.id("source", "irev")
+    source = p.id("source", "irev", DAY)
     p.add(
         "source",
         id=source,
