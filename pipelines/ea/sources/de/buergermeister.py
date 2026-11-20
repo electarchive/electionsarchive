@@ -135,9 +135,9 @@ def _day(text: str) -> date:
     return date(int(y), int(m), int(d))
 
 
-def page(url: str) -> Page:
+def page(url: str, source: str = SOURCE) -> Page:
     parser = _Table()
-    parser.feed(raw.cached(SOURCE, url).path.read_text(errors="replace"))
+    parser.feed(raw.cached(source, url).path.read_text(errors="replace"))
     flat = " ".join(" ".join(parser.text).split())
     code = re.search(r"(?:/b|/)(\d{6})(?:kw|_)", url)
     if code is None:

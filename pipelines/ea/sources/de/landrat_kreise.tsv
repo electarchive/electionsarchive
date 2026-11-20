@@ -1,0 +1,172 @@
+ags	area_id	name
+05111	01a13bb5-c5a4-7608-a693-afdd42cab755	Düsseldorf, Stadt
+05112	01a13bb5-c5a4-7608-a693-afde53fc338f	Duisburg, Stadt
+05113	01a13bb5-c5a4-7608-a693-afdf57fe2386	Essen, Stadt
+05114	01a13bb5-c5a4-7608-a693-afe07995babb	Krefeld, Stadt
+05116	01a13bb5-c5a4-7608-a693-afe13ee44d2c	Mönchengladbach, Stadt
+05117	01a13bb5-c5a4-7608-a693-afe2f7cffdf5	Mülheim an der Ruhr, Stadt
+05119	01a13bb5-c5a4-7608-a693-afe3d653b78c	Oberhausen, Stadt
+05120	01a13bb5-c5a4-7608-a693-afe4dc6679b9	Remscheid, Stadt
+05122	01a13bb5-c5a4-7608-a693-afe5749673c8	Solingen, Klingenstadt
+05124	01a13bb5-c5a4-7608-a693-afe64fa535bf	Wuppertal, Stadt
+05154	01a13bb5-c5a4-7608-a693-afe70219a77a	Kleve
+05158	01a13bb5-c5a4-7608-a693-afe81d2e0504	Mettmann
+05162	01a13bb5-c5a4-7608-a693-afe91dfa7b8e	Rhein-Kreis Neuss
+05166	01a13bb5-c5a4-7608-a693-afea1e399fe9	Viersen
+05170	01a13bb5-c5a4-7608-a693-afebd2ebc161	Wesel
+05314	01a13bb5-c5a4-7608-a693-afec0cb81dc5	Bonn, Stadt
+05315	01a13bb5-c5a4-7608-a693-afed1c1bc046	Köln, Stadt
+05316	01a13bb5-c5a4-7608-a693-afeeb9fdb973	Leverkusen, Stadt
+05334	01a13bb5-c5a4-7608-a693-afef141d09f8	Städteregion Aachen
+05358	01a13bb5-c5a4-7608-a693-aff00c70b198	Düren
+05362	01a13bb5-c5a4-7608-a693-aff15ff09fcd	Rhein-Erft-Kreis
+05366	01a13bb5-c5a4-7608-a693-aff2844324f4	Euskirchen
+05370	01a13bb5-c5a4-7608-a693-aff3a3bbbd23	Heinsberg
+05374	01a13bb5-c5a4-7608-a693-aff431df9398	Oberbergischer Kreis
+05378	01a13bb5-c5a4-7608-a693-aff50ef6f47b	Rheinisch-Bergischer Kreis
+05382	01a13bb5-c5a4-7608-a693-aff67ef3d751	Rhein-Sieg-Kreis
+05512	01a13bb5-c5a4-7608-a693-aff7a4dce925	Bottrop, Stadt
+05513	01a13bb5-c5a4-7608-a693-aff847b2ce40	Gelsenkirchen, Stadt
+05515	01a13bb5-c5a4-7608-a693-aff964c501cd	Münster, Stadt
+05554	01a13bb5-c5a4-7608-a693-affa70628696	Borken
+05558	01a13bb5-c5a4-7608-a693-affbdd2163b6	Coesfeld
+05562	01a13bb5-c5a4-7608-a693-affc6fdc50a5	Recklinghausen
+05566	01a13bb5-c5a4-7608-a693-affd05d399c2	Steinfurt
+05570	01a13bb5-c5a4-7608-a693-affe13cc8684	Warendorf
+05711	01a13bb5-c5a4-7608-a693-afffbc47495e	Bielefeld, Stadt
+05754	01a13bb5-c5a4-7608-a693-b00011ae6395	Gütersloh
+05758	01a13bb5-c5a4-7608-a693-b001444edd4b	Herford
+05762	01a13bb5-c5a4-7608-a693-b002a9a22a02	Höxter
+05766	01a13bb5-c5a4-7608-a693-b00354c07c7c	Lippe
+05770	01a13bb5-c5a4-7608-a693-b0048bf13681	Minden-Lübbecke
+05774	01a13bb5-c5a4-7608-a693-b005640d2dce	Paderborn
+05911	01a13bb5-c5a4-7608-a693-b00611af5920	Bochum, Stadt
+05913	01a13bb5-c5a4-7608-a693-b007e3fdb219	Dortmund, Stadt
+05914	01a13bb5-c5a4-7608-a693-b00880f27d07	Hagen, Stadt der FernUniversität
+05915	01a13bb5-c5a4-7608-a693-b009fdb6b8c7	Hamm, Stadt
+05916	01a13bb5-c5a4-7608-a693-b00a76267585	Herne, Stadt
+05954	01a13bb5-c5a4-7608-a693-b00bf29a3a86	Ennepe-Ruhr-Kreis
+05958	01a13bb5-c5a4-7608-a693-b00c443857da	Hochsauerlandkreis
+05962	01a13bb5-c5a4-7608-a693-b00dfbe894c6	Märkischer Kreis
+05966	01a13bb5-c5a4-7608-a693-b00e32abcf77	Olpe
+05970	01a13bb5-c5a4-7608-a693-b00f6fbf2ef4	Siegen-Wittgenstein
+05974	01a13bb5-c5a4-7608-a693-b010ef76c662	Soest
+05978	01a13bb5-c5a4-7608-a693-b011d703cb3a	Unna
+09161	01a13bb5-c5a5-7588-aead-0d4f34511f60	Ingolstadt
+09162	01a13bb5-c5a5-7588-aead-0d50648ab30e	München, Landeshauptstadt
+09163	01a13bb5-c5a5-7588-aead-0d51dc599a77	Rosenheim
+09171	01a13bb5-c5a5-7588-aead-0d5200e9cc91	Altötting
+09172	01a13bb5-c5a5-7588-aead-0d53c80579a6	Berchtesgadener Land
+09173	01a13bb5-c5a5-7588-aead-0d543b85350a	Bad Tölz-Wolfratshausen
+09174	01a13bb5-c5a5-7588-aead-0d55a04803c3	Dachau
+09175	01a13bb5-c5a5-7588-aead-0d56c98e6fb3	Ebersberg
+09176	01a13bb5-c5a5-7588-aead-0d572fd3702e	Eichstätt
+09177	01a13bb5-c5a5-7588-aead-0d586e87a76b	Erding
+09178	01a13bb5-c5a5-7588-aead-0d59cc93920d	Freising
+09179	01a13bb5-c5a5-7588-aead-0d5a59c901d5	Fürstenfeldbruck
+09180	01a13bb5-c5a5-7588-aead-0d5b689aa5d6	Garmisch-Partenkirchen
+09181	01a13bb5-c5a5-7588-aead-0d5c6fca8dfd	Landsberg am Lech
+09182	01a13bb5-c5a5-7588-aead-0d5d8c279cb8	Miesbach
+09183	01a13bb5-c5a5-7588-aead-0d5e5902d818	Mühldorf a.Inn
+09184	01a13bb5-c5a5-7588-aead-0d5fdd3a6e95	München
+09185	01a13bb5-c5a5-7588-aead-0d606160f2b2	Neuburg-Schrobenhausen
+09186	01a13bb5-c5a5-7588-aead-0d61fe4c3924	Pfaffenhofen a.d.Ilm
+09187	01a13bb5-c5a5-7588-aead-0d6236f006c9	Rosenheim
+09188	01a13bb5-c5a5-7588-aead-0d63a1594d3d	Starnberg
+09189	01a13bb5-c5a5-7588-aead-0d64a75040ca	Traunstein
+09190	01a13bb5-c5a5-7588-aead-0d65e8901cb5	Weilheim-Schongau
+09261	01a13bb5-c5a5-7588-aead-0d66e37ef6e7	Landshut
+09262	01a13bb5-c5a5-7588-aead-0d678d4ac3f0	Passau
+09263	01a13bb5-c5a5-7588-aead-0d684904ad58	Straubing
+09271	01a13bb5-c5a5-7588-aead-0d69969222bf	Deggendorf
+09272	01a13bb5-c5a5-7588-aead-0d6a55188769	Freyung-Grafenau
+09273	01a13bb5-c5a5-7588-aead-0d6ba20ef57f	Kelheim
+09274	01a13bb5-c5a5-7588-aead-0d6cc372bbeb	Landshut
+09275	01a13bb5-c5a5-7588-aead-0d6d39bef7fd	Passau
+09276	01a13bb5-c5a5-7588-aead-0d6e97f53451	Regen
+09277	01a13bb5-c5a5-7588-aead-0d6f95fd9649	Rottal-Inn
+09278	01a13bb5-c5a5-7588-aead-0d703fe5fe1f	Straubing-Bogen
+09279	01a13bb5-c5a5-7588-aead-0d7158095ca4	Dingolfing-Landau
+09361	01a13bb5-c5a5-7588-aead-0d725f237182	Amberg
+09362	01a13bb5-c5a5-7588-aead-0d735a969110	Regensburg
+09363	01a13bb5-c5a5-7588-aead-0d746819b05a	Weiden i.d.OPf.
+09371	01a13bb5-c5a5-7588-aead-0d754944a1d6	Amberg-Sulzbach
+09372	01a13bb5-c5a5-7588-aead-0d76cf9ae993	Cham
+09373	01a13bb5-c5a5-7588-aead-0d772d133f1a	Neumarkt i.d.OPf.
+09374	01a13bb5-c5a5-7588-aead-0d78a62c2b19	Neustadt a.d.Waldnaab
+09375	01a13bb5-c5a5-7588-aead-0d79d62f57e9	Regensburg
+09376	01a13bb5-c5a5-7588-aead-0d7ab8e2be08	Schwandorf
+09377	01a13bb5-c5a5-7588-aead-0d7ba7e5c5f0	Tirschenreuth
+09461	01a13bb5-c5a5-7588-aead-0d7c4b5d29d3	Bamberg
+09462	01a13bb5-c5a5-7588-aead-0d7d3499aec5	Bayreuth
+09463	01a13bb5-c5a5-7588-aead-0d7e0513271d	Coburg
+09464	01a13bb5-c5a5-7588-aead-0d7fe045af2f	Hof
+09471	01a13bb5-c5a5-7588-aead-0d80751202e1	Bamberg
+09472	01a13bb5-c5a5-7588-aead-0d819f22c166	Bayreuth
+09473	01a13bb5-c5a5-7588-aead-0d82fdb6fc28	Coburg
+09474	01a13bb5-c5a5-7588-aead-0d83e0a186d5	Forchheim
+09475	01a13bb5-c5a5-7588-aead-0d84ceb31c28	Hof
+09476	01a13bb5-c5a5-7588-aead-0d859563e32e	Kronach
+09477	01a13bb5-c5a5-7588-aead-0d8672862125	Kulmbach
+09478	01a13bb5-c5a5-7588-aead-0d87aad89c97	Lichtenfels
+09479	01a13bb5-c5a5-7588-aead-0d88868fbe60	Wunsiedel i.Fichtelgebirge
+09561	01a13bb5-c5a5-7588-aead-0d896dd9e2b4	Ansbach
+09562	01a13bb5-c5a5-7588-aead-0d8a2299f389	Erlangen
+09563	01a13bb5-c5a5-7588-aead-0d8bf6c796e1	Fürth
+09564	01a13bb5-c5a5-7588-aead-0d8c083bdf24	Nürnberg
+09565	01a13bb5-c5a5-7588-aead-0d8d754ceb51	Schwabach
+09571	01a13bb5-c5a5-7588-aead-0d8ee59c2cc9	Ansbach
+09572	01a13bb5-c5a5-7588-aead-0d8f99be7402	Erlangen-Höchstadt
+09573	01a13bb5-c5a5-7588-aead-0d906e4c15c9	Fürth
+09574	01a13bb5-c5a5-7588-aead-0d919feec453	Nürnberger Land
+09575	01a13bb5-c5a5-7588-aead-0d92d7f78957	Neustadt a.d.Aisch-Bad Windsheim
+09576	01a13bb5-c5a5-7588-aead-0d93764740cb	Roth
+09577	01a13bb5-c5a5-7588-aead-0d94340d908d	Weißenburg-Gunzenhausen
+09661	01a13bb5-c5a5-7588-aead-0d9520dab7c6	Aschaffenburg
+09662	01a13bb5-c5a5-7588-aead-0d96d06c7549	Schweinfurt
+09663	01a13bb5-c5a5-7588-aead-0d970ae8542b	Würzburg
+09671	01a13bb5-c5a5-7588-aead-0d98bbd8cb72	Aschaffenburg
+09672	01a13bb5-c5a5-7588-aead-0d99efd89030	Bad Kissingen
+09673	01a13bb5-c5a5-7588-aead-0d9ae375d75b	Rhön-Grabfeld
+09674	01a13bb5-c5a5-7588-aead-0d9b2060cc52	Haßberge
+09675	01a13bb5-c5a5-7588-aead-0d9c9305b369	Kitzingen
+09676	01a13bb5-c5a5-7588-aead-0d9dacc1952d	Miltenberg
+09677	01a13bb5-c5a5-7588-aead-0d9e81bd9444	Main-Spessart
+09678	01a13bb5-c5a5-7588-aead-0d9f236b9648	Schweinfurt
+09679	01a13bb5-c5a5-7588-aead-0da08bf3f099	Würzburg
+09761	01a13bb5-c5a5-7588-aead-0da18df6a591	Augsburg
+09762	01a13bb5-c5a5-7588-aead-0da20f8219af	Kaufbeuren
+09763	01a13bb5-c5a5-7588-aead-0da35a4b94e9	Kempten (Allgäu)
+09764	01a13bb5-c5a5-7588-aead-0da4f2556d85	Memmingen
+09771	01a13bb5-c5a5-7588-aead-0da5b2a3527d	Aichach-Friedberg
+09772	01a13bb5-c5a5-7588-aead-0da6221a7090	Augsburg
+09773	01a13bb5-c5a5-7588-aead-0da78bc7cf81	Dillingen a.d.Donau
+09774	01a13bb5-c5a5-7588-aead-0da8ce0da3cd	Günzburg
+09775	01a13bb5-c5a5-7588-aead-0da90fa72fe1	Neu-Ulm
+09776	01a13bb5-c5a5-7588-aead-0daad49b9d8f	Lindau (Bodensee)
+09777	01a13bb5-c5a5-7588-aead-0dabd0a5bbff	Ostallgäu
+09778	01a13bb5-c5a5-7588-aead-0daced2df791	Unterallgäu
+09779	01a13bb5-c5a5-7588-aead-0dadff090635	Donau-Ries
+09780	01a13bb5-c5a5-7588-aead-0dae4c8205fb	Oberallgäu
+16051	01a13bb5-c5a5-7588-aead-0deb4cf2cbd1	Erfurt, Stadt
+16052	01a13bb5-c5a5-7588-aead-0dec97bb1c24	Gera, Stadt
+16053	01a13bb5-c5a5-7588-aead-0ded3506be4d	Jena, Stadt
+16054	01a13bb5-c5a5-7588-aead-0deefa5d7ae2	Suhl, Stadt
+16055	01a13bb5-c5a5-7588-aead-0defe185a46f	Weimar, Stadt
+16061	01a13bb5-c5a5-7588-aead-0df0e6f08e57	Eichsfeld
+16062	01a13bb5-c5a5-7588-aead-0df100e66362	Nordhausen
+16063	01a13bb5-c5a5-7588-aead-0df22efca751	Wartburgkreis
+16064	01a13bb5-c5a5-7588-aead-0df383c9b788	Unstrut-Hainich-Kreis
+16065	01a13bb5-c5a5-7588-aead-0df4f54965dd	Kyffhäuserkreis
+16066	01a13bb5-c5a5-7588-aead-0df5412c4914	Schmalkalden-Meiningen
+16067	01a13bb5-c5a5-7588-aead-0df603b87cdc	Gotha
+16068	01a13bb5-c5a5-7588-aead-0df7fb9d574e	Sömmerda
+16069	01a13bb5-c5a5-7588-aead-0df8839e73b2	Hildburghausen
+16070	01a13bb5-c5a5-7588-aead-0df9e4e5b924	Ilm-Kreis
+16071	01a13bb5-c5a5-7588-aead-0dfa1ae35607	Weimarer Land
+16072	01a13bb5-c5a5-7588-aead-0dfba90d579a	Sonneberg
+16073	01a13bb5-c5a5-7588-aead-0dfcfa5c0e39	Saalfeld-Rudolstadt
+16074	01a13bb5-c5a5-7588-aead-0dfdb5225aed	Saale-Holzland-Kreis
+16075	01a13bb5-c5a5-7588-aead-0dfed914b389	Saale-Orla-Kreis
+16076	01a13bb5-c5a5-7588-aead-0dfff742af5b	Greiz
+16077	01a13bb5-c5a5-7588-aead-0e002e449417	Altenburger Land
