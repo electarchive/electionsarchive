@@ -270,12 +270,15 @@ TURNOUT_NA = "https://web.archive.org/web/20240627001835id_/https://ecp.gov.pk/s
 TURNOUT_PA = "https://web.archive.org/web/20240627001838id_/https://ecp.gov.pk/storage/files/1/ge2008-t2.pdf"
 POSITION_NA = "https://web.archive.org/web/20260208114539id_/https://ecp.gov.pk/storage/files/1/ge2008-p1.pdf"
 POSITION_PA = "https://web.archive.org/web/20260217104208id_/https://ecp.gov.pk/storage/files/1/ge2008-p2.pdf"
-# The notifications of the candidates returned on 1 March 2008, by assembly. The Sindh notification is not archived.
+# The notifications of the candidates returned on 1 March 2008, by assembly. The Sindh notification, No.F.2(6)/2008-Cord.
+# of that day, is the Commission's file for the provincial assembly of Sindh, as archived on 1 July 2022.
 RETURNED = {
     "NA": "https://web.archive.org/web/20240627001823id_/https://ecp.gov.pk/storage/files/1/ge2008-g1.pdf",
     "PF": "https://web.archive.org/web/20240627001825id_/https://ecp.gov.pk/storage/files/1/ge2008-g2.pdf",
     "PP": "https://web.archive.org/web/20240627001828id_/https://ecp.gov.pk/storage/files/1/ge2008-g3.pdf",
     "PB": "https://web.archive.org/web/20240627001831id_/https://ecp.gov.pk/storage/files/1/ge2008-g4.pdf",
+    "PS": "https://web.archive.org/web/20220701083618id_/https://ecp.gov.pk/Documents/General%20Elections%202008/"
+    "Results/%5BGazette%20Notification%20of%20the%20Returned%20Candidates%20%5D%20%20-%20PS.pdf",
 }
 FILES_2008 = [PAGE_2008, VOLUME, PARTY_VOTES, TURNOUT_NA, TURNOUT_PA, POSITION_NA, POSITION_PA, *RETURNED.values()]
 ECP_2008 = key("source", "ecp", "2008")
@@ -712,6 +715,9 @@ class Notified(NamedTuple):
     father: str
 
 
+RUN_TOGETHER_RETURNED = {"PS-125": Notified("Mr. Muhammad Moin Aamir Pirzada", "Muhammad Mobin")}
+
+
 def returned(prefix: str) -> dict[str, Notified | None]:
     """The returned candidate of each constituency in a notification, or None where the notification is stayed or
     the election did not stand. A name is read from its column, which on each page runs from where most entries'
@@ -728,13 +734,19 @@ def returned(prefix: str) -> dict[str, Notified | None]:
             if not match or match.group(1) != prefix:
                 continue
             code = f"{prefix}-{match.group(2)}"
+            if code in RUN_TOGETHER_RETURNED:
+                # A row whose name and father's name are separated by a single space.
+                found[code] = RUN_TOGETHER_RETURNED[code]
+                continue
             rest = match.group(3)
             fields = list(re.finditer(r"\S+(?: \S+)*", rest))
             # A constituency name that wraps leaves the code alone before the returned candidate's name.
             position = 0 if rest.startswith("  ") else 1
             father = fields[position + 1].group() if len(fields) > position + 1 else ""
             entries.append((code, index, father))
-            if not re.search(r"stayed|Postponed|Terminated|expired|Returned cand", rest, re.IGNORECASE):
+            if not re.search(
+                r"stayed|Postponed|Terminated|expired|Returned cand|Consolidation|Recounting", rest, re.IGNORECASE
+            ):
                 starts.append(match.start(3) + fields[position].start())
                 ends.append(match.start(3) + fields[position + 1].start())
         if not entries:
@@ -751,8 +763,11 @@ def returned(prefix: str) -> dict[str, Notified | None]:
             if appointed := re.search(r"The Returned candi\w+,? (.+?) appointed\b", whole):
                 # Returned, then appointed governor before the notification.
                 found[code] = Notified(appointed.group(1), "")
-            elif re.search(r"stayed|Postponed|Terminated|expired", whole, re.IGNORECASE):
+            elif re.search(r"stayed|Postponed|Terminated|expired|Consolidation|Recounting", whole, re.IGNORECASE):
                 found[code] = None
+            elif plain := re.search(r"The Returned candi\w+,? (.+)$", whole):
+                # The name stands alone in the row, with no father's name or address.
+                found[code] = Notified(plain.group(1), "")
             else:
                 found[code] = Notified(clean(" ".join(line[start - 2 : end - 1] for line in block)), father)
     if len(found) != ASSEMBLIES[prefix].seats:
@@ -1242,15 +1257,11 @@ def caveats(seat: Seat2008, has_winner: bool, notified: dict[str, Notified | Non
             "here, so no winner is stored for this constituency."
         )
     elif not has_winner:
-        if seat.prefix == "PS":
+        if notified.get(seat.code) is None:
             found.append(
-                "The Commission's notification of the candidates returned to the Provincial Assembly of Sindh is "
-                "not archived, so no winner is stored for this constituency."
-            )
-        elif notified.get(seat.code) is None:
-            found.append(
-                "The Commission's notification of 1 March 2008 stayed the return of a candidate here, by its own "
-                "order or a court's, so no winner is stored for this constituency."
+                "The Commission's notification of 1 March 2008 names no returned candidate here: the return was "
+                "stayed, or the result was still to be consolidated or recounted by order, so no winner is stored "
+                "for this constituency."
             )
     if any(c.retired for c in seat.candidates):
         found.append("The volume marks a candidate as retired: they withdrew, but stayed on the ballot.")
