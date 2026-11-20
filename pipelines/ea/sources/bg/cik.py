@@ -924,26 +924,14 @@ def geo() -> Package:
         p.add("area_parent", area_id=id, parent_id=NATION)
         p.name(id, f"{code:02d}. {english}", "en", "official")
         p.name(id, f"{code:02d}. {native}", "bg", "native", False)
-    # The provinces, municipalities, and settlements. The ids of the first two are the ones the local-election
-    # packages use, so that both families of elections roll up to the same areas.
+    # The provinces and municipalities belong to the `bg.cik_local` geo package, which created them with these ids, so
+    # that both families of elections roll up to the same areas; they are listed as external and the settlements
+    # below hang from them.
     where = ekatte()
-    for number, (nsi_code, english, native) in cik_local.OBLASTS.items():
-        id = cik_local.oblast(number)
-        p.add("area", id=id, scheme_code="bg.oblast")
-        p.add("area_code", area_id=id, code=nsi_code)
-        p.add("area_parent", area_id=id, parent_id=NATION)
-        p.add("external_id", entity_id=id, scheme="bg.cik.oblast", value=f"{number:02d}")
-        p.name(id, english, "en", "official")
-        p.name(id, native, "bg", "native", False)
-    for nsi_code, row in sorted(where.municipalities.items()):
-        code = cik_local.cik_code(nsi_code)
-        id = cik_local.obshtina(code)
-        p.add("area", id=id, scheme_code="bg.obshtina")
-        p.add("area_code", area_id=id, code=nsi_code)
-        p.add("area_parent", area_id=id, parent_id=cik_local.oblast(int(code[:2])))
-        p.add("external_id", entity_id=id, scheme="bg.cik.obshtina", value=code)
-        p.name(id, str(row["name_en"]), "en", "official")
-        p.name(id, str(row["name"]), "bg", "native", False)
+    for number in cik_local.OBLASTS:
+        p.external.add(cik_local.oblast(number))
+    for nsi_code in where.municipalities:
+        p.external.add(cik_local.obshtina(cik_local.cik_code(nsi_code)))
     for code, row in sorted(where.settlements.items()):
         id = settlement(code)
         p.add("area", id=id, scheme_code="bg.ekatte")
