@@ -14,7 +14,7 @@ from ea.sources.us.wikidata_links import NICKNAMES
 from ea.store import Connection, connect
 
 SOURCE = "crosswalk"
-VERSION = "2"
+VERSION = "3"
 NEAR = 12 * 366
 RIVAL = 60
 MOST = 200_000
@@ -42,27 +42,45 @@ CANON = {"rudy": "rudolph", "rudi": "rudolph"} | {
     for form in forms.split()
     if form not in {"kathleen", "jon", "bert"}
 }
-CODED = ("person", "polity", "area", "office", "body", "party", "pipeline")
-COLUMNS = ("person", "name", "day", "wide", "inside", "polity", "area", "office", "body", "party", "pipeline")
+CODED = ("person", "polity", "area", "office", "body", "party", "pipeline", "nation")
+COLUMNS = (
+    "person",
+    "name",
+    "day",
+    "wide",
+    "inside",
+    "polity",
+    "area",
+    "office",
+    "body",
+    "party",
+    "pipeline",
+    "nation",
+    "birth",
+)
 ROWS = """copy (
   with recursive up(id, at, depth) as (
     select id, id, 0 from polity
     union all
     select up.id, pp.parent_id, up.depth + 1 from up join polity_parent pp on pp.polity_id = up.at where up.depth < 8
   ), country as (
-    select distinct on (up.id) up.id, split_part(p.iso_code, '-', 1) as iso
+    select distinct on (up.id) up.id, split_part(p.iso_code, '-', 1) as iso, up.at as nation
     from up join polity p on p.id = up.at where p.kind = 'sovereign_state' and p.iso_code is not null
     order by up.id, up.depth
   ), inside as (select id from country where iso = any(%(countries)s))
   select cy.person_id, coalesce(cy.ballot_name, n.text), e.date_from,
          (p.kind in ('sovereign_state', 'federal_unit', 'region'))::int, (e.polity_id in (select id from inside))::int,
-         e.polity_id, k.district_area_id, k.office_id, k.body_id, o.party_id, c.pipeline
+         e.polity_id, k.district_area_id, k.office_id, k.body_id, o.party_id, c.pipeline,
+         n2.nation,
+         case when x.birth_precision = 'day' then x.birth_date end
   from candidacy cy
   join contest_option o on o.id = cy.option_id
   join contest k on k.id = o.contest_id
   join election e on e.id = k.election_id
   join polity p on p.id = e.polity_id
   join changeset c on c.id = cy.changeset_id
+  join person x on x.id = cy.person_id
+  left join country n2 on n2.id = e.polity_id
   left join lateral (select text from name where entity_id = cy.person_id and is_preferred limit 1) n on true
   where e.date_from is not null and split_part(c.pipeline, '.', 1) <> all(%(matched)s)
     and cy.person_id in (
@@ -70,7 +88,8 @@ ROWS = """copy (
       join contest_option yo on yo.id = y.option_id
       join contest yk on yk.id = yo.contest_id
       join election ye on ye.id = yk.election_id
-      where ye.polity_id in (select id from inside))
+      where ye.polity_id in (select id from inside)
+      union select id from person where birth_precision = 'day')
 ) to stdout with (format csv)"""
 EPOCH = date(1970, 1, 1).toordinal()
 SOLE = """select k.office_id::text from contest k join office f on f.id = k.office_id
@@ -89,10 +108,15 @@ def _frame(conn: Connection) -> tuple[pl.DataFrame, dict[str, pl.DataFrame]]:
         has_header=False,
         new_columns=list(COLUMNS),
         schema_overrides={
-            column: pl.Date if column == "day" else pl.Int8 if column in ("wide", "inside") else pl.String
+            column: pl.Date if column in ("day", "birth") else pl.Int8 if column in ("wide", "inside") else pl.String
             for column in COLUMNS
         },
-    ).with_columns(pl.col("day").cast(pl.Int32), pl.col("wide").cast(pl.Boolean), pl.col("inside").cast(pl.Boolean))
+    ).with_columns(
+        pl.col("day").cast(pl.Int32),
+        pl.col("birth").cast(pl.Int32),
+        pl.col("wide").cast(pl.Boolean),
+        pl.col("inside").cast(pl.Boolean),
+    )
     del buffer
     named = pl.DataFrame(
         [
@@ -161,6 +185,15 @@ def _bodies(frame: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+def _births(frame: pl.DataFrame) -> pl.DataFrame:
+    return (
+        frame.filter(pl.col("key").is_not_null() & pl.col("birth").is_not_null() & pl.col("nation").is_not_null())
+        .group_by(["nation", "key", "birth"])
+        .agg(pl.col("person").unique())
+        .filter(pl.col("person").list.len() > 1)
+    )
+
+
 def emit() -> Path:
     with connect() as conn:
         conn.execute("set statement_timeout = 0")
@@ -178,9 +211,15 @@ def emit() -> Path:
 
         seats = _seats(frame, coded("office", sole))
         bodies = _bodies(frame)
-        people = set(seats["person"].explode().to_list()) | set(bodies["person"].explode().to_list())
+        births = _births(frame)
+        people = (
+            set(seats["person"].explode().to_list())
+            | set(bodies["person"].explode().to_list())
+            | set(births["person"].explode().to_list())
+        )
         print(
-            f"{frame.height} candidacies, {len(people)} people in {seats.height} seat and {bodies.height} body groups"
+            f"{frame.height} candidacies, {len(people)} people in {seats.height} seat, {bodies.height} body, "
+            f"and {births.height} birth groups"
         )
         rows = frame.filter(pl.col("person").is_in(list(people)))
         held_busy = set(rows.filter(pl.col("pipeline").is_in(coded("pipeline", busy)))["person"].to_list())
@@ -282,7 +321,7 @@ def emit() -> Path:
 
         decode = {
             column: dict(codes[column].select("code", column).iter_rows())
-            for column in ("polity", "area", "office", "body", "party")
+            for column in ("polity", "area", "office", "body", "party", "nation")
         }
 
         def day_of(day: int) -> date:
@@ -354,6 +393,27 @@ def emit() -> Path:
                 parent[root(edge[0])] = root(edge[1])
                 edges.append(edge)
 
+        for nation, key, birth, members in births.iter_rows():
+            for one, two in combinations(sorted(members), 2):
+                if (reason := apart(one, two)) is not None:
+                    refused[f"birth: {reason}"] += 1
+                    continue
+                _, day, other = min((abs(a - b), a, b) for a in dates[one] for b in dates[two])
+                parent[root(one)] = root(two)
+                edges.append(
+                    (
+                        one,
+                        two,
+                        "birth",
+                        key,
+                        decode["nation"][nation],
+                        day_of(birth).isoformat(),
+                        None,
+                        day_of(day),
+                        day_of(other),
+                    )
+                )
+
         groups: dict[int, list[int]] = defaultdict(list)
         for person in list(parent):
             groups[root(person)].append(person)
@@ -366,7 +426,8 @@ def emit() -> Path:
                 "source or per race joined across elections, where the same printed name "
                 "ran for the same seat within 12 years, or for the same legislature of a country, state, or region under "
                 "the same party within 12 years with no one else of that name there, and nothing tells them apart; "
-                "plus pairs joined by hand with cited evidence"
+                "people anywhere but Brazil and Turkey who share a printed name, a country, and an exact birth date, "
+                "and nothing tells them apart; plus pairs joined by hand with cited evidence"
             ),
             polity=None,
             kind="match",
@@ -429,7 +490,13 @@ def emit() -> Path:
             },
             orient="row",
         )
-        named = [*evidence["one"], *evidence["two"], *evidence["place"], *evidence["seat"], *evidence["party"]]
+        named = [
+            *evidence["one"],
+            *evidence["two"],
+            *evidence["place"],
+            *evidence.filter(pl.col("rule") != "birth")["seat"],
+            *evidence["party"],
+        ]
         labels = pl.DataFrame(
             conn.execute(
                 """select distinct on (entity_id) entity_id::text, text from name
