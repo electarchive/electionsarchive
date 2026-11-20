@@ -7,7 +7,8 @@ from uuid import UUID
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.it.interno import BLANK, INVALID, REGISTERED, VOTERS, VOTES
 from ea.sources.it.storico import EXISTING, NEW, cased
 from ea.store import DATA, connect
@@ -62,6 +63,88 @@ VDA_HELD = {
     (date(2020, 9, 20), date(2020, 9, 21)): 142,
     (date(2025, 9, 28), date(2025, 9, 28)): 190,
 }
+# The region's results pages start in 2003 and its printed volumes for earlier councils are not online, so
+# 1949-1998 comes from two sources that agree on every total: the Istituto Cattaneo's table of special-statute
+# regional elections (ISTAT's 1990 compendium through 1988, the Interior Ministry for 1993 and 1998) for turnout,
+# and the Italian Wikipedia's article on each election for votes and seats by list.
+VDA_HISTORY = [
+    date(1949, 4, 24),
+    date(1954, 11, 14),
+    date(1959, 5, 17),
+    date(1963, 10, 27),
+    date(1968, 4, 21),
+    date(1973, 6, 10),
+    date(1978, 6, 25),
+    date(1983, 6, 26),
+    date(1988, 6, 26),
+    date(1993, 5, 30),
+    date(1998, 5, 31),
+]
+CATTANEO = "https://web.archive.org/web/20110722091126id_/http://www.cattaneo.org/archivi/adele/regioni/speciale.xls"
+CATTANEO_SHEETS = ["Valle d'Aosta 1949-1988", "Valle d'Aosta 1993-2003"]
+CATTANEO_LABELS = {
+    "Totale voti": "listed",
+    "Elettori": "registered",
+    "Votanti": "voters",
+    "Voti non validi": "invalid",
+    "di cui schede bianche": "blank",
+}
+WIKIPEDIA = "https://it.wikipedia.org/w/index.php?title=Elezioni_regionali_in_Valle_d%27Aosta_del_{}&action=raw"
+HISTORY_SOURCES = {
+    "totals": (
+        "Istituto Carlo Cattaneo",
+        "Elezioni regionali nelle regioni a statuto speciale",
+        "academic",
+        "http://www.cattaneo.org/archivi/adele/regioni/speciale.xls",
+        None,
+    ),
+    "lists": (
+        "Wikipedia",
+        "Elezioni regionali in Valle d'Aosta",
+        "community",
+        "https://it.wikipedia.org/wiki/Elezioni_regionali_in_Valle_d%27Aosta",
+        "CC BY-SA 4.0",
+    ),
+}
+PANACHAGE = date(1959, 12, 31)
+# Lists that stand for one party, by the Wikipedia article they link to (or their name when the link is piped to
+# another name), mapped to the labels `party_of` resolves; any other list is its own list vehicle.
+HISTORY_PARTIES = {
+    "Democrazia Cristiana": "DC",
+    "Partito Comunista Italiano": "PCI",
+    "Partito Socialista Italiano": "PSI",
+    "Partito Socialista Democratico Italiano": "PSDI",
+    "Partito Liberale Italiano": "PLI",
+    "Partito Repubblicano Italiano": "PRI",
+    "Movimento Sociale Italiano": "MSI",
+    "Movimento Sociale Italiano - Destra Nazionale": "MSI-DN",
+    "PSI-PSDI Unificati": "PSU",
+    "Partito Socialista Italiano di Unità Proletaria (1964)": "PSIUP",
+    "Democrazia Proletaria": "DEM.PROL",
+    "Democrazia Nazionale - Costituente di Destra": "DN-CD",
+    "Union Valdôtaine": "UV",
+    "Lega Nord": "LEGA NORD",
+    "Lega Nord - Val d'Aohta Libra": "LEGA NORD",
+    "Forza Italia (1994)": "FORZA ITALIA",
+    "Partito della Rifondazione Comunista": "RIFONDAZIONE COMUNISTA",
+    "Alleanza Nazionale": "ALLEANZA NAZIONALE",
+    "Union Valdôtaine Progressiste (1972)": "UVP-1972",
+    "Democratici Popolari": "DEMOCRATICI POPOLARI",
+    "Rassemblement Valdôtain (1963)": "RASSEMBLEMENT VALDÔTAIN",
+    "Rassemblement Indépendant Valdôtain": "RASSEMBLEMENT VALDÔTAIN",
+    "Autonomistes Démocrates Progressistes": "AUTONOMISTES DÉMOCRATES PROGRESSISTES",
+}
+# Regional parties of the earlier councils, keyed apart from later parties that took the same name.
+FORMER_PARTIES = {
+    "UVP-1972": ("union-valdotaine-progressiste-1972", "Union Valdôtaine Progressiste", "UVP"),
+    "DEMOCRATICI POPOLARI": ("democratici-popolari", "Democratici Popolari", None),
+    "RASSEMBLEMENT VALDÔTAIN": ("rassemblement-valdotain", "Rassemblement Valdôtain", "RV"),
+    "AUTONOMISTES DÉMOCRATES PROGRESSISTES": (
+        "autonomistes-democrates-progressistes",
+        "Autonomistes Démocrates Progressistes",
+        "ADP",
+    ),
+}
 PARTIES = {
     "PARTITO DEMOCRATICO": "PARTITO DEMOCRATICO",
     "MOVIMENTO 5 STELLE": "MOVIMENTO 5 STELLE",
@@ -87,6 +170,23 @@ NOTES = {
         "the list with the lower vote total among those tied on remainders."
     ),
 }
+HISTORY_COUNTED = (
+    "Turnout (registered voters, voters, and blank and invalid ballots) is from the Istituto Cattaneo's table of "
+    "special-statute regional elections, which cites ISTAT's 45 anni di elezioni in Italia 1946-1990 through 1988 and "
+    "the Interior Ministry for 1993 and 1998. Votes and seats by list are from the Italian Wikipedia's article on the "
+    "election, and their total matches the table's."
+)
+HISTORY_ALLOCATED = {
+    True: (
+        "The council's 35 seats were filled by a majoritarian limited vote with panachage, in which voters could choose "
+        "candidates from more than one list and the leading list took most of the seats. Each list's votes are its "
+        "theoretical head votes, the average vote of its candidates, so they do not add up to the valid ballots."
+    ),
+    False: (
+        "The council's 35 seats were allocated by proportional representation among lists across the whole region, "
+        "and the council elected the President of the Region."
+    ),
+}
 COUNT_LABELS = {"Elettori": "registered", "Votanti": "voters", "Schede bianche": "blank", "Schede nulle": "null"}
 
 
@@ -97,10 +197,66 @@ def vda_url(number: int) -> str:
 def fetch() -> None:
     for number in VDA_HELD.values():
         raw.fetch(SOURCE, vda_url(number), suffix=".html")
+    raw.fetch(SOURCE, CATTANEO, suffix=".xls")
+    for day in VDA_HISTORY:
+        raw.fetch(SOURCE, WIKIPEDIA.format(day.year), suffix=".wiki")
 
 
 def number(text: str) -> int:
     return int(text.replace(".", "").strip())
+
+
+def cattaneo(path: str) -> dict[date, dict[str, int]]:
+    """Turnout by election day from the Cattaneo table's absolute-values block for the Aosta Valley."""
+    totals: dict[date, dict[str, int]] = {}
+    for sheet in CATTANEO_SHEETS:
+        frame = pl.read_excel(path, sheet_name=sheet, has_header=False, infer_schema_length=0)
+        rows = [[None if cell is None else str(cell).strip() for cell in row] for row in frame.iter_rows()]
+        header = next(row for row in rows if row[0] == "Liste")
+        days: dict[int, date] = {}
+        for column, cell in enumerate(header[1:], start=1):
+            if cell and (found := re.match(r"(\d{2})/(\d{2})/(\d{4})|(\d{4})-(\d{2})-(\d{2})", cell)):
+                day, month, year = (found[1], found[2], found[3]) if found[1] else (found[6], found[5], found[4])
+                days[column] = date(int(year), int(month), int(day))
+        seen: set[str] = set()
+        for row in rows[rows.index(header) :]:
+            key = CATTANEO_LABELS.get(row[0] or "")
+            if key is None or key in seen:
+                continue
+            seen.add(key)
+            for column, day in days.items():
+                totals.setdefault(day, {})[key] = int(float(str(row[column])))
+    return totals
+
+
+def wikipedia(text: str) -> list[dict[str, str | int | None]]:
+    """Lists, votes, and seats from an article's {{Elezione}} results template."""
+    block = re.search(r"(?s)\{\{Elezione\s*\n(.*?)\n\}\}", text)
+    if block is None:
+        raise ValueError("no {{Elezione}} template")
+    cells = [re.sub(r"^\|\s*", "", cell.strip()) for cell in block[1].split("\n|")]
+    cells = [cell for cell in cells if cell and not re.match(r"(votanti|elettori)\s*=", cell)]
+    if len(cells) % 3:
+        raise ValueError("the results template is not in label, votes, seats triples")
+    lists = []
+    for shown, votes, seats in zip(cells[::3], cells[1::3], cells[2::3], strict=True):
+        shown = re.sub(r"(?s)<ref[^>]*/>|<ref.*?</ref>|<small>.*?</small>", "", shown)
+        shown = re.sub(r"<br\s*/?>|\s\([A-Z][A-Z-]+\)", " ", shown).strip()
+        links = re.findall(r"\[\[([^|\]]+)(?:\|([^\]]+))?\]\]", shown)
+        label = re.sub(r"\s+", " ", re.sub(r"\[\[(?:[^|\]]+\|)?([^\]]+)\]\]", r"\1", shown)).strip()
+        label = label[1:-1] if re.fullmatch(r'"[^"]+"', label) else label
+        whole = len(links) == 1 and re.fullmatch(r"\[\[[^\]]+\]\]", shown)
+        target = links[0][0] if whole and re.sub(r" \([^)]*\)$", "", links[0][0]) == label else label
+        lists.append(
+            {
+                "list": label,
+                "group": None,
+                "votes": number(votes),
+                "seats": 0 if seats == "-" else int(seats),
+                "party": HISTORY_PARTIES.get(target),
+            }
+        )
+    return lists
 
 
 def vda(page: str) -> tuple[dict[str, int], list[dict[str, object]]]:
@@ -143,22 +299,59 @@ def parse() -> None:
             raise ValueError(f"02 {day}: list votes do not add up to valid votes")
         if frame["seats"].sum() != 35:
             raise ValueError(f"02 {day}: seats do not add up to 35")
-        elections.append({"region": "02", "day": day, "last": last, "url": vda_url(number_), "size": 35, **counts})
+        url = vda_url(number_)
+        elections.append(
+            {"region": "02", "day": day, "last": last, "url": url, "counts_url": url, "size": 35, **counts}
+        )
+        lists.extend({"region": "02", "day": day, **row, "party": None} for row in rows)
+    totals = cattaneo(str(raw.cached(SOURCE, CATTANEO).path))
+    for day in VDA_HISTORY:
+        url = WIKIPEDIA.format(day.year)
+        rows = wikipedia(raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))
+        total = totals[day]
+        listed = sum(int(str(row["votes"])) for row in rows)
+        valid = total["voters"] - total["invalid"]
+        # Under the panachage of 1949-1959 list votes are theoretical head votes, which add up to the table's
+        # total but not to the valid ballots; from 1963 they add up to the valid ballots. (The table's own 1963
+        # total leaves out the Union Valdôtaine's 12,930 votes, which the valid ballots include.)
+        if listed != (total["listed"] if day <= PANACHAGE else valid):
+            raise ValueError(f"02 {day}: list votes {listed:,} do not add up")
+        if sum(int(str(row["seats"])) for row in rows) != 35:
+            raise ValueError(f"02 {day}: seats do not add up to 35")
+        elections.append(
+            {
+                "region": "02",
+                "day": day,
+                "last": day,
+                "url": url,
+                "counts_url": CATTANEO,
+                "size": 35,
+                "registered": total["registered"],
+                "voters": total["voters"],
+                "blank": total["blank"],
+                "null": total["invalid"] - total["blank"],
+            }
+        )
         lists.extend({"region": "02", "day": day, **row} for row in rows)
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(elections).write_parquet(PARSED / "elections.parquet")
-    pl.DataFrame(lists, schema_overrides={"group": pl.Int64}).write_parquet(PARSED / "lists.parquet")
+    pl.DataFrame(lists, schema_overrides={"group": pl.Int64, "party": pl.String}).write_parquet(
+        PARSED / "lists.parquet"
+    )
 
 
 def emit() -> None:
     elections = pl.read_parquet(PARSED / "elections.parquet")
     lists = pl.read_parquet(PARSED / "lists.parquet")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Regional council elections in Italy's special-statute regions from the regions' own results, by region",
+            summary=(
+                "Regional council elections in Italy's special-statute regions from the regions' own results, "
+                "and from historical compilations before them, by region"
+            ),
             polity="IT",
         )
 
@@ -170,8 +363,8 @@ def emit() -> None:
             raise ValueError("publish it.interno before it.speciali")
         parties: dict[tuple[str, str], UUID] = {}
 
-        def party_of(shown: str) -> UUID:
-            label = PARTIES.get(shown.upper(), shown.upper())
+        def party_of(shown: str, party: str | None) -> UUID:
+            label = party or PARTIES.get(shown.upper(), shown.upper())
             spec = EXISTING.get(label)
             if spec is not None:
                 if spec not in parties:
@@ -179,7 +372,10 @@ def emit() -> None:
                     if parties[spec] in cs.minted:
                         raise ValueError(f"{spec} is not in the database")
                 return parties[spec]
-            if label in REGIONAL_PARTIES:
+            if label in FORMER_PARTIES:
+                value, full, abbreviation = FORMER_PARTIES[label]
+                key, kind = ("it.party", value), "party"
+            elif label in REGIONAL_PARTIES:
                 full, abbreviation = REGIONAL_PARTIES[label]
                 key, kind = ("it.party", slug(full)), "party"
             elif label in NEW:
@@ -239,7 +435,7 @@ def emit() -> None:
             unit = cs.unit("it.regione", code)
             if area in cs.minted or unit in cs.minted:
                 raise ValueError("publish it.istat before it.speciali")
-            if region in cs.minted:
+            if region in cs.minted or region in cs.own_entities:
                 cs.add("polity", id=region, kind="region", iso_code=info.iso)
                 cs.add("slug", path=f"it/{info.slug}", entity_id=region)
                 cs.add("polity_parent", polity_id=region, parent_id=italy)
@@ -254,9 +450,28 @@ def emit() -> None:
                 name(body, info.council_it, "it", "native")
             held = elections.filter(pl.col("region") == code).sort("day")
             days = held["day"].to_list()
-            for total in held.iter_rows(named=True):
+            history: dict[str, UUID] = {}
+            if (held["counts_url"] != held["url"]).any():
+                for role, (publisher, title, kind, home, license) in HISTORY_SOURCES.items():
+                    history[role] = cs.source(publisher, title)
+                    if history[role] in cs.minted or history[role] in cs.own_entities:
+                        cs.add(
+                            "source",
+                            id=history[role],
+                            kind=kind,
+                            publisher=publisher,
+                            title=title,
+                            url=home,
+                            license=license,
+                        )
+            # The region's own elections go first, so a list vehicle that also ran before 2003 keeps their name for it.
+            for total in held.sort(pl.col("counts_url") != pl.col("url"), "day").iter_rows(named=True):
                 day = total["day"]
-                cs.artifact(raw.cached(SOURCE, total["url"]), source)
+                earlier = total["counts_url"] != total["url"]
+                counted = history["totals"] if earlier else source
+                listed = history["lists"] if earlier else source
+                cs.artifact(raw.cached(SOURCE, total["counts_url"]), counted)
+                cs.artifact(raw.cached(SOURCE, total["url"]), listed)
                 label = str(day.year) if sum(other.year == day.year for other in days) == 1 else f"{day:%B} {day.year}"
                 election = cs.key(f"{SOURCE}.election", f"{code}:{day}")
                 cs.add(
@@ -272,7 +487,7 @@ def emit() -> None:
                 name(election, f"Elezioni regionali in {info.native} del {day.year}", "it", "native")
                 path = f"it/{info.slug}/{day}-general"
                 cs.add("slug", path=path, entity_id=election)
-                accounting = result_set(f"{code}:{day}:election", election, None, source)
+                accounting = result_set(f"{code}:{day}:election", election, None, counted)
                 value(accounting, unit, None, REGISTERED, total["registered"])
                 value(accounting, unit, None, VOTERS, total["voters"])
                 value(accounting, unit, None, BLANK, total["blank"])
@@ -294,9 +509,13 @@ def emit() -> None:
                     "note",
                     entity_id=contest,
                     kind="context",
-                    body_md=" ".join([info.counted, info.allocated, *filter(None, [NOTES.get((code, day))])]),
+                    body_md=" ".join(
+                        [HISTORY_COUNTED, HISTORY_ALLOCATED[day <= PANACHAGE]]
+                        if earlier
+                        else [info.counted, info.allocated, *filter(None, [NOTES.get((code, day))])]
+                    ),
                 )
-                list_set = result_set(f"{code}:{day}:list", election, contest, source)
+                list_set = result_set(f"{code}:{day}:list", election, contest, listed)
                 for row in (
                     lists.filter(pl.col("region") == code, pl.col("day") == day)
                     .sort("votes", "list", descending=[True, False])
@@ -308,7 +527,7 @@ def emit() -> None:
                         id=option,
                         contest_id=contest,
                         kind="list",
-                        party_id=party_of(row["list"]),
+                        party_id=party_of(row["list"], row["party"]),
                         ballot_label=row["list"],
                     )
                     value(list_set, unit, option, VOTES, row["votes"])
