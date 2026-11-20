@@ -475,6 +475,40 @@ def put(p: Package, result_set: str, unit: str, option: str | None, measure: int
     )
 
 
+HELD_ELECTIONS = {date(2023, 12, 2)}
+
+
+def own_election(p: Package, plan: Plan, election: str, path: str, main: bool, year: int) -> None:
+    """Write the record, names, and slug of an election no other package holds."""
+    p.add(
+        "election",
+        id=election,
+        polity_id=COUNTRY,
+        kind=plan.kind,
+        date_from=plan.day,
+        date_to=plan.day,
+        status="held",
+        rerun_of_id=p.id("election", plan.rerun_of) if plan.rerun_of else None,
+    )
+    p.add("slug", path=path, entity_id=election, is_current=True)
+    when = f"{plan.day.day} {plan.day.strftime('%B %Y')}"
+    p.name(
+        election,
+        f"{year} Ivorian municipal council elections" if main else f"{year} Ivorian municipal council poll of {when}",
+        "en",
+        "official",
+    )
+    p.name(
+        election,
+        f"Élection des conseillers municipaux de {year}"
+        if main
+        else f"Élection des conseillers municipaux, scrutin du {plan.day.day:02d}/{plan.day.month:02d}/{year}",
+        "fr",
+        "native",
+        False,
+    )
+
+
 def build(plan: Plan) -> Package:
     key_ = f"ci.cei/municipal-{plan.day}"
     depends = [GEO, REGISTRY]
@@ -495,34 +529,12 @@ def build(plan: Plan) -> Package:
     election = p.id("election", plan.day)
     main = plan.kind == "local"
     year = plan.day.year
-    p.add(
-        "election",
-        id=election,
-        polity_id=COUNTRY,
-        kind=plan.kind,
-        date_from=plan.day,
-        date_to=plan.day,
-        status="held",
-        rerun_of_id=p.id("election", plan.rerun_of) if plan.rerun_of else None,
-    )
     path = f"ci/{plan.day}-municipal"
-    p.add("slug", path=path, entity_id=election, is_current=True)
-    when = f"{plan.day.day} {plan.day.strftime('%B %Y')}"
-    p.name(
-        election,
-        f"{year} Ivorian municipal council elections" if main else f"{year} Ivorian municipal council poll of {when}",
-        "en",
-        "official",
-    )
-    p.name(
-        election,
-        f"Élection des conseillers municipaux de {year}"
-        if main
-        else f"Élection des conseillers municipaux, scrutin du {plan.day.day:02d}/{plan.day.month:02d}/{year}",
-        "fr",
-        "native",
-        False,
-    )
+    if plan.day in HELD_ELECTIONS:
+        # the regional package of this polling day holds the election's record, names, and slug: attach to it
+        p.external.add(election)
+    else:
+        own_election(p, plan, election, path, main, year)
     held = held_dossiers(plan)
     slugs: set[str] = set()
     off: list[tuple[str, dict[str, int], int]] = []
