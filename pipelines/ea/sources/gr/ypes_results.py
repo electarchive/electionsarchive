@@ -1,4 +1,4 @@
-"""Greece's national elections from the Ministry of Interior's results site, down to the municipal unit.
+"""Greece's national elections from the Ministry of Interior's results site, down to the municipal unit or station.
 
 The Ministry publishes each election as a set of small script files, one per electoral district (`ep_N.js`), and,
 for the elections from 2012 to 2023, one per municipality (`dhm_N.js`) and municipal unit (`den_N.js`); from 2023 the
@@ -8,6 +8,10 @@ gather them in a JSON object keyed by address; `split` takes them apart again.
 The 1996, 1999, 2000, and 2004 European pages give only the national result. The 2004 to 2009 parliamentary and 2009
 European elections, which the Ministry published only by electoral district, are built by `ypes_national`. The 2019
 and 2024 European elections, which the Ministry published by polling station, are built by `ypes_ep`.
+
+The September 2015 parliamentary election also goes down to the polling station: each station's pair of `tm_<id>.js`
+files (static names and dynamic counts) sits under its municipal unit, or under its district when it has none, and the
+build fails unless each unit's and district's stations add up to that unit's and district's own file.
 """
 
 import html
@@ -767,6 +771,7 @@ class Build:
                 "euro": "The {} European Parliament election in Greece by electoral district and municipal unit",
                 "referendum": "The {} Greek referendum by electoral district and municipal unit",
             }[election.family].format(election.day.year)
+            + (", down to the polling station," if election.stations else "")
             + " from the Ministry of Interior's results site"
             if election.key in UNITS
             else {
