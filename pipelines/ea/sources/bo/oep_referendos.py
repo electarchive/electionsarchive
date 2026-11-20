@@ -37,16 +37,14 @@ BOLIVIA = str(uuid5(package.NAMESPACE, "polity\x1fBO"))
 COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fBOL"))
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
 _IDS = Package(SOURCE, SOURCE, "ids")
-WAYBACK = "https://web.archive.org/web/2026id_/https://web.oep.org.bo/wp-content/uploads/"
-ATLAS1 = WAYBACK + "2017/03/Atlas_Electoral_tomo-II_Cap_I-II.pdf"
-ATLAS2 = WAYBACK + "2017/03/Atlas_Electoral_tomo-II_Cap_III-IV-V-VI.pdf"
-B2015 = WAYBACK + "2017/01/referendo_aprobatorio_2015.pdf"
-B2016 = (
-    "https://web.archive.org/web/20260325224312id_/https://web.oep.org.bo/wp-content/uploads/2017/01/"
-    "referendo_constitucional_2016.pdf"
-)
-S2016 = WAYBACK + "2016/12/separata_resultados.pdf"
-R2017 = WAYBACK + "2017/07/resultados_reaco_2017.pdf"
+SNAP = "https://web.archive.org/web/"
+UPLOADS = "https://web.oep.org.bo/wp-content/uploads/"
+ATLAS1 = f"{SNAP}20260325224257id_/{UPLOADS}2017/03/Atlas_Electoral_tomo-II_Cap_I-II.pdf"
+ATLAS2 = f"{SNAP}20260325224301id_/{UPLOADS}2017/03/Atlas_Electoral_tomo-II_Cap_III-IV-V-VI.pdf"
+B2015 = f"{SNAP}20260325224321id_/{UPLOADS}2017/01/referendo_aprobatorio_2015.pdf"
+B2016 = f"{SNAP}20260325224312id_/{UPLOADS}2017/01/referendo_constitucional_2016.pdf"
+S2016 = f"{SNAP}20260325184956id_/{UPLOADS}2016/12/separata_resultados.pdf"
+R2017 = f"{SNAP}20260325185228id_/{UPLOADS}2017/07/resultados_reaco_2017.pdf"
 GEOBOUNDARIES = "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/BOL/"
 ADM1 = GEOBOUNDARIES + "ADM1/geoBoundaries-BOL-ADM1_simplified.geojson"
 ADM3 = GEOBOUNDARIES + "ADM3/geoBoundaries-BOL-ADM3_simplified.geojson"
