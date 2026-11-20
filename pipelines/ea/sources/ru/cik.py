@@ -21,12 +21,14 @@ not carry, and the candidates elected from the federal lists in 1995 and 1999.
 
 import functools
 import html
+import importlib
 import json
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
+from types import ModuleType
 from uuid import uuid5
 
 import shapely
@@ -258,10 +260,10 @@ def fetch() -> None:
     """Add the files the archive's machines read from the Commission's archive pages to the raw cache.
 
     They sit in the manual inbox with the listing that maps each address to its file; the Commission's hosts refuse
-    scripted requests, so nothing is fetched directly.
+    scripted requests, so nothing is fetched from them directly. The precinct tables of 2000 to 2024 and the
+    geoBoundaries layer are fetched.
     """
-    raw.fetch(SOURCE, LAYER, suffix=".geojson")
-    raw.fetch(SOURCE, META, suffix=".json")
+    precincts().fetch()
     index = json.loads((INBOX / "index.json").read_text())
     for url, entry in index.items():
         content = (INBOX / entry["file"]).read_bytes()
@@ -573,7 +575,13 @@ def packages() -> list[str]:
         f"{SOURCE}/duma-1995",
         f"{SOURCE}/president-1996",
         f"{SOURCE}/duma-1999",
+        *precincts().packages(),
     ]
+
+
+def precincts() -> ModuleType:
+    """The presidential elections of 2000 to 2024 by precinct, which `cik_president` builds."""
+    return importlib.import_module("ea.sources.ru.cik_president")
 
 
 def parse() -> None:
@@ -583,6 +591,7 @@ def parse() -> None:
     duma(1995).write()
     president().write()
     duma(1999).write()
+    precincts().parse()
 
 
 def emit() -> None:
