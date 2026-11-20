@@ -143,6 +143,26 @@ READ = {
             "10": "Sangana",
         },
     ),
+    ("06", "06"): (
+        "Sagbama",
+        "Sagbama",
+        {
+            "01": "Agbere",
+            "02": "Angalabiri",
+            "03": "Ofoni 1",
+            "04": "Ofoni 2",
+            "05": "Ebedebiri",
+            "06": "Ossiama",
+            "07": "Asamabiri",
+            "08": "Odoni",
+            "09": "Trofani",
+            "10": "Sagbama",
+            "11": "Agoro",
+            "12": "Toru-Ebeni",
+            "13": "Adagbabiri",
+            "14": "Osekwenike",
+        },
+    ),
 }
 RENDER = 2000
 
