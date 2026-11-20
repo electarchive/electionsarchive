@@ -1,4 +1,4 @@
-"""India's Lok Sabha general elections, 1951 to 1999, from the Election Commission of India's statistical reports.
+"""India's Lok Sabha general elections, 1951 to 2009, from the Election Commission of India's statistical reports.
 
 For each general election the Commission published a statistical report. Volume I holds the national and state
 abstracts (the list of participating parties, the list of successful candidates, and the party-wise summaries) and, in
@@ -6,6 +6,11 @@ its second part, the detailed results of every parliamentary constituency: each 
 electors, the voters, and the valid votes. Volume II holds a summary page per constituency with the date of the poll.
 The reports are computer-typeset PDFs, and the module reads their text layer through `ea.eci_report`, which knows
 nothing of the year, so the state assembly reports (same layout) can run through it too.
+
+The 2004 and 2009 reports are laid out differently (`ea.eci_report_2000s`): volume I's detailed results print each
+candidate's votes by channel, volume II's summary pages carry each constituency's electors, voters, valid votes, poll
+date, and winner, and volume III holds each candidate's votes in every assembly segment of a constituency and the
+postal ballots, which become reporting units under the constituency's.
 
 The Commission's own site refuses scripted requests, so the reports are read from archived captures of the old site
 (eci.nic.in/eci_main/StatisticalReports), and each package cites the capture it read. The 1985 report holds the
@@ -16,12 +21,13 @@ import functools
 import json
 import re
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 from uuid import uuid5
 
 from ea import eci_report as reader
+from ea import eci_report_2000s as modern
 from ea import package, raw
 from ea.changeset import slug
 from ea.package import Package
@@ -44,6 +50,7 @@ BODY = key("body", "lok-sabha")
 FPTP = key("electoral_system", "fptp")
 BLOCK = key("electoral_system", "block")
 SCHEME = "in.pc"
+SEGMENT_SCHEME = "in.pc_segment"
 
 
 @dataclass(frozen=True)
@@ -56,9 +63,13 @@ class Edition:
     volume2: str | None
     later: tuple[str, str | None] | None = None  # the report of polls adjourned to the next year
     group: str = ""  # the places and parties package the election builds with ("" for the first one)
+    volume3: str | None = None  # the assembly segments (2004 and later layout)
+    check: str | None = None  # a table that is only compared with the parsed results, not cited
+    layout: str = "classic"  # "classic" or "modern" (the 2004 and 2009 reports)
 
 
 NINETIES = "1990s"
+TWO_THOUSANDS = "2000s"
 
 
 def capture(stamp: str, path: str, port: bool = True) -> str:
@@ -134,6 +145,25 @@ EDITIONS = [
         group=NINETIES,
     ),
     Edition(1999, 13, capture("20180712181210", "LS_1999/Vol_I_LS_99.pdf"), None, group=NINETIES),
+    Edition(
+        2004,
+        14,
+        capture("20180712165954", "LS_2004/Vol_I_LS_2004.pdf"),
+        capture("20180713093401", "LS_2004/Vol_II_LS_2004.pdf"),
+        group=TWO_THOUSANDS,
+        volume3=capture("20180508070337", "LS_2004/Vol_III_LS_2004.pdf"),
+        layout="modern",
+    ),
+    Edition(
+        2009,
+        15,
+        f"{ARCHIVE}/20180915124500id_/https://www.eci.nic.in/eci_main/archiveofge2009/Stats/VOLI/25_ConstituencyWiseDetailedResult.pdf",
+        f"{ARCHIVE}/20180713101706id_/http://eci.nic.in:80/eci_main/archiveofge2009/Stats/VOLII/VolII_ConstituencyDataSummary.pdf",
+        group=TWO_THOUSANDS,
+        volume3=f"{ARCHIVE}/20180713082152id_/http://eci.nic.in:80/eci_main/archiveofge2009/Stats/VOLIII/VolIII_DetailsOfAssemblySegmentsOfPC.pdf",
+        check=f"{ARCHIVE}/20180712190437id_/http://eci.nic.in:80/eci_main/archiveofge2009/Stats/VOLII/STATE_PARTYWISESEATWONANDVOTES_LokSabha2009_24012014.pdf",
+        layout="modern",
+    ),
 ]
 BY_YEAR = {e.year: e for e in EDITIONS}
 ORDINALS = {
@@ -150,6 +180,8 @@ ORDINALS = {
     11: "eleventh",
     12: "twelfth",
     13: "thirteenth",
+    14: "fourteenth",
+    15: "fifteenth",
 }
 
 METHOD = (
@@ -157,6 +189,13 @@ METHOD = (
     "report on the {year} general election, as the report prints them: for each candidate the party and the votes, "
     "and for the constituency the electors, the voters (votes polled) and the valid votes. The winners are those "
     "the report's list of successful candidates names."
+)
+METHOD_MODERN = (
+    "Constituency results from the Election Commission of India's statistical report on the {year} general election. "
+    "Each candidate's party and votes (general and postal together) are from the detailed results in volume I; the "
+    "electors, the voters, and the valid votes are from the constituency's summary page in volume II, which also "
+    "names the winner; the votes in each assembly segment, and the postal ballots, which are counted for the whole "
+    "constituency, are from volume III."
 )
 TWO_MEMBER = (
     " This constituency elected {seats} members, and each voter had as many votes as there were seats, so the "
@@ -200,7 +239,7 @@ def known_parties() -> set[str]:
 def urls() -> list[str]:
     found: list[str] = []
     for e in EDITIONS:
-        found += [u for u in (e.volume1, e.volume2) if u]
+        found += [u for u in (e.volume1, e.volume2, e.volume3, e.check) if u]
         if e.later:
             found += [u for u in e.later if u]
     return found
@@ -238,6 +277,8 @@ class Report:
     summaries: dict[tuple[str, int], reader.Summary]
     parties: dict[str, str]
     totals: dict[str, reader.PartyTotal]
+    assemblies: dict[tuple[str, int], modern.Assembly] = field(default_factory=dict)
+    rejected: dict[tuple[str, int], int | None] = field(default_factory=dict)  # rejected postal votes, 2004 and later
 
 
 @functools.cache
@@ -252,7 +293,48 @@ def read(url: str, volume2: str | None) -> Report:
     return Report(constituencies, winners, summaries, reader.parties(lines), reader.national(lines))
 
 
+@functools.cache
+def read_modern(e: Edition) -> Report:
+    """The 2004 or 2009 report: detailed results, summaries, and assembly segments joined by state and number."""
+    assert e.volume2 and e.volume3
+    lines = reader.text(raw.cached(SOURCE, e.volume1).path)
+    constituencies = modern.detailed(lines)
+    entries = modern.assemblies(reader.text(raw.cached(SOURCE, e.volume3).path))
+    state_of = {a.code: a.state.upper() for a in entries}
+    pages = {(state_of[x.code], x.number): x for x in modern.summaries(reader.text(raw.cached(SOURCE, e.volume2).path))}
+    summaries: dict[tuple[str, int], reader.Summary] = {}
+    assemblies: dict[tuple[str, int], modern.Assembly] = {}
+    rejected: dict[tuple[str, int], int | None] = {}
+    for c in constituencies:
+        k = (c.state.upper(), c.number)
+        hits = [a for a in entries if a.number == c.number and modern.same_state(a.state, c.state)]
+        if len(hits) != 1:
+            raise ValueError(f"{c.state} {c.number} {c.name}: {len(hits)} entries in volume III")
+        assembly = assemblies[k] = hits[0]
+        page = pages.get((assembly.state.upper(), c.number))
+        if page is None:
+            raise ValueError(f"{c.state} {c.number} {c.name}: no summary page in volume II")
+        c.electors, c.voters, c.valid = page.electors, page.voters, page.valid
+        summaries[k] = reader.Summary(poll=page.poll, winners=page.winners)
+        rejected[k] = page.rejected
+        # Volume III spells a party code in full where the detailed results cut a long one at the column.
+        paired = modern.match(c.candidates, assembly.parties, assembly.names)
+        if paired is None:
+            raise ValueError(f"{c.state} {c.number} {c.name}: volume III's candidates do not pair with volume I's")
+        for number, candidate in (paired or {}).items():
+            full = assembly.parties[number]
+            if full != candidate.party and full.startswith(candidate.party):
+                candidate.party = full
+    # The 2004 report lists every participating party; the 2009 one the archive holds does not, so its parties take
+    # the names the 2004 list gives them.
+    named = reader.parties(reader.text(raw.cached(SOURCE, BY_YEAR[2004].volume1).path))
+    totals = reader.national(lines) if e.year == 2004 else {}
+    return Report(constituencies, {}, summaries, named, totals, assemblies, rejected)
+
+
 def reports(e: Edition) -> list[Report]:
+    if e.layout == "modern":
+        return [read_modern(e)]
     found = [read(e.volume1, e.volume2)]
     if e.later:
         found.append(read(*e.later))
@@ -267,7 +349,11 @@ def unit(year: int, state: str, number: int) -> str:
     return key("unit", year, state.upper(), number)
 
 
-def party(code: str) -> str:
+def party(code: str, group: str = "") -> str:
+    """A party's id. A party the first packages hold keeps their id. The 2000s group mints its other parties under
+    its own namespace, because the 1990s group mints parties from its own reports that this one cannot see."""
+    if group == TWO_THOUSANDS and code not in known_parties():
+        return key("party", group, code)
     return key("party", code)
 
 
@@ -330,8 +416,18 @@ def geo(group: str = "") -> Package:
         noun="parliamentary constituency",
         code_system=None,
     )
+    if any(e.layout == "modern" for e in members(group)):
+        p.add(
+            "scheme",
+            code=SEGMENT_SCHEME,
+            polity_id=INDIA,
+            kind="precinct",
+            rank=2,
+            noun="assembly segment",
+            code_system=None,
+        )
     for e in members(group):
-        for url in (e.volume1, e.volume2, *(e.later or ())):
+        for url in (e.volume1, e.volume2, e.volume3, *(e.later or ())):
             if url:
                 p.uses(raw.cached(SOURCE, url))
         for report in reports(e):
@@ -379,9 +475,14 @@ def registry(group: str = "") -> Package:
     for code, name in sorted(codes.items()):
         if group and code in known_parties():
             continue
-        id = party(code)
+        id = party(code, group)
         p.add("party", id=id, kind="party", polity_id=INDIA)
-        p.add("external_id", entity_id=id, scheme="in.eci_stat.party", value=code)
+        p.add(
+            "external_id",
+            entity_id=id,
+            scheme="in.eci_stat.party" if group != TWO_THOUSANDS else f"in.eci_stat.party.{group}",
+            value=code,
+        )
         p.name(id, title(name) if name else code, "en", "official" if name else "abbreviation")
         if name:
             p.name(id, code, "en", "abbreviation", False)
@@ -480,7 +581,7 @@ def election(year: int) -> Package:
     p.external.add(INDIA)
     if e.group:
         p.external.update({BODY, *(party(code) for code in known_parties())})
-    for url in (e.volume1, e.volume2, *(e.later or ())):
+    for url in (e.volume1, e.volume2, e.volume3, *(e.later or ())):
         if url:
             p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
     dates = polls(e)
@@ -535,6 +636,7 @@ def _accept(p: Package, e: Edition) -> None:
     """Accept the accounting findings that the report's own printed figures cause, naming each constituency."""
     over: list[str] = []
     short: list[str] = []
+    postal: list[str] = []
     for report in reports(e):
         for c in report.constituencies:
             where = f"{title(c.name)} ({title(c.state)}; {c.voters} voters, {c.electors} electors)"
@@ -543,19 +645,28 @@ def _accept(p: Package, e: Edition) -> None:
             if c.seats == 1 and c.valid is not None and c.candidates:
                 total = sum(x.votes or 0 for x in c.candidates)
                 if total != c.valid and not all(x.uncontested for x in c.candidates):
-                    short.append(f"{title(c.name)} ({title(c.state)}; {total} votes, {c.valid} valid)")
+                    rejected = report.rejected.get((c.state.upper(), c.number))
+                    if rejected is not None and total - c.valid == rejected:
+                        postal.append(title(c.name))
+                    else:
+                        short.append(f"{title(c.name)} ({title(c.state)}; {total} votes, {c.valid} valid)")
     if over:
         p.accept(
             "accounting.turnout",
             "The report prints more voters than electors in " + "; ".join(over),
         )
-    if short:
-        p.accept(
-            "accounting.votes_valid",
-            "The report's candidate votes differ from its valid votes in "
-            + "; ".join(short)
-            + ". Where the page cuts off a candidate's votes, they are not stored.",
-        )
+    if short or postal:
+        reason = "The report's candidate votes differ from its valid votes in "
+        if postal:
+            reason += (
+                f"{len(postal)} constituencies by exactly the rejected postal votes its summary page prints, "
+                "which the candidates' postal counts appear to include"
+            )
+            reason += "; and in " if short else ""
+        if short:
+            reason += "; ".join(short)
+        reason += ". Where the page cuts off a candidate's votes, they are not stored."
+        p.accept("accounting.votes_valid", reason)
 
 
 def _contest(
@@ -601,7 +712,7 @@ def _contest(
         is_default=True,
         completeness=1.0,
     )
-    method = METHOD.format(year=e.year)
+    method = (METHOD_MODERN if e.layout == "modern" else METHOD).format(year=e.year)
     if c.seats > 1:
         method += TWO_MEMBER.format(seats=c.seats)
     if poll:
@@ -623,7 +734,7 @@ def _contest(
             id=option,
             contest_id=contest,
             kind="candidate",
-            party_id=party(x.party) if coded else None,
+            party_id=party(x.party, e.group) if coded else None,
             ballot_position=x.position,
             ballot_label=title(x.name),
         )
@@ -634,7 +745,7 @@ def _contest(
             option_id=option,
             role="head",
             ballot_name=title(x.name),
-            member_of_party_id=party(x.party) if coded else None,
+            member_of_party_id=party(x.party, e.group) if coded else None,
             is_independent=True if x.party == "IND" else None,
         )
         won = id(x) in winners
@@ -655,6 +766,53 @@ def _contest(
         _value(p, result_set, unit_id, None, measure, value)
     for x, option in options:
         _value(p, result_set, unit_id, option, VOTES, x.votes)
+    if e.layout == "modern":
+        _segments(p, e, report, c, tag, result_set, unit_id, options)
+
+
+def _segments(
+    p: Package,
+    e: Edition,
+    report: Report,
+    c: reader.Constituency,
+    tag: str,
+    result_set: str,
+    parent: str,
+    options: list[tuple[reader.Candidate, str]],
+) -> None:
+    """The constituency's assembly segments and its postal ballots, as units under the constituency's."""
+    assembly = report.assemblies[(c.state.upper(), c.number)]
+    paired = modern.match(c.candidates, assembly.parties, assembly.names)
+    if paired is None:
+        raise ValueError(f"{c.state} {c.number} {c.name}: volume III's candidates do not pair with volume I's")
+    option_of = {number: option for number, candidate in paired.items() for x, option in options if x is candidate}
+    home = area(e.year, c.state, c.number)
+
+    def child(code: str, kind: str) -> str:
+        id = key("unit", tag, code)
+        p.add(
+            "reporting_unit",
+            id=id,
+            polity_id=INDIA,
+            scheme_code=SEGMENT_SCHEME,
+            code=f"{tag}:{code}",
+            parent_id=parent,
+            area_relation="within",
+            area_id=home,
+            kind=kind,
+        )
+        return id
+
+    for segment in assembly.segments:
+        unit_id = child(str(segment.number), "standard")
+        _value(p, result_set, unit_id, None, VALID, segment.total)
+        for number, votes in segment.votes.items():
+            _value(p, result_set, unit_id, option_of[number], VOTES, votes)
+    if assembly.postal:
+        unit_id = child("postal", "postal_district")
+        _value(p, result_set, unit_id, None, VALID, assembly.postal_total)
+        for number, votes in assembly.postal.items():
+            _value(p, result_set, unit_id, option_of[number], VOTES, votes)
 
 
 def _value(p: Package, result_set: str, unit_id: str, option: str | None, measure: int, value: int | None) -> None:
@@ -742,3 +900,46 @@ def state_totals(year: int) -> dict[str, object]:
         if tuple(got[found[0]]) != (t.votes, t.won):
             differ.append(f"{code} in {state}: printed {t.votes} votes and {t.won} seats, parsed {got[found[0]]}")
     return {"year": year, "rows": len(printed), "checked": checked, "differ": differ}
+
+
+def table_2009() -> dict[str, object]:
+    """Compare the parsed 2009 constituencies with the Commission's party-wise table of seats won and votes polled
+    by state, which lists each party that won a seat (and the independents) with its seats and votes in the state."""
+    e = BY_YEAR[2009]
+    assert e.check
+    rows = modern.state_parties(reader.text(raw.cached(SOURCE, e.check).path))
+    report = read_modern(e)
+    seats: dict[tuple[str, str], int] = {}
+    votes: dict[tuple[str, str], int] = {}
+    valid: dict[str, int] = {}
+    for c in report.constituencies:
+        wins = {id(x) for x in winner_for(c, report)}
+        for x in c.candidates:
+            code = "IND" if x.party == "IND" else x.party
+            k = (c.state.upper(), code)
+            votes[k] = votes.get(k, 0) + (x.votes or 0)
+            seats[k] = seats.get(k, 0) + (id(x) in wins)
+    differ: list[str] = []
+    matched = 0
+    for row in rows:
+        state = row.state.upper()
+        found = [k for k in votes if modern.same_state(k[0], state) and votes[k] == row.votes]
+        if len(found) != 1:
+            differ.append(f"{row.party} in {row.state}: no party with {row.votes} votes")
+            continue
+        matched += 1
+        if seats[found[0]] != row.seats:
+            differ.append(f"{row.party} in {row.state}: printed {row.seats} seats, parsed {seats[found[0]]}")
+    for row in rows:
+        valid.setdefault(row.state.upper(), row.state_valid)
+    for state, printed in sorted(valid.items()):
+        got = sum(v for (st, _), v in votes.items() if modern.same_state(st, state))
+        if got != printed:
+            differ.append(f"{state}: printed {printed} valid votes, the candidates' votes add up to {got}")
+    return {
+        "rows": len(rows),
+        "matched": matched,
+        "seats": sum(r.seats for r in rows),
+        "parsed_seats": sum(seats.values()),
+        "differ": differ,
+    }
