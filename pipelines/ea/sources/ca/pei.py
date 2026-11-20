@@ -79,12 +79,12 @@ TITLE: Final = re.compile(
 def _header(lines: list[str], h: int) -> bool:
     if "Elections" in lines[h] or "Elected" in lines[h]:
         return False
-    if re.search(r"POLL+ING\s*DIVISION", lines[h]):
+    if re.search(r"POLL+ING\s*DIVISION|^\s*No\s+POLL\b", lines[h]):
         return True
     return bool(re.search(r"\bPOLLING\b", lines[h]) and "DIVISION" in "".join(lines[h + 1 : h + 3]))
 
 
-def tables(lines: list[str]) -> list[Table]:
+def tables(lines: list[str], fallback: tuple[int, str] | None = None) -> list[Table]:
     found: dict[int, Table] = {}
     for h in range(len(lines)):
         if not _header(lines, h):
@@ -95,6 +95,8 @@ def tables(lines: list[str]) -> list[Table]:
             if m and "Elected" not in lines[j]:
                 title = (int(m.group(1)), re.sub(r"\s+", " ", m.group(2)).strip(), j)
                 break
+        if title is None and fallback is not None:
+            title = (fallback[0], fallback[1], h - 3)
         if title is None:
             continue
         end = next((j for j in range(h + 1, min(h + 70, len(lines))) if re.match(r"\s*TOTALS", lines[j])), None)
@@ -106,7 +108,7 @@ def tables(lines: list[str]) -> list[Table]:
         pending_numbers: list[int] | None = None
         suffix = ""
         for j in range(h + 1, end):
-            text = lines[j]
+            text = re.sub(r"(?<=\s)-(?=\s|$)", "0", lines[j])
             if re.search(r"%|\d\.\d|PERCENTAGE|Percentage", text):
                 continue
             m = ROW.match(text)
@@ -621,7 +623,7 @@ def dual(year: int, lines: list[str]) -> list[Seat]:
 
 
 def fetch() -> None:
-    for url in (*GENERAL_REPORTS.values(), *HISTORY.values()):
+    for url in (*GENERAL_REPORTS.values(), *HISTORY.values(), *BY_REPORTS.values(), *BY_RESULTS.values()):
         raw.fetch(SOURCE, url, suffix=".pdf")
 
 
@@ -710,6 +712,7 @@ PARTIES: Final = {
     "ccf": ("Co-operative Commonwealth Federation", "CCF", "CCF"),
     "pro": ("Progressive Party", "Progressive", "PRO"),
     "dbp": ("Draft Beer Party", "Draft Beer Party", "DBP"),
+    "garden": ("Garden Party", "Garden Party", "GARDEN"),
 }
 DEFERRED: Final = {(1966, "1st Kings"): date(1966, 7, 11), (2019, "09"): date(2019, 7, 15)}
 
@@ -725,7 +728,7 @@ class Contest:
     entries: list[Entry]
     polls: list[Poll] | None = None
     totals: Poll | None = None
-    source: str = ""
+    sources: tuple[str, ...] = ()
     notes: list[str] = field(default_factory=list)
 
 
@@ -756,7 +759,7 @@ def historical(year: int) -> list[Contest]:
         seats = columns(year, lines)
         for seat in seats:
             code, _, label = seat.district.partition(" ")
-            out.append(Contest(year, day, "1996", code, label, "member", seat.entries, source=HISTORY[year]))
+            out.append(Contest(year, day, "1996", code, label, "member", seat.entries, sources=(HISTORY[year],)))
     else:
         for seat in dual(year, lines):
             when = DEFERRED.get((year, seat.district), day)
@@ -769,7 +772,7 @@ def historical(year: int) -> list[Contest]:
                     seat.district,
                     seat.seat,
                     seat.entries,
-                    source=HISTORY[year],
+                    sources=(HISTORY[year],),
                 )
             )
     return out
@@ -792,7 +795,16 @@ def modern(year: int) -> list[Contest]:
         assert when is not None
         out.append(
             Contest(
-                year, when, plan, f"{d.number:02d}", d.name, "member", entries, d.polls, d.totals, GENERAL_REPORTS[year]
+                year,
+                when,
+                plan,
+                f"{d.number:02d}",
+                d.name,
+                "member",
+                entries,
+                d.polls,
+                d.totals,
+                (GENERAL_REPORTS[year],),
             )
         )
     return out
@@ -814,8 +826,17 @@ def district_unit(plan: str, code: str) -> str:
     return key("unit", "district", plan, code)
 
 
+def by_days() -> list[date]:
+    return sorted({day for day, *_ in BY_ELECTIONS})
+
+
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/ge-{year}" for year in years())]
+    return [
+        f"{SOURCE}/geo",
+        f"{SOURCE}/registry",
+        *(f"{SOURCE}/ge-{year}" for year in years()),
+        *(f"{SOURCE}/be-{day}" for day in by_days()),
+    ]
 
 
 def _county_names() -> dict[str, str]:
@@ -902,7 +923,7 @@ def registry() -> Package:
         license_url=None,
         attribution="Elections PEI",
     )
-    for url in (*GENERAL_REPORTS.values(), *HISTORY.values()):
+    for url in (*GENERAL_REPORTS.values(), *HISTORY.values(), *BY_REPORTS.values(), *BY_RESULTS.values()):
         p.artifact(raw.cached(SOURCE, url), EP)
     p.add("body", id=ASSEMBLY, polity_id=PEI, kind="unicameral")
     p.name(ASSEMBLY, "Legislative Assembly of Prince Edward Island", "en", "official")
@@ -927,7 +948,7 @@ def registry() -> Package:
         "councillor and an assemblyman, each in a separate vote for one seat.",
         lang="en",
     )
-    used = {e.party for year in years() for c in contests(year) for e in c.entries if e.party != "ind"}
+    used = {e.party for c in all_contests() for e in c.entries if e.party not in ("ind", "")}
     for code in sorted(used):
         official, short, abbreviation = PARTIES[code]
         id = key("party", code)
@@ -992,7 +1013,7 @@ def _contest(p: Package, election: str, path: str, c: Contest) -> tuple[str, boo
         source_id=EP,
         status="active",
         is_default=True,
-        completeness=None if acclaimed else 1.0,
+        completeness=None if acclaimed or any(e.votes is None for e in c.entries) else 1.0,
     )
     p.add(
         "note",
@@ -1011,7 +1032,7 @@ def _contest(p: Package, election: str, path: str, c: Contest) -> tuple[str, boo
         option = key("option", tag)
         person = key("person", tag)
         options.append(option)
-        party = None if entry.party == "ind" else key("party", entry.party)
+        party = None if entry.party in ("ind", "") else key("party", entry.party)
         p.add("person", id=person)
         p.name(person, entry.name, "en", "official")
         p.add(
@@ -1089,7 +1110,7 @@ def election(year: int) -> Package:
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external |= {PEI, PROVINCE_AREA}
-    for url in {c.source for c in items}:
+    for url in sorted({url for c in items for url in c.sources}):
         p.uses(raw.cached(SOURCE, url))
     days = sorted({c.day for c in items})
     main = days[0] if len(days) == 1 else max(days, key=lambda d: sum(c.day == d for c in items))
@@ -1145,12 +1166,323 @@ def _accept(p: Package, items: list[Contest]) -> None:
         )
 
 
+def by_election(day: date) -> Package:
+    items = [c for c in by_elections() if c.day == day]
+    p = Package(
+        f"{SOURCE}/be-{day}",
+        SOURCE,
+        f"The Prince Edward Island by-election of {day}, from Elections PEI",
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+    )
+    p.external |= {PEI, PROVINCE_AREA}
+    for url in sorted({url for c in items for url in c.sources}):
+        p.uses(raw.cached(SOURCE, url))
+    election_id = key("election", day, "by")
+    path = f"ca/pei/{day}-by-election"
+    p.add("election", id=election_id, polity_id=PEI, kind="by_election", date_from=day, date_to=day, status="held")
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    places = ", ".join(dict.fromkeys(c.district for c in items))
+    p.name(election_id, f"{places} by-election, {day:%-d %B %Y}", "en", "official")
+    for c in items:
+        _contest(p, election_id, path, c)
+    _accept(p, items)
+    return p
+
+
 def parse() -> None:
     geo().write()
     registry().write()
     for year in years():
         election(year).write()
+    for day in by_days():
+        by_election(day).write()
 
 
 def emit() -> None:
     package.run("load", packages())
+
+
+BY_REPORTS: Final[dict[str, str]] = {
+    "2016": WWW + "EPEI_CEO_2016.pdf",
+    "2017": TEST + "2017%20Nov%2027%20By-Election%20District%2011.pdf",
+    "2020": WWW + "WebVersion_2020_D10BY-ELECTION.pdf",
+    "2021": WWW + "2021_D16BYELECTIONSummaryFINAL.pdf",
+    "2024": TEST + "CEOReportDistrict19ByElectionFeb7_2024.pdf",
+    "2025-d2": TEST + "2025%20By-Election%20District%202.pdf",
+    "2025-d9": TEST + "2025%20By-Election%20District%209%20and%20District%2015.pdf",
+    "1975": TEST + "1975%20Feb%2017%20ByElection%205th%20Queens.pdf",
+    "1976": TEST + "1976%20Dec%2031%20ByElections_4%20Districts.pdf",
+    "1981-02": TEST + "1981%20Feb%202%20ByElection%202nd%20Prince.pdf",
+    "1981-07": TEST + "1981%20July%2013%20ByElection%203rd%20Kings.pdf",
+}
+BY_RESULTS: Final[dict[str, str]] = {
+    "2016": TEST + "2016%20ByElection%20Results.pdf",
+    "2017": TEST + "2017%20ByElection%20Results.pdf",
+    "2020": TEST + "D10ByElectionNov22020.pdf",
+    "2021": TEST + "District16ByElection.pdf",
+    "2024": TEST + "District19ByElectionFeb72024.pdf",
+    "2025-d2": TEST + "D2ByElectionDec82025.pdf",
+    "2025-d9": TEST + "D9D15ByElectionAug122025.pdf",
+    "2026": TEST + "District16ByElectionJuly132026.pdf",
+}
+
+
+def _e(party: str, name: str, votes: int | None, elected: bool = False) -> Entry:
+    return Entry(party, party.upper(), name, votes, elected)
+
+
+# By-elections, as the authority's results pages and reports print them: the day, the district's code in the plan
+# of the day, the seat, the report with the poll table if it has one, and the candidates with their votes. Those of
+# 1975 to 1981 are read from the page images of the reports; they print no party for the 1981 candidates.
+BY_ELECTIONS: Final[list[tuple[date, str, str, str, str | None, list[Entry]]]] = [
+    (
+        date(1975, 2, 17),
+        "counties",
+        "Q5",
+        "assemblyman",
+        "1975",
+        [
+            _e("ndp", "Madrien Ferris", 735),
+            _e("pc", "James Lee", 2343, True),
+            _e("lib", "David McLane", 2250),
+            _e("garden", "Susan Partridge", 53),
+        ],
+    ),
+    (
+        date(1976, 11, 8),
+        "counties",
+        "P2",
+        "councillor",
+        "1976",
+        [_e("pc", "Dr. George L. Dewar", 1165, True), _e("lib", "Robert Allison Ellis", 1150)],
+    ),
+    (
+        date(1976, 11, 8),
+        "counties",
+        "P5",
+        "assemblyman",
+        "1976",
+        [_e("pc", "George McMahon", 2131, True), _e("lib", "George Olscamp", 1311)],
+    ),
+    (
+        date(1976, 11, 8),
+        "counties",
+        "Q4",
+        "assemblyman",
+        "1976",
+        [_e("lib", "John Brehaut", 1005), _e("pc", "J. Angus MacLean", 1257, True)],
+    ),
+    (
+        date(1976, 11, 8),
+        "counties",
+        "K1",
+        "councillor",
+        "1976",
+        [_e("lib", "James Fay", 1472, True), _e("pc", "Reg Peters", 1045)],
+    ),
+    (
+        date(1981, 2, 2),
+        "counties",
+        "P2",
+        "assemblyman",
+        "1981-02",
+        [_e("", "James Matheson", 1055), _e("", "Keith Milligan", 1405, True)],
+    ),
+    (
+        date(1981, 7, 13),
+        "counties",
+        "K3",
+        "assemblyman",
+        "1981-07",
+        [_e("", "Paul DesRoches", 980), _e("", 'A.A. "Joey" Fraser', 1293, True)],
+    ),
+    (
+        date(2016, 10, 17),
+        "2007",
+        "21",
+        "member",
+        "2016",
+        [
+            _e("green", "Lynn Lund", 506),
+            _e("ndp", "Scott Gaudet", 107),
+            _e("lib", "Chris Palmer", 978, True),
+            _e("pc", "Brian Ramsay", 720),
+        ],
+    ),
+    (
+        date(2017, 11, 27),
+        "2007",
+        "11",
+        "member",
+        "2017",
+        [
+            _e("green", "Hannah Bell", 768, True),
+            _e("ndp", "Mike Redmond", 202),
+            _e("lib", "Bob Doiron", 621),
+            _e("pc", "Melissa Hilton", 586),
+        ],
+    ),
+    (
+        date(2020, 11, 2),
+        "2019",
+        "10",
+        "member",
+        "2020",
+        [
+            _e("green", "Chris van Ouwerkerk", 783),
+            _e("ndp", "Lynne Thiele", 37),
+            _e("lib", "Zac Murphy", 636),
+            _e("pc", "Zack Bell", 1402, True),
+        ],
+    ),
+    (
+        date(2021, 11, 15),
+        "2019",
+        "16",
+        "member",
+        "2021",
+        [
+            _e("ndp", "Larry Hale", 83),
+            _e("lib", "Jane MacIsaac", 815),
+            _e("green", "Todd McLean", 574),
+            _e("pc", "Mark McLane", 982, True),
+        ],
+    ),
+    (
+        date(2024, 2, 7),
+        "2019",
+        "19",
+        "member",
+        "2024",
+        [
+            _e("green", "Matt MacFarlane", 1226, True),
+            _e("lib", "Gordon Sobey", 272),
+            _e("ndp", "Karen Morton", 40),
+            _e("pc", "Carmen Reeves", 964),
+        ],
+    ),
+    (
+        date(2025, 8, 12),
+        "2019",
+        "09",
+        "member",
+        "2025-d9",
+        [
+            _e("green", "Janine Karpakis", 231),
+            _e("lib", "Carolyn Simpson", 979, True),
+            _e("ndp", "Simone Webster", 55),
+            _e("pc", "Dennis Jameson", 784),
+        ],
+    ),
+    (
+        date(2025, 8, 12),
+        "2019",
+        "15",
+        "member",
+        "2025-d9",
+        [
+            _e("green", "Philip Hamming", 538),
+            _e("lib", "Nicole Ford", 527),
+            _e("ndp", "Michelle Neill", 63),
+            _e("pc", "Kent Dollar", 1140, True),
+        ],
+    ),
+    (
+        date(2025, 12, 8),
+        "2019",
+        "02",
+        "member",
+        "2025-d2",
+        [
+            _e("green", "Eddie Childs", 200),
+            _e("lib", "Robert Mitchell", 881),
+            _e("ndp", "Kevin Trainor", 40),
+            _e("pc", "Brendan J. Curran", 986, True),
+        ],
+    ),
+    (
+        date(2026, 7, 13),
+        "2019",
+        "16",
+        "member",
+        None,
+        [
+            _e("green", "Tayte Willows", 1184, True),
+            _e("lib", "Robert Mitchell", 955),
+            _e("ndp", "Craig Nash", 24),
+            _e("pc", "Caley McDonald", None),
+        ],
+    ),
+]
+FALLBACK_TITLES: Final = {"2017": (11, "Charlottetown-Parkdale"), "2020": (10, "Charlottetown-Winsloe")}
+LAYOUT_BY: Final = {"2016": "ec", "2017": "ec", "2020": "ec", "2024": "c", "2025-d9": "ec"}
+
+
+def _by_table(key: str, number: int) -> Table | None:
+    lines = pdf_text(BY_REPORTS[key])
+    return next((t for t in tables(lines, FALLBACK_TITLES.get(key)) if t.number == number), None)
+
+
+def _polls_of(key: str, number: int, entries: list[Entry]) -> tuple[list[Poll], Poll] | None:
+    """The polling divisions of a by-election, with each column of votes put in the order of the candidates by
+    matching its total to theirs."""
+    table = _by_table(key, number)
+    if table is None:
+        return None
+    if key == "2025-d2":
+        polls = []
+        for row in table.rows:
+            nums = row.numbers
+            if len(nums) == 6:
+                nums = [*nums, nums[-1]]
+            cast, votes, valid = nums[0], nums[1:5], nums[5]
+            polls.append(Poll(row.code, row.name, None, cast, votes, max(cast - valid, 0)))
+        totals = Poll("", "Total", None, table.totals[0], table.totals[1:5], table.totals[6])
+        for poll in polls:
+            if "dvance" in poll.name:
+                poll.code = ""
+    else:
+        k = len(table.totals) - len(LAYOUT_BY[key]) - 1
+        district = build(table, [Candidate("", "", "ind")] * k, LAYOUT_BY[key])
+        polls, totals = district.polls, district.totals
+    order = []
+    for entry in entries:
+        found = [i for i, v in enumerate(totals.votes) if v == entry.votes]
+        if len(found) != 1:
+            raise ValueError(f"{key}: cannot place {entry.name} among {totals.votes}")
+        order.append(found[0])
+    for poll in [*polls, totals]:
+        poll.votes = [poll.votes[i] for i in order]
+    return polls, totals
+
+
+def by_elections() -> list[Contest]:
+    out: list[Contest] = []
+    for day, plan, code, seat, key_, entries in BY_ELECTIONS:
+        if plan == "counties":
+            label = _county_names()[code]
+        else:
+            label = district_names()[plan, code]
+        polls = totals = None
+        sources = [BY_REPORTS[key_]] if key_ else []
+        number = int(code) if code.isdigit() else 0
+        if plan != "counties" and key_ and key_ not in ("2021",):
+            found = _polls_of(key_, number, entries)
+            if found:
+                polls, totals = found
+        if key_ in BY_RESULTS:
+            sources.append(BY_RESULTS[key_])
+        elif key_ is None:
+            sources.append(BY_RESULTS["2026"])
+        c = Contest(day.year, day, plan, code, label, seat, entries, polls, totals, tuple(sources))
+        if any(e.votes is None for e in entries):
+            c.notes.append(
+                "The authority's results page prints no vote count for one candidate: the cell is cut off in the "
+                "published table. That candidate's votes are not stored."
+            )
+        out.append(c)
+    return out
+
+
+def all_contests() -> list[Contest]:
+    return [c for year in years() for c in contests(year)] + by_elections()
