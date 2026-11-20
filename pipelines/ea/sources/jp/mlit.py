@@ -388,8 +388,8 @@ def parse() -> None:
                 "new_geometry": moved,
             }
             versions.append(current)
-    pl.DataFrame(spans).write_parquet(PARSED / "spans.parquet")
-    pl.DataFrame(versions).write_parquet(PARSED / "versions.parquet")
+    pl.DataFrame(spans, infer_schema_length=None).write_parquet(PARSED / "spans.parquet")
+    pl.DataFrame(versions, infer_schema_length=None).write_parquet(PARSED / "versions.parquet")
     print(build())
 
 
