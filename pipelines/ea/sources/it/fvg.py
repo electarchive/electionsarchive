@@ -23,7 +23,7 @@ from ea import package, raw
 from ea.package import Package
 
 SOURCE = "it.fvg"
-ITALY = str(uuid5(package.NAMESPACE, "polity\x1fIT"))
+ITALY = "01a13bf7-2f71-7303-964e-fdd9421ca0b6"
 REGION_POLITY = "003af61b-db4b-53d0-a3ab-6b17ba0520dd"
 REGION_AREA = "01a13bf7-2f89-7329-a8e6-bbfa2ff5d618"
 REGION_UNIT = "19499865-133c-570b-9c8f-e3863b8eadae"
@@ -160,39 +160,34 @@ def page(name: str) -> str:
     body = re.sub(r"(?s)<script.*?</script>|<style.*?</style>|<head>.*?</head>|<!--.*?-->", "", body)
     body = re.sub(r"</t[dh]>", "|", body)
     body = html.unescape(re.sub(r"<[^>]+>", " ", body))
-    return re.sub(r"\s+", " ", body)
+    return re.sub(r"\s*\|\s*", "|", re.sub(r"\s+", " ", body))
 
 
 def pages() -> Race:
     """2018: the region pages for the candidates, the lists, the seats, and the turnout."""
     candidates = page("Coalizioni/000001.html")
-    start = candidates.index("percentuale|")
-    figures = candidates[start + len("percentuale|") :]
+    figures = candidates[candidates.index("percentuale|") :]
     people = [
         (label(match[1]), number(match[2]))
-        for match in re.finditer(r"([A-ZÀ-Ý][A-ZÀ-Ý' ]+?) \| (?:[^|]*?) \| ([\d.]+) \| [\d,]+% \|", figures)
+        for match in re.finditer(r"([A-ZÀ-Ý][A-ZÀ-Ý' ]+?)\|[^|]*?\|([\d.]+)\|[\d,]+%\|", figures)
     ]
-    trailer = {
-        name: number(value)
-        for name, value in re.findall(r"(Schede bianche|Schede nulle|Voti contestati e non assegnati|Totale votanti): ([\d.]+)", figures)
-    }
+    ballots = (
+        r"(Schede bianche|Schede nulle|Voti contestati e non assegnati|Totale votanti|Totale voti validi): ([\d.]+)"
+    )
+    trailer = {name: number(value) for name, value in re.findall(ballots, figures)}
     votes = page("Liste/000001.html")
     list_votes = {
         label(match[1]): number(match[2])
-        for match in re.finditer(r"\| ([A-Z][^|]+?) \| ([\d.]+) \| [\d,]+% \|", votes[votes.index("percentuale|") :])
+        for match in re.finditer(r"([A-Z][^|]+?)\|([\d.]+)\|[\d,]+%\|", votes[votes.index("percentuale|") :])
     }
-    list_trailer = {
-        name: number(value)
-        for name, value in re.findall(r"(Schede bianche|Schede nulle|Voti contestati e non assegnati|Totale voti validi): ([\d.]+)", votes)
-    }
+    list_trailer = {name: number(value) for name, value in re.findall(ballots, votes)}
     seats = page("Seggi/000001.html")
-    seat_rows = {label(m[1]): (number(m[2]), int(m[3])) for m in re.finditer(r"\| ([A-Z][^|]+?) \| \| ([\d.]+) \| (\d+) \|", seats)}
-    if not seat_rows:
-        seat_rows = {
-            label(m[1]): (number(m[2]), int(m[3])) for m in re.finditer(r"([A-Z][^|]+?)\| +\| ([\d.]+)\| (\d+)", seats)
-        }
+    seat_rows = {
+        label(m[1]): (number(m[2]), int(m[3]))
+        for m in re.finditer(r"([A-Z][^|]+?)\|+([\d.]+)\|(\d+)\|", seats[seats.index("seggi|") :])
+    }
     turnout = page("Affluenza/000001.html")
-    registered = [number(m[1]) for m in re.finditer(r"TOTALE \| [\d,]+ % \| [\d./]+ \| -\| -\| [\d.]+ \| ([\d.]+)", turnout)]
+    registered = [number(m[1]) for m in re.finditer(r"TOTALE\|[\d,]+ ?%\|[\d./]+\|-\|-\|[\d.]+\|([\d.]+)\|", turnout)]
     assert len(people) == 4 and list_votes.keys() == seat_rows.keys(), (people, list_votes.keys(), seat_rows.keys())
     for name, (voted, _) in seat_rows.items():
         assert list_votes[name] == voted, name
@@ -269,8 +264,8 @@ def fetch() -> None:
 
 def parse() -> None:
     registry().write()
-    for day in RACES:
-        election(RACES[day]()).write()
+    for build in RACES.values():
+        election(build()).write()
 
 
 def emit() -> None:
@@ -319,8 +314,8 @@ def registry() -> Package:
     p.name(PRESIDENCY, "President of Friuli-Venezia Giulia", "en", "official")
     p.name(PRESIDENCY, "Presidente della Regione Friuli Venezia Giulia", "it", "native", False)
     seen: set[str] = set()
-    for day in RACES:
-        for text, *_ in RACES[day]().lists:
+    for build in RACES.values():
+        for text, *_ in build().lists:
             id, name, kind = party_of(text)
             if id in seen:
                 continue
@@ -402,7 +397,12 @@ def election(race: Race) -> Package:
             completeness=1.0,
         )
         p.add(
-            "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method(race), lang="en"
+            "note",
+            id=key("note", result_set),
+            entity_id=result_set,
+            kind="methodology",
+            body_md=method(race),
+            lang="en",
         )
         return contest, result_set
 
