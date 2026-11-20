@@ -391,6 +391,16 @@ def registry() -> Package:
         area_id=COUNTRY,
         kind="aggregate",
     )
+    p.add(
+        "source",
+        id=ASSEMBLY,
+        kind="official_body",
+        publisher="Kuvendi i Republikës së Kosovës",
+        title="Minutes of the plenary sessions and decisions of the Assembly of the Republic of Kosovo",
+        url=HOME,
+        license="No license stated; published by the Assembly for public use",
+        attribution="Kuvendi i Republikës së Kosovës",
+    )
     p.add("office", id=PRESIDENCY, polity_id=KOSOVO, kind="head_of_state")
     p.name(PRESIDENCY, "President of Kosovo", "en", "official")
     p.name(PRESIDENCY, "Presidenti i Kosovës", "sq", "official", False)
@@ -462,16 +472,7 @@ def election(e: Election) -> Package:
         depends=[f"{SOURCE}/registry"],
     )
     p.external.add(KOSOVO)
-    p.add(
-        "source",
-        id=ASSEMBLY,
-        kind="official_body",
-        publisher="Kuvendi i Republikës së Kosovës",
-        title="Minutes of the plenary sessions and decisions of the Assembly of the Republic of Kosovo",
-        url=HOME,
-        license="No license stated; published by the Assembly for public use",
-        attribution="Kuvendi i Republikës së Kosovës",
-    )
+    p.external.add(ASSEMBLY)
     artifacts = {url: p.artifact(raw.cached(SOURCE, url), ASSEMBLY) for url in urls(e)}
     stored = raw.cached(SOURCE, e.minutes)
     id = key("election", day)
