@@ -465,16 +465,7 @@ def general(year: int) -> list[tuple[District, date | None]]:
     return out
 
 
-HISTORY: Final[dict[int, str]] = {
-    1873: WWW + "1873_APRILREPORT.pdf",
-    1876: WWW + "1876_AUG17_REPORT.pdf",
-    1879: WWW + "1879_APRIL2_REPORT.pdf",
-    1882: WWW + "1882_MAY8_REPORT.pdf",
-    1886: WWW + "1886_JUNE30_REPORT.pdf",
-    1890: WWW + "1890_JAN30_REPORT.pdf",
-    1893: WWW + "1893_DEC13_REPORT.pdf",
-    1897: WWW + "1897_JULY28_report.pdf",
-}
+HISTORY: Final[dict[int, str]] = {}
 HISTORY.update(
     {
         year: TEST + f"{year}Report.pdf"
