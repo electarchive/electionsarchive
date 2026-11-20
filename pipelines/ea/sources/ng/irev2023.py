@@ -406,6 +406,11 @@ def geo() -> Package:
         "and for polling units",
     )
     p.external |= {NIGERIA, *(state_area(code) for code, _ in STATES.values())}
+    # The package replaces the loaded one whole, so an area missing here would be deleted from under the results
+    # packages that place their polling units in it: every local government area with readings must be in READ.
+    on_file = {tuple(path.stem.split("-")) for path in READINGS.glob("*.tsv")}
+    if on_file != set(READ):
+        raise ValueError(f"READ and the readings on file differ: {sorted(on_file ^ set(READ))}")
     sources(p)
     p.add(
         "source",
