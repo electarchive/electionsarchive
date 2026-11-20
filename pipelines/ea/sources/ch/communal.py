@@ -323,6 +323,17 @@ def registry() -> Package:
         attribution="Statistisches Amt des Kantons Zürich",
         notes="The data were entered by the municipalities and were not checked by the Statistical Office.",
     )
+    p.add(
+        "source",
+        id=_id("source", SOURCE_CITY),
+        kind="official_body",
+        publisher="Stadt Zürich, Präsidialdepartement, Statistik Stadt Zürich",
+        title="Gemeinderatswahlen: Resultate aller Kandidierenden und Herkunft der Stimmen",
+        url="https://data.stadt-zuerich.ch/dataset/politik_gemeinderatswahlen_2022_resultate",
+        license="CC0 1.0",
+        license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+        attribution="Statistik Stadt Zürich",
+    )
     p.artifact(raw.cached(SOURCE, DOCUMENTATION), _id("source", SOURCE))
     for numbers in YEARS.values():
         for number in numbers:
@@ -452,17 +463,6 @@ def city_election(day: str) -> Package:
     p.external |= {CH, ZURICH_AREA}
     p.uses(raw.cached(SOURCE, CITY.format(y=CITY_DAYS[day])))
     source = _id("source", SOURCE_CITY)
-    p.add(
-        "source",
-        id=source,
-        kind="official_body",
-        publisher="Stadt Zürich, Präsidialdepartement, Statistik Stadt Zürich",
-        title=f"Gemeinderatswahlen {when.year}: Resultate aller Kandidierenden und Herkunft der Stimmen",
-        url=f"https://data.stadt-zuerich.ch/dataset/politik_gemeinderatswahlen_{when.year}_resultate",
-        license="CC0 1.0",
-        license_url="https://creativecommons.org/publicdomain/zero/1.0/",
-        attribution="Statistik Stadt Zürich",
-    )
     p.artifact(raw.cached(SOURCE, CITY.format(y=CITY_DAYS[day])), source)
     english, german = _title(when)
     english = english.replace("in the canton of Zürich", "in the city of Zürich")
