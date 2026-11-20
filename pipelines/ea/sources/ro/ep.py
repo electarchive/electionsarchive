@@ -1,7 +1,13 @@
 """European Parliament elections in Romania of 2009 and 2014, by polling station, from the Permanent Electoral
-Authority's older open data files (Excel workbooks on data.gov.ro)."""
+Authority's older open data files (Excel workbooks on data.gov.ro).
 
+The seats won by each list in 2014 come from the Central Electoral Bureau's record of the count and the allocation of
+seats, published in Monitorul Oficial nr. 399 of 29 May 2014 and read here from the text of that issue. Its national
+totals are compared with the polling stations, and the build fails on any difference."""
+
+import html
 import re
+import unicodedata
 from datetime import date
 from pathlib import Path
 from uuid import uuid5
@@ -24,6 +30,7 @@ URLS = {
     "2014-stations": f"{HOST}/2014-06-11T07:48:12.888Z/siaep2014-stat-statistica-la-nivel-de-sectie-de-votare1.xls",
     "2014-counties": f"{HOST}/2014-06-11T07:50:35.016Z/siaep2014-stat-statistica-la-nivel-de-tara-pe-birou-electoral.xls",
 }
+MINUTES = {"2014-05-25": "https://legeaz.net/monitorul-oficial-399-2014/proces-verbal-2014"}
 DAYS = {"2009-06-07": date(2009, 6, 7), "2014-05-25": date(2014, 5, 25)}
 SEATS = {"2009-06-07": 33, "2014-05-25": 32}
 FIRST_INDEPENDENT_2014 = 31
@@ -35,12 +42,20 @@ METHOD = (
     "abroad print no list of registered voters, so their registered voters are left empty."
 )
 
+SEATS_METHOD = (
+    " The seats are those the Central Electoral Bureau declared in its record of the count and the allocation of "
+    "seats, published in Monitorul Oficial nr. 399 of 29 May 2014. That record's registered voters, ballots cast, "
+    "valid and null votes, and the votes of every list and independent candidate equal the sums of the polling "
+    "stations."
+)
+
 
 def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
 
 
 EP_SOURCE = key("source", "aep")
+BEC_SOURCE = key("source", "bec")
 SYSTEM = key("electoral_system", "ep-list")
 
 
@@ -55,6 +70,8 @@ def party_id(label: str) -> str:
 def fetch() -> None:
     for url in URLS.values():
         raw.fetch(SOURCE, url, suffix=Path(url).suffix)
+    for url in MINUTES.values():
+        raw.fetch(SOURCE, url, suffix=".html")
 
 
 def packages() -> list[str]:
@@ -138,6 +155,19 @@ def registry() -> Package:
     )
     for url in URLS.values():
         p.artifact(raw.cached(SOURCE, url), EP_SOURCE)
+    p.add(
+        "source",
+        id=BEC_SOURCE,
+        kind="official_body",
+        publisher="Biroul Electoral Central",
+        title="Record of the count and the allocation of seats in the European Parliament election of 25 May 2014, "
+        "Monitorul Oficial al României, Partea I, nr. 399 of 29 May 2014",
+        url=MINUTES["2014-05-25"],
+        license="Official text, not subject to copyright (Law 8/1996, art. 9)",
+        attribution="Biroul Electoral Central",
+    )
+    for url in MINUTES.values():
+        p.artifact(raw.cached(SOURCE, url), BEC_SOURCE)
     p.add("scheme", code="ro.ep_sv", polity_id=ROMANIA, kind="precinct", rank=2, noun="polling station")
     p.add("electoral_system", id=SYSTEM, polity_id=ROMANIA, rules={"formula": "dhondt"}, rules_version=1)
     p.add(
@@ -205,7 +235,8 @@ def build(day: str) -> Package:
         is_default=True,
         completeness=1.0,
     )
-    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
+    method = METHOD + (SEATS_METHOD if day in MINUTES else "")
+    p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en")
     options: dict[str, str] = {}
     for position, (column, label, independent) in enumerate(lines, 1):
         option = key("option", day, position)
@@ -233,6 +264,8 @@ def build(day: str) -> Package:
                 is_independent=True,
             )
     stage(p, result_set, frame, options)
+    if day in MINUTES:
+        declare(p, day, result_set, frame, lines, options)
     p.accept(
         "accounting.ballots_sum",
         "some polling stations print valid and null votes that do not add up to the voters who took part; stored as "
@@ -430,3 +463,80 @@ def check_2014(frame: pl.DataFrame, header: list[str], totals: list[object]) -> 
         for column, _, _ in lines_2014():
             if part[column].sum() != whole(row[head.index(column)]):
                 raise ValueError(f"2014 county {row[0]} {column} differs from the county file")
+
+
+def plain(text: str) -> str:
+    """A label without diacritics or spacing differences, for matching the record's names with the data files'."""
+    folded = unicodedata.normalize("NFKD", canon(text))
+    return "".join(char for char in folded if not unicodedata.combining(char))
+
+
+def cells(text: str) -> int:
+    return int(re.sub(r"\D", "", text))
+
+
+def minutes(day: str) -> tuple[dict[str, int], dict[str, int], dict[str, int]]:
+    """The record's national totals (points a, b, e, f), the valid votes of each list (point g), and the seats of each
+    list (point k), keyed by plain label. The record prints each number one digit to a box."""
+    page = raw.cached(SOURCE, MINUTES[day]).path.read_text(encoding="utf-8")
+    page = re.sub(r"<(script|style)\b.*?</\1>", " ", page, flags=re.DOTALL)
+    text = " ".join(html.unescape(re.sub(r"<[^>]+>", " ", page)).split())
+    start = text.index("PROCES - VERBAL privind centralizarea voturilor")
+    text = text[start:]
+
+    def between(first: str, last: str) -> str:
+        at = text.index(first)
+        return text[at : text.index(last, at)]
+
+    totals = {}
+    for point, label, end in (
+        ("registered", " a Numărul total al alegătorilor înscriși", " a1 Numărul"),
+        ("cast", " b Numărul total al alegătorilor înscriși în listele electorale, care", " b1 Numărul"),
+        ("valid", " e Numărul voturilor valabil exprimate", " f Numărul"),
+        ("invalid", " f Numărul voturilor nule", " g. Numărul"),
+    ):
+        part = between(label, end)
+        totals[point] = cells(part[part.index("|") :])
+
+    def rows(part: str) -> dict[str, int]:
+        found = {
+            plain(name): cells(boxes)
+            for _, name, boxes in re.findall(r"(?:^| )(\d+) ([^|\d]+?) ((?:[|_\d ])*\|)", part)
+        }
+        if not found:
+            raise ValueError(f"{day}: no rows in the record")
+        return found
+
+    votes = rows(between(" g. ", " h. ").split("obținute", 1)[1])
+    seats = rows(between(" k. ", " Total ").split("Număr mandate atribuite", 1)[1])
+    printed = cells(between(" k. ", " 1. ").split(" Total ", 1)[1])
+    if sum(seats.values()) != printed or printed != SEATS[day]:
+        raise ValueError(f"{day}: the record's seats sum to {sum(seats.values())}, it prints {printed}")
+    return totals, votes, seats
+
+
+def declare(
+    p: Package,
+    day: str,
+    result_set: str,
+    frame: pl.DataFrame,
+    lines: list[tuple[str, str, bool]],
+    options: dict[str, str],
+) -> None:
+    """Store the seats the Central Electoral Bureau declared, after checking its totals against the stations."""
+    p.uses(raw.cached(SOURCE, MINUTES[day]))
+    totals, votes, seats = minutes(day)
+    for column, printed in totals.items():
+        summed = frame[column].sum()
+        if summed != printed:
+            raise ValueError(f"{day} {column}: stations sum to {summed}, the record prints {printed}")
+    columns = {plain(label): column for column, label, _ in lines}
+    if set(votes) != set(columns):
+        raise ValueError(f"{day}: the record's lists differ from the data file's: {set(votes) ^ set(columns)}")
+    for label, printed in votes.items():
+        if frame[columns[label]].sum() != printed:
+            raise ValueError(
+                f"{day} {label}: stations sum to {frame[columns[label]].sum()}, the record prints {printed}"
+            )
+    for label, won in seats.items():
+        p.add("outcome", result_set_id=result_set, option_id=options[columns[label]], kind="won", seats=won)
