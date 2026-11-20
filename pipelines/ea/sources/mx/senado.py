@@ -497,25 +497,100 @@ def formulas(columns: list[str], totals: dict[str, int]) -> list[tuple[tuple[str
     return [(tuple(parties), cols) for parties, cols in groups.values()]
 
 
-def candidaturas(year: int) -> dict[tuple[int, str], str]:
+# A formula pair as INE's candidate file registers it: the propietarios of the first and second formulas, then
+# their suplentes. The file prints "-" where a column names nobody, and "Sin candidatura" in place of one person.
+Formula = tuple[tuple[str | None, ...], tuple[str | None, ...]]
+NOBODY = "-"
+VACANT = "Sin candidatura"
+INDEPENDENT_LABEL = "Candidatura independiente"
+
+
+def filed(code: str) -> str:
+    """A party, combination, or independent code of INE's candidate file as the casilla columns name it: the file
+    spells Nueva Alianza out, and the columns' combinations abbreviate it."""
+    if code.startswith("CI_"):
+        return code
+    return "_".join(COLUMN_PARTY.get(part, part) for part in ([code] if code in COLUMN_PARTY else code.split("_")))
+
+
+def candidaturas(year: int) -> dict[int, dict[str, Formula]]:
+    """The formulas INE registered in each state, from its candidate file: {state: {code: formula}}, keyed by the
+    party (as `members` names it), the combination of parties (their codes joined by "_"), or the independent
+    (CI_ and INE's number). The file repeats each state's rows for every district; they must agree."""
     import csv
 
-    url, inner, _ = COMPUTOS[year]
-    with zipfile.ZipFile(raw.cached(RAW, url).path) as outer, zipfile.ZipFile(io.BytesIO(outer.read(inner))) as sen:
+    _, inner, _ = COMPUTOS[year]
+    with zipfile.ZipFile(computos_zip(year)) as outer, zipfile.ZipFile(io.BytesIO(outer.read(inner))) as sen:
         name = next(n for n in sen.namelist() if n.endswith(CANDIDATURAS[year]))
         text = sen.read(name).decode("latin-1").split("\n", 1)[1]
-    result = {}
+    found: dict[int, dict[str, Formula]] = {}
     for row in csv.DictReader(io.StringIO(text), delimiter="|"):
-        state = row.get("ESTADO") or row["ID_ENTIDAD"]
-        result[int(state), row["PARTIDO_CI"]] = " / ".join(
-            part.strip() for part in row["CANDIDATURA_PROPIETARIA"].split(",")
+        state = int(row.get("ESTADO") or row["ID_ENTIDAD"])
+        owners, substitutes = (
+            tuple(
+                None if part.strip() == VACANT else part.strip()
+                for part in row[column].split(",")
+                if row[column].strip() != NOBODY
+            )
+            for column in ("CANDIDATURA_PROPIETARIA", "CANDIDATURA_SUPLENTE")
         )
-    return result
+        formula: Formula = (owners, substitutes)
+        if any(len(people) not in (0, 2) for people in formula):
+            raise ValueError(f"{year} state {state}: {row['PARTIDO_CI']} registers {formula}")
+        code = filed(row["PARTIDO_CI"])
+        if found.setdefault(state, {}).setdefault(code, formula) != formula:
+            raise ValueError(f"{year} state {state}: {code} registers {found[state][code]} and {formula}")
+    return found
+
+
+def split(
+    columns: list[str], totals: dict[str, int], registered: dict[str, Formula]
+) -> list[tuple[tuple[str, ...], list[str], Formula | None]]:
+    """The lists of a state's contest from INE's candidate file: the parties that register the same formulas form
+    one list, and each casilla column joins the list its parties register. A column that combines parties of
+    different lists (a coalition that did not run in the state) and an independent column the state has no
+    independent for must count no votes there, and are left out. A party that registers nobody is a list of its
+    own. Independents take the independent columns in the order of INE's numbers, as the cómputos files do."""
+    independents = sorted((code for code in registered if code.startswith("CI_")), key=lambda c: int(c[3:]))
+    slots = [column for column in columns if column.startswith("CAND_IND")]
+    if len(independents) > len(slots):
+        raise ValueError(f"{len(independents)} independents for the columns {slots}")
+    taken = dict(zip(slots, independents, strict=False))
+
+    def owner(party: str) -> Formula | str:
+        formula = registered.get(party)
+        return formula if formula is not None and any(formula) else party
+
+    groups: dict[Formula | str, tuple[list[str], list[str], Formula | None]] = {}
+    for column in columns:
+        if column.startswith("CAND_IND"):
+            if column not in taken:
+                if totals.get(column, 0):
+                    raise ValueError(f"{column} counts {totals[column]} votes without an independent")
+                continue
+            groups[taken[column]] = ([column], [column], registered[taken[column]])
+            continue
+        parts = members(column)
+        owners = {owner(part) for part in parts}
+        if len(owners) > 1:
+            if totals.get(column, 0):
+                raise ValueError(f"{column} counts {totals[column]} votes across the lists {owners}")
+            continue
+        (key,) = owners
+        formula = key if isinstance(key, tuple) else None
+        listed = registered.get("_".join(parts))
+        if len(parts) > 1 and listed is not None and listed != formula:
+            raise ValueError(f"{column} registers {listed}, its parties {formula}")
+        parties, cols, _ = groups.setdefault(key, ([], [], formula))
+        cols.append(column)
+        parties.extend(part for part in parts if part not in parties)
+    return [(tuple(parties), cols, formula) for parties, cols, formula in groups.values()]
 
 
 SUMMARY = (
     "Elections to the Senate of Mexico (1991-2024): the 32 state contests and the national list, by casilla, with "
-    "the party-list seats as declared and the state seats of 2000, 2018 and 2024 as the Senate's rosters record them"
+    "the party-list seats as declared, the state seats of 2000, 2018 and 2024 as the Senate's rosters record them, "
+    "and the state formulas' candidates of 2018 and 2024 as INE registered them"
 )
 
 
@@ -625,6 +700,17 @@ def build() -> Path:
                     if item is not None:
                         cs.add("external_id", entity_id=parties[abbrev], scheme="wikidata", value=item)
             return parties[abbrev]
+
+        persons: dict[str, UUID] = {}
+
+        def person(key: str, text: str) -> UUID:
+            """A candidate INE registered, one per name within a state's contest of a year."""
+            if key not in persons:
+                persons[key] = cs.key("mx.person", key)
+                if persons[key] in cs.minted:
+                    cs.add("person", id=persons[key])
+                    name(persons[key], text, "es")
+            return persons[key]
 
         alliances: dict[str, UUID] = {}
 
@@ -846,7 +932,7 @@ def build() -> Path:
                         casillas = casillas.filter(pl.col("acta").is_in(["both", kind]))
                         votes = votes.filter(pl.col("acta").is_in(["both", kind]))
                     data[kind] = (casillas, votes)
-            names_of = candidaturas(year) if year in CANDIDATURAS else {}
+            registered_in = candidaturas(year) if year in CANDIDATURAS else None
 
             def set_of(
                 contest: UUID,
@@ -916,21 +1002,25 @@ def build() -> Path:
                         for row in state_totals.filter(pl.col("state") == state).iter_rows(named=True)
                     }
                     ranked: list[tuple[int, tuple[str, ...], UUID]] = []
-                    groups = formulas(columns, totals)
-                    for position, (group, cols) in enumerate(groups, 1):
+                    groups = (
+                        [(group, cols, None) for group, cols in formulas(columns, totals)]
+                        if registered_in is None
+                        else split(columns, totals, registered_in.get(code, {}))
+                    )
+                    for position, (group, cols, people) in enumerate(groups, 1):
+                        independent = cols[0].startswith("CAND_IND")
                         label = (
                             ALLIANCES[COLUMN_ALLIANCE[cols[0]]][1]
                             if len(cols) == 1 and cols[0] in COLUMN_ALLIANCE
+                            else INDEPENDENT_LABEL
+                            if independent
                             else "-".join(group)
                         )
-                        if names_of:
-                            found = {
-                                names_of.get((code, member)) for member in group if member in {*COLUMN_PARTY.values()}
-                            }
-                            found.discard(None)
-                            if found:
-                                label = f"{label}: {' | '.join(sorted(name for name in found if name is not None))}"
-                        formula = cs.key("mx.option", f"{day}:senate:{code:02d}:{'+'.join(cols)}")
+                        heads = [text for text in (people or ((),))[0] if text is not None]
+                        if heads:
+                            label = f"{label}: {' / '.join(heads)}"
+                        formula_key = f"{day}:senate:{code:02d}:{'+'.join(cols)}"
+                        formula = cs.key("mx.option", formula_key)
                         cs.add(
                             "contest_option",
                             id=formula,
@@ -941,6 +1031,22 @@ def build() -> Path:
                             ballot_position=position,
                             ballot_label=label,
                         )
+                        for role, suffix, printed in zip(
+                            ("list_member", "substitute"), "ps", people or (), strict=False
+                        ):
+                            for number, text in enumerate(printed, 1):
+                                if text is None:
+                                    continue
+                                cs.add(
+                                    "candidacy",
+                                    id=cs.key("mx.candidacy", f"{formula_key}:{number}{suffix}"),
+                                    person_id=person(f"{day}:senate:{code:02d}:{' '.join(fold(text))}", text),
+                                    option_id=formula,
+                                    role=role,
+                                    list_position=number,
+                                    ballot_name=text,
+                                    is_independent=independent,
+                                )
                         for column in cols:
                             line = formula
                             if len(cols) > 1:
@@ -1220,24 +1326,12 @@ def computos_zip(year: int) -> Path:
         return raw.cached("mx.computos", url).path
 
 
-def registered(year: int) -> dict[tuple[int, str], list[list[str]]]:
-    """The candidates each party registered in each state, propietarios and suplentes, from INE's candidate file:
-    {(state, party): [name words]}. A formula without a propietario prints "Sin candidatura" in its place."""
-    import csv
-
-    _, inner, _ = COMPUTOS[year]
-    with zipfile.ZipFile(computos_zip(year)) as outer, zipfile.ZipFile(io.BytesIO(outer.read(inner))) as sen:
-        name = next(n for n in sen.namelist() if n.endswith(CANDIDATURAS[year]))
-        text = sen.read(name).decode("latin-1").split("\n", 1)[1]
-    found: dict[tuple[int, str], list[list[str]]] = {}
-    for row in csv.DictReader(io.StringIO(text), delimiter="|"):
-        key = (int(row.get("ESTADO") or row["ID_ENTIDAD"]), row["PARTIDO_CI"])
-        names = found.setdefault(key, [])
-        for column in ("CANDIDATURA_PROPIETARIA", "CANDIDATURA_SUPLENTE"):
-            for person in row[column].split(","):
-                words = fold(person)
-                if words and person.strip() != "Sin candidatura" and words not in names:
-                    names.append(words)
+def registered(candidacies: pl.DataFrame) -> dict[str, list[list[str]]]:
+    """The candidates INE registered on each list, propietarios and suplentes, as the package's candidacies hold
+    them: {option_id: [name words]}."""
+    found: dict[str, list[list[str]]] = {}
+    for option, text in candidacies.select("option_id", "ballot_name").iter_rows():
+        found.setdefault(str(option), []).append(fold(str(text)))
     return found
 
 
@@ -1301,40 +1395,28 @@ def group_seats(day: str, keys: pl.DataFrame, lists: pl.DataFrame) -> dict[int, 
     return found
 
 
-def seated(year: int, options: dict[int, list[tuple[str, str]]]) -> dict[int, tuple[str, list[str], Seated | str]]:
+def seated(
+    year: int, options: dict[int, list[tuple[str, str]]], people: dict[str, list[list[str]]]
+) -> dict[int, tuple[str, list[str], Seated | str]]:
     """Match each state's seated senators to the lists of its contest ({code: [(option_id, ballot_label)]}),
-    through the propietarios and suplentes INE registered for each party of a list. Gives {code: (state, url,
-    {option_id: [(name, principle)]})}, or the reason in place of the seats when the roster does not settle them:
-    it lists other than three senators (one on leave in its first week), or a senator names no registered
-    candidate. Where the casilla reading splits one coalition's formula into several lists, each naming the
-    coalition's candidates, the senator sits on the list with the fewest registered candidates, the one of the
-    formula's own party."""
-    people = registered(year)
+    through the propietarios and suplentes INE registered on each list ({option_id: [name words]}). Gives {code:
+    (state, url, {option_id: [(name, principle)]})}, or the reason in place of the seats when the roster does not
+    settle them: it lists other than three senators (one on leave in its first week), or a senator names no
+    registered candidate, or names one on more than one list."""
     found: dict[int, tuple[str, list[str], Seated | str]] = {}
     for code, (state, url, senators) in roster(year).items():
         if len(senators) != 3:
             found[code] = (state, [url], f"the roster lists {len(senators)} senators")
             continue
-        pools = {
-            option: [
-                person
-                for party in dict.fromkeys(label.partition(": ")[0].split("-"))
-                for person in people.get((code, party), [])
-            ]
-            for option, label in options[code]
-        }
+        pools = {option: people.get(option, []) for option, _ in options[code]}
         held: Seated = {}
         for name, elected in senators:
-            lists = sorted(
-                (len(pool), option)
-                for option, pool in pools.items()
-                if any(same_person(fold(name), person) for person in pool)
-            )
-            if not lists or len(lists) > 1 and lists[0][0] == lists[1][0]:
+            lists = [option for option, pool in pools.items() if any(same_person(fold(name), p) for p in pool)]
+            if len(lists) != 1:
                 held = {}
                 found[code] = (state, [url], f"{name} names a registered candidate on {len(lists)} lists")
                 break
-            held.setdefault(lists[0][1], []).append((name, elected))
+            held.setdefault(lists[0], []).append((name, elected))
         if held:
             found[code] = (state, [url], held)
     return found
@@ -1399,6 +1481,8 @@ def declare(out: Path) -> Path:
         for table in ("outcome", "note", "source", "source_artifact", "citation")
     }
     tables["source_artifact"] = recite(tables["source_artifact"])
+    candidacies = out / "candidacy.parquet"
+    on_lists = registered(pl.read_parquet(candidacies)) if candidacies.exists() else {}
     contests = dict(keys.filter(pl.col("scheme") == "mx.contest").select("value", "entity_id").iter_rows())
     sets = dict(keys.filter(pl.col("scheme") == "mx.result_set").select("value", "entity_id").iter_rows())
     outcomes, notes = tables["outcome"], tables["note"]
@@ -1432,7 +1516,7 @@ def declare(out: Path) -> Path:
         }
         labels = {option: label for rows in options.values() for option, label in rows}
         unsettled, changed = [], []
-        found = group_seats(day, keys, lists) if year == 2000 else seated(year, options)
+        found = group_seats(day, keys, lists) if year == 2000 else seated(year, options, on_lists)
         for code, (state, pages, held) in sorted(found.items()):
             if isinstance(held, str):
                 unsettled.append(f"{state} ({held})")
