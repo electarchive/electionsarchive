@@ -621,7 +621,7 @@ RUNOFF = {
 FIRST_NAMED = {**RUNOFF, "2": ("Yaku Pérez Guartambel", "", ""), "42": ("Xavier Hervas Morillo", "", "")}
 
 
-def _president(p: Package, day: str, first: bool) -> None:
+def _president(p: Package, day: str, first: bool) -> tuple[str, set[str], dict[str, tuple[str, str]]]:
     url = FIRST_2021 if first else RUNOFF_2021
     frame, _ = sav(url, FIRST_PRESIDENT_ROWS if first else 0)
     if first:
@@ -734,6 +734,55 @@ def _president(p: Package, day: str, first: bool) -> None:
             "the file's own parish figures disagree: valid votes plus blank and null votes differ from the ballots "
             "cast in 528 of 1,299 parishes, by 83 ballots at most and 1,100 ballots in all; stored as published",
         )
+    return election, seen, parishes
+
+
+ANDEAN_SEATS = 5
+ANDEAN_NAMED = {"1030": "UNES"}
+# the body and the Webster list system that ec.cne/registry-2017 holds
+ANDEAN_BODY = key("body", "andean-parliament")
+SYSTEM_LISTS = key("electoral_system", "assembly", "webster")
+
+
+def _andean(p: Package, day: str, election: str, seen: set[str], parishes: dict[str, tuple[str, str]]) -> None:
+    """The first round's national list contest for the Andean Parliament, by parish.
+
+    The file labels no list, so a list is named only where the presidential file names its organization code.
+    """
+    frame, _ = sav(FIRST_2021)
+    frame = frame.filter(pl.col("DIGNIDAD_NOMBRE") == 8.0)
+    contest = key("contest", day, "andean")
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="list_allocation",
+        body_id=ANDEAN_BODY,
+        magnitude=ANDEAN_SEATS,
+        round_number=1,
+        default_result_kind="counted",
+        electoral_system_id=SYSTEM_LISTS,
+    )
+    p.name(contest, "2021 Ecuadorian election of members of the Andean Parliament", "en", "official")
+    p.name(contest, "Parlamentarios andinos del Ecuador 2021", "es", "native", False)
+    p.add("slug", path=f"ec/{day}-presidential/andean-parliament", entity_id=contest, is_current=True)
+    result_set = _result_set(p, election, contest, f"{day}/andean")
+    options: dict[str, str] = {}
+    for position, org in enumerate(sorted({code(v) for v in frame["OP_CODIGO"].to_list()}, key=int), 1):
+        option = options[org] = key("option", day, "andean", org)
+        label = f"{ANDEAN_NAMED[org]} (organization {org})" if org in ANDEAN_NAMED else f"Organization {org}"
+        p.add(
+            "contest_option", id=option, contest_id=contest, kind="list", ballot_position=position, ballot_label=label
+        )
+    table = _table(frame, [], "OP_CODIGO")
+    for parish_rows in table.partition_by("PARROQUIA_CODIGO", as_dict=False):
+        row = parish_rows.row(0, named=True)
+        unit = _unit(p, day, code(row["PARROQUIA_CODIGO"]), parishes, seen)
+        _put(p, result_set, unit, None, CAST, int(row["SUFRAGANTES"]))
+        _put(p, result_set, unit, None, BLANK, int(row["BLANCOS"]))
+        _put(p, result_set, unit, None, INVALID, int(row["NULOS"]))
+        for org, votes in zip(parish_rows["OP_CODIGO"].to_list(), parish_rows["VOTOS"].to_list(), strict=True):
+            _put(p, result_set, unit, options[code(org)], VOTES, int(votes))
 
 
 def build(day: str) -> Package:
@@ -741,11 +790,18 @@ def build(day: str) -> Package:
         f"ec.cne/{day}",
         SOURCE,
         f"The Ecuadorian elections of {DAYS[day]} by parish, from the National Electoral Council's results files",
-        depends=["ec.cne/geo", "ec.cne/registry", *(["ec.cne/2021-02-07"] if day == "2021-04-11" else [])],
+        depends=[
+            "ec.cne/geo",
+            "ec.cne/registry",
+            *(["ec.cne/registry-2017"] if day == "2021-02-07" else []),
+            *(["ec.cne/2021-02-07"] if day == "2021-04-11" else []),
+        ],
     )
     p.external.add(ECUADOR)
     if day == "2019-03-24":
         _local(p, day)
     else:
-        _president(p, day, day == "2021-02-07")
+        election, seen, parishes = _president(p, day, day == "2021-02-07")
+        if day == "2021-02-07":
+            _andean(p, day, election, seen, parishes)
     return p
