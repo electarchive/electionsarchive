@@ -7,13 +7,14 @@ from uuid import UUID
 
 import polars as pl
 
-from ea import raw
-from ea.changeset import Changeset
+from ea import package, raw
+from ea.package import Draft
 from ea.sources.mx import diputados, ine, mge
 from ea.store import DATA, connect
 
 SOURCE = "mx.congreso_local"
 VERSION = "1"
+KEY = f"{SOURCE}/all"
 PARSED = DATA / "parsed" / SOURCE
 LICENSE = (
     "Public information the institute publishes for download (Ley General de Transparencia, art. 70); no license stated"
@@ -141,6 +142,10 @@ def parties_of(column: str) -> tuple[str, ...]:
     if column.startswith("CAND_IND"):
         return (INDEPENDENT,)
     return tuple(column.split("_"))
+
+
+def rank(group: tuple[str, ...], columns: dict[str, tuple[str, ...]]) -> tuple[int, ...]:
+    return tuple(sorted(NATIONAL.index(m) if m in NATIONAL else len(NATIONAL) for c in group for m in columns[c]))
 
 
 def parse_state(iso: str, config: dict) -> None:
@@ -294,6 +299,7 @@ def elected_of(iso: str, config: dict) -> pl.DataFrame:
 def parse() -> None:
     for iso, config in STATES.items():
         parse_state(iso, config)
+    build()
 
 
 MR_RULES = {"formula": "fptp"}
@@ -325,15 +331,26 @@ CASILLA_NOTE = (
 )
 
 
-def emit() -> Path:
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package mx.congreso_local/all from the parsed tables. It reads the database through Draft, so the
+    rows it rebuilds keep the ids the changeset path gave them."""
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary="Mexican state legislatures: district contests by polling station and proportional seats, from the "
             "state electoral institutes (" + ", ".join(STATES) + ")",
             polity="MX",
+        )
+        cs.accept(
+            "accounting.turnout",
+            "IEPAC's casilla file prints more votes cast than the nominal roll at 10 Yucatán casillas (sections 44, "
+            "123, 176, 245, 249, 250, 724, 727, 824 and 825; 1,844 against 656 at 176 C1); both are stored as printed",
         )
         if conn.execute("select 1 from scheme where code = 'mx.distrito_local'").fetchone() is None:
             raise ValueError("publish mx.distrito_local before mx.congreso_local")
@@ -360,11 +377,14 @@ def emit() -> Path:
                         cs.add("external_id", entity_id=parties[key], scheme="wikidata", value=item)
             return parties[key]
 
+        # The federal count's casillas, which this pipeline's results attach to; the casillas it mints itself are
+        # left out, so a rebuild writes them again.
         casilla_units = {
             code: unit
             for code, unit in conn.execute(
                 "select code, id from reporting_unit where scheme_code = 'mx.casilla' and code like '2024:%'"
             ).fetchall()
+            if unit not in cs.own_entities
         }
         by_place: dict[tuple[str, int, str], str] = {}
         for code in casilla_units:
@@ -567,13 +587,15 @@ def emit() -> Path:
                     mine.filter((pl.col("kind_votes") == "list") & (pl.col("votes") > 0))
                     .group_by("option")
                     .agg(pl.col("votes").sum())
+                    .sort("option")
                     .iter_rows()
                 )
                 standing = {
                     tuple(sorted(g)): sum(totals_by[c] for c in g)
                     for g in diputados.groups_of(columns, list(totals_by))
                 }
-                ordered = sorted(standing.items(), key=lambda item: -item[1])
+                # Options with equal votes take national parties first, then the order of their columns' names.
+                ordered = sorted(standing.items(), key=lambda item: (-item[1], rank(item[0], columns), item[0]))
                 if len(ordered) > 1 and ordered[0][1] == ordered[1][1]:
                     raise ValueError(f"{iso} {district}: tie for first place")
                 declared = elected.filter((pl.col("tier") == "mr") & (pl.col("number") == district)).row(0, named=True)
