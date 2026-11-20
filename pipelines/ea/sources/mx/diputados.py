@@ -1,6 +1,5 @@
 import csv
 import io
-import os
 import re
 from datetime import date
 from pathlib import Path
@@ -9,7 +8,8 @@ from uuid import UUID
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.mx import ine
 from ea.store import DATA, connect
 
@@ -124,8 +124,12 @@ def parse() -> None:
             print(year, kind, units.height, "casillas", units["total"].sum(), "votes", dict(national.rows()))
 
 
+# Convergencia took the name Movimiento Ciudadano in 2011, and the Partido Socialdemócrata was Alternativa
+# Socialdemócrata y Campesina until 2008: each is the same party under its name of the day.
 EXTRA_PARTIES = {
     "PH": ("Q17624582", "Partido Humanista", "Humanist Party"),
+    "CONV": ("Q10920094", "Convergencia", "Convergence"),
+    "PSD": ("Q1803295", "Partido Socialdemócrata", "Social Democratic Party"),
 }
 PARTIES = ine.PARTIES | EXTRA_PARTIES
 INDEPENDENT = "IND"
@@ -192,7 +196,114 @@ ELECTIONS: dict[int, dict] = {
             "PES": (2, 1, 1, 2, 2),
         },
     },
+    2012: {
+        "day": date(2012, 7, 1),
+        "columns": {
+            "PAN": ("PAN",),
+            "PRI": ("PRI",),
+            "PRD": ("PRD",),
+            "PVEM": ("PVEM",),
+            "PT": ("PT",),
+            "MC": ("MC",),
+            "NVA_ALIANZA": ("NA",),
+            "PRI_PVEM": ("PRI", "PVEM"),
+            "PRD_PT_MC": ("PRD", "PT", "MC"),
+            "PRD_PT": ("PRD", "PT"),
+            "PRD_MC": ("PRD", "MC"),
+            "PT_MC": ("PT", "MC"),
+        },
+        "acuerdo": (
+            "https://repositoriodocumental.ine.mx/xmlui/bitstream/handle/123456789/86836/CGe230812ap_2.pdf",
+            (
+                "CG582/2012: Acuerdo del Consejo General del Instituto Federal Electoral por el que se efectúa el "
+                "cómputo total, se declara la validez de la elección de Diputados por el principio de representación "
+                "proporcional y se asignan a los partidos políticos nacionales: Acción Nacional, Revolucionario "
+                "Institucional, de la Revolución Democrática, del Trabajo, Verde Ecologista de México, Movimiento "
+                "Ciudadano y Nueva Alianza, los Diputados que por este principio les corresponden de acuerdo con la "
+                "votación obtenida por cada uno de ellos en el Proceso Electoral Federal 2011-2012"
+            ),
+            {"votes": 47, "seats": 71},
+        ),
+        "votes": {
+            "PAN": 12960875,
+            "PRI": 15960086,
+            "PRD": 9194637,
+            "PT": 2294460,
+            "PVEM": 3054718,
+            "MC": 2000524,
+            "NA": 2041608,
+            "unregistered": 41556,
+            "null": 2494300,
+            "total": 50042764,
+        },
+        "seats": {
+            "PAN": (14, 18, 11, 9, 10),
+            "PRI": (11, 10, 10, 7, 11),
+            "PRD": (5, 5, 10, 13, 11),
+            "PT": (2, 2, 2, 3, 2),
+            "PVEM": (2, 3, 4, 3, 3),
+            "MC": (4, 0, 1, 3, 1),
+            "NA": (2, 2, 2, 2, 2),
+        },
+    },
+    2009: {
+        "day": date(2009, 7, 5),
+        "columns": {
+            "PAN": ("PAN",),
+            "PRI": ("PRI",),
+            "PRD": ("PRD",),
+            "PVEM": ("PVEM",),
+            "PT": ("PT",),
+            "CONVERGENCIA": ("CONV",),
+            "NVA_ALIANZA": ("NA",),
+            "PSD": ("PSD",),
+            "PRIMERO_MEXICO": ("PRI", "PVEM"),
+            "SALVEMOS_MEXICO": ("PT", "CONV"),
+        },
+        "acuerdo": (
+            "https://repositoriodocumental.ine.mx/xmlui/bitstream/handle/123456789/91140/CGe210809apunico.pdf",
+            (
+                "CG426/2009: Acuerdo del Consejo General del Instituto Federal Electoral por el que se efectúa el "
+                "cómputo total, se declara la validez de la elección de Diputados por el principio de representación "
+                "proporcional y se asignan a los partidos políticos: Acción Nacional, Revolucionario Institucional, de "
+                "la Revolución Democrática, del Trabajo, Verde Ecologista de México, Convergencia y Nueva Alianza, los "
+                "Diputados que por este principio les corresponden de acuerdo con la votación obtenida por cada uno de "
+                "ellos en el Proceso Electoral Federal del año dos mil nueve"
+            ),
+            {"votes": 50, "seats": 68},
+        ),
+        "votes": {
+            "PAN": 9714180,
+            "PRI": 12809395,
+            "PRD": 4228623,
+            "PT": 1268151,
+            "PVEM": 2326045,
+            "CONV": 854311,
+            "NA": 1186875,
+            "PSD": 358485,
+            "unregistered": 56819,
+            "null": 1875107,
+            "total": 34677991,
+        },
+        "seats": {
+            "PAN": (18, 17, 15, 11, 12),
+            "PRI": (11, 12, 12, 7, 11),
+            "PRD": (3, 3, 7, 10, 9),
+            "PT": (2, 1, 1, 4, 2),
+            "PVEM": (4, 4, 2, 4, 3),
+            "CONV": (0, 1, 1, 2, 2),
+            "NA": (2, 2, 2, 2, 1),
+        },
+    },
 }
+TURNOUT = (
+    "INE's district count files print more votes than the nominal roll for these casillas; the counts are stored as "
+    "the files print them"
+)
+SEATS_ONLY = (
+    "Each circunscripción's set holds the list seats the Consejo General assigned there as outcomes; the list vote is "
+    "stored once, in the national set"
+)
 
 
 CIRCUNSCRIPCIONES = {
@@ -320,20 +431,19 @@ def district_frame(
 
 
 def emit() -> Path:
-    year = int(os.environ.get("MX_DIPUTADOS", "2015"))
-    config = ELECTIONS[year]
-    day: date = config["day"]
-    columns: dict[str, tuple[str, ...]] = config["columns"]
-    url, title, pages = config["acuerdo"]
+    years = sorted(ELECTIONS)
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary=f"Mexican Chamber of Deputies {year}: the 300 district contests by polling station from INE's "
-            "district counts, and the 200 list seats by circunscripción from the Consejo General's acuerdo",
+            summary=f"Mexican Chamber of Deputies ({', '.join(map(str, years))}): the 300 district contests of each "
+            "election by polling station from INE's district counts, and the 200 list seats by circunscripción from "
+            "the Consejo General's acuerdo",
             polity="MX",
         )
+        cs.accept("accounting.turnout", TURNOUT)
+        cs.accept("result_set.empty", SEATS_ONLY)
         for scheme in ("mx.entidad", "mx.seccion", "mx.casilla", "mx.distrito_federal"):
             if conn.execute("select 1 from scheme where code = %s", (scheme,)).fetchone() is None:
                 raise ValueError("publish mx.mge before mx.diputados")
@@ -354,11 +464,6 @@ def emit() -> Path:
             license_url=ine.INE_PAGE,
             attribution="Instituto Nacional Electoral, cómputos distritales",
         )
-        for kind in KINDS:
-            cs.artifact(raw.cached(RAW, siceef_url(kind, year)), ine_source)
-        acuerdo = cs.source(ine.INE, title)
-        cs.add("source", id=acuerdo, kind="official_body", publisher=ine.INE, title=title, url=url, license=ine.PUBLIC)
-        cs.artifact(raw.cached(RAW, url), acuerdo)
         law = cs.source(ine.CAMARA, CPEUM)
         cs.add(
             "source", id=law, kind="official_body", publisher=ine.CAMARA, title=CPEUM, url=CPEUM_URL, license=ine.PUBLIC
@@ -396,14 +501,6 @@ def emit() -> Path:
                     cs.add("external_id", entity_id=parties[abbrev], scheme="wikidata", value=item)
             return parties[abbrev]
 
-        election = cs.key("mx.election", f"{day}:general")
-        path = f"mx/{day}-general"
-        if election in cs.minted:
-            cs.add("election", id=election, polity_id=mexico, kind="general", date_from=day, date_to=day, status="held")
-            name(election, f"{year} Mexican general election")
-            name(election, f"Elecciones federales de {year}", "es", "native")
-            cs.add("slug", path=path, entity_id=election)
-
         states = {
             code: text
             for code, text in conn.execute(
@@ -420,44 +517,6 @@ def emit() -> Path:
             state = f"{code:02d}"
             unit = state_units[state] = cs.unit("mx.entidad", state)
             unit_rows[unit] = ("mx.entidad", state, nation_unit, "equals", cs.area("mx.entidad", state), "standard")
-
-        def make_set(contest: UUID, key: str, default: bool, source: UUID, completeness: float, note: str) -> UUID:
-            result_set = cs.key("mx.result_set", f"{day}:dip:{key}")
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=election,
-                contest_id=contest,
-                stage="official",
-                kind="counted",
-                status="active",
-                source_id=source,
-                is_default=default,
-                completeness=completeness,
-            )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
-            return result_set
-
-        alliances: dict[str, UUID] = {}
-
-        def alliance_of(members: list[str]) -> UUID:
-            key = "-".join(members)
-            if key not in alliances:
-                alliances[key] = cs.key("mx.alliance", f"{day}:{key}")
-                cs.add("alliance", id=alliances[key], kind="electoral_alliance", election_id=election)
-                name(alliances[key], "–".join(members) + " coalition")
-                name(alliances[key], "Coalición " + "–".join(members), "es", "native")
-                for member in members:
-                    cs.add("alliance_member", alliance_id=alliances[key], party_id=party(member))
-            return alliances[key]
-
-        votes = pl.read_parquet(PARSED / f"mr_{year}_votes.parquet")
-        casillas = pl.read_parquet(PARSED / f"mr_{year}_casillas.parquet")
-        casillas = casillas.filter((pl.col("casilla") != "") | (pl.col("total") > 0))
-        unknown = set(votes.filter(pl.col("kind") == "list")["option"]) - set(columns)
-        if unknown:
-            raise ValueError(f"{year}: columns without a party: {sorted(unknown)}")
-
         sections = dict(
             conn.execute(
                 "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'mx.seccion'"
@@ -469,236 +528,323 @@ def emit() -> Path:
                 "where x.scheme = 'mx.ine.municipio' and a.scheme_code = 'mx.municipio'"
             ).fetchall()
         )
-        placed = []
-        for row in casillas.iter_rows(named=True):
-            state = f"{int(row['state']):02d}"
-            district = int(row["district"]) if row["district"].isdigit() else 0
-            section = int(row["section"])
-            letter = row["casilla"][:1] or "X"
-            code = f"{year}:{state}-{district:02d}-{section:04d}-{ine.casilla_code(year, re.sub(r'^S(?:MR|RP)', 'S', row['casilla']) or 'X')}"
-            channel, kind, area = 0, "standard", None
-            if letter in "MV" or section == 0:
-                channel, kind = ine.ABROAD, "aggregate"
-            elif letter == "A":
-                channel, kind = ine.EARLY, "aggregate"
-            elif letter == "P":
-                channel, kind = ine.PRISON, "prison"
-            else:
-                area = sections.get(f"{state}{section:04d}")
-                if area is None and row["municipality"] not in ("", "0"):
-                    area = towns.get(f"{state}{int(row['municipality']):03d}")
-            unit_id = cs.unit("mx.casilla", code)
-            if unit_id in unit_rows:
-                raise ValueError(f"{year}: casilla {code} appears twice")
-            unit_rows[unit_id] = (
-                "mx.casilla",
-                code,
-                state_units[state],
-                "within",
-                area or cs.area("mx.entidad", state),
-                kind,
-            )
-            placed.append((*(row[k] for k in ine.KEYS), str(unit_id), channel))
-        units = pl.DataFrame(
-            placed,
-            schema=[*((k, pl.String) for k in ine.KEYS), ("unit_id", pl.String), ("channel", pl.Int16)],
-            orient="row",
-        )
-        located = casillas.join(units, on=ine.KEYS)
-        joined = votes.join(units, on=ine.KEYS)
-        totals = (
-            joined.filter(pl.col("kind") == "list").group_by("state", "district", "option").agg(pl.col("votes").sum())
-        )
-
+        rows: list[tuple[str, str, str | None, int, int, int]] = []
         frames: list[pl.DataFrame] = []
-        winners: dict[str, int] = {}
-        decided = 0
-        by_district = {key: rows for key, rows in totals.group_by(["state", "district"])}
-        for (state, district), rows in sorted(by_district.items(), key=lambda item: (int(item[0][0]), int(item[0][1]))):
-            ss, dd = f"{int(state):02d}", int(district)
-            contest_key = f"{day}:dip:mr:{ss}{dd:02d}"
-            contest = cs.key("mx.contest", contest_key)
+
+        for year in years:
+            config = ELECTIONS[year]
+            day: date = config["day"]
+            columns: dict[str, tuple[str, ...]] = config["columns"]
+            url, title, pages = config["acuerdo"]
+            for kind in KINDS:
+                cs.artifact(raw.cached(RAW, siceef_url(kind, year)), ine_source)
+            acuerdo = cs.source(ine.INE, title)
             cs.add(
-                "contest",
-                id=contest,
-                election_id=election,
-                kind="body_seats",
-                body_id=body,
-                magnitude=1,
-                electoral_system_id=mr_system,
-                default_result_kind="counted",
+                "source", id=acuerdo, kind="official_body", publisher=ine.INE, title=title, url=url, license=ine.PUBLIC
             )
-            name(contest, f"{year} Chamber of Deputies, {states[ss]}, district {dd}")
-            name(contest, f"Diputación federal {year}, {states[ss]}, distrito {dd}", "es", "native")
-            cs.add("slug", path=f"{path}/{slug(states[ss])}-district-{dd}", entity_id=contest)
-            totals_by = {r["option"]: r["votes"] for r in rows.iter_rows(named=True) if r["votes"] > 0}
-            standing = {tuple(sorted(g)): sum(totals_by[c] for c in g) for g in groups_of(columns, list(totals_by))}
-            ordered = sorted(standing.items(), key=lambda item: -item[1])
-            if len(ordered) > 1 and ordered[0][1] == ordered[1][1]:
-                raise ValueError(f"{year} {states[ss]} {dd}: tie for first place")
-            district_unit = cs.unit("mx.distrito_federal", f"{year}:{ss}-{dd:02d}")
-            unit_rows[district_unit] = (
-                "mx.distrito_federal",
-                f"{year}:{ss}-{dd:02d}",
-                state_units[ss],
-                "within",
-                cs.area("mx.entidad", ss),
-                "aggregate",
-            )
-            district_set = make_set(contest, f"mr:{ss}{dd:02d}:district", True, ine_source, 1, MR_METHOD)
-            casilla_set = make_set(contest, f"mr:{ss}{dd:02d}:casilla", False, ine_source, 1, CASILLA_NOTE)
-            options: dict[str, str] = {}
-            for position, (group, _) in enumerate(ordered, 1):
-                members = sorted({m for c in group for m in columns[c]} - {INDEPENDENT})
-                head = cs.key("mx.option", f"{contest_key}:{'+'.join(group)}")
+            cs.artifact(raw.cached(RAW, url), acuerdo)
+
+            election = cs.key("mx.election", f"{day}:general")
+            path = f"mx/{day}-general"
+            if election in cs.minted:
                 cs.add(
-                    "contest_option",
-                    id=head,
-                    contest_id=contest,
-                    kind="candidate",
-                    party_id=party(members[0]) if len(members) == 1 else None,
-                    alliance_id=alliance_of(members) if len(members) > 1 else None,
-                    ballot_position=position,
-                    ballot_label="–".join(members) if members else "Candidatura independiente",
+                    "election", id=election, polity_id=mexico, kind="general", date_from=day, date_to=day, status="held"
                 )
-                if position == 1:
-                    cs.add("outcome", result_set_id=district_set, option_id=head, kind="elected", seats=1)
-                    label = "–".join(members) if members else INDEPENDENT
-                    winners[label] = winners.get(label, 0) + 1
-                for column in group:
-                    if len(group) == 1:
-                        options[column] = str(head)
-                        continue
-                    line = cs.key("mx.option", f"{contest_key}:{'+'.join(group)}:{column}")
-                    mine = [m for m in columns[column] if m != INDEPENDENT]
+                name(election, f"{year} Mexican general election")
+                name(election, f"Elecciones federales de {year}", "es", "native")
+                cs.add("slug", path=path, entity_id=election)
+
+            def make_set(
+                contest: UUID,
+                key: str,
+                default: bool,
+                source: UUID,
+                completeness: float,
+                note: str,
+                day: date = day,
+                election: UUID = election,
+            ) -> UUID:
+                result_set = cs.key("mx.result_set", f"{day}:dip:{key}")
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=default,
+                    completeness=completeness,
+                )
+                cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
+                return result_set
+
+            alliances: dict[str, UUID] = {}
+
+            def alliance_of(
+                members: list[str], day: date = day, election: UUID = election, alliances: dict[str, UUID] = alliances
+            ) -> UUID:
+                key = "-".join(members)
+                if key not in alliances:
+                    alliances[key] = cs.key("mx.alliance", f"{day}:{key}")
+                    cs.add("alliance", id=alliances[key], kind="electoral_alliance", election_id=election)
+                    name(alliances[key], "–".join(members) + " coalition")
+                    name(alliances[key], "Coalición " + "–".join(members), "es", "native")
+                    for member in members:
+                        cs.add("alliance_member", alliance_id=alliances[key], party_id=party(member))
+                return alliances[key]
+
+            votes = pl.read_parquet(PARSED / f"mr_{year}_votes.parquet")
+            casillas = pl.read_parquet(PARSED / f"mr_{year}_casillas.parquet")
+            casillas = casillas.filter((pl.col("casilla") != "") | (pl.col("total") > 0))
+            unknown = set(votes.filter(pl.col("kind") == "list")["option"]) - set(columns)
+            if unknown:
+                raise ValueError(f"{year}: columns without a party: {sorted(unknown)}")
+
+            placed = []
+            for row in casillas.iter_rows(named=True):
+                state = f"{int(row['state']):02d}"
+                district = int(row["district"]) if row["district"].isdigit() else 0
+                section = int(row["section"])
+                letter = row["casilla"][:1] or "X"
+                code = f"{year}:{state}-{district:02d}-{section:04d}-{ine.casilla_code(year, re.sub(r'^S(?:MR|RP)', 'S', row['casilla']) or 'X')}"
+                channel, kind, area = 0, "standard", None
+                if letter in "MV" or section == 0:
+                    channel, kind = ine.ABROAD, "aggregate"
+                elif letter == "A":
+                    channel, kind = ine.EARLY, "aggregate"
+                elif letter == "P":
+                    channel, kind = ine.PRISON, "prison"
+                else:
+                    area = sections.get(f"{state}{section:04d}")
+                    if area is None and row["municipality"] not in ("", "0"):
+                        area = towns.get(f"{state}{int(row['municipality']):03d}")
+                unit_id = cs.unit("mx.casilla", code)
+                if unit_id in unit_rows:
+                    raise ValueError(f"{year}: casilla {code} appears twice")
+                unit_rows[unit_id] = (
+                    "mx.casilla",
+                    code,
+                    state_units[state],
+                    "within",
+                    area or cs.area("mx.entidad", state),
+                    kind,
+                )
+                placed.append((*(row[k] for k in ine.KEYS), str(unit_id), channel))
+            units = pl.DataFrame(
+                placed,
+                schema=[*((k, pl.String) for k in ine.KEYS), ("unit_id", pl.String), ("channel", pl.Int16)],
+                orient="row",
+            )
+            located = casillas.join(units, on=ine.KEYS)
+            joined = votes.join(units, on=ine.KEYS)
+            totals = (
+                joined.filter(pl.col("kind") == "list")
+                .group_by("state", "district", "option")
+                .agg(pl.col("votes").sum())
+            )
+
+            winners: dict[str, int] = {}
+            decided = 0
+            by_district = {key: group for key, group in totals.group_by(["state", "district"])}
+            for (state, district), group in sorted(
+                by_district.items(), key=lambda item: (int(item[0][0]), int(item[0][1]))
+            ):
+                ss, dd = f"{int(state):02d}", int(district)
+                contest_key = f"{day}:dip:mr:{ss}{dd:02d}"
+                contest = cs.key("mx.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats",
+                    body_id=body,
+                    magnitude=1,
+                    electoral_system_id=mr_system,
+                    default_result_kind="counted",
+                )
+                name(contest, f"{year} Chamber of Deputies, {states[ss]}, district {dd}")
+                name(contest, f"Diputación federal {year}, {states[ss]}, distrito {dd}", "es", "native")
+                cs.add("slug", path=f"{path}/{slug(states[ss])}-district-{dd}", entity_id=contest)
+                totals_by = {r["option"]: r["votes"] for r in group.iter_rows(named=True) if r["votes"] > 0}
+                standing = {tuple(sorted(g)): sum(totals_by[c] for c in g) for g in groups_of(columns, list(totals_by))}
+                # Equal totals below first place take the order of their column names, so a rebuild orders them alike.
+                ordered = sorted(standing.items(), key=lambda item: (-item[1], item[0]))
+                if len(ordered) > 1 and ordered[0][1] == ordered[1][1]:
+                    raise ValueError(f"{year} {states[ss]} {dd}: tie for first place")
+                district_unit = cs.unit("mx.distrito_federal", f"{year}:{ss}-{dd:02d}")
+                unit_rows[district_unit] = (
+                    "mx.distrito_federal",
+                    f"{year}:{ss}-{dd:02d}",
+                    state_units[ss],
+                    "within",
+                    cs.area("mx.entidad", ss),
+                    "aggregate",
+                )
+                district_set = make_set(contest, f"mr:{ss}{dd:02d}:district", True, ine_source, 1, MR_METHOD)
+                casilla_set = make_set(contest, f"mr:{ss}{dd:02d}:casilla", False, ine_source, 1, CASILLA_NOTE)
+                options: dict[str, str] = {}
+                for position, (lines, _) in enumerate(ordered, 1):
+                    members = sorted({m for c in lines for m in columns[c]} - {INDEPENDENT})
+                    head = cs.key("mx.option", f"{contest_key}:{'+'.join(lines)}")
                     cs.add(
                         "contest_option",
-                        id=line,
+                        id=head,
                         contest_id=contest,
                         kind="candidate",
-                        parent_option_id=head,
-                        party_id=party(mine[0]) if len(mine) == 1 else None,
-                        alliance_id=alliance_of(mine) if len(mine) > 1 else None,
-                        ballot_label="–".join(mine),
+                        party_id=party(members[0]) if len(members) == 1 else None,
+                        alliance_id=alliance_of(members) if len(members) > 1 else None,
+                        ballot_position=position,
+                        ballot_label="–".join(members) if members else "Candidatura independiente",
                     )
-                    options[column] = str(line)
-            write_in = cs.key("mx.option", f"{contest_key}:unregistered")
-            cs.add(
-                "contest_option",
-                id=write_in,
-                contest_id=contest,
-                kind="write_in",
-                ballot_label="Candidatos no registrados",
-            )
-            mine = joined.filter((pl.col("state") == state) & (pl.col("district") == district))
-            mine_units = located.filter((pl.col("state") == state) & (pl.col("district") == district))
-            frames.append(
-                district_frame(
-                    mine, mine_units, options, str(write_in), str(casilla_set), str(district_unit), str(district_set)
+                    if position == 1:
+                        cs.add("outcome", result_set_id=district_set, option_id=head, kind="elected", seats=1)
+                        label = "–".join(members) if members else INDEPENDENT
+                        winners[label] = winners.get(label, 0) + 1
+                    for column in lines:
+                        if len(lines) == 1:
+                            options[column] = str(head)
+                            continue
+                        line = cs.key("mx.option", f"{contest_key}:{'+'.join(lines)}:{column}")
+                        mine = [m for m in columns[column] if m != INDEPENDENT]
+                        # A line that combines parties of the coalition belongs to the coalition's alliance.
+                        cs.add(
+                            "contest_option",
+                            id=line,
+                            contest_id=contest,
+                            kind="candidate",
+                            parent_option_id=head,
+                            party_id=party(mine[0]) if len(mine) == 1 else None,
+                            alliance_id=alliance_of(members) if len(mine) > 1 else None,
+                            ballot_label="–".join(mine),
+                        )
+                        options[column] = str(line)
+                write_in = cs.key("mx.option", f"{contest_key}:unregistered")
+                cs.add(
+                    "contest_option",
+                    id=write_in,
+                    contest_id=contest,
+                    kind="write_in",
+                    ballot_label="Candidatos no registrados",
                 )
-            )
-            decided += 1
-        print(year, "district winners", dict(sorted(winners.items(), key=lambda item: -item[1])), decided)
+                mine_votes = joined.filter((pl.col("state") == state) & (pl.col("district") == district))
+                mine_units = located.filter((pl.col("state") == state) & (pl.col("district") == district))
+                frames.append(
+                    district_frame(
+                        mine_votes,
+                        mine_units,
+                        options,
+                        str(write_in),
+                        str(casilla_set),
+                        str(district_unit),
+                        str(district_set),
+                    )
+                )
+                decided += 1
 
-        national = cs.key("mx.contest", f"{day}:dip:rp")
-        cs.add(
-            "contest",
-            id=national,
-            election_id=election,
-            kind="list_allocation",
-            body_id=body,
-            magnitude=200,
-            electoral_system_id=rp_system,
-            default_result_kind="counted",
-        )
-        name(national, f"{year} Chamber of Deputies, proportional representation lists")
-        name(national, f"Diputaciones federales {year}, representación proporcional", "es", "native")
-        cs.add("slug", path=f"{path}/proportional", entity_id=national)
-        declared = config["votes"]
-        unregistered, null, total = declared["unregistered"], declared["null"], declared["total"]
-        listed = {
-            abbrev: count for abbrev, count in declared.items() if abbrev not in ("unregistered", "null", "total")
-        }
-        if sum(listed.values()) + unregistered + null != total:
-            raise ValueError(f"{year}: the declared figures do not add to {total}")
-        rp_options: dict[str, UUID] = {}
-        for position, abbrev in enumerate(sorted(listed, key=lambda a: -listed[a]), 1):
-            rp_options[abbrev] = cs.key("mx.option", f"{day}:dip:rp:{abbrev}")
-            cs.add(
-                "contest_option",
-                id=rp_options[abbrev],
-                contest_id=national,
-                kind="list",
-                party_id=party(abbrev) if abbrev != INDEPENDENT else None,
-                ballot_position=position,
-                ballot_label=abbrev if abbrev != INDEPENDENT else "Candidaturas independientes",
-            )
-        rp_write_in = cs.key("mx.option", f"{day}:dip:rp:unregistered")
-        cs.add(
-            "contest_option",
-            id=rp_write_in,
-            contest_id=national,
-            kind="write_in",
-            ballot_label="Candidatos no registrados",
-        )
-        national_set = make_set(
-            national, "rp:national", True, acuerdo, 1, RP_NATIONAL_METHOD.format(page=pages["votes"])
-        )
-        cs.add("citation", entity_id=national_set, source_id=acuerdo, locator={"page": pages["votes"]})
-        rows: list[tuple[str, str, str | None, int, int, int]] = []
-        unit = str(nation_unit)
-        for abbrev, count in listed.items():
-            rows.append((str(national_set), unit, str(rp_options[abbrev]), VOTES, count, 0))
-        rows.append((str(national_set), unit, str(rp_write_in), VOTES, unregistered, 0))
-        for measure, value in ((BALLOTS, total), (VALID, total - null), (INVALID, null)):
-            rows.append((str(national_set), unit, None, measure, value, 0))
-        seat_total = 0
-        for number in range(1, 6):
-            contest = cs.key("mx.contest", f"{day}:dip:rp:{number}")
+            national = cs.key("mx.contest", f"{day}:dip:rp")
             cs.add(
                 "contest",
-                id=contest,
+                id=national,
                 election_id=election,
                 kind="list_allocation",
                 body_id=body,
-                magnitude=40,
+                magnitude=200,
                 electoral_system_id=rp_system,
-                allocation_parent_id=national,
                 default_result_kind="counted",
             )
-            name(contest, f"{year} Chamber of Deputies, proportional representation, circunscripción {number}")
-            name(contest, f"Diputaciones federales {year}, circunscripción {number}", "es", "native")
-            cs.add("slug", path=f"{path}/proportional-{number}", entity_id=contest)
-            cs.add("note", entity_id=contest, kind="methodology", body_md=f"States: {CIRCUNSCRIPCIONES[number]}.")
-            seat_set = make_set(contest, f"rp:{number}", True, acuerdo, 1, RP_SEATS_METHOD.format(page=pages["seats"]))
-            cs.add("citation", entity_id=seat_set, source_id=acuerdo, locator={"page": pages["seats"]})
-            circ_options: dict[str, UUID] = {}
-            for position, abbrev in enumerate(listed, 1):
-                circ_options[abbrev] = cs.key("mx.option", f"{day}:dip:rp:{number}:{abbrev}")
+            name(national, f"{year} Chamber of Deputies, proportional representation lists")
+            name(national, f"Diputaciones federales {year}, representación proporcional", "es", "native")
+            cs.add("slug", path=f"{path}/proportional", entity_id=national)
+            declared = config["votes"]
+            unregistered, null, total = declared["unregistered"], declared["null"], declared["total"]
+            listed = {
+                abbrev: count for abbrev, count in declared.items() if abbrev not in ("unregistered", "null", "total")
+            }
+            if sum(listed.values()) + unregistered + null != total:
+                raise ValueError(f"{year}: the declared figures do not add to {total}")
+            rp_options: dict[str, UUID] = {}
+            for position, abbrev in enumerate(sorted(listed, key=lambda a: -listed[a]), 1):
+                rp_options[abbrev] = cs.key("mx.option", f"{day}:dip:rp:{abbrev}")
                 cs.add(
                     "contest_option",
-                    id=circ_options[abbrev],
-                    contest_id=contest,
+                    id=rp_options[abbrev],
+                    contest_id=national,
                     kind="list",
                     party_id=party(abbrev) if abbrev != INDEPENDENT else None,
                     ballot_position=position,
-                    ballot_label=abbrev,
+                    ballot_label=abbrev if abbrev != INDEPENDENT else "Candidaturas independientes",
                 )
-            won = 0
-            for abbrev, per in config["seats"].items():
-                if per[number - 1]:
-                    won += per[number - 1]
+            rp_write_in = cs.key("mx.option", f"{day}:dip:rp:unregistered")
+            cs.add(
+                "contest_option",
+                id=rp_write_in,
+                contest_id=national,
+                kind="write_in",
+                ballot_label="Candidatos no registrados",
+            )
+            national_set = make_set(
+                national, "rp:national", True, acuerdo, 1, RP_NATIONAL_METHOD.format(page=pages["votes"])
+            )
+            cs.add("citation", entity_id=national_set, source_id=acuerdo, locator={"page": pages["votes"]})
+            unit = str(nation_unit)
+            for abbrev, count in listed.items():
+                rows.append((str(national_set), unit, str(rp_options[abbrev]), VOTES, count, 0))
+            rows.append((str(national_set), unit, str(rp_write_in), VOTES, unregistered, 0))
+            for measure, value in ((BALLOTS, total), (VALID, total - null), (INVALID, null)):
+                rows.append((str(national_set), unit, None, measure, value, 0))
+            seat_total = 0
+            for number in range(1, 6):
+                contest = cs.key("mx.contest", f"{day}:dip:rp:{number}")
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="list_allocation",
+                    body_id=body,
+                    magnitude=40,
+                    electoral_system_id=rp_system,
+                    allocation_parent_id=national,
+                    default_result_kind="counted",
+                )
+                name(contest, f"{year} Chamber of Deputies, proportional representation, circunscripción {number}")
+                name(contest, f"Diputaciones federales {year}, circunscripción {number}", "es", "native")
+                cs.add("slug", path=f"{path}/proportional-{number}", entity_id=contest)
+                cs.add("note", entity_id=contest, kind="methodology", body_md=f"States: {CIRCUNSCRIPCIONES[number]}.")
+                seat_set = make_set(
+                    contest, f"rp:{number}", True, acuerdo, 1, RP_SEATS_METHOD.format(page=pages["seats"])
+                )
+                cs.add("citation", entity_id=seat_set, source_id=acuerdo, locator={"page": pages["seats"]})
+                circ_options: dict[str, UUID] = {}
+                for position, abbrev in enumerate(listed, 1):
+                    circ_options[abbrev] = cs.key("mx.option", f"{day}:dip:rp:{number}:{abbrev}")
                     cs.add(
-                        "outcome",
-                        result_set_id=seat_set,
-                        option_id=circ_options[abbrev],
-                        kind="won",
-                        seats=per[number - 1],
+                        "contest_option",
+                        id=circ_options[abbrev],
+                        contest_id=contest,
+                        kind="list",
+                        party_id=party(abbrev) if abbrev != INDEPENDENT else None,
+                        ballot_position=position,
+                        ballot_label=abbrev,
                     )
-            if won != 40:
-                raise ValueError(f"{year}: circunscripción {number} seats add to {won}, not 40")
-            seat_total += won
-        print(year, "district winners", dict(sorted(winners.items(), key=lambda item: -item[1])), decided, seat_total)
+                won = 0
+                for abbrev, per in config["seats"].items():
+                    if per[number - 1]:
+                        won += per[number - 1]
+                        cs.add(
+                            "outcome",
+                            result_set_id=seat_set,
+                            option_id=circ_options[abbrev],
+                            kind="won",
+                            seats=per[number - 1],
+                        )
+                if won != 40:
+                    raise ValueError(f"{year}: circunscripción {number} seats add to {won}, not 40")
+                seat_total += won
+            print(
+                year, "district winners", dict(sorted(winners.items(), key=lambda item: -item[1])), decided, seat_total
+            )
 
         minted = [
             {
