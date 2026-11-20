@@ -193,6 +193,21 @@ MUNICIPALITIES = {
 MERGED_INTO_KICHEVO = {"Drugovo", "Oslomej", "Vraneshtitsa", "Zajas"}
 ALIASES = {"дебрца": "Дебарца", "маврово и ростуше": "Маврово и Ростуша"}
 BY_FOLD = {name.casefold(): name for name in MUNICIPALITIES} | ALIASES
+# The electoral units of 2011-2020 as unions of whole municipalities, each municipality in the unit that holds most of
+# its polling stations (the 2014 and 2020 station files agree). Chair, Kumanovo, Staro Nagorichane, Bitola, Krivogashtani,
+# and Kichevo are split between two units in the station files, so their outlines are approximate edges of the units.
+UNIT_MUNICIPALITIES = {
+    1: "Aerodrom,Karposh,Kisela Voda,Makedonski Brod,Saraj,Sopishte,Studenichani,Centar,Chair",
+    2: "Arachinovo,Butel,Gazi Baba,Gjorche Petrov,Kumanovo,Lipkovo,Staro Nagorichane,Chucher - Sandevo,Shuto Orizari",
+    3: "Berovo,Veles,Vinitsa,Gradsko,Delchevo,Zelenikovo,Zrnovtsi,Ilinden,Karbintsi,Kochani,Kratovo,Kriva Palanka,"
+    "Lozovo,Makedonska Kamenitsa,Petrovets,Pehchevo,Probishtip,Rankovtse,Sveti Nikole,Chashka,Cheshinovo - Obleshevo,"
+    "Shtip",
+    4: "Bogdantsi,Bosilovo,Valandovo,Vasilevo,Gevgelija,Demir Kapija,Dojran,Kavadartsi,Konche,Krivogashtani,Mogila,"
+    "Negotino,Novatsi,Novo Selo,Prilep,Radovish,Rosoman,Strumitsa",
+    5: "Bitola,Vevchani,Debar,Debartsa,Demir Hisar,Dolneni,Kichevo,Krushevo,Mavrovo and Rostusha,Ohrid,Plasnitsa,"
+    "Resen,Struga,Centar Zhupa",
+    6: "Bogovinje,Brvenitsa,Vrapchishte,Gostivar,Zhelino,Jegunovtse,Teartse,Tetovo",
+}
 ABROAD_2014 = {7: "Electoral unit 7 (abroad)", 8: "Electoral unit 8 (abroad)", 9: "Electoral unit 9 (abroad)"}
 
 
@@ -553,6 +568,7 @@ def geo() -> Package:
         as_of=shapes.retrieved_at.date(),
     )
     latin: dict[str, shapely.Geometry] = {}
+    outlines: dict[str, shapely.Geometry] = {}
     pieces: dict[str, list[shapely.Geometry]] = defaultdict(list)
     for feature in json.loads(shapes.path.read_text(encoding="utf-8"))["features"]:
         name = feature["properties"]["shapeName"]
@@ -568,6 +584,8 @@ def geo() -> Package:
         p.name(id, name, "mk", "official")
         p.name(id, english, "en", "english", False)
         outline = latin.get(english)
+        if outline is not None:
+            outlines[english] = outline
         if outline is None:
             raise ValueError(f"no outline for {english}")
         polygons = [
@@ -601,6 +619,34 @@ def geo() -> Package:
         p.name(id, name, "en", "official")
         number = code if code.isdigit() else "7"
         p.name(id, f"Изборна единица {number}", "mk", "official", False)
+    p.add(
+        "boundary_set",
+        id=key("boundary_set", S_DISTRICT, 2011),
+        scheme_code=S_DISTRICT,
+        vintage="2011",
+        valid_from=date(2011, 1, 1),
+        as_of=shapes.retrieved_at.date(),
+    )
+    for unit, names in UNIT_MUNICIPALITIES.items():
+        union = shapely.union_all([outlines[name] for name in names.split(",")])
+        polygons = [
+            part
+            for geometry in shapely.get_parts(union)
+            if shapely.get_type_id(geometry) in (3, 6)
+            for part in shapely.get_parts(geometry)
+        ]
+        multi = shapely.set_srid(shapely.MultiPolygon(polygons), 4326)
+        p.add(
+            "area_geometry",
+            area_id=district_area(str(unit)),
+            valid_from=date(2011, 1, 1),
+            geom=shapely.to_wkb(multi, hex=True, include_srid=True),
+            label_point=shapely.to_wkb(
+                shapely.set_srid(shapely.point_on_surface(multi), 4326), hex=True, include_srid=True
+            ),
+            quality="academic",
+            source_id=SHAPE_SOURCE,
+        )
     return p
 
 
