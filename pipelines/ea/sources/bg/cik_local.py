@@ -1,5 +1,8 @@
 """Bulgaria's local elections of 2011, 2015, 2019, and 2023 by polling section, from the CIK's open data.
 
+The 2007 local elections, published only as a results site, are read by `cik_local_2007` into packages of this
+pipeline.
+
 Every local election day elects, in each of the 265 municipalities, a municipal council (by list) and a mayor, and in
 the villages and towns with a mayoralty (a `kmetstvo`) a mayor of the mayoralty. The three cities of Sofia, Plovdiv,
 and Varna are also divided into districts (`rayoni`) that elect their own mayors. A mayor needs more than half of the
@@ -131,6 +134,9 @@ def fetch() -> None:
             raw.fetch(SOURCE, url, suffix=".json" if url.startswith(NSI) else ".zip")
         except httpx.HTTPError as failure:
             print(f"{url}: {failure}", flush=True)
+    from ea.sources.bg import cik_local_2007
+
+    cik_local_2007.fetch()
 
 
 def key(kind: str, *parts: object) -> str:
@@ -1232,14 +1238,19 @@ def accept(
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/registry", f"{SOURCE}/geo", *(f"{SOURCE}/{d.id}" for d in DAYS)]
+    from ea.sources.bg import cik_local_2007
+
+    return [f"{SOURCE}/registry", f"{SOURCE}/geo", *(f"{SOURCE}/{d.id}" for d in DAYS), *cik_local_2007.packages()]
 
 
 def parse() -> None:
+    from ea.sources.bg import cik_local_2007
+
     registry().write()
     geo().write()
     for day in DAYS:
         build(day).write()
+    cik_local_2007.parse()
 
 
 def emit() -> None:
