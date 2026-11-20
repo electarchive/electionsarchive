@@ -1841,18 +1841,14 @@ def build_year(cs: Draft, year: int, written: set[UUID], taken: set[UUID]) -> No
     )
     unit_rows: dict[UUID, dict[str, str | None]] = {}
     values: list[tuple[str, str, str | None, int, int]] = []
-    areas = {
-        code[:6]: area
-        for code, area in conn.execute(
-            "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'pl.gmina'"
-        ).fetchall()
-    }
-    counts = Counter(
-        code[:6]
-        for (code,) in conn.execute(
-            "select c.code from area a join area_code c on c.area_id = a.id where a.scheme_code = 'pl.gmina'"
-        ).fetchall()
-    )
+    # A gmina unit equals the area whose 7-digit TERYT code starts with its 6 digits. Warsaw's 18 districts
+    # (146502-146519) report as gminas but are areas of their own scheme, inside the gmina 1465011.
+    codes = conn.execute(
+        "select c.code, a.id from area a join area_code c on c.area_id = a.id "
+        "where a.scheme_code in ('pl.gmina', 'pl.dzielnica_warszawy')"
+    ).fetchall()
+    areas = {code[:6]: area for code, area in codes}
+    counts = Counter(code[:6] for code, _ in codes)
     gmina_units: dict[str, UUID] = {}
 
     def gmina_unit(code: str) -> UUID:

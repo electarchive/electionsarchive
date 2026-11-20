@@ -575,8 +575,10 @@ def emit() -> Path:
             "area_id": str(nation_area),
             "kind": "standard",
         }
+        # Warsaw's districts (146502-146519) report as gminas but are pl.dzielnica_warszawy areas.
         codes = conn.execute(
-            "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'pl.gmina'"
+            "select c.code, a.id from area a join area_code c on c.area_id = a.id "
+            "where a.scheme_code in ('pl.gmina', 'pl.dzielnica_warszawy')"
         ).fetchall()
         areas = {code[:6]: area for code, area in codes}
         gmina_units: dict[str, UUID] = {}
