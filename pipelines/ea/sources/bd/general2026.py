@@ -1,15 +1,12 @@
 """The 12 February 2026 general election to the 13th Jatiya Sangsad, from the returning officers' result sheets that
 the Election Commission's results portal serves (see `portal2026`)."""
 
-import struct
-import subprocess
 import unicodedata
 from datetime import date
 
 from ea import raw
 from ea.package import Package
 from ea.sources.bd import portal2026
-from ea.store import DATA
 
 DAY = date(2026, 2, 12)
 
@@ -118,31 +115,6 @@ def bengali_parties() -> dict[str, str]:
     return {PARTIES[k]: v for k, v in printed.items() if k in PARTIES}
 
 
-def page_image(path, image_key: str) -> tuple[int, int]:
-    target = DATA / image_key
-    target.parent.mkdir(parents=True, exist_ok=True)
-    if not target.exists():
-        subprocess.run(
-            [
-                "pdftoppm",
-                "-r",
-                "100",
-                "-png",
-                "-singlefile",
-                "-f",
-                "1",
-                "-l",
-                "1",
-                str(path),
-                str(target.with_suffix("")),
-            ],
-            check=True,
-            stderr=subprocess.DEVNULL,
-        )
-    width, height = struct.unpack(">II", target.read_bytes()[16:24])
-    return width, height
-
-
 def build(m) -> Package:
     """The election's package; `m` is the `ecs_parliament` module, whose ids and helpers it shares."""
     p = Package(
@@ -174,16 +146,22 @@ def build(m) -> Package:
     p.name(id, "2026 Bangladeshi general election", "en", "official")
     noted: list[str] = []
     for cid, e in seats().items():
-        stored = raw.cached(m.SOURCE, portal2026.sheet_document(portal[cid]) or "")
-        artifact = p.artifact(stored, source)
-        page = m.key("page", DAY, cid)
-        image_key = f"pages/{m.SOURCE}/{stored.sha256}-1.png"
-        width, height = page_image(stored.path, image_key)
-        p.add(
-            "source_page", id=page, artifact_id=artifact, page_number=1, image_key=image_key, width=width, height=height
-        )
+        url = portal2026.sheet_document(portal[cid]) or ""
         name = m.english(bengali_name(e["name"]))
         tag = f"{DAY}:{e['number']}"
+        # Each sheet is its own source, so that every value it gives points at the sheet it was read from.
+        sheet = m.key("source", "portal2026", cid)
+        p.add(
+            "source",
+            id=sheet,
+            kind="official_body",
+            publisher="Bangladesh Election Commission",
+            title=f"Returning officer's result sheet, {e['number']} {name}, general election of 12 February 2026",
+            url=url,
+            license="No license stated; published by the electoral authority for public use",
+            attribution="Bangladesh Election Commission",
+        )
+        p.artifact(raw.cached(m.SOURCE, url), sheet)
         district = m.area(name)
         unit = m.key("unit", tag)
         p.add(
@@ -239,12 +217,12 @@ def build(m) -> Package:
         top = sorted((c[2] for c in e["candidates"]), reverse=True)
 
         def put(
-            option: str | None, measure: int, value: int, at: tuple[str, str, str] = (result_set, unit, page)
+            option: str | None, measure: int, value: int, at: tuple[str, str, str] = (result_set, unit, sheet)
         ) -> None:
-            """A value, located on its sheet's page; the scans give no cell boxes, so the box is the page."""
+            """A value, located on the sheet it was read from; the scans give no cell boxes."""
             key = {"result_set_id": at[0], "unit_id": at[1], "option_id": option, "channel": 0, "measure": measure}
             p.add("result_value", **key, count_round=0, flags=m.DIGITIZED, value=value)
-            p.add("value_locator", **key, count_round=0, page_id=at[2], source_id=None, x0=0.0, y0=0.0, x1=1.0, y1=1.0)
+            p.add("value_locator", **key, count_round=0, page_id=None, source_id=at[2])
 
         for index, (person_name, code, votes) in enumerate(e["candidates"], start=1):
             person_name = unicodedata.normalize("NFC", person_name)
