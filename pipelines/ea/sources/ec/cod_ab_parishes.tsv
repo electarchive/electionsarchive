@@ -1,0 +1,1026 @@
+code	inec	name	method
+5	EC071351	Abañín	name
+10	EC130151	Abdón Calderón	name
+15	EC010851	Abdón Calderón	name
+20	EC060251	Achupallas	name
+25	EC150151	Ahuano	name
+30	EC170151	Alangasí	name
+35	EC050151	Aláquez	name
+40	EC060758	Santa Fé de Galán	name
+45	EC060757	San José del Chazo	name
+50	EC130152	Alhajuela	name
+55	EC170351	Aloag	name
+60	EC170352	Aloasí	name
+65	EC140151	Alshi	name
+70	EC080551	Alto Tambo	name
+75	EC230151	Alluriquín	name
+80	EC170152	Amaguaña	name
+85	EC011351	Amaluza	name
+90	EC140251	Amazonas	name
+95	EC180151	Ambatillo	name
+100	EC100151	Ambuquí	name
+105	EC130651	América	name
+110	EC080552	Ancón	name
+115	EC240351	Anconcito	name
+120	EC080251	Anchayacu	name
+125	EC050451	Angamarca	name
+130	EC100152	Angochagua	name
+135	EC050551	Antonio José Holguín	name
+140	EC120851	Antonio Sotomayor	name
+145	EC100351	Apuela	name
+150	EC121051	Patricia Pilar	name
+155	EC140451	Arapicos	name
+160	EC070851	El Ingenio	name
+165	EC170251	Ascázubi	name
+170	EC020351	Asunción	name
+175	EC010251	La Asunción	name
+180	EC140651	Asunción	name
+185	EC091451	Valle de la Virgen	name
+190	EC180152	Atahualpa	name
+195	EC170153	Atahualpa	name
+200	EC080252	Atahualpa	name
+205	EC240151	Atahualpa	name
+210	EC180153	Augusto N. Martínez	name
+215	EC220451	Ávila	name
+220	EC131351	Ayacucho	name
+225	EC070351	Ayapamba	name
+230	EC210251	El Reventador	name
+235	EC200351	Bella Vista	name
+240	EC130251	Membrillo	name
+245	EC070652	La Iberia	name
+250	EC040555	Piartal	name
+255	EC070152	El Retiro	name
+260	EC090654	Limonal	name
+265	EC131551	Bachillero	name
+270	EC111052	El Arenal	name
+275	EC020551	Balsapamba	name
+280	EC111353	Limones	name
+285	EC010151	Baños	name
+290	EC111352	Garzareal	name
+295	EC180851	Baquerizo Moreno	name
+300	EC070651	Barbones	name
+305	EC230155	Valle Hermoso	name
+310	EC111160	Sumaypamba	name
+315	EC050152	Belisario Quevedo	name
+320	EC110651	Bellavista	name
+325	EC071251	Bellavista	name
+330	EC131651	Bellavista	name
+335	EC180751	Benítez	name
+340	EC140252	Bermejos	name
+345	EC020552	Bilován	name
+350	EC140253	Bomboíza	name
+355	EC080351	Bolívar	name
+360	EC111551	Fundochamba	name
+365	EC180752	Bolívar	name
+370	EC080253	Borbón	name
+375	EC070355	San Juan de Cerro Azul	name
+380	EC130351	Boyacá	name
+385	EC110551	Buenavista	name
+390	EC070951	Buenavista	name
+395	EC010552	Bulán	name
+400	EC220455	San Vicente de Huaticocha	name
+405	EC130354	Chibunga	name
+410	EC060759	Valparaiso	name
+415	EC220353	San Carlos	name
+420	EC060151	Cacha	name
+425	EC100651	Cahuasquí	name
+430	EC170154	Calacalí	name
+435	EC080553	Calderón	name
+440	EC170155	Calderón	name
+445	EC060152	Calpi	name
+450	EC080152	Camarones	name
+455	EC190951	Bellavista	name
+460	EC131051	Campozano	name
+465	EC050651	Canchagua	name
+470	EC132251	Canoa	name
+475	EC160152	Canelos	name
+480	EC170252	Cangahua	name
+485	EC110951	Cangonamá	name
+490	EC220351	enokanqui	name
+495	EC130352	Canuto	name
+500	EC060351	Cañi	name
+505	EC071051	Capiro	name
+510	EC220251	Capitán Augusto Rivadeneyra	name
+515	EC060551	Capzol	name
+520	EC120152	Caracol	name
+525	EC141052	Shimpis	name
+530	EC100153	La Carolina	name
+535	EC080554	Carondelet	name
+540	EC131052	Cascol	name
+545	EC110957	San Antonio	name
+550	EC111351	Mangahurco	name
+555	EC060651	Cebadas	name
+560	EC130654	La Unión	name
+565	EC111051	Ciano	name
+570	EC080555	5 de Junio	name
+575	EC010451	Cochapata	name
+580	EC131751	Cojimíes	name
+585	EC030151	Cojitambo	name
+590	EC110251	Colaisaca	name
+595	EC140951	Huasaga	name
+600	EC210454	San Pedro de los Cofánes	name
+605	EC240152	Colonche	name
+610	EC060352	Columbe	name
+615	EC060552	Compud	name
+620	EC080556	Concepción	name
+625	EC170156	Conocoto	name
+630	EC220252	Cononaco	name
+635	EC180154	Constantino Fernández	name
+640	EC130353	Convento	name
+645	EC140551	Copal	name
+650	EC170355	Manuel Cornejo Astorga	name
+655	EC080153	Coronel Carlos Concha Torres	name
+660	EC092251	Coronel Lorenzo de Garaycoa	name
+665	EC190651	El Guisme	name
+670	EC150751	Cosanga	name
+675	EC180753	Cotaló	name
+680	EC170551	Cotogchoa	name
+685	EC150352	Cotundo	name
+690	EC040551	Cristóbal Colón	name
+695	EC110451	Cruzpamba	name
+700	EC080451	Cube	name
+705	EC060153	Cubijíes	name
+710	EC140853	San Jacinto de Wakambeis	name
+715	EC140452	Cumandá	name
+720	EC190151	Cumbaratza	name
+725	EC170157	Cumbayá	name
+730	EC010152	Cumbe	name
+735	EC160451	Curaray	name
+740	EC071151	Curtincapa	name
+745	EC050552	Cusubamba	name
+750	EC010951	Cuchil	name
+755	EC170353	Cutuglahua	name
+760	EC210751	Cuyabeno	name
+765	EC150752	Cuyuja	name
+770	EC130153	Crucita	name
+775	EC070956	Cañaquemada	name
+780	EC210455	Siete de Julio	name
+785	EC131753	Atahualpa	name
+790	EC110655	El Ingenio	name
+795	EC020160	San Luis de Pambil	name
+800	EC180167	Cunchibamba	name
+805	EC070251	Chacras	name
+810	EC180168	Unamuncho	name
+815	EC050754	Palo Quemado	name
+820	EC240153	Chanduy	name
+825	EC110751	Changaimina	name
+830	EC050652	Chantilín	name
+835	EC111451	Chaquinal	name
+840	EC131453	Charapotó	name
+845	EC010153	Chaucha	name
+850	EC170354	El Chaupi	name
+855	EC170158	Chavezpamba	name
+860	EC010154	Checa	name
+865	EC170159	Checa	name
+870	EC010553	Chicán	name
+875	EC140751	Chiguaza	name
+880	EC140254	Chigüinda	name
+885	EC010252	San Gerardo	name
+890	EC010562	Dug Dug	name
+895	EC080154	Chinca	name
+900	EC180754	Chiquicha	name
+905	EC010155	Chiquintad	name
+910	EC040552	Chitán de Navarrete	name
+915	EC190251	Chito	name
+920	EC091051	Chobo	name
+925	EC060955	La Candelaria	name
+930	EC080751	Chontaduro	name
+935	EC030351	Chontamarca	name
+940	EC150153	Chontapunta	name
+945	EC190653	Tundayme	name
+950	EC030352	Chorocopte	name
+955	EC100551	Chugá	name
+960	EC050751	Chugchillán	name
+965	EC080752	Chumundé	name
+970	EC140552	Chupianza	name
+975	EC110152	Chuquiribamba	name
+980	EC080452	Chura	name
+985	EC190551	Chicaña	name
+990	EC050653	Cochapamba	name
+995	EC110958	Casanga	name
+1000	EC110959	Yamana	name
+1005	EC010352	Daniel Córdova Toral	name
+1010	EC080352	Daule	name
+1015	EC190652	Pachicutza	name
+1020	EC150451	Gonzalo Díaz de Pineda	name
+1025	EC160154	Diez de Agosto	name
+1030	EC131752	Diez de Agosto	name
+1035	EC111452	12 de Diciembre	name
+1040	EC100451	Dr. Miguel Egas Cabezas	name
+1045	EC210152	Dureno	name
+1050	EC220452	Puerto Murialdo	name
+1055	EC040255	San Rafael	name
+1060	EC131152	San Sebastián	name
+1065	EC131151	Barraganete	name
+1070	EC130451	Wilfrido Loor Moreira	name
+1075	EC071453	San Isidro	name
+1080	EC071452	El Paraíso	name
+1085	EC030254	Jerusalén	name
+1090	EC210252	Gonzalo Pizarro	name
+1095	EC210652	Sevilla	name
+1100	EC071451	La Libertad	name
+1105	EC131355	San Pablo	name
+1110	EC060951	El Altar	name
+1115	EC130652	El Anegado	name
+1120	EC190952	Nuevo Quito	name
+1125	EC040151	El Carmelo	name
+1130	EC010852	El Carmen de Pijilí	manual
+1135	EC110153	El Cisne	name
+1140	EC140655	Santa Marianita de Jesús	name
+1145	EC190252	El Chorro	name
+1150	EC040351	El Goaltal	name
+1155	EC111053	El Limo	name
+1160	EC130355	Eloy Alfaro	name
+1165	EC111151	El Paraíso de Celen	name
+1170	EC210551	El Playón de San Francisco	name
+1175	EC010452	El Progreso	name
+1180	EC110552	El Rosario	name
+1185	EC180755	El Rosario	name
+1190	EC111152	El Tablón	name
+1195	EC040159	El Chical	name
+1200	EC110351	El Tambo	name
+1205	EC140953	Tuutinentsa	name
+1210	EC180852	Emilio María Terán	name
+1215	EC100452	Eugenio Espejo	name
+1220	EC200151	El Progreso	name
+1225	EC070954	Progreso	name
+1230	EC110252	El Lucero	name
+1235	EC220151	Dayuma	name
+1240	EC190851	El Porvenir del Carmen	name
+1245	EC220152	Taracoa	name
+1250	EC140162	Cuchaentza	name
+1255	EC020151	Facundo Vela	name
+1260	EC160155	Fátima	name
+1265	EC120153	Febres Cordero	name
+1270	EC040553	Fernández Salvador	name
+1275	EC160166	El Triunfo	name
+1280	EC060154	Flores	name
+1285	EC210155	El eno	name
+1290	EC210156	Pacayacu	name
+1295	EC141251	San José de Morona	name
+1300	EC240156	San José de Ancón	name
+1305	EC080353	Galera	name
+1310	EC100352	García Moreno	name
+1315	EC040251	García Moreno	name
+1320	EC180756	García Moreno	name
+1325	EC060956	Bilbao	name
+1330	EC210153	General Farfán	name
+1335	EC030353	General Morales	name
+1340	EC092053	General Pedro J. Montero	name
+1345	EC140153	General Proaño	name
+1350	EC091951	General Vernaza	name
+1355	EC010952	Jima	name
+1360	EC100453	González Suárez	name
+1365	EC140557	San Francisco de Chinimbimi	name
+1370	EC060553	Gonzol	name
+1375	EC180951	Quinchicoto	name
+1380	EC110952	Guachanamá	name
+1385	EC071056	Saracay	name
+1390	EC190152	Guadalupe	name
+1395	EC131053	Guale	name
+1400	EC170161	Gualea	name
+1405	EC110154	Gualel	name
+1410	EC030354	Gualleturo	name
+1415	EC060751	Guanando	name
+1420	EC071353	Guanazán	name
+1425	EC071354	Guizhaguiña	name
+1430	EC050453	Guangaje	name
+1435	EC090551	San Jacinto	name
+1440	EC170162	Guangopolo	name
+1445	EC030153	Guapán	name
+1450	EC110554	Amarillos	name
+1455	EC010556	Guarainag	name
+1460	EC120251	Guare	name
+1465	EC060253	Guasuntos	name
+1470	EC090851	Guayas	name
+1475	EC170163	Guayllabamba	name
+1480	EC110352	Guayquichuma	name
+1485	EC050153	Guaytacama	name
+1490	EC010953	Güel	name
+1495	EC110457	Teniente Maximiliano Rodríguez Loaiza	name
+1500	EC050251	Guasaganda	name
+1505	EC080263	San José de Cayapas	name
+1510	EC080262	Colón Eloy del María	name
+1515	EC080264	Timbiré	name
+1520	EC040651	Mariscal Sucre	name
+1525	EC120155	La Unión	name
+1530	EC080455	La Unión	name
+1535	EC011152	La Unión	name
+1540	EC011051	Susudel	name
+1545	EC130952	La Pila	name
+1550	EC110254	Sanguillín	name
+1555	EC210752	Aguas Negras	name
+1560	EC220154	El Dorado	name
+1565	EC220157	Inés Arango	name
+1570	EC131653	Arquitecto Sixto Durán Ballén	name
+1575	EC011154	San Martín de Puzhio	name
+1585	EC011153	Luis Galarza Orellana	name
+1590	EC220155	El Edén	name
+1595	EC091953	Junquillal	name
+1600	EC130551	San Francisco de Novillo	name
+1605	EC030355	Honorato Vásquez	name
+1610	EC131352	Honorato Vásquez	name
+1615	EC080654	Tonsupa	name
+1620	EC130552	Zapallo	name
+1625	EC180155	Huachi Grande	name
+1630	EC180757	Guambaló	name
+1635	EC140652	Huambi	name
+1640	EC090852	El Rosario	name
+1645	EC110656	El Airo	name
+1650	EC011253	San Vicente	name
+1655	EC071355	Huertas	name
+1660	EC060254	Huigra	name
+1665	EC071257	Bellamaría	name
+1670	EC091452	Sabanilla	name
+1675	EC190351	Zurmi	name
+1680	EC220454	San José de Dahuano	name
+1685	EC140455	16 de Agosto	name
+1690	EC010652	San Rafael de Sharug	name
+1695	EC070255	Carcabón	name
+1700	EC071358	Sinsao	name
+1705	EC060752	Ilapo	name
+1710	EC100353	Imantag	name
+1715	EC100251	Imbaya	name
+1720	EC140351	Indanza	name
+1725	EC030356	Ingapirca	name
+1730	EC140164	Río Blanco	name
+1735	EC050752	Isinlivi	name
+1740	EC120252	Isla de Bejucal	name
+1745	EC180156	Izamba	name
+1750	EC071359	Salvias	name
+1755	EC230153	Luz de América	name
+1760	EC010359	Luis Cordero Vega	name
+1765	EC040161	Santa Martha de Cuba	name
+1770	EC190158	San Carlos de Las Minas	name
+1775	EC030362	Ventura	name
+1780	EC110163	Quinara	name
+1785	EC140854	Santiago de Pananza	name
+1790	EC210158	Santa Cecilia	name
+1795	EC210157	Jambelí	name
+1800	EC130852	Santa Marianita	name
+1805	EC010353	Jadán	name
+1810	EC220156	García Moreno	name
+1815	EC071252	Jambelí	name
+1820	EC220158	La Belleza	name
+1825	EC030154	Javier Loyola	name
+1830	EC091151	Jesús María	name
+1835	EC040452	Jijón y Caamaño	name
+1840	EC110155	Jimbilla	name
+1845	EC110652	Jimbura	name
+1850	EC240352	José Luis Tamayo	name
+1855	EC090652	Juan Bautista Aguirre	name
+1860	EC180157	Juan Benigno Vela	name
+1865	EC060353	Juan de Velasco	name
+1870	EC090152	Juan Gómez Rendón	name
+1875	EC040453	Juan Montalvo	name
+1880	EC130653	Julcuy	name
+1885	EC040153	Julio Andrade	name
+1890	EC020153	Julio E. Moreno	name
+1895	EC030363	Ducur	name
+1900	EC030357	Juncal	name
+1905	EC050154	Joseguango Bajo	name
+1910	EC140258	El Ideal	name
+1915	EC092056	Virgen de Fátima	name
+1920	EC131952	Salango	name
+1925	EC130157	Chirijos	name
+1930	EC150157	Tálag	name
+1935	EC220161	San Luis de Armenia	name
+1940	EC220159	Nuevo Paraíso	name
+1945	EC220160	San José de Guayusa	name
+1950	EC220356	Rumipamba	name
+1955	EC220357	Tres de Noviembre	name
+1960	EC220355	Lago San Pedro	name
+1965	EC220358	Unión Milagreña	name
+1970	EC230154	San Jacinto del Búa	name
+1975	EC070451	Bellamaría	name
+1980	EC130452	San Pedro de Suma	name
+1985	EC200352	Santa Rosa	name
+1990	EC230156	El Esfuerzo	name
+1995	EC220153	Alejandro Labaka	name
+2000	EC111355	Bolaspamba	name
+2005	EC071253	La Avanzada	name
+2010	EC040451	Concepción	name
+2015	EC190254	La Chonta	name
+2020	EC100154	La Esperanza	name
+2025	EC170451	La Esperanza	name
+2030	EC131552	Ángel Pedro Giler	name
+2035	EC080753	Lagarto	name
+2040	EC040352	La Libertad	name
+2045	EC230157	Santa María del Toachi	name
+2050	EC070654	Río Bonito	name
+2055	EC170164	La Merced	name
+2060	EC100652	La Merced de Buenos Aires	name
+2065	EC040554	La Paz	name
+2070	EC190451	La Paz	name
+2075	EC070953	La Peaña	name
+2080	EC060753	La Providencia	name
+2085	EC110851	Larama	name
+2090	EC131054	Lascano	name
+2095	EC210552	La Sofía	name
+2100	EC160351	San José	name
+2105	EC090656	Los Lojas	name
+2110	EC190259	San Andrés	name
+2115	EC050753	Las Pampas	name
+2120	EC111651	La Tingue	name
+2125	EC080254	La Tola	name
+2130	EC080651	La Unión	name
+2135	EC131353	La Unión	name
+2140	EC110954	Lauro Guerrero	name
+2145	EC110852	La Victoria	name
+2150	EC050455	La Victoria	name
+2155	EC190153	Imbana	name
+2160	EC060155	Licán	name
+2165	EC060156	Licto	name
+2170	EC190854	La Canela	name
+2175	EC210451	Limoncocha	name
+2180	EC150452	Linares	name
+2185	EC100155	Lita	name
+2205	EC040252	Los Andes	name
+2210	EC180552	Los Andes	name
+2215	EC010954	Ludo	name
+2220	EC030155	Luis Cordero	name
+2225	EC080255	Luis Vargas Torres	name
+2230	EC071052	La Bocana	name
+2240	EC190553	Los encuentros	name
+2255	EC010156	Llacao	name
+2260	EC060554	Llagos	name
+2265	EC170165	Llano Chico	name
+2270	EC180251	Lligua	name
+2275	EC170166	Lloa	name
+2280	EC111153	Lluzhapa	name
+2285	EC140952	Macuma	name
+2305	EC131951	Machalilla	name
+2310	EC160251	Madre Tierra	name
+2315	EC020353	La Magdalena	name
+2320	EC080159	Majua	name
+2325	EC110156	Malacatos	name
+2330	EC170452	Malchinguí	name
+2335	EC080256	Maldonado	name
+2340	EC040154	Maldonado	name
+2345	EC080453	Malimpia	name
+2350	EC071356	Malvas	name
+2355	EC240154	Manglaralto	name
+2360	EC111154	Manú	name
+2365	EC030451	Manuel J. Calle	name
+2375	EC180853	Marcos Espinel	name
+2380	EC100552	Mariano Acosta	name
+2385	EC010354	Mariano Moreno	name
+2390	EC091053	Mariscal Sucre	name
+2395	EC080557	Mataje	name
+2400	EC060952	Matus	name
+2405	EC111054	Mercadillo	name
+2410	EC170751	Mindo	name
+2430	EC010157	Molleturo	name
+2435	EC180158	Montalvo	name
+2445	EC080754	Montalvo	name
+2450	EC160156	Montalvo	name
+2455	EC040253	Monte Olivo	name
+2460	EC050351	Moraspungo	name
+2465	EC071053	Moromoro	name
+2470	EC090153	Morro	name
+2475	EC050553	Mulalillo	name
+2480	EC050156	Mulaló	name
+2485	EC060255	Multitud	name
+2490	EC050554	Mulliquindil	name
+2520	EC110753	Nambacola	name
+2525	EC170168	Nanegal	name
+2530	EC170169	Nanegalito	name
+2540	EC170170	Nayón	name
+2545	EC030251	Nazón	name
+2550	EC010453	Las Nieves	name
+2555	EC131652	Noboa	name
+2560	EC170171	Nono	name
+2565	EC140256	Nueva Tarqui	name
+2570	EC010158	Nulti	name
+2575	EC111251	Nueva Fátima	name
+2595	EC010159	Octavio Cordero Palacios	name
+2600	EC170253	Olmedo	name
+2620	EC050157	Once de Noviembre	name
+2630	EC110956	Orianga	name
+2635	EC170254	Otón	name
+2640	EC150453	Oyacachi	name
+2670	EC080257	Pampanal de Bolívar	name
+2675	EC100653	Pablo Arenas	name
+2680	EC010160	Paccha	name
+2690	EC170172	Pacto	name
+2710	EC111354	Paletillas	name
+2715	EC070254	Palmales	name
+2720	EC210351	Palma Roja	name
+2725	EC011352	Palmas	name
+2730	EC060652	Palmira	name
+2745	EC030452	Pancho Negro	name
+2750	EC140851	Pan de Azúcar	name
+2755	EC150154	Pano	name
+2760	EC050555	Pansaleo	name
+2765	EC210452	Pañacocha	name
+2770	EC150753	Papallacta	name
+2775	EC180159	Pasa	name
+2785	EC100454	Pataquí	name
+2795	EC140553	Patuca	name
+2810	EC130657	Pedro Pablo Gómez	name
+2820	EC100354	Peñaherrera	name
+2825	EC170174	Perucho	name
+2830	EC180160	Picaihua	name
+2850	EC071054	Piedras	name
+2855	EC170175	Pifo	name
+2860	EC180161	Pilagüín	name
+2865	EC050456	Pilaló	name
+2875	EC120154	Pimocha	name
+2885	EC030156	Pindilig	name
+2890	EC050352	Pinllopata	name
+2895	EC170176	Píntag	name
+2900	EC040155	Pioter	name
+2905	EC060256	Pistishi	name
+2915	EC100355	Plaza Gutiérrez	name
+2920	EC050158	Poaló	name
+2925	EC170177	Pomasqui	name
+2930	EC220352	Pompeya	name
+2940	EC090156	Posorja	name
+2945	EC180854	Presidente Urbina	name
+2950	EC011151	Principal	name
+2955	EC190256	Pucapamba	name
+2965	EC050252	Pucayacu	name
+2970	EC130154	Pueblo Nuevo	name
+2975	EC060953	Puela	name
+2980	EC170178	Puéllaro	name
+2985	EC170179	Puembo	name
+2990	EC130658	Puerto Cayo	name
+3000	EC150155	Puerto Misahuallí	name
+3005	EC210352	Puerto Bolívar	name
+3015	EC120451	Puerto Pechiche	name
+3020	EC210353	Puerto Rodríguez	name
+3025	EC060257	Pumallacta	name
+3030	EC090157	Puná	name
+3035	EC060157	Pungalá	name
+3040	EC060158	Punín	name
+3045	EC110754	Purunuma	name
+3050	EC150156	Puerto Napo	name
+3055	EC160157	Pomona	name
+3095	EC060159	Quimiag	name
+3100	EC170160	El Quinche	name
+3105	EC010161	Quingeo	name
+3110	EC130252	Quiroga	name
+3115	EC100356	Quiroga	name
+3120	EC180162	Quisapincha	name
+3125	EC080354	Quingue	name
+3155	EC050353	Ramón Campaña	name
+3160	EC010356	Remigio Crespo Toral	name
+3165	EC010162	Ricaurte	name
+3170	EC130356	Ricaurte	name
+3175	EC120651	Ricaurte	name
+3180	EC160158	Río Corrientes	name
+3185	EC130155	Riochico	name
+3190	EC180252	Río Negro	name
+3195	EC160159	Río Tigre	name
+3200	EC180253	Río Verde	name
+3210	EC030157	Rivera	name
+3215	EC080755	Rocafuerte	name
+3220	EC210553	Rosa Florida	name
+3225	EC140255	El Rosario	name
+3230	EC170552	Rumipamba	name
+3235	EC091054	Roberto Astudillo	name
+3250	EC140356	San Miguel de Conchay	name
+3255	EC110456	Sabanilla	name
+3260	EC190155	Sabanilla	name
+3265	EC110853	Sabiango	name
+3270	EC110756	Sacapalca	name
+3275	EC071153	Salatí	name
+3280	EC080355	Sálima	name
+3285	EC020155	Salinas	name
+3290	EC100156	Salinas	name
+3295	EC060754	San Andrés	name
+3300	EC180855	San Andrés	name
+3305	EC030358	San Antonio	name
+3315	EC100157	San Antonio	name
+3320	EC140353	San Antonio	name
+3325	EC170180	San Antonio	name
+3330	EC071254	San Antonio	name
+3335	EC060954	San Antonio de Bayushig	name
+3340	EC111155	San Antonio de Qumbe	name
+3345	EC111552	San Antonio de Las Aradas	name
+3350	EC130357	San Antonio	name
+3355	EC180163	San Bartolomé de Pinllo	name
+3360	EC010955	San Bartolomé	name
+3365	EC100654	San Blas	name
+3370	EC091152	San Carlos	name
+3375	EC010559	San Cristóbal	name
+3380	EC180164	San Fernando	name
+3390	EC080356	San Francisco	name
+3395	EC150754	San Francisco de Borja	name
+3400	EC100252	San Francisco de Natabuela	name
+3405	EC080258	San Francisco de Onzole	name
+3410	EC030252	San Francisco de Sageo	name
+3415	EC100553	San Francisco de Sigsipamba	name
+3420	EC140454	Sangay	name
+3425	EC060755	San Gerardo	name
+3430	EC080357	San Gregorio	name
+3435	EC040353	San Isidro	name
+3440	EC140156	San Isidro	name
+3445	EC131457	San Isidro	name
+3450	EC060756	San Isidro de Patulú	name
+3455	EC080558	San Javier de Cachaví	name
+3460	EC010163	San Joaquín	name
+3465	EC100253	San José de Chaltura	name
+3470	EC080358	San José de Chamanga	name
+3475	EC170181	San José de Minas	name
+3480	EC220453	San José de Payamino	name
+3485	EC180856	San José de Poaló	name
+3490	EC100455	San José de Quichinche	name
+3495	EC010956	San José de Raranga	name
+3500	EC020251	San José del Tambo	name
+3505	EC010357	San Juan	name
+3510	EC120452	San Juan	name
+3515	EC060160	San Juan	name
+3525	EC100456	San Juan de Ilumán	name
+3530	EC050159	San Juan de Pastocalle	name
+3535	EC110455	Pózul	name
+3545	EC020156	San Lorenzo	name
+3550	EC130851	San Lorenzo	name
+3555	EC110157	San Lucas	name
+3560	EC060161	San Luis	name
+3565	EC140554	San Luis de El Acho	name
+3570	EC080163	San Mateo	name
+3575	EC030158	San Miguel	name
+3580	EC140257	San Miguel de Cuyes	name
+3585	EC180857	San Miguelito	name
+3590	EC100457	San Pablo	name
+3595	EC020554	San Pablo	name
+3600	EC111156	San Pablo de Tenta	name
+3605	EC150354	San Pablo de Ushpayacu	name
+3610	EC110353	San Pedro de la Bendita	name
+3615	EC210254	Puerto Libre	name
+3625	EC130156	San Plácido	name
+3630	EC100458	San Rafael	name
+3632	EC130453	Santa María	manual
+3635	EC130454	El Paraíso la 14	manual
+3640	EC100254	San Roque	name
+3645	EC210453	San Roque	name
+3650	EC071055	San Roque	name
+3655	EC020354	San Sebastián	name
+3660	EC220354	San Sebastián del Coca	name
+3665	EC111157	San Sebastián de Yúluc	name
+3670	EC020157	San Simón	name
+3680	EC040254	San Vicente de Pusir	name
+3685	EC010164	Santa Ana	name
+3690	EC210554	Santa Bárbara	name
+3705	EC210354	Santa Elena	name
+3710	EC020158	Santa Fe	name
+3720	EC220253	Santa María de Huiririma	name
+3725	EC080559	Santa Rita	name
+3730	EC180165	Santa Rosa	name
+3735	EC170255	Santa Rosa de Cuzubamba	name
+3740	EC091153	Santa Rosa de Flandes	name
+3745	EC150454	Santa Rosa	name
+3750	EC210651	Santa Rosa de Sucumbíos	name
+3755	EC110553	Santa Rufina	name
+3760	EC140357	Santa Susana de Chiviaza	name
+3765	EC110653	Santa Teresita	name
+3770	EC110159	Santiago	name
+3775	EC020555	Santiago	name
+3780	EC010360	Simón Bolívar	name
+3785	EC160161	Sarayacu	name
+3790	EC150455	Sardinas	name
+3795	EC010165	Sayausí	name
+3800	EC100357	Seis de Julio de Cuellaje	name
+3805	EC080260	Selva Alegre	name
+3810	EC100459	Selva Alegre	name
+3815	EC111158	Selva Alegre	name
+3820	EC060258	Sevilla	name
+3830	EC140157	Sevilla Don Bosco	name
+3835	EC010853	Shaglli	name
+3840	EC160252	Shell	name
+3845	EC060259	Sibambe	name
+3850	EC010166	Sidcay	name
+3860	EC020159	Simiátug	name
+3870	EC010167	Sinincay	name
+3875	EC030651	Solano	name
+3880	EC080652	Súa	name
+3885	EC180553	Sucre	name
+3890	EC150756	Sumaco	name
+3900	EC020556	San Vicente	name
+3905	EC180758	Salasaca	name
+3915	EC240155	Simón Bolívar	name
+3920	EC140852	San Carlos de Limón	name
+3925	EC170183	Tababela	name
+3930	EC080165	Tabiazo	name
+3935	EC111252	Tacamoros	name
+3940	EC080166	Tachina	name
+3945	EC030160	Taday	name
+3955	EC080560	Tambillo	name
+3960	EC170356	Tambillo	name
+3965	EC050161	Tanicuchi	name
+3970	EC110160	Taquil	name
+3975	EC091651	Tarifa	name
+3980	EC010168	Tarqui	name
+3985	EC160163	Tarqui	name
+3990	EC091154	Taura	name
+3995	EC020355	Telimbela	name
+4000	EC070653	Tendales	name
+4005	EC160164	Teniente Hugo Ortiz	name
+4010	EC190156	Timbara	name
+4015	EC050457	Tingo	name
+4030	EC060260	Tixán	name
+4035	EC050162	Toacaso	name
+4040	EC040156	Tobar Donoso	name
+4045	EC170453	Tocachi	name
+4050	EC010561	Tomebamba	name
+4055	EC080653	Tonchigüe	name
+4065	EC180166	Totoras	name
+4070	EC040157	Tufiño	name
+4075	EC080561	Tululbí	name
+4080	EC100655	Tumbabiro	name
+4085	EC170184	Tumbaco	name
+4090	EC170454	Tupigachi	name
+4095	EC010169	Turi	name
+4100	EC030253	Turupamba	name
+4105	EC190452	Tutupali	name
+4110	EC180551	El Triunfo	name
+4115	EC140556	Tayuza	name
+4120	EC090158	Tenguel	name
+4125	EC080562	Urbina	name
+4130	EC040158	Urbina	name
+4135	EC180254	Ulba	name
+4145	EC111159	Urdaneta	name
+4150	EC110253	Utuana	name
+4155	EC170357	Uyumbicho	name
+4160	EC070955	Uzhcurrumi	name
+4165	EC200251	Tomás de Berlanga	name
+4170	EC080261	Telembí	name
+4185	EC100358	Vacas Galindo	name
+4195	EC190853	Valladolid	name
+4200	EC010170	Valle	name
+4205	EC160165	Veracruz	name
+4210	EC111055	Vicentino	name
+4215	EC071256	Victoria	name
+4220	EC091952	La Victoria	name
+4225	EC010171	Victoria del Portete	name
+4230	EC080454	Viche	name
+4235	EC110161	Vilcabamba	name
+4240	EC080168	Vuelta Larga	name
+4275	EC092055	Yaguachi Viejo	name
+4280	EC110162	Yangana	name
+4290	EC170185	Yaruquí	name
+4295	EC220255	Yasuní	name
+4300	EC141051	Yaupi	name
+4305	EC140358	Yunganza	name
+4310	EC180652	Yanayacu Mochapata	name
+4325	EC170186	Zámbiza	name
+4330	EC120752	Zapotal	name
+4340	EC010358	Zhidmad	name
+4345	EC030361	Zhud	name
+4360	EC140160	Zuña	name
+4365	EC050458	Zumbahua	name
+4385	EC190752	Triunfo Dorado	name
+4415	EC200152	Isla Santa María Floreana	name
+4420	EC120555	La Esperanza	name
+4425	EC120553	San Carlos	name
+4430	EC060354	Santiago de Quito	name
+4440	EC230152	Puerto Limón	name
+4445	EC071352	Arcapamba	name
+4450	EC071357	Muluncay Grande	name
+4455	EC110354	Zambi	name
+4460	EC110654	27 de Abril	name
+4465	EC080259	Santo Domingo de Onzole	name
+4475	EC110151	Chantaco	name
+4480	EC070352	Cordoncillo	name
+4485	EC140158	Sinaí	name
+4490	EC130656	Membrillal	name
+4495	EC070952	Casacay	name
+4500	EC090653	Laurel	name
+4505	EC190852	San Francisco del Vergel	name
+4510	EC160162	Simón Bolívar	name
+4515	EC020553	Régulo de Mora	name
+4520	EC071152	Morales	name
+4525	EC071255	Torata	name
+4530	EC070354	San José	name
+4535	EC070353	Milagro	name
+4540	EC110158	San Pedro de Vilcabamba	name
+4545	EC111453	Milagros	name
+4550	EC180651	Rumipamba	name
+4555	EC180451	Pinguilí	name
+4560	EC010751	Chumblín	name
+4565	EC010554	El Cabo	name
+4570	EC190352	Nuevo Paraíso	name
+4575	EC140954	Pumpuentsa	name
+4580	EC150158	San Juan de Muyuna	name
+4585	EC120754	Los Ángeles	name
+4590	EC120753	Chacarita	name
+4595	EC080265	Santa Lucía de Las Peñas	name
+4600	EC190753	Panguintza	name
+4605	EC111356	Cazaderos	name
+4610	EC010854	San Salvador de Cañaribamba	name
+4615	EC120351	La Esmeralda	name
+4620	EC170256	San José de Ayora	name
+4625	EC210160	10 de Agosto	name
+4630	EC150356	Hatun Sumaku	name
+4635	EC230251	Monterrey	name
+4640	EC230252	La Villegas	name
+4645	EC230253	Plan Piloto	name
+4650	EC070256	La Cuca	name
+4655	EC190353	Nankais	name
+4745	EC210355	Sansahuari	manual
+5005	EC111050	Alamor	name
+5010	EC060250	Alausí	name
+5020	EC110650	Amaluza	name
+5040	EC070250	Arenillas	name
+5050	EC100250	Atuntaqui	name
+5065	EC030150	Azogues	name
+5070	EC150350	Archidona	name
+5085	EC120250	Baba	name
+5090	EC150750	Baeza	name
+5095	EC131450	Bahia de Caráquez	name
+5100	EC090450	Balzar	name
+5105	EC180250	Baños	name
+5115	EC030250	Biblián	name
+5150	EC130250	Calceta	name
+5160	EC030350	Cañar	name
+5175	EC110250	Cariamanga	name
+5180	EC110950	Catacocha	name
+5185	EC120650	Catarama	name
+5190	EC170250	Cayambe	name
+5195	EC110450	Celica	name
+5200	EC091950	El Salitre	name
+5245	EC020250	Chillanes	name
+5250	EC130350	Chone	name
+5255	EC060550	Chunchi	name
+5270	EC110350	Catamayo	name
+5275	EC090650	Daule	name
+5295	EC040350	El Ángel	name
+5300	EC130450	El Carmen	name
+5305	EC050350	El Corazón	name
+5335	EC080150	Esmeraldas	name
+5340	EC070650	El Guabo	name
+5345	EC090950	El Triunfo	name
+5350	EC020450	Echeandía	name
+5365	EC090550	Colimes	name
+5390	EC140350	Gral. Leonidas Plaza Gutiérrez	name
+5395	EC010250	Girón	name
+5400	EC110750	Gonzanamá	name
+5420	EC010350	Gualaceo	name
+5425	EC140250	Gualaquiza	name
+5430	EC060650	Guamote	name
+5470	EC090350	Balao	name
+5475	EC060450	Chambo	name
+5480	EC130550	Flavio Alfaro	name
+5485	EC130650	Jipijapa	name
+5505	EC130750	Junín	name
+5510	EC150450	El Chaco	name
+5515	EC180950	Tisaleo	name
+5520	EC190350	Guayzimi	name
+5525	EC210550	La Bonita	name
+5610	EC030450	La Troncal	name
+5615	EC140150	Macas	name
+5620	EC170350	Machachi	name
+5625	EC070150	Machala	name
+5635	EC130850	Manta	name
+5640	EC120350	Montalvo	name
+5645	EC140550	Santiago de Méndez	name
+5650	EC160250	Mera	name
+5660	EC091050	Milagro	name
+5665	EC130950	Montecristi	name
+5670	EC080350	Muisne	name
+5675	EC091150	Naranjal	name
+5680	EC110850	Macará	name
+5685	EC040450	Mira	name
+5690	EC010650	Pucará	name
+5700	EC220250	Nuevo Rocafuerte	name
+5705	EC091250	Naranjito	name
+5710	EC210150	Nueva Loja	name
+5715	EC070550	Chilla	name
+5725	EC091350	Palestina	name
+5735	EC091450	Pedro Carbo	name
+5740	EC060950	Penipe	name
+5745	EC070350	Paccha	name
+5750	EC100550	Pimampiro	name
+5755	EC131050	Paján	name
+5760	EC140450	Palora	name
+5775	EC010550	Paute	name
+5780	EC180750	Pelileo	name
+5785	EC180850	Píllaro	name
+5790	EC071050	Piñas	name
+5795	EC130150	Portoviejo	name
+5800	EC120450	Puebloviejo	name
+5810	EC111450	Pindal	name
+5820	EC050450	Pujilí	name
+5825	EC160150	Puyo	name
+5830	EC180550	Patate	name
+5835	EC180650	Quero	name
+5850	EC071150	Portovelo	name
+5855	EC120550	Quevedo	name
+5885	EC131250	Rocafuerte	name
+5895	EC080450	Rosa Zárate	name
+5920	EC240350	Salinas	name
+5925	EC091650	Samborondón	name
+5965	EC170550	Sangolquí	name
+5975	EC020350	San José de Chimbo	name
+5995	EC020550	San Miguel	name
+6000	EC050550	San Miguel	name
+6030	EC131350	Santa Ana de Vuelta Larga	name
+6040	EC240150	Santa Elena	name
+6045	EC010850	Santa Isabel	name
+6060	EC071250	Santa Rosa	name
+6065	EC230150	Santo Domingo de los Colorados	name
+6070	EC050650	Saquisilí	name
+6075	EC111150	Saraguro	name
+6085	EC010950	Sígsig	name
+6105	EC131650	Sucre	name
+6110	EC140650	Sucúa	name
+6120	EC111250	Sozoranga	name
+6125	EC170950	Puerto Quito	name
+6130	EC080550	San Lorenzo	name
+6140	EC210450	Shushufindi	name
+6145	EC170450	Tabacundo	name
+6160	EC150150	Tena	name
+6165	EC040150	Tulcán	name
+6170	EC131550	Tosagua	name
+6190	EC100650	Urcuquí	name
+6200	EC220350	La Joya de los Sachas	name
+6205	EC080250	Valdez	name
+6215	EC190450	28 de Mayo	name
+6225	EC090850	Velasco Ibarra	name
+6235	EC120750	Ventanas	name
+6245	EC120850	Vinces	name
+6255	EC092150	General Villamil	name
+6260	EC111550	Quilanga	name
+6285	EC092050	San Jacinto de Yaguachi	seat
+6295	EC190550	Yantzaza	name
+6300	EC210250	Lumbaquí	name
+6305	EC190150	Zamora	name
+6310	EC071350	Zaruma	name
+6315	EC190250	Zumba	name
+6320	EC111350	Zapotillo	name
+6325	EC210650	El Dorado de Cascales	name
+6330	EC120950	Palenque	name
+6335	EC071450	La Victoria	name
+6340	EC020650	Caluma	name
+6345	EC030550	El Tambo	name
+6350	EC170750	San Miguel de los Bancos	name
+6355	EC190650	El Pangui	name
+6360	EC011050	San Felipe de Oña	seat
+6380	EC080650	Atacames	name
+6385	EC092250	Simón Bolívar	name
+6390	EC140750	Huamboya	name
+6395	EC160350	Santa Clara	name
+6410	EC092350	Coronel Marcelino Maridueña	name
+6415	EC170850	Pedro Vicente Maldonado	name
+6420	EC061050	Cumandá	name
+6425	EC030650	Déleg	name
+6430	EC131750	Pedernales	name
+6435	EC011150	Chordeleg	name
+6440	EC092450	Lomas de Sargentillo	name
+6445	EC140850	San Juan Bosco	name
+6450	EC050750	Sigchos	name
+6455	EC220450	Loreto	name
+6460	EC092550	Narcisa de Jesús	name
+6465	EC121050	San Jacinto de Buena Fe	name
+6470	EC020750	Las Naves	name
+6480	EC011350	Sevilla de Oro	name
+6485	EC011250	El Pan	name
+6495	EC131850	Olmedo	name
+6500	EC210350	Puerto El Carmen de Putumayo	name
+6505	EC200350	Puerto Ayora	name
+6510	EC200150	Puerto Baquerizo Moreno	name
+6515	EC200250	Puerto Villamil	name
+6520	EC040250	Bolívar	name
+6525	EC090750	Eloy Alfaro	name
+6530	EC110550	Chaguarpamba	name
+6535	EC050250	La Maná	name
+6540	EC060850	Pallatanga	name
+6545	EC090250	Alfredo Baquerizo Moreno (Juján)	name
+6550	EC131150	Pichincha	name
+6555	EC180350	Cevallos	name
+6560	EC180450	Mocha	name
+6565	EC010750	San Fernando	name
+6570	EC070850	Marcabelí	name
+6575	EC131950	Puerto López	name
+6580	EC091850	Santa Lucía	name
+6590	EC070450	Balsas	name
+6595	EC010450	Nabón	name
+6610	EC240250	La Libertad	name
+6615	EC011450	Guachapala	name
+6620	EC092750	General Antonio Elizalde	name
+6625	EC190750	Zumbi	name
+6665	EC040650	Huaca	name
+6685	EC121150	Valencia	name
+6695	EC121250	Mocache	name
+6700	EC140950	Taisha	name
+6705	EC160450	Arajuno	name
+6710	EC092850	Isidro Ayora	name
+6715	EC030750	Suscal	name
+6720	EC080750	Rioverde	name
+6730	EC111650	Olmedo	name
+6735	EC141050	Logroño	name
+6740	EC190850	Palanda	name
+6750	EC132050	Jama	name
+6755	EC132150	Jaramijó	name
+6760	EC150950	Carlos Julio Arosemena Tola	name
+6765	EC210750	Tarapoa	name
+6785	EC132250	San Vicente	name
+6870	EC141150	Pablo Sexto	name
+6875	EC011550	Camilo Ponce enríquez	name
+6885	EC190950	Paquisha	name
+6890	EC141250	Santiago	name
+6915	EC121350	Quinsaloma	name
+7170	EC170150	Quito	name
+7520	EC230250	La Concordia	name
+9997	EC210653	Nueva Troncal	name
