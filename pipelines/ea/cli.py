@@ -42,7 +42,13 @@ def main() -> None:
     commands = parser.add_subparsers(dest="command", required=True)
     for step in ("fetch", "parse", "emit"):
         commands.add_parser(step).add_argument("source", help="registry name, such as ca.elections")
-    commands.add_parser("apply").add_argument("changeset", type=Path, help="changeset artifact directory")
+    applying = commands.add_parser("apply")
+    applying.add_argument("changeset", type=Path, help="changeset artifact directory")
+    applying.add_argument(
+        "--hold",
+        action="store_true",
+        help="leave a changeset that passes its checks in pending_review instead of publishing it",
+    )
     publishing = commands.add_parser("publish")
     publishing.add_argument("changeset_id", help="a changeset in pending_review")
     reverting = commands.add_parser(
@@ -261,7 +267,7 @@ def main() -> None:
     )
     match args.command:
         case "apply":
-            print(apply(args.changeset))
+            print(apply(args.changeset, publishing=not args.hold))
         case "census":
             if args.targets == ["due"]:
                 print(census_calendar.show(args.json))
