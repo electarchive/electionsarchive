@@ -23,6 +23,7 @@ import shapely
 from ea import package, raw
 from ea.package import Package
 from ea.sources.ps import candidates_2006
+from ea.store import DATA
 
 SOURCE = "ps.cec"
 SITE = "https://www.elections.ps"
@@ -225,7 +226,25 @@ def text(name: str) -> str:
     return re.sub("[\u202a-\u202e\u200e\u200f]", "", body).replace("االله", "الله")
 
 
+def render_pages() -> None:
+    """Render the pages that the 2006 district values cite, at 150 dpi, to the image keys their `source_page` rows name."""
+    for name in ("2006-candidates", "2006-district-ballots"):
+        artifact = raw.cached(SOURCE, FILES[name])
+        folder = DATA / "pages" / SOURCE / artifact.path.stem
+        for page in _words(name):
+            target = folder / f"{page}.png"
+            if target.exists():
+                continue
+            folder.mkdir(parents=True, exist_ok=True)
+            stem = target.with_suffix("")
+            subprocess.run(
+                ["pdftoppm", "-r", "150", "-png", "-f", str(page), "-l", str(page), "-singlefile", artifact.path, stem],
+                check=True,
+            )
+
+
 def parse() -> None:
+    render_pages()
     registry().write()
     geo().write()
     for day in DAYS:
