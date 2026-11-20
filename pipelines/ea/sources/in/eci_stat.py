@@ -1,4 +1,4 @@
-"""India's Lok Sabha general elections, 1951 to 1989, from the Election Commission of India's statistical reports.
+"""India's Lok Sabha general elections, 1951 to 1999, from the Election Commission of India's statistical reports.
 
 For each general election the Commission published a statistical report. Volume I holds the national and state
 abstracts (the list of participating parties, the list of successful candidates, and the party-wise summaries) and, in
@@ -13,6 +13,7 @@ polls of Assam and Punjab that were adjourned in 1984; they go under the 1984 el
 """
 
 import functools
+import json
 import re
 from collections import Counter
 from dataclasses import dataclass
@@ -54,6 +55,10 @@ class Edition:
     volume1: str
     volume2: str | None
     later: tuple[str, str | None] | None = None  # the report of polls adjourned to the next year
+    group: str = ""  # the places and parties package the election builds with ("" for the first one)
+
+
+NINETIES = "1990s"
 
 
 def capture(stamp: str, path: str, port: bool = True) -> str:
@@ -114,6 +119,21 @@ EDITIONS = [
         ),
     ),
     Edition(1989, 9, capture("20180713095333", "LS_1989/Vol_I_LS_89.pdf"), None),
+    Edition(
+        1996,
+        11,
+        capture("20180712190247", "LS_1996/Vol_I_LS_96.pdf"),
+        None,
+        group=NINETIES,
+    ),
+    Edition(
+        1998,
+        12,
+        f"{ARCHIVE}/20180927113612id_/https://www.eci.nic.in/eci_main/StatisticalReports/LS_1998/Vol_I_LS_98.pdf",
+        None,
+        group=NINETIES,
+    ),
+    Edition(1999, 13, capture("20180712181210", "LS_1999/Vol_I_LS_99.pdf"), None, group=NINETIES),
 ]
 BY_YEAR = {e.year: e for e in EDITIONS}
 ORDINALS = {
@@ -126,6 +146,10 @@ ORDINALS = {
     7: "seventh",
     8: "eighth",
     9: "ninth",
+    10: "tenth",
+    11: "eleventh",
+    12: "twelfth",
+    13: "thirteenth",
 }
 
 METHOD = (
@@ -151,8 +175,26 @@ def package_key(year: int) -> str:
     return f"{SOURCE}/ls-{year}"
 
 
+def groups() -> list[str]:
+    return sorted({e.group for e in EDITIONS})
+
+
+def group_key(kind: str, group: str) -> str:
+    return f"{SOURCE}/{kind}-{group}" if group else f"{SOURCE}/{kind}"
+
+
+def members(group: str) -> list[Edition]:
+    return [e for e in EDITIONS if e.group == group]
+
+
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(e.year) for e in EDITIONS)]
+    keys = [group_key(kind, g) for g in groups() for kind in ("geo", "registry")]
+    return [*keys, *(package_key(e.year) for e in EDITIONS)]
+
+
+def known_parties() -> set[str]:
+    """The party codes that the first packages (1951 to 1989) already minted, which later ones reference."""
+    return set(json.loads(Path(__file__).with_name("eci_stat_parties.json").read_text()))
 
 
 def urls() -> list[str]:
@@ -179,8 +221,9 @@ def emit() -> None:
 
 
 def parse() -> None:
-    geo().write()
-    registry().write()
+    for g in groups():
+        geo(g).write()
+        registry(g).write()
     for e in EDITIONS:
         election(e.year).write()
 
@@ -263,14 +306,20 @@ def source_row(p: Package) -> None:
 # Places.
 
 
-def geo() -> Package:
+def span(group: str) -> str:
+    years = [e.year for e in members(group)]
+    return f"{min(years)} to {max(years)}"
+
+
+def geo(group: str = "") -> Package:
     p = Package(
-        f"{SOURCE}/geo",
+        group_key("geo", group),
         SOURCE,
-        "India's parliamentary constituencies in the Lok Sabha elections of 1951 to 1989, as the Election Commission's "
-        "statistical reports list them",
+        f"India's parliamentary constituencies in the Lok Sabha elections of {span(group)}, as the Election "
+        "Commission's statistical reports list them",
     )
     p.external.add(INDIA)
+    # Later groups restate the source and the scheme unchanged, so the package stands on its own.
     source_row(p)
     p.add(
         "scheme",
@@ -281,7 +330,7 @@ def geo() -> Package:
         noun="parliamentary constituency",
         code_system=None,
     )
-    for e in EDITIONS:
+    for e in members(group):
         for url in (e.volume1, e.volume2, *(e.later or ())):
             if url:
                 p.uses(raw.cached(SOURCE, url))
@@ -297,21 +346,56 @@ def geo() -> Package:
 # The Lok Sabha, its electoral systems, and the parties.
 
 
-def registry() -> Package:
+def registry(group: str = "") -> Package:
     p = Package(
-        f"{SOURCE}/registry",
+        group_key("registry", group),
         SOURCE,
-        "The Lok Sabha, its electoral systems, and the parties that fielded candidates in 1951 to 1989",
-        depends=[f"{SOURCE}/geo"],
+        f"The Lok Sabha, its electoral systems, and the parties that fielded candidates in {span(group)}"
+        if not group
+        else f"The parties that fielded candidates in the Lok Sabha elections of {span(group)}, beyond those the "
+        "earlier elections' registry holds",
+        depends=[group_key("geo", group)] if group else [f"{SOURCE}/geo"],
     )
     p.external.add(INDIA)
-    for e in EDITIONS:
+    for e in members(group):
         p.uses(raw.cached(SOURCE, e.volume1))
         if e.later:
             p.uses(raw.cached(SOURCE, e.later[0]))
+    if group:
+        p.external.update({BODY, *(party(code) for code in known_parties())})
+    else:
+        _body(p)
+    _systems(p)
+    codes: dict[str, str] = {}
+    for e in members(group):
+        for report in reports(e):
+            for c in report.constituencies:
+                for x in c.candidates:
+                    if x.party and x.party != "IND":
+                        codes.setdefault(x.party, report.parties.get(x.party) or "")
+            for code, name in report.parties.items():
+                if code in codes and not codes[code]:
+                    codes[code] = name
+    for code, name in sorted(codes.items()):
+        if group and code in known_parties():
+            continue
+        id = party(code)
+        p.add("party", id=id, kind="party", polity_id=INDIA)
+        p.add("external_id", entity_id=id, scheme="in.eci_stat.party", value=code)
+        p.name(id, title(name) if name else code, "en", "official" if name else "abbreviation")
+        if name:
+            p.name(id, code, "en", "abbreviation", False)
+    return p
+
+
+def _body(p: Package) -> None:
     p.add("body", id=BODY, polity_id=INDIA, kind="lower_house")
     p.name(BODY, "Lok Sabha", "en", "official")
     p.name(BODY, "लोक सभा", "hi", "native", False)
+
+
+def _systems(p: Package) -> None:
+    """The two electoral systems; a later package restates them unchanged, since the snapshot has no systems."""
     for id, rules, note in (
         (FPTP, {"formula": "fptp"}, NOTE["fptp"]),
         (BLOCK, {"formula": "block"}, NOTE["block"]),
@@ -326,24 +410,6 @@ def registry() -> Package:
             rules_version=1,
         )
         p.add("note", id=key("note", id), entity_id=id, kind="methodology", body_md=note, lang="en")
-    codes: dict[str, str] = {}
-    for e in EDITIONS:
-        for report in reports(e):
-            for c in report.constituencies:
-                for x in c.candidates:
-                    if x.party and x.party != "IND":
-                        codes.setdefault(x.party, report.parties.get(x.party) or "")
-            for code, name in report.parties.items():
-                if code in codes and not codes[code]:
-                    codes[code] = name
-    for code, name in sorted(codes.items()):
-        id = party(code)
-        p.add("party", id=id, kind="party", polity_id=INDIA)
-        p.add("external_id", entity_id=id, scheme="in.eci_stat.party", value=code)
-        p.name(id, title(name) if name else code, "en", "official" if name else "abbreviation")
-        if name:
-            p.name(id, code, "en", "abbreviation", False)
-    return p
 
 
 # The elections.
@@ -359,9 +425,14 @@ def winner_for(c: reader.Constituency, report: Report) -> list[reader.Candidate]
     chosen: list[reader.Candidate] = []
     if named:
         for w in named:
-            hits = [x for x in c.candidates if norm(x.name) == norm(w.name) and x.party == w.party]
+
+            def same(code: str, w: reader.Winner = w) -> bool:
+                # The list cuts a long party code at its column: "CPI(ML)(L)" prints as "CPI(ML)(".
+                return code == w.party or (w.party.count("(") > w.party.count(")") and code.startswith(w.party))
+
+            hits = [x for x in c.candidates if norm(x.name) == norm(w.name) and same(x.party)]
             if len(hits) != 1:
-                hits = [x for x in c.candidates if x.party == w.party and norm(x.name)[:12] == norm(w.name)[:12]]
+                hits = [x for x in c.candidates if same(x.party) and norm(x.name)[:12] == norm(w.name)[:12]]
             if len(hits) != 1:
                 raise ValueError(f"{c.state} {c.number} {c.name}: winner {w.name} ({w.party}) is not one candidate")
             chosen.append(hits[0])
@@ -404,9 +475,11 @@ def election(year: int) -> Package:
         SOURCE,
         f"The {year} Indian general election to the Lok Sabha, by parliamentary constituency, from the Election "
         "Commission's statistical report",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[group_key("geo", e.group), group_key("registry", e.group)],
     )
     p.external.add(INDIA)
+    if e.group:
+        p.external.update({BODY, *(party(code) for code in known_parties())})
     for url in (e.volume1, e.volume2, *(e.later or ())):
         if url:
             p.artifact(raw.cached(SOURCE, url), SOURCE_ID)

@@ -68,6 +68,16 @@ def _words(value: str) -> str:
     return " ".join(value.split())
 
 
+SEX_INSIDE = re.compile(r"^(.+?)\s+([MF])\s+(\S.*)$")
+
+
+def _split(name: str, sex: str | None, party: str) -> tuple[str, str | None, str]:
+    """A name the typesetting set in two columns ("MADAN LAL    S/O PHOOL CHAND") leaves the sex inside the party."""
+    if sex is None and (m := SEX_INSIDE.match(party)) is not None:
+        return _words(f"{name} {m[1]}"), m[2], _words(m[3])
+    return _words(name), sex, _words(party)
+
+
 def detailed(lines: list[str]) -> list[Constituency]:
     """Every constituency of the report's detailed results, with its candidates and printed totals."""
     start = next(i for i, line in enumerate(lines) if line.strip() == "DETAILED RESULTS" and i > 200)
@@ -107,15 +117,15 @@ def detailed(lines: list[str]) -> list[Constituency]:
         if (m := UNCONTESTED.match(line)) is not None:
             if current is None:
                 raise ValueError(f"candidate without a constituency: {line!r}")
-            current.candidates.append(
-                Candidate(int(m[1]), _words(m[2]), m[3], _words(m[4]), None, None, page, uncontested=True)
-            )
+            name, sex, party = _split(m[2], m[3], m[4])
+            current.candidates.append(Candidate(int(m[1]), name, sex, party, None, None, page, uncontested=True))
             continue
         if (m := CANDIDATE.match(line)) is not None:
             if current is None:
                 raise ValueError(f"candidate without a constituency: {line!r}")
             share = None if m[6] == "#Num!" else m[6]
-            current.candidates.append(Candidate(int(m[1]), _words(m[2]), m[3], _words(m[4]), int(m[5]), share, page))
+            name, sex, party = _split(m[2], m[3], m[4])
+            current.candidates.append(Candidate(int(m[1]), name, sex, party, int(m[5]), share, page))
             continue
         if (m := GLUED.match(line)) is not None:
             if current is None:
@@ -225,7 +235,8 @@ def successful(lines: list[str], known: dict[tuple[str, int], str] | None = None
                 )
                 continue
             joined = _words(line)
-            state = f"{state} {joined}" if state.endswith((" OF", " of")) and number == 0 else joined
+            wrapped = state.endswith((" OF", " of")) or joined.startswith(("OF ", "of "))
+            state = f"{state} {joined}" if wrapped and number == 0 and state else joined
             number = 0
     return result
 
