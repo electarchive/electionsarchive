@@ -430,6 +430,12 @@
       "publisher": "Istituto nazionale di statistica (ISTAT)",
       "url": "https://www.istat.it/wp-content/uploads/2024/09/Bilancio-annuale-demografia-comunale_Anni-1991-2025.xlsx",
       "kind": "official_body"
+    },
+    "sicilia-regionali": {
+      "title": "Elezioni regionali: risultati provvisori degli scrutini (each election's regional summary, list votes, and turnout pages; saved 2026-11-19)",
+      "publisher": "Regione Siciliana, Assessorato delle autonomie locali e della funzione pubblica, Servizio elettorale",
+      "url": "https://www.elezioni.regione.sicilia.it/",
+      "kind": "official_body"
     }
   },
   "tiers": [
@@ -1219,7 +1225,7 @@
           "it.regione"
         ]
       },
-      "note": "Counted per region: each regional council election counts once. The 15 ordinary-statute regions' elections since 1970 come from the Interior Ministry's historical archive (Eligendo). Sicily, Sardinia, Aosta Valley, Trentino-Alto Adige, and Friuli-Venezia Giulia elect their councils under their own statutes, and Eligendo doesn't list them; of these, only the Aosta Valley elections since 2003, from the region's own results pages, are counted so far. Neither are four ordinary-statute elections that Eligendo leaves out: Marche in 2020 and 2025 and Molise in 2018 and 2023. The five special-statute regions first voted between 1947 (Sicily) and 1964 (Friuli-Venezia Giulia), the fifteen ordinary ones on 7 June 1970. Trentino-Alto Adige's council has since 2001 been the two provincial councils sitting together, counted under the autonomous provinces. Systems: PR by province (1970-1990), the Tatarellum's PR plus a regional list bonus (1995-), and each region's own law since the 1999 constitutional reform.",
+      "note": "Counted per region: each regional council election counts once. The 15 ordinary-statute regions' elections since 1970 come from the Interior Ministry's historical archive (Eligendo). Sicily, Sardinia, Aosta Valley, Trentino-Alto Adige, and Friuli-Venezia Giulia elect their councils under their own statutes, and Eligendo doesn't list them; of these, only the Aosta Valley elections since 2003 and the Sicilian ones since 2008, from the regions' own results pages, are counted so far. Neither are four ordinary-statute elections that Eligendo leaves out: Marche in 2020 and 2025 and Molise in 2018 and 2023. The five special-statute regions first voted between 1947 (Sicily) and 1964 (Friuli-Venezia Giulia), the fifteen ordinary ones on 7 June 1970. Trentino-Alto Adige's council has since 2001 been the two provincial councils sitting together, counted under the autonomous provinces. Systems: PR by province (1970-1990), the Tatarellum's PR plus a regional list bonus (1995-), and each region's own law since the 1999 constitutional reform.",
       "source": "eligendo-regionali",
       "match": [
         {
@@ -1455,6 +1461,15 @@
           "quote": "Regionali 05/11/2006, Area ITALIA, Regione: MOLISE"
         },
         {
+          "date": "2008-04-13",
+          "contests": 1,
+          "regions": {
+            "19": 1
+          },
+          "source": "sicilia-regionali",
+          "quote": "ELEZIONI REGIONALI DEL 13/14 APRILE 2008"
+        },
+        {
           "date": "2008-05-25",
           "contests": 1,
           "regions": {
@@ -1501,6 +1516,15 @@
           },
           "source": "eligendo-regionali",
           "quote": "Regionali 16/10/2011, Area ITALIA, Regione: MOLISE"
+        },
+        {
+          "date": "2012-10-28",
+          "contests": 1,
+          "regions": {
+            "19": 1
+          },
+          "source": "sicilia-regionali",
+          "quote": "ELEZIONI REGIONALI DEL 28 OTTOBRE 2012"
         },
         {
           "date": "2013-02-24",
@@ -1565,6 +1589,15 @@
           },
           "source": "eligendo-regionali",
           "quote": "Regionali 31/05/2015, Area ITALIA, Regione: CAMPANIA, LIGURIA, MARCHE, PUGLIA, TOSCANA, UMBRIA, VENETO"
+        },
+        {
+          "date": "2017-11-05",
+          "contests": 1,
+          "regions": {
+            "19": 1
+          },
+          "source": "sicilia-regionali",
+          "quote": "ELEZIONI REGIONALI DEL 5 NOVEMBRE 2017"
         },
         {
           "date": "2018-03-04",
@@ -1654,6 +1687,15 @@
           },
           "source": "eligendo-regionali",
           "quote": "Regionali 03/10/2021, Area ITALIA, Regione: CALABRIA"
+        },
+        {
+          "date": "2022-09-25",
+          "contests": 1,
+          "regions": {
+            "19": 1
+          },
+          "source": "sicilia-regionali",
+          "quote": "ELEZIONI REGIONALI DEL 25 SETTEMBRE 2022"
         },
         {
           "date": "2023-02-12",
@@ -1805,6 +1847,21 @@
           "finest": "it.comune",
           "finest_scheme": "it.comune",
           "evidence": "list votes by comune for each regional election"
+        },
+        {
+          "platform": "Regione Siciliana, Elezioni regionali (Servizio elettorale)",
+          "url": "https://www.elezioni.regione.sicilia.it/regionali2022/home.html",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-19",
+          "checked_at": "2026-11-19",
+          "first_date": "2008-04-13",
+          "last_date": "2022-09-25",
+          "source": "sicilia-regionali",
+          "within": "IT-82",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "evidence": "provisional count by comune of the President and the provincial lists for each Assembly election from 2008 (regionali2008 to regionali2022); the 2006 pages at regione.sicilia.it/risultati_elezioni_2006/ return 404"
         },
         {
           "platform": "Sardegna Elezioni",
@@ -2722,6 +2779,21 @@
           "finest": "it.comune",
           "finest_scheme": "it.comune",
           "evidence": "list votes by comune for each regional election"
+        },
+        {
+          "platform": "Regione Siciliana, Elezioni regionali (Servizio elettorale)",
+          "url": "https://www.elezioni.regione.sicilia.it/regionali2022/home.html",
+          "format": "html",
+          "access": "open",
+          "checked": "2026-11-19",
+          "checked_at": "2026-11-19",
+          "first_date": "2008-04-13",
+          "last_date": "2022-09-25",
+          "source": "sicilia-regionali",
+          "within": "IT-82",
+          "finest": "it.comune",
+          "finest_scheme": "it.comune",
+          "evidence": "provisional count by comune of the President and the provincial lists for each Assembly election from 2008 (regionali2008 to regionali2022); the 2006 pages at regione.sicilia.it/risultati_elezioni_2006/ return 404"
         },
         {
           "platform": "Sardegna Elezioni",
