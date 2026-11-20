@@ -208,11 +208,17 @@ class Contest:
         return document_url(path) if path else None
 
 
+# The result sheets sort chandrabindu, anusvara, and visarga after every other letter and sign, so that
+# "মোহাম্মদ" comes before "মোঃ" (checked by eye on four sheets where this decides the order).
+LAST = str.maketrans({"ঁ": "৽", "ং": "৾", "ঃ": "৿"})
+
+
 def collation(name: str) -> str:
-    """A candidate's name as the ballot sorts it: Bengali alphabetical order, which the decomposed code points
-    follow, without the invisible joiners some names carry."""
+    """A candidate's name as the result sheet sorts it: by decomposed code points, which follow Bengali
+    alphabetical order, with the signs in `LAST` moved after every letter, and without the invisible joiners some
+    names carry."""
     text = name.replace("‌", "").replace("‍", "").replace("﻿", "")
-    return unicodedata.normalize("NFD", " ".join(text.split()))
+    return unicodedata.normalize("NFD", " ".join(text.split())).translate(LAST)
 
 
 def clean(text: str) -> str:
