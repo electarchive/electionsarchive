@@ -1,9 +1,10 @@
 import re
 import struct
 import subprocess
+from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
-from typing import TypedDict
+from typing import NamedTuple, TypedDict
 from uuid import UUID
 
 from ea import package, raw
@@ -20,8 +21,8 @@ URL = (
 TITLE = "Risalah Perubahan Undang-Undang Dasar Negara Republik Indonesia Tahun 1945, Tahun Sidang 1999"
 PUBLISHER = "Sekretariat Jenderal Majelis Permusyawaratan Rakyat Republik Indonesia"
 SUMMARY = (
-    "Indonesia's 1999 elections of the President and the Vice President and its 2001 election of the Vice President "
-    "by the People's Consultative Assembly"
+    "Indonesia's elections of the President by the People's Consultative Assembly (MPR) and its provisional "
+    "predecessor from 1968 to 1999 and of the Vice President from 1973 to 2001"
 )
 MEASURES = {"votes": 1, "ballots": 3, "valid": 4, "invalid": 5, "blank": 6, "present": 20}
 WAYBACK = "https://web.archive.org/web/{}id_/{}"
@@ -150,6 +151,115 @@ NOTE = (
 )
 
 
+JDIH = "https://jdih.mpr.go.id/common/dokumen/{}.pdf"
+MPR = "Majelis Permusyawaratan Rakyat Republik Indonesia"
+MPRS = "Majelis Permusyawaratan Rakyat Sementara Republik Indonesia"
+DECREE_LICENSE = "Public record: decree of the MPR, no license stated"
+DECREE_LICENSE_URL = "https://jdih.mpr.go.id/"
+
+
+class Decree(NamedTuple):
+    """One decree of the MPR(S) that appointed a President or a Vice President: its number, the file the MPR's legal
+    documentation network serves and the Wayback capture the cache holds, the office, the day it was adopted, the
+    person and the name it prints, and the PDF pages that print that name and the date."""
+
+    number: str
+    file: str
+    capture: str
+    office: str
+    day: date
+    person: str
+    printed: str
+    pages: tuple[int, int]
+
+
+# Every appointment from 1968 to 1998. The MPR's site refuses scripted requests, so each decree is read from the
+# capture the Wayback Machine made of the file the MPR's legal documentation network links.
+DECREES = [
+    Decree("XLIV/MPRS/1968", "1968tapmprs044", "20220610170751", "presiden", date(1968, 3, 27), "soeharto",
+           "Jenderal Soeharto", (2, 3)),
+    Decree("IX/MPR/1973", "1973tapmpr009", "20220703031705", "presiden", date(1973, 3, 23), "soeharto",
+           "Soeharto Jenderal TNI", (2, 3)),
+    Decree("XI/MPR/1973", "1973tapmpr011", "20220703031817", "wakil-presiden", date(1973, 3, 23),
+           "hamengkubuwono-ix", "Sri Sultan Hamengkubuwono IX", (2, 3)),
+    Decree("X/MPR/1978", "1978tapmpr010", "20220703031459", "presiden", date(1978, 3, 22), "soeharto",
+           "SOEHARTO", (2, 3)),
+    Decree("XI/MPR/1978", "1978tapmpr011", "20220703031549", "wakil-presiden", date(1978, 3, 23), "adam-malik",
+           "ADAM MALIK", (2, 3)),
+    Decree("VI/MPR/1983", "1983tapmpr006", "20220703031226", "presiden", date(1983, 3, 10), "soeharto",
+           "Jenderal TNI (Purnawirawan) SOEHARTO", (2, 3)),
+    Decree("VIII/MPR/1983", "1983tapmpr008", "20220703031200", "wakil-presiden", date(1983, 3, 11),
+           "umar-wirahadikusumah", "Jenderal TNI (Purnawirawan) UMAR WIRAHADIKUSUMAH", (2, 3)),
+    Decree("V/MPR/1988", "1988tapmpr005", "20220703031054", "presiden", date(1988, 3, 10), "soeharto",
+           "Soeharto", (2, 3)),
+    Decree("VII/MPR/1988", "1988tapmpr007", "20220703031031", "wakil-presiden", date(1988, 3, 11), "sudharmono",
+           "Sudharmono, S.H Letnan Jenderal TNI Purnawirawan", (2, 3)),
+    Decree("IV/MPR/1993", "1993tapmpr004", "20220703030959", "presiden", date(1993, 3, 10), "soeharto",
+           "Soeharto", (2, 3)),
+    Decree("V/MPR/1993", "1993tapmpr005", "20220703030934", "wakil-presiden", date(1993, 3, 11), "try-sutrisno",
+           "Try Sutrisno", (2, 3)),
+    Decree("IV/MPR/1998", "1998tapmpr004", "20220703030402", "presiden", date(1998, 3, 10), "soeharto",
+           "Soeharto", (2, 3)),
+    Decree("VI/MPR/1998", "1998tapmpr006", "20220703030801", "wakil-presiden", date(1998, 3, 11), "habibie",
+           "Prof. Dr.-Ing. Bacharuddin Jusuf Habibie", (2, 3)),
+]  # fmt: skip
+APPOINTEES = {
+    "soeharto": "Soeharto",
+    "hamengkubuwono-ix": "Hamengkubuwono IX",
+    "adam-malik": "Adam Malik",
+    "umar-wirahadikusumah": "Umar Wirahadikusumah",
+    "sudharmono": "Sudharmono",
+    "try-sutrisno": "Try Sutrisno",
+    "habibie": "Bacharuddin Jusuf Habibie",
+}
+SUBJECTS = {
+    "presiden": "Pengangkatan Presiden Republik Indonesia",
+    "wakil-presiden": "Pengangkatan Wakil Presiden Republik Indonesia",
+}
+SUBJECT_1968 = "Pengangkatan Pengemban Ketetapan MPRS No. IX/MPRS/1966 sebagai Presiden Republik Indonesia"
+PROCEDURE = Decree("II/MPR/1973", "1973tapmpr002", "20220703031836", "", date(1973, 3, 19), "", "", (5, 7))
+PROCEDURE_SUBJECT = "Tata-Cara Pemilihan Presiden dan Wakil Presiden Republik Indonesia"
+ACCOUNT = Decree("III/MPR/1999", "1999tapmpr003", "20220703030546", "", date(1999, 10, 19), "habibie", "", (1, 1))
+ACCOUNT_SUBJECT = "Pertanggungjawaban Presiden Republik Indonesia Prof. Dr. Ing. Bacharuddin Jusuf Habibie"
+HABIBIE_SWORN = date(1998, 5, 21)
+OFFICE_NAMES = {
+    "presiden": ("presidential", "president", "Presiden", "President"),
+    "wakil-presiden": ("vice-presidential", "vice-president", "Wakil Presiden", "Vice President"),
+}
+METHODOLOGY_1973 = (
+    "From 1973 to 1998 the People's Consultative Assembly (MPR) elected the President and then the Vice President "
+    "under its decree II/MPR/1973. Fractions nominated candidates in writing. With more than one candidate the "
+    "members voted by secret ballot, and a candidate needed more than half of the members present, with a further "
+    "ballot between the two leading candidates. When every fraction nominated the same single candidate, the "
+    "plenary ratified that candidate without a ballot (Articles 13(2) and 25(2)). Each election from 1973 to 1998 "
+    "had one candidate for each office, so each is stored as that candidate elected, with no counts."
+)
+NOTE_1968 = (
+    "The Provisional People's Consultative Assembly (MPRS) appointed General Soeharto, who held the mandate of its "
+    "decree IX/MPRS/1966 and had served as Acting President, as President of the Republic until a President was "
+    "elected by the MPR formed from a general election (decree XLIV/MPRS/1968, Article 1). The decree records the "
+    "MPRS's fifth general session and no vote, so the contest holds him elected, with no counts."
+)
+HABIBIE_NOTE = (
+    "Bacharuddin Jusuf Habibie, Vice President, became President when he took the oath of office on 21 May 1998, "
+    "ending Soeharto's term; there was no vote. MPR decree III/MPR/1999 records that he held the office from that "
+    "oath. He served until the MPR elected Abdurrahman Wahid on 20 October 1999."
+)
+
+
+def decree_note(decree: Decree) -> str:
+    office = OFFICE_NAMES[decree.office][3]
+    return (
+        f"MPR decree {decree.number}, adopted on {decree.day.day} {decree.day:%B %Y}, appoints {decree.printed} "
+        f"{office} of the Republic of Indonesia (Article 1). It cites the plenary's decision and records no vote."
+    )
+
+
+def decree_title(decree: Decree, subject: str) -> str:
+    assembly = MPRS if "MPRS" in decree.number else MPR
+    return f"Ketetapan {assembly} Nomor {decree.number} tentang {subject}"
+
+
 class Vote(TypedDict):
     office: str
     day: date
@@ -212,6 +322,8 @@ def fetch() -> None:
     # mpr.go.id refuses scripted requests from some hosts; the Wayback capture holds the same volume.
     raw.fetch(SOURCE, WAYBACK.format(BOOK_2001_CAPTURE, BOOK_2001), suffix=".pdf")
     raw.fetch(SOURCE, URL, suffix=".pdf")
+    for decree in [*DECREES, PROCEDURE, ACCOUNT]:
+        raw.fetch(SOURCE, WAYBACK.format(decree.capture, JDIH.format(decree.file)), suffix=".pdf")
 
 
 def article_counts(text: str) -> dict[str, list[int]]:
@@ -743,4 +855,186 @@ def build() -> Path:
         )
         cs.add("citation", entity_id=elected, source_id=book_2001, locator={"pdf_pages": [20, 21]})
         cs.add("citation", entity_id=elected, source_id=article, locator={"section": "lead"})
+        appointments(cs, name, indonesia, nation, assembly, offices)
         return cs.write()
+
+
+def decree_source(cs: Draft, decree: Decree, subject: str) -> UUID:
+    """The decree as a source, with the cached capture of its file as the artifact."""
+    publisher = MPRS if "MPRS" in decree.number else MPR
+    title = decree_title(decree, subject)
+    source = cs.source(publisher, title)
+    cs.add(
+        "source",
+        id=source,
+        kind="official_body",
+        publisher=publisher,
+        title=title,
+        url=JDIH.format(decree.file),
+        license=DECREE_LICENSE,
+        license_url=DECREE_LICENSE_URL,
+    )
+    cs.artifact(raw.cached(SOURCE, WAYBACK.format(decree.capture, JDIH.format(decree.file))), source)
+    return source
+
+
+def appointments(
+    cs: Draft,
+    name: Callable[..., None],
+    indonesia: UUID,
+    nation: UUID,
+    assembly: UUID,
+    offices: dict[str, UUID],
+) -> None:
+    """The MPR(S)'s appointments of the President from 1968 and of the Vice President from 1973 to 1998, each a
+    contest with one candidate declared elected and no counts, the terms they began, and Habibie's succession to the
+    presidency in May 1998, which was not an election."""
+    procedure = decree_source(cs, PROCEDURE, PROCEDURE_SUBJECT)
+    system = cs.key("id.electoral_system", "mpr:1973")
+    cs.add(
+        "electoral_system",
+        id=system,
+        polity_id=indonesia,
+        rules={"formula": "repeated_ballot", "majorities": [{"fromRound": 1, "share": 0.5, "strict": True}]},
+        rules_version=1,
+    )
+    name(system, "Election of the President and Vice President by the MPR under decree II/MPR/1973", "en", "english")
+    cs.add("note", entity_id=system, kind="methodology", body_md=METHODOLOGY_1973)
+    cs.add("citation", entity_id=system, source_id=procedure, locator={"pdf_pages": list(PROCEDURE.pages)})
+
+    provisional = cs.key("id.body", "mprs")
+    if provisional in cs.minted:
+        cs.add("body", id=provisional, polity_id=indonesia, kind="council")
+        name(provisional, "Majelis Permusyawaratan Rakyat Sementara")
+        name(provisional, "MPRS", kind="abbreviation")
+        name(provisional, "Provisional People's Consultative Assembly", "en", "english")
+
+    persons: dict[str, UUID] = {}
+    for key, common in APPOINTEES.items():
+        persons[key] = cs.key(f"{SOURCE}.person", key)
+        if persons[key] in cs.minted:
+            cs.add("person", id=persons[key])
+            name(persons[key], common)
+
+    held: dict[str, UUID] = {}
+    tenures: list[tuple[str, dict[str, object]]] = []
+    for decree in DECREES:
+        day, office = decree.day, decree.office
+        english, slug, native, _ = OFFICE_NAMES[office]
+        mprs = "MPRS" in decree.number
+        source = decree_source(cs, decree, SUBJECT_1968 if mprs else SUBJECTS[office])
+        election = cs.key("id.election", f"{day}:{office}")
+        path = f"id/{day}-{english}"
+        title = f"{day.year} Indonesian {english.replace('-', ' ')} election"
+        cs.add(
+            "election",
+            id=election,
+            polity_id=indonesia,
+            kind="indirect",
+            date_from=day,
+            date_to=day,
+            date_precision="day",
+            status="held",
+        )
+        name(election, title, "en", "english")
+        name(election, f"Pemilihan {native} Republik Indonesia {day.year}")
+        cs.add("slug", path=path, entity_id=election)
+        contest_key = f"{day}:{office}"
+        contest = cs.key("id.contest", contest_key)
+        cs.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="office",
+            office_id=offices[office],
+            body_id=provisional if mprs else assembly,
+            district_area_id=nation,
+            term="full",
+            magnitude=1,
+            round_number=1,
+            previous_round_id=None,
+            electoral_system_id=None if mprs else system,
+            default_result_kind="tacit",
+        )
+        name(contest, title, "en", "english")
+        name(contest, f"Pemilihan {native} Republik Indonesia {day.year}")
+        cs.add("slug", path=f"{path}/{slug}", entity_id=contest)
+        result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+        cs.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="official",
+            kind="tacit",
+            status="active",
+            source_id=source,
+            is_default=True,
+            completeness=None,
+        )
+        cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE_1968 if mprs else decree_note(decree))
+        cs.add("citation", entity_id=result_set, source_id=source, locator={"pdf_pages": list(decree.pages)})
+        option = cs.key("id.option", f"{contest_key}:{decree.person}")
+        cs.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="candidate",
+            party_id=None,
+            ballot_position=None,
+            ballot_label=decree.printed,
+        )
+        cs.add(
+            "candidacy",
+            id=cs.key("id.candidacy", f"{contest_key}:{decree.person}"),
+            person_id=persons[decree.person],
+            option_id=option,
+            role="head",
+            ballot_name=decree.printed,
+            is_independent=False,
+        )
+        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
+        tenure = cs.key(f"{SOURCE}.tenure", contest_key)
+        tenures.append(
+            (
+                office,
+                {
+                    "id": tenure,
+                    "person_id": persons[decree.person],
+                    "office_id": offices[office],
+                    "from_date": day,
+                    "acquired_via": "elected",
+                    "ended_via": "term_end",
+                    "contest_id": contest,
+                    "succeeds_tenure_id": held.get(office),
+                },
+            )
+        )
+        held[office] = tenure
+
+    # Each term runs to the day the next appointment to the same office was adopted. Soeharto's last term ended
+    # when he resigned and Habibie, his Vice President, took the oath as President.
+    following: dict[str, object] = {office: HABIBIE_SWORN for office in held}
+    for office, row in reversed(tenures):
+        row["to_date"] = following[office]
+        following[office] = row["from_date"]
+    account = decree_source(cs, ACCOUNT, ACCOUNT_SUBJECT)
+    succession = cs.key(f"{SOURCE}.tenure", f"{HABIBIE_SWORN}:presiden")
+    for office, row in tenures:
+        if row["id"] == held[office]:
+            row["ended_via"] = "resigned" if office == "presiden" else "elevated"
+        cs.add("tenure", **row)
+    cs.add(
+        "tenure",
+        id=succession,
+        person_id=persons["habibie"],
+        office_id=offices["presiden"],
+        from_date=HABIBIE_SWORN,
+        to_date=VOTES[0]["day"],
+        acquired_via="succession",
+        ended_via="term_end",
+        contest_id=None,
+        succeeds_tenure_id=held["presiden"],
+    )
+    cs.add("note", entity_id=succession, kind="context", body_md=HABIBIE_NOTE)
+    cs.add("citation", entity_id=succession, source_id=account, locator={"pdf_pages": list(ACCOUNT.pages)})
