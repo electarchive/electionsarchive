@@ -1,6 +1,8 @@
 import io
 import json
+import os
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from pathlib import Path
 from uuid import UUID, uuid5
@@ -330,7 +332,11 @@ def parse() -> None:
     )
     versions: list[dict[str, object]] = []
     spans: list[dict[str, object]] = []
-    for (layer, code), group in frames.sort("vintage").group_by(["layer", "code"], maintain_order=True):
+    groups = list(frames.sort("vintage").group_by(["layer", "code"], maintain_order=True))
+    # GEOS releases the GIL, so the areas are compared on every core; the nation alone takes minutes.
+    with ThreadPoolExecutor(os.cpu_count()) as pool:
+        shifts = list(pool.map(lambda item: moves(list(item[1]["geom"])), groups))
+    for ((layer, code), group), moved_in in zip(groups, shifts, strict=True):
         present = group["vintage"].to_list()
         first, last = order.index(present[0]), order.index(present[-1])
         if present != order[first : last + 1]:
@@ -350,12 +356,10 @@ def parse() -> None:
             )
         kept: shapely.Geometry | None = None
         current: dict[str, object] | None = None
-        for vintage, parent, name, kind_, wkb in group.select("vintage", "parent", "name", "kind", "geom").rows():
+        for (vintage, parent, name, kind_, wkb), moved in zip(
+            group.select("vintage", "parent", "name", "kind", "geom").rows(), moved_in, strict=True
+        ):
             geometry = shapely.from_wkb(wkb)
-            moved = kept is None or (
-                shapely.area(shapely.symmetric_difference(kept, geometry))
-                > CHANGED * max(shapely.area(kept), shapely.area(geometry))
-            )
             same = current is not None and (current["parent"], current["name"], current["kind"]) == (
                 parent,
                 name,
@@ -391,6 +395,25 @@ def parse() -> None:
     pl.DataFrame(spans, infer_schema_length=None).write_parquet(PARSED / "spans.parquet")
     pl.DataFrame(versions, infer_schema_length=None).write_parquet(PARSED / "versions.parquet")
     print(build())
+
+
+def moves(shapes: list[bytes]) -> list[bool]:
+    """Whether each vintage of an area takes a new geometry: its first, and any whose symmetric difference from the
+    geometry last taken covers more than CHANGED of the larger of the two. The difference is read from the
+    intersection, which GEOS computes several times faster than the difference itself."""
+    flags: list[bool] = []
+    kept: shapely.Geometry | None = None
+    for wkb in shapes:
+        geometry = shapely.from_wkb(wkb)
+        moved = kept is None
+        if kept is not None:
+            sizes = shapely.area(kept), shapely.area(geometry)
+            difference = sum(sizes) - 2 * shapely.area(shapely.intersection(kept, geometry))
+            moved = difference > CHANGED * max(sizes)
+        if moved:
+            kept = geometry
+        flags.append(moved)
+    return flags
 
 
 def runs(rows: list[dict[str, object]], field: str) -> list[tuple[object, object, object]]:
