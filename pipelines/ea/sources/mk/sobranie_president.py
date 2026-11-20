@@ -6,7 +6,8 @@ invalid ballots (printed as a word). The 1991 Constitution made the office direc
 election of its kind.
 
 The same sitting then voted twice on the Vice-President of the Republic, proposed by the President. Neither ballot
-reached two thirds of all deputies, so nobody was elected. Each ballot is stored as its own round contest.
+reached two thirds of all deputies, so nobody was elected. Each ballot is stored as its own round contest. The Sixth session, on 1 February 1991, repeated the whole procedure: its
+one ballot elected Ljupco Georgievski with 88 of the 118 deputies who voted, and is stored as a further contest.
 """
 
 import re
@@ -28,9 +29,11 @@ COUNTRY = str(uuid5(package.NAMESPACE, "area:world.country@None\x1fMKD"))
 SCHEME = "mk.nation"
 HOME = "https://www.sobranie.mk/"
 NOTES = HOME + "WBStorage/Files/05sed27jan91god.pdf"
+SIXTH = HOME + "WBStorage/Files/06sed1fev91god.pdf"
 VOTES, BALLOTS, VALID, INVALID = 1, 3, 4, 5
 FLAG_DERIVED = 1
 DAY = date(1991, 1, 27)
+REPEAT = date(1991, 2, 1)
 WINNER = "Киро Глигоров"
 DEPUTY = "Љупчо Ѓеорѓиевски"
 ASSEMBLY_SIZE = 120
@@ -72,6 +75,16 @@ DEPUTY_ROUNDS = (
         Count("invalid", 45, r"Неважечки\s+гласачки\s+ливчиња\s+има\s+(45)"),
     ),
 )
+REPEAT_ANCHOR = "Врз основа на резултатите од гласањето"
+REPEAT_ROUND = (
+    Count("took_part", 118, r"од\s+вкупно\s+од\s+(118)\s+пратеници\s+кои\s+гласале"),
+    Count(DEPUTY, 88, r"гласале\s+(88)\s+пратеници"),
+    Count("invalid", 30, r"Неважечки\s+ливчиња\s+има\s+(30)"),
+)
+REPEAT_NEEDLES = (
+    "избран за потпретседател на претседателот на социјалистичка република македонија",
+    "доби двотретинско мнозинство",
+)
 NEEDLES = (
     "избран за претседател на социјалистичка република македонија",
     "двотретинско мнозинство",
@@ -90,11 +103,12 @@ class Page:
 
 def fetch() -> None:
     raw.fetch(SOURCE, NOTES, suffix=".pdf")
+    raw.fetch(SOURCE, SIXTH, suffix=".pdf")
 
 
-def read() -> tuple[str, list[tuple[int, int, int]], list[Page]]:
+def read(url: str = NOTES) -> tuple[str, list[tuple[int, int, int]], list[Page]]:
     out = subprocess.run(
-        ["pdftotext", "-bbox", str(raw.cached(SOURCE, NOTES).path), "-"], check=True, capture_output=True
+        ["pdftotext", "-bbox", str(raw.cached(SOURCE, url).path), "-"], check=True, capture_output=True
     ).stdout
     root = ET.fromstring(re.sub(rb"<!DOCTYPE[^>]*>", b"", out))
     ns = "{http://www.w3.org/1999/xhtml}"
@@ -122,11 +136,14 @@ def read() -> tuple[str, list[tuple[int, int, int]], list[Page]]:
 
 
 def locate(
-    counts: tuple[Count, ...] = COUNTS, anchor: str = "Комисијата за гласање го поднесува", after: int = 0
+    counts: tuple[Count, ...] = COUNTS,
+    anchor: str = "Комисијата за гласање го поднесува",
+    after: int = 0,
+    url: str = NOTES,
 ) -> tuple[dict[str, tuple[int, float, float, float, float]], int]:
     """Each printed count's page (from 1) and normalized box, found in order in the notes from `anchor`, with the
     text position the last count ends at."""
-    text, spans, pages = read()
+    text, spans, pages = read(url)
     found: dict[str, tuple[int, float, float, float, float]] = {}
     position = text.index(anchor, after)
     for count in counts:
@@ -151,14 +168,22 @@ def locate(
     return found, position
 
 
+def body(url: str) -> str:
+    out = subprocess.run(["pdftotext", str(raw.cached(SOURCE, url).path), "-"], check=True, capture_output=True).stdout
+    return " ".join(out.decode("utf-8", "replace").split()).lower()
+
+
 def check() -> None:
-    out = subprocess.run(
-        ["pdftotext", str(raw.cached(SOURCE, NOTES).path), "-"], check=True, capture_output=True
-    ).stdout
-    body = " ".join(out.decode("utf-8", "replace").split()).lower()
-    for needle in NEEDLES:
-        if needle not in body:
-            raise ValueError(f"the notes do not contain {needle!r}")
+    for url, needles in ((NOTES, NEEDLES), (SIXTH, REPEAT_NEEDLES)):
+        text = body(url)
+        for needle in needles:
+            if needle not in text:
+                raise ValueError(f"the notes do not contain {needle!r}")
+    votes = {c.field: c.value for c in REPEAT_ROUND}
+    if votes[DEPUTY] + votes["invalid"] != votes["took_part"]:
+        raise ValueError("the votes and invalid ballots do not add up to the deputies who voted")
+    if votes[DEPUTY] * 3 < ASSEMBLY_SIZE * 2:
+        raise ValueError("the deputy candidate lacks two thirds of all deputies")
     votes = {c.field: c.value for c in COUNTS}
     if votes[WINNER] + votes["invalid"] != votes["took_part"]:
         raise ValueError("the votes and invalid ballots do not add up to the deputies who voted")
@@ -227,8 +252,8 @@ def election() -> Package:
     p = Package(
         f"{SOURCE}/{DAY}",
         SOURCE,
-        "The election of the President of the Socialist Republic of Macedonia by the Assembly on 27 January 1991, "
-        "from the stenographic notes of the Assembly's Fifth session",
+        "The election of the President of the Socialist Republic of Macedonia by the Assembly on 27 January 1991 and "
+        "of its Vice-President by 1 February 1991, from the stenographic notes of the Assembly's Fifth and Sixth sessions",
         depends=[f"{SOURCE}/registry"],
     )
     p.external |= {MACEDONIA, COUNTRY}
@@ -244,9 +269,11 @@ def election() -> Package:
     )
     stored = raw.cached(SOURCE, NOTES)
     artifact = p.artifact(stored, ASSEMBLY)
+    sixth = raw.cached(SOURCE, SIXTH)
+    sixth_artifact = p.artifact(sixth, ASSEMBLY)
     id = key("election", DAY)
     path = f"mk/{DAY}-president"
-    p.add("election", id=id, polity_id=MACEDONIA, kind="indirect", date_from=DAY, date_to=DAY, status="held")
+    p.add("election", id=id, polity_id=MACEDONIA, kind="indirect", date_from=DAY, date_to=REPEAT, status="held")
     p.add("slug", path=path, entity_id=id, is_current=True)
     p.name(id, "1991 Macedonian presidential election", "en", "official")
     p.name(id, "Избор на претседател на Република Македонија, 1991", "mk", "native", False)
@@ -456,6 +483,108 @@ def election() -> Package:
                 }
             )
         rows.append((vice_set, unit, None, VALID, for_, FLAG_DERIVED))
+    repeat_boxes, _ = locate(REPEAT_ROUND, REPEAT_ANCHOR, 0, SIXTH)
+    repeat_pages: dict[int, str] = {}
+    for number, *_rest in repeat_boxes.values():
+        if number not in repeat_pages:
+            repeat_pages[number] = key("page", REPEAT, number)
+            width, height = render(sixth.path, sixth.sha256, number)
+            p.add(
+                "source_page",
+                id=repeat_pages[number],
+                artifact_id=sixth_artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{sixth.sha256}/{number}.png",
+                width=width,
+                height=height,
+            )
+    again = key("contest", DAY, "vice", "repeat")
+    p.add(
+        "contest",
+        id=again,
+        election_id=id,
+        kind="office",
+        office_id=VICE,
+        magnitude=1,
+        round_number=1,
+        electoral_system_id=SYSTEM,
+        default_result_kind="counted",
+    )
+    p.name(again, "1991 vice-presidential election, repeated procedure", "en", "official")
+    p.add("slug", path=f"{path}/vice-president/repeated-procedure", entity_id=again, is_current=True)
+    again_set = key("result_set", DAY, "vice", "repeat")
+    p.add(
+        "result_set",
+        id=again_set,
+        election_id=id,
+        contest_id=again,
+        stage="official",
+        kind="counted",
+        source_id=ASSEMBLY,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    voted, for_, invalid = (c.value for c in REPEAT_ROUND)
+    p.add(
+        "note",
+        id=key("note", again_set),
+        entity_id=again_set,
+        kind="methodology",
+        body_md="The Assembly repeated its whole procedure for the Vice-President in its plenary session of 1 February "
+        "1991, after the two failed ballots of 27 January, from the stenographic notes of the Sixth session. "
+        f"Ljupco Georgievski was the only candidate again. Of {voted} deputies who voted, {for_} voted for him and "
+        f"{invalid} ballots were invalid. That is more than the two thirds of all 120 deputies that the law "
+        "requires, so he was elected.",
+        lang="en",
+    )
+    again_option = key("option", DAY, "vice", "repeat", DEPUTY)
+    p.add(
+        "contest_option",
+        id=again_option,
+        contest_id=again,
+        kind="candidate",
+        ballot_position=1,
+        ballot_label=DEPUTY,
+    )
+    again_candidacy = key("candidacy", DAY, "vice", "repeat", DEPUTY)
+    p.add(
+        "candidacy",
+        id=again_candidacy,
+        person_id=deputy,
+        option_id=again_option,
+        role="head",
+        ballot_name=DEPUTY,
+        is_independent=False,
+    )
+    p.add("outcome", result_set_id=again_set, option_id=again_option, candidacy_id=None, kind="elected", seats=1)
+    for count in REPEAT_ROUND:
+        if count.field == "took_part":
+            option_id, measure = None, BALLOTS
+        elif count.field == "invalid":
+            option_id, measure = None, INVALID
+        else:
+            option_id, measure = again_option, VOTES
+        rows.append((again_set, unit, option_id, measure, count.value, 0))
+        p.add("declared", result_set_id=again_set, option_id=option_id, measure=measure, value=count.value)
+        page, x0, y0, x1, y1 = repeat_boxes[count.field]
+        locators.append(
+            {
+                "result_set_id": again_set,
+                "unit_id": unit,
+                "option_id": option_id,
+                "channel": 0,
+                "measure": measure,
+                "count_round": 0,
+                "page_id": repeat_pages[page],
+                "source_id": None,
+                "x0": x0,
+                "y0": y0,
+                "x1": x1,
+                "y1": y1,
+            }
+        )
+    rows.append((again_set, unit, None, VALID, for_, FLAG_DERIVED))
     p.frame(
         "result_value",
         pl.DataFrame(
