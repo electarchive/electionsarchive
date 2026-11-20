@@ -1,5 +1,6 @@
 import csv
 import io
+import re
 import zipfile
 from datetime import date
 from pathlib import Path
@@ -7,13 +8,14 @@ from uuid import UUID
 
 import polars as pl
 
-from ea import raw
-from ea.changeset import Changeset
+from ea import package, raw
+from ea.package import Draft
 from ea.sources.mx import diputados, ine, mge
 from ea.store import DATA, connect
 
 SOURCE = "mx.congreso_local"
 VERSION = "1"
+KEY = f"{SOURCE}/all"
 PARSED = DATA / "parsed" / SOURCE
 LICENSE = (
     "Public information the institute publishes for download (Ley General de Transparencia, art. 70); no license stated"
@@ -24,6 +26,9 @@ REGISTERED, BALLOTS, VALID, INVALID, VOTES = ine.REGISTERED, ine.BALLOTS, ine.VA
 IEPAC = "https://iepac.mx/public/micrositios/resultados-electorales/procesos-electorales/2024/"
 
 IEE_COLIMA = "https://ieecolima.org.mx/"
+IEC = "https://www.iec.org.mx/v1/"
+IEC_ACUERDOS = IEC + "archivos//acuerdos/2023/"
+IEEPCNL = "https://www.ieepcnl.mx/data/info/sesiones/acuerdos/2024/"
 
 LOCAL_PARTIES = {
     "YUC": {"NAY": (None, "Nueva Alianza Yucatán", "New Alliance Yucatán")},
@@ -31,6 +36,14 @@ LOCAL_PARTIES = {
         "PNA": (None, "Partido Nueva Alianza Colima", "New Alliance Party of Colima"),
         "PES": (None, "Partido Encuentro Solidario Colima", "Solidarity Encounter Party of Colima"),
         "FPM": (None, "Fuerza por México Colima", "Force for Mexico Colima"),
+    },
+    "COA": {"UDC": (None, "Unidad Democrática de Coahuila", "Democratic Unity of Coahuila")},
+    "NLE": {
+        "VIDA": (None, "VIDA Nuevo León", "VIDA Nuevo León"),
+        "ESO": (None, "Esperanza Social Nuevo León", "Social Hope Nuevo León"),
+        "PL": (None, "Partido Liberal", "Liberal Party (Nuevo León)"),
+        "PES": (None, "Partido Encuentro Solidario Nuevo León", "Solidarity Encounter Party of Nuevo León"),
+        "PJ": (None, "Partido Justicialista", "Justicialist Party (Nuevo León)"),
     },
 }
 
@@ -103,6 +116,215 @@ STATES: dict[str, dict] = {
             "Acuerdo IEE/CG/A116/2024 (table 24, page 32)."
         ),
     },
+    "COA": {
+        "day": date(2023, 6, 4),
+        "process": "Proceso electoral local ordinario 2023 de Coahuila",
+        "publisher": "Instituto Electoral de Coahuila (IEC)",
+        "page": IEC + "index.php/procesos/proceso-electoral-local-2023",
+        "workbook": "iec",
+        "casillas": IEC + "images/proceso2023/computos_finales/Diputaciones2023_X_Casilla.xlsx",
+        "districts": IEC + "images/proceso2023/computos_finales/Diputacione2023_X_Distrito.xlsx",
+        "statewide": (
+            IEC_ACUERDOS + "IEC.CG.169.2023%20C%C3%B3mputo%20DIPUTACIONES.pdf",
+            (
+                "Acuerdo IEC/CG/169/2023: cómputo estatal de la elección de diputaciones locales, Proceso Electoral Local "
+                "Ordinario 2023"
+            ),
+        ),
+        "winners": (
+            IEC_ACUERDOS + "IEC.CG.170.2023%20Asignaci%C3%B3n%20RP%20PELO2023.pdf",
+            (
+                "Acuerdo IEC/CG/170/2023: asignación de diputaciones por el principio de representación proporcional "
+                "para integrar el Congreso del Estado de Coahuila de Zaragoza, periodo 2024-2026"
+            ),
+        ),
+        "rp_votes": {
+            "PAN": 88_967,
+            "PRI": 590_174,
+            "PRD": 30_875,
+            "PVEM": 60_523,
+            "PT": 117_573,
+            "UDC": 42_333,
+            "MC": 27_182,
+            "MORENA": 354_480,
+            "CNR": 364,
+            "NULOS": 34_143,
+            "V. FINAL": 1_346_614,
+        },
+        "declared": {
+            "mr": {
+                1: "PAN",
+                2: "PRD",
+                3: "PRI",
+                4: "PRI",
+                5: "PAN",
+                6: "PAN",
+                7: "PRI",
+                8: "PAN",
+                9: "PAN",
+                10: "PRI",
+                11: "PRI",
+                12: "PRI",
+                13: "PRI",
+                14: "PRI",
+                15: "PRD",
+                16: "PRI",
+            },
+            "rp": {"PRI": 2, "PVEM": 1, "PT": 1, "UDC": 1, "MORENA": 4},
+            "pages": {"mr": 43, "rp": 44, "votes": 14},
+        },
+        "mr": 16,
+        "rp": 9,
+        "body": ("Congreso del Estado de Coahuila de Zaragoza", "Congress of Coahuila"),
+        "mr_method": (
+            "Polling-station (casilla) counts from the institute's final count workbook, summed to the district. The "
+            "workbook also carries the separate list-only tally sheets of the special casillas (S1RP, S2RP), which "
+            "count for the proportional seats only and are left out here; with them, the sums equal the institute's "
+            "district workbook. The early vote (voto anticipado) and the vote in pretrial detention (VPPP) are "
+            "included, each on its own channel. Votes marked for two or more parties of one coalition are counted as "
+            "that coalition's candidate. The winner and the party that nominated them are as Acuerdo IEC/CG/170/2023 "
+            "lists the elected deputies (page 43)."
+        ),
+        "casilla_note": (
+            "Polling-station results from the institute's final count workbook, district tally sheets only. Each line "
+            "is a column of the workbook: a party, or a combination of the parties of one coalition that a voter marked."
+        ),
+        "rp_method": (
+            "Votes by party in the state, as the Consejo General's statewide count prints them in Acuerdo "
+            "IEC/CG/169/2023 (pages 14 and 15), with the votes marked for several parties of a coalition distributed "
+            "among them. They include the list-only tally sheets of the special casillas and equal the sum of every "
+            "tally sheet in the count workbook. Seats by party are those Acuerdo IEC/CG/170/2023 assigned (page 44)."
+        ),
+        "rp_system": (
+            "The nine list seats are filled from closed statewide lists. A party needs 3 percent of the valid vote to "
+            "take part; each such party first receives one seat (porcentaje específico), and the remaining seats go "
+            "by the natural quotient and largest remainders, subject to the federal limits that no party may hold a "
+            "share of the congress more than 8 points above or below its share of the vote (Constitución Política de "
+            "los Estados Unidos Mexicanos, art. 116 II; Código Electoral para el Estado de Coahuila de Zaragoza, art. "
+            "18). The model records the formula and the threshold; the first seat and the limits are in the declared "
+            "seats."
+        ),
+    },
+    "NLE": {
+        "day": date(2024, 6, 2),
+        "publisher": "Instituto Estatal Electoral y de Participación Ciudadana de Nuevo León (IEEPCNL)",
+        "page": "https://computo24.ieepcnl.mx/",
+        "workbook": "ieepcnl",
+        "casillas": ("https://computo24.ieepcnl.mx/20240610_NL.zip", "NL_DIP_LOC_2024.xlsx"),
+        "statewide": (
+            IEEPCNL + "IEEPCNL-CG-280-2024_ocred.pdf",
+            (
+                "Acuerdo IEEPCNL/CG/280/2024: distribución y asignación de curules por el principio de representación "
+                "proporcional para integrar el H. Congreso del Estado de Nuevo León, periodo 2024-2027, en cumplimiento "
+                "de la sentencia SM-JRC-341/2024 y acumulados"
+            ),
+        ),
+        "winners": (
+            IEEPCNL + "IEEPCNL-CG-280-2024_ocred.pdf",
+            (
+                "Acuerdo IEEPCNL/CG/280/2024: distribución y asignación de curules por el principio de representación "
+                "proporcional para integrar el H. Congreso del Estado de Nuevo León, periodo 2024-2027, en cumplimiento "
+                "de la sentencia SM-JRC-341/2024 y acumulados"
+            ),
+        ),
+        "mr_winners": (
+            IEEPCNL + "IEEPCNL-CG-278-2024_ocred.pdf",
+            (
+                "Acuerdo IEEPCNL/CG/278/2024: modificación de los cómputos distritales de diversos distritos y "
+                "distribución y asignación de curules por el principio de representación proporcional, en cumplimiento "
+                "de lo resuelto por el Tribunal Electoral del Estado de Nuevo León"
+            ),
+        ),
+        "rp_stage": "court_revised",
+        "rp_votes": {
+            "PAN": 517_587,
+            "PRI": 345_790,
+            "PRD": 23_223,
+            "PVEM": 109_499,
+            "PT": 77_360,
+            "MC": 688_220,
+            "MORENA": 533_754,
+            "VIDA": 58_682,
+            "ESO": 16_621,
+            "PL": 17_987,
+            "PES": 6_223,
+            "PJ": 7_246,
+            "CNR": 1_243,
+            "NULOS": 88_069,
+            "V. FINAL": 2_491_504,
+        },
+        # District 13's candidacy of the Partido Encuentro Solidario Nuevo León was cancelled before the count
+        # (Acuerdo IEEPCNL/CG/255/2024), and the votes marked for it there count as votes for unregistered candidates.
+        "cancelled": {13: "PES"},
+        "declared": {
+            "mr": {
+                1: "PRI",
+                2: "PRI",
+                3: "PAN",
+                4: "MC",
+                5: "PRD",
+                6: "PRD",
+                7: "PRI",
+                8: "PRI",
+                9: "PAN",
+                10: "PAN",
+                11: "MC",
+                12: "MORENA",
+                13: "MORENA",
+                14: "MC",
+                15: "PAN",
+                16: "PRD",
+                17: "MORENA",
+                18: "PAN",
+                19: "PAN",
+                20: "MORENA",
+                21: "MC",
+                22: "MC",
+                23: "MC",
+                24: "PRI",
+                25: "MORENA",
+                26: "PAN",
+            },
+            "rp": {"PT": 1, "PVEM": 1, "PRI": 3, "PAN": 3, "MORENA": 4, "MC": 4},
+            "pages": {"mr": 43, "rp": 36, "votes": 22},
+        },
+        "mr": 26,
+        "rp": 16,
+        "body": ("H. Congreso del Estado de Nuevo León", "Congress of Nuevo León"),
+        "mr_method": (
+            "Polling-station (casilla) counts from the institute's district count workbook of 10 June 2024, district "
+            "tally sheets only (the list-only sheets of the special casillas are left out), summed to the district; "
+            "the early vote (voto anticipado) is included on its own channel. Votes marked for two or more parties of "
+            "one coalition are counted as that coalition's candidate. In district 13 the votes marked for the "
+            "Partido Encuentro Solidario Nuevo León count as votes for unregistered candidates, because Acuerdo "
+            "IEEPCNL/CG/255/2024 cancelled its candidacy there. The Tribunal Electoral del Estado de Nuevo León later "
+            "annulled casillas in several districts; the revised district totals are not in this workbook, and no "
+            "winner changed. The winner and the party that nominated them are as Acuerdo IEEPCNL/CG/278/2024 lists "
+            "them (table 7, pages 43 and 44)."
+        ),
+        "casilla_note": (
+            "Polling-station results from the institute's district count workbook of 10 June 2024, district tally "
+            "sheets only. Each line is a column of the workbook: a party, or a combination of the parties of one "
+            "coalition that a voter marked."
+        ),
+        "rp_method": (
+            "Votes by party in the state as Acuerdo IEEPCNL/CG/280/2024 prints them (table 9, page 22), after the "
+            "casillas the courts annulled and the casilla the regional chamber restored, with the votes marked for "
+            "several parties of a coalition distributed among them. The acuerdo prints 88,079 null votes and 2,402,182 "
+            "valid votes in its table 10; the 88,069 of table 9 are kept, because they add up with the party votes to "
+            "table 11's 2,402,192 valid votes. Seats by party are those of table 28 (page 36), which the acuerdo "
+            "confirms from Acuerdo IEEPCNL/CG/278/2024."
+        ),
+        "rp_system": (
+            "The 16 list seats go to the parties with 3 percent of the valid vote: each first receives one seat "
+            "(porcentaje mínimo), and the remaining seats go by the electoral quotient and largest remainders, "
+            "subject to the federal limit that no party may hold a share of the congress more than 8 points above its "
+            "share of the vote (Constitución Política de los Estados Unidos Mexicanos, art. 116 II; Ley Electoral "
+            "para el Estado de Nuevo León, arts. 263 to 267). A party's seats are filled partly from its list and "
+            "partly by its district candidates who lost with the highest share of the vote in their district. The "
+            "model records the formula and the threshold; the first seat and the limit are in the declared seats."
+        ),
+    },
 }
 
 
@@ -112,7 +334,7 @@ def url_of(spec: str | tuple[str, str]) -> str:
 
 def fetch() -> None:
     for config in STATES.values():
-        for key in ("casillas", "districts", "statewide", "winners", "rp_casillas"):
+        for key in ("casillas", "districts", "statewide", "winners", "mr_winners", "rp_casillas"):
             if key in config:
                 url = url_of(config[key])
                 raw.fetch(SOURCE, url, suffix="." + url.rsplit(".", 1)[1].lower())
@@ -143,9 +365,150 @@ def parties_of(column: str) -> tuple[str, ...]:
     return tuple(column.split("_"))
 
 
+def rank(group: tuple[str, ...], columns: dict[str, tuple[str, ...]]) -> tuple[int, ...]:
+    return tuple(sorted(NATIONAL.index(m) if m in NATIONAL else len(NATIONAL) for c in group for m in columns[c]))
+
+
+def sheet_of(spec: str | tuple[str, str]) -> pl.DataFrame:
+    """A count workbook's first sheet as text, from the row that names its columns."""
+    path = raw.cached(SOURCE, url_of(spec)).path
+    if isinstance(spec, tuple):
+        with zipfile.ZipFile(path) as archive:
+            data = archive.read(next(n for n in archive.namelist() if n.endswith(spec[1])))
+    else:
+        data = path.read_bytes()
+    sheet = pl.read_excel(io.BytesIO(data), has_header=False, infer_schema_length=0)
+    head = next(i for i, row in enumerate(sheet.iter_rows()) if str(row[0]).strip() in ("CLAVE_CASILLA", "cve_cas2"))
+    names = [str(value).strip() for value in sheet.row(head)]
+    return sheet.slice(head + 1).rename(dict(zip(sheet.columns, names, strict=True)))
+
+
+def casilla_row(
+    district: str, section: str, kind: str, number: int, extension: int, counts: dict[str, int], **figures: str
+) -> dict[str, str]:
+    """A workbook row in the field names of INE's casilla files, which parse_state reads."""
+    return {
+        "ID_DISTRITO_LOCAL": district,
+        "SECCION": section,
+        "TIPO_CASILLA": kind,
+        "ID_CASILLA": str(number),
+        "EXT_CONTIGUA": str(extension),
+        "ESTATUS_ACTA": "",
+        "NUM_VOTOS_VALIDOS": str(sum(counts.values())),
+        **{option: str(value) for option, value in counts.items()},
+        **figures,
+    }
+
+
+def iec_rows(iso: str, config: dict) -> tuple[list[str], list[dict[str, str]]]:
+    """IEC's final count workbook. Special casillas have a second, list-only tally sheet (tipo S1RP), which counts
+    toward the proportional seats only: it is left out of the district contests, and it is part of the totals the
+    district workbook and the statewide count print, which the whole workbook is checked against."""
+    sheet = sheet_of(config["casillas"])
+    columns = sheet.columns[sheet.columns.index("tipo") + 1 : sheet.columns.index("cand_nreg")]
+    options = [column.upper() for column in columns]
+    figures = [*columns, "cand_nreg", "nulos", "total_votos"]
+    numbers = sheet.with_columns(pl.col(c).map_elements(ine.number, return_dtype=pl.Int64) for c in figures)
+    numbers = numbers.with_columns(pl.col("dtto_loc").cast(pl.Int64))
+    district_sheet = pl.read_excel(
+        raw.cached(SOURCE, config["districts"]).path, has_header=False, infer_schema_length=0
+    )
+    head = next(i for i, row in enumerate(district_sheet.iter_rows()) if str(row[0]).strip() == "No.")
+    names = [str(value).strip().lower() for value in district_sheet.row(head)]
+    printed = district_sheet.slice(head + 1).rename(dict(zip(district_sheet.columns, names, strict=True)))
+    printed = printed.filter(pl.col("no.").str.contains(r"^\d+$"))
+    summed = numbers.group_by("dtto_loc").agg(pl.col(c).sum() for c in figures)
+    for row in printed.iter_rows(named=True):
+        sums = summed.filter(pl.col("dtto_loc") == int(row["no."])).row(0, named=True)
+        for column in figures:
+            label = {"total_votos": "total votos"}.get(column, column.lower())
+            if label in row and ine.number(row[label]) != sums[column]:
+                raise ValueError(f"{iso} district {row['no.']}: {column} sums to {sums[column]}, printed {row[label]}")
+    if printed.height != config["mr"]:
+        raise ValueError(f"{iso}: {printed.height} districts in the district workbook")
+    whole = numbers.select(pl.col(c).sum() for c in figures).row(0, named=True)
+    declared = config["rp_votes"]
+    for column, label in (("cand_nreg", "CNR"), ("nulos", "NULOS"), ("total_votos", "V. FINAL")):
+        if whole[column] != declared[label]:
+            raise ValueError(
+                f"{iso}: the workbook's {column} is {whole[column]}, the statewide count {declared[label]}"
+            )
+    rows = []
+    for row in numbers.iter_rows(named=True):
+        tipo = row["tipo"].strip()
+        if tipo.endswith("RP"):
+            continue
+        if tipo == "N/A":
+            kind, number, extension = {"VA": "A", "VPPP": "P"}[row["casilla"].strip()], 1, 0
+        else:
+            match = re.fullmatch(r"([BCES])(\d*)(?:C(\d+))?", tipo)
+            if match is None:
+                raise ValueError(f"{iso}: casilla type {tipo!r}")
+            kind, number, extension = match.group(1), int(match.group(2) or 1), int(match.group(3) or 0)
+        rows.append(
+            casilla_row(
+                str(row["dtto_loc"]),
+                row["seccion"],
+                kind,
+                number,
+                extension,
+                {option: row[column] for option, column in zip(options, columns, strict=True)},
+                ID_ESTADO=str(mge.STATES.index(next(s for s in mge.STATES if s[0] == iso)) + 1),
+                LISTA_NOMINAL=row["lista"],
+                NUM_VOTOS_CAN_NREG=str(row["cand_nreg"]),
+                NUM_VOTOS_NULOS=str(row["nulos"]),
+                TOTAL_VOTOS=str(row["total_votos"]),
+            )
+        )
+    return options, rows
+
+
+def ieepcnl_rows(iso: str, config: dict) -> tuple[list[str], list[dict[str, str]]]:
+    """IEEPCNL's per-acta count workbook. Tally sheets of type 4 are the list-only sheets of the special casillas and
+    are left out of the district contests. A district's early votes (casilla A) can come on two sheets with the same
+    key; they are numbered in the order of the workbook."""
+    sheet = sheet_of(config["casillas"])
+    columns = sheet.columns[sheet.columns.index("TIPO_ACTA") + 1 : sheet.columns.index("NO_REGISTRADAS")]
+    options = [column.removeprefix("C_") for column in columns]
+    cancelled: dict[int, str] = config.get("cancelled", {})
+    early: dict[int, int] = {}
+    rows = []
+    for row in sheet.iter_rows(named=True):
+        if row["TIPO_ACTA"] == "4":
+            continue
+        if row["TIPO_ACTA"] != "3":
+            raise ValueError(f"{iso}: tally sheet type {row['TIPO_ACTA']}")
+        district = int(row["ID_DISTRITO_LOCAL"])
+        counts = {option: ine.number(row[column]) for option, column in zip(options, columns, strict=True)}
+        unregistered = ine.number(row["NO_REGISTRADAS"])
+        if district in cancelled:
+            unregistered += counts[cancelled[district]]
+            counts[cancelled[district]] = 0
+        number = int(row["ID_CASILLA"])
+        if row["TIPO_CASILLA"] == "A":
+            early[district] = number = early.get(district, 0) + 1
+        rows.append(
+            casilla_row(
+                str(district),
+                "0" if row["SECCION"] == "N/A" else row["SECCION"],
+                row["TIPO_CASILLA"].strip(),
+                number,
+                int(row["EXT_CONTIGUA"]),
+                counts,
+                ID_ESTADO=row["ID_ENTIDAD"],
+                LISTA_NOMINAL=row["LISTA_NOMINAL"],
+                NUM_VOTOS_CAN_NREG=str(unregistered),
+                NUM_VOTOS_NULOS=row["NULOS"],
+                TOTAL_VOTOS=row["TOTAL_VOTOS_CALCULADO"],
+            )
+        )
+    return options, rows
+
+
 def parse_state(iso: str, config: dict) -> None:
     entidad = mge.STATES.index(next(s for s in mge.STATES if s[0] == iso)) + 1
-    options, rows = see(member(config["casillas"]))
+    reader = {"iec": iec_rows, "ieepcnl": ieepcnl_rows}.get(config.get("workbook", ""))
+    options, rows = see(member(config["casillas"])) if reader is None else reader(iso, config)
     units, votes = [], []
     for row in rows:
         counts = {option: ine.number(row[option]) for option in options}
@@ -178,7 +541,7 @@ def parse_state(iso: str, config: dict) -> None:
     if units_frame.group_by(keys).len().filter(pl.col("len") > 1).height:
         raise ValueError(f"{iso}: duplicate casillas")
     votes_frame = pl.DataFrame(votes)
-    if "districts" in config:
+    if "districts" in config and reader is None:
         check_districts(iso, config, options, votes_frame)
     statewide_frame = statewide_of(iso, config)
     elected_frame = elected_of(iso, config)
@@ -220,6 +583,14 @@ def check_districts(iso: str, config: dict, options: list[str], votes_frame: pl.
 
 
 def statewide_of(iso: str, config: dict) -> pl.DataFrame:
+    if "rp_votes" in config:
+        declared: dict[str, int] = config["rp_votes"]
+        if sum(v for k, v in declared.items() if k != "V. FINAL") != declared["V. FINAL"]:
+            raise ValueError(f"{iso}: the statewide votes do not add up to their total")
+        return pl.DataFrame(
+            [{"district": 0, "option": option, "votes": votes} for option, votes in declared.items()],
+            schema={"district": pl.Int64, "option": pl.String, "votes": pl.Int64},
+        )
     if "rp_casillas" in config:
         options, rows = see(member(config["rp_casillas"]))
         renamed = {"NUM_VOTOS_CAN_NREG": "CNR", "NUM_VOTOS_NULOS": "NULOS", "TOTAL_VOTOS": "V. FINAL"}
@@ -294,6 +665,7 @@ def elected_of(iso: str, config: dict) -> pl.DataFrame:
 def parse() -> None:
     for iso, config in STATES.items():
         parse_state(iso, config)
+    build()
 
 
 MR_RULES = {"formula": "fptp"}
@@ -325,15 +697,28 @@ CASILLA_NOTE = (
 )
 
 
-def emit() -> Path:
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package mx.congreso_local/all from the parsed tables. It reads the database through Draft, so the
+    rows it rebuilds keep the ids the changeset path gave them."""
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary="Mexican state legislatures: district contests by polling station and proportional seats, from the "
             "state electoral institutes (" + ", ".join(STATES) + ")",
             polity="MX",
+        )
+        cs.accept(
+            "accounting.turnout",
+            "IEPAC's casilla file prints more votes cast than the nominal roll at 10 Yucatán casillas (sections 44, "
+            "123, 176, 245, 249, 250, 724, 727, 824 and 825; 1,844 against 656 at 176 C1), and IEC's count workbook "
+            "does at 10 Coahuila casillas (31 C5, 85 B, 97 B, 146 C2, 327 C1, 870 C1, 1033 B, 1139 B, 1142 C1 and "
+            "1437 B; 1,926 against 747 at 31 C5); both figures are stored as printed",
         )
         if conn.execute("select 1 from scheme where code = 'mx.distrito_local'").fetchone() is None:
             raise ValueError("publish mx.distrito_local before mx.congreso_local")
@@ -360,17 +745,21 @@ def emit() -> Path:
                         cs.add("external_id", entity_id=parties[key], scheme="wikidata", value=item)
             return parties[key]
 
+        # The federal count's casillas, which this pipeline's results attach to; the casillas it mints itself are
+        # left out, so a rebuild writes them again.
         casilla_units = {
             code: unit
             for code, unit in conn.execute(
-                "select code, id from reporting_unit where scheme_code = 'mx.casilla' and code like '2024:%'"
+                "select code, id from reporting_unit where scheme_code = 'mx.casilla' and code like any(%s)",
+                [sorted({f"{config['day'].year}:%" for config in STATES.values()})],
             ).fetchall()
+            if unit not in cs.own_entities
         }
-        by_place: dict[tuple[str, int, str], str] = {}
+        by_place: dict[tuple[int, str, int, str], str] = {}
         for code in casilla_units:
-            _, rest = code.split(":")
+            year, rest = code.split(":")
             state, _, section, letter = rest.split("-")
-            by_place[(state, int(section), letter)] = code
+            by_place[(int(year), state, int(section), letter)] = code
         sections = dict(
             conn.execute(
                 "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'mx.seccion'"
@@ -406,9 +795,13 @@ def emit() -> Path:
                 if key in config:
                     cs.artifact(raw.cached(SOURCE, url_of(config[key])), source)
 
+            documents: dict[tuple[str, str], UUID] = {}
+
             def document(spec: tuple[str, str]) -> UUID:
+                if spec in documents:
+                    return documents[spec]
                 url, title = spec
-                found = cs.source(config["publisher"], title)
+                found = documents[spec] = cs.source(config["publisher"], title)
                 cs.add(
                     "source",
                     id=found,
@@ -425,6 +818,7 @@ def emit() -> Path:
 
             statewide_source = document(config.get("statewide") or config["rp_casillas"])
             winners_source = document(config["winners"])
+            mr_source = document(config["mr_winners"]) if "mr_winners" in config else winners_source
             pages = config.get("declared", {}).get("pages", {})
 
             native, english = config["body"]
@@ -443,7 +837,7 @@ def emit() -> Path:
             if rp_system in cs.minted:
                 cs.add("electoral_system", id=rp_system, polity_id=polity, rules=RP_RULES, rules_version=1)
                 name(rp_system, f"{state_name} statewide closed-list proportional system")
-                cs.add("note", entity_id=rp_system, kind="methodology", body_md=RP_SYSTEM)
+                cs.add("note", entity_id=rp_system, kind="methodology", body_md=config.get("rp_system", RP_SYSTEM))
 
             election = cs.key("mx.election", f"{day}:{iso}")
             path = f"mx/{iso.lower()}/{day}-general"
@@ -452,19 +846,22 @@ def emit() -> Path:
                     "election", id=election, polity_id=polity, kind="general", date_from=day, date_to=day, status="held"
                 )
                 name(election, f"{year} {state_name} state election")
-                name(election, f"Proceso electoral local {year - 1}-{year} de {state_name}", "es", "native")
+                process = config.get("process", f"Proceso electoral local {year - 1}-{year} de {state_name}")
+                name(election, process, "es", "native")
                 cs.add("slug", path=path, entity_id=election)
 
             state_unit = cs.unit("mx.entidad", ss)
 
-            def make_set(contest: UUID, key: str, default: bool, source_id: UUID, note: str) -> UUID:
+            def make_set(
+                contest: UUID, key: str, default: bool, source_id: UUID, note: str, stage: str = "official"
+            ) -> UUID:
                 result_set = cs.key("mx.result_set", f"MX-{iso}:{day}:dip:{key}")
                 cs.add(
                     "result_set",
                     id=result_set,
                     election_id=election,
                     contest_id=contest,
-                    stage="official",
+                    stage=stage,
                     kind="counted",
                     status="active",
                     source_id=source_id,
@@ -495,12 +892,14 @@ def emit() -> Path:
             placed = []
             for row in casillas.iter_rows(named=True):
                 letter = ine.casilla_code(2024, f"{row['kind'][:1]}{row['number']:02d}{row['extension']:02d}")
-                code = by_place.get((ss, row["section"], letter))
+                code = by_place.get((year, ss, row["section"], letter))
                 if code is None:
                     code = f"{year}:{ss}-L{row['district']:02d}-{row['section']:04d}-{letter}"
                     unit_id = cs.unit("mx.casilla", code)
                     channel, kind, area = 0, "standard", sections.get(f"{ss}{row['section']:04d}")
-                    if row["section"] == 0 or row["kind"][:1] == "A":
+                    if row["kind"][:1] == "P":
+                        channel, kind, area = ine.PRISON, "prison", None
+                    elif row["section"] == 0 or row["kind"][:1] == "A":
                         channel, kind, area = ine.EARLY if row["kind"][:1] == "A" else ine.ABROAD, "aggregate", None
                     unit_rows[unit_id] = (
                         "mx.casilla",
@@ -567,13 +966,15 @@ def emit() -> Path:
                     mine.filter((pl.col("kind_votes") == "list") & (pl.col("votes") > 0))
                     .group_by("option")
                     .agg(pl.col("votes").sum())
+                    .sort("option")
                     .iter_rows()
                 )
                 standing = {
                     tuple(sorted(g)): sum(totals_by[c] for c in g)
                     for g in diputados.groups_of(columns, list(totals_by))
                 }
-                ordered = sorted(standing.items(), key=lambda item: -item[1])
+                # Options with equal votes take national parties first, then the order of their columns' names.
+                ordered = sorted(standing.items(), key=lambda item: (-item[1], rank(item[0], columns), item[0]))
                 if len(ordered) > 1 and ordered[0][1] == ordered[1][1]:
                     raise ValueError(f"{iso} {district}: tie for first place")
                 declared = elected.filter((pl.col("tier") == "mr") & (pl.col("number") == district)).row(0, named=True)
@@ -587,12 +988,16 @@ def emit() -> Path:
                     cs.area("mx.distrito_local", f"{ss}{district:02d}"),
                     "standard",
                 )
-                district_set = make_set(contest, f"mr:{district:02d}:district", True, source, MR_METHOD)
-                casilla_set = make_set(contest, f"mr:{district:02d}:casilla", False, source, CASILLA_NOTE)
+                district_set = make_set(
+                    contest, f"mr:{district:02d}:district", True, source, config.get("mr_method", MR_METHOD)
+                )
+                casilla_set = make_set(
+                    contest, f"mr:{district:02d}:casilla", False, source, config.get("casilla_note", CASILLA_NOTE)
+                )
                 cs.add(
                     "citation",
                     entity_id=district_set,
-                    source_id=winners_source,
+                    source_id=mr_source,
                     locator={"page": pages["mr"]} if pages else {"row": declared["number"]},
                 )
                 options: dict[str, str] = {}
@@ -672,13 +1077,17 @@ def emit() -> Path:
             name(national, f"{year} Congress of {state_name}, proportional representation")
             name(national, f"Diputaciones locales {year}, {state_name}, representación proporcional", "es", "native")
             cs.add("slug", path=f"{path}/congress-proportional", entity_id=national)
-            rp_set = make_set(national, "rp", True, statewide_source, config["rp_method"])
+            rp_set = make_set(
+                national, "rp", True, statewide_source, config["rp_method"], config.get("rp_stage", "official")
+            )
             cs.add(
                 "citation",
                 entity_id=rp_set,
                 source_id=winners_source,
                 locator={"page": pages["rp"]} if pages else {"section": "representación proporcional"},
             )
+            if "votes" in pages:
+                cs.add("citation", entity_id=rp_set, source_id=statewide_source, locator={"page": pages["votes"]})
             rp_options: dict[str, UUID] = {}
             totals = dict(statewide.filter(pl.col("district") == 0).select("option", "votes").iter_rows())
             for position, abbrev in enumerate(sorted(listed, key=lambda a: -totals[a]), 1):
@@ -717,7 +1126,7 @@ def emit() -> Path:
                 else:
                     target = rp_write_in if option == "CNR" else rp_options[option]
                     rows.append((str(rp_set), str(unit), str(target), VOTES, row["votes"], 0))
-            for district in (0, *range(1, config["mr"] + 1)):
+            for district in sorted(set(statewide["district"])):
                 part = statewide.filter(
                     (pl.col("district") == district) & ~pl.col("option").is_in(["NULOS", "V. FINAL"])
                 )
