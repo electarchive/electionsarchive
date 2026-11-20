@@ -7,7 +7,8 @@ from uuid import UUID
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.es import euskadi
 from ea.sources.es.euskadi import (
     BALLOTS,
@@ -24,7 +25,7 @@ from ea.sources.es.euskadi import (
     sheets,
     tidy,
 )
-from ea.store import DATA, connect
+from ea.store import DATA, Connection, connect
 
 SOURCE = "es.euskadi_juntas"
 PARSED = DATA / "parsed" / SOURCE
@@ -253,6 +254,119 @@ def title(text: str) -> str:
     return " ".join(w if w in SMALL else w[:1].upper() + w[1:] for w in words)
 
 
+# Municipalities of today that an earlier election's files don't list because their territory still belonged to
+# another municipality, keyed to the municipalities it came from where its neighbors lie in more than one
+# circunscripción. The files bear each one out: at the first election that lists the new municipality, its parents'
+# electors fall by about its own (Bilbao by 30,387 in 1983, against 28,053 in Derio, Erandio, Loiu, Sondika, and
+# Zamudio; Hernani and Urnieta by 11,939 in 1987, against 15,346 in Lasarte-Oria and Astigarraga; Ikaztegieta by 218
+# in 1991, against 240 in Baliarrain and Orendain; Elgoibar by 704 in 1987, against 1,224 in Mendaro; Durango by
+# 2,638 in 1991, against 3,947 in Iurreta; Barakaldo by 1,085 in 1991, against 2,523 in Alonsotegi; Markina-Xemein by
+# 317 in 2007, against 350 in Ziortza-Bolibar). Usansolo left Galdakao in 2022 and no file lists it. Every other
+# such municipality borders only municipalities of one circunscripción, and joins that one.
+PARENTS = {
+    "20901": ("20032",),
+    "20902": ("20040", "20072"),
+    "20903": ("20040",),
+    "20904": ("20044",),
+    "20905": ("20044",),
+    "48901": ("48020",),
+    "48902": ("48020",),
+    "48903": ("48020",),
+    "48904": ("48020",),
+    "48905": ("48020",),
+    "48910": ("48027",),
+    "48912": ("48013",),
+    "48915": ("48060",),
+    "48916": ("48036",),
+}
+# Interior rings smaller than this are slivers between the INE municipal outlines, which don't share vertices; the
+# smallest real hole in a circunscripción (inside Bilbao's own outline) is 3,349 m2.
+SLIVER = 2000
+AREA_METHOD = (
+    "The union of the present-day INE outlines of the {count} municipalities the Basque Government's results file "
+    "places in this circunscripción for the {year} election."
+)
+AREA_LATER = " It also takes in the present-day municipalities the file does not list: {places}."
+
+
+def circ_members(conn: Connection, muns: pl.DataFrame) -> dict[tuple[int, str, str], tuple[list[str], list[str]]]:
+    """Each circunscripción's municipalities as the file lists them, and the present-day municipalities whose
+    territory it then held without listing them, by election, territory, and circunscripción."""
+    current = {
+        str(code)
+        for (code,) in conn.execute(
+            """select c.code from area a join area_code c on c.area_id = a.id
+               where a.scheme_code = 'es.municipio' and left(c.code, 2) = any(%s)
+                 and exists (select from area_geometry g where g.area_id = a.id)""",
+            [list(TERRITORIES)],
+        )
+    }
+    listed = {(year, th + mun) for year, th, mun in muns.select("year", "th", "mun").iter_rows()}
+    years = {year for year, _ in listed}
+    later = sorted(code for code in current if any((year, code) not in listed for year in years))
+    neighbors: dict[str, list[str]] = {
+        str(code): [str(other) for other in others]
+        for code, others in conn.execute(
+            """with m as (select c.code, g.geom from area a join area_code c on c.area_id = a.id
+                          join area_geometry g on g.area_id = a.id and upper_inf(g.valid)
+                          where a.scheme_code = 'es.municipio' and left(c.code, 2) = any(%s))
+               select x.code, array_agg(y.code order by y.code) from m x join m y
+                 on x.code <> y.code and x.geom && st_expand(y.geom, 0.01)
+                 and st_dwithin(x.geom::geography, y.geom::geography, 100)
+               where x.code = any(%s) group by x.code""",
+            [list(TERRITORIES), later],
+        )
+    }
+    out: dict[tuple[int, str, str], tuple[list[str], list[str]]] = {}
+    for (year, th), group in muns.group_by("year", "th", maintain_order=True):
+        placed = {th + mun: circ for mun, circ in group.select("mun", "circ").iter_rows()}
+        for code, circ in placed.items():
+            out.setdefault((year, th, circ), ([], []))[0].append(code)
+        missing = sorted(code for code in current if code[:2] == th and code not in placed)
+        while missing:
+            settled: dict[str, str] = {}
+            for code in missing:
+                around = {placed[p] for p in PARENTS.get(code, neighbors.get(code, [])) if p in placed}
+                if len(around) > 1:
+                    raise ValueError(f"{year} {code}: lies between circunscripciones {sorted(around)}")
+                if around:
+                    settled[code] = around.pop()
+            if not settled:
+                raise ValueError(f"{year}: no circunscripción for {missing}")
+            for code, circ in settled.items():
+                placed[code] = circ
+                out[year, th, circ][1].append(code)
+            missing = [code for code in missing if code not in settled]
+    return {key: (sorted(members), sorted(extra)) for key, (members, extra) in out.items()}
+
+
+def union(conn: Connection, codes: list[str]) -> tuple[str, str, UUID]:
+    """The union of the municipalities' current INE outlines, without the slivers between them, its label point, and
+    the outlines' source."""
+    row = conn.execute(
+        """with whole as (
+               select st_collectionextract(st_makevalid(st_union(g.geom)), 3) geom, min(g.source_id::text) source
+               from area_code c join area a on a.id = c.area_id and a.scheme_code = 'es.municipio'
+               join area_geometry g on g.area_id = a.id and upper_inf(g.valid)
+               where c.code = any(%s)),
+           parts as (select (st_dump(geom)).geom part, source from whole),
+           filled as (
+               select st_makepolygon(
+                        st_exteriorring(part),
+                        array(select st_interiorringn(part, i) from generate_series(1, st_numinteriorrings(part)) i
+                              where st_area(st_makepolygon(st_interiorringn(part, i))::geography) >= %s)) part,
+                      source
+               from parts)
+           select encode(st_asewkb(st_multi(st_union(part))), 'hex'),
+                  encode(st_asewkb(st_pointonsurface(st_union(part))), 'hex'), min(source)
+           from filled""",
+        [codes, SLIVER],
+    ).fetchone()
+    if row is None or row[0] is None:
+        raise ValueError(f"no INE outlines for {codes}")
+    return str(row[0]), str(row[1]), UUID(row[2])
+
+
 def emit() -> Path:
     circ = pl.read_parquet(PARSED / "circ.parquet")
     circ_votes = pl.read_parquet(PARSED / "circ_votes.parquet")
@@ -262,7 +376,7 @@ def emit() -> Path:
     mesa_votes = pl.read_parquet(PARSED / "mesa_votes.parquet")
     members = pl.read_parquet(PARSED / "elected.parquet")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version="1",
@@ -271,6 +385,21 @@ def emit() -> Path:
                 "and polling station, with the elected members, from the Basque Government's results files"
             ),
             polity="ES",
+        )
+        cs.accept(
+            "accounting.ballots_sum",
+            "the Basque Government's circunscripción, municipality, and mesa files give ballots cast that differ from "
+            "the votes to candidacies, blank, and null ballots in some units; the figures are stored as published",
+        )
+        cs.accept(
+            "accounting.votes_valid",
+            "in some units the files' list votes add up to other than their votes to candidacies, as the result sets' "
+            "notes say for the circunscripciones; the figures are stored as published",
+        )
+        cs.accept(
+            "accounting.turnout",
+            "two mesas in the files report more ballots cast than registered voters; the figures are stored as "
+            "published",
         )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
@@ -281,15 +410,14 @@ def emit() -> Path:
             if conn.execute("select 1 from scheme where code = %s", (scheme,)).fetchone() is None:
                 raise ValueError("publish es.ine and es.referendums before the Juntas Generales")
         scheme = "es.junta_circ"
-        if conn.execute("select 1 from scheme where code = %s", (scheme,)).fetchone() is None:
-            cs.add(
-                "scheme",
-                code=scheme,
-                polity_id=spain,
-                kind="electoral_district",
-                rank=3,
-                noun="Juntas Generales circunscripción",
-            )
+        cs.add(
+            "scheme",
+            code=scheme,
+            polity_id=spain,
+            kind="electoral_district",
+            rank=3,
+            noun="Juntas Generales circunscripción",
+        )
         source = cs.source(PUBLISHER, TITLE)
         cs.add(
             "source",
@@ -346,6 +474,75 @@ def emit() -> Path:
                 "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'es.seccion'"
             ).fetchall()
         )
+        town_names = dict(
+            conn.execute(
+                """select distinct on (c.code) c.code, n.text from area a join area_code c on c.area_id = a.id
+                   join name n on n.entity_id = a.id and n.is_preferred
+                   where a.scheme_code = 'es.municipio' and left(c.code, 2) = any(%s)
+                   order by c.code, n.lang = 'es' desc, n.kind = 'official' desc""",
+                [list(TERRITORIES)],
+            ).fetchall()
+        )
+        circs = circ_members(conn, muns)
+        days = list(ELECTIONS.values())
+        until = {day: days[index + 1] if index + 1 < len(days) else None for index, day in enumerate(days)}
+        for year, day in ELECTIONS.items():
+            if circ.filter(pl.col("year") == year).height:
+                cs.add(
+                    "boundary_set",
+                    scheme_code=scheme,
+                    vintage=day.isoformat(),
+                    valid_from=day,
+                    valid_to=until[day],
+                    as_of=day,
+                )
+
+        def circ_area(year: int, province: str, key_circ: str, code: str, label: str) -> UUID:
+            day, end = ELECTIONS[year], until[ELECTIONS[year]]
+            area = cs.area(scheme, code)
+            towns, later = circs[year, province, key_circ]
+            cs.add("area", id=area, scheme_code=scheme)
+            cs.add("area_code", area_id=area, code=code, valid_from=day, valid_to=end)
+            cs.add(
+                "area_parent", area_id=area, parent_id=cs.area("es.provincia", province), valid_from=day, valid_to=end
+            )
+            name(area, label, "es")
+            geom, point, ine = union(conn, towns + later)
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=day,
+                valid_to=end,
+                geom=geom,
+                label_point=point,
+                quality="official",
+                source_id=ine,
+            )
+            for town in towns:
+                cs.add(
+                    "area_membership",
+                    area_id=municipality_areas[town],
+                    parent_id=area,
+                    partial=False,
+                    valid_from=day,
+                    valid_to=end,
+                )
+            note = AREA_METHOD.format(count=len(towns), year=year)
+            if later:
+                places = [
+                    f"{town_names[town]} (then part of "
+                    + (
+                        " and ".join(town_names[parent] for parent in PARENTS[town] if parent in towns)
+                        if town in PARENTS
+                        else "a neighbor; every municipality around it lies in this circunscripción"
+                    )
+                    + ")"
+                    for town in later
+                ]
+                note += AREA_LATER.format(places="; ".join(places))
+            cs.add("note", entity_id=area, kind="methodology", body_md=note)
+            return area
+
         unit_rows: dict[UUID, tuple[UUID, str, str, UUID | None, str, UUID | None, str]] = {}
         province_units: dict[str, UUID] = {}
         for code in TERRITORIES:
@@ -408,6 +605,8 @@ def emit() -> Path:
                 seats_by_party = Counter(declared["party"].to_list())
                 key = f"{day}:{province}:{key_circ}"
                 label = title(entry["label"])
+                circ_code = f"{stamp}:{province}:{key_circ}"
+                district = circ_area(year, province, key_circ, circ_code, label)
                 contest = cs.key(f"{SOURCE}.contest", key)
                 cs.add(
                     "contest",
@@ -415,7 +614,7 @@ def emit() -> Path:
                     election_id=election,
                     kind="list_allocation",
                     body_id=bodies[province],
-                    district_area_id=cs.area("es.provincia", province),
+                    district_area_id=district,
                     magnitude=declared.height,
                     electoral_system_id=systems[threshold(year)],
                     default_result_kind="counted",
@@ -462,14 +661,14 @@ def emit() -> Path:
                     split = ", ".join(f"{p} {n}" for p, n in sorted(computed.items()))
                     note += MISMATCH.format(declared=declared.height, share=int(threshold(year) * 100), computed=split)
                 circ_set = make_set("circ", True, 1, note)
-                circ_unit = cs.unit(scheme, f"{stamp}:{province}:{key_circ}")
+                circ_unit = cs.unit(scheme, circ_code)
                 unit_rows[circ_unit] = (
                     circ_unit,
                     scheme,
-                    f"{stamp}:{province}:{key_circ}",
+                    circ_code,
                     province_units[province],
-                    "unlocated",
-                    None,
+                    "equals",
+                    district,
                     "standard",
                 )
                 accounting(circ_set, circ_unit, entry)
