@@ -19,10 +19,14 @@ protocols print no candidate's votes, so each result holds the district's electo
 and the declared winner.
 """
 
+import json
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from uuid import uuid5
+
+import shapely
+import shapely.geometry
 
 from ea import package, raw
 from ea.package import Package
@@ -32,6 +36,7 @@ SOURCE = "ge.respublika"
 GEORGIA = cec_1990s.GEORGIA
 COUNTRY = cec_1990s.COUNTRY
 SCHEME = "ge.district_1995"
+AREA_SCHEME = "ge.rayon_1995"
 LIBRARY = "https://dspace.nplg.gov.ge"
 REGISTERED, VOTERS = 2, 14
 POINTS = 72 / 300
@@ -353,6 +358,7 @@ def _pdf(path: Path) -> None:
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, ADM2, suffix=".geojson")
     for issue in ISSUES:
         raw.fetch(SOURCE, issue.url, suffix=".pdf", check=_pdf)
 
@@ -376,7 +382,7 @@ def package_key(year: int) -> str:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/registry", *(package_key(year) for year in PARLIAMENT_ELECTIONS)]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(package_key(year) for year in PARLIAMENT_ELECTIONS)]
 
 
 def unit(district: int) -> str:
@@ -397,11 +403,187 @@ def _source(p: Package) -> None:
     )
 
 
+# ---------------------------------------------------------------------------------------------------------------------
+# Shapes
+
+ADM2 = (
+    "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/GEO/ADM2/"
+    "geoBoundaries-GEO-ADM2_simplified.geojson"
+)
+GEO_SOURCE = key("source", "geoboundaries-adm2")
+PLAN_FROM, PLAN_TO = date(1995, 11, 5), date(2004, 3, 28)
+"""The plan the shapes belong to: the districts of the 1995 and 1999 elections, until the single-member seats ended."""
+BOUNDARY_SET = key("boundary_set", AREA_SCHEME, "gbopen-adm2")
+
+# The rayons of 1995 by district number: the geoBoundaries ADM2 name that outlines each and the English name.
+RAYONS = {
+    11: ("Sagarejo", "Sagarejo"),
+    12: ("Gurjaani", "Gurjaani"),
+    13: ("Sighnaghi", "Sighnaghi"),
+    14: ("Dedoplis Tskaro", "Dedoplistskaro"),
+    15: ("Lagodekhi", "Lagodekhi"),
+    16: ("Qvareli", "Kvareli"),
+    17: ("Telavi", "Telavi"),
+    18: ("Akhmeta", "Akhmeta"),
+    19: ("Tianeti", "Tianeti"),
+    21: ("Gardabani", "Gardabani"),
+    22: ("Marneuli", "Marneuli"),
+    23: ("Bolnisi", "Bolnisi"),
+    24: ("Dmanisi", "Dmanisi"),
+    25: ("Tsalka", "Tsalka"),
+    26: ("Tetri Sqaro", "Tetritskaro"),
+    27: ("Mtskheta", "Mtskheta"),
+    28: ("Dusheti", "Dusheti"),
+    29: ("Kazbegi", "Kazbegi"),
+    30: ("Kaspi", "Kaspi"),
+    31: ("Akhalgori", "Akhalgori"),
+    32: ("Gori", "Gori"),
+    33: ("Kareli", "Kareli"),
+    35: ("Khashuri", "Khashuri"),
+    36: ("Borjomi", "Borjomi"),
+    37: ("Akhaltsikhe", "Akhaltsikhe"),
+    38: ("Adigeni", "Adigeni"),
+    39: ("Aspindza", "Aspindza"),
+    40: ("Akhalkalaki", "Akhalkalaki"),
+    41: ("Ninotsminda", "Ninotsminda"),
+    43: ("Oni", "Oni"),
+    44: ("Ambrolauri", "Ambrolauri"),
+    45: ("Tsageri", "Tsageri"),
+    46: ("Lentekhi", "Lentekhi"),
+    47: ("Mestia", "Mestia"),
+    48: ("Kharagauli", "Kharagauli"),
+    49: ("Terjola", "Terjola"),
+    50: ("Sachkhere", "Sachkhere"),
+    51: ("Zestaponi", "Zestaponi"),
+    52: ("Baghdati", "Baghdati"),
+    53: ("Vani", "Vani"),
+    54: ("Samtredia", "Samtredia"),
+    55: ("Khoni", "Khoni"),
+    56: ("Chiatura", "Chiatura"),
+    57: ("Tkibuli", "Tkibuli"),
+    58: ("Tsqaltubo", "Tskaltubo"),
+    60: ("Ozurgeti", "Ozurgeti"),
+    61: ("Lanchkhuti", "Lanchkhuti"),
+    62: ("Chokhatauri", "Chokhatauri"),
+    63: ("Abasha", "Abasha"),
+    64: ("Senaki", "Senaki"),
+    65: ("Martvili", "Martvili"),
+    66: ("Khobi", "Khobi"),
+    67: ("Zugdidi", "Zugdidi"),
+    68: ("Tsalenjikha", "Tsalenjikha"),
+    69: ("Chkhorotsku", "Chkhorotsku"),
+    80: ("Keda", "Keda"),
+    81: ("Kobuleti", "Kobuleti"),
+    82: ("Shuakhevi", "Shuakhevi"),
+    83: ("Khelvachauri", "Khelvachauri"),
+    84: ("Khulo", "Khulo"),
+}
+"""The districts that voted in 1995 or 1999; the Abkhazian districts of 1992 have no reporting unit."""
+CITY_DISTRICTS = {
+    20: "Gardabani",
+    79: "Khelvachauri",
+}
+"""City districts with no outline of their own, by the geoBoundaries polygon that holds the city's centre
+(Rustavi and Batumi). Kutaisi (59) and Poti (70) fall in polygons that do not match the cities' surroundings,
+so they get no area."""
+TBILISI = "Tbilisi"
+TBILISI_DISTRICTS = range(1, 11)
+
+
+def rayon_area(district: int) -> str:
+    return key("area", AREA_SCHEME, district)
+
+
+TBILISI_AREA = key("area", AREA_SCHEME, "tbilisi")
+
+
+def area_of(district: int) -> str | None:
+    """The area a district's unit equals, or None when the unit has no shape of its own."""
+    return rayon_area(district) if district in RAYONS else None
+
+
+def geo() -> Package:
+    p = Package(
+        f"{SOURCE}/geo",
+        SOURCE,
+        "Georgia's rayons of 1995 as outlined by geoBoundaries, for the single-member districts of 1995 to 2003",
+    )
+    p.external.add(GEORGIA)
+    p.add(
+        "source",
+        id=GEO_SOURCE,
+        kind="academic",
+        publisher="geoBoundaries (William & Mary geoLab)",
+        title="geoBoundaries gbOpen Georgia ADM2",
+        url="https://www.geoboundaries.org/",
+        license="CC BY 4.0",
+        license_url="https://creativecommons.org/licenses/by/4.0/",
+        attribution="geoBoundaries (William & Mary geoLab), CC BY 4.0",
+    )
+    artifact = raw.cached(SOURCE, ADM2)
+    p.artifact(artifact, GEO_SOURCE)
+    p.add(
+        "scheme",
+        code=AREA_SCHEME,
+        polity_id=GEORGIA,
+        kind="administrative",
+        rank=1,
+        noun="rayon",
+        code_system=None,
+    )
+    outlines: dict[str, shapely.Geometry] = {}
+    for feature in json.loads(artifact.path.read_text(encoding="utf-8"))["features"]:
+        name = feature["properties"]["shapeName"]
+        if name in outlines:
+            raise ValueError(f"geoBoundaries holds two ADM2 outlines named {name}")
+        outlines[name] = shapely.geometry.shape(feature["geometry"])
+
+    def shape(area: str, name: str) -> None:
+        outline = outlines[name]
+        p.add(
+            "area_geometry",
+            area_id=area,
+            valid_from=PLAN_FROM,
+            valid_to=PLAN_TO,
+            geom=shapely.to_wkb(shapely.set_srid(outline, 4326), hex=True, include_srid=True),
+            label_point=shapely.to_wkb(
+                shapely.set_srid(shapely.point_on_surface(outline), 4326), hex=True, include_srid=True
+            ),
+            quality="academic",
+            source_id=GEO_SOURCE,
+        )
+
+    names = {d: name for d, name, *_ in (*FIRST_ROUND_1995, *DISTRICTS_1999)}
+    for district, (adm2, english) in sorted(RAYONS.items()):
+        area = rayon_area(district)
+        p.add("area", id=area, scheme_code=AREA_SCHEME)
+        p.add("area_code", area_id=area, code=str(district), valid_from=None, valid_to=None)
+        p.name(area, f"{english} rayon", "en", "english")
+        p.name(area, f"{names[district]} რაიონი", "ka", "official")
+        shape(area, adm2)
+    p.add("area", id=TBILISI_AREA, scheme_code=AREA_SCHEME)
+    p.add("area_code", area_id=TBILISI_AREA, code="tbilisi", valid_from=None, valid_to=None)
+    p.name(TBILISI_AREA, "Tbilisi", "en", "english")
+    p.name(TBILISI_AREA, "თბილისი", "ka", "official")
+    shape(TBILISI_AREA, TBILISI)
+    p.add(
+        "boundary_set",
+        id=BOUNDARY_SET,
+        scheme_code=AREA_SCHEME,
+        vintage="geoBoundaries gbOpen ADM2, read as the rayons of 1995",
+        valid_from=PLAN_FROM,
+        valid_to=PLAN_TO,
+        as_of=PLAN_FROM,
+    )
+    return p
+
+
 def registry() -> Package:
     p = Package(
         f"{SOURCE}/registry",
         SOURCE,
         "Georgia's single-member electoral districts of 1995 and 1999 as reporting units",
+        depends=[f"{SOURCE}/geo"],
     )
     p.external |= {GEORGIA, COUNTRY}
     p.add(
@@ -425,10 +607,24 @@ def registry() -> Package:
             polity_id=GEORGIA,
             scheme_code=SCHEME,
             code=str(district),
-            area_relation="within",
-            area_id=COUNTRY,
+            area_relation="equals" if area_of(district) else "within",
+            area_id=area_of(district) or COUNTRY,
             kind="standard",
         )
+        containing = TBILISI_AREA if district in TBILISI_DISTRICTS else None
+        if district in CITY_DISTRICTS:
+            containing = rayon_area(next(d for d, (adm2, _) in RAYONS.items() if adm2 == CITY_DISTRICTS[district]))
+        if containing:
+            p.add(
+                "reporting_unit_area",
+                unit_id=id,
+                area_id=containing,
+                valid_from=None,
+                valid_to=None,
+                approximate=True,
+                partial=False,
+                method="point_in_polygon",
+            )
         p.name(id, f"№{district} {name} საარჩევნო ოლქი", "ka", "official")
         p.name(id, f"Single-member district No. {district}", "en", "english")
     return p
@@ -659,6 +855,7 @@ def build(year: int) -> Package:
 
 
 def parse() -> None:
+    geo().write()
     registry().write()
     for year in PARLIAMENT_ELECTIONS:
         build(year).write()
