@@ -53,6 +53,7 @@ _STAT = Package("in.eci_stat", "in.eci_stat", "ids")
 _GEO = Package("in.geo", "in.geo", "ids")
 BODY = _STAT.id("body", "lok-sabha")
 FPTP = _STAT.id("electoral_system", "fptp")
+GEO_PACKAGE = "in.geo/geo"
 PS_SCHEME = "in.ps"
 AC_SCHEME = "in.ac"
 PC_SCHEME = "in.pc"
@@ -305,7 +306,7 @@ def row_boxes(source: Artifact, page: int, count: int, cells: int) -> list[tuple
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/registry", *(f"{SOURCE}/2024-{iso.lower()}" for iso in STATES)]
+    return [GEO_PACKAGE, f"{SOURCE}/registry", *(f"{SOURCE}/2024-{iso.lower()}" for iso in STATES)]
 
 
 def parse() -> None:
@@ -394,7 +395,7 @@ def election(state: State) -> Package:
         f"{SOURCE}/2024-{state.iso.lower()}",
         SOURCE,
         f"The 2024 Lok Sabha election in {state.name} by polling station, from the returning officers' Form 20",
-        depends=[f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/registry", GEO_PACKAGE],
     )
     p.external |= {INDIA, BODY, FPTP, AC_SCHEME, PC_SCHEME}
     data = transcripts(state)
