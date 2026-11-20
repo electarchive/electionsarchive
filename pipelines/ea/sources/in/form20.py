@@ -23,7 +23,8 @@ The election, the Lok Sabha, and every constituency contest of both States, with
 totals, are already held by in.eci_results. Each Form 20 result set attaches to that contest and its options, matched
 by the names the sheets print, and stays beside its default declared count.
 
-Maharashtra's 2019 sheets, which the Chief Electoral Officer still posts, are read by `form20_mh`, built from here.
+Maharashtra's 2019 sheets, which the Chief Electoral Officer still posts, are read by `form20_mh`, and Bihar's 2019
+sheets, which the Chief Electoral Officer posts on ceoelection.bihar.gov.in, by `form20_br`; both are built from here.
 """
 
 import functools
@@ -53,6 +54,7 @@ from ea.package import Package
 from ea.store import DATA
 
 form20_mh = importlib.import_module("ea.sources.in.form20_mh")
+form20_br = importlib.import_module("ea.sources.in.form20_br")
 
 SOURCE = "in.form20"
 INDIA = str(uuid5(package.NAMESPACE, "polity\x1fIN"))
@@ -120,8 +122,9 @@ def ac_area(s: State, ac: int) -> str:
 
 
 def fetch() -> None:
-    """Fetch Maharashtra's 2019 sheets, then store the saved copies of Bihar's and Rajasthan's."""
+    """Fetch Maharashtra's and Bihar's 2019 sheets, then store the saved copies of Bihar's and Rajasthan's 2024 ones."""
     form20_mh.fetch()
+    form20_br.fetch()
     if (INBOX / "index.json").exists():
         _store_saved()
 
@@ -727,7 +730,11 @@ def package_key(s: State) -> str:
 
 def packages() -> list[str]:
     """The packages with at least one constituency whose sheets check out."""
-    return [*(package_key(s) for s in STATES.values() if constituencies(s)), *form20_mh.packages()]
+    return [
+        *(package_key(s) for s in STATES.values() if constituencies(s)),
+        *form20_mh.packages(),
+        *form20_br.packages(),
+    ]
 
 
 def constituencies(s: State) -> list[Constituency]:
@@ -930,9 +937,13 @@ def parse() -> None:
             election(s).write()
     if form20_mh.packages():
         form20_mh.election().write()
+    if form20_br.packages():
+        form20_br.election().write()
     package.folder(SOURCE).mkdir(parents=True, exist_ok=True)
     (package.folder(SOURCE) / "coverage.json").write_text(json.dumps(coverage(), indent=1))
     (package.folder(SOURCE) / "coverage-mh-2019.json").write_text(json.dumps(form20_mh.coverage(), indent=1))
+    if form20_br.ready():
+        (package.folder(SOURCE) / "coverage-br-2019.json").write_text(json.dumps(form20_br.coverage(), indent=1))
 
 
 def emit() -> None:
