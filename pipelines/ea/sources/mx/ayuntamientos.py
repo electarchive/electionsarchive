@@ -1,3 +1,4 @@
+import json
 import os
 import re
 import subprocess
@@ -57,6 +58,17 @@ ELECTIONS: dict[str, dict] = {
             "Ley de Instituciones y Procedimientos Electorales para el Estado de Durango",
             267,
         ),
+        # The institute's answer to RSPD's question on the regidurías: the 3 percent threshold binds each party of a
+        # coalition on its own votes, and a coalition party takes seats only from the regidurías the coalition
+        # agreement gives it.
+        "agreement": (
+            "https://iepcdurango.mx/IEPC_DURANGO/consejogeneral_documentacion_2022/IEPC-CG86-2022.pdf",
+            (
+                "Acuerdo IEPC/CG86/2022 por el que se resuelve la consulta formulada por Redes Sociales Progresistas "
+                "Durango, vinculada con la asignación de regidurías (10 May 2022)"
+            ),
+            {"section": "Considerandos XXIV and XXV", "pages": "10-18"},
+        ),
         "fixes": {("MORENA+PVEM+RSPD", 2): "MORENA+PT+RSPD"},
         "labels": {30: {11: "CAND. NO REG.", 12: "VOTOS NULOS"}},
         "unnamed": {35},
@@ -71,7 +83,11 @@ INDEPENDENT = "IND"
 GENDERS = {"MUJER": "female", "HOMBRE": "male"}
 MEMBER = re.compile(r"(PRESIDENCIA|SINDICATURA|(\d+)ª\s*REGIDUR[IÍ]A)\s+(\S+)\s+(MUJER|HOMBRE)\s+(.+?)(?:\s{2,}|$)")
 MR_RULES = {"formula": "fptp"}
-RP_RULES = {"formula": "hare", "threshold": {"percent": 3, "level": "party", "scope": "contest"}}
+RP_RULES = {
+    "formula": "hare",
+    "threshold": {"percent": 3, "level": "party", "scope": "contest", "members": "any"},
+    "lists": {"order": "closed", "exhausted": "elsewhere", "vacancy": "substitute"},
+}
 MR_SYSTEM = (
     "Each municipality elects a planilla of a municipal president and a síndico, with their substitutes, by "
     "plurality of the votes cast in the municipality, with no runoff. Parties in a coalition or common candidacy "
@@ -80,10 +96,14 @@ MR_SYSTEM = (
 RP_SYSTEM = (
     "The regidurías of each ayuntamiento are all filled by proportional representation (Durango electoral law, "
     "art. 267). A party takes part if it ran a planilla for president and síndico and won at least 3 percent of "
-    "the valid municipal vote. The votes of the parties below the threshold are deducted, the remainder is "
-    "divided by the number of regidurías to give a common factor (factor común), each party takes a seat for each "
-    "whole factor in its vote, and the seats left go by largest remainder (resto mayor). Seats are filled from "
-    "each party's registered list, subject to the parity rules."
+    "the valid municipal vote, the votes cast less the null votes and the votes for unregistered candidates. A "
+    "party in a coalition must reach the 3 percent with its own votes (institute agreement IEPC/CG86/2022). The "
+    "votes of the parties below the threshold are deducted, the remainder is divided by the number of regidurías "
+    "to give a common factor (factor común), each party takes a seat for each whole factor in its vote, and the "
+    "seats left go by largest remainder (resto mayor). Seats are filled in order from the party's planilla; a "
+    "party in a coalition takes seats only from the regidurías the coalition agreement assigns to it (its "
+    "siglado). A party with fewer such regidurías than its vote earns takes only those, one with none takes no seat, "
+    "and each seat a party cannot fill goes to the party with the next largest remainder."
 )
 MR_METHOD = (
     "Municipal totals as the institute's count workbook prints them, which equal the sum of its polling-station "
@@ -287,6 +307,7 @@ def parse() -> None:
     key, election = config()
     workbook = raw.fetch(SOURCE, election["workbook"][0], suffix=".xlsb")
     listing = raw.fetch(SOURCE, election["members"][0], suffix=".pdf")
+    raw.fetch(SOURCE, election["agreement"][0], suffix=".pdf")
     reader = fastexcel.read_excel(str(workbook.path))
     frames: dict[str, list[dict]] = {
         "casillas": [],
@@ -313,6 +334,19 @@ def parse() -> None:
     pl.DataFrame(members).write_parquet(out / "members.parquet")
     print(key, {name: len(part) for name, part in frames.items()}, "members", len(members))
     build()
+
+
+def allocate(eligible: dict[str, int], seats: int, lists: dict[str, int]) -> dict[str, int]:
+    """Regidurías by factor común and resto mayor (art. 267), with each party in `lists` held to that many seats,
+    the regidurías its coalition's planilla gives it; a seat a party cannot fill goes to the next largest remainder."""
+    factor = sum(eligible.values()) / seats
+    won = {p: min(int(v // factor), lists.get(p, seats)) for p, v in eligible.items()}
+    order = sorted(eligible, key=lambda p: (-(eligible[p] - int(eligible[p] // factor) * factor), -eligible[p]))
+    while sum(won.values()) < seats and any(won[p] < lists.get(p, seats) for p in order):
+        for p in order:
+            if sum(won.values()) < seats and won[p] < lists.get(p, seats):
+                won[p] += 1
+    return {p: n for p, n in won.items() if n}
 
 
 def groups_of(present: list[str]) -> list[list[str]]:
@@ -355,6 +389,16 @@ def build() -> Path:
             "state electoral institute",
             polity="MX",
         )
+        cs.accept(
+            "accounting.ballots_sum",
+            "The count workbook prints 373 votes cast at Vicente Guerrero's polling station 1375 B, 3 more than the "
+            "370 its party and null columns hold; both are stored as printed, with a caveat on the result set",
+        )
+        cs.accept(
+            "accounting.turnout",
+            "The count workbook prints 2 more votes cast than the nominal roll at Tamazula's polling stations "
+            "1277 C1 and 1289 B; both figures are stored as printed",
+        )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
@@ -389,6 +433,8 @@ def build() -> Path:
             url=law_url,
             license=ine.PUBLIC,
         )
+        agreement_url, agreement_title, agreement_locator = election["agreement"]
+        agreement = source(agreement_title, agreement_url)
         mr_system = cs.key("mx.electoral_system", "ayuntamiento-mr")
         if mr_system in cs.minted:
             cs.add("electoral_system", id=mr_system, polity_id=mexico, rules=MR_RULES, rules_version=1)
@@ -400,6 +446,7 @@ def build() -> Path:
             name(rp_system, "Durango regidurías proportional system")
             cs.add("note", entity_id=rp_system, kind="methodology", body_md=RP_SYSTEM)
             cs.add("citation", entity_id=rp_system, source_id=law, locator={"article": article})
+            cs.add("citation", entity_id=rp_system, source_id=agreement, locator=agreement_locator)
 
         parties: dict[str, UUID] = {}
 
@@ -417,19 +464,21 @@ def build() -> Path:
                     cs.add("note", entity_id=parties[abbrev], kind="caveat", body_md=RSPD_NOTE)
             return parties[abbrev]
 
-        alliances: dict[str, UUID] = {}
+        alliances: dict[tuple[str, str], UUID] = {}
 
-        def alliance_of(members_: list[str], umbrella: UUID) -> UUID:
+        def alliance_of(members_: list[str], election_id: UUID, where: str) -> UUID:
+            """The coalition of these parties in one municipality's election: an alliance belongs to the election
+            whose contests it runs in."""
             label = "-".join(members_)
-            if label not in alliances:
-                alliances[label] = cs.key("mx.alliance", f"{day}:{iso}:{label}")
-                if alliances[label] in cs.minted:
-                    cs.add("alliance", id=alliances[label], kind="electoral_alliance", election_id=umbrella)
-                    name(alliances[label], "–".join(members_) + " coalition")
-                    name(alliances[label], "Coalición " + "–".join(members_), "es", "native")
+            if (where, label) not in alliances:
+                alliance = alliances[where, label] = cs.key("mx.alliance", f"{day}:{where}:{label}")
+                if alliance in cs.minted:
+                    cs.add("alliance", id=alliance, kind="electoral_alliance", election_id=election_id)
+                    name(alliance, "–".join(members_) + " coalition")
+                    name(alliance, "Coalición " + "–".join(members_), "es", "native")
                     for member in members_:
-                        cs.add("alliance_member", alliance_id=alliances[label], party_id=party(member))
-            return alliances[label]
+                        cs.add("alliance_member", alliance_id=alliance, party_id=party(member))
+            return alliances[where, label]
 
         umbrella = cs.key("mx.election", f"{day}:local:{iso}")
         state_name = dict(
@@ -466,7 +515,7 @@ def build() -> Path:
         values: list[tuple[str, str, str | None, int, int]] = []
         winners: dict[str, int] = {}
         seats_total = 0
-        engine_differs: list[str] = []
+        exhausted: list[str] = []
         uneven_towns: list[str] = []
         uneven_towns_allowed = {
             towns[t][2] for t in casillas.filter(pl.col("total") != pl.col("counted"))["town"].unique()
@@ -600,11 +649,14 @@ def build() -> Path:
             president = mine.filter(pl.col("office") == "presidencia").row(0, named=True)
             sindic = mine.filter(pl.col("office") == "sindicatura").row(0, named=True)
             options: dict[str, UUID] = {}
+            allied: set[str] = set()
             for position, (group, total) in enumerate(ordered, 1):
                 ticket = named.get(total)
                 if ticket is None:
                     raise ValueError(f"{label}: no planilla printed with {total} votes")
                 lineup = sorted({m for c in group for m in c.split("+")} - {INDEPENDENT})
+                if len(lineup) > 1:
+                    allied.update(lineup)
                 head = cs.key("mx.option", f"{day}:ayu:{inegi}:mr:{'|'.join(group)}")
                 single = len(lineup) == 1
                 cs.add(
@@ -613,7 +665,7 @@ def build() -> Path:
                     contest_id=contest,
                     kind="candidate",
                     party_id=party(lineup[0]) if single else None,
-                    alliance_id=alliance_of(lineup, umbrella) if len(lineup) > 1 else None,
+                    alliance_id=alliance_of(lineup, election_id, where) if len(lineup) > 1 else None,
                     ballot_position=position,
                     ballot_label=ticket["president"] or "–".join(lineup) or INDEPENDENT,
                 )
@@ -659,7 +711,9 @@ def build() -> Path:
                         kind="candidate",
                         parent_option_id=head,
                         party_id=party(own[0]) if len(own) == 1 else None,
-                        alliance_id=alliance_of(own, umbrella) if len(own) > 1 else None,
+                        # Votes marked for several parties of the coalition count for its planilla: the line belongs
+                        # to the coalition, and its label names the parties marked.
+                        alliance_id=alliance_of(lineup, election_id, where) if len(own) > 1 else None,
                         ballot_label=column.replace("+", "–"),
                     )
                     options[column] = line
@@ -838,20 +892,42 @@ def build() -> Path:
             seats_total += seats
             valid = sum(v for p, v in split.items() if p not in ("unregistered", "null"))
             eligible = {p: split[p] for p in listed if split[p] * 100 >= valid * 3}
-            factor = sum(eligible.values()) / seats
-            engine = {p: int(v // factor) for p, v in eligible.items()}
-            for p in sorted(eligible, key=lambda p: -(eligible[p] - engine[p] * factor))[
-                : seats - sum(engine.values())
-            ]:
-                engine[p] += 1
-            if {p: s for p, s in engine.items() if s} != won:
-                engine_differs.append(label)
+            hare = allocate(eligible, seats, {})
+            # A party the declared seats hold below its count holds that many regidurías on its coalition's planilla;
+            # a party that would then take a seat passed on to it, and was declared none, holds none.
+            held: dict[str, int] = {}
+            while over := {p: won.get(p, 0) for p, n in allocate(eligible, seats, held).items() if n > won.get(p, 0)}:
+                held.update(over)
+            if set(held) - allied:
+                raise ValueError(f"{label}: {sorted(set(held) - allied)} declared below Hare outside a coalition")
+            if allocate(eligible, seats, held) != won:
+                raise ValueError(f"{label}: declared {won}, Hare with the coalition lists {held} gives otherwise")
+            if held:
+                gained = sorted(p for p in won if won[p] > hare.get(p, 0))
+                listed_held = "; ".join(
+                    f"{p} took {won.get(p, 0) or 'none'} where its {split[p]:,} votes earn {hare[p]}"
+                    if hare.get(p, 0) > won.get(p, 0)
+                    else f"{p}, next by remainder, took none"
+                    for p in sorted(held, key=lambda p: (-hare.get(p, 0), p))
+                )
+                cs.add(
+                    "note",
+                    entity_id=rp_set,
+                    kind="methodology",
+                    body_md=f"The regidurías differ from a plain count by factor común and resto mayor: {listed_held}. "
+                    "A party in a coalition takes seats only from the regidurías the coalition agreement gives it on "
+                    "the planilla (IEPC/CG86/2022), so each seat such a party cannot fill went to the party with the "
+                    f"next largest remainder, here {' and '.join(gained)}.",
+                )
+                exhausted.append(
+                    f"{label} ({', '.join(f'{p} {won.get(p, 0)} of {hare.get(p, 0)}' for p in sorted(held))})"
+                )
 
         for person, gender in people.items():
             if person in cs.minted:
                 cs.add("person", id=person, gender=gender)
         print(key, "winners", dict(sorted(winners.items(), key=lambda item: -item[1])), "regidurías", seats_total)
-        print("hare differs from the declared seats in", len(engine_differs), engine_differs)
+        print("coalition lists hold parties below their Hare seats in", len(exhausted), exhausted)
         print("printed totals differ from the columns in", uneven_towns)
         cs.frame(
             "reporting_unit",
@@ -886,4 +962,39 @@ def build() -> Path:
                 orient="row",
             ).with_columns(channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)),
         )
-        return cs.write()
+        out = cs.write()
+    return retire(out)
+
+
+def retire(out: Path) -> Path:
+    """Drop the names of the pipeline's alliances that the package no longer holds. The coalitions used to belong to
+    the state's umbrella election; they now belong to each municipality's election, and Draft would carry the old
+    alliances' Spanish names as aliases of entities the package withdraws."""
+    manifest = json.loads((out / "package.json").read_text())
+    kept = set(pl.read_parquet(out / "alliance.parquet")["id"].to_list())
+    with connect() as conn:
+        former = [
+            str(id)
+            for (id,) in conn.execute(
+                "select a.id from alliance a join changeset c on c.id = a.changeset_id where c.pipeline = %s",
+                [SOURCE],
+            )
+            if str(id) not in kept
+        ]
+    names = pl.read_parquet(out / "name.parquet")
+    pruned = names.filter(~pl.col("entity_id").is_in(former))
+    if pruned.height == names.height:
+        return out
+    pruned.write_parquet(out / "name.parquet", statistics=False)
+    package._seal(
+        KEY,
+        SOURCE,
+        manifest["summary"],
+        out,
+        {**manifest["tables"], "name": pruned.height},
+        manifest["adopts"],
+        manifest["sources"],
+        manifest["accepted"],
+    )
+    print(f"{KEY}: dropped {names.height - pruned.height} names of {len(former)} former alliances", flush=True)
+    return out
