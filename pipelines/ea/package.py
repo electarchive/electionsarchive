@@ -99,6 +99,10 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
     "area_code": (None, {"area_id": U, "code": U, "valid_from": D, "valid_to": D}),
     "area_kind": (None, {"area_id": U, "kind": U, "valid_from": D, "valid_to": D, "source_id": U}),
     "area_parent": (None, {"area_id": U, "parent_id": U, "valid_from": D, "valid_to": D}),
+    "area_membership": (
+        None,
+        {"area_id": U, "parent_id": U, "partial": B, "valid_from": D, "valid_to": D},
+    ),
     "area_geometry": (
         None,
         {
@@ -706,6 +710,8 @@ REFERENCES = [
     ("area_kind", "area_id", "area"),
     ("area_parent", "area_id", "area"),
     ("area_parent", "parent_id", "area"),
+    ("area_membership", "area_id", "area"),
+    ("area_membership", "parent_id", "area"),
     ("area_geometry", "area_id", "area"),
     ("area_geometry", "source_id", "source"),
     ("polity_territory", "polity_id", "polity"),

@@ -66,13 +66,18 @@ def sections() -> pl.DataFrame:
     return pl.DataFrame({c: table[c] for c in columns}, infer_schema_length=None)
 
 
-def assigned(frame: pl.DataFrame, plan: str) -> dict[tuple[int, int], int]:
-    """Section to district for one plan. A section the table lists twice, because INE split it between two districts,
-    has no single shape and stays out."""
+def placed(frame: pl.DataFrame, plan: str) -> dict[tuple[int, int], set[int]]:
+    """Section to the districts INE lists it in under one plan; a section INE split between districts lists several."""
     rows = frame.with_columns(pl.coalesce(PLANS[plan][2]).alias("district")).filter(pl.col("district").is_not_null())
-    twice = rows.group_by("Cve_Ent", "Seccion").len().filter(pl.col("len") > 1)
-    rows = rows.join(twice, on=["Cve_Ent", "Seccion"], how="anti")
-    return {(int(e), int(s)): int(d) for e, s, d in rows.select("Cve_Ent", "Seccion", "district").iter_rows()}
+    found: dict[tuple[int, int], set[int]] = {}
+    for e, s, d in rows.select("Cve_Ent", "Seccion", "district").iter_rows():
+        found.setdefault((int(e), int(s)), set()).add(int(d))
+    return found
+
+
+def assigned(frame: pl.DataFrame, plan: str) -> dict[tuple[int, int], int]:
+    """Section to district for one plan. A section split between two districts has no single shape and stays out."""
+    return {key: next(iter(ds)) for key, ds in placed(frame, plan).items() if len(ds) == 1}
 
 
 def outlines(entidad: int) -> tuple[dict[int, shapely.Geometry], int]:
@@ -157,26 +162,26 @@ def hexed(shape: shapely.Geometry) -> str:
     return shapely.to_wkb(shape, hex=True, include_srid=True)
 
 
-def reference() -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
-    """Codes to ids for the federal districts, entities, and entity names production already holds."""
+def reference() -> tuple[dict[str, str], dict[str, str], dict[str, str], dict[str, str]]:
+    """Codes to ids for the federal districts, entities, entity names, and sections production already holds."""
     folder = DATA / "reference" / "mx"
     areas = pl.read_parquet(folder / "area.parquet", columns=["id", "scheme_code", "name"])
     codes = pl.read_parquet(folder / "area_code.parquet", columns=["area_id", "code"])
     held = areas.join(codes, left_on="id", right_on="area_id")
     found = [
         {row["code"]: row["id"] for row in held.filter(pl.col("scheme_code") == scheme).iter_rows(named=True)}
-        for scheme in (SCHEME, "mx.entidad")
+        for scheme in (SCHEME, "mx.entidad", "mx.seccion")
     ]
     labels = {
         row["code"][:2]: row["name"].split(" de ", 1)[1]
         for row in held.filter(pl.col("scheme_code") == SCHEME).iter_rows(named=True)
     }
-    return found[0], found[1], labels
+    return found[0], found[1], labels, found[2]
 
 
 def geo() -> Package:
     frame = sections()
-    held, entities, labels = reference()
+    held, entities, labels, sections_held = reference()
     p = Package(
         f"{SOURCE}/geo",
         SOURCE,
@@ -260,4 +265,24 @@ def geo() -> Package:
                 quality="synthetic",
                 source_id=source,
             )
+    linked: set[str] = set()
+    for plan, (begin, end, _) in PLANS.items():
+        missing = 0
+        for (entidad, number), found in sorted(placed(frame, plan).items()):
+            section = sections_held.get(f"{entidad:02d}{number:04d}")
+            if section is None:
+                missing += 1
+                continue
+            linked.add(section)
+            for district in sorted(found):
+                p.add(
+                    "area_membership",
+                    area_id=section,
+                    parent_id=held[f"{entidad:02d}{district:02d}"],
+                    partial=len(found) > 1,
+                    valid_from=begin,
+                    valid_to=end,
+                )
+        print(f"{plan} plan: {missing:,} sections production does not hold get no membership", flush=True)
+    p.external |= linked
     return p
