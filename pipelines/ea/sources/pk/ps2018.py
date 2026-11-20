@@ -8,11 +8,17 @@ consolidated result of each constituency (Form 49). Data entry operators keyed t
 dataset covers 252 National Assembly and 540 provincial assembly constituencies; the forms of the rest were missing or
 unreadable.
 
+The Commission's gazette notifications of 2 October 2018 list each constituency's candidates with their votes and name
+the candidate declared elected (the returned candidate). Those name the winner of every constituency whose
+notification was not stayed by a court; the keyed constituencies the notification stayed carry no outcomes.
+
 Each contest gets two result sets. The default holds the Form 49 total of each candidate at the constituency, with the
 registered voters of the constituency, as the dataset keys them. A second set holds the polling-station counts as
 keyed, with its completeness, its keyed votes divided by the Form 49 votes."""
 
+import json
 from datetime import date
+from pathlib import Path
 from typing import NamedTuple
 from uuid import uuid5
 
@@ -28,6 +34,19 @@ STAMP = DAY.isoformat()
 OSF = "https://osf.io/mtsnd/"
 WIDE = "https://osf.io/69gpn/download"
 LONG = "https://osf.io/2sdzg/download"
+GAZETTE_FOLDER = "https://web.archive.org/web/20230613221223id_/https://ecp.gov.pk/storage/files/1/"
+GAZETTES = {
+    "NA": GAZETTE_FOLDER + "National%20Assembly1.pdf",
+    "PP": GAZETTE_FOLDER + "Provincial%20Punjab1.pdf",
+    "PS": GAZETTE_FOLDER + "Provincial%20Sindh1.pdf",
+    "PK": GAZETTE_FOLDER + "Provincial%20KPK1.pdf",
+    "PB": GAZETTE_FOLDER + "Provincial%20Balochistan1.pdf",
+}
+GAZETTE_PAGE = "https://ecp.gov.pk/detailed-gazette-notification"
+# The candidate each gazette notification declares elected, by constituency: the keyed candidate's ballot position
+# and the gazette page of the declaration. Notifications stayed by the High Court of Sindh (PS-29, PS-48, PS-54) name
+# no one.
+RETURNED: dict[str, dict] = json.loads((Path(__file__).parent / "ps2018_returned.json").read_text())
 VOTES, REGISTERED, CAST, VALID, INVALID = 1, 2, 3, 4, 5
 
 # Constituencies whose keyed Form 49 cannot stand as the constituency's result: PP-8's keyed Form 49 figures are
@@ -42,6 +61,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 DATASET = key("source", "osf")
+GAZETTE = key("source", "gazette")
 SYSTEM = key("electoral_system", "fptp")
 STATION = "pk.station"
 PA_SCHEME = "pk.pa"
@@ -78,8 +98,9 @@ METHOD = (
     "general election of 25 July 2018, as keyed by hand from the Commission's scanned forms for the 2019 dataset "
     '"2018 Pakistani General Election Polling Station Data" (Luke Sonnet, Open Science Framework). Registered '
     "voters are those of the constituency's electoral roll, keyed from the polling scheme (Form 28). The keyed data "
-    "holds no total of valid, rejected, or total votes for the constituency, and no notification of the returned "
-    "candidate, so none is stored."
+    "holds no total of valid, rejected, or total votes for the constituency, so none is stored. The returned "
+    "candidate is the one the Commission's gazette notification of 2 October 2018 declares elected; every other "
+    "candidate is recorded as having lost."
 )
 METHOD_STATIONS = (
     "The count at each polling station, keyed by hand from the Election Commission's scanned statements of the "
@@ -89,13 +110,16 @@ METHOD_STATIONS = (
     "out. Pages missing from the Commission's scans leave polling stations out, and keying errors remain, so the "
     "polling stations do not always add up to the constituency's Form 49 totals; completeness is the keyed "
     "candidate votes divided by the Form 49 candidate votes. The totals of valid, rejected, and total votes are "
-    "stored as keyed, and do not always equal the sum of the keyed candidate votes."
+    "stored as keyed, and do not always equal the sum of the keyed candidate votes. Where this set is the "
+    "constituency's default, its outcomes are those of the Commission's gazette notification of 2 October 2018."
 )
 
 
 def fetch() -> None:
     for url in (WIDE, LONG):
         raw.fetch(SOURCE, url, suffix=".csv")
+    for url in GAZETTES.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def parse() -> None:
@@ -186,6 +210,17 @@ def registry() -> Package:
     for url in (WIDE, LONG):
         p.artifact(raw.cached(SOURCE, url), DATASET)
     p.add(
+        "source",
+        id=GAZETTE,
+        kind="official_body",
+        publisher="Election Commission of Pakistan",
+        title="Gazette of Pakistan, Extra., 2 October 2018, Part III: notifications of the returned candidates of the "
+        "general election of 25 July 2018",
+        url=GAZETTE_PAGE,
+    )
+    for url in GAZETTES.values():
+        p.artifact(raw.cached(SOURCE, url), GAZETTE)
+    p.add(
         "scheme", code=PA_SCHEME, polity_id=PAKISTAN, kind="electoral_district", rank=1, noun="provincial constituency"
     )
     p.add("scheme", code=STATION, polity_id=PAKISTAN, kind="precinct", rank=2, noun="polling station")
@@ -220,7 +255,7 @@ def election() -> Package:
         depends=[f"{SOURCE}/registry"],
     )
     p.external |= {PAKISTAN, "pk.na"}
-    for url in (WIDE, LONG):
+    for url in (WIDE, LONG, *GAZETTES.values()):
         p.uses(raw.cached(SOURCE, url))
     rows = long()
     stations = wide()
@@ -389,6 +424,14 @@ def election() -> Package:
                 member_of_party_id=None if independent else party_id(c["party"]),
                 is_independent=independent,
             )
+            returned = RETURNED.get(code.replace("-", ""))
+            if returned is not None:
+                p.add(
+                    "outcome",
+                    result_set_id=official if usable else by_station,
+                    option_id=option,
+                    kind="elected" if returned["position"] == position else "lost",
+                )
             if usable:
                 _put(p, official, unit, option, VOTES, c["form49"])
                 p.add("declared", result_set_id=official, option_id=option, measure=VOTES, value=c["form49"])
