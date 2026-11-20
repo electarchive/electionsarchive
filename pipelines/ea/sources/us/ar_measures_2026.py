@@ -286,6 +286,13 @@ def parse() -> None:
     print(frame.height)
 
 
+# Contests loaded under an earlier label keep their ids; the new label only renames them.
+RELABELED = {
+    ("City of Oppelo", "1% Sales and Use Tax for Water and Wastewater"): "Sales Tax",
+    ("City of Alma", "1% Lodging Tax for Advertising and Promotion"): "Special Election Question",
+}
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "measures.parquet")
     with connect() as conn:
@@ -370,6 +377,9 @@ def emit() -> Path:
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             contest_key = f"{DAY}:AR:{code}:measure:{slug(label)}"
+            earlier = RELABELED.get((entity, label))
+            if earlier is not None:
+                cs.renamed[contest_key] = f"{DAY}:AR:{code}:measure:{slug(earlier)}"
             contest = cs.key("us.contest", contest_key)
             contest_path = f"{path}/{DAY}-general/{slug(label)}"
             if civil.slugs.get(contest_path, contest) != contest:
