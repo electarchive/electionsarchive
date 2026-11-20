@@ -9,7 +9,7 @@ import polars as pl
 from PIL import Image
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.package import Draft
 from ea.sources.jp.mic_chiji import (
     FIGURES,
     candidates,
@@ -169,13 +169,24 @@ def emit() -> Path:
                 "select scheme, value from external_id where scheme in ('jp.mic_chiji.party', 'jp.mic.party')"
             )
         }
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary="Japan's designated-city mayoral elections 2011-2026 from the Ministry of Internal Affairs and "
             "Communications' election summaries, city totals",
             polity="JP",
+        )
+        cs.accept(
+            "accounting.votes_valid",
+            "Kobe 2013-10-27: the summary prints candidate votes with the fractions of proportionally split "
+            "ambiguous ballots (161,889.094 and 26,548.897), which sum to 444,736.991, 0.009 below the 444,737 valid "
+            "votes it prints",
+        )
+        cs.accept(
+            "accounting.ballots_sum",
+            "Sakai 2013-09-29: the summary's ballots cast, 342,341, also count the 3 unreturned ballots, so they are "
+            "3 more than its valid and invalid ballots, as printed",
         )
 
         def name(entity: UUID, text: str, lang: str, kind: str = "official", preferred: bool | None = None) -> None:
