@@ -1435,15 +1435,23 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
     return findings
 
 
+_MERGED_TYPES: dict[tuple[str, int, str, str | None], list[str]] = {}
+
+
 def merged(
     conn: Connection, changeset_id: str | None = None, tables: set[str] | None = None
 ) -> list[tuple[str, str, UUID, UUID, UUID, int]]:
-    types = [
-        kind
-        for (kind,) in conn.execute(
-            "select distinct e.type::text from entity_merge m join entity e on e.id = m.entity_id"
-        ).fetchall()
-    ]
+    latest = conn.execute("select changeset_id::text from entity_merge order by changeset_id desc limit 1").fetchone()
+    stamp = (conn.info.host, conn.info.port, conn.info.dbname, latest[0] if latest is not None else None)
+    types = _MERGED_TYPES.get(stamp)
+    if types is None:
+        types = [
+            kind
+            for (kind,) in conn.execute(
+                "select distinct e.type::text from entity_merge m join entity e on e.id = m.entity_id"
+            ).fetchall()
+        ]
+        _MERGED_TYPES[stamp] = types
     found: list[tuple[str, str, UUID, UUID, UUID, int]] = []
     for relation, column, stamped in conn.execute(
         """select c.conrelid::regclass::text, a.attname, exists (
