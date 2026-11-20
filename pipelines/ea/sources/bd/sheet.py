@@ -324,21 +324,27 @@ class Reader:
     def __init__(self, samples: list[tuple[np.ndarray, int]]) -> None:
         self.x = np.stack([s for s, _ in samples]).astype(np.float32)
         self.y = np.array([d for _, d in samples])
+        self.norms = (self.x**2).sum(axis=1)
+        self.digits = sorted({int(d) for d in self.y})
+        self.members = [np.flatnonzero(self.y == d) for d in self.digits]
+
+    def ranks(self, found: list[Glyph]) -> list[list[tuple[int, float]]]:
+        """For each glyph, each digit with the distance of its nearest known sample, nearest first."""
+        if not found:
+            return []
+        g = np.stack([glyph.features for glyph in found]).astype(np.float32)
+        distance = (g**2).sum(axis=1)[:, None] + self.norms[None, :] - 2 * g @ self.x.T
+        nearest = np.stack([distance[:, m].min(axis=1) for m in self.members], axis=1)
+        return [sorted(zip(self.digits, map(float, row), strict=True), key=lambda item: item[1]) for row in nearest]
 
     def ranked(self, glyph: Glyph) -> list[tuple[int, float]]:
-        """Each digit with the distance of its nearest known sample, nearest first."""
-        distance = ((self.x - glyph.features) ** 2).sum(axis=1)
-        best: dict[int, float] = {}
-        near = np.argpartition(distance, 200)[:200] if len(distance) > 200 else np.arange(len(distance))
-        for i in near[np.argsort(distance[near])]:
-            best.setdefault(int(self.y[i]), float(distance[i]))
-        return sorted(best.items(), key=lambda item: item[1])
+        return self.ranks([glyph])[0]
 
     def votes(self, numbers: list[Number], valid: int) -> tuple[list[int], bool] | None:
         """The numbers read, if they add up to the valid votes, and whether one digit had to change for that: a
         digit read as its runner-up, when that is the only such change that closes the gap and that digit is the
         least certain one on the sheet."""
-        read: list[list[list[tuple[int, float]]]] = [[self.ranked(g) for g in n.glyphs] for n in numbers]
+        read: list[list[list[tuple[int, float]]]] = [self.ranks(n.glyphs) for n in numbers]
         if any(not row for row in read):
             return None
         values = [int("".join(str(r[0][0]) for r in row)) for row in read]
