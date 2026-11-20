@@ -79,6 +79,18 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
     ),
     "polity": (("id",), {"id": U, "kind": U, "iso_code": U}),
     "polity_parent": (None, {"polity_id": U, "parent_id": U, "valid_from": D, "valid_to": D}),
+    "polity_relation": (
+        ("id",),
+        {
+            "id": U,
+            "from_polity_id": U,
+            "to_polity_id": U,
+            "kind": U,
+            "date": D,
+            "date_precision": U,
+            "source_id": U,
+        },
+    ),
     "scheme": (
         ("code",),
         {"code": U, "polity_id": U, "kind": U, "rank": I16, "noun": U, "kinds": U, "code_system": U},
@@ -757,6 +769,9 @@ REFERENCES = [
     ("ballot_question_text", "contest_id", "contest"),
     ("ballot_question_text", "source_id", "source"),
     ("body_size", "body_id", "body"),
+    ("polity_relation", "from_polity_id", "polity"),
+    ("polity_relation", "to_polity_id", "polity"),
+    ("polity_relation", "source_id", "source"),
 ]
 TARGET_KEY = {"scheme": "code", "polity": "id"}
 ENTITY_TABLES = (

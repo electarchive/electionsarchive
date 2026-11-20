@@ -36,9 +36,10 @@ SUMMARY = (
 # The changesets this pipeline published before packages: the first de.landtag/all package adopts them, so its load
 # takes over their rows (Thuringia's constituency outlines among them) instead of clashing with them.
 ADOPTS = ["01a1dc05-d0ac-7577-a355-7ec53e090e92"]
-# Rows the package format does not hold. The changesets that wrote them keep them: the merger relations of the
-# former Länder, and the merge of the East German KPD into the party of 1990.
-CHANGESET_ONLY = ("polity_relation", "entity_merge")
+# Rows the package format does not hold. The changeset that wrote it keeps it: the merge of the East German KPD into
+# the party of 1990. The merger relations of the former Länder go in the package, which the format now holds, so the
+# load keeps them rather than dropping the rows of the adopted changesets.
+CHANGESET_ONLY = ("entity_merge",)
 PARSED = DATA / "parsed" / SOURCE
 BW = "https://wahlen.statistik-bw.de/ltw26"
 MV = "https://www.laiv-mv.de/static/LAIV/Wahlen/2-Landtagswahlen/2026/Ergebnisse"
