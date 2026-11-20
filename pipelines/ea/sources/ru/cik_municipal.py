@@ -678,7 +678,7 @@ def _contest(
             id=key("candidacy", DAY, tag, ballot),
             person_id=person,
             option_id=option,
-            role="head" if head else "member",
+            role="head",
             ballot_name=ballot,
         )
         if row is None:
