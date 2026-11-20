@@ -514,7 +514,14 @@ def resolve(name: str, names: dict[str, str]) -> str | None:
 
 
 def body(authority: Authority) -> str:
-    return key("body", authority.ident)
+    """An authority's council, shared with the 2026 pipeline: the same code takes the same id there and here."""
+    return cec_local.key("body", authority.ident)
+
+
+@cache
+def _written_bodies() -> frozenset[str]:
+    """The codes of the authorities whose council the 2026 registry already writes."""
+    return frozenset(a.ident for a in cec_local.authorities())
 
 
 def registry() -> Package:
@@ -523,7 +530,7 @@ def registry() -> Package:
         SOURCE,
         "Palestine's local councils, the electoral system of the 2021-2022 local elections, and the parties the "
         "lists name",
-        depends=[f"{cec_local.SOURCE}/geo"],
+        depends=[f"{cec_local.SOURCE}/geo", f"{cec_local.SOURCE}/registry"],
     )
     p.external |= {PALESTINE, COUNTRY}
     p.add(
@@ -557,6 +564,9 @@ def registry() -> Package:
     for phase in (1, 2):
         for authority in authorities(phase):
             id = body(authority)
+            if authority.ident in _written_bodies():
+                p.external.add(id)
+                continue
             if id not in seen:
                 seen.add(id)
                 p.add("body", id=id, polity_id=PALESTINE, kind="council")
@@ -722,7 +732,12 @@ def election(phase: int) -> Package:
         SOURCE,
         f"The Palestinian local elections of {day:%-d %B %Y} ({'first' if phase == 1 else 'second'} phase): the "
         "councils of the West Bank's local authorities, by authority, from the Central Elections Commission's tables",
-        depends=[f"{cec_local.SOURCE}/geo", f"{cec_local.SOURCE}/{cec_local.DAY}", f"{SOURCE}/registry"],
+        depends=[
+            f"{cec_local.SOURCE}/geo",
+            f"{cec_local.SOURCE}/{cec_local.DAY}",
+            f"{cec_local.SOURCE}/registry",
+            f"{SOURCE}/registry",
+        ],
     )
     p.external |= {PALESTINE, COUNTRY}
     for url in FILES.values():
