@@ -30,7 +30,6 @@ import shapely
 from ea import changeset, raw
 from ea.latin import ukrainian
 from ea.package import Package
-from ea.sources.ua import cvk
 from ea.sources.ua import cvk_local as base
 from ea.sources.ua.cvk import clean, norm, number, text
 
@@ -804,31 +803,23 @@ def nominators() -> dict[str, str]:
     return _spellings()
 
 
-def loose(code: str) -> str:
-    """A party code without case, spacing, quote style, or punctuation, the way the same party's spellings compare."""
-    return re.sub(r"[\W_]+", "", code.casefold())
-
-
-@functools.cache
-def national() -> dict[str, str]:
-    """The national registry's parties, by loose code, with the ids that registry gave them."""
-    return {loose(code): cvk.party(code) for code in cvk.party_names()}
+loose = base.loose
 
 
 @functools.cache
 def local() -> dict[str, str]:
-    """The 2020 local registry's parties, by loose code, with the ids that registry gave them."""
-    return {loose(code): base.party(code) or "" for code in base.nominators()}
+    """The parties the 2020 local registry adds itself, by loose code, with the ids that registry gave them."""
+    return {loose(code): base.key("party", code) for code in base.nominators() if base.earlier(code) is None}
 
 
 def existing(code: str) -> str | None:
     """The id of the party an already-landed registry declares under ua.cvk.party, spelled as this code or alike."""
-    return local().get(loose(code)) or national().get(loose(code))
+    return base.earlier(code) or local().get(loose(code))
 
 
 def party_ids(codes: set[str]) -> set[str]:
-    """The ids of the national registry's parties among the codes, for the package to list as external."""
-    return {id for code in codes if (id := existing(code)) is not None and id not in local().values()}
+    """The ids of the parliamentary registry's parties among the codes, for the package to list as external."""
+    return base.earlier_ids(codes)
 
 
 def registry() -> Package:

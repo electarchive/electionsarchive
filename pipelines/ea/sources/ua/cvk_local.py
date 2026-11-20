@@ -24,6 +24,7 @@ import json
 import re
 import zipfile
 from collections import Counter
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from uuid import uuid5
@@ -693,17 +694,32 @@ def system(kind: str) -> str:
     return key("electoral_system", kind)
 
 
+def loose(code: str) -> str:
+    """A party code without case, spacing, quote style, or punctuation, the way the same party's spellings compare."""
+    return re.sub(r"[\W_]+", "", code.casefold())
+
+
 @functools.cache
 def earlier_parties() -> dict[str, str]:
-    """The parties the Commission's parliamentary pipeline already registers under the ua.cvk.party scheme, by key."""
-    return {code: parliament.party(code) for code in parliament.party_names()}
+    """The parties the Commission's parliamentary pipeline already registers under the ua.cvk.party scheme, by the
+    loose form of the codes it stores, with the ids it gave them."""
+    return {loose(code): parliament.party(code) for code in parliament.party_names()}
+
+
+def earlier(name: str) -> str | None:
+    """The id the parliamentary registry gave the party spelled as this name or alike, if it registers one."""
+    return earlier_parties().get(loose(norm(name)))
 
 
 def party(name: str) -> str | None:
     if norm(name) == SELF:
         return None
-    code = norm(name)
-    return earlier_parties().get(code) or key("party", code)
+    return earlier(name) or key("party", norm(name))
+
+
+def earlier_ids(names: Iterable[str]) -> set[str]:
+    """The ids of the parliamentary registry's parties among the names, for a package to list as external."""
+    return {id for name in names if (id := earlier(name)) is not None}
 
 
 @functools.cache
@@ -771,7 +787,7 @@ def registry() -> Package:
             "note", id=key("note", system(kind)), entity_id=system(kind), kind="methodology", body_md=method, lang="en"
         )
     for code, name in sorted(nominators().items()):
-        if code in earlier_parties():
+        if earlier(code) is not None:
             continue
         id = key("party", code)
         p.add("party", id=id, kind="party", polity_id=UKRAINE)
@@ -946,6 +962,7 @@ def first() -> Package:
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{parliament.SOURCE}/registry"],
     )
     p.external.add(UKRAINE)
+    p.external |= earlier_ids(nominators().values())
     for url in [OPEN_DATA, COUNCILS, HEADS, DEPARTED_HEADS, *lists("pvm037"), *lists("pvm040")]:
         p.artifact(raw.cached(SOURCE, url), CVK)
     b = _election(p, DAY, "local")
@@ -1194,6 +1211,7 @@ def runoff(day: date) -> Package:
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", f"{parliament.SOURCE}/registry", f"{SOURCE}/{DAY}"],
     )
     p.external.add(UKRAINE)
+    p.external |= earlier_ids(nominators().values())
     b = _election(p, day, "runoff")
     known = set(nominators())
     for h in sorted(heads().values(), key=lambda h: (int(h.region), h.label, h.community, int(h.rada))):
