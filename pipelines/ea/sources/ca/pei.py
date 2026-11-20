@@ -751,6 +751,36 @@ def district_names() -> dict[tuple[str, str], str]:
     return names
 
 
+HISTORY_NOTES: Final = {
+    (1904, "2nd Kings", "assemblyman"): (
+        "Arthur Peters and Harvey D. McEwen each received 515 votes, so no candidate is marked as elected. The "
+        "authority's note says a writ was issued on 25 February 1905 for a by-election, in which Arthur Peters was "
+        "elected by acclamation; that by-election is not stored."
+    ),
+    (1966, "1st Kings", "councillor"): "The poll was deferred to 11 July 1966 because a candidate died.",
+    (1966, "1st Kings", "assemblyman"): "The poll was deferred to 11 July 1966 because a candidate died.",
+}
+
+
+def settle(c: Contest) -> Contest:
+    """Note a seat where the page marks as elected a candidate with fewer votes than another. The mark is stored as
+    declared."""
+    note = HISTORY_NOTES.get((c.year, c.district, c.seat))
+    if note:
+        c.notes.append(note)
+    voted = [e for e in c.entries if e.votes is not None]
+    elected = [e for e in c.entries if e.elected]
+    if voted and len(elected) == 1:
+        top = max(voted, key=lambda e: e.votes or 0)
+        if elected[0] is not top and sum(e.votes == top.votes for e in voted) == 1:
+            c.notes.append(
+                f"The authority's page marks {elected[0].name} as elected, but {top.name} received more votes "
+                f"({top.votes} to {elected[0].votes}), and the party standings it prints count one more seat for "
+                f"{top.name}'s party than the candidates it marks as elected. The mark is stored as printed."
+            )
+    return c
+
+
 def historical(year: int) -> list[Contest]:
     lines = history_text(year)
     day = election_day(lines)
@@ -759,20 +789,24 @@ def historical(year: int) -> list[Contest]:
         seats = columns(year, lines)
         for seat in seats:
             code, _, label = seat.district.partition(" ")
-            out.append(Contest(year, day, "1996", code, label, "member", seat.entries, sources=(HISTORY[year],)))
+            out.append(
+                settle(Contest(year, day, "1996", code, label, "member", seat.entries, sources=(HISTORY[year],)))
+            )
     else:
         for seat in dual(year, lines):
             when = DEFERRED.get((year, seat.district), day)
             out.append(
-                Contest(
-                    year,
-                    when,
-                    "counties",
-                    COUNTY_CODES[seat.district],
-                    seat.district,
-                    seat.seat,
-                    seat.entries,
-                    sources=(HISTORY[year],),
+                settle(
+                    Contest(
+                        year,
+                        when,
+                        "counties",
+                        COUNTY_CODES[seat.district],
+                        seat.district,
+                        seat.seat,
+                        seat.entries,
+                        sources=(HISTORY[year],),
+                    )
                 )
             )
     return out
@@ -871,7 +905,7 @@ def geo() -> Package:
             vintage=plan,
             valid_from=start,
             valid_to=end,
-            as_of=start,
+            as_of=start or date(1900, 12, 12),
         )
         if plan == "counties":
             items = [(code, label) for code, label in _county_names().items() if code != "P6" and code != "K6"]
