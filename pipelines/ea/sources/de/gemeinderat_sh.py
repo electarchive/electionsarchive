@@ -153,6 +153,30 @@ def held(year: int) -> list[Result]:
     return [r for r in results(year) if r.ags in known and r.seats]
 
 
+@cache
+def sizes() -> dict[str, list[tuple[int, date, date | None]]]:
+    """Each council's size over the years covered, one row per period of constant size.
+
+    A size holds from the election that set it until the next election that set a different one. Every election
+    package writes the same rows for a council, so whichever loads last claims them and none overlap.
+    """
+    by_body: dict[str, list[tuple[date, int]]] = {}
+    for year, day in sorted(DAYS.items()):
+        for r in held(year):
+            by_body.setdefault(r.ags, []).append((day, r.seats))
+    out: dict[str, list[tuple[int, date, date | None]]] = {}
+    for ags, seen in by_body.items():
+        periods: list[tuple[int, date, date | None]] = []
+        for day, seats in seen:
+            if periods and periods[-1][0] == seats:
+                continue
+            if periods:
+                periods[-1] = (periods[-1][0], periods[-1][1], day)
+            periods.append((seats, day, None))
+        out[ags] = periods
+    return out
+
+
 def missing(year: int) -> list[Result]:
     known = areas()
     return [r for r in results(year) if r.ags not in known]
@@ -307,7 +331,8 @@ def election(year: int) -> Package:
             tail = f"{tail}-{r.ags[5:]}"
         taken.add(f"{path}/{tail}")
         p.add("slug", path=f"{path}/{tail}", entity_id=contest, is_current=True)
-        p.add("body_size", body_id=p.id("body", r.ags), seats=r.seats, valid_from=day, valid_to=None)
+        for seats, start, end in sizes()[r.ags]:
+            p.add("body_size", body_id=p.id("body", r.ags), seats=seats, valid_from=start, valid_to=end)
         p.add(
             "reporting_unit",
             id=unit,
