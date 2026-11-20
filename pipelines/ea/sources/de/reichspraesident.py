@@ -9,7 +9,7 @@ from uuid import UUID
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.package import Draft
 from ea.sources.licenses import UNLICENSED
 from ea.store import DATA, connect
 
@@ -157,7 +157,7 @@ def emit() -> Path:
     frame = returns()
     pages = pl.read_parquet(raw.parsed(SOURCE) / "pages.parquet")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
@@ -245,7 +245,7 @@ def emit() -> Path:
             ).fetchall()
         )
         for column, (full, item) in CANDIDATES.items():
-            if item in linked:
+            if item in linked and linked[item] not in cs.own_entities:
                 persons[column] = linked[item]
                 continue
             persons[column] = cs.key(f"{SOURCE}.person", item)
