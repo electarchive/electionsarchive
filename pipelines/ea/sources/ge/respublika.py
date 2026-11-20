@@ -378,6 +378,7 @@ def _pdf(path: Path) -> None:
 
 def fetch() -> None:
     raw.fetch(SOURCE, ADM2, suffix=".geojson")
+    raw.fetch(SOURCE, OSM, suffix=".geojson")
     for issue in ISSUES:
         raw.fetch(SOURCE, issue.url, suffix=".pdf", check=_pdf)
 
@@ -433,6 +434,32 @@ ADM2 = (
     "geoBoundaries-GEO-ADM2_simplified.geojson"
 )
 GEO_SOURCE = key("source", "geoboundaries-adm2")
+SLIVER = 1e-5
+"""The smallest polygon kept when a city is cut out of a rayon, in square degrees (about a tenth of a square
+kilometer)."""
+OSM_SOURCE = key("source", "osm.ge.cities")
+OSM_RELATIONS = {
+    1: 13438811,
+    2: 11300449,
+    3: 11300446,
+    4: 13438809,
+    5: 13438808,
+    6: 11300436,
+    7: 13438810,
+    8: 11300445,
+    9: 11300438,
+    10: 13438812,
+    20: 5997314,
+    59: 2024547,
+    70: 1995348,
+    79: 2009237,
+}
+"""The OpenStreetMap administrative boundary relation that outlines each district with no rayon of its own: the ten
+districts of Tbilisi and the cities of Rustavi (20), Kutaisi (59), Poti (70), and Batumi (79). Liakhvi (85) has no
+boundary in OpenStreetMap."""
+OSM = "https://nominatim.openstreetmap.org/lookup?format=geojson&polygon_geojson=1&osm_ids=" + ",".join(
+    f"R{r}" for r in OSM_RELATIONS.values()
+)
 PLAN_FROM, PLAN_TO = date(1995, 11, 5), date(2004, 3, 28)
 """The plan the shapes belong to: the districts of the 1995 and 1999 elections, until the single-member seats ended."""
 BOUNDARY_SET = key("boundary_set", AREA_SCHEME, "gbopen-adm2")
@@ -501,15 +528,27 @@ RAYONS = {
     84: ("Khulo", "Khulo"),
 }
 """The districts that voted in 1995 or 1999; the Abkhazian districts of 1992 have no reporting unit."""
-CITY_DISTRICTS = {
-    20: "Gardabani",
-    79: "Khelvachauri",
+CITIES = {
+    20: ("Rustavi", "რუსთავი"),
+    59: ("Kutaisi", "ქუთაისი"),
+    70: ("Poti", "ფოთი"),
+    79: ("Batumi", "ბათუმი"),
 }
-"""City districts with no outline of their own, by the geoBoundaries polygon that holds the city's centre
-(Rustavi and Batumi). Kutaisi (59) and Poti (70) fall in polygons that do not match the cities' surroundings,
-so they get no area."""
+"""The city districts, outlined from OpenStreetMap."""
 TBILISI = "Tbilisi"
-TBILISI_DISTRICTS = range(1, 11)
+TBILISI_DISTRICTS = {
+    1: "Mtatsminda",
+    2: "Vake",
+    3: "Saburtalo",
+    4: "Krtsanisi",
+    5: "Isani",
+    6: "Samgori",
+    7: "Chughureti",
+    8: "Didube",
+    9: "Nadzaladevi",
+    10: "Gldani",
+}
+"""The ten districts of Tbilisi, each the single-member district of the same number."""
 
 
 def rayon_area(district: int) -> str:
@@ -521,7 +560,30 @@ TBILISI_AREA = key("area", AREA_SCHEME, "tbilisi")
 
 def area_of(district: int) -> str | None:
     """The area a district's unit equals, or None when the unit has no shape of its own."""
-    return rayon_area(district) if district in RAYONS else None
+    return rayon_area(district) if district in RAYONS or district in OSM_RELATIONS else None
+
+
+def osm_shapes() -> dict[int, shapely.Geometry]:
+    """The OpenStreetMap outline of each city district, by district number."""
+    districts = {str(rel): d for d, rel in OSM_RELATIONS.items()}
+    out: dict[int, shapely.Geometry] = {}
+    for feature in json.loads(raw.cached(SOURCE, OSM).path.read_text(encoding="utf-8"))["features"]:
+        shape = shapely.make_valid(shapely.geometry.shape(feature["geometry"]))
+        out[districts[str(feature["properties"]["osm_id"])]] = polygons(shape)
+    if set(out) != set(OSM_RELATIONS):
+        raise ValueError(f"OpenStreetMap outlines for {sorted(out)}, expected {sorted(OSM_RELATIONS)}")
+    return out
+
+
+def polygons(shape: shapely.Geometry, smallest: float = SLIVER) -> shapely.Geometry:
+    """The polygons of a shape that are larger than a sliver."""
+    parts = [g for g in shapely.get_parts(shape) if g.geom_type == "Polygon" and g.area >= smallest]
+    return shapely.MultiPolygon(parts) if len(parts) > 1 else parts[0]
+
+
+def carve(outline: shapely.Geometry, taken: shapely.Geometry) -> shapely.Geometry:
+    """An outline less the districts that have an outline of their own."""
+    return polygons(shapely.make_valid(outline).difference(taken))
 
 
 def geo() -> Package:
@@ -553,15 +615,31 @@ def geo() -> Package:
         noun="rayon",
         code_system=None,
     )
+    p.add(
+        "source",
+        id=OSM_SOURCE,
+        kind="academic",
+        publisher="OpenStreetMap contributors",
+        title="OpenStreetMap administrative boundaries of the districts of Tbilisi and the cities of Rustavi, Kutaisi, "
+        "Poti, and Batumi",
+        url="https://www.openstreetmap.org/",
+        license="ODbL 1.0",
+        license_url="https://opendatacommons.org/licenses/odbl/1.0/",
+        attribution="© OpenStreetMap contributors, ODbL",
+    )
+    p.artifact(raw.cached(SOURCE, OSM), OSM_SOURCE)
     outlines: dict[str, shapely.Geometry] = {}
     for feature in json.loads(artifact.path.read_text(encoding="utf-8"))["features"]:
         name = feature["properties"]["shapeName"]
         if name in outlines:
             raise ValueError(f"geoBoundaries holds two ADM2 outlines named {name}")
         outlines[name] = shapely.geometry.shape(feature["geometry"])
+    cities = osm_shapes()
+    taken = shapely.union_all(list(cities.values()))
+    for name, outline in outlines.items():
+        outlines[name] = carve(outline, taken)
 
-    def shape(area: str, name: str) -> None:
-        outline = outlines[name]
+    def shape(area: str, outline: shapely.Geometry, source: str = GEO_SOURCE, quality: str = "academic") -> None:
         p.add(
             "area_geometry",
             area_id=area,
@@ -569,10 +647,10 @@ def geo() -> Package:
             valid_to=PLAN_TO,
             geom=shapely.to_wkb(shapely.set_srid(outline, 4326), hex=True, include_srid=True),
             label_point=shapely.to_wkb(
-                shapely.set_srid(shapely.point_on_surface(outline), 4326), hex=True, include_srid=True
+                shapely.point_on_surface(shapely.set_srid(outline, 4326)), hex=True, include_srid=True
             ),
-            quality="academic",
-            source_id=GEO_SOURCE,
+            quality=quality,
+            source_id=source,
         )
 
     names = {d: name for d, name, *_ in (*FIRST_ROUND_1995, *DISTRICTS_1999)}
@@ -582,17 +660,30 @@ def geo() -> Package:
         p.add("area_code", area_id=area, code=str(district), valid_from=None, valid_to=None)
         p.name(area, f"{english} rayon", "en", "english")
         p.name(area, f"{names[district]} რაიონი", "ka", "official")
-        shape(area, adm2)
+        shape(area, outlines[adm2])
+    for district, shape_ in sorted(cities.items()):
+        area = rayon_area(district)
+        p.add("area", id=area, scheme_code=AREA_SCHEME)
+        p.add("area_code", area_id=area, code=str(district), valid_from=None, valid_to=None)
+        if district in CITIES:
+            english, georgian = CITIES[district]
+            p.name(area, english, "en", "english")
+            p.name(area, georgian, "ka", "official")
+        else:
+            p.name(area, f"{TBILISI_DISTRICTS[district]} district", "en", "english")
+            p.name(area, f"{names[district]} რაიონი", "ka", "official")
+        shape(area, shape_, OSM_SOURCE, "osm")
     p.add("area", id=TBILISI_AREA, scheme_code=AREA_SCHEME)
     p.add("area_code", area_id=TBILISI_AREA, code="tbilisi", valid_from=None, valid_to=None)
     p.name(TBILISI_AREA, "Tbilisi", "en", "english")
     p.name(TBILISI_AREA, "თბილისი", "ka", "official")
-    shape(TBILISI_AREA, TBILISI)
+    shape(TBILISI_AREA, shapely.union_all([cities[d] for d in TBILISI_DISTRICTS]), OSM_SOURCE, "osm")
     p.add(
         "boundary_set",
         id=BOUNDARY_SET,
         scheme_code=AREA_SCHEME,
-        vintage="geoBoundaries gbOpen ADM2, read as the rayons of 1995",
+        vintage="geoBoundaries gbOpen ADM2, read as the rayons of 1995, with the cities and the districts of Tbilisi "
+        "outlined from OpenStreetMap and cut out of them",
         valid_from=PLAN_FROM,
         valid_to=PLAN_TO,
         as_of=PLAN_FROM,
@@ -633,20 +724,6 @@ def registry() -> Package:
             area_id=area_of(district) or COUNTRY,
             kind="standard",
         )
-        containing = TBILISI_AREA if district in TBILISI_DISTRICTS else None
-        if district in CITY_DISTRICTS:
-            containing = rayon_area(next(d for d, (adm2, _) in RAYONS.items() if adm2 == CITY_DISTRICTS[district]))
-        if containing:
-            p.add(
-                "reporting_unit_area",
-                unit_id=id,
-                area_id=containing,
-                valid_from=None,
-                valid_to=None,
-                approximate=True,
-                partial=False,
-                method="point_in_polygon",
-            )
         p.name(id, f"№{district} {name} საარჩევნო ოლქი", "ka", "official")
         p.name(id, f"Single-member district No. {district}", "en", "english")
     return p
