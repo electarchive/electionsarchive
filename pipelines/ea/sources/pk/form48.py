@@ -705,9 +705,15 @@ def bootstrap(pending: list[tuple[Page, int]], k: int, features: dict[tuple[int,
             break
         boxes = [p.grid.box(r, c) for c in range(2, k + 5)]
         crops = [crop(p.gray, b) for b in boxes]
-        a = strip(crops)
-        b = strip([np.where(binary(c), 0, 255).astype(np.uint8) for c in crops], 1.5)
-        solved, _ = solve([options([x, y]) for x, y in zip(a, b, strict=True)], k)
+        a = strip(crops, 2.0)
+        b = strip([np.where(binary(c), 0, 255).astype(np.uint8) for c in crops], 2.0)
+        opts = [options([x, y]) for x, y in zip(a, b, strict=True)]
+        solved, _ = solve(opts, k)
+        if solved is None:
+            for i, o in enumerate(opts):
+                if len(o) != 1:
+                    opts[i] = options([a[i], b[i], *single(crops[i])])
+            solved, _ = solve(opts, k)
         if solved is None:
             continue
         at = sum(len(cell.glyphs) for cell in row[:2])
@@ -794,18 +800,23 @@ def read_document(path: Path, k: int, images: Path | None = None, shared: Bank |
         for f, label in zip(shared.features, shared.labels, strict=True):
             if bank.labels.count(label) < 3:
                 bank.add(f, label)
-    if len(bank.classes()) < 10:
-        return Document(count, [], [(p.number, -1) for p in pages], unread)
-
     pending = [(p, r) for p in pages if p.grid is not None for r in range(len(p.cells))]
     width_ = SIZE[0] * SIZE[1] + 1
     features = {
         (p.number, r): np.array([feature(p.gray, g) for cell in p.cells[r] for g in cell.glyphs]).reshape(-1, width_)
         for p, r in pending
     }
+    booted = False
+    if len(bank.classes()) < 10:
+        # a form that does not number its columns as expected: learn its digits from rows Tesseract settles
+        booted = True
+        boot = bootstrap(pending, k, features)
+        for f, label in zip(boot.features, boot.labels, strict=True):
+            bank.add(f, label)
+    if len(bank.classes()) < 10:
+        return Document(count, [], [(p.number, -1) for p in pages], unread)
     rows: dict[tuple[int, int], Row] = {}
     spreads = [1.15, 1.3, 1.5]
-    booted = False
     while spreads:
         spread = spreads.pop(0)
         matrix = bank.matrix()
@@ -1069,28 +1080,16 @@ def assemble(code: str, artifact: raw.Artifact, read: dict) -> Seat | str:
     printed = min(totals, key=lambda r: abs(r["figures"][k] - valid49))["figures"] if totals else None
     if printed is not None and abs(printed[k] - valid49) > 0.05 * valid49:
         printed = None
-    # which candidate each column can be: with the printed totals, the Form 49 total less at most the postal votes
-    if printed is not None:
-        postal = valid49 - printed[k]
-        feasible = [[0 <= f49[j] - printed[i] <= postal + 2 for j in range(k)] for i in range(k)]
-    else:
-        feasible = [
-            [
-                abs(sums[i] - completeness * f49[j]) <= 0.25 * completeness * f49[j] + 3 * np.sqrt(f49[j]) + 5
-                for j in range(k)
-            ]
-            for i in range(k)
-        ]
-    # the order of the Form 49 serials stands unless some column's total is far from its candidate's: a form whose
-    # printed total differs from Form 49 by a few votes still follows it
-    if printed is not None:
-        loose = [abs(f49[i] - printed[i]) <= max(valid49 - printed[k] + 2, 0.03 * f49[i] + 5) for i in range(k)]
-    else:
-        loose = [
-            abs(sums[i] - completeness * f49[i]) <= 0.35 * completeness * f49[i] + 4 * np.sqrt(f49[i]) + 10
-            for i in range(k)
-        ]
-    if all(loose):
+
+    # which candidate each column can be: one whose Form 49 total the column's total comes near, the printed total
+    # falling short of it by at most the postal votes, or by a few votes where the two forms disagree
+    def fits(i: int, j: int) -> bool:
+        if printed is not None:
+            return abs(f49[j] - printed[i]) <= max(valid49 - printed[k] + 2, 0.03 * f49[j] + 5)
+        return bool(abs(sums[i] - completeness * f49[j]) <= 0.35 * completeness * f49[j] + 4 * np.sqrt(f49[j]) + 10)
+
+    feasible = [[fits(i, j) for j in range(k)] for i in range(k)]
+    if all(feasible[i][i] for i in range(k)):
         mapping = list(range(k))
         order = "in the order of the Form 49 serials"
     else:
@@ -1099,31 +1098,46 @@ def assemble(code: str, artifact: raw.Artifact, read: dict) -> Seat | str:
             return "its columns are not in the order of the Form 49 serials, and its heading could not be read"
         listed = [c[1] for c in sorted(form["candidates"], key=lambda c: c[0])]
         similarity = np.array([[_similar(names[i], listed[j]) for j in range(k)] for i in range(k)])
-        cost = np.where(np.array(feasible), -similarity, 10.0)
-        _, cols_j = linear_sum_assignment(cost)
-        mapping = [int(j) for j in cols_j]
-        sure = {i: mapping[i] for i in range(k) if feasible[i][mapping[i]] and similarity[i, mapping[i]] >= 0.5}
+        # a column keeps its serial's candidate where the total fits and its name points to no one else
+        sure: dict[int, int] = {}
+        for i in range(k):
+            others = [similarity[i, j] for j in range(k) if j != i and feasible[i][j]]
+            if feasible[i][i] and similarity[i, i] >= max(others, default=0.0) - 0.1:
+                sure[i] = i
+        rest = [i for i in range(k) if i not in sure]
+        free = [j for j in range(k) if j not in sure.values()]
+        if rest and free:
+            cost = np.array([[-similarity[i, j] if feasible[i][j] else 10.0 for j in free] for i in rest])
+            picked_i, picked_j = linear_sum_assignment(cost)
+            for a, b in zip(picked_i, picked_j, strict=True):
+                i, j = rest[int(a)], free[int(b)]
+                if feasible[i][j] and similarity[i, j] >= 0.5:
+                    sure[i] = j
         # a column whose name could not be read takes the one candidate left whose total fits it
         changed = True
         while changed:
             changed = False
-            free = set(range(k)) - set(sure.values())
+            left_over = set(range(k)) - set(sure.values())
             for i in range(k):
                 if i in sure:
                     continue
-                fits = [j for j in free if feasible[i][j]]
-                if len(fits) == 1:
-                    sure[i] = fits[0]
+                options_ = [j for j in left_over if feasible[i][j]]
+                if len(options_) == 1:
+                    sure[i] = options_[0]
                     changed = True
                     break
         weak = [i + 1 for i in range(k) if i not in sure]
-        mapping = [sure.get(i, -1) for i in range(k)]
         if weak:
             return (
                 "its columns are not in the order of the Form 49 serials, and the names its heading gives columns "
                 f"{weak} could not be matched to a candidate whose total fits the column"
             )
-        order = "matched to the candidates by the names the form's heading gives them and the totals each adds up to"
+        mapping = [sure[i] for i in range(k)]
+        moved = sum(mapping[i] != i for i in range(k))
+        order = (
+            f"matched to the candidates by the names the form's heading gives them and the totals each adds up to, "
+            f"since the form does not list {moved} of them in the order of the Form 49 serials"
+        )
     votes = np.zeros(k, dtype=np.int64)
     for i, j in enumerate(mapping):
         votes[j] = sums[i]
