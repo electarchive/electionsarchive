@@ -1,0 +1,8311 @@
+{
+"councils": {
+"1": "Saidpur",
+"2": "Noorpur Shahan",
+"3": "Mal pur",
+"4": "Kot Hathial (North)",
+"5": "Kot Hathial (South)",
+"6": "Phulgran",
+"7": "Pind Begowal",
+"8": "Tumair",
+"9": "Charah",
+"10": "Kirpa",
+"11": "Mughal",
+"12": "Rawat",
+"13": "Humak",
+"14": "Sihala",
+"15": "Loi Bher",
+"16": "Pahg Panwal",
+"17": "Koral",
+"18": "Khana Dak",
+"19": "Tarlai Kalan",
+"20": "Ali Pur",
+"21": "Sohan Dehati",
+"22": "Chak Shahzad",
+"23": "Kuri",
+"24": "Rawal Town & Margala Town",
+"25": "F-6",
+"26": "G-6/1",
+"27": "G-6/2, G-6/3 & G-6/4",
+"28": "F-7, F-8 & Jinnah Park F-9",
+"29": "F-10 & F-11",
+"30": "G-7/3 & G-7/4",
+"31": "G-7/1 & G-7/2",
+"32": "G-8/3 & G-8/4",
+"33": "G-8/1 & G-8/2",
+"34": "G-9/1, G-9/3 & G-9/4",
+"35": "G-9/2",
+"36": "G-10/3 & G-10/4",
+"37": "G-10/1 & G-10/2",
+"38": "G-11/1, G-11/2, G-11/3 & G-11/4",
+"39": "Maira Sumbal Jaffar",
+"40": "I-8",
+"41": "I-9",
+"42": "I-10/1 & I-10/4 (Partly)",
+"43": "I-10/2, I-10/3, I-10/4 (Partly) & H-10",
+"44": "Bokra",
+"45": "Jhangi Saydan",
+"46": "Badhana Kalan",
+"47": "Tarnol",
+"48": "Sarai Kharbooza",
+"49": "Shah Allah Ditta",
+"50": "Golra Sharif"
+},
+"rows": [
+{
+"page": 2,
+"seat": "chairman",
+"ward": null,
+"name": "SHIRAZ KIYANI",
+"box": [
+1023,
+479,
+1359,
+549
+],
+"uc": 1
+},
+{
+"page": 2,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MUHAMMAD ASHRAF",
+"box": [
+1023,
+549,
+1359,
+616
+],
+"uc": 1
+},
+{
+"page": 2,
+"seat": "general",
+"ward": 1,
+"name": "SAIF UR REHMAN",
+"box": [
+1023,
+616,
+1359,
+664
+],
+"uc": 1
+},
+{
+"page": 2,
+"seat": "general",
+"ward": 2,
+"name": "ZAREEN AHMED",
+"box": [
+1023,
+664,
+1359,
+719
+],
+"uc": 1
+},
+{
+"page": 2,
+"seat": "general",
+"ward": 3,
+"name": "MUHAMMAD ADIL",
+"box": [
+1023,
+719,
+1359,
+773
+],
+"uc": 1
+},
+{
+"page": 2,
+"seat": "general",
+"ward": 4,
+"name": "SHAKEEL ZAMAN",
+"box": [
+1023,
+773,
+1359,
+821
+],
+"uc": 1
+},
+{
+"page": 2,
+"seat": "general",
+"ward": 5,
+"name": "MUHAMMAD SAEED",
+"box": [
+1023,
+821,
+1359,
+890
+],
+"uc": 1
+},
+{
+"page": 2,
+"seat": "general",
+"ward": 6,
+"name": "MEHRBAN KHAN",
+"box": [
+1023,
+890,
+1359,
+943
+],
+"uc": 1
+},
+{
+"page": 2,
+"seat": "woman",
+"ward": 1,
+"name": "SHAHIDA SHAHEEN",
+"box": [
+1023,
+943,
+1359,
+984
+],
+"uc": 1
+},
+{
+"page": 2,
+"seat": "woman",
+"ward": 2,
+"name": "NAJBEEN BIBI",
+"box": [
+1023,
+984,
+1359,
+1037
+],
+"uc": 1
+},
+{
+"page": 2,
+"seat": "peasant_worker",
+"ward": null,
+"name": "ABDUL RAZZAQ",
+"box": [
+1023,
+1037,
+1359,
+1076
+],
+"uc": 1
+},
+{
+"page": 2,
+"seat": "youth",
+"ward": null,
+"name": "SYED MOHSIN ALI",
+"box": [
+1023,
+1076,
+1359,
+1141
+],
+"uc": 1
+},
+{
+"page": 2,
+"seat": "chairman",
+"ward": null,
+"name": "PIR ADIL SHAH",
+"box": [
+1023,
+1141,
+1359,
+1212
+],
+"uc": 2
+},
+{
+"page": 2,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MUHAMMAD SHEHZAD ABBASI",
+"box": [
+1023,
+1212,
+1359,
+1283
+],
+"uc": 2
+},
+{
+"page": 2,
+"seat": "general",
+"ward": 1,
+"name": "M. EJAZ ABBASI",
+"box": [
+1023,
+1283,
+1359,
+1348
+],
+"uc": 2
+},
+{
+"page": 2,
+"seat": "general",
+"ward": 2,
+"name": "MEHMOOD AHMED",
+"box": [
+1023,
+1348,
+1359,
+1413
+],
+"uc": 2
+},
+{
+"page": 2,
+"seat": "general",
+"ward": 3,
+"name": "MASOOD AHMED",
+"box": [
+1023,
+1413,
+1359,
+1478
+],
+"uc": 2
+},
+{
+"page": 3,
+"seat": "general",
+"ward": 4,
+"name": "KAMRAN AHMED",
+"box": [
+1034,
+472,
+1369,
+538
+],
+"uc": 2
+},
+{
+"page": 3,
+"seat": "general",
+"ward": 5,
+"name": "SAMANDAR HAYAT KHAN",
+"box": [
+1034,
+538,
+1369,
+604
+],
+"uc": 2
+},
+{
+"page": 3,
+"seat": "general",
+"ward": 6,
+"name": "NAYYAR JAHANGIR",
+"box": [
+1034,
+604,
+1369,
+670
+],
+"uc": 2
+},
+{
+"page": 3,
+"seat": "woman",
+"ward": 1,
+"name": "KAUSAR BIBI",
+"box": [
+1034,
+670,
+1369,
+735
+],
+"uc": 2
+},
+{
+"page": 3,
+"seat": "woman",
+"ward": 2,
+"name": "YASMIN KOUSAR NAZ",
+"box": [
+1034,
+735,
+1369,
+800
+],
+"uc": 2
+},
+{
+"page": 3,
+"seat": "peasant_worker",
+"ward": null,
+"name": "AWAIS ABBASI",
+"box": [
+1034,
+800,
+1369,
+866
+],
+"uc": 2
+},
+{
+"page": 3,
+"seat": "youth",
+"ward": null,
+"name": "FARMAN ULLAH KHAN",
+"box": [
+1034,
+866,
+1369,
+934
+],
+"uc": 2
+},
+{
+"page": 3,
+"seat": "non_muslim",
+"ward": null,
+"name": "SARWAR MASIH",
+"box": [
+1034,
+934,
+1369,
+1018
+],
+"uc": 2
+},
+{
+"page": 3,
+"seat": "chairman",
+"ward": null,
+"name": "CH. MUSHTAQ AHMED",
+"box": [
+1034,
+1018,
+1369,
+1085
+],
+"uc": 3
+},
+{
+"page": 3,
+"seat": "vice_chairman",
+"ward": null,
+"name": "NAEEM ANWER",
+"box": [
+1034,
+1085,
+1369,
+1154
+],
+"uc": 3
+},
+{
+"page": 3,
+"seat": "general",
+"ward": 1,
+"name": "RAJA MUHAMMAD FAISAL",
+"box": [
+1034,
+1154,
+1369,
+1219
+],
+"uc": 3
+},
+{
+"page": 3,
+"seat": "general",
+"ward": 2,
+"name": "IMRAN KHAN",
+"box": [
+1034,
+1219,
+1369,
+1286
+],
+"uc": 3
+},
+{
+"page": 3,
+"seat": "general",
+"ward": 3,
+"name": "MUHAMMAD NASEER",
+"box": [
+1034,
+1286,
+1369,
+1355
+],
+"uc": 3
+},
+{
+"page": 3,
+"seat": "general",
+"ward": 4,
+"name": "MUHAMMAD NAVAS ABBASI",
+"box": [
+1034,
+1355,
+1369,
+1420
+],
+"uc": 3
+},
+{
+"page": 3,
+"seat": "general",
+"ward": 5,
+"name": "IMTIAZ AHMED",
+"box": [
+1034,
+1420,
+1369,
+1491
+],
+"uc": 3
+},
+{
+"page": 4,
+"seat": "general",
+"ward": 6,
+"name": "CH. FAISAL MEHMOOD",
+"box": [
+1030,
+476,
+1366,
+546
+],
+"uc": 3
+},
+{
+"page": 4,
+"seat": "woman",
+"ward": 1,
+"name": "HINA KANWAL",
+"box": [
+1030,
+546,
+1366,
+611
+],
+"uc": 3
+},
+{
+"page": 4,
+"seat": "woman",
+"ward": 2,
+"name": "IRAM FAROOQ",
+"box": [
+1030,
+611,
+1366,
+677
+],
+"uc": 3
+},
+{
+"page": 4,
+"seat": "peasant_worker",
+"ward": null,
+"name": "TAHIR JAHANGIR ABBASI",
+"box": [
+1030,
+677,
+1366,
+743
+],
+"uc": 3
+},
+{
+"page": 4,
+"seat": "youth",
+"ward": null,
+"name": "RAJA SIBTAIN KHAN",
+"box": [
+1030,
+743,
+1366,
+812
+],
+"uc": 3
+},
+{
+"page": 4,
+"seat": "chairman",
+"ward": null,
+"name": "ISHTIAQ AHMED MALIK",
+"box": [
+1030,
+812,
+1366,
+891
+],
+"uc": 4
+},
+{
+"page": 4,
+"seat": "vice_chairman",
+"ward": null,
+"name": "SYED EJAZ ABBAS GILANI",
+"box": [
+1030,
+891,
+1366,
+960
+],
+"uc": 4
+},
+{
+"page": 4,
+"seat": "general",
+"ward": 1,
+"name": "SYED HASNAIN SHAH",
+"box": [
+1030,
+960,
+1366,
+1028
+],
+"uc": 4
+},
+{
+"page": 4,
+"seat": "general",
+"ward": 2,
+"name": "ASHFAQ AHMED",
+"box": [
+1030,
+1028,
+1366,
+1094
+],
+"uc": 4
+},
+{
+"page": 4,
+"seat": "general",
+"ward": 3,
+"name": "SULTAN AHMED",
+"box": [
+1030,
+1094,
+1366,
+1159
+],
+"uc": 4
+},
+{
+"page": 4,
+"seat": "general",
+"ward": 4,
+"name": "ARSHAD MEHMOOD",
+"box": [
+1030,
+1159,
+1366,
+1228
+],
+"uc": 4
+},
+{
+"page": 4,
+"seat": "general",
+"ward": 5,
+"name": "ABID MEHMOOD RAJA",
+"box": [
+1030,
+1228,
+1366,
+1297
+],
+"uc": 4
+},
+{
+"page": 4,
+"seat": "general",
+"ward": 6,
+"name": "BASHIR AHMED",
+"box": [
+1030,
+1297,
+1366,
+1362
+],
+"uc": 4
+},
+{
+"page": 4,
+"seat": "woman",
+"ward": 1,
+"name": "HABIBA BANO",
+"box": [
+1030,
+1362,
+1366,
+1427
+],
+"uc": 4
+},
+{
+"page": 4,
+"seat": "woman",
+"ward": 2,
+"name": "UZMA GULTAJ",
+"box": [
+1030,
+1427,
+1366,
+1492
+],
+"uc": 4
+},
+{
+"page": 5,
+"seat": "peasant_worker",
+"ward": null,
+"name": "ARSHAD MEHMOOD AWAN",
+"box": [
+1031,
+464,
+1368,
+530
+],
+"uc": 4
+},
+{
+"page": 5,
+"seat": "youth",
+"ward": null,
+"name": "MUHAMMAD HUSSANIAN HAIDER YOUSAF",
+"box": [
+1031,
+530,
+1368,
+647
+],
+"uc": 4
+},
+{
+"page": 5,
+"seat": "non_muslim",
+"ward": null,
+"name": "PERVAIZ AKHTAR",
+"box": [
+1031,
+647,
+1368,
+714
+],
+"uc": 4
+},
+{
+"page": 5,
+"seat": "chairman",
+"ward": null,
+"name": "MUHAMMAD WAHID",
+"box": [
+1031,
+714,
+1368,
+784
+],
+"uc": 5
+},
+{
+"page": 5,
+"seat": "vice_chairman",
+"ward": null,
+"name": "FAZAKAT ALI",
+"box": [
+1031,
+784,
+1368,
+849
+],
+"uc": 5
+},
+{
+"page": 5,
+"seat": "general",
+"ward": 1,
+"name": "SYED MANZOOR HUSSAIN SHAH",
+"box": [
+1031,
+849,
+1368,
+918
+],
+"uc": 5
+},
+{
+"page": 5,
+"seat": "general",
+"ward": 2,
+"name": "MUHAMMAD ZAREEN",
+"box": [
+1031,
+918,
+1368,
+986
+],
+"uc": 5
+},
+{
+"page": 5,
+"seat": "general",
+"ward": 3,
+"name": "SHABBIR AHMED MUGHAL",
+"box": [
+1031,
+986,
+1368,
+1055
+],
+"uc": 5
+},
+{
+"page": 5,
+"seat": "general",
+"ward": 4,
+"name": "MUHAMMAD SHEMROZ CH.",
+"box": [
+1031,
+1055,
+1368,
+1121
+],
+"uc": 5
+},
+{
+"page": 5,
+"seat": "general",
+"ward": 5,
+"name": "MUHAMMAD REHMAN",
+"box": [
+1031,
+1121,
+1368,
+1190
+],
+"uc": 5
+},
+{
+"page": 5,
+"seat": "general",
+"ward": 6,
+"name": "KAMRAN JAVED ABBASI",
+"box": [
+1031,
+1190,
+1368,
+1258
+],
+"uc": 5
+},
+{
+"page": 5,
+"seat": "woman",
+"ward": 1,
+"name": "SHEHRISH JABEEN",
+"box": [
+1031,
+1258,
+1368,
+1324
+],
+"uc": 5
+},
+{
+"page": 5,
+"seat": "woman",
+"ward": 2,
+"name": "SOBIA NAWAZ",
+"box": [
+1031,
+1324,
+1368,
+1389
+],
+"uc": 5
+},
+{
+"page": 5,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MUHAMMAD ZULFQAR",
+"box": [
+1031,
+1389,
+1368,
+1457
+],
+"uc": 5
+},
+{
+"page": 6,
+"seat": "youth",
+"ward": null,
+"name": "INZAMAM-UL-HAQ",
+"box": [
+1034,
+476,
+1368,
+542
+],
+"uc": 5
+},
+{
+"page": 6,
+"seat": "non_muslim",
+"ward": null,
+"name": "NASIR SHAHZAD",
+"box": [
+1034,
+542,
+1368,
+608
+],
+"uc": 5
+},
+{
+"page": 6,
+"seat": "chairman",
+"ward": null,
+"name": "WAQAR AHMED",
+"box": [
+1034,
+608,
+1368,
+687
+],
+"uc": 6
+},
+{
+"page": 6,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MUHAMMAD AFZAL",
+"box": [
+1034,
+687,
+1368,
+752
+],
+"uc": 6
+},
+{
+"page": 6,
+"seat": "general",
+"ward": 1,
+"name": "MUHAMMAD SADIQ",
+"box": [
+1034,
+752,
+1368,
+827
+],
+"uc": 6
+},
+{
+"page": 6,
+"seat": "general",
+"ward": 2,
+"name": "ARSALAN RASHEED",
+"box": [
+1034,
+827,
+1368,
+916
+],
+"uc": 6
+},
+{
+"page": 6,
+"seat": "general",
+"ward": 3,
+"name": "GHULAM JEELANI QADRI",
+"box": [
+1034,
+916,
+1368,
+1025
+],
+"uc": 6
+},
+{
+"page": 6,
+"seat": "general",
+"ward": 4,
+"name": "RAJA FARMAN IQBAL",
+"box": [
+1034,
+1025,
+1368,
+1096
+],
+"uc": 6
+},
+{
+"page": 6,
+"seat": "general",
+"ward": 5,
+"name": "WAQAS AHMED",
+"box": [
+1034,
+1096,
+1368,
+1187
+],
+"uc": 6
+},
+{
+"page": 6,
+"seat": "general",
+"ward": 6,
+"name": "SHAKIR HUSSAIN AWAN",
+"box": [
+1034,
+1187,
+1368,
+1269
+],
+"uc": 6
+},
+{
+"page": 6,
+"seat": "woman",
+"ward": 1,
+"name": "ASMA BIBI",
+"box": [
+1034,
+1269,
+1368,
+1347
+],
+"uc": 6
+},
+{
+"page": 6,
+"seat": "woman",
+"ward": 2,
+"name": "KHURSHID BEGUM",
+"box": [
+1034,
+1347,
+1368,
+1430
+],
+"uc": 6
+},
+{
+"page": 6,
+"seat": "peasant_worker",
+"ward": null,
+"name": "RAJA WAQAR AHMED",
+"box": [
+1034,
+1430,
+1368,
+1526
+],
+"uc": 6
+},
+{
+"page": 7,
+"seat": "youth",
+"ward": null,
+"name": "VICKY WILAYAT",
+"box": [
+1028,
+477,
+1364,
+560
+],
+"uc": 6
+},
+{
+"page": 7,
+"seat": "non_muslim",
+"ward": null,
+"name": "FARYAD MASIH",
+"box": [
+1028,
+560,
+1364,
+662
+],
+"uc": 6
+},
+{
+"page": 7,
+"seat": "chairman",
+"ward": null,
+"name": "RAJA QAISER GHAFFAR",
+"box": [
+1028,
+662,
+1364,
+737
+],
+"uc": 7
+},
+{
+"page": 7,
+"seat": "vice_chairman",
+"ward": null,
+"name": "ABDUL MAJEED",
+"box": [
+1028,
+737,
+1364,
+812
+],
+"uc": 7
+},
+{
+"page": 7,
+"seat": "general",
+"ward": 1,
+"name": "RAJA MUHAMMAD SAFEER",
+"box": [
+1028,
+812,
+1364,
+877
+],
+"uc": 7
+},
+{
+"page": 7,
+"seat": "general",
+"ward": 2,
+"name": "ABID IQBAL",
+"box": [
+1028,
+877,
+1364,
+954
+],
+"uc": 7
+},
+{
+"page": 7,
+"seat": "general",
+"ward": 3,
+"name": "SUBIDAR (R) MANGAT KHAN",
+"box": [
+1028,
+954,
+1364,
+1019
+],
+"uc": 7
+},
+{
+"page": 7,
+"seat": "general",
+"ward": 4,
+"name": "NASIR NASEER",
+"box": [
+1028,
+1019,
+1364,
+1091
+],
+"uc": 7
+},
+{
+"page": 7,
+"seat": "general",
+"ward": 5,
+"name": "SAJID MEHMOOD",
+"box": [
+1028,
+1091,
+1364,
+1165
+],
+"uc": 7
+},
+{
+"page": 7,
+"seat": "general",
+"ward": 6,
+"name": "TAIMOOR ZAFAR",
+"box": [
+1028,
+1165,
+1364,
+1237
+],
+"uc": 7
+},
+{
+"page": 7,
+"seat": "woman",
+"ward": 1,
+"name": "TAHIRA SHAHEEN",
+"box": [
+1028,
+1237,
+1364,
+1301
+],
+"uc": 7
+},
+{
+"page": 7,
+"seat": "woman",
+"ward": 2,
+"name": "SOBIA NOREEN",
+"box": [
+1028,
+1301,
+1364,
+1377
+],
+"uc": 7
+},
+{
+"page": 7,
+"seat": "peasant_worker",
+"ward": null,
+"name": "RAJA QAMER SHEHZAD",
+"box": [
+1028,
+1377,
+1364,
+1461
+],
+"uc": 7
+},
+{
+"page": 8,
+"seat": "youth",
+"ward": null,
+"name": "SUDHEER AKHTAR",
+"box": [
+1028,
+480,
+1363,
+556
+],
+"uc": 7
+},
+{
+"page": 8,
+"seat": "chairman",
+"ward": null,
+"name": "RAJA KHURAM SHAHZAD NAWAZ",
+"box": [
+1028,
+556,
+1363,
+632
+],
+"uc": 8
+},
+{
+"page": 8,
+"seat": "vice_chairman",
+"ward": null,
+"name": "RAJA YASIR MURTAZA",
+"box": [
+1028,
+632,
+1363,
+700
+],
+"uc": 8
+},
+{
+"page": 8,
+"seat": "general",
+"ward": 1,
+"name": "MUHAMMAD ZAMIR",
+"box": [
+1028,
+700,
+1363,
+765
+],
+"uc": 8
+},
+{
+"page": 8,
+"seat": "general",
+"ward": 2,
+"name": "KAMRAN RASHID",
+"box": [
+1028,
+765,
+1363,
+829
+],
+"uc": 8
+},
+{
+"page": 8,
+"seat": "general",
+"ward": 3,
+"name": "ASIM RAEES",
+"box": [
+1028,
+829,
+1363,
+892
+],
+"uc": 8
+},
+{
+"page": 8,
+"seat": "general",
+"ward": 4,
+"name": "RAJA MUHAMMAD ISHTIAQ",
+"box": [
+1028,
+892,
+1363,
+957
+],
+"uc": 8
+},
+{
+"page": 8,
+"seat": "general",
+"ward": 5,
+"name": "AJMAL HUSSAIN",
+"box": [
+1028,
+957,
+1363,
+1024
+],
+"uc": 8
+},
+{
+"page": 8,
+"seat": "general",
+"ward": 6,
+"name": "SHAH RAIZ AKHTER",
+"box": [
+1028,
+1024,
+1363,
+1096
+],
+"uc": 8
+},
+{
+"page": 8,
+"seat": "woman",
+"ward": 1,
+"name": "GHAZALA SHAHEEN",
+"box": [
+1028,
+1096,
+1363,
+1177
+],
+"uc": 8
+},
+{
+"page": 8,
+"seat": "woman",
+"ward": 2,
+"name": "SAIMA ZAHID",
+"box": [
+1028,
+1177,
+1363,
+1247
+],
+"uc": 8
+},
+{
+"page": 8,
+"seat": "peasant_worker",
+"ward": null,
+"name": "RAJA SAGHER AHMAD",
+"box": [
+1028,
+1247,
+1363,
+1333
+],
+"uc": 8
+},
+{
+"page": 8,
+"seat": "youth",
+"ward": null,
+"name": "TAHIR MEHMOOD",
+"box": [
+1028,
+1333,
+1363,
+1464
+],
+"uc": 8
+},
+{
+"page": 9,
+"seat": "chairman",
+"ward": null,
+"name": "RAJA ZULQURNAIN HAIDER",
+"box": [
+1032,
+479,
+1368,
+546
+],
+"uc": 9
+},
+{
+"page": 9,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MUHAMMAD KAMRAN KIYANI",
+"box": [
+1032,
+546,
+1368,
+612
+],
+"uc": 9
+},
+{
+"page": 9,
+"seat": "general",
+"ward": 1,
+"name": "CH. MUHAMMAD ARFAQ",
+"box": [
+1032,
+612,
+1368,
+701
+],
+"uc": 9
+},
+{
+"page": 9,
+"seat": "general",
+"ward": 2,
+"name": "RAJA IMRAN SADIQ",
+"box": [
+1032,
+701,
+1368,
+759
+],
+"uc": 9
+},
+{
+"page": 9,
+"seat": "general",
+"ward": 3,
+"name": "JAMIL AHMED",
+"box": [
+1032,
+759,
+1368,
+818
+],
+"uc": 9
+},
+{
+"page": 9,
+"seat": "general",
+"ward": 4,
+"name": "FAYYAZ AHMED SATTI",
+"box": [
+1032,
+818,
+1368,
+899
+],
+"uc": 9
+},
+{
+"page": 9,
+"seat": "general",
+"ward": 5,
+"name": "MUDASSIR AHMED KIYANI",
+"box": [
+1032,
+899,
+1368,
+983
+],
+"uc": 9
+},
+{
+"page": 9,
+"seat": "general",
+"ward": 6,
+"name": "NAEEM AKHTAR",
+"box": [
+1032,
+983,
+1368,
+1059
+],
+"uc": 9
+},
+{
+"page": 9,
+"seat": "woman",
+"ward": 1,
+"name": "RAHEELA BANO",
+"box": [
+1032,
+1059,
+1368,
+1130
+],
+"uc": 9
+},
+{
+"page": 9,
+"seat": "woman",
+"ward": 2,
+"name": "MOTIA WAQAR KIYANI",
+"box": [
+1032,
+1130,
+1368,
+1221
+],
+"uc": 9
+},
+{
+"page": 9,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MUNIR EJAZ",
+"box": [
+1032,
+1221,
+1368,
+1321
+],
+"uc": 9
+},
+{
+"page": 9,
+"seat": "youth",
+"ward": null,
+"name": "RAZA HUSSAIN",
+"box": [
+1032,
+1321,
+1368,
+1477
+],
+"uc": 9
+},
+{
+"page": 10,
+"seat": "chairman",
+"ward": null,
+"name": "ZAHID HUSSAIN",
+"box": [
+1025,
+495,
+1361,
+573
+],
+"uc": 10
+},
+{
+"page": 10,
+"seat": "vice_chairman",
+"ward": null,
+"name": "ASAD ALI",
+"box": [
+1025,
+573,
+1361,
+654
+],
+"uc": 10
+},
+{
+"page": 10,
+"seat": "general",
+"ward": 1,
+"name": "TARIQ MEHMOOD",
+"box": [
+1025,
+654,
+1361,
+727
+],
+"uc": 10
+},
+{
+"page": 10,
+"seat": "general",
+"ward": 3,
+"name": "IKHLAQ AKBAR RAJA",
+"box": [
+1025,
+727,
+1361,
+835
+],
+"uc": 10
+},
+{
+"page": 10,
+"seat": "general",
+"ward": 4,
+"name": "RAJA MUMTAZ ALI",
+"box": [
+1025,
+835,
+1361,
+922
+],
+"uc": 10
+},
+{
+"page": 10,
+"seat": "general",
+"ward": 5,
+"name": "ABID HUSSAIN",
+"box": [
+1025,
+922,
+1361,
+1018
+],
+"uc": 10
+},
+{
+"page": 10,
+"seat": "general",
+"ward": 6,
+"name": "MUHAMMAD AYAZ",
+"box": [
+1025,
+1018,
+1361,
+1109
+],
+"uc": 10
+},
+{
+"page": 10,
+"seat": "woman",
+"ward": 1,
+"name": "MUSARRAT SHAHEEN",
+"box": [
+1025,
+1109,
+1361,
+1186
+],
+"uc": 10
+},
+{
+"page": 10,
+"seat": "woman",
+"ward": 2,
+"name": "ABIDA PARVEEN",
+"box": [
+1025,
+1186,
+1361,
+1283
+],
+"uc": 10
+},
+{
+"page": 10,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MIRZA BABER SHAKEEL MUGHAL",
+"box": [
+1025,
+1283,
+1361,
+1394
+],
+"uc": 10
+},
+{
+"page": 10,
+"seat": "youth",
+"ward": null,
+"name": "RAJA AITHSAM HUSSAIN",
+"box": [
+1025,
+1394,
+1361,
+1461
+],
+"uc": 10
+},
+{
+"page": 11,
+"seat": "chairman",
+"ward": null,
+"name": "ADIL AZIZ QAZI",
+"box": [
+1027,
+497,
+1362,
+587
+],
+"uc": 11
+},
+{
+"page": 11,
+"seat": "vice_chairman",
+"ward": null,
+"name": "SHUMAIL SHAFIQUE MIRZA ADVOCATE",
+"box": [
+1027,
+587,
+1362,
+690
+],
+"uc": 11
+},
+{
+"page": 11,
+"seat": "general",
+"ward": 1,
+"name": "SHABBIR AKHTER MUGHAL",
+"box": [
+1027,
+690,
+1362,
+756
+],
+"uc": 11
+},
+{
+"page": 11,
+"seat": "general",
+"ward": 2,
+"name": "CH. IRFAN JAVED",
+"box": [
+1027,
+756,
+1362,
+815
+],
+"uc": 11
+},
+{
+"page": 11,
+"seat": "general",
+"ward": 3,
+"name": "RAJA SULTAN MEHMOOD",
+"box": [
+1027,
+815,
+1362,
+881
+],
+"uc": 11
+},
+{
+"page": 11,
+"seat": "general",
+"ward": 4,
+"name": "RAJA GHAZANFAR HUSSAIN",
+"box": [
+1027,
+881,
+1362,
+946
+],
+"uc": 11
+},
+{
+"page": 11,
+"seat": "general",
+"ward": 5,
+"name": "ANWAR MASOOD",
+"box": [
+1027,
+946,
+1362,
+1023
+],
+"uc": 11
+},
+{
+"page": 11,
+"seat": "general",
+"ward": 6,
+"name": "MUHAMMAD BASHARAT KIANI",
+"box": [
+1027,
+1023,
+1362,
+1088
+],
+"uc": 11
+},
+{
+"page": 11,
+"seat": "woman",
+"ward": 1,
+"name": "SHAZIA BIBI",
+"box": [
+1027,
+1088,
+1362,
+1151
+],
+"uc": 11
+},
+{
+"page": 11,
+"seat": "woman",
+"ward": 2,
+"name": "NAGINA SHAHEEN",
+"box": [
+1027,
+1151,
+1362,
+1241
+],
+"uc": 11
+},
+{
+"page": 11,
+"seat": "peasant_worker",
+"ward": null,
+"name": "SYED HAIDER BILAL BUKHARI",
+"box": [
+1027,
+1241,
+1362,
+1318
+],
+"uc": 11
+},
+{
+"page": 11,
+"seat": "youth",
+"ward": null,
+"name": "ABDUL HAMEED JAN",
+"box": [
+1027,
+1318,
+1362,
+1408
+],
+"uc": 11
+},
+{
+"page": 11,
+"seat": "non_muslim",
+"ward": null,
+"name": "SHAKEEL PITRAS",
+"box": [
+1027,
+1408,
+1362,
+1503
+],
+"uc": 11
+},
+{
+"page": 12,
+"seat": "chairman",
+"ward": null,
+"name": "AZHAR MEHMOOD",
+"box": [
+1035,
+493,
+1370,
+564
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "vice_chairman",
+"ward": null,
+"name": "RAJA SHEHZAD JAVED",
+"box": [
+1035,
+564,
+1370,
+616
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "general",
+"ward": 1,
+"name": "RAJA BABER NADEEM",
+"box": [
+1035,
+616,
+1370,
+662
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "general",
+"ward": 2,
+"name": "MUHAMMAD IRSHAD",
+"box": [
+1035,
+662,
+1370,
+713
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "general",
+"ward": 3,
+"name": "CH. FARRUKH MEMOOD NAGIAL",
+"box": [
+1035,
+713,
+1370,
+779
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "general",
+"ward": 4,
+"name": "NAZEER AHMAD KHAN",
+"box": [
+1035,
+779,
+1370,
+830
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "general",
+"ward": 5,
+"name": "RAJA PERVEZ AKHTER",
+"box": [
+1035,
+830,
+1370,
+888
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "general",
+"ward": 6,
+"name": "MUHAMMAD SHERAZ",
+"box": [
+1035,
+888,
+1370,
+949
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "woman",
+"ward": 1,
+"name": "PERVEEN AKHTER",
+"box": [
+1035,
+949,
+1370,
+1005
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "woman",
+"ward": 2,
+"name": "SAMINA FAZIL",
+"box": [
+1035,
+1005,
+1370,
+1060
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "peasant_worker",
+"ward": null,
+"name": "TAHIR SHEERAZ MUGHAL",
+"box": [
+1035,
+1060,
+1370,
+1125
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "youth",
+"ward": null,
+"name": "CH. AMIR HUSSAIN",
+"box": [
+1035,
+1125,
+1370,
+1182
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "non_muslim",
+"ward": null,
+"name": "AKRAM MASIH",
+"box": [
+1035,
+1182,
+1370,
+1241
+],
+"uc": 12
+},
+{
+"page": 12,
+"seat": "chairman",
+"ward": null,
+"name": "QAZI FAISAL NAEEM",
+"box": [
+1035,
+1241,
+1370,
+1278
+],
+"uc": 13
+},
+{
+"page": 12,
+"seat": "vice_chairman",
+"ward": null,
+"name": "CH. IKHLAQ HUSSAIN",
+"box": [
+1035,
+1278,
+1370,
+1314
+],
+"uc": 13
+},
+{
+"page": 12,
+"seat": "general",
+"ward": 1,
+"name": "CH. SHAKEEL AHMAD",
+"box": [
+1035,
+1314,
+1370,
+1350
+],
+"uc": 13
+},
+{
+"page": 12,
+"seat": "general",
+"ward": 2,
+"name": "SARDAR AMIR ISHAQUE KHAN",
+"box": [
+1035,
+1350,
+1370,
+1415
+],
+"uc": 13
+},
+{
+"page": 12,
+"seat": "general",
+"ward": 3,
+"name": "CH. MUHAMMAD IRHSAD ALI",
+"box": [
+1035,
+1415,
+1370,
+1480
+],
+"uc": 13
+},
+{
+"page": 12,
+"seat": "general",
+"ward": 4,
+"name": "MUHAMMAD ASIF",
+"box": [
+1035,
+1480,
+1370,
+1528
+],
+"uc": 13
+},
+{
+"page": 13,
+"seat": "general",
+"ward": 5,
+"name": "TALIB HUSSAIN",
+"box": [
+1031,
+475,
+1367,
+525
+],
+"uc": 13
+},
+{
+"page": 13,
+"seat": "general",
+"ward": 6,
+"name": "CH. MUHAMMAD BASHARAT",
+"box": [
+1031,
+525,
+1367,
+590
+],
+"uc": 13
+},
+{
+"page": 13,
+"seat": "woman",
+"ward": 1,
+"name": "MUSARRAT PERVEEN MALIK",
+"box": [
+1031,
+590,
+1367,
+656
+],
+"uc": 13
+},
+{
+"page": 13,
+"seat": "woman",
+"ward": 2,
+"name": "ZUBAIDA BIBI",
+"box": [
+1031,
+656,
+1367,
+711
+],
+"uc": 13
+},
+{
+"page": 13,
+"seat": "peasant_worker",
+"ward": null,
+"name": "RAJA JAVED IQBAL",
+"box": [
+1031,
+711,
+1367,
+772
+],
+"uc": 13
+},
+{
+"page": 13,
+"seat": "youth",
+"ward": null,
+"name": "HASSAN BAJWA",
+"box": [
+1031,
+772,
+1367,
+835
+],
+"uc": 13
+},
+{
+"page": 13,
+"seat": "non_muslim",
+"ward": null,
+"name": "DR SHEHZAD GHAURI",
+"box": [
+1031,
+835,
+1367,
+893
+],
+"uc": 13
+},
+{
+"page": 13,
+"seat": "chairman",
+"ward": null,
+"name": "CH. NADEEM AKHTER",
+"box": [
+1031,
+893,
+1367,
+968
+],
+"uc": 14
+},
+{
+"page": 13,
+"seat": "vice_chairman",
+"ward": null,
+"name": "NASIR MEHMOOD",
+"box": [
+1031,
+968,
+1367,
+1004
+],
+"uc": 14
+},
+{
+"page": 13,
+"seat": "general",
+"ward": 1,
+"name": "CH. AMIR AZIZ",
+"box": [
+1031,
+1004,
+1367,
+1071
+],
+"uc": 14
+},
+{
+"page": 13,
+"seat": "general",
+"ward": 2,
+"name": "BABER ZAMEER",
+"box": [
+1031,
+1071,
+1367,
+1142
+],
+"uc": 14
+},
+{
+"page": 13,
+"seat": "general",
+"ward": 3,
+"name": "CH. HUMAYUN SHEHZAD",
+"box": [
+1031,
+1142,
+1367,
+1207
+],
+"uc": 14
+},
+{
+"page": 13,
+"seat": "general",
+"ward": 4,
+"name": "MUHAMMAD BASHEER KHAWAJA",
+"box": [
+1031,
+1207,
+1367,
+1273
+],
+"uc": 14
+},
+{
+"page": 13,
+"seat": "general",
+"ward": 5,
+"name": "JAVED HUSSAIN",
+"box": [
+1031,
+1273,
+1367,
+1336
+],
+"uc": 14
+},
+{
+"page": 13,
+"seat": "general",
+"ward": 6,
+"name": "CHANGAIZ AKHTER KIANI",
+"box": [
+1031,
+1336,
+1367,
+1401
+],
+"uc": 14
+},
+{
+"page": 13,
+"seat": "woman",
+"ward": 1,
+"name": "NIAMAT BIBI",
+"box": [
+1031,
+1401,
+1367,
+1460
+],
+"uc": 14
+},
+{
+"page": 13,
+"seat": "woman",
+"ward": 2,
+"name": "SAFINA SHERAZ",
+"box": [
+1031,
+1460,
+1367,
+1504
+],
+"uc": 14
+},
+{
+"page": 14,
+"seat": "peasant_worker",
+"ward": null,
+"name": "HAJI ABDUL RAHEEM JANJUA",
+"box": [
+1023,
+475,
+1359,
+541
+],
+"uc": 14
+},
+{
+"page": 14,
+"seat": "youth",
+"ward": null,
+"name": "RAJA HAMZA ZAFAR",
+"box": [
+1023,
+541,
+1359,
+622
+],
+"uc": 14
+},
+{
+"page": 14,
+"seat": "non_muslim",
+"ward": null,
+"name": "AASIM IKHLAQ",
+"box": [
+1023,
+622,
+1359,
+697
+],
+"uc": 14
+},
+{
+"page": 14,
+"seat": "chairman",
+"ward": null,
+"name": "MALIK IKHLAQ AHMED AWAN",
+"box": [
+1023,
+697,
+1359,
+769
+],
+"uc": 15
+},
+{
+"page": 14,
+"seat": "vice_chairman",
+"ward": null,
+"name": "CH MUHAMMAD ALI",
+"box": [
+1023,
+769,
+1359,
+843
+],
+"uc": 15
+},
+{
+"page": 14,
+"seat": "general",
+"ward": 1,
+"name": "SOHAIL AHMED KHAN",
+"box": [
+1023,
+843,
+1359,
+942
+],
+"uc": 15
+},
+{
+"page": 14,
+"seat": "general",
+"ward": 2,
+"name": "MAQSOOD AHMED",
+"box": [
+1023,
+942,
+1359,
+1024
+],
+"uc": 15
+},
+{
+"page": 14,
+"seat": "general",
+"ward": 3,
+"name": "WAQAS AHMAD",
+"box": [
+1023,
+1024,
+1359,
+1114
+],
+"uc": 15
+},
+{
+"page": 14,
+"seat": "general",
+"ward": 4,
+"name": "QASIM ISHFAQ",
+"box": [
+1023,
+1114,
+1359,
+1189
+],
+"uc": 15
+},
+{
+"page": 14,
+"seat": "general",
+"ward": 5,
+"name": "IFTIKHAR ALI KHAN",
+"box": [
+1023,
+1189,
+1359,
+1256
+],
+"uc": 15
+},
+{
+"page": 14,
+"seat": "general",
+"ward": 6,
+"name": "MALIK FAZAL MEHMOOD",
+"box": [
+1023,
+1256,
+1359,
+1328
+],
+"uc": 15
+},
+{
+"page": 14,
+"seat": "woman",
+"ward": 1,
+"name": "TASNEEM QAISAR ABBAS",
+"box": [
+1023,
+1328,
+1359,
+1413
+],
+"uc": 15
+},
+{
+"page": 15,
+"seat": "woman",
+"ward": 2,
+"name": "SADIA ZAHID",
+"box": [
+1030,
+478,
+1366,
+594
+],
+"uc": 15
+},
+{
+"page": 15,
+"seat": "peasant_worker",
+"ward": null,
+"name": "ADEEL JAVED",
+"box": [
+1030,
+594,
+1366,
+671
+],
+"uc": 15
+},
+{
+"page": 15,
+"seat": "youth",
+"ward": null,
+"name": "JAHANGIR JAVED",
+"box": [
+1030,
+671,
+1366,
+844
+],
+"uc": 15
+},
+{
+"page": 15,
+"seat": "chairman",
+"ward": null,
+"name": "CH MUHAMMAD HANIF",
+"box": [
+1030,
+844,
+1366,
+916
+],
+"uc": 16
+},
+{
+"page": 15,
+"seat": "vice_chairman",
+"ward": null,
+"name": "ASHFIQ HUSSAIN",
+"box": [
+1030,
+916,
+1366,
+981
+],
+"uc": 16
+},
+{
+"page": 15,
+"seat": "general",
+"ward": 1,
+"name": "ZAHID MEHMOOD",
+"box": [
+1030,
+981,
+1366,
+1056
+],
+"uc": 16
+},
+{
+"page": 15,
+"seat": "general",
+"ward": 2,
+"name": "ASAD MEHMOOD",
+"box": [
+1030,
+1056,
+1366,
+1132
+],
+"uc": 16
+},
+{
+"page": 15,
+"seat": "general",
+"ward": 3,
+"name": "MUHAMMAD GULFARAZ",
+"box": [
+1030,
+1132,
+1366,
+1238
+],
+"uc": 16
+},
+{
+"page": 15,
+"seat": "general",
+"ward": 4,
+"name": "QAMER ZAMAN",
+"box": [
+1030,
+1238,
+1366,
+1304
+],
+"uc": 16
+},
+{
+"page": 15,
+"seat": "general",
+"ward": 5,
+"name": "MUHAMMAD SAGHIR",
+"box": [
+1030,
+1304,
+1366,
+1367
+],
+"uc": 16
+},
+{
+"page": 15,
+"seat": "general",
+"ward": 6,
+"name": "MUHAMMAD MUNIR",
+"box": [
+1030,
+1367,
+1366,
+1449
+],
+"uc": 16
+},
+{
+"page": 15,
+"seat": "woman",
+"ward": 1,
+"name": "NASREEN AKHTAR",
+"box": [
+1030,
+1449,
+1366,
+1512
+],
+"uc": 16
+},
+{
+"page": 16,
+"seat": "woman",
+"ward": 2,
+"name": "SHAISTA BIBI",
+"box": [
+1025,
+485,
+1361,
+569
+],
+"uc": 16
+},
+{
+"page": 16,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MALIK DANISH ALI",
+"box": [
+1025,
+569,
+1361,
+645
+],
+"uc": 16
+},
+{
+"page": 16,
+"seat": "youth",
+"ward": null,
+"name": "AZEEM ALI",
+"box": [
+1025,
+645,
+1361,
+739
+],
+"uc": 16
+},
+{
+"page": 16,
+"seat": "chairman",
+"ward": null,
+"name": "QAISAR JAVED BHATTI",
+"box": [
+1025,
+739,
+1361,
+825
+],
+"uc": 17
+},
+{
+"page": 16,
+"seat": "vice_chairman",
+"ward": null,
+"name": "AMIR HUSSAIN",
+"box": [
+1025,
+825,
+1361,
+890
+],
+"uc": 17
+},
+{
+"page": 16,
+"seat": "general",
+"ward": 1,
+"name": "RAJA ADEEL ARSHAD",
+"box": [
+1025,
+890,
+1361,
+958
+],
+"uc": 17
+},
+{
+"page": 16,
+"seat": "general",
+"ward": 2,
+"name": "RAJA SHAKEEL AHMED",
+"box": [
+1025,
+958,
+1361,
+1030
+],
+"uc": 17
+},
+{
+"page": 16,
+"seat": "general",
+"ward": 3,
+"name": "ABDUL KHALIQ",
+"box": [
+1025,
+1030,
+1361,
+1116
+],
+"uc": 17
+},
+{
+"page": 16,
+"seat": "general",
+"ward": 4,
+"name": "MUHAMMAD HAFEEZ KHOKHAR",
+"box": [
+1025,
+1116,
+1361,
+1182
+],
+"uc": 17
+},
+{
+"page": 16,
+"seat": "general",
+"ward": 5,
+"name": "RAJA ALTAF HUSSAIN JANJUA",
+"box": [
+1025,
+1182,
+1361,
+1247
+],
+"uc": 17
+},
+{
+"page": 16,
+"seat": "general",
+"ward": 6,
+"name": "SHAHID IQBAL KHAN",
+"box": [
+1025,
+1247,
+1361,
+1283
+],
+"uc": 17
+},
+{
+"page": 16,
+"seat": "woman",
+"ward": 1,
+"name": "UZMA PARVEEN",
+"box": [
+1025,
+1283,
+1361,
+1357
+],
+"uc": 17
+},
+{
+"page": 16,
+"seat": "woman",
+"ward": 2,
+"name": "SHUMAILA SHOKAT KIANI",
+"box": [
+1025,
+1357,
+1361,
+1422
+],
+"uc": 17
+},
+{
+"page": 16,
+"seat": "peasant_worker",
+"ward": null,
+"name": "ABDUL MOHEED AWAN",
+"box": [
+1025,
+1422,
+1361,
+1495
+],
+"uc": 17
+},
+{
+"page": 17,
+"seat": "youth",
+"ward": null,
+"name": "CH. SHAHID SHAFIQUE",
+"box": [
+1028,
+484,
+1365,
+581
+],
+"uc": 17
+},
+{
+"page": 17,
+"seat": "non_muslim",
+"ward": null,
+"name": "ANILA RAFIQ",
+"box": [
+1028,
+581,
+1365,
+677
+],
+"uc": 17
+},
+{
+"page": 17,
+"seat": "chairman",
+"ward": null,
+"name": "WASEEM SANA MALIK",
+"box": [
+1028,
+677,
+1365,
+749
+],
+"uc": 18
+},
+{
+"page": 17,
+"seat": "vice_chairman",
+"ward": null,
+"name": "RAJA AMJAD HUSSAIN",
+"box": [
+1028,
+749,
+1365,
+825
+],
+"uc": 18
+},
+{
+"page": 17,
+"seat": "general",
+"ward": 1,
+"name": "SAEED AHMAD",
+"box": [
+1028,
+825,
+1365,
+902
+],
+"uc": 18
+},
+{
+"page": 17,
+"seat": "general",
+"ward": 2,
+"name": "CH. FAISAL MEHMOOD",
+"box": [
+1028,
+902,
+1365,
+986
+],
+"uc": 18
+},
+{
+"page": 17,
+"seat": "general",
+"ward": 3,
+"name": "GHULAM ISRAR",
+"box": [
+1028,
+986,
+1365,
+1055
+],
+"uc": 18
+},
+{
+"page": 17,
+"seat": "general",
+"ward": 4,
+"name": "ABDUL RAUF",
+"box": [
+1028,
+1055,
+1365,
+1122
+],
+"uc": 18
+},
+{
+"page": 17,
+"seat": "general",
+"ward": 5,
+"name": "MUHAMMAD SADIQ JANJUA",
+"box": [
+1028,
+1122,
+1365,
+1188
+],
+"uc": 18
+},
+{
+"page": 17,
+"seat": "general",
+"ward": 6,
+"name": "MUHAMMAD SADDIQUE",
+"box": [
+1028,
+1188,
+1365,
+1282
+],
+"uc": 18
+},
+{
+"page": 17,
+"seat": "woman",
+"ward": 1,
+"name": "SAJIDA NAHEED",
+"box": [
+1028,
+1282,
+1365,
+1365
+],
+"uc": 18
+},
+{
+"page": 17,
+"seat": "woman",
+"ward": 2,
+"name": "RIZWANA ALTAF",
+"box": [
+1028,
+1365,
+1365,
+1425
+],
+"uc": 18
+},
+{
+"page": 17,
+"seat": "peasant_worker",
+"ward": null,
+"name": "WAHEED GUL",
+"box": [
+1028,
+1425,
+1365,
+1498
+],
+"uc": 18
+},
+{
+"page": 18,
+"seat": "youth",
+"ward": null,
+"name": "MUHAMMAD FARRUKH SHAHID",
+"box": [
+1030,
+483,
+1366,
+553
+],
+"uc": 18
+},
+{
+"page": 18,
+"seat": "non_muslim",
+"ward": null,
+"name": "PITRAS MASIH",
+"box": [
+1030,
+553,
+1366,
+633
+],
+"uc": 18
+},
+{
+"page": 18,
+"seat": "chairman",
+"ward": null,
+"name": "CH. MANZOOR HUSSAIN",
+"box": [
+1030,
+633,
+1366,
+705
+],
+"uc": 19
+},
+{
+"page": 18,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MUHAMMAD YOUSAF",
+"box": [
+1030,
+705,
+1366,
+820
+],
+"uc": 19
+},
+{
+"page": 18,
+"seat": "general",
+"ward": 1,
+"name": "WAQAR ALI CHOUDARY",
+"box": [
+1030,
+820,
+1366,
+900
+],
+"uc": 19
+},
+{
+"page": 18,
+"seat": "general",
+"ward": 2,
+"name": "NAVEED AHMAD CHUDHARY",
+"box": [
+1030,
+900,
+1366,
+972
+],
+"uc": 19
+},
+{
+"page": 18,
+"seat": "general",
+"ward": 3,
+"name": "SAJJAD HUSSAIN",
+"box": [
+1030,
+972,
+1366,
+1043
+],
+"uc": 19
+},
+{
+"page": 18,
+"seat": "general",
+"ward": 4,
+"name": "CH. NASIR MEHMOOD",
+"box": [
+1030,
+1043,
+1366,
+1122
+],
+"uc": 19
+},
+{
+"page": 18,
+"seat": "general",
+"ward": 5,
+"name": "MURTAZA KHAN",
+"box": [
+1030,
+1122,
+1366,
+1201
+],
+"uc": 19
+},
+{
+"page": 18,
+"seat": "general",
+"ward": 6,
+"name": "MUHAMMAD AKBAR MUGHAL",
+"box": [
+1030,
+1201,
+1366,
+1267
+],
+"uc": 19
+},
+{
+"page": 18,
+"seat": "woman",
+"ward": 1,
+"name": "MUNAZZA BIBI",
+"box": [
+1030,
+1267,
+1366,
+1303
+],
+"uc": 19
+},
+{
+"page": 18,
+"seat": "woman",
+"ward": 2,
+"name": "FARYAL ALI QADIR",
+"box": [
+1030,
+1303,
+1366,
+1383
+],
+"uc": 19
+},
+{
+"page": 18,
+"seat": "peasant_worker",
+"ward": null,
+"name": "RIZWAN AHMAD",
+"box": [
+1030,
+1383,
+1366,
+1456
+],
+"uc": 19
+},
+{
+"page": 19,
+"seat": "youth",
+"ward": null,
+"name": "MUHAMMAD SAJID GUL",
+"box": [
+1029,
+479,
+1365,
+593
+],
+"uc": 19
+},
+{
+"page": 19,
+"seat": "non_muslim",
+"ward": null,
+"name": "AMEEN MASIH",
+"box": [
+1029,
+593,
+1365,
+703
+],
+"uc": 19
+},
+{
+"page": 19,
+"seat": "chairman",
+"ward": null,
+"name": "Syed Ibrar Hussain",
+"box": [
+1029,
+703,
+1365,
+775
+],
+"uc": 20
+},
+{
+"page": 19,
+"seat": "vice_chairman",
+"ward": null,
+"name": "SHAHID IQBAL",
+"box": [
+1029,
+775,
+1365,
+847
+],
+"uc": 20
+},
+{
+"page": 19,
+"seat": "general",
+"ward": 1,
+"name": "AZHAR MEHMOOD KHOKHAR",
+"box": [
+1029,
+847,
+1365,
+934
+],
+"uc": 20
+},
+{
+"page": 19,
+"seat": "general",
+"ward": 2,
+"name": "RAJA ZULFIQAR HUSSAIN JANJUA",
+"box": [
+1029,
+934,
+1365,
+1009
+],
+"uc": 20
+},
+{
+"page": 19,
+"seat": "general",
+"ward": 3,
+"name": "ABID MUSHTAQ",
+"box": [
+1029,
+1009,
+1365,
+1045
+],
+"uc": 20
+},
+{
+"page": 19,
+"seat": "general",
+"ward": 4,
+"name": "BASHARAT ALI",
+"box": [
+1029,
+1045,
+1365,
+1119
+],
+"uc": 20
+},
+{
+"page": 19,
+"seat": "general",
+"ward": 5,
+"name": "SAQIB NOOR",
+"box": [
+1029,
+1119,
+1365,
+1202
+],
+"uc": 20
+},
+{
+"page": 19,
+"seat": "general",
+"ward": 6,
+"name": "MUHAMMAD FOLAD",
+"box": [
+1029,
+1202,
+1365,
+1238
+],
+"uc": 20
+},
+{
+"page": 19,
+"seat": "woman",
+"ward": 1,
+"name": "RABIA TABASSUM",
+"box": [
+1029,
+1238,
+1365,
+1274
+],
+"uc": 20
+},
+{
+"page": 19,
+"seat": "woman",
+"ward": 2,
+"name": "SAFOORA BIBI",
+"box": [
+1029,
+1274,
+1365,
+1310
+],
+"uc": 20
+},
+{
+"page": 19,
+"seat": "peasant_worker",
+"ward": null,
+"name": "RAJA ASHAQ HUSSAIN",
+"box": [
+1029,
+1310,
+1365,
+1381
+],
+"uc": 20
+},
+{
+"page": 19,
+"seat": "youth",
+"ward": null,
+"name": "RAJA MUTASSAM BILLAH ABBASI",
+"box": [
+1029,
+1381,
+1365,
+1450
+],
+"uc": 20
+},
+{
+"page": 20,
+"seat": "non_muslim",
+"ward": null,
+"name": "NADEEM NAZEER SOHATRA",
+"box": [
+1025,
+475,
+1361,
+560
+],
+"uc": 20
+},
+{
+"page": 20,
+"seat": "chairman",
+"ward": null,
+"name": "MALIK AMIR ALI",
+"box": [
+1025,
+560,
+1361,
+633
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "vice_chairman",
+"ward": null,
+"name": "SOHAIL AHMED SATTI",
+"box": [
+1025,
+633,
+1361,
+709
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "general",
+"ward": 1,
+"name": "ZIA UR REHMAN",
+"box": [
+1025,
+709,
+1361,
+745
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "general",
+"ward": 2,
+"name": "MALIK MUHAMMAD RASHEED",
+"box": [
+1025,
+745,
+1361,
+811
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "general",
+"ward": 3,
+"name": "ZOHAIB IQBAL",
+"box": [
+1025,
+811,
+1361,
+847
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "general",
+"ward": 4,
+"name": "MUHAMMAD SAEED",
+"box": [
+1025,
+847,
+1361,
+883
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "general",
+"ward": 5,
+"name": "CH GULZAR AHMAD",
+"box": [
+1025,
+883,
+1361,
+918
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "general",
+"ward": 6,
+"name": "REHMAT ULLAH",
+"box": [
+1025,
+918,
+1361,
+954
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "woman",
+"ward": 1,
+"name": "PARI JAN",
+"box": [
+1025,
+954,
+1361,
+990
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "woman",
+"ward": 2,
+"name": "RASHEEDA BIBI",
+"box": [
+1025,
+990,
+1361,
+1060
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "peasant_worker",
+"ward": null,
+"name": "IHSAN UL HAQ SATTI",
+"box": [
+1025,
+1060,
+1361,
+1097
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "youth",
+"ward": null,
+"name": "SHAHID REHMAN",
+"box": [
+1025,
+1097,
+1361,
+1133
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "non_muslim",
+"ward": null,
+"name": "IRFAN MASIH",
+"box": [
+1025,
+1133,
+1361,
+1219
+],
+"uc": 21
+},
+{
+"page": 20,
+"seat": "chairman",
+"ward": null,
+"name": "CH MATLOOB HUSSAIN",
+"box": [
+1025,
+1219,
+1361,
+1291
+],
+"uc": 22
+},
+{
+"page": 20,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MUHAMMAD ILYAS",
+"box": [
+1025,
+1291,
+1361,
+1359
+],
+"uc": 22
+},
+{
+"page": 20,
+"seat": "general",
+"ward": 1,
+"name": "MUHAMMAD KABEER",
+"box": [
+1025,
+1359,
+1361,
+1432
+],
+"uc": 22
+},
+{
+"page": 20,
+"seat": "general",
+"ward": 2,
+"name": "SHEIKH MEHMOOD TAHIR",
+"box": [
+1025,
+1432,
+1361,
+1500
+],
+"uc": 22
+},
+{
+"page": 21,
+"seat": "general",
+"ward": 3,
+"name": "MALIK ZAHEER AHMAD",
+"box": [
+1035,
+478,
+1371,
+548
+],
+"uc": 22
+},
+{
+"page": 21,
+"seat": "general",
+"ward": 4,
+"name": "MUBASHIR HUSSAIN CHATTHA",
+"box": [
+1035,
+548,
+1371,
+617
+],
+"uc": 22
+},
+{
+"page": 21,
+"seat": "general",
+"ward": 5,
+"name": "ADEEL SHAHZAD KIANI",
+"box": [
+1035,
+617,
+1371,
+685
+],
+"uc": 22
+},
+{
+"page": 21,
+"seat": "general",
+"ward": 6,
+"name": "CH SAJID MEHMOOD",
+"box": [
+1035,
+685,
+1371,
+747
+],
+"uc": 22
+},
+{
+"page": 21,
+"seat": "woman",
+"ward": 1,
+"name": "SAIRA QADEER",
+"box": [
+1035,
+747,
+1371,
+820
+],
+"uc": 22
+},
+{
+"page": 21,
+"seat": "woman",
+"ward": 2,
+"name": "SHAHEEN AKHTAR",
+"box": [
+1035,
+820,
+1371,
+856
+],
+"uc": 22
+},
+{
+"page": 21,
+"seat": "peasant_worker",
+"ward": null,
+"name": "KHURRAM SHAHZAD",
+"box": [
+1035,
+856,
+1371,
+930
+],
+"uc": 22
+},
+{
+"page": 21,
+"seat": "youth",
+"ward": null,
+"name": "ALI FAHAD",
+"box": [
+1035,
+930,
+1371,
+1008
+],
+"uc": 22
+},
+{
+"page": 21,
+"seat": "non_muslim",
+"ward": null,
+"name": "ASLAM SANDHU",
+"box": [
+1035,
+1008,
+1371,
+1066
+],
+"uc": 22
+},
+{
+"page": 21,
+"seat": "chairman",
+"ward": null,
+"name": "MUHAMMAD JAMIL",
+"box": [
+1035,
+1066,
+1371,
+1145
+],
+"uc": 23
+},
+{
+"page": 21,
+"seat": "vice_chairman",
+"ward": null,
+"name": "RASHID SHOAIB KIANI",
+"box": [
+1035,
+1145,
+1371,
+1231
+],
+"uc": 23
+},
+{
+"page": 21,
+"seat": "general",
+"ward": 1,
+"name": "MUHAMMAD RAFEEZ",
+"box": [
+1035,
+1231,
+1371,
+1323
+],
+"uc": 23
+},
+{
+"page": 21,
+"seat": "general",
+"ward": 2,
+"name": "ABDUL NADEEM",
+"box": [
+1035,
+1323,
+1371,
+1408
+],
+"uc": 23
+},
+{
+"page": 21,
+"seat": "general",
+"ward": 3,
+"name": "JAFFAR ALI AZAD",
+"box": [
+1035,
+1408,
+1371,
+1510
+],
+"uc": 23
+},
+{
+"page": 22,
+"seat": "general",
+"ward": 4,
+"name": "RAJA ABDUL KHALIQ ABBASI",
+"box": [
+1037,
+474,
+1374,
+540
+],
+"uc": 23
+},
+{
+"page": 22,
+"seat": "general",
+"ward": 5,
+"name": "MUHAMMAD AYUB",
+"box": [
+1037,
+540,
+1374,
+614
+],
+"uc": 23
+},
+{
+"page": 22,
+"seat": "general",
+"ward": 6,
+"name": "MUHAMMAD RAFIQ CHOHAN",
+"box": [
+1037,
+614,
+1374,
+702
+],
+"uc": 23
+},
+{
+"page": 22,
+"seat": "woman",
+"ward": 1,
+"name": "NAHEED KAUSAR",
+"box": [
+1037,
+702,
+1374,
+778
+],
+"uc": 23
+},
+{
+"page": 22,
+"seat": "woman",
+"ward": 2,
+"name": "KISHWAR SULTANA",
+"box": [
+1037,
+778,
+1374,
+847
+],
+"uc": 23
+},
+{
+"page": 22,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MUHAMMAD NAWAZ",
+"box": [
+1037,
+847,
+1374,
+926
+],
+"uc": 23
+},
+{
+"page": 22,
+"seat": "youth",
+"ward": null,
+"name": "USMAN GHANI",
+"box": [
+1037,
+926,
+1374,
+993
+],
+"uc": 23
+},
+{
+"page": 22,
+"seat": "non_muslim",
+"ward": null,
+"name": "LAZER MASIH",
+"box": [
+1037,
+993,
+1374,
+1081
+],
+"uc": 23
+},
+{
+"page": 22,
+"seat": "chairman",
+"ward": null,
+"name": "SYED ZAHEER AHMED SHAH",
+"box": [
+1037,
+1081,
+1374,
+1190
+],
+"uc": 24
+},
+{
+"page": 22,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MOHSIN RAZA GONDAL",
+"box": [
+1037,
+1190,
+1374,
+1296
+],
+"uc": 24
+},
+{
+"page": 22,
+"seat": "general",
+"ward": 1,
+"name": "MUHAMMAD RIZWAN UL HAQ HASSAN ABBASI",
+"box": [
+1037,
+1296,
+1374,
+1399
+],
+"uc": 24
+},
+{
+"page": 22,
+"seat": "general",
+"ward": 2,
+"name": "MALIK ATHAR RAFI",
+"box": [
+1037,
+1399,
+1374,
+1478
+],
+"uc": 24
+},
+{
+"page": 23,
+"seat": "general",
+"ward": 3,
+"name": "HAFIZ MOHABIT KHAN",
+"box": [
+1033,
+489,
+1369,
+572
+],
+"uc": 24
+},
+{
+"page": 23,
+"seat": "general",
+"ward": 4,
+"name": "NASIR IQBAL AWAN",
+"box": [
+1033,
+572,
+1369,
+658
+],
+"uc": 24
+},
+{
+"page": 23,
+"seat": "general",
+"ward": 5,
+"name": "INAM BASIR",
+"box": [
+1033,
+658,
+1369,
+742
+],
+"uc": 24
+},
+{
+"page": 23,
+"seat": "general",
+"ward": 6,
+"name": "RASHID MEHMOOD",
+"box": [
+1033,
+742,
+1369,
+853
+],
+"uc": 24
+},
+{
+"page": 23,
+"seat": "woman",
+"ward": 1,
+"name": "ZUBEDA KHATOON",
+"box": [
+1033,
+853,
+1369,
+949
+],
+"uc": 24
+},
+{
+"page": 23,
+"seat": "woman",
+"ward": 2,
+"name": "TASNIM TAHIR",
+"box": [
+1033,
+949,
+1369,
+1038
+],
+"uc": 24
+},
+{
+"page": 23,
+"seat": "peasant_worker",
+"ward": null,
+"name": "SAEED AKBAR",
+"box": [
+1033,
+1038,
+1369,
+1133
+],
+"uc": 24
+},
+{
+"page": 23,
+"seat": "youth",
+"ward": null,
+"name": "ASAD MUNIR BHATTI",
+"box": [
+1033,
+1133,
+1369,
+1214
+],
+"uc": 24
+},
+{
+"page": 23,
+"seat": "non_muslim",
+"ward": null,
+"name": "KAMRAN PERVAIZ",
+"box": [
+1033,
+1214,
+1369,
+1317
+],
+"uc": 24
+},
+{
+"page": 23,
+"seat": "chairman",
+"ward": null,
+"name": "ATTIQUE ULLAH KHAN KHATTAK",
+"box": [
+1033,
+1317,
+1369,
+1405
+],
+"uc": 25
+},
+{
+"page": 23,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MUHAMMAD UZAIR ANWAR",
+"box": [
+1033,
+1405,
+1369,
+1469
+],
+"uc": 25
+},
+{
+"page": 24,
+"seat": "general",
+"ward": 1,
+"name": "ABDUL RAZAQ",
+"box": [
+1031,
+481,
+1366,
+587
+],
+"uc": 25
+},
+{
+"page": 24,
+"seat": "general",
+"ward": 2,
+"name": "UMAR JAVED",
+"box": [
+1031,
+587,
+1366,
+674
+],
+"uc": 25
+},
+{
+"page": 24,
+"seat": "general",
+"ward": 3,
+"name": "ALI RAZA MUHAMMAD",
+"box": [
+1031,
+674,
+1366,
+772
+],
+"uc": 25
+},
+{
+"page": 24,
+"seat": "general",
+"ward": 4,
+"name": "SAMSON ISHAQ",
+"box": [
+1031,
+772,
+1366,
+820
+],
+"uc": 25
+},
+{
+"page": 24,
+"seat": "general",
+"ward": 5,
+"name": "MUHAMMAD TAYYAB",
+"box": [
+1031,
+820,
+1366,
+885
+],
+"uc": 25
+},
+{
+"page": 24,
+"seat": "general",
+"ward": 6,
+"name": "MALIK KHADIM HUSSAIN AWAN",
+"box": [
+1031,
+885,
+1366,
+950
+],
+"uc": 25
+},
+{
+"page": 24,
+"seat": "woman",
+"ward": 1,
+"name": "TAHIRA JAMAL",
+"box": [
+1031,
+950,
+1366,
+1003
+],
+"uc": 25
+},
+{
+"page": 24,
+"seat": "woman",
+"ward": 2,
+"name": "MARYUM ROTH",
+"box": [
+1031,
+1003,
+1366,
+1072
+],
+"uc": 25
+},
+{
+"page": 24,
+"seat": "peasant_worker",
+"ward": null,
+"name": "RIASAT ALI",
+"box": [
+1031,
+1072,
+1366,
+1187
+],
+"uc": 25
+},
+{
+"page": 24,
+"seat": "youth",
+"ward": null,
+"name": "SYED KHUBAIB ZIA",
+"box": [
+1031,
+1187,
+1366,
+1297
+],
+"uc": 25
+},
+{
+"page": 24,
+"seat": "non_muslim",
+"ward": null,
+"name": "SOHAIL SHAHID",
+"box": [
+1031,
+1297,
+1366,
+1474
+],
+"uc": 25
+},
+{
+"page": 25,
+"seat": "chairman",
+"ward": null,
+"name": "CH. ALLAH DITTA",
+"box": [
+1031,
+489,
+1366,
+570
+],
+"uc": 26
+},
+{
+"page": 25,
+"seat": "vice_chairman",
+"ward": null,
+"name": "CH. ABDUL SATTAR",
+"box": [
+1031,
+570,
+1366,
+653
+],
+"uc": 26
+},
+{
+"page": 25,
+"seat": "general",
+"ward": 1,
+"name": "MEHRAJ SAKHAWAT",
+"box": [
+1031,
+653,
+1366,
+732
+],
+"uc": 26
+},
+{
+"page": 25,
+"seat": "general",
+"ward": 2,
+"name": "SYED JABIR HUSSAIN SHAH",
+"box": [
+1031,
+732,
+1366,
+800
+],
+"uc": 26
+},
+{
+"page": 25,
+"seat": "general",
+"ward": 3,
+"name": "MUHAMMAD TAHIR ABBAS",
+"box": [
+1031,
+800,
+1366,
+869
+],
+"uc": 26
+},
+{
+"page": 25,
+"seat": "general",
+"ward": 4,
+"name": "CHAUDHRY TARIQ MEHMOOD",
+"box": [
+1031,
+869,
+1366,
+963
+],
+"uc": 26
+},
+{
+"page": 25,
+"seat": "general",
+"ward": 5,
+"name": "MUHAMMAD SAQIB",
+"box": [
+1031,
+963,
+1366,
+1046
+],
+"uc": 26
+},
+{
+"page": 25,
+"seat": "general",
+"ward": 6,
+"name": "SABIR HUSSAIN NAQVI",
+"box": [
+1031,
+1046,
+1366,
+1120
+],
+"uc": 26
+},
+{
+"page": 25,
+"seat": "woman",
+"ward": 1,
+"name": "FARAH JAVED",
+"box": [
+1031,
+1120,
+1366,
+1206
+],
+"uc": 26
+},
+{
+"page": 25,
+"seat": "woman",
+"ward": 2,
+"name": "MUNAWAR",
+"box": [
+1031,
+1206,
+1366,
+1289
+],
+"uc": 26
+},
+{
+"page": 25,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MUHAMMAD ASLAM KHAN",
+"box": [
+1031,
+1289,
+1366,
+1357
+],
+"uc": 26
+},
+{
+"page": 25,
+"seat": "youth",
+"ward": null,
+"name": "MUHAMMAD UMER",
+"box": [
+1031,
+1357,
+1366,
+1451
+],
+"uc": 26
+},
+{
+"page": 25,
+"seat": "non_muslim",
+"ward": null,
+"name": "CH ASHRAF FARZAND",
+"box": [
+1031,
+1451,
+1366,
+1526
+],
+"uc": 26
+},
+{
+"page": 26,
+"seat": "chairman",
+"ward": null,
+"name": "ANJUM SHAHZAD TANOLI",
+"box": [
+1026,
+484,
+1362,
+556
+],
+"uc": 27
+},
+{
+"page": 26,
+"seat": "vice_chairman",
+"ward": null,
+"name": "ABDUL BASIT",
+"box": [
+1026,
+556,
+1362,
+645
+],
+"uc": 27
+},
+{
+"page": 26,
+"seat": "general",
+"ward": 1,
+"name": "RASHEED AHMAD",
+"box": [
+1026,
+645,
+1362,
+710
+],
+"uc": 27
+},
+{
+"page": 26,
+"seat": "general",
+"ward": 2,
+"name": "SYED FARHAN ALI SHAH",
+"box": [
+1026,
+710,
+1362,
+779
+],
+"uc": 27
+},
+{
+"page": 26,
+"seat": "general",
+"ward": 3,
+"name": "SYED ZEESHAN AHMED",
+"box": [
+1026,
+779,
+1362,
+868
+],
+"uc": 27
+},
+{
+"page": 26,
+"seat": "general",
+"ward": 4,
+"name": "JAWAD AHMED",
+"box": [
+1026,
+868,
+1362,
+960
+],
+"uc": 27
+},
+{
+"page": 26,
+"seat": "general",
+"ward": 5,
+"name": "ZOHAIB TAJ KHAN",
+"box": [
+1026,
+960,
+1362,
+1061
+],
+"uc": 27
+},
+{
+"page": 26,
+"seat": "general",
+"ward": 6,
+"name": "AWAIS MUBARIK",
+"box": [
+1026,
+1061,
+1362,
+1148
+],
+"uc": 27
+},
+{
+"page": 26,
+"seat": "woman",
+"ward": 1,
+"name": "RABIA HUSSAIN",
+"box": [
+1026,
+1148,
+1362,
+1248
+],
+"uc": 27
+},
+{
+"page": 26,
+"seat": "woman",
+"ward": 2,
+"name": "SOFIA YASMEEN",
+"box": [
+1026,
+1248,
+1362,
+1339
+],
+"uc": 27
+},
+{
+"page": 26,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MUHAMMAD TAMOOR",
+"box": [
+1026,
+1339,
+1362,
+1419
+],
+"uc": 27
+},
+{
+"page": 26,
+"seat": "youth",
+"ward": null,
+"name": "SAAD AHMED KHAN",
+"box": [
+1026,
+1419,
+1362,
+1506
+],
+"uc": 27
+},
+{
+"page": 27,
+"seat": "non_muslim",
+"ward": null,
+"name": "SHAZIA ISHTIAQ",
+"box": [
+1032,
+485,
+1368,
+587
+],
+"uc": 27
+},
+{
+"page": 27,
+"seat": "chairman",
+"ward": null,
+"name": "FAWZIA ARSHAD",
+"box": [
+1032,
+587,
+1368,
+696
+],
+"uc": 28
+},
+{
+"page": 27,
+"seat": "vice_chairman",
+"ward": null,
+"name": "AMJAD MEHMOOD MIAN",
+"box": [
+1032,
+696,
+1368,
+771
+],
+"uc": 28
+},
+{
+"page": 27,
+"seat": "general",
+"ward": 1,
+"name": "SABA AFZAL",
+"box": [
+1032,
+771,
+1368,
+834
+],
+"uc": 28
+},
+{
+"page": 27,
+"seat": "general",
+"ward": 2,
+"name": "FAZAL RABI",
+"box": [
+1032,
+834,
+1368,
+932
+],
+"uc": 28
+},
+{
+"page": 27,
+"seat": "general",
+"ward": 3,
+"name": "SHAHRAM YOUSAF KHAN",
+"box": [
+1032,
+932,
+1368,
+1000
+],
+"uc": 28
+},
+{
+"page": 27,
+"seat": "general",
+"ward": 4,
+"name": "RIAZ MASIH",
+"box": [
+1032,
+1000,
+1368,
+1089
+],
+"uc": 28
+},
+{
+"page": 27,
+"seat": "general",
+"ward": 5,
+"name": "ZIA SARWAR",
+"box": [
+1032,
+1089,
+1368,
+1184
+],
+"uc": 28
+},
+{
+"page": 27,
+"seat": "general",
+"ward": 6,
+"name": "INAMULLAH",
+"box": [
+1032,
+1184,
+1368,
+1289
+],
+"uc": 28
+},
+{
+"page": 27,
+"seat": "woman",
+"ward": 1,
+"name": "NIGHAT SAEED",
+"box": [
+1032,
+1289,
+1368,
+1398
+],
+"uc": 28
+},
+{
+"page": 27,
+"seat": "woman",
+"ward": 2,
+"name": "SANA WILSON",
+"box": [
+1032,
+1398,
+1368,
+1487
+],
+"uc": 28
+},
+{
+"page": 28,
+"seat": "peasant_worker",
+"ward": null,
+"name": "ARSHAD RAHIM",
+"box": [
+1023,
+480,
+1358,
+570
+],
+"uc": 28
+},
+{
+"page": 28,
+"seat": "youth",
+"ward": null,
+"name": "ADNAN MORIS",
+"box": [
+1023,
+570,
+1358,
+636
+],
+"uc": 28
+},
+{
+"page": 28,
+"seat": "non_muslim",
+"ward": null,
+"name": "SHEZAN DANIEL",
+"box": [
+1023,
+636,
+1358,
+859
+],
+"uc": 28
+},
+{
+"page": 28,
+"seat": "chairman",
+"ward": null,
+"name": "KHURRAM BAKHTIAR",
+"box": [
+1023,
+859,
+1358,
+931
+],
+"uc": 29
+},
+{
+"page": 28,
+"seat": "vice_chairman",
+"ward": null,
+"name": "SEMI AIZDI",
+"box": [
+1023,
+931,
+1358,
+1030
+],
+"uc": 29
+},
+{
+"page": 28,
+"seat": "general",
+"ward": 1,
+"name": "USMAN AYUB QURESHI",
+"box": [
+1023,
+1030,
+1358,
+1117
+],
+"uc": 29
+},
+{
+"page": 28,
+"seat": "general",
+"ward": 2,
+"name": "AFZAL KHAN",
+"box": [
+1023,
+1117,
+1358,
+1190
+],
+"uc": 29
+},
+{
+"page": 28,
+"seat": "general",
+"ward": 3,
+"name": "FAYYAZ AHMAD",
+"box": [
+1023,
+1190,
+1358,
+1274
+],
+"uc": 29
+},
+{
+"page": 28,
+"seat": "general",
+"ward": 4,
+"name": "SHEIKH ZAHID HUSSAIN",
+"box": [
+1023,
+1274,
+1358,
+1375
+],
+"uc": 29
+},
+{
+"page": 28,
+"seat": "general",
+"ward": 5,
+"name": "NASEEM ALI KHAN",
+"box": [
+1023,
+1375,
+1358,
+1460
+],
+"uc": 29
+},
+{
+"page": 29,
+"seat": "general",
+"ward": 6,
+"name": "ATLAS HUSSAIN SHAH",
+"box": [
+1030,
+494,
+1366,
+571
+],
+"uc": 29
+},
+{
+"page": 29,
+"seat": "woman",
+"ward": 1,
+"name": "SEMA DURRANI",
+"box": [
+1030,
+571,
+1366,
+651
+],
+"uc": 29
+},
+{
+"page": 29,
+"seat": "woman",
+"ward": 2,
+"name": "AMNA ALI",
+"box": [
+1030,
+651,
+1366,
+728
+],
+"uc": 29
+},
+{
+"page": 29,
+"seat": "peasant_worker",
+"ward": null,
+"name": "SYED IMRAN ABBAS KAZMI",
+"box": [
+1030,
+728,
+1366,
+796
+],
+"uc": 29
+},
+{
+"page": 29,
+"seat": "youth",
+"ward": null,
+"name": "SHEHRYAR ASHRAF",
+"box": [
+1030,
+796,
+1366,
+903
+],
+"uc": 29
+},
+{
+"page": 29,
+"seat": "non_muslim",
+"ward": null,
+"name": "SHAHID MAQBOOL ALAM",
+"box": [
+1030,
+903,
+1366,
+971
+],
+"uc": 29
+},
+{
+"page": 29,
+"seat": "chairman",
+"ward": null,
+"name": "MUHAMMAD NAEEM ALI",
+"box": [
+1030,
+971,
+1366,
+1043
+],
+"uc": 30
+},
+{
+"page": 29,
+"seat": "vice_chairman",
+"ward": null,
+"name": "NADIM IQBAL",
+"box": [
+1030,
+1043,
+1366,
+1108
+],
+"uc": 30
+},
+{
+"page": 29,
+"seat": "general",
+"ward": 1,
+"name": "SHOUKAT ALI",
+"box": [
+1030,
+1108,
+1366,
+1199
+],
+"uc": 30
+},
+{
+"page": 29,
+"seat": "general",
+"ward": 2,
+"name": "SAMI ULLAH",
+"box": [
+1030,
+1199,
+1366,
+1293
+],
+"uc": 30
+},
+{
+"page": 29,
+"seat": "general",
+"ward": 3,
+"name": "YASIR ALI SHAH",
+"box": [
+1030,
+1293,
+1366,
+1379
+],
+"uc": 30
+},
+{
+"page": 29,
+"seat": "general",
+"ward": 4,
+"name": "MUHAMMAD MUZAMMIL",
+"box": [
+1030,
+1379,
+1366,
+1447
+],
+"uc": 30
+},
+{
+"page": 30,
+"seat": "general",
+"ward": 5,
+"name": "MUHAMMAD NOUMAN",
+"box": [
+1033,
+488,
+1370,
+586
+],
+"uc": 30
+},
+{
+"page": 30,
+"seat": "general",
+"ward": 6,
+"name": "MAJID AHTER",
+"box": [
+1033,
+586,
+1370,
+696
+],
+"uc": 30
+},
+{
+"page": 30,
+"seat": "woman",
+"ward": 1,
+"name": "RIFFAT NAHEED",
+"box": [
+1033,
+696,
+1370,
+801
+],
+"uc": 30
+},
+{
+"page": 30,
+"seat": "woman",
+"ward": 2,
+"name": "UZMA BIBI",
+"box": [
+1033,
+801,
+1370,
+871
+],
+"uc": 30
+},
+{
+"page": 30,
+"seat": "peasant_worker",
+"ward": null,
+"name": "SYED ARMAN HAYDER NAQVI",
+"box": [
+1033,
+871,
+1370,
+972
+],
+"uc": 30
+},
+{
+"page": 30,
+"seat": "youth",
+"ward": null,
+"name": "NOUMAN ALI SAJID",
+"box": [
+1033,
+972,
+1370,
+1047
+],
+"uc": 30
+},
+{
+"page": 30,
+"seat": "non_muslim",
+"ward": null,
+"name": "SALEEM MASIH",
+"box": [
+1033,
+1047,
+1370,
+1117
+],
+"uc": 30
+},
+{
+"page": 30,
+"seat": "chairman",
+"ward": null,
+"name": "AHMAD KHAN",
+"box": [
+1033,
+1117,
+1370,
+1231
+],
+"uc": 31
+},
+{
+"page": 30,
+"seat": "vice_chairman",
+"ward": null,
+"name": "ZAHID MEHMOOD",
+"box": [
+1033,
+1231,
+1370,
+1315
+],
+"uc": 31
+},
+{
+"page": 30,
+"seat": "general",
+"ward": 1,
+"name": "SAFEER MUHAMMAD",
+"box": [
+1033,
+1315,
+1370,
+1383
+],
+"uc": 31
+},
+{
+"page": 30,
+"seat": "general",
+"ward": 2,
+"name": "KHALID NASEER",
+"box": [
+1033,
+1383,
+1370,
+1475
+],
+"uc": 31
+},
+{
+"page": 31,
+"seat": "general",
+"ward": 3,
+"name": "ABDUL BASIT",
+"box": [
+1008,
+489,
+1337,
+572
+],
+"uc": 31
+},
+{
+"page": 31,
+"seat": "general",
+"ward": 4,
+"name": "TOUQEER GILL",
+"box": [
+1008,
+572,
+1337,
+657
+],
+"uc": 31
+},
+{
+"page": 31,
+"seat": "general",
+"ward": 5,
+"name": "GUL RAZZAQ",
+"box": [
+1008,
+657,
+1337,
+754
+],
+"uc": 31
+},
+{
+"page": 31,
+"seat": "general",
+"ward": 6,
+"name": "MALIK MUHAMMAD ASIM RAZA",
+"box": [
+1008,
+754,
+1337,
+821
+],
+"uc": 31
+},
+{
+"page": 31,
+"seat": "woman",
+"ward": 1,
+"name": "BIBI HALEEMA",
+"box": [
+1008,
+821,
+1337,
+915
+],
+"uc": 31
+},
+{
+"page": 31,
+"seat": "woman",
+"ward": 2,
+"name": "ABIDA ASHFAQ",
+"box": [
+1008,
+915,
+1337,
+1029
+],
+"uc": 31
+},
+{
+"page": 31,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MUHAMMAD JUNAID",
+"box": [
+1008,
+1029,
+1337,
+1119
+],
+"uc": 31
+},
+{
+"page": 31,
+"seat": "youth",
+"ward": null,
+"name": "FAHAD BIN NAEEM",
+"box": [
+1008,
+1119,
+1337,
+1216
+],
+"uc": 31
+},
+{
+"page": 31,
+"seat": "non_muslim",
+"ward": null,
+"name": "AMEEN LATIF",
+"box": [
+1008,
+1216,
+1337,
+1313
+],
+"uc": 31
+},
+{
+"page": 31,
+"seat": "chairman",
+"ward": null,
+"name": "MUHAMMAD MUNIR ASHRAF",
+"box": [
+1008,
+1313,
+1337,
+1383
+],
+"uc": 32
+},
+{
+"page": 31,
+"seat": "vice_chairman",
+"ward": null,
+"name": "IKHLQ AHMAD ADVOCATE",
+"box": [
+1008,
+1383,
+1337,
+1470
+],
+"uc": 32
+},
+{
+"page": 32,
+"seat": "general",
+"ward": 1,
+"name": "MUHAMMAD IQBAL KHATTAK",
+"box": [
+1031,
+486,
+1367,
+598
+],
+"uc": 32
+},
+{
+"page": 32,
+"seat": "general",
+"ward": 2,
+"name": "TARIQ BIN AZAD",
+"box": [
+1031,
+598,
+1367,
+705
+],
+"uc": 32
+},
+{
+"page": 32,
+"seat": "general",
+"ward": 3,
+"name": "ZAHID MASOOD",
+"box": [
+1031,
+705,
+1367,
+813
+],
+"uc": 32
+},
+{
+"page": 32,
+"seat": "general",
+"ward": 4,
+"name": "SHAHID MASIH",
+"box": [
+1031,
+813,
+1367,
+927
+],
+"uc": 32
+},
+{
+"page": 32,
+"seat": "general",
+"ward": 5,
+"name": "WAQAR HUSSAIN",
+"box": [
+1031,
+927,
+1367,
+1023
+],
+"uc": 32
+},
+{
+"page": 32,
+"seat": "general",
+"ward": 6,
+"name": "IHTSHAM WAHEED SATTI",
+"box": [
+1031,
+1023,
+1367,
+1136
+],
+"uc": 32
+},
+{
+"page": 32,
+"seat": "woman",
+"ward": 1,
+"name": "JAMEELA AKHTER",
+"box": [
+1031,
+1136,
+1367,
+1233
+],
+"uc": 32
+},
+{
+"page": 32,
+"seat": "woman",
+"ward": 2,
+"name": "AYESHA BIBI",
+"box": [
+1031,
+1233,
+1367,
+1326
+],
+"uc": 32
+},
+{
+"page": 32,
+"seat": "peasant_worker",
+"ward": null,
+"name": "ASLAM KHAN",
+"box": [
+1031,
+1326,
+1367,
+1423
+],
+"uc": 32
+},
+{
+"page": 32,
+"seat": "youth",
+"ward": null,
+"name": "MUHAMMAD KAMRAN YOUSAF",
+"box": [
+1031,
+1423,
+1367,
+1491
+],
+"uc": 32
+},
+{
+"page": 33,
+"seat": "non_muslim",
+"ward": null,
+"name": "YOUSAF MASIH",
+"box": [
+1026,
+493,
+1363,
+616
+],
+"uc": 32
+},
+{
+"page": 33,
+"seat": "chairman",
+"ward": null,
+"name": "RAJA WAHEED ULLAH HASAN",
+"box": [
+1026,
+616,
+1363,
+707
+],
+"uc": 33
+},
+{
+"page": 33,
+"seat": "vice_chairman",
+"ward": null,
+"name": "SYED MATIN TAHIR",
+"box": [
+1026,
+707,
+1363,
+815
+],
+"uc": 33
+},
+{
+"page": 33,
+"seat": "general",
+"ward": 1,
+"name": "JAVED VEERU MASIH",
+"box": [
+1026,
+815,
+1363,
+910
+],
+"uc": 33
+},
+{
+"page": 33,
+"seat": "general",
+"ward": 2,
+"name": "ABDUR REHMAN",
+"box": [
+1026,
+910,
+1363,
+1006
+],
+"uc": 33
+},
+{
+"page": 33,
+"seat": "general",
+"ward": 3,
+"name": "JAHANZAIB AJAIB",
+"box": [
+1026,
+1006,
+1363,
+1119
+],
+"uc": 33
+},
+{
+"page": 33,
+"seat": "general",
+"ward": 4,
+"name": "MUHAMMAD SHAHBAZ GHAFFAR",
+"box": [
+1026,
+1119,
+1363,
+1222
+],
+"uc": 33
+},
+{
+"page": 33,
+"seat": "general",
+"ward": 5,
+"name": "MUHAMMAD IKRAM ULLAH",
+"box": [
+1026,
+1222,
+1363,
+1291
+],
+"uc": 33
+},
+{
+"page": 33,
+"seat": "general",
+"ward": 6,
+"name": "KHURRAM WALI",
+"box": [
+1026,
+1291,
+1363,
+1381
+],
+"uc": 33
+},
+{
+"page": 33,
+"seat": "woman",
+"ward": 1,
+"name": "SHAHIDA BIBI",
+"box": [
+1026,
+1381,
+1363,
+1480
+],
+"uc": 33
+},
+{
+"page": 34,
+"seat": "woman",
+"ward": 2,
+"name": "YASMIN AMJAD",
+"box": [
+1029,
+483,
+1366,
+562
+],
+"uc": 33
+},
+{
+"page": 34,
+"seat": "peasant_worker",
+"ward": null,
+"name": "SHAHZAD SAFDAR",
+"box": [
+1029,
+562,
+1366,
+667
+],
+"uc": 33
+},
+{
+"page": 34,
+"seat": "youth",
+"ward": null,
+"name": "HAMZA IQBAL AWAN",
+"box": [
+1029,
+667,
+1366,
+736
+],
+"uc": 33
+},
+{
+"page": 34,
+"seat": "non_muslim",
+"ward": null,
+"name": "CH. GULZAR MAISH",
+"box": [
+1029,
+736,
+1366,
+820
+],
+"uc": 33
+},
+{
+"page": 34,
+"seat": "chairman",
+"ward": null,
+"name": "MALIK SAJJAD",
+"box": [
+1029,
+820,
+1366,
+892
+],
+"uc": 34
+},
+{
+"page": 34,
+"seat": "vice_chairman",
+"ward": null,
+"name": "HAJI NISAR AHMAD LANGAH",
+"box": [
+1029,
+892,
+1366,
+960
+],
+"uc": 34
+},
+{
+"page": 34,
+"seat": "general",
+"ward": 1,
+"name": "AMIR TUFAIL ABBASI",
+"box": [
+1029,
+960,
+1366,
+1040
+],
+"uc": 34
+},
+{
+"page": 34,
+"seat": "general",
+"ward": 2,
+"name": "FARHAN ULLAH JAN",
+"box": [
+1029,
+1040,
+1366,
+1134
+],
+"uc": 34
+},
+{
+"page": 34,
+"seat": "general",
+"ward": 3,
+"name": "MUHAMMAD IDREES",
+"box": [
+1029,
+1134,
+1366,
+1222
+],
+"uc": 34
+},
+{
+"page": 34,
+"seat": "general",
+"ward": 4,
+"name": "SHAHID ULLAH",
+"box": [
+1029,
+1222,
+1366,
+1318
+],
+"uc": 34
+},
+{
+"page": 34,
+"seat": "general",
+"ward": 5,
+"name": "ROMAN ALI KHATTAK",
+"box": [
+1029,
+1318,
+1366,
+1379
+],
+"uc": 34
+},
+{
+"page": 34,
+"seat": "general",
+"ward": 6,
+"name": "GHULAM NABI AWAN",
+"box": [
+1029,
+1379,
+1366,
+1481
+],
+"uc": 34
+},
+{
+"page": 35,
+"seat": "woman",
+"ward": 1,
+"name": "SAFEENA IBRAHIM",
+"box": [
+1038,
+483,
+1373,
+576
+],
+"uc": 34
+},
+{
+"page": 35,
+"seat": "woman",
+"ward": 2,
+"name": "GHAZALA",
+"box": [
+1038,
+576,
+1373,
+676
+],
+"uc": 34
+},
+{
+"page": 35,
+"seat": "peasant_worker",
+"ward": null,
+"name": "BILAL",
+"box": [
+1038,
+676,
+1373,
+754
+],
+"uc": 34
+},
+{
+"page": 35,
+"seat": "youth",
+"ward": null,
+"name": "MOHSIN ZULFIQAR",
+"box": [
+1038,
+754,
+1373,
+861
+],
+"uc": 34
+},
+{
+"page": 35,
+"seat": "non_muslim",
+"ward": null,
+"name": "AUGUSTIN SARFRAZ GIL",
+"box": [
+1038,
+861,
+1373,
+939
+],
+"uc": 34
+},
+{
+"page": 35,
+"seat": "chairman",
+"ward": null,
+"name": "MUHAMMAD RAFIQ",
+"box": [
+1038,
+939,
+1373,
+1016
+],
+"uc": 35
+},
+{
+"page": 35,
+"seat": "vice_chairman",
+"ward": null,
+"name": "ABDUL HAKEEM",
+"box": [
+1038,
+1016,
+1373,
+1088
+],
+"uc": 35
+},
+{
+"page": 35,
+"seat": "general",
+"ward": 1,
+"name": "MIAN MUHAMMAD RIZWAN",
+"box": [
+1038,
+1088,
+1373,
+1157
+],
+"uc": 35
+},
+{
+"page": 35,
+"seat": "general",
+"ward": 2,
+"name": "RAHMAT ULLAH",
+"box": [
+1038,
+1157,
+1373,
+1231
+],
+"uc": 35
+},
+{
+"page": 35,
+"seat": "general",
+"ward": 3,
+"name": "TARIQ MEHMOOD LODHI",
+"box": [
+1038,
+1231,
+1373,
+1310
+],
+"uc": 35
+},
+{
+"page": 35,
+"seat": "general",
+"ward": 4,
+"name": "MIAN MUHAMMAD SHAKEEL AKHTER",
+"box": [
+1038,
+1310,
+1373,
+1378
+],
+"uc": 35
+},
+{
+"page": 35,
+"seat": "general",
+"ward": 5,
+"name": "MUHAMMAD SULEMAN",
+"box": [
+1038,
+1378,
+1373,
+1476
+],
+"uc": 35
+},
+{
+"page": 36,
+"seat": "general",
+"ward": 6,
+"name": "RANA MUHAMMAD ZESHAN",
+"box": [
+1038,
+481,
+1375,
+550
+],
+"uc": 35
+},
+{
+"page": 36,
+"seat": "woman",
+"ward": 1,
+"name": "SADIA ASMAT",
+"box": [
+1038,
+550,
+1375,
+617
+],
+"uc": 35
+},
+{
+"page": 36,
+"seat": "woman",
+"ward": 2,
+"name": "SHAZIA RAUF ABBASI",
+"box": [
+1038,
+617,
+1375,
+700
+],
+"uc": 35
+},
+{
+"page": 36,
+"seat": "peasant_worker",
+"ward": null,
+"name": "SYED SAJJAD PRINCE",
+"box": [
+1038,
+700,
+1375,
+775
+],
+"uc": 35
+},
+{
+"page": 36,
+"seat": "youth",
+"ward": null,
+"name": "MUBASHIR ZAFAR",
+"box": [
+1038,
+775,
+1375,
+869
+],
+"uc": 35
+},
+{
+"page": 36,
+"seat": "non_muslim",
+"ward": null,
+"name": "PERVAIZ MASIH",
+"box": [
+1038,
+869,
+1375,
+990
+],
+"uc": 35
+},
+{
+"page": 36,
+"seat": "chairman",
+"ward": null,
+"name": "FAISAL NADEEM",
+"box": [
+1038,
+990,
+1375,
+1062
+],
+"uc": 36
+},
+{
+"page": 36,
+"seat": "vice_chairman",
+"ward": null,
+"name": "SHAHBAZ SHARIF",
+"box": [
+1038,
+1062,
+1375,
+1136
+],
+"uc": 36
+},
+{
+"page": 36,
+"seat": "general",
+"ward": 1,
+"name": "MUHAMMAD ISHTIAQ",
+"box": [
+1038,
+1136,
+1375,
+1219
+],
+"uc": 36
+},
+{
+"page": 36,
+"seat": "general",
+"ward": 2,
+"name": "MAJID UR REHMAN",
+"box": [
+1038,
+1219,
+1375,
+1296
+],
+"uc": 36
+},
+{
+"page": 36,
+"seat": "general",
+"ward": 3,
+"name": "TEHZEEB UL HASSAN",
+"box": [
+1038,
+1296,
+1375,
+1386
+],
+"uc": 36
+},
+{
+"page": 36,
+"seat": "general",
+"ward": 4,
+"name": "CH. TARIQ SULEMAN",
+"box": [
+1038,
+1386,
+1375,
+1458
+],
+"uc": 36
+},
+{
+"page": 37,
+"seat": "general",
+"ward": 5,
+"name": "SAJJAD HAIDER",
+"box": [
+1031,
+473,
+1366,
+574
+],
+"uc": 36
+},
+{
+"page": 37,
+"seat": "general",
+"ward": 6,
+"name": "MUHAMMAD QAMAR KIANI",
+"box": [
+1031,
+574,
+1366,
+644
+],
+"uc": 36
+},
+{
+"page": 37,
+"seat": "woman",
+"ward": 1,
+"name": "KHALIDA PARVEEN",
+"box": [
+1031,
+644,
+1366,
+728
+],
+"uc": 36
+},
+{
+"page": 37,
+"seat": "woman",
+"ward": 2,
+"name": "FARHAT YASMEEN",
+"box": [
+1031,
+728,
+1366,
+799
+],
+"uc": 36
+},
+{
+"page": 37,
+"seat": "peasant_worker",
+"ward": null,
+"name": "AFTAB HUSSAIN SHAH",
+"box": [
+1031,
+799,
+1366,
+867
+],
+"uc": 36
+},
+{
+"page": 37,
+"seat": "youth",
+"ward": null,
+"name": "MUHAMMAD NOUMAN HAFEEZ",
+"box": [
+1031,
+867,
+1366,
+935
+],
+"uc": 36
+},
+{
+"page": 37,
+"seat": "non_muslim",
+"ward": null,
+"name": "ASIF SADIQ SANDHOO",
+"box": [
+1031,
+935,
+1366,
+1017
+],
+"uc": 36
+},
+{
+"page": 37,
+"seat": "chairman",
+"ward": null,
+"name": "MALIK SAJID MEHMOOD",
+"box": [
+1031,
+1017,
+1366,
+1089
+],
+"uc": 37
+},
+{
+"page": 37,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MUHAMMAD ATIQ UR REHMAN",
+"box": [
+1031,
+1089,
+1366,
+1185
+],
+"uc": 37
+},
+{
+"page": 37,
+"seat": "general",
+"ward": 1,
+"name": "SYED IRFAN AHMED SHAH",
+"box": [
+1031,
+1185,
+1366,
+1254
+],
+"uc": 37
+},
+{
+"page": 37,
+"seat": "general",
+"ward": 2,
+"name": "SAQIB HUSSAIN RAJA",
+"box": [
+1031,
+1254,
+1366,
+1329
+],
+"uc": 37
+},
+{
+"page": 37,
+"seat": "general",
+"ward": 3,
+"name": "MIAN IRFAN ALI SHAH KAKA KHEL",
+"box": [
+1031,
+1329,
+1366,
+1397
+],
+"uc": 37
+},
+{
+"page": 37,
+"seat": "general",
+"ward": 4,
+"name": "MUHAMMAD TANVEER",
+"box": [
+1031,
+1397,
+1366,
+1496
+],
+"uc": 37
+},
+{
+"page": 38,
+"seat": "general",
+"ward": 5,
+"name": "ABDUL HASNAT AHMAD",
+"box": [
+1018,
+466,
+1353,
+572
+],
+"uc": 37
+},
+{
+"page": 38,
+"seat": "general",
+"ward": 6,
+"name": "SYED MUHAMMAD HASSAN ANSAR",
+"box": [
+1018,
+572,
+1353,
+641
+],
+"uc": 37
+},
+{
+"page": 38,
+"seat": "woman",
+"ward": 1,
+"name": "GHULAM FATIMA",
+"box": [
+1018,
+641,
+1353,
+718
+],
+"uc": 37
+},
+{
+"page": 38,
+"seat": "woman",
+"ward": 2,
+"name": "UROOJ FATIMA",
+"box": [
+1018,
+718,
+1353,
+803
+],
+"uc": 37
+},
+{
+"page": 38,
+"seat": "peasant_worker",
+"ward": null,
+"name": "NAZAKAT ALI CHANNAR",
+"box": [
+1018,
+803,
+1353,
+904
+],
+"uc": 37
+},
+{
+"page": 38,
+"seat": "youth",
+"ward": null,
+"name": "DANIAL ABBASI",
+"box": [
+1018,
+904,
+1353,
+983
+],
+"uc": 37
+},
+{
+"page": 38,
+"seat": "non_muslim",
+"ward": null,
+"name": "ANWAR IQBAL",
+"box": [
+1018,
+983,
+1353,
+1127
+],
+"uc": 37
+},
+{
+"page": 38,
+"seat": "chairman",
+"ward": null,
+"name": "TANVEER HUSSAIN",
+"box": [
+1018,
+1127,
+1353,
+1236
+],
+"uc": 38
+},
+{
+"page": 38,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MIAN BASHARAT ULLAH",
+"box": [
+1018,
+1236,
+1353,
+1342
+],
+"uc": 38
+},
+{
+"page": 38,
+"seat": "general",
+"ward": 1,
+"name": "MUHAMMAD ALI SIAL",
+"box": [
+1018,
+1342,
+1353,
+1424
+],
+"uc": 38
+},
+{
+"page": 38,
+"seat": "general",
+"ward": 2,
+"name": "SULTAN TAHIR",
+"box": [
+1018,
+1424,
+1353,
+1514
+],
+"uc": 38
+},
+{
+"page": 39,
+"seat": "general",
+"ward": 3,
+"name": "HAMID MALIK",
+"box": [
+1026,
+462,
+1359,
+542
+],
+"uc": 38
+},
+{
+"page": 39,
+"seat": "general",
+"ward": 4,
+"name": "JAHAN ZEB",
+"box": [
+1026,
+542,
+1359,
+604
+],
+"uc": 38
+},
+{
+"page": 39,
+"seat": "general",
+"ward": 5,
+"name": "NAZAR SHABBIR",
+"box": [
+1026,
+604,
+1359,
+692
+],
+"uc": 38
+},
+{
+"page": 39,
+"seat": "general",
+"ward": 6,
+"name": "SHABBIR AHMED BAIG",
+"box": [
+1026,
+692,
+1359,
+776
+],
+"uc": 38
+},
+{
+"page": 39,
+"seat": "woman",
+"ward": 1,
+"name": "SADAF NAVEED",
+"box": [
+1026,
+776,
+1359,
+868
+],
+"uc": 38
+},
+{
+"page": 39,
+"seat": "woman",
+"ward": 2,
+"name": "NAHEED SIDDIQUE",
+"box": [
+1026,
+868,
+1359,
+955
+],
+"uc": 38
+},
+{
+"page": 39,
+"seat": "peasant_worker",
+"ward": null,
+"name": "KHAN SHAFIQ UR REHMAN",
+"box": [
+1026,
+955,
+1359,
+1025
+],
+"uc": 38
+},
+{
+"page": 39,
+"seat": "youth",
+"ward": null,
+"name": "MUHAMMAD SIBTAIN SAQIB",
+"box": [
+1026,
+1025,
+1359,
+1094
+],
+"uc": 38
+},
+{
+"page": 39,
+"seat": "non_muslim",
+"ward": null,
+"name": "MUKHTAR MASEH",
+"box": [
+1026,
+1094,
+1359,
+1207
+],
+"uc": 38
+},
+{
+"page": 39,
+"seat": "chairman",
+"ward": null,
+"name": "SAJID MEHMOOD",
+"box": [
+1026,
+1207,
+1359,
+1281
+],
+"uc": 39
+},
+{
+"page": 39,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MUHAMMAD IQBAL",
+"box": [
+1026,
+1281,
+1359,
+1352
+],
+"uc": 39
+},
+{
+"page": 39,
+"seat": "general",
+"ward": 1,
+"name": "NASEER AHMED",
+"box": [
+1026,
+1352,
+1359,
+1420
+],
+"uc": 39
+},
+{
+"page": 39,
+"seat": "general",
+"ward": 2,
+"name": "MUHAMMAD RAZIQ",
+"box": [
+1026,
+1420,
+1359,
+1508
+],
+"uc": 39
+},
+{
+"page": 40,
+"seat": "general",
+"ward": 3,
+"name": "ALLAH DAD",
+"box": [
+1035,
+464,
+1380,
+530
+],
+"uc": 39
+},
+{
+"page": 40,
+"seat": "general",
+"ward": 4,
+"name": "SHABBIR AHMED",
+"box": [
+1035,
+558,
+1380,
+623
+],
+"uc": 39
+},
+{
+"page": 40,
+"seat": "general",
+"ward": 5,
+"name": "WAQAR AHMED MALIK",
+"box": [
+1035,
+639,
+1380,
+705
+],
+"uc": 39
+},
+{
+"page": 40,
+"seat": "general",
+"ward": 6,
+"name": "MUHAMMAD NAWAZ",
+"box": [
+1035,
+721,
+1380,
+787
+],
+"uc": 39
+},
+{
+"page": 40,
+"seat": "woman",
+"ward": 1,
+"name": "NIGHAT AFZAL",
+"box": [
+1035,
+803,
+1380,
+869
+],
+"uc": 39
+},
+{
+"page": 40,
+"seat": "woman",
+"ward": 2,
+"name": "SAMINA MALIK",
+"box": [
+1035,
+873,
+1380,
+939
+],
+"uc": 39
+},
+{
+"page": 40,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MALIK ADNAN",
+"box": [
+1035,
+950,
+1380,
+1015
+],
+"uc": 39
+},
+{
+"page": 40,
+"seat": "youth",
+"ward": null,
+"name": "BABAR HUSSAIN",
+"box": [
+1035,
+1026,
+1380,
+1091
+],
+"uc": 39
+},
+{
+"page": 40,
+"seat": "non_muslim",
+"ward": null,
+"name": "SALAMAT MASIH",
+"box": [
+1035,
+1096,
+1380,
+1161
+],
+"uc": 39
+},
+{
+"page": 40,
+"seat": "chairman",
+"ward": null,
+"name": "ALI NAWAZ AWAN",
+"box": [
+1035,
+1157,
+1380,
+1222
+],
+"uc": 40
+},
+{
+"page": 40,
+"seat": "vice_chairman",
+"ward": null,
+"name": "HAIDER BIN MASOOD",
+"box": [
+1035,
+1216,
+1380,
+1282
+],
+"uc": 40
+},
+{
+"page": 40,
+"seat": "general",
+"ward": 1,
+"name": "ASIF MAHMOOD",
+"box": [
+1035,
+1277,
+1380,
+1343
+],
+"uc": 40
+},
+{
+"page": 40,
+"seat": "general",
+"ward": 2,
+"name": "MUHAMMAD AFZAL NAZ",
+"box": [
+1035,
+1347,
+1380,
+1413
+],
+"uc": 40
+},
+{
+"page": 40,
+"seat": "general",
+"ward": 3,
+"name": "BABAR MURTAZA AWAN",
+"box": [
+1035,
+1423,
+1380,
+1489
+],
+"uc": 40
+},
+{
+"page": 41,
+"seat": "general",
+"ward": 4,
+"name": "HASSAN MUKHTAR",
+"box": [
+1032,
+442,
+1367,
+518
+],
+"uc": 40
+},
+{
+"page": 41,
+"seat": "general",
+"ward": 5,
+"name": "UMER SULTAN",
+"box": [
+1032,
+518,
+1367,
+567
+],
+"uc": 40
+},
+{
+"page": 41,
+"seat": "general",
+"ward": 6,
+"name": "RAHEEL AKHTER",
+"box": [
+1032,
+567,
+1367,
+641
+],
+"uc": 40
+},
+{
+"page": 41,
+"seat": "woman",
+"ward": 1,
+"name": "REHANA BABAR",
+"box": [
+1032,
+641,
+1367,
+690
+],
+"uc": 40
+},
+{
+"page": 41,
+"seat": "woman",
+"ward": 2,
+"name": "TAYYABA IBRAHIM",
+"box": [
+1032,
+690,
+1367,
+759
+],
+"uc": 40
+},
+{
+"page": 41,
+"seat": "peasant_worker",
+"ward": null,
+"name": "ZIA ZAMAN SHINWARI",
+"box": [
+1032,
+759,
+1367,
+844
+],
+"uc": 40
+},
+{
+"page": 41,
+"seat": "youth",
+"ward": null,
+"name": "UMAIR AHMED KHAN",
+"box": [
+1032,
+844,
+1367,
+922
+],
+"uc": 40
+},
+{
+"page": 41,
+"seat": "non_muslim",
+"ward": null,
+"name": "DILAWAR MASIH",
+"box": [
+1032,
+922,
+1367,
+984
+],
+"uc": 40
+},
+{
+"page": 41,
+"seat": "chairman",
+"ward": null,
+"name": "SARDAR MEHTAB AHMED KHAN",
+"box": [
+1032,
+984,
+1367,
+1080
+],
+"uc": 41
+},
+{
+"page": 41,
+"seat": "vice_chairman",
+"ward": null,
+"name": "NAVEED ANJUM ABBASI",
+"box": [
+1032,
+1080,
+1367,
+1161
+],
+"uc": 41
+},
+{
+"page": 41,
+"seat": "general",
+"ward": 1,
+"name": "HABIB ULLAH KHAN",
+"box": [
+1032,
+1161,
+1367,
+1223
+],
+"uc": 41
+},
+{
+"page": 41,
+"seat": "general",
+"ward": 2,
+"name": "IMRAN JAVED AWAN",
+"box": [
+1032,
+1223,
+1367,
+1293
+],
+"uc": 41
+},
+{
+"page": 41,
+"seat": "general",
+"ward": 3,
+"name": "SOHAIL NAWAZ",
+"box": [
+1032,
+1293,
+1367,
+1373
+],
+"uc": 41
+},
+{
+"page": 41,
+"seat": "general",
+"ward": 4,
+"name": "KHALID NAWAZ",
+"box": [
+1032,
+1373,
+1367,
+1441
+],
+"uc": 41
+},
+{
+"page": 42,
+"seat": "general",
+"ward": 5,
+"name": "GHULAM RAZA",
+"box": [
+1028,
+446,
+1362,
+508
+],
+"uc": 41
+},
+{
+"page": 42,
+"seat": "general",
+"ward": 6,
+"name": "ATIF QUDDUS",
+"box": [
+1028,
+508,
+1362,
+570
+],
+"uc": 41
+},
+{
+"page": 42,
+"seat": "woman",
+"ward": 1,
+"name": "HASEENA ISHFAQ",
+"box": [
+1028,
+570,
+1362,
+623
+],
+"uc": 41
+},
+{
+"page": 42,
+"seat": "woman",
+"ward": 2,
+"name": "ABIDA RASHEED",
+"box": [
+1028,
+623,
+1362,
+683
+],
+"uc": 41
+},
+{
+"page": 42,
+"seat": "peasant_worker",
+"ward": null,
+"name": "SHEIKH AMIR RIAZ",
+"box": [
+1028,
+683,
+1362,
+744
+],
+"uc": 41
+},
+{
+"page": 42,
+"seat": "youth",
+"ward": null,
+"name": "ALI ABBASI",
+"box": [
+1028,
+744,
+1362,
+822
+],
+"uc": 41
+},
+{
+"page": 42,
+"seat": "chairman",
+"ward": null,
+"name": "FARMAN ALI MUGHAL",
+"box": [
+1028,
+822,
+1362,
+894
+],
+"uc": 42
+},
+{
+"page": 42,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MUHAMMAD TAHIR",
+"box": [
+1028,
+894,
+1362,
+956
+],
+"uc": 42
+},
+{
+"page": 42,
+"seat": "general",
+"ward": 1,
+"name": "SHAHID MEHMOOD",
+"box": [
+1028,
+956,
+1362,
+1031
+],
+"uc": 42
+},
+{
+"page": 42,
+"seat": "general",
+"ward": 2,
+"name": "UMAR NASEEM",
+"box": [
+1028,
+1031,
+1362,
+1101
+],
+"uc": 42
+},
+{
+"page": 42,
+"seat": "general",
+"ward": 3,
+"name": "MOHSIN ALI",
+"box": [
+1028,
+1101,
+1362,
+1186
+],
+"uc": 42
+},
+{
+"page": 42,
+"seat": "general",
+"ward": 4,
+"name": "RANA MUHAMMAD NADEEM",
+"box": [
+1028,
+1186,
+1362,
+1254
+],
+"uc": 42
+},
+{
+"page": 42,
+"seat": "general",
+"ward": 5,
+"name": "SYED TABEER HUSSAIN KAZMI",
+"box": [
+1028,
+1254,
+1362,
+1351
+],
+"uc": 42
+},
+{
+"page": 42,
+"seat": "general",
+"ward": 6,
+"name": "RAJA FAROOQ AHMED",
+"box": [
+1028,
+1351,
+1362,
+1435
+],
+"uc": 42
+},
+{
+"page": 43,
+"seat": "woman",
+"ward": 1,
+"name": "RAKHSHANDA ZAREEN",
+"box": [
+1025,
+455,
+1360,
+524
+],
+"uc": 42
+},
+{
+"page": 43,
+"seat": "woman",
+"ward": 2,
+"name": "DR. HAJMEER BIBI",
+"box": [
+1025,
+524,
+1360,
+581
+],
+"uc": 42
+},
+{
+"page": 43,
+"seat": "peasant_worker",
+"ward": null,
+"name": "ASHFAQ KHAN",
+"box": [
+1025,
+581,
+1360,
+650
+],
+"uc": 42
+},
+{
+"page": 43,
+"seat": "youth",
+"ward": null,
+"name": "RAJA NAUMAN ABBASI",
+"box": [
+1025,
+650,
+1360,
+726
+],
+"uc": 42
+},
+{
+"page": 43,
+"seat": "non_muslim",
+"ward": null,
+"name": "KASHIF IQBAL",
+"box": [
+1025,
+726,
+1360,
+781
+],
+"uc": 42
+},
+{
+"page": 43,
+"seat": "chairman",
+"ward": null,
+"name": "MUHAMMAD ISHFAQ",
+"box": [
+1025,
+781,
+1360,
+890
+],
+"uc": 43
+},
+{
+"page": 43,
+"seat": "vice_chairman",
+"ward": null,
+"name": "ZAHID MAQBOOL",
+"box": [
+1025,
+890,
+1360,
+959
+],
+"uc": 43
+},
+{
+"page": 43,
+"seat": "general",
+"ward": 1,
+"name": "MUHAMMAD YASIR",
+"box": [
+1025,
+959,
+1360,
+1040
+],
+"uc": 43
+},
+{
+"page": 43,
+"seat": "general",
+"ward": 2,
+"name": "MUHAMMAD YAQOOB KHAN",
+"box": [
+1025,
+1040,
+1360,
+1109
+],
+"uc": 43
+},
+{
+"page": 43,
+"seat": "general",
+"ward": 3,
+"name": "WAJID KHAN",
+"box": [
+1025,
+1109,
+1360,
+1186
+],
+"uc": 43
+},
+{
+"page": 43,
+"seat": "general",
+"ward": 4,
+"name": "MUHAMMAD ARIF RANA",
+"box": [
+1025,
+1186,
+1360,
+1255
+],
+"uc": 43
+},
+{
+"page": 43,
+"seat": "general",
+"ward": 5,
+"name": "RAJA SAJID SALEEM KIANI",
+"box": [
+1025,
+1255,
+1360,
+1327
+],
+"uc": 43
+},
+{
+"page": 43,
+"seat": "general",
+"ward": 6,
+"name": "ZULFIQAR MASIH",
+"box": [
+1025,
+1327,
+1360,
+1405
+],
+"uc": 43
+},
+{
+"page": 43,
+"seat": "woman",
+"ward": 1,
+"name": "TAHIRA ASIF",
+"box": [
+1025,
+1405,
+1360,
+1475
+],
+"uc": 43
+},
+{
+"page": 44,
+"seat": "woman",
+"ward": 2,
+"name": "REHANA PARVEEN",
+"box": [
+1026,
+439,
+1362,
+527
+],
+"uc": 43
+},
+{
+"page": 44,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MIAN ABDUL HANNAN AHMED",
+"box": [
+1026,
+527,
+1362,
+624
+],
+"uc": 43
+},
+{
+"page": 44,
+"seat": "youth",
+"ward": null,
+"name": "ALI WAQAS",
+"box": [
+1026,
+624,
+1362,
+701
+],
+"uc": 43
+},
+{
+"page": 44,
+"seat": "non_muslim",
+"ward": null,
+"name": "ASIF MASIH",
+"box": [
+1026,
+701,
+1362,
+809
+],
+"uc": 43
+},
+{
+"page": 44,
+"seat": "chairman",
+"ward": null,
+"name": "MUHAMMAD AFTAB",
+"box": [
+1026,
+809,
+1362,
+881
+],
+"uc": 44
+},
+{
+"page": 44,
+"seat": "vice_chairman",
+"ward": null,
+"name": "YASIR MEHBOOB",
+"box": [
+1026,
+881,
+1362,
+971
+],
+"uc": 44
+},
+{
+"page": 44,
+"seat": "general",
+"ward": 1,
+"name": "MUHAMMAD ISRAR",
+"box": [
+1026,
+971,
+1362,
+1036
+],
+"uc": 44
+},
+{
+"page": 44,
+"seat": "general",
+"ward": 2,
+"name": "SYED HABIB SHAH",
+"box": [
+1026,
+1036,
+1362,
+1136
+],
+"uc": 44
+},
+{
+"page": 44,
+"seat": "general",
+"ward": 3,
+"name": "NASIR KAHN",
+"box": [
+1026,
+1136,
+1362,
+1208
+],
+"uc": 44
+},
+{
+"page": 44,
+"seat": "general",
+"ward": 4,
+"name": "NAJAM UL GHAFFAR",
+"box": [
+1026,
+1208,
+1362,
+1287
+],
+"uc": 44
+},
+{
+"page": 44,
+"seat": "general",
+"ward": 5,
+"name": "AKBAR ALI",
+"box": [
+1026,
+1287,
+1362,
+1362
+],
+"uc": 44
+},
+{
+"page": 44,
+"seat": "general",
+"ward": 6,
+"name": "GHUFRAN KHAN",
+"box": [
+1026,
+1362,
+1362,
+1441
+],
+"uc": 44
+},
+{
+"page": 45,
+"seat": "woman",
+"ward": 1,
+"name": "NAILA RANI",
+"box": [
+1032,
+442,
+1366,
+539
+],
+"uc": 44
+},
+{
+"page": 45,
+"seat": "woman",
+"ward": 2,
+"name": "SUMAIRA SHAHID",
+"box": [
+1032,
+539,
+1366,
+613
+],
+"uc": 44
+},
+{
+"page": 45,
+"seat": "peasant_worker",
+"ward": null,
+"name": "ISRAR HUSSAIN",
+"box": [
+1032,
+613,
+1366,
+682
+],
+"uc": 44
+},
+{
+"page": 45,
+"seat": "youth",
+"ward": null,
+"name": "KHURAM AFZAD",
+"box": [
+1032,
+682,
+1366,
+749
+],
+"uc": 44
+},
+{
+"page": 45,
+"seat": "chairman",
+"ward": null,
+"name": "GULFARAZ KHAN",
+"box": [
+1032,
+749,
+1366,
+821
+],
+"uc": 45
+},
+{
+"page": 45,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MEHRBAN ALI",
+"box": [
+1032,
+821,
+1366,
+889
+],
+"uc": 45
+},
+{
+"page": 45,
+"seat": "general",
+"ward": 1,
+"name": "SYED AZQAR HUSSAIN KAZMI",
+"box": [
+1032,
+889,
+1366,
+977
+],
+"uc": 45
+},
+{
+"page": 45,
+"seat": "general",
+"ward": 2,
+"name": "MUHAMMAD RAFIQ MUGHAL",
+"box": [
+1032,
+977,
+1366,
+1066
+],
+"uc": 45
+},
+{
+"page": 45,
+"seat": "general",
+"ward": 3,
+"name": "NAEEM AKHTAR",
+"box": [
+1032,
+1066,
+1366,
+1157
+],
+"uc": 45
+},
+{
+"page": 45,
+"seat": "general",
+"ward": 4,
+"name": "SYED ISRAR ALI SHAH GILLANI",
+"box": [
+1032,
+1157,
+1366,
+1234
+],
+"uc": 45
+},
+{
+"page": 45,
+"seat": "general",
+"ward": 5,
+"name": "ARSHAD MEHMOOD",
+"box": [
+1032,
+1234,
+1366,
+1318
+],
+"uc": 45
+},
+{
+"page": 45,
+"seat": "general",
+"ward": 6,
+"name": "MUHAMMAD ZAREEN",
+"box": [
+1032,
+1318,
+1366,
+1401
+],
+"uc": 45
+},
+{
+"page": 45,
+"seat": "woman",
+"ward": 1,
+"name": "SOBIA JABEEN",
+"box": [
+1032,
+1401,
+1366,
+1466
+],
+"uc": 45
+},
+{
+"page": 46,
+"seat": "woman",
+"ward": 2,
+"name": "NAZIA NAEEM",
+"box": [
+1022,
+469,
+1357,
+546
+],
+"uc": 45
+},
+{
+"page": 46,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MUHAMMAD RAFIQ HASHMI QURESHI",
+"box": [
+1022,
+546,
+1357,
+619
+],
+"uc": 45
+},
+{
+"page": 46,
+"seat": "youth",
+"ward": null,
+"name": "MALIK NISAR",
+"box": [
+1022,
+619,
+1357,
+686
+],
+"uc": 45
+},
+{
+"page": 46,
+"seat": "non_muslim",
+"ward": null,
+"name": "RAJESH KUMAR",
+"box": [
+1022,
+686,
+1357,
+755
+],
+"uc": 45
+},
+{
+"page": 46,
+"seat": "chairman",
+"ward": null,
+"name": "HAFEEZ UR REHMAN TIPU",
+"box": [
+1022,
+755,
+1357,
+827
+],
+"uc": 46
+},
+{
+"page": 46,
+"seat": "vice_chairman",
+"ward": null,
+"name": "AKSEER AHMED MUGHAL",
+"box": [
+1022,
+827,
+1357,
+895
+],
+"uc": 46
+},
+{
+"page": 46,
+"seat": "general",
+"ward": 1,
+"name": "IFTIKHAR AHMED",
+"box": [
+1022,
+895,
+1357,
+956
+],
+"uc": 46
+},
+{
+"page": 46,
+"seat": "general",
+"ward": 2,
+"name": "MEHBOOB KHAN",
+"box": [
+1022,
+956,
+1357,
+1025
+],
+"uc": 46
+},
+{
+"page": 46,
+"seat": "general",
+"ward": 3,
+"name": "MALIK ALLAH NAWAZ NOON",
+"box": [
+1022,
+1025,
+1357,
+1094
+],
+"uc": 46
+},
+{
+"page": 46,
+"seat": "general",
+"ward": 4,
+"name": "GUL ZAMEER KHAN",
+"box": [
+1022,
+1094,
+1357,
+1168
+],
+"uc": 46
+},
+{
+"page": 46,
+"seat": "general",
+"ward": 5,
+"name": "RAJA KHALID MEHMOOD",
+"box": [
+1022,
+1168,
+1357,
+1237
+],
+"uc": 46
+},
+{
+"page": 46,
+"seat": "general",
+"ward": 6,
+"name": "ABDUR RASHEED AWAN",
+"box": [
+1022,
+1237,
+1357,
+1305
+],
+"uc": 46
+},
+{
+"page": 46,
+"seat": "woman",
+"ward": 1,
+"name": "SOBIA SHAHEEN",
+"box": [
+1022,
+1305,
+1357,
+1374
+],
+"uc": 46
+},
+{
+"page": 46,
+"seat": "woman",
+"ward": 2,
+"name": "SHABANA BIBI",
+"box": [
+1022,
+1374,
+1357,
+1433
+],
+"uc": 46
+},
+{
+"page": 46,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MUHAMMAD BANARAS",
+"box": [
+1022,
+1433,
+1357,
+1510
+],
+"uc": 46
+},
+{
+"page": 47,
+"seat": "youth",
+"ward": null,
+"name": "MALIK ARSLAN MUSHTAQ GUJJAR",
+"box": [
+1025,
+451,
+1340,
+516
+],
+"uc": 46
+},
+{
+"page": 47,
+"seat": "chairman",
+"ward": null,
+"name": "MALIK RIZWAN AHMED",
+"box": [
+1025,
+512,
+1340,
+578
+],
+"uc": 47
+},
+{
+"page": 47,
+"seat": "vice_chairman",
+"ward": null,
+"name": "RAJA NAJAM HAYAT",
+"box": [
+1025,
+593,
+1340,
+658
+],
+"uc": 47
+},
+{
+"page": 47,
+"seat": "general",
+"ward": 1,
+"name": "HAKEEM KHAN",
+"box": [
+1025,
+674,
+1340,
+740
+],
+"uc": 47
+},
+{
+"page": 47,
+"seat": "general",
+"ward": 2,
+"name": "RAJA NUSRAT",
+"box": [
+1025,
+751,
+1340,
+817
+],
+"uc": 47
+},
+{
+"page": 47,
+"seat": "general",
+"ward": 3,
+"name": "MUHAMMAD DASSAR",
+"box": [
+1025,
+829,
+1340,
+895
+],
+"uc": 47
+},
+{
+"page": 47,
+"seat": "general",
+"ward": 4,
+"name": "NAEEM KHAN",
+"box": [
+1025,
+899,
+1340,
+965
+],
+"uc": 47
+},
+{
+"page": 47,
+"seat": "general",
+"ward": 5,
+"name": "MUHAMMAD NAVEED AKHTAR",
+"box": [
+1025,
+979,
+1340,
+1044
+],
+"uc": 47
+},
+{
+"page": 47,
+"seat": "general",
+"ward": 6,
+"name": "MUHAMMAD AZMAT",
+"box": [
+1025,
+1051,
+1340,
+1116
+],
+"uc": 47
+},
+{
+"page": 47,
+"seat": "woman",
+"ward": 1,
+"name": "NASIRA IBRAR",
+"box": [
+1025,
+1136,
+1340,
+1201
+],
+"uc": 47
+},
+{
+"page": 47,
+"seat": "woman",
+"ward": 2,
+"name": "NIGHAT SHEHZADI",
+"box": [
+1025,
+1220,
+1340,
+1285
+],
+"uc": 47
+},
+{
+"page": 47,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MUHAMMAD IJAZ",
+"box": [
+1025,
+1301,
+1340,
+1367
+],
+"uc": 47
+},
+{
+"page": 47,
+"seat": "youth",
+"ward": null,
+"name": "SADDAM HUSSAIN",
+"box": [
+1025,
+1374,
+1340,
+1439
+],
+"uc": 47
+},
+{
+"page": 48,
+"seat": "chairman",
+"ward": null,
+"name": "MUHAMMAD AZAM KHAN",
+"box": [
+1024,
+456,
+1338,
+521
+],
+"uc": 48
+},
+{
+"page": 48,
+"seat": "vice_chairman",
+"ward": null,
+"name": "NISAR AHMAD",
+"box": [
+1024,
+534,
+1338,
+599
+],
+"uc": 48
+},
+{
+"page": 48,
+"seat": "general",
+"ward": 1,
+"name": "MUHAMMAD IBRAR ABBASI",
+"box": [
+1024,
+613,
+1338,
+678
+],
+"uc": 48
+},
+{
+"page": 48,
+"seat": "general",
+"ward": 2,
+"name": "SYED ZAFAR ABBAS",
+"box": [
+1024,
+694,
+1338,
+760
+],
+"uc": 48
+},
+{
+"page": 48,
+"seat": "general",
+"ward": 3,
+"name": "MANZOOR KHAN",
+"box": [
+1024,
+770,
+1338,
+835
+],
+"uc": 48
+},
+{
+"page": 48,
+"seat": "general",
+"ward": 4,
+"name": "KHALID MEHMOOD AWAN",
+"box": [
+1024,
+840,
+1338,
+905
+],
+"uc": 48
+},
+{
+"page": 48,
+"seat": "general",
+"ward": 5,
+"name": "MUHAMMAD SHABBIR",
+"box": [
+1024,
+910,
+1338,
+975
+],
+"uc": 48
+},
+{
+"page": 48,
+"seat": "general",
+"ward": 6,
+"name": "TARIQ MEHMOOD ABBASI",
+"box": [
+1024,
+1003,
+1338,
+1068
+],
+"uc": 48
+},
+{
+"page": 48,
+"seat": "woman",
+"ward": 1,
+"name": "SHEHNAZ BEGUM",
+"box": [
+1024,
+1090,
+1338,
+1155
+],
+"uc": 48
+},
+{
+"page": 48,
+"seat": "woman",
+"ward": 2,
+"name": "GULNAZ AKHTAR SADOZAI",
+"box": [
+1024,
+1183,
+1338,
+1248
+],
+"uc": 48
+},
+{
+"page": 48,
+"seat": "peasant_worker",
+"ward": null,
+"name": "MUHAMMAD TASEER QURESHI",
+"box": [
+1024,
+1288,
+1338,
+1353
+],
+"uc": 48
+},
+{
+"page": 48,
+"seat": "youth",
+"ward": null,
+"name": "MUHAMMAD REHMAN KHAN",
+"box": [
+1024,
+1393,
+1338,
+1458
+],
+"uc": 48
+},
+{
+"page": 49,
+"seat": "non_muslim",
+"ward": null,
+"name": "ZAFAR MASIH",
+"box": [
+1024,
+478,
+1358,
+587
+],
+"uc": 48
+},
+{
+"page": 49,
+"seat": "chairman",
+"ward": null,
+"name": "SYED ZEESHAN ALI NAQVI",
+"box": [
+1024,
+587,
+1358,
+660
+],
+"uc": 49
+},
+{
+"page": 49,
+"seat": "vice_chairman",
+"ward": null,
+"name": "GHULAM DASTAGEER AWAN",
+"box": [
+1024,
+660,
+1358,
+755
+],
+"uc": 49
+},
+{
+"page": 49,
+"seat": "general",
+"ward": 1,
+"name": "ZULFIQAR HUSSAIN",
+"box": [
+1024,
+755,
+1358,
+827
+],
+"uc": 49
+},
+{
+"page": 49,
+"seat": "general",
+"ward": 2,
+"name": "SYED NAZIM HUSSAIN NAQVI",
+"box": [
+1024,
+827,
+1358,
+939
+],
+"uc": 49
+},
+{
+"page": 49,
+"seat": "general",
+"ward": 3,
+"name": "SABIR HUSSAIN",
+"box": [
+1024,
+939,
+1358,
+1045
+],
+"uc": 49
+},
+{
+"page": 49,
+"seat": "general",
+"ward": 4,
+"name": "MUHAMMAD ASHRAF",
+"box": [
+1024,
+1045,
+1358,
+1139
+],
+"uc": 49
+},
+{
+"page": 49,
+"seat": "general",
+"ward": 5,
+"name": "ARIF NADEEM KHAN",
+"box": [
+1024,
+1139,
+1358,
+1239
+],
+"uc": 49
+},
+{
+"page": 49,
+"seat": "general",
+"ward": 6,
+"name": "ABDUL GHAFOOR",
+"box": [
+1024,
+1239,
+1358,
+1350
+],
+"uc": 49
+},
+{
+"page": 49,
+"seat": "woman",
+"ward": 1,
+"name": "IRSHAD BEGUM",
+"box": [
+1024,
+1350,
+1358,
+1424
+],
+"uc": 49
+},
+{
+"page": 50,
+"seat": "woman",
+"ward": 2,
+"name": "MUKHTIAR JAN",
+"box": [
+1023,
+467,
+1357,
+581
+],
+"uc": 49
+},
+{
+"page": 50,
+"seat": "peasant_worker",
+"ward": null,
+"name": "ABDUL KHAMEED",
+"box": [
+1023,
+581,
+1357,
+662
+],
+"uc": 49
+},
+{
+"page": 50,
+"seat": "youth",
+"ward": null,
+"name": "MALIK MUBASHIR NAZEER",
+"box": [
+1023,
+662,
+1357,
+731
+],
+"uc": 49
+},
+{
+"page": 50,
+"seat": "chairman",
+"ward": null,
+"name": "SHOAIB KHAN",
+"box": [
+1023,
+731,
+1357,
+803
+],
+"uc": 50
+},
+{
+"page": 50,
+"seat": "vice_chairman",
+"ward": null,
+"name": "MALIK TARIQ MEHMOOD AWAN",
+"box": [
+1023,
+803,
+1357,
+897
+],
+"uc": 50
+},
+{
+"page": 50,
+"seat": "general",
+"ward": 1,
+"name": "MUHAMMAD ILYAS",
+"box": [
+1023,
+897,
+1357,
+957
+],
+"uc": 50
+},
+{
+"page": 50,
+"seat": "general",
+"ward": 2,
+"name": "NAVEED SHAHZAD",
+"box": [
+1023,
+957,
+1357,
+1065
+],
+"uc": 50
+},
+{
+"page": 50,
+"seat": "general",
+"ward": 3,
+"name": "JABIR MEHMOOD",
+"box": [
+1023,
+1065,
+1357,
+1178
+],
+"uc": 50
+},
+{
+"page": 50,
+"seat": "general",
+"ward": 4,
+"name": "ZAHID",
+"box": [
+1023,
+1178,
+1357,
+1247
+],
+"uc": 50
+},
+{
+"page": 50,
+"seat": "general",
+"ward": 5,
+"name": "SHAKIR NAWAZ",
+"box": [
+1023,
+1247,
+1357,
+1322
+],
+"uc": 50
+},
+{
+"page": 50,
+"seat": "general",
+"ward": 6,
+"name": "LIAQAT ALI KHAN",
+"box": [
+1023,
+1322,
+1357,
+1413
+],
+"uc": 50
+},
+{
+"page": 50,
+"seat": "woman",
+"ward": 1,
+"name": "NOREEN FAROOQ",
+"box": [
+1023,
+1413,
+1357,
+1508
+],
+"uc": 50
+},
+{
+"page": 51,
+"seat": "woman",
+"ward": 2,
+"name": "AMNA SADAF",
+"box": [
+1004,
+470,
+1332,
+577
+],
+"uc": 50
+},
+{
+"page": 51,
+"seat": "peasant_worker",
+"ward": null,
+"name": "TAHIR SHAHZAD",
+"box": [
+1004,
+577,
+1332,
+661
+],
+"uc": 50
+},
+{
+"page": 51,
+"seat": "youth",
+"ward": null,
+"name": "RAJA NABEEL SHAHZAD",
+"box": [
+1004,
+661,
+1332,
+744
+],
+"uc": 50
+}
+]
+}
