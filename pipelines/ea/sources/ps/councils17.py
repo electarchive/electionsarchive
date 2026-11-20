@@ -9,6 +9,7 @@ letters reversed, which the text extractor then reverses again (the lam-alef of 
 `fix_ligatures` writes them back in order. The second is read through `ligature_pdf`.
 """
 
+import itertools
 import re
 from collections import defaultdict
 from collections.abc import Callable
@@ -455,3 +456,104 @@ def report_nominations(document: pymupdf.Document) -> list[Nomination]:
 def line_text(words: list[Word]) -> str:
     """The words of a cell in reading order: top line first, each line from the right."""
     return clean(" ".join(w[4] for w in sorted(words, key=lambda w: (round(middle(w) / 6), -w[0]))))
+
+
+# --- the final report's annex of candidates ---------------------------------------------------------------------------
+
+
+ANNEX_FIRST_PAGE = 98
+ANNEX_LAST_PAGE = 281
+ANNEX_BOTTOM = 732
+ANNEX_FOOTNOTES = {"امتنع", "استقال", "مجلس"}
+ANNEX_SKIP = {"مقعد", "مقاعد", "تابع", "-", "*"}
+WINNER = "فائز"
+
+
+class AnnexRow(NamedTuple):
+    """One candidate of the annex: the position the table numbers, the name, the list, and the note beside them."""
+
+    position: int
+    name: Cell
+    list_name: Cell
+    note: Cell
+
+    @property
+    def winner(self) -> bool:
+        return WINNER in self.note.text
+
+    @property
+    def acclaimed(self) -> bool:
+        return TAZKIYA in self.note.text
+
+
+class AnnexCouncil(NamedTuple):
+    district: str
+    name: str
+    seats: int | None
+    first_page: int
+    rows: list[AnnexRow]
+
+
+def annex_councils(document: pymupdf.Document) -> list[AnnexCouncil]:
+    """The candidate tables of the 13 May elections (the report's pages 98 to 281): a block for each council with a
+    header row, the council's name and seats at the right (centered on its rows), and a row for each candidate with the
+    number, name, list, and a note (a winner, "winner / acclamation" for an acclaimed council, or a dash). A council
+    that runs onto the next page repeats its name after "continued", and its numbering goes on."""
+    out: list[AnnexCouncil] = []
+    for index in range(ANNEX_FIRST_PAGE - 1, ANNEX_LAST_PAGE):
+        words = [
+            (w[0], w[1], w[2], w[3], clean(w[4]))
+            for w in document[index].get_text("words")
+            if clean(w[4]) and 55 < (w[1] + w[3]) / 2 < ANNEX_BOTTOM
+        ]
+        marks = sorted((w for w in words if w[4] == "دائرة" and w[0] < 300 and middle(w) < 125), key=middle)
+        if not marks:
+            raise ValueError(f"page {index + 1}: no district heading")
+        mark = marks[0]
+        line = [w for w in words if abs(middle(w) - middle(mark)) < 5 and w[2] <= mark[2] and w[0] > 150]
+        district = clean(
+            " ".join(w[4] for w in sorted(line, key=lambda w: -w[0]) if w[4] not in {"دائرة", "الانتخابية"})
+        )
+        words = [w for w in words if middle(w) > middle(mark) + 5]
+        heads = sorted(middle(w) for w in words if w[4] == "#" and w[0] < 440)
+        anchors = sorted((w for w in words if re.fullmatch(r"\d+", w[4]) and 420 <= w[0] <= 440), key=middle)
+        bounds = [*heads, ANNEX_BOTTOM]
+        for low, high in itertools.pairwise(bounds):
+            block = [a for a in anchors if low < middle(a) < high]
+            head = sorted(
+                (w for w in words if w[0] >= 440 and low < middle(w) < high),
+                key=lambda w: (round(middle(w) / 6), -w[0]),
+            )
+            kept = [w for w in head if w[4] not in ANNEX_SKIP | ANNEX_FOOTNOTES and not re.fullmatch(r"[\d()]+", w[4])]
+            label = clean(" ".join(w[4] for w in kept))
+            found = re.search(r"(\d+)\s*\(|\)\s*(\d+)", " ".join(w[4] for w in head))
+            if not block or not label:
+                raise ValueError(f"page {index + 1}: a block reads {[w[4] for w in head]} with {len(block)} rows")
+            seats = int(found.group(1) or found.group(2)) if found else None
+            rows: list[AnnexRow] = []
+            body = [w for w in words if low < middle(w) < high and w[0] < 440]
+            for anchor, group in zip(block, group_rows(body, block), strict=True):
+                ordered = sorted(group, key=lambda w: (round(middle(w) / 6), -w[0]))
+                names = [w for w in ordered if w is not anchor and w[0] >= 252]
+                lists = [w for w in ordered if w[2] <= 250 and w[0] >= 118]
+                notes = [w for w in ordered if w[2] <= 118]
+                if not names or not lists:
+                    raise ValueError(f"page {index + 1}: a candidate row reads {[w[4] for w in group]}")
+                rows.append(
+                    AnnexRow(
+                        int(anchor[4]),
+                        cell(index + 1, names, line_text(names)),
+                        cell(index + 1, lists, line_text(lists).rstrip("- ")),
+                        cell(index + 1, notes, line_text(notes)) if notes else Cell("", None),
+                    )
+                )
+            continued = out and out[-1].district == district and rows[0].position == out[-1].rows[-1].position + 1
+            if continued and fold(out[-1].name) == fold(label):
+                out[-1].rows.extend(rows)
+                out[-1] = out[-1]._replace(seats=out[-1].seats or seats)
+            else:
+                out.append(AnnexCouncil(district, label, seats, index + 1, rows))
+    missing = [c.name for c in out if c.seats is None]
+    if missing:
+        raise ValueError(f"the annex gives no seats for {missing}")
+    return out
