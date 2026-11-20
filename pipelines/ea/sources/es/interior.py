@@ -148,6 +148,32 @@ SYSTEMS: dict[str, tuple[dict[str, object], str, str]] = {
 Frame = pl.DataFrame
 
 
+# The pipeline that holds each kind of contest, and from which election day on; es.interior builds only the rest.
+ELSEWHERE: dict[str, tuple[str, date]] = {
+    "congress": ("es.congreso", date(1977, 1, 1)),
+    "senate": ("es.senado", date(1977, 1, 1)),
+    "european": ("es.europeas", date(1987, 1, 1)),
+    "referendum": ("es.referendums", date(1976, 1, 1)),
+    "cabildo": ("es.cabildos", date(1987, 1, 1)),
+    "municipal": ("es.municipales", date(2011, 1, 1)),
+}
+# The local elections production already holds for these days (es.cabildos' "<day>:local" elections, external id
+# scheme es.election); es.interior's municipal contests of the day attach to them instead of minting a second one.
+UMBRELLAS = {
+    date(1987, 6, 10): "f62b6102-da26-5853-acef-184563deaad7",
+    date(1991, 5, 26): "fef4a776-731b-5cd9-b277-91e9a6f347cc",
+    date(1995, 5, 28): "9ca4fa9a-8e3b-5afc-8620-89fb32db68b0",
+    date(1999, 6, 13): "22a7b4d4-fb4a-53a8-bd66-34c76975dd3e",
+    date(2003, 5, 25): "8528bf25-9def-5846-bf31-a1a846daa33a",
+    date(2007, 5, 27): "bcdf584d-7996-5b23-843d-27f0afa3c455",
+}
+
+
+def elsewhere(tag: str, d: date) -> bool:
+    """Whether another pipeline holds this kind of contest on this day."""
+    return tag in ELSEWHERE and d >= ELSEWHERE[tag][1]
+
+
 def uid(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
 
@@ -388,6 +414,8 @@ def parties() -> dict[str, tuple[str, str, bool]]:
     """Source-local parties: one per distinct pair of abbreviation and name, taken from the head of a coalition."""
     found: dict[str, tuple[str, str, bool]] = {}
     for kind, process in held():
+        if elsewhere(KINDS[kind], election_day(kind, process)):
+            continue
         frame = lists(kind, process)
         for row in frame.iter_rows(named=True):
             found.setdefault(row["party"], (row["head_short"], row["head_label"], kind in {"04", "06"}))
@@ -1325,7 +1353,7 @@ def titles(d: date, group: str) -> tuple[str, str]:
 
 def parts_for(d: date) -> list[Part]:
     if d == date(1976, 12, 15):
-        return [part_referendum_1976()]
+        return [] if elsewhere("referendum", d) else [part_referendum_1976()]
     found = calendar()[d]
     built: list[Part] = []
     for kind, builder in (
@@ -1336,6 +1364,8 @@ def parts_for(d: date) -> list[Part]:
         ("07", part_european),
         ("01", part_referendum),
     ):
+        if elsewhere(KINDS[kind], d):
+            continue
         for process in found.get(kind, []):
             built.append(builder(process))
     return built
@@ -1413,6 +1443,10 @@ class Build:
         if group in self.elections:
             return self.elections[group]
         p, d = self.p, self.d
+        if group == "local" and d in UMBRELLAS:
+            id = self.elections[group] = UMBRELLAS[d]
+            p.external.add(id)
+            return id
         id = self.elections[group] = uid("election", d, group)
         p.add("election", id=id, polity_id=SPAIN, kind=kind, date_from=d, date_to=d, status="held")
         english, native = titles(d, group)
@@ -1636,7 +1670,10 @@ class Build:
         )
         built = located.unique(["scheme", "ucode"]).select("scheme", "ucode", "ucat", "area_scheme", "acode")
         built = built.with_columns(
-            unit_id=pl.Series(ids("unit", built["scheme"].to_list(), built["ucode"].to_list()), dtype=pl.String)
+            # A unit belongs to its election day, as its code does, so the day is part of its id.
+            unit_id=pl.Series(
+                ids("unit", [d] * built.height, built["scheme"].to_list(), built["ucode"].to_list()), dtype=pl.String
+            )
         )
         fresh = built.filter(~pl.col("unit_id").is_in(list(self.units))) if self.units else built
         for unit_id in fresh["unit_id"].to_list():
