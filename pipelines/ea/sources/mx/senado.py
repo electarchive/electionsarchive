@@ -74,6 +74,12 @@ ACUERDOS = {
         ),
     ),
 }
+# INE's document repository now refuses scripts (403), so each acuerdo is read from the Internet Archive's copy of
+# its address; the source keeps INE's address.
+ACUERDO_COPIES = {
+    2018: "20250610042556",
+    2024: "20240825114438",
+}
 
 
 KEY = f"{SOURCE}/all"
@@ -167,14 +173,30 @@ def siceef_url(name: str) -> str:
     return f"{ine.SICEEF}{name}.csv"
 
 
+def acuerdo_url(year: int) -> str:
+    return ARCHIVED.format(stamp=ACUERDO_COPIES[year], url=ACUERDOS[year][0])
+
+
+def ine_file(url: str) -> raw.Artifact:
+    """INE's file at `url` in the cache, or the Internet Archive's copy of it where the cache holds only that (as
+    for Senadores1994 and the acuerdos)."""
+    try:
+        return raw.cached(RAW, url)
+    except LookupError:
+        copies = sorted(key for key in raw.keys(RAW) if key.startswith(ARCHIVED[:24]) and key.endswith(f"id_/{url}"))
+        if not copies:
+            raise
+        return raw.cached(RAW, copies[-1])
+
+
 def fetch() -> None:
     for name in (*SICEEF_STATE.values(), *SICEEF_LIST.values()):
         raw.fetch(RAW, siceef_url(name), suffix=".csv")
     for url, *_ in COMPUTOS.values():
         raw.fetch(RAW, url, suffix=".zip")
     raw.fetch(RAW, SEATS_PAGE, suffix=".html")
-    for url, *_ in ACUERDOS.values():
-        raw.fetch(RAW, url, suffix=".pdf")
+    for year in ACUERDOS:
+        raw.fetch(RAW, acuerdo_url(year), suffix=".pdf")
     for year in ROSTERS:
         for url in roster_urls(year).values():
             raw.fetch(SOURCE, url, suffix=".html")
@@ -183,7 +205,7 @@ def fetch() -> None:
 def read_siceef(name: str) -> tuple[list[str], list[dict[str, str]]]:
     import csv
 
-    text = raw.cached(RAW, siceef_url(name)).path.read_bytes().decode("latin-1")
+    text = ine_file(siceef_url(name)).path.read_bytes().decode("latin-1")
     reader = csv.DictReader(io.StringIO(text))
     rows = [
         {
@@ -465,6 +487,12 @@ SUMMARY = (
 )
 
 
+TURNOUT = (
+    "INE's district count files print more ballots than the nominal roll for these casillas; the counts are stored "
+    "as the files print them"
+)
+
+
 def emit() -> None:
     package.run("load", [KEY])
 
@@ -477,6 +505,7 @@ def build() -> Path:
 
     with connect() as conn:
         cs = Draft(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="MX")
+        cs.accept("accounting.turnout", TURNOUT)
         for scheme in ("mx.entidad", "mx.municipio", "mx.seccion", "mx.casilla"):
             if conn.execute("select 1 from scheme where code = %s", (scheme,)).fetchone() is None:
                 raise ValueError("publish mx.mge before mx.senado")
@@ -498,7 +527,7 @@ def build() -> Path:
             attribution="Instituto Nacional Electoral, cómputos distritales",
         )
         for name_ in (*SICEEF_STATE.values(), *SICEEF_LIST.values()):
-            cs.artifact(raw.cached(RAW, siceef_url(name_)), ine_source)
+            cs.artifact(ine_file(siceef_url(name_)), ine_source)
         for url, *_ in COMPUTOS.values():
             cs.artifact(raw.cached(RAW, url), ine_source)
         seats_source = cs.source(ine.INE, SEATS_TITLE)
@@ -525,7 +554,7 @@ def build() -> Path:
                 url=url,
                 license=ine.PUBLIC,
             )
-            cs.artifact(raw.cached(RAW, url), source)
+            cs.artifact(ine_file(url), source)
 
         body = cs.key("mx.body", "senado")
         cs.add("body", id=body, polity_id=mexico, kind="upper_house")
@@ -1238,6 +1267,35 @@ def jsonb_text(value: dict[str, str]) -> str:
     return json.dumps(dict(sorted(value.items(), key=lambda item: (len(item[0]), item[0]))), ensure_ascii=False)
 
 
+def artifact_row(source: str, artifact: raw.Artifact) -> dict[str, object]:
+    """A source_artifact row with the id Draft gives a new one."""
+    return {
+        "id": str(uuid5(NAMESPACE, f"artifact\x1f{source}\x1f{artifact.storage_key}")),
+        "source_id": source,
+        "url": artifact.url,
+        "sha256": artifact.sha256,
+        "retrieved_at": artifact.retrieved_at,
+        "storage_key": artifact.storage_key,
+        "media_type": artifact.media_type,
+        "bytes": artifact.bytes,
+    }
+
+
+def recite(artifacts: pl.DataFrame) -> pl.DataFrame:
+    """Point each source_artifact row whose file the raw cache lacks at the copy of its address the cache holds.
+    The published rows cite two such files: a copy of the seats page, which carries a token that changes with each
+    request, so no later copy matches it, and an empty response from INE's repository for the 2024 acuerdo, read
+    since from the Internet Archive's copy."""
+    rows = []
+    for row in artifacts.to_dicts():
+        if not (DATA / str(row["storage_key"])).exists():
+            artifact = ine_file(str(row["url"]))
+            print(f"{row['url']}: cites {artifact.storage_key} in place of {row['storage_key']}", flush=True)
+            row = artifact_row(str(row["source_id"]), artifact)
+        rows.append(row)
+    return pl.DataFrame(rows, schema=artifacts.schema)
+
+
 def declare(out: Path) -> Path:
     """Give the state contests of 2018 and 2024 the seats the Senate's rosters record, in place of the seats derived
     from the casilla count, in the package built at `out`: replace the outcome rows where the two differ, cite the
@@ -1251,6 +1309,7 @@ def declare(out: Path) -> Path:
         table: pl.read_parquet(out / f"{table}.parquet")
         for table in ("outcome", "note", "source", "source_artifact", "citation")
     }
+    tables["source_artifact"] = recite(tables["source_artifact"])
     contests = dict(keys.filter(pl.col("scheme") == "mx.contest").select("value", "entity_id").iter_rows())
     sets = dict(keys.filter(pl.col("scheme") == "mx.result_set").select("value", "entity_id").iter_rows())
     outcomes, notes = tables["outcome"], tables["note"]
@@ -1273,19 +1332,7 @@ def declare(out: Path) -> Path:
             }
         )
         for url in roster_urls(year).values():
-            artifact = raw.cached(SOURCE, url)
-            added["source_artifact"].append(
-                {
-                    "id": str(uuid5(NAMESPACE, f"artifact\x1f{source}\x1f{artifact.storage_key}")),
-                    "source_id": source,
-                    "url": artifact.url,
-                    "sha256": artifact.sha256,
-                    "retrieved_at": artifact.retrieved_at,
-                    "storage_key": artifact.storage_key,
-                    "media_type": artifact.media_type,
-                    "bytes": artifact.bytes,
-                }
-            )
+            added["source_artifact"].append(artifact_row(source, raw.cached(SOURCE, url)))
         options = {
             code: list(
                 lists.filter(pl.col("contest_id") == str(contests[f"{day}:senate:{code:02d}"]))
