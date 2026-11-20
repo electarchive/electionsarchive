@@ -1,11 +1,13 @@
-"""Pakistan's 2024 National Assembly election by polling station in the Punjab and Islamabad, from the returning
-officers' consolidated statements of the count (Form 48).
+"""Pakistan's 2024 National Assembly election by polling station in the Punjab and Islamabad, and the election of
+the Provincial Assembly of the Punjab, from the returning officers' consolidated statements of the count (Form 48).
 
 After the count of 8 February 2024, each returning officer typed a Form 48: one row per polling station with each
 candidate's valid votes (tendered and challenged votes included), the valid votes, the invalid votes, and the total,
 and a row of totals at the foot. The Election Commission's shared folder of the Punjab's forms holds the Form 48 of
-each National Assembly constituency of the Punjab and of Islamabad, NA-46 to NA-189, as a PDF of photographs of the
-typed pages (`fetch` lists the folder through Drive's embedded folder view and downloads each file).
+each National Assembly constituency of the Punjab and of Islamabad, NA-46 to NA-189, and of each Provincial Assembly
+constituency, PP-1 to PP-297, as a PDF of photographs of the typed pages (`fetch` lists the folder through Drive's
+embedded folder view and downloads each file; a revised form takes the place of the first). Each house is its own
+package.
 
 The photographs carry no usable text, so each page is read here. It is turned so that its rules run level and its
 polling-station column lies to the left of the candidates' columns; its horizontal rules give the rows, and its
@@ -56,7 +58,42 @@ ENTRY = re.compile(
     r'<div class="flip-entry" id="entry-([^"]+)".*?<a href="([^"]+)".*?<div class="flip-entry-title">(.*?)</div>',
     re.DOTALL,
 )
-SEAT = re.compile(r"^NA[\s_.-]*0*(\d+)", re.IGNORECASE)
+STAMP = "2024-02-08"
+
+
+@dataclass(frozen=True)
+class House:
+    """One assembly whose forms the folder holds: its seat prefix, its subfolder, its package, and how it is named."""
+
+    prefix: str
+    folder: str
+    key: str
+    source: str  # the part that tells its source row from the other house's
+    seat: re.Pattern[str]  # a form's file name, with the seat number
+    name: str
+    place: str
+
+
+HOUSES = {
+    "NA": House(
+        "NA",
+        "National_Assembly",
+        f"{SOURCE}/{STAMP}",
+        "form48",
+        re.compile(r"^NA[\s_.-]*0*(\d+)", re.IGNORECASE),
+        "National Assembly",
+        "the Punjab and Islamabad",
+    ),
+    "PP": House(
+        "PP",
+        "Provincial_Assembly",
+        f"{SOURCE}/{STAMP}-pp",
+        "form48-pp",
+        re.compile(r"^(?:revised[\s_-]+form[\s_-]*48[\s_-]*)?PP?[\s_.-]*0*(\d+)", re.IGNORECASE),
+        "Provincial Assembly of the Punjab",
+        "the Punjab",
+    ),
+}
 
 
 def entries(folder: str) -> list[tuple[str, bool, str]]:
@@ -64,26 +101,39 @@ def entries(folder: str) -> list[tuple[str, bool, str]]:
     return [(id, "/folders/" in href, html.unescape(title)) for id, href, title in ENTRY.findall(text)]
 
 
+class Tiff(ValueError):
+    """The form is a scanned TIFF, not a PDF."""
+
+
 def _not_html(path: Path) -> None:
     head = path.read_bytes()[:1024].lstrip().lower()
+    if head.startswith((b"ii*\x00", b"mm\x00*")):
+        raise Tiff("the form is a TIFF")
     if not head.startswith(b"%pdf"):
         raise ValueError("the host returned something other than a PDF")
 
 
-def files(fetching: bool = False) -> dict[str, str]:
-    """The Drive id of each constituency's Form 48, by seat code."""
+def _tiff(path: Path) -> None:
+    if not path.read_bytes()[:4] in (b"II*\x00", b"MM\x00*"):
+        raise ValueError("the host returned something other than a TIFF")
+
+
+def files(house: House, fetching: bool = False) -> dict[str, str]:
+    """The Drive id of each constituency's Form 48, by seat code; a revised form takes the place of the first."""
     if fetching:
         raw.fetch(SOURCE, LISTING.format(ROOT), suffix=".html")
-    folder = next(id for id, is_folder, title in entries(ROOT) if is_folder and title == "National_Assembly")
+    folder = next(id for id, is_folder, title in entries(ROOT) if is_folder and title == house.folder)
     if fetching:
         raw.fetch(SOURCE, LISTING.format(folder), suffix=".html")
     found: dict[str, str] = {}
+    revised: dict[str, str] = {}
     for id, is_folder, title in entries(folder):
-        m = SEAT.match(title.strip())
+        m = house.seat.match(title.strip())
         if is_folder or m is None:
             continue
-        found[f"NA-{int(m.group(1))}"] = id
-    return found
+        into = revised if title.strip().lower().startswith("revised") else found
+        into[f"{house.prefix}-{int(m.group(1))}"] = id
+    return found | revised
 
 
 CONFIRMED = DRIVE + "&confirm=t"  # past the page Drive shows instead of a file too large for its virus scan
@@ -95,13 +145,20 @@ def url(id: str) -> str:
 
 
 def fetch() -> None:
-    found = files(True)
+    for house in HOUSES.values():
+        fetch_house(house)
+
+
+def fetch_house(house: House) -> None:
+    found = files(house, True)
 
     def one(id: str) -> None:
         if DRIVE.format(id) in raw.keys(SOURCE):
             return
         try:
             raw.fetch(SOURCE, DRIVE.format(id), suffix=".pdf", check=_not_html)
+        except Tiff:  # a few forms are multi-page TIFF scans, which the reader opens as they are
+            raw.fetch(SOURCE, DRIVE.format(id), suffix=".tif", check=_tiff)
         except ValueError:
             raw.fetch(SOURCE, CONFIRMED.format(id), suffix=".pdf", check=_not_html)
 
@@ -882,9 +939,9 @@ def read_document(path: Path, k: int, images: Path | None = None, shared: Bank |
     return Document(count, ordered, [(p.number, r) for p, r in pending], unread)
 
 
-def documents() -> dict[str, raw.Artifact]:
+def documents(house: House) -> dict[str, raw.Artifact]:
     """Each constituency's cached Form 48, by seat code."""
-    return {code: raw.cached(SOURCE, url(id)) for code, id in sorted(files().items(), key=lambda x: int(x[0][3:]))}
+    return {code: raw.cached(SOURCE, url(id)) for code, id in sorted(files(house).items(), key=lambda x: int(x[0][3:]))}
 
 
 PAGES = DATA / "pages" / SOURCE
@@ -922,17 +979,20 @@ def _read(job: tuple[str, raw.Artifact]) -> str:
 
 
 def parse() -> None:
-    jobs = [(code, artifact) for code, artifact in documents().items() if code in FORMS]
+    for house in HOUSES.values():
+        print(parse_house(house))
+
+
+def parse_house(house: House) -> Path:
+    jobs = [(code, artifact) for code, artifact in documents(house).items() if code in FORMS]
     with ProcessPoolExecutor(3) as pool:
         for line in pool.map(_read, jobs):
             print(line, flush=True)
-    print(write())
+    return write_house(house)
 
 
 # ---- the constituencies --------------------------------------------------------------------------------------------
 
-STAMP = "2024-02-08"
-KEY = f"{SOURCE}/{STAMP}"
 STATION = "pk.station"
 VOTES, CAST, VALID, INVALID = 1, 3, 4, 5
 DIGITIZED = 8
@@ -1167,14 +1227,17 @@ def assemble(code: str, artifact: raw.Artifact, read: dict) -> Seat | str:
     return Seat(code, artifact, stations, completeness, printed is not None, complete, order)
 
 
-SOURCE_ID = key("source", "form48", STAMP)
 FOLDER = "https://drive.google.com/drive/folders/" + ROOT
 
 
-def seats() -> tuple[list[Seat], dict[str, str]]:
+def source_id(house: House) -> str:
+    return key("source", house.source, STAMP)
+
+
+def seats(house: House) -> tuple[list[Seat], dict[str, str]]:
     found: list[Seat] = []
     left: dict[str, str] = {}
-    for code, artifact in documents().items():
+    for code, artifact in documents(house).items():
         if code not in FORMS:
             left[code] = "no Form 49 is held for it"
             continue
@@ -1190,42 +1253,44 @@ def seats() -> tuple[list[Seat], dict[str, str]]:
     return found, left
 
 
-def build(found: list[Seat], left: dict[str, str]) -> Package:
+def build(house: House, found: list[Seat], left: dict[str, str]) -> Package:
     p = Package(
-        KEY,
+        house.key,
         SOURCE,
-        "The 2024 Pakistani National Assembly election in the Punjab and Islamabad by polling station, read from the "
+        f"The 2024 Pakistani {house.name} election in {house.place} by polling station, read from the "
         "returning officers' scanned consolidated statements (Form 48)",
     )
+    source = source_id(house)
     p.external.add(ecp.PAKISTAN)
     p.external.add(STATION)
     election = ecp.key("election", STAMP)
     p.external.add(election)
     p.add(
         "source",
-        id=SOURCE_ID,
+        id=source,
         kind="official_body",
         publisher="Election Commission of Pakistan",
-        title="General Elections 2024: consolidated statements of the count (Form 48), National Assembly, the Punjab",
+        title=f"General Elections 2024: consolidated statements of the count (Form 48), {house.name}"
+        + (", the Punjab" if house.prefix == "NA" else ""),
         url=FOLDER,
         license="Official publication; reuse terms are not stated",
         attribution="Election Commission of Pakistan",
     )
-    for folder in (ROOT, *(id for id, is_folder, _ in entries(ROOT) if is_folder)):
+    for folder in (ROOT, *(id for id, is_folder, title in entries(ROOT) if is_folder and title == house.folder)):
         if LISTING.format(folder) in raw.keys(SOURCE):
-            p.artifact(raw.cached(SOURCE, LISTING.format(folder)), SOURCE_ID)
+            p.artifact(raw.cached(SOURCE, LISTING.format(folder)), source)
     values: list[dict[str, object]] = []
     locators: list[dict[str, object]] = []
     for seat in found:
-        _seat(p, seat, values, locators)
+        _seat(p, seat, source, values, locators)
     if left:
         p.add(
             "note",
-            id=key("note", election, "left-out"),
+            id=key("note", election, "left-out", *([] if house.prefix == "NA" else [house.prefix])),
             entity_id=election,
             kind="context",
             body_md="Polling-station results from the returning officers' Forms 48 are stored for "
-            f"{len(found)} National Assembly constituencies of the Punjab and Islamabad. Left out: "
+            f"{len(found)} {house.name} constituencies of {house.place}. Left out: "
             + "; ".join(f"{code} ({why})" for code, why in left.items())
             + ".",
             lang="en",
@@ -1263,7 +1328,9 @@ METHOD = (
 )
 
 
-def _seat(p: Package, seat: Seat, values: list[dict[str, object]], locators: list[dict[str, object]]) -> None:
+def _seat(
+    p: Package, seat: Seat, source: str, values: list[dict[str, object]], locators: list[dict[str, object]]
+) -> None:
     form = FORMS[seat.code]
     k = len(form["candidates"])
     contest = ecp.key("contest", STAMP, seat.code)
@@ -1278,7 +1345,7 @@ def _seat(p: Package, seat: Seat, values: list[dict[str, object]], locators: lis
         contest_id=contest,
         stage="official",
         kind="counted",
-        source_id=SOURCE_ID,
+        source_id=source,
         status="active",
         is_default=False,
         completeness=round(seat.completeness, 6),
@@ -1305,7 +1372,7 @@ def _seat(p: Package, seat: Seat, values: list[dict[str, object]], locators: lis
         body_md=METHOD.format(order=seat.order, coverage=coverage),
         lang="en",
     )
-    stored = p.artifact(seat.artifact, SOURCE_ID)
+    stored = p.artifact(seat.artifact, source)
     pages: dict[int, str] = {}
     for n in sorted({s.page for s in seat.stations}):
         image = PAGES / f"{seat.artifact.sha256}-{n}.jpg"
@@ -1341,13 +1408,18 @@ def _seat(p: Package, seat: Seat, values: list[dict[str, object]], locators: lis
 
 
 def packages() -> list[str]:
-    return [KEY]
+    return [house.key for house in HOUSES.values()]
 
 
 def emit() -> None:
     package.run("load", packages())
 
 
-def write() -> Path:
-    found, left = seats()
-    return build(found, left).write()
+def write() -> None:
+    for house in HOUSES.values():
+        print(write_house(house))
+
+
+def write_house(house: House) -> Path:
+    found, left = seats(house)
+    return build(house, found, left).write()
