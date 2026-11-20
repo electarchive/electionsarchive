@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 import re
+import struct
 import subprocess
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
@@ -22,6 +23,7 @@ import polars as pl
 
 from ea import package, raw
 from ea.package import Package
+from ea.store import DATA
 
 SOURCE = "xk.kuvendi_president"
 KOSOVO = str(uuid5(package.NAMESPACE, "polity\x1fXK"))
@@ -492,13 +494,14 @@ def election(e: Election) -> Package:
     for number, *_rest in boxes.values():
         if number not in pages:
             pages[number] = key("page", day, number)
-            width, height = page_size(stored.path, number)
+            image_key = f"pages/{SOURCE}/{stored.sha256}/{number}.png"
+            width, height = page_image(stored.path, number, image_key)
             p.add(
                 "source_page",
                 id=pages[number],
                 artifact_id=artifacts[e.minutes],
                 page_number=number,
-                image_key=f"pages/{SOURCE}/{stored.sha256}/{number}.png",
+                image_key=image_key,
                 width=width,
                 height=height,
             )
@@ -668,11 +671,26 @@ def election(e: Election) -> Package:
     return p
 
 
-def page_size(path: Path, number: int) -> tuple[int, int]:
-    out = subprocess.run(
-        ["pdfinfo", "-f", str(number), "-l", str(number), str(path)], capture_output=True, text=True, check=True
-    ).stdout
-    found = re.search(rf"Page\s+{number} size:\s+([\d.]+) x ([\d.]+)", out)
-    if found is None:
-        raise ValueError(f"{path}: no size for page {number}")
-    return round(float(found[1])), round(float(found[2]))
+def page_image(path: Path, number: int, image_key: str) -> tuple[int, int]:
+    """Render one PDF page to `data/<image_key>` at 100 dpi and return its size in pixels."""
+    target = DATA / image_key
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if not target.exists():
+        subprocess.run(
+            [
+                "pdftoppm",
+                "-r",
+                "100",
+                "-png",
+                "-singlefile",
+                "-f",
+                str(number),
+                "-l",
+                str(number),
+                str(path),
+                str(target.with_suffix("")),
+            ],
+            check=True,
+        )
+    width, height = struct.unpack(">II", target.read_bytes()[16:24])
+    return width, height
