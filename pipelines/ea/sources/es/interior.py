@@ -751,8 +751,13 @@ def part_municipal(process: str) -> Part:
     units, uvotes = mesas(kind, process, code)
     if not units.height:
         units, uvotes = municipalities(kind, process, code)
-    options = with_options(dvotes, uvotes, units, cands)
     small = read(kind, process, "11")
+    if small.height and units.height:
+        # An open-list municipality is counted by candidate on its own row of the small-municipality file; the
+        # mesa file lists 08139's one mesa in 1995 again by list, so its mesa is left out rather than counted twice.
+        units = units.filter(~pl.col("ckey").is_in(small.select(code.alias("ckey"))["ckey"].implode()))
+        uvotes = uvotes.filter(pl.col("ucode").is_in(units["ucode"].implode()))
+    options = with_options(dvotes, uvotes, units, cands)
     if small.height:
         tiers = small.select(
             code.alias("ckey"),
