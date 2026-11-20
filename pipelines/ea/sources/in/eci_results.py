@@ -236,8 +236,12 @@ RESERVED = re.compile(r"\s*\((SC|ST)\)")
 STATE = re.compile(r"\s*\((?!SC\)|ST\))[^()]+\)\s*$")
 
 
+ARROW = re.compile(r"\s*-->.*$")
+
+
 def heading(html: str) -> str:
-    """The constituency's heading as the page prints it, with the state's name last when it prints one."""
+    """The constituency's heading as the page prints it, with the state's name last when it prints one. The Lok
+    Sabha pages follow the heading with an arrow and the count's status (`--> won`), which is not part of it."""
     tokens = [clean(t) for t in re.split(r"<[^>]+>", re.sub(r"(?s)<script.*?</script>", "", html))]
     tokens = [t for t in tokens if t]
     for index, token in enumerate(tokens):
@@ -247,7 +251,7 @@ def heading(html: str) -> str:
                 if follow.startswith(("Status", "S.N.")):
                     break
                 out.append(follow)
-            return " ".join(out)
+            return ARROW.sub("", " ".join(out))
         if token == "Roundwise-All Candidates" and index + 1 < len(tokens) and "-" in tokens[index + 1]:
             return tokens[index + 1]
     return ""
@@ -438,6 +442,10 @@ METHOD = (
     "is shared in Form 20, so this set is stored as printed at the stage `official`. The winner is the candidate the "
     "site marks as having won, or, where only the table page is held, the candidate with the most votes."
 )
+# Election paths that another pipeline's election holds: in/2024-general belongs to the 2024 general election that
+# in.form20_wb mints for its polling-station sets. Until that pipeline attaches its contests to this election, as
+# in.form20_s3waas does, this election carries no path of its own; its contests keep theirs.
+HELD_PATHS = {"in/2024-general"}
 RESERVATIONS = {
     "SC": "constituency reserved for Scheduled Castes",
     "ST": "constituency reserved for Scheduled Tribes",
@@ -630,7 +638,8 @@ def election(poll: Poll, seats: dict[tuple[str, int], Seat], left: list[tuple[st
         date_precision="day",
         status="held",
     )
-    p.add("slug", path=path, entity_id=id, is_current=True)
+    if path not in HELD_PATHS:
+        p.add("slug", path=path, entity_id=id, is_current=True)
     p.name(id, f"{first:%Y} Indian general election" if lower else f"{first:%Y} {what} election", "en", "official")
     gaps = f" {len(left):,} of the {poll.seats} constituencies are not stored: " if left else ""
     p.add(
@@ -673,7 +682,10 @@ def election(poll: Poll, seats: dict[tuple[str, int], Seat], left: list[tuple[st
         )
         title = seat.name if not lower else f"{seat.name}, {chosen_state(seat)}"
         p.name(contest, title if lower else f"{first:%Y} {what} election, {seat.name}", "en", "official")
-        p.add("slug", path=f"{path}/{code.lower()}-{number}-{slug(seat.name)}", entity_id=contest, is_current=True)
+        # A Lok Sabha contest's path carries the state's name after the constituency's, as it has since it was first
+        # published.
+        tail = slug(f"{seat.name} {chosen_state(seat)}" if lower else seat.name)
+        p.add("slug", path=f"{path}/{code.lower()}-{number}-{tail}", entity_id=contest, is_current=True)
         result_set = key("result_set", tag)
         used = [seat.page] + ([seat.cards] if seat.cards is not None and seat.cards is not seat.page else [])
         stamp = max(page.captured for page in used)
