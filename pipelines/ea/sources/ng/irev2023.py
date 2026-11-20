@@ -89,7 +89,23 @@ READ = {
             "10": "Okoloba",
             "11": "Igbedi",
         },
-    )
+    ),
+    ("06", "01"): (
+        "Brass",
+        "Brass",
+        {
+            "01": "Brass 1",
+            "02": "Brass 2",
+            "03": "Brass 3",
+            "04": "Okpoama",
+            "05": "Odioma-Diema",
+            "06": "Cape Formosa",
+            "07": "Kongho",
+            "08": "Oginibiri",
+            "09": "Minibie",
+            "10": "Sangana",
+        },
+    ),
 }
 RENDER = 2000
 
