@@ -13,7 +13,7 @@ The archive already holds the state, the municipalities, and the Brazil polity, 
 import re
 import subprocess
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, timedelta
 from typing import NamedTuple
 from uuid import uuid5
 
@@ -301,7 +301,7 @@ def registry() -> Package:
         id=SYSTEM,
         polity_id=BRAZIL,
         valid_from=DAYS[0].date,
-        valid_to=DAYS[-1].date,
+        valid_to=DAYS[-1].date + timedelta(days=1),
         rules={"formula": "referendum"},
         rules_version=1,
     )
@@ -357,7 +357,7 @@ def plebiscites(day: Day) -> Package:
                 area_id=town.area,
                 kind="standard",
                 valid_from=day.date,
-                valid_to=day.date,
+                valid_to=day.date + timedelta(days=1),
             )
             p.name(unit, town.name, "pt", "official")
         return towns[code]
@@ -462,7 +462,7 @@ def plebiscites(day: Day) -> Package:
                 area_id=town.area,
                 kind="standard",
                 valid_from=day.date,
-                valid_to=day.date,
+                valid_to=day.date + timedelta(days=1),
             )
             p.name(section, f"{town.name}, zona {s['zone']}, seção {s['number']}: {sec.place}", "pt", "official")
             values(section, s)
