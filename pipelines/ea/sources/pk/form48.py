@@ -1,15 +1,17 @@
-"""Pakistan's 2024 National Assembly election by polling station in the Punjab and Islamabad, and the election of
-the Provincial Assembly of the Punjab, from the returning officers' consolidated statements of the count (Form 48).
+"""Pakistan's 2024 National Assembly election by polling station, and the elections of the four Provincial
+Assemblies, from the returning officers' consolidated statements of the count (Form 48).
 
 After the count of 8 February 2024, each returning officer typed a Form 48: one row per polling station with each
 candidate's valid votes (tendered and challenged votes included), the valid votes, the invalid votes, and the total,
-and a row of totals at the foot. The Election Commission's shared folder of the Punjab's forms holds the Form 48 of
-each National Assembly constituency of the Punjab and of Islamabad, NA-46 to NA-189, and of each Provincial Assembly
-constituency, PP-1 to PP-297, as a PDF of photographs of the typed pages (`fetch` lists the folder through Drive's
-embedded folder view and downloads each file; a revised form takes the place of the first). Each house is its own
-package.
+and a row of totals at the foot. The Election Commission shared each province's forms in a Drive folder: the Punjab's
+holds the Form 48 of each National Assembly constituency of the Punjab and of Islamabad, NA-46 to NA-189, and of each
+Provincial Assembly constituency, PP-1 to PP-297; Sindh's holds NA-190 to NA-250 and PS-1 to PS-130; Khyber
+Pakhtunkhwa's holds NA-1 to NA-45 and PK-1 to PK-115, and Balochistan's NA-251 to NA-266 and PB-1 to PB-51, each form in
+a folder of its own seat. Each form is a PDF of photographs or scans of the typed pages (`fetch` lists the folders
+through Drive's embedded folder view and downloads each file; a revised form takes the place of the first, and a seat's
+by-election forms are not read). Each house of each province is its own package.
 
-The photographs carry no usable text, so each page is read here. It is turned so that its rules run level and its
+The photographs carry no text, or only a scanner's unreliable reading of it, so each page is read here. It is turned so that its rules run level and its
 polling-station column lies to the left of the candidates' columns; its horizontal rules give the rows, and its
 vertical rules, found band by band since a photographed page leans and bows, are fitted to the columns of the
 document's table: two for the serial number and the station, one per candidate, and three for the valid, invalid,
@@ -63,35 +65,130 @@ STAMP = "2024-02-08"
 
 @dataclass(frozen=True)
 class House:
-    """One assembly whose forms the folder holds: its seat prefix, its subfolder, its package, and how it is named."""
+    """One assembly's forms in one province's folder: its seat prefix, where its forms lie, its package, and how it
+    is named."""
 
     prefix: str
-    folder: str
+    root: str  # the Drive folder the forms are found from
+    path: tuple[str, ...]  # the titles of the folders to descend through from the root
     key: str
-    source: str  # the part that tells its source row from the other house's
-    seat: re.Pattern[str]  # a form's file name, with the seat number
+    source: str  # the part that tells its source row from the other houses'
+    seat: re.Pattern[str]  # a form's file name, or its seat folder's name, with the seat number
     name: str
     place: str
+    title: str  # the source's title after the common part
+    note: tuple[str, ...]  # the parts that tell its left-out note from the other houses'
+    nested: bool = False  # whether each seat's form lies in a folder of its own
 
+
+def _named(prefix: str) -> re.Pattern[str]:
+    return re.compile(rf"^{prefix}[\s_.*-]*0*(\d+)", re.IGNORECASE)
+
+
+SINDH = "14X4qrGjOUUVti-R1u0Tq95KEkogDiqUt"
+KP = "1tCQNFIyI5sI72IE5UbDC2RRmD9MVlEKc"
+BALOCHISTAN = "1VcMHcyaDN1rn3AD4_7NbIX77L2ESGhWz"
 
 HOUSES = {
     "NA": House(
         "NA",
-        "National_Assembly",
+        ROOT,
+        ("National_Assembly",),
         f"{SOURCE}/{STAMP}",
         "form48",
         re.compile(r"^NA[\s_.-]*0*(\d+)", re.IGNORECASE),
         "National Assembly",
         "the Punjab and Islamabad",
+        "National Assembly, the Punjab",
+        (),
     ),
     "PP": House(
         "PP",
-        "Provincial_Assembly",
+        ROOT,
+        ("Provincial_Assembly",),
         f"{SOURCE}/{STAMP}-pp",
         "form48-pp",
         re.compile(r"^(?:revised[\s_-]+form[\s_-]*48[\s_-]*)?PP?[\s_.-]*0*(\d+)", re.IGNORECASE),
         "Provincial Assembly of the Punjab",
         "the Punjab",
+        "Provincial Assembly of the Punjab",
+        ("PP",),
+    ),
+    "NA-sindh": House(
+        "NA",
+        SINDH,
+        ("Form-48", "NA"),
+        f"{SOURCE}/{STAMP}-na-sindh",
+        "form48-na-sindh",
+        _named("NA"),
+        "National Assembly",
+        "Sindh",
+        "National Assembly, Sindh",
+        ("NA", "Sindh"),
+    ),
+    "PS": House(
+        "PS",
+        SINDH,
+        ("Form-48", "PS"),
+        f"{SOURCE}/{STAMP}-ps",
+        "form48-ps",
+        _named("PS"),
+        "Provincial Assembly of Sindh",
+        "Sindh",
+        "Provincial Assembly of Sindh",
+        ("PS",),
+    ),
+    "NA-kp": House(
+        "NA",
+        KP,
+        ("Form-48", "National Assembly"),
+        f"{SOURCE}/{STAMP}-na-kp",
+        "form48-na-kp",
+        _named("NA"),
+        "National Assembly",
+        "Khyber Pakhtunkhwa",
+        "National Assembly, Khyber Pakhtunkhwa",
+        ("NA", "Khyber Pakhtunkhwa"),
+        nested=True,
+    ),
+    "PK": House(
+        "PK",
+        KP,
+        ("Form-48", "Provincial Assembly"),
+        f"{SOURCE}/{STAMP}-pk",
+        "form48-pk",
+        _named("PK"),
+        "Provincial Assembly of Khyber Pakhtunkhwa",
+        "Khyber Pakhtunkhwa",
+        "Provincial Assembly of Khyber Pakhtunkhwa",
+        ("PK",),
+        nested=True,
+    ),
+    "NA-balochistan": House(
+        "NA",
+        BALOCHISTAN,
+        ("Form-48",),
+        f"{SOURCE}/{STAMP}-na-balochistan",
+        "form48-na-balochistan",
+        _named("NA"),
+        "National Assembly",
+        "Balochistan",
+        "National Assembly, Balochistan",
+        ("NA", "Balochistan"),
+        nested=True,
+    ),
+    "PB": House(
+        "PB",
+        BALOCHISTAN,
+        ("Form-48",),
+        f"{SOURCE}/{STAMP}-pb",
+        "form48-pb",
+        _named("PB"),
+        "Provincial Assembly of Balochistan",
+        "Balochistan",
+        "Provincial Assembly of Balochistan",
+        ("PB",),
+        nested=True,
     ),
 }
 
@@ -118,21 +215,54 @@ def _tiff(path: Path) -> None:
         raise ValueError("the host returned something other than a TIFF")
 
 
-def files(house: House, fetching: bool = False) -> dict[str, str]:
-    """The Drive id of each constituency's Form 48, by seat code; a revised form takes the place of the first."""
+def _child(folder: str, title: str) -> str:
+    return next(id for id, is_folder, name in entries(folder) if is_folder and name.lower() == title.lower())
+
+
+def folders(house: House, fetching: bool = False) -> list[str]:
+    """The Drive folders from the house's root down to the one that holds its forms or its seats' folders."""
+    found = [house.root]
+    for title in house.path:
+        if fetching:
+            raw.fetch(SOURCE, LISTING.format(found[-1]), suffix=".html")
+        found.append(_child(found[-1], title))
     if fetching:
-        raw.fetch(SOURCE, LISTING.format(ROOT), suffix=".html")
-    folder = next(id for id, is_folder, title in entries(ROOT) if is_folder and title == house.folder)
+        raw.fetch(SOURCE, LISTING.format(found[-1]), suffix=".html")
+    return found
+
+
+def _form(folder: str, fetching: bool) -> str | None:
+    """The Drive id of the form in a seat's own folder: a revised form before the first, and of several, the one
+    whose name says it is a Form 48."""
     if fetching:
         raw.fetch(SOURCE, LISTING.format(folder), suffix=".html")
+    inside = [(id, title.strip()) for id, is_folder, title in entries(folder) if not is_folder]
+    if not inside:
+        return None
+    ranked = sorted(
+        inside,
+        key=lambda f: (not f[1].lower().startswith("revised"), "48" not in f[1], f[1].lower()),
+    )
+    return ranked[0][0]
+
+
+def files(house: House, fetching: bool = False) -> dict[str, str]:
+    """The Drive id of each constituency's Form 48, by seat code; a revised form takes the place of the first."""
+    folder = folders(house, fetching)[-1]
     found: dict[str, str] = {}
     revised: dict[str, str] = {}
     for id, is_folder, title in entries(folder):
         m = house.seat.match(title.strip())
-        if is_folder or m is None:
+        if m is None or is_folder != house.nested:
+            continue
+        code = f"{house.prefix}-{int(m.group(1))}"
+        if house.nested:
+            form = _form(id, fetching)
+            if form is not None:
+                found[code] = form
             continue
         into = revised if title.strip().lower().startswith("revised") else found
-        into[f"{house.prefix}-{int(m.group(1))}"] = id
+        into[code] = id
     return found | revised
 
 
@@ -1227,7 +1357,7 @@ def assemble(code: str, artifact: raw.Artifact, read: dict) -> Seat | str:
     return Seat(code, artifact, stations, completeness, printed is not None, complete, order)
 
 
-FOLDER = "https://drive.google.com/drive/folders/" + ROOT
+FOLDER = "https://drive.google.com/drive/folders/"
 
 
 def source_id(house: House) -> str:
@@ -1270,13 +1400,15 @@ def build(house: House, found: list[Seat], left: dict[str, str]) -> Package:
         id=source,
         kind="official_body",
         publisher="Election Commission of Pakistan",
-        title=f"General Elections 2024: consolidated statements of the count (Form 48), {house.name}"
-        + (", the Punjab" if house.prefix == "NA" else ""),
-        url=FOLDER,
+        title=f"General Elections 2024: consolidated statements of the count (Form 48), {house.title}",
+        url=FOLDER + house.root,
         license="Official publication; reuse terms are not stated",
         attribution="Election Commission of Pakistan",
     )
-    for folder in (ROOT, *(id for id, is_folder, title in entries(ROOT) if is_folder and title == house.folder)):
+    listed = folders(house)
+    if house.nested:
+        listed += [id for id, is_folder, title in entries(listed[-1]) if is_folder and house.seat.match(title.strip())]
+    for folder in listed:
         if LISTING.format(folder) in raw.keys(SOURCE):
             p.artifact(raw.cached(SOURCE, LISTING.format(folder)), source)
     values: list[dict[str, object]] = []
@@ -1286,7 +1418,7 @@ def build(house: House, found: list[Seat], left: dict[str, str]) -> Package:
     if left:
         p.add(
             "note",
-            id=key("note", election, "left-out", *([] if house.prefix == "NA" else [house.prefix])),
+            id=key("note", election, "left-out", *house.note),
             entity_id=election,
             kind="context",
             body_md="Polling-station results from the returning officers' Forms 48 are stored for "
