@@ -99,7 +99,12 @@ ELECTIONS: dict[str, dict[str, object]] = {
         ),
     },
 }
-NEXT_DAY = {"1945": date(1946, 6, 2), "1946-06": date(1946, 10, 27), "1946-11": date(1951, 6, 17)}
+NEXT_DAY = {
+    "1945": date(1946, 6, 2),
+    "1946-06": date(1946, 10, 27),
+    "1946-11": date(1951, 6, 17),
+    "1951": date(1956, 1, 2),
+}
 BODIES = {
     "constituent-1945": (
         "constituent_assembly",
