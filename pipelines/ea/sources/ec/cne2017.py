@@ -3,6 +3,11 @@
 The book prints the presidential first round and runoff by canton (and by country abroad), and the National
 Assembly and Andean Parliament contests by province, canton, and country. The tables are read from the book's text
 layer by ``book2017``, and each table is checked against the totals the book prints under it before it is stored.
+
+The ten provincial circumscriptions of Guayas, Manabí, and Pichincha also print each list's votes by parish. Those
+rows are matched to the Council's parish codes by name within the canton, and must add up to their canton's row; they
+go into a finer result set that supersedes the canton-level one. The book's "más votada por parroquia" pages are maps
+that print no figures, so the presidential rounds stay at the canton.
 """
 
 import functools
