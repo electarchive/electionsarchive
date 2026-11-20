@@ -1,0 +1,973 @@
+{
+ "NA-54": {
+  "form": "48",
+  "id": "1m51DAyhBx2ajvIE0hxJmnklH0Szw2JiX",
+  "name": "",
+  "valid": 230704,
+  "invalid": 5224,
+  "candidates": [
+   [
+    1,
+    "Ajmal Khan",
+    "",
+    69
+   ],
+   [
+    2,
+    "Ajmal Sabir Raja",
+    "",
+    41
+   ],
+   [
+    3,
+    "Ihtisham Iqbal (RTD)",
+    "",
+    191
+   ],
+   [
+    4,
+    "Ejaz Asghar",
+    "",
+    106
+   ],
+   [
+    5,
+    "Barkat Ullah",
+    "",
+    76
+   ],
+   [
+    6,
+    "Chaudhary Nisar Ali Khan",
+    "",
+    19106
+   ],
+   [
+    7,
+    "Hafiz Muhammad Rizwan",
+    "",
+    370
+   ],
+   [
+    8,
+    "Khawaja Muhammad Imtiaz (RTD)",
+    "",
+    176
+   ],
+   [
+    9,
+    "Zeeshan Siddique Butt (RTD)",
+    "",
+    3893
+   ],
+   [
+    10,
+    "Robeena Ajmal Raja",
+    "",
+    36
+   ],
+   [
+    11,
+    "Zubair Farooq Khan",
+    "",
+    176
+   ],
+   [
+    12,
+    "Safeer Alam",
+    "",
+    1433
+   ],
+   [
+    13,
+    "Sultan Mehmood",
+    "",
+    96
+   ],
+   [
+    14,
+    "Syed Ishrat Ali Zaidi",
+    "",
+    222
+   ],
+   [
+    15,
+    "Syed Qamar Abbas",
+    "",
+    2365
+   ],
+   [
+    16,
+    "Shamas Ur Rehman",
+    "",
+    5292
+   ],
+   [
+    17,
+    "Tahir Mehmood",
+    "",
+    13282
+   ],
+   [
+    18,
+    "Abdul Hakeem Farooqi",
+    "",
+    3317
+   ],
+   [
+    19,
+    "Azra Masood",
+    "",
+    73729
+   ],
+   [
+    20,
+    "Aqeel Malik",
+    "",
+    85930
+   ],
+   [
+    21,
+    "Ghulam Sarwar Khan",
+    "",
+    16891
+   ],
+   [
+    22,
+    "Farkhanda Koukeb",
+    "",
+    301
+   ],
+   [
+    23,
+    "Muhammad Sarwar",
+    "",
+    1368
+   ],
+   [
+    24,
+    "Mudassar Hussain Shah",
+    "",
+    407
+   ],
+   [
+    25,
+    "Malik Azhar Mehmood",
+    "",
+    126
+   ],
+   [
+    26,
+    "Malik Tauqeer Ali Mardan (RTD)",
+    "",
+    200
+   ],
+   [
+    27,
+    "Malik Taimur Masood (RTD)",
+    "",
+    765
+   ],
+   [
+    28,
+    "Nouman Tariq",
+    "",
+    185
+   ],
+   [
+    29,
+    "Wajid Kiyani",
+    "",
+    472
+   ],
+   [
+    30,
+    "Wajid Murtaza",
+    "",
+    83
+   ]
+  ]
+ },
+ "PS-52": {
+  "form": "48",
+  "id": "144cciMhgybFaQL1aZkibGuMTMMPIDzrg",
+  "name": "",
+  "valid": 87636,
+  "invalid": 2133,
+  "candidates": [
+   [
+    1,
+    "Imam Ali",
+    "",
+    17
+   ],
+   [
+    2,
+    "Pir Shan Ali Shah Jeelani",
+    "",
+    93
+   ],
+   [
+    3,
+    "Habibullah",
+    "",
+    29
+   ],
+   [
+    4,
+    "Dilawar Khan",
+    "",
+    74
+   ],
+   [
+    5,
+    "Dost Muhammad",
+    "",
+    70429
+   ],
+   [
+    6,
+    "Deedar Hussain",
+    "",
+    500
+   ],
+   [
+    7,
+    "Sher Khan",
+    "",
+    15853
+   ],
+   [
+    8,
+    "Gulji Mal",
+    "",
+    38
+   ],
+   [
+    9,
+    "Liaquat Ali",
+    "",
+    67
+   ],
+   [
+    10,
+    "Mushtaque Ali",
+    "",
+    16
+   ],
+   [
+    11,
+    "Mehar Khan",
+    "",
+    520
+   ]
+  ]
+ },
+ "PP-219": {
+  "form": "48",
+  "id": "1iZ93mnoenjMujclZQRFRyZUAXrFSOPuK",
+  "name": "",
+  "valid": 128402,
+  "invalid": 2472,
+  "candidates": [
+   [
+    1,
+    "Amjad Nawaz",
+    "",
+    447
+   ],
+   [
+    2,
+    "Ansar Abbas",
+    "",
+    57
+   ],
+   [
+    3,
+    "Haider Abbas",
+    "",
+    90
+   ],
+   [
+    4,
+    "Dalair Khan",
+    "",
+    34311
+   ],
+   [
+    5,
+    "Sohail Aftab",
+    "",
+    278
+   ],
+   [
+    6,
+    "Zia Ur Rehman",
+    "",
+    1194
+   ],
+   [
+    7,
+    "Zafar Ahmad",
+    "",
+    232
+   ],
+   [
+    8,
+    "Abdul Kareem",
+    "",
+    1299
+   ],
+   [
+    9,
+    "Ali Akbar",
+    "",
+    71
+   ],
+   [
+    10,
+    "Muhammad Asif",
+    "",
+    1435
+   ],
+   [
+    11,
+    "Muhammad Akhtar",
+    "",
+    39496
+   ],
+   [
+    12,
+    "Muhammad Idrees",
+    "",
+    230
+   ],
+   [
+    13,
+    "Muhammad Salman Ellahi",
+    "",
+    5466
+   ],
+   [
+    14,
+    "Muhammad Tayyab Gujjar",
+    "",
+    607
+   ],
+   [
+    15,
+    "Malik Wasif Muzhar",
+    "",
+    43189
+   ]
+  ]
+ },
+ "PB-37": {
+  "form": "48",
+  "id": "1pREI3Gr4VNhvZqDYZ21FCIpdjogYO7DE",
+  "name": "",
+  "valid": 42143,
+  "invalid": 2263,
+  "candidates": [
+   [
+    1,
+    "Ahmed Khan Sarprah",
+    "",
+    283
+   ],
+   [
+    2,
+    "Jamil Ahmed",
+    "",
+    62
+   ],
+   [
+    3,
+    "Hazoor Bakhsh",
+    "",
+    11
+   ],
+   [
+    4,
+    "Khalid Ur Rehman",
+    "",
+    1032
+   ],
+   [
+    5,
+    "Zulekha Aziz",
+    "",
+    268
+   ],
+   [
+    6,
+    "Sardar Kamal Khan Bangulzai",
+    "",
+    7026
+   ],
+   [
+    7,
+    "Sardar Noor Ahmed Bangulzai",
+    "",
+    11428
+   ],
+   [
+    8,
+    "Saif Ud Din",
+    "",
+    11
+   ],
+   [
+    9,
+    "Saddam Hussain",
+    "",
+    402
+   ],
+   [
+    10,
+    "Tariq Aziz",
+    "",
+    173
+   ],
+   [
+    11,
+    "Abdul Jaleel",
+    "",
+    431
+   ],
+   [
+    12,
+    "Abdul Waheed",
+    "",
+    32
+   ],
+   [
+    13,
+    "Muhammad Asif",
+    "",
+    1319
+   ],
+   [
+    14,
+    "Muhammad Ishaq",
+    "",
+    70
+   ],
+   [
+    15,
+    "Mir Ahmed",
+    "",
+    32
+   ],
+   [
+    16,
+    "Mir Hasil Khan",
+    "",
+    30
+   ],
+   [
+    17,
+    "Mir Abdul Latif Muhammad Hassani",
+    "",
+    51
+   ],
+   [
+    18,
+    "Mir Muhammad Akbar Bangulzai",
+    "",
+    10
+   ],
+   [
+    19,
+    "Mir Yasir Arfat",
+    "",
+    68
+   ],
+   [
+    20,
+    "Nawab Muhammad Aslam Khan Raisani",
+    "",
+    13675
+   ],
+   [
+    21,
+    "Nawab Muhammad Khan Shahwani",
+    "",
+    5729
+   ]
+  ]
+ },
+ "PK-105": {
+  "form": "48",
+  "id": "1zXI8vOz0MDYnzVWoIyTuBP3E6hdTxitE",
+  "name": "",
+  "valid": 87113,
+  "invalid": 2474,
+  "candidates": [
+   [
+    1,
+    "Akhtar Munir Marwat",
+    "",
+    11
+   ],
+   [
+    2,
+    "Ishfaq Ahmad Khan",
+    "",
+    22
+   ],
+   [
+    3,
+    "Imdadullah",
+    "",
+    128
+   ],
+   [
+    4,
+    "Amir Nawaz Khan",
+    "",
+    24
+   ],
+   [
+    5,
+    "Inam Ullah Khan",
+    "",
+    335
+   ],
+   [
+    6,
+    "Johar Muhammad",
+    "",
+    36905
+   ],
+   [
+    7,
+    "Sher Afzal Khan",
+    "",
+    461
+   ],
+   [
+    8,
+    "Sher Ali Baz Khan",
+    "",
+    2514
+   ],
+   [
+    9,
+    "Zafar Ullah Khan",
+    "",
+    14
+   ],
+   [
+    10,
+    "Abdul Haleem",
+    "",
+    5
+   ],
+   [
+    11,
+    "Abdullah",
+    "",
+    58
+   ],
+   [
+    12,
+    "Farmanullah Khan",
+    "",
+    6
+   ],
+   [
+    13,
+    "Fawad Ahmad",
+    "",
+    263
+   ],
+   [
+    14,
+    "Faheemullah Khan",
+    "",
+    169
+   ],
+   [
+    15,
+    "Qudrat Ullah Khan",
+    "",
+    215
+   ],
+   [
+    16,
+    "Muhammad Iqbal",
+    "",
+    8
+   ],
+   [
+    17,
+    "Muhammad Arif Khan",
+    "",
+    10
+   ],
+   [
+    18,
+    "Muhammad Mehtab Khan",
+    "",
+    10
+   ],
+   [
+    19,
+    "Mansoor Kamal Marwat",
+    "",
+    28
+   ],
+   [
+    20,
+    "Munawar Khan Son Of Habib Ur Rehman",
+    "",
+    439
+   ],
+   [
+    21,
+    "Munawar Khan Son Of Ghulam Sarwar Khan",
+    "",
+    26333
+   ],
+   [
+    22,
+    "Nisar Ahmad Khan",
+    "",
+    17
+   ],
+   [
+    23,
+    "Najib Ullah Khan",
+    "",
+    19135
+   ],
+   [
+    24,
+    "Hidayatullah Khan",
+    "",
+    3
+   ]
+  ]
+ },
+ "PS-104": {
+  "form": "48",
+  "id": "1Xv5hMCsn5VnodIOv7IZAmrQy4hVRmYG9",
+  "name": "",
+  "valid": 75714,
+  "invalid": 1209,
+  "candidates": [
+   [
+    1,
+    "Amjad Asif Jah",
+    "",
+    8488
+   ],
+   [
+    2,
+    "Amjad Ali Asif",
+    "",
+    2652
+   ],
+   [
+    3,
+    "Aurangzeb Kashif Ali",
+    "",
+    51
+   ],
+   [
+    4,
+    "Hafiz Ghulam Mustafa",
+    "",
+    763
+   ],
+   [
+    5,
+    "Rana Tanzeel Ur Rehman",
+    "",
+    78
+   ],
+   [
+    6,
+    "Syed Mohsin Razi",
+    "",
+    24
+   ],
+   [
+    7,
+    "Syed Matloob Hussain Shah Kazmi",
+    "",
+    67
+   ],
+   [
+    8,
+    "Syeda Sara Kanwal Shahid",
+    "",
+    48
+   ],
+   [
+    9,
+    "Sohaib Azhar Butt",
+    "",
+    41
+   ],
+   [
+    10,
+    "Abdul Sattar",
+    "",
+    2288
+   ],
+   [
+    11,
+    "Abdul Sattar",
+    "",
+    202
+   ],
+   [
+    12,
+    "Abdul Qadir",
+    "",
+    53
+   ],
+   [
+    13,
+    "Uzair Hanif",
+    "",
+    17
+   ],
+   [
+    14,
+    "Ali Ahmed Palh",
+    "",
+    63
+   ],
+   [
+    15,
+    "Ali Ahmed Rafiq Surmawala",
+    "",
+    41
+   ],
+   [
+    16,
+    "Farhat Ullah Khan",
+    "",
+    969
+   ],
+   [
+    17,
+    "Liaquat Hussain Khan",
+    "",
+    56
+   ],
+   [
+    18,
+    "Muhammad Akram",
+    "",
+    4922
+   ],
+   [
+    19,
+    "Muhammad Tasneem",
+    "",
+    42
+   ],
+   [
+    20,
+    "Muhammad Junaid Mukati",
+    "",
+    23588
+   ],
+   [
+    21,
+    "Muhammad Daniyal",
+    "",
+    30465
+   ],
+   [
+    22,
+    "Muhammad Sohail Tariq",
+    "",
+    50
+   ],
+   [
+    23,
+    "Muhammad Sohaib",
+    "",
+    127
+   ],
+   [
+    24,
+    "Muhammad Tariq",
+    "",
+    49
+   ],
+   [
+    25,
+    "Muhammad Mansoor Umer Khan",
+    "",
+    83
+   ],
+   [
+    26,
+    "Muhammad Yousuf",
+    "",
+    131
+   ],
+   [
+    27,
+    "Mustaqeem Ahmed Siddiqui Qadri",
+    "",
+    315
+   ],
+   [
+    28,
+    "Musarat Shah",
+    "",
+    11
+   ],
+   [
+    29,
+    "Naufil Shah Daud",
+    "",
+    17
+   ],
+   [
+    30,
+    "Wali Muhammad Abbasi",
+    "",
+    13
+   ]
+  ]
+ },
+ "PB-21": {
+  "form": "47",
+  "id": "1cR_KV9v53Y3cjg0BMnLXOrdykadWk1Gp",
+  "name": "Hub",
+  "registered": 139585,
+  "valid": 73328,
+  "invalid": 3648,
+  "split": 14,
+  "candidates": [
+   [
+    1,
+    "Rajab Ali Rind",
+    "National Party",
+    17000
+   ],
+   [
+    2,
+    "Rehmatullah",
+    "Independent",
+    91
+   ],
+   [
+    3,
+    "Sikandar Khan (RTD)",
+    "Independent",
+    1716
+   ],
+   [
+    4,
+    "Abdul Jabbar",
+    "Independent",
+    150
+   ],
+   [
+    5,
+    "Abdul Ghafoor",
+    "Muttahida Qaumi Movement Pakistan",
+    206
+   ],
+   [
+    6,
+    "Abdul Wahab",
+    "Independent",
+    70
+   ],
+   [
+    7,
+    "Ubaid Ur Rehman",
+    "Awami National Party",
+    114
+   ],
+   [
+    8,
+    "Ali Hassan Zehri",
+    "Pakistan Peoples Party Parliamentarians",
+    14120
+   ],
+   [
+    9,
+    "Ali Nawaz",
+    "Tehreek Jawanan Pakistan",
+    30
+   ],
+   [
+    10,
+    "Inayatullah",
+    "Mazloom Olsi Tehreek Pakistan",
+    75
+   ],
+   [
+    11,
+    "Ghulam Qadir",
+    "Jamiat Ulama-e-Islam Pakistan",
+    2351
+   ],
+   [
+    12,
+    "Ghulam Mustafa Malik",
+    "Independent",
+    741
+   ],
+   [
+    13,
+    "Qudratullah",
+    "Balochistan National Party (Awami)",
+    81
+   ],
+   [
+    14,
+    "Gul Sher",
+    "Independent",
+    273
+   ],
+   [
+    15,
+    "Maria Kamal",
+    "Independent",
+    247
+   ],
+   [
+    16,
+    "Muhammad Jan",
+    "Jamaat-e-Islami Pakistan",
+    620
+   ],
+   [
+    17,
+    "Muhammad Saleh Bhutani",
+    "Balochistan Awami Party",
+    30910
+   ],
+   [
+    18,
+    "Muhammad Karim Baloch",
+    "Independent",
+    100
+   ],
+   [
+    19,
+    "Mansoor Ahmad Baloch",
+    "Rabita Jamiat Ulma-e-Islam",
+    12
+   ],
+   [
+    20,
+    "Naveed Akbar",
+    "Tehreek Labbaik Pakistan",
+    4421
+   ]
+  ]
+ }
+}
