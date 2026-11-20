@@ -455,7 +455,13 @@ def region_code(text: str) -> str:
     return found.pop()
 
 
-def read(day: date, archive: zipfile.ZipFile, member: str) -> pl.DataFrame:
+def read(
+    day: date,
+    archive: zipfile.ZipFile,
+    member: str,
+    columns: dict[str, tuple[str, ...]] = COLUMNS,
+    numbers: tuple[str, ...] = NUMBERS,
+) -> pl.DataFrame:
     data = archive.read(member)
     if member.lower().endswith(".xlsx"):
         frame = pl.read_excel(io.BytesIO(data), infer_schema_length=0)
@@ -472,7 +478,7 @@ def read(day: date, archive: zipfile.ZipFile, member: str) -> pl.DataFrame:
         )
     frame = frame.rename({column: column.strip().upper() for column in frame.columns})
     renamed: dict[str, str] = {}
-    for canonical, aliases in COLUMNS.items():
+    for canonical, aliases in columns.items():
         for alias in aliases:
             if alias in frame.columns:
                 renamed[alias] = canonical
@@ -481,11 +487,11 @@ def read(day: date, archive: zipfile.ZipFile, member: str) -> pl.DataFrame:
     if "round" not in frame.columns:
         frame = frame.with_columns(round=pl.lit("2" if "secondo" in member.lower() else "1"))
     frame = frame.with_columns(
-        [pl.col(c).str.strip_chars().fill_null("") for c in frame.columns if c not in NUMBERS]
+        [pl.col(c).str.strip_chars().fill_null("") for c in frame.columns if c not in numbers]
         + [
             pl.col(c).str.strip_chars().str.replace(r"[.,]0+$", "").replace("", None).cast(pl.Int64, strict=True)
             for c in frame.columns
-            if c in NUMBERS
+            if c in numbers
         ]
     )
     if "SEZIONE" in frame.columns and (frame["SEZIONE"] == "").all():
@@ -499,10 +505,19 @@ def read(day: date, archive: zipfile.ZipFile, member: str) -> pl.DataFrame:
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
+    frames, unplaced = collect(DAYS)
+    unplaced.write_parquet(PARSED / "unplaced.parquet")
+    for stem, frame in frames.items():
+        frame.write_parquet(PARSED / f"{stem}.parquet")
+
+
+def collect(days: list[date]) -> tuple[dict[str, pl.DataFrame], pl.DataFrame]:
+    """The municipal accounting, list, and candidate rows of the given elections, each placed by ISTAT code, and the
+    places no code was found for."""
     accounting: list[pl.DataFrame] = []
     lists: list[pl.DataFrame] = []
     candidates: list[pl.DataFrame] = []
-    for day in DAYS:
+    for day in days:
         archive = zipfile.ZipFile(raw.cached(SOURCE, url(day)).path)
         members = [m for m in archive.namelist() if not m.endswith("/") and not SKIPPED.search(m)]
         for member in members:
@@ -545,6 +560,17 @@ def parse() -> None:
                         pl.col("candidate_votes").sum(), *[pl.col(c).max() for c in extra]
                     )
                 candidates.append(rows)
+    return locate(
+        {
+            "accounting": pl.concat(accounting, how="diagonal_relaxed"),
+            "lists": pl.concat(lists, how="diagonal_relaxed"),
+            "candidates": pl.concat(candidates, how="diagonal_relaxed"),
+        }
+    )
+
+
+def locate(frames: dict[str, pl.DataFrame]) -> tuple[dict[str, pl.DataFrame], pl.DataFrame]:
+    """Each frame's rows with the ISTAT code of their municipality, and the places no code was found for."""
     resolve, _, _ = regionali.municipalities()
 
     def code_of(region: str, province: str, label: str, day: date) -> str | None:
@@ -555,11 +581,6 @@ def parse() -> None:
             return alias
         return resolve(region, alias or label, day)
 
-    frames = {
-        "accounting": pl.concat(accounting, how="diagonal_relaxed"),
-        "lists": pl.concat(lists, how="diagonal_relaxed"),
-        "candidates": pl.concat(candidates, how="diagonal_relaxed"),
-    }
     place = ["day", "region", "PROVINCIA", "COMUNE"]
     located = (
         pl.concat([frame.select(place) for frame in frames.values()])
@@ -574,11 +595,11 @@ def parse() -> None:
     clashes = located.filter(pl.col("code").is_not_null(), pl.len().over("day", "code") > 1)
     if clashes.height:
         raise ValueError(f"municipalities named twice in one election: {clashes.sort('code').rows()}")
-    located.filter(pl.col("code").is_null()).write_parquet(PARSED / "unplaced.parquet")
-    for stem, frame in frames.items():
-        frame.join(located, on=place, how="left").filter(pl.col("code").is_not_null()).write_parquet(
-            PARSED / f"{stem}.parquet"
-        )
+    placed = {
+        stem: frame.join(located, on=place, how="left").filter(pl.col("code").is_not_null())
+        for stem, frame in frames.items()
+    }
+    return placed, located.filter(pl.col("code").is_null())
 
 
 def label_of(day: date) -> str:
