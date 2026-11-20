@@ -22,7 +22,7 @@ from ea.package import NAMESPACE, Package
 from ea.store import DATA
 
 SOURCE = "it.municipi"
-ITALY = str(uuid5(NAMESPACE, "polity\x1fIT"))
+ITALY = "01a13bf7-2f71-7303-964e-fdd9421ca0b6"  # production's Italy polity, from the reference partition
 MANUAL = DATA / "inbox" / "manual" / "MF-municipi"
 
 GENOA_POLITY = "85b976d9-b10a-540b-93d9-7724fb08f494"
