@@ -705,6 +705,8 @@ def authorities_of(day: date) -> list[Authority]:
         )
         for c in council_table(f"{key_}-acclaimed")
     ]
+    if day == MAY:
+        _name_acclaimed(acclaimed)
     out = voted + acclaimed
     if day == MAY:
         out.append(anata())
@@ -720,6 +722,32 @@ def authorities_of(day: date) -> list[Authority]:
     if len(set(idents)) != len(idents):
         raise ValueError(f"two councils share a name: {[i for i, n in Counter(idents).items() if n > 1]}")
     return out
+
+
+@cache
+def annex() -> list[councils17.AnnexCouncil]:
+    return councils17.annex_councils(councils17.fix_ligatures(council_path("report")))
+
+
+def _name_acclaimed(acclaimed: list[Authority]) -> None:
+    """The winners of each council declared elected by acclamation, from the annex of the final report: the annex's
+    block for the council marks each of its candidates "winner / acclamation"."""
+    blocks = {
+        (councils17.fold(_district(b.district)), councils17.fold(b.name)): b
+        for b in annex()
+        if any(r.acclaimed for r in b.rows)
+    }
+    if len(blocks) != len(acclaimed) or set(blocks) != {a.matching for a in acclaimed}:
+        raise ValueError(
+            f"the annex's acclaimed councils differ from the table's: {set(blocks) ^ {a.matching for a in acclaimed}}"
+        )
+    for a in acclaimed:
+        block = blocks[a.matching]
+        if block.seats != a.seats or not all(r.acclaimed and r.winner for r in block.rows):
+            raise ValueError(f"{a.ident}: the annex does not name {a.seats} winners by acclamation")
+        if [r.position for r in block.rows] != list(range(1, a.seats + 1)):
+            raise ValueError(f"{a.ident}: the annex's candidates are numbered {[r.position for r in block.rows]}")
+        a.winners = [Winner(r.position, r.name, r.list_name) for r in block.rows]
 
 
 def party_list(name: str, labels: dict[str, str]) -> str | None:
@@ -992,6 +1020,12 @@ def councils(day: date) -> Package:
             + (
                 " The Commission's report prints the council's lists, votes, and seats and its annex the winners."
                 if a.file == "report"
+                else ""
+            )
+            + (
+                " The winners are the candidates its final report's annex (the table of candidates and winners, from "
+                "page 98) marks as winners by acclamation."
+                if not a.voted and a.winners
                 else ""
             ),
             lang="en",
