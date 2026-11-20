@@ -5,6 +5,7 @@ import re
 import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
+from dataclasses import field as default
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
@@ -34,6 +35,15 @@ LEGEND = (
     "https://web.archive.org/web/20250319191034id_/"
     "http://ekloges-prev.singularlogic.eu/2023/october/d/home/dist/model.el.js"
 )
+LEGEND_2019 = (
+    "https://web.archive.org/web/20240422123316id_/http://ekloges-prev.singularlogic.eu/2019/d/home/dist/model.el.js"
+)
+# The 2010 and 2014 sites have no text legend: each draws a support bit as a colored block and a party id as a colored
+# figure, and these pages hold those images and the party logos.
+IMAGES = {
+    2010: "https://ekloges-prev.singularlogic.eu/dn2010/images/stirixi/flat/z{sid}.png",
+    2014: "https://ekloges-prev.singularlogic.eu/may2014/images/stirixi/z{sid}.png",
+}
 YEARS: dict[int, Year] = {
     2010: Year(f"{SERVICE}/dn2010/{{stat,dyn}}/snom_n_{{id}}.js", date(2010, 11, 7), date(2010, 11, 14), 0.5),
     2014: Year(f"{SERVICE}/may2014/{{stat,dyn}}/dn/snom_n_{{id}}.js", date(2014, 5, 18), date(2014, 5, 25), 0.5),
@@ -126,7 +136,7 @@ def fetch() -> None:
     """
     inbox = Path(os.environ["EA_GR_YPES_INBOX"])
     index: dict[str, dict[str, str]] = json.loads((inbox / "index.json").read_text())
-    wanted = {year.bundle for year in YEARS.values()} | {LEGEND}
+    wanted = {year.bundle for year in YEARS.values()} | {LEGEND, LEGEND_2019, *IMAGES.values()}
     for url, entry in index.items():
         origin = entry.get("source", url)
         if origin not in wanted:
@@ -144,7 +154,11 @@ def fetch() -> None:
 
 def artifacts(year: int) -> list[raw.Artifact]:
     found = [raw.cached(SOURCE, YEARS[year].bundle)]
-    if year in LEGEND_YEARS:
+    if year == 2019:
+        found.append(raw.cached(SOURCE, LEGEND_2019))
+    elif year in IMAGES:
+        found.append(raw.cached(SOURCE, IMAGES[year]))
+    else:
         found.append(raw.cached(SOURCE, LEGEND))
     return found
 
@@ -165,34 +179,95 @@ def files(year: int) -> Mapping[str, Any]:
 
 # ---------------------------------------------------------------- party support
 
-LEGEND_YEARS = (2023,)
-# The support bits, from the `parseStirixi` function of the October 2023 site: a ticket's `ST_ID` is 1000 times
-# a bit set of the parties that back it plus the legend id of the party its candidate belongs to.
-SUPPORT_BITS = {1: 2, 2: 4, 4: 106, 8: 3, 64: 100, 128: 157, 256: 44}
-OTHER_SUPPORT = 16  # backed by parties the legend does not name
-RENUMBERED = {75: 44, 15: 28}  # ids the site rewrites to the legend's id for the same party
-INDEPENDENT = 998
+
+@dataclass(frozen=True)
+class Support:
+    """How one election's site writes a ticket's `ST_ID`.
+
+    The code is 1000 times a bit set of the parties that back the ticket plus the id of the party its candidate
+    belongs to. Each election has its own bits and its own party ids.
+    """
+
+    bits: Mapping[int, int]  # support bit -> id of the party it stands for
+    other: int  # bit for parties the legend does not name, or 0
+    independent: int  # candidate id for an independent
+    unnamed: int = 0  # bits the site draws but no file names
+    renumbered: Mapping[int, int] = default(default_factory=dict)  # ids the site rewrites to the legend's id
+    other_only: int = 0  # whole bit set that means only other parties back the ticket
+
+
+INDEPENDENT = 998  # the 2023 legend's entry for independents, which no row stands for
+
+SUPPORTS: dict[int, Support] = {
+    # Read from the colors of the support blocks (z{sid}.png) and party figures (p{pid}.png) on the 2010 site, whose
+    # party logos name the parties.
+    2010: Support({1: 1, 2: 2, 4: 3, 8: 4, 16: 16, 32: 28, 64: 56}, 0, 998),
+    # The same reading for 2014. Bit 128 and the party the site gives id 90, with bit 256, are drawn but not named.
+    2014: Support({1: 2, 2: 4, 4: 41, 8: 56, 16: 3}, 1024, 997, unnamed=128 | 256, renumbered={90: 0}, other_only=997),
+    # From the `parseStirixi` function of the 2019 site and the one of the October 2023 site.
+    2019: Support({1: 4, 2: 2, 4: 106, 8: 41, 16: 3, 32: 28, 128: 44, 256: 100}, 64, 998, renumbered={75: 44, 15: 28}),
+    2023: Support({1: 2, 2: 4, 4: 106, 8: 3, 64: 100, 128: 157, 256: 44}, 16, 998, renumbered={75: 44, 15: 28}),
+}
+# Parties the 2019 legend or a logo names that the 2023 legend does not. A logo's own text is the name.
+LOGOS = {1: "ΠΑΣΟΚ", 56: "Δημοκρατική Αριστερά"}
+
+
+def _table(text: str, start: str, end: str) -> dict[int, tuple[str, str, str]]:
+    table = text[text.index(start) : text.index(end, text.index(start))]
+    found = re.findall(
+        r"(\d+):\{id:\1,name:(?:\"(.*?)\"|'(.*?)'),shortName:\"(.*?)\"(?:,color:\"([0-9A-Fa-f]{6})\")?\}", table
+    )
+    return {int(n): (clean(a or b), clean(c), color.lower()) for n, a, b, c, color in found}
 
 
 @functools.cache
 def legend() -> dict[int, tuple[str, str, str]]:
     """The party table of the 2023 site: id -> name, short name, color."""
     text = raw.cached(SOURCE, LEGEND).path.read_text(encoding="utf-8")
-    table = text[text.index("s={2:{id:2,") : text.index("},g={1:{id:1,")]
-    found = re.findall(
-        r"(\d+):\{id:\1,name:(?:\"(.*?)\"|'(.*?)'),shortName:\"(.*?)\",color:\"([0-9A-Fa-f]{6})\"\}", table
-    )
-    return {int(n): (clean(a or b), clean(c), color.lower()) for n, a, b, c, color in found}
+    return _table(text, "s={2:{id:2,", "},g={1:{id:1,")
 
 
-def decode(code: int) -> tuple[int | None, list[int], bool]:
-    """Splits a ticket's `ST_ID` into its candidate's party, the legend parties backing it, and whether others do."""
+@functools.cache
+def legend_2019() -> dict[int, tuple[str, str, str]]:
+    """The party table of the 2019 site."""
+    text = raw.cached(SOURCE, LEGEND_2019).path.read_text(encoding="utf-8")
+    return _table(text, "s={4:{id:4,", "},g={")
+
+
+@functools.cache
+def parties() -> dict[int, tuple[str, str]]:
+    """Every party a ticket's code can name: id -> name, short name. The newest legend that names one wins."""
+    out: dict[int, tuple[str, str]] = {number: (name, name) for number, name in LOGOS.items()}
+    used = {number for support in SUPPORTS.values() for number in support.bits.values()}
+    for number, (name, short, _) in legend_2019().items():
+        if number in used:
+            out[number] = (name, short)
+    for number, (name, short, _) in legend().items():
+        if number != INDEPENDENT:
+            out[number] = (name, short)
+    return out
+
+
+@dataclass(frozen=True)
+class Code:
+    member: int | None  # party the candidate belongs to
+    independent: bool
+    backers: list[int]  # parties that back the ticket and that the legend names
+    others: bool  # whether parties the legend does not name back it too
+
+
+def decode(year: int, code: int) -> Code:
+    """Splits a ticket's `ST_ID` into its candidate's party and the parties backing it."""
+    rule = SUPPORTS[year]
     party, support = code % 1000, code // 1000
-    party = RENUMBERED.get(party, party)
-    if support & ~(OTHER_SUPPORT | sum(SUPPORT_BITS)):
-        raise ValueError(f"unknown support bits in {code}")
-    backers = [number for bit, number in SUPPORT_BITS.items() if support & bit]
-    return (None if party == INDEPENDENT else party), backers, bool(support & OTHER_SUPPORT)
+    party = rule.renumbered.get(party, party)
+    if support == rule.other_only:
+        support = rule.other
+    if support & ~(rule.other | rule.unnamed | sum(rule.bits)):
+        raise ValueError(f"unknown support bits in {code} of {year}")
+    backers = [number for bit, number in rule.bits.items() if support & bit]
+    others = bool(support & (rule.other | rule.unnamed))
+    return Code(None if party in (rule.independent, 0) else party, party == rule.independent, backers, others)
 
 
 def party_id(number: int) -> str:
@@ -209,6 +284,7 @@ class Race:
     parent: int  # regional unit of a municipality, or 0 for a region
     region: int
     tickets: dict[int, dict[str, str]]  # candidate number -> printed candidate and ticket names
+    codes: dict[int, int]  # candidate number -> the stat file's party-support code, where it has one
     total: dict[str, Any]
     candidates: list[dict[str, Any]]
     units: list[tuple[int, str, dict[str, Any], dict[int, dict[str, int]]]]  # id, name, counts, votes by candidate
@@ -263,6 +339,7 @@ def races(year: int) -> list[Race]:
                     tickets={
                         int(k): {"name": clean(v["Descr"]), "ticket": clean(v["Synd"])} for k, v in stat["cds"].items()
                     },
+                    codes={int(k): int(v["ST_ID"]) for k, v in stat["cds"].items() if v.get("ST_ID") is not None},
                     total=dyn,
                     candidates=dyn["cds"],
                     units=units,
@@ -370,12 +447,11 @@ def registry() -> Package:
         depends=["gr.ypes/geo"],
     )
     p.external |= {GREECE, COUNTRY}
-    p.uses(raw.cached(SOURCE, LEGEND))
+    for url in (LEGEND, LEGEND_2019, *IMAGES.values()):
+        p.uses(raw.cached(SOURCE, url))
     # The legend's colors are left out: the party rows are shared with the national results registry, and another
     # pipeline already holds an open-ended color for some of them, which a second color here would clash with.
-    for number, (name, short, _) in legend().items():
-        if number == INDEPENDENT:
-            continue
+    for number, (name, short) in sorted(parties().items()):
         p.add("party", id=party_id(number), kind="party", polity_id=GREECE)
         p.name(party_id(number), name, "el", "official")
         if short != name:
@@ -475,7 +551,10 @@ def local(year: int) -> Package:
                     [c for c in race.candidates] if round_number == 1 else sorted(fin, key=lambda c: c["CAND_ID"])
                 )
                 votes = {c["CAND_ID"]: c[f"{letter}VOTES"] for c in contenders}
-                codes = {c["CAND_ID"]: c.get("ST_ID") for c in race.candidates}
+                codes = {
+                    **race.codes,
+                    **{c["CAND_ID"]: c["ST_ID"] for c in race.candidates if c.get("ST_ID") is not None},
+                }
                 if round_number == 1 and not runoff:
                     winners = [race.total["WIN_ID"]]
                     outcome = {n: "elected" if n in winners else "lost" for n in votes}
@@ -592,8 +671,9 @@ def local(year: int) -> Package:
                     options: dict[int, str] = {}
                     for number in votes:
                         ticket = race.tickets[number]
-                        code = codes.get(number) if year in LEGEND_YEARS else None
-                        member, backers, others = decode(code) if code else (None, [], False)
+                        code = codes.get(number)
+                        found = decode(year, code) if code else Code(None, False, [], False)
+                        backers, others = found.backers, found.others
                         sole = backers[0] if len(backers) == 1 and not others else None
                         option = options[number] = key("option", noun, year, round_number, race.id, kind, number)
                         p.add(
@@ -606,7 +686,7 @@ def local(year: int) -> Package:
                             party_id=party_id(sole) if sole else None,
                         )
                         if len(backers) + others > 1 or (others and backers):
-                            named = ", ".join(legend()[n][1] for n in backers)
+                            named = ", ".join(parties()[n][1] for n in backers)
                             p.add(
                                 "note",
                                 id=key("note", option),
@@ -632,8 +712,8 @@ def local(year: int) -> Package:
                             option_id=option,
                             role="head",
                             ballot_name=ticket["name"],
-                            member_of_party_id=party_id(member) if member else None,
-                            is_independent=bool(code) and member is None,
+                            member_of_party_id=party_id(found.member) if found.member else None,
+                            is_independent=found.independent,
                         )
                         if kind == "head":
                             p.add("outcome", result_set_id=result_set, option_id=option, kind=outcome[number])
