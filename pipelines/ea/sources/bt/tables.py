@@ -612,3 +612,101 @@ def na2024(path: Path = GE2024) -> list[tuple[str, Seat]]:
         if sum(bool(r.elected) for r in seat.rows) != 1 or not max(seat.rows, key=lambda r: r.total).elected:
             raise ValueError(f"{seat.name}: the elected candidate is not the one with the most votes")
     return found
+
+
+NC2018_LABELS = (
+    "Bumthang|Chhukha|Dagana|Gasa|Haa|Lhuentse|Monggar|Paro|Pema Gatshel|Punakha|Samdrup|Jongkhar|Samtse|Sarpang|"
+    "Thimphu|Trashi Yangtse|Trashigang|Tsirang|Trongsa|Wangdue|Phodrang|Zhemgang"
+)
+
+
+def _section(text: str, start: str, end: str) -> list[str]:
+    """The lines from the first line holding `start` up to the next line holding `end`."""
+    lines = text.splitlines()
+    first = next(i for i, line in enumerate(lines) if start in line)
+    last = next(i for i in range(first + 1, len(lines)) if end in lines[i])
+    return lines[first:last]
+
+
+@dataclass
+class Rejected:
+    """Postal ballots set aside when the Commission opened the inner envelopes, by dzongkhag."""
+
+    conventional: int
+    booth: int
+
+
+def nc2018(text: str) -> tuple[list[Seat], dict[str, Rejected], dict[str, int]]:
+    """The 2018 National Council tables of the Election Statistics 2018 book, from `pdftotext -layout` output:
+    the registered EVM and postal voters (Table 1.3), the postal voters who voted (Table 1.15), the invalid postal
+    ballots (Table 1.17), each candidate's EVM, postal, and total votes (Table 1.18), and the members elected
+    (Table 1.21). Returns the dzongkhags in print order, the invalid ballots by dzongkhag name, and the book's own
+    national totals."""
+    registered: dict[int, tuple[int, int]] = {}
+    for line in _section(text, "Table 1.3: Summary of Registered EVM", "Table 1.4"):
+        found = re.match(
+            r"\s*(\d+)\s+(?:([A-Za-z][A-Za-z ]*?)\s+)?(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s*$", line
+        )
+        if found:
+            registered[dzongkhag_index(found[2] or "Wangdue Phodrang")] = (int(found[8]), int(found[5]))
+    turnout: dict[int, int] = {}
+    for line in _section(text, "Table 1.15: Total Postal Voter Turnout", "Rejection during the Opening"):
+        found = re.match(r"\s*(\d+)\s+(?:([A-Za-z][A-Za-z ]*?)\s+)?((?:\d+\s+){5})(\d+)\s+[\d.]+\s*$", line)
+        if found:
+            turnout[dzongkhag_index(found[2] or "Wangdue Phodrang")] = int(found[4])
+    invalid: dict[str, Rejected] = {}
+    for line in _section(text, "Table 1.17: Invalid Postal Ballots", "Election Results"):
+        found = re.match(r"\s*(\d+)\s+(?:([A-Za-z][A-Za-z ]*?)\s+)?\d+\s+\d+\s+(\d+)\s+\d+\s+\d+\s+(\d+)\s*$", line)
+        if found:
+            invalid[DZONGKHAGS[dzongkhag_index(found[2] or "Wangdue Phodrang")]] = Rejected(
+                int(found[3]), int(found[4])
+            )
+    if len(registered) != 20 or len(turnout) != 20 or len(invalid) != 20:
+        raise ValueError("the 2018 National Council tables do not list 20 dzongkhags")
+    rows: list[tuple[str, int, int, int]] = []
+    for line in _section(text, "Table 1.18: Total EVM and Postal Votes", "Table 1.19"):
+        found = re.match(
+            rf"^\s*(?:(?:{NC2018_LABELS})(?: [A-Z][a-z]+)?\s{{2,}})?(\S.*?)\s{{2,}}(\d+)\s+(\d+)\s+(\d+)\s*$", line
+        )
+        if found and not line.strip().startswith("Dzongkhag"):
+            rows.append((found[1].strip(), int(found[2]), int(found[3]), int(found[4])))
+    if len(rows) != 127:
+        raise ValueError(f"expected 127 candidates in Table 1.18, found {len(rows)}")
+    seats: list[Seat] = []
+    cursor = 0
+    # Table 1.18 prints Trashi Yangtse before Trashigang, and Tsirang before Trongsa.
+    order = [dzongkhag_index(n) for n in DZONGKHAGS]
+    for first, second in (("Trashigang", "Trashi Yangtse"), ("Trongsa", "Tsirang")):
+        one, two = dzongkhag_index(first), dzongkhag_index(second)
+        order[one], order[two] = two, one
+    for index in order:
+        name = DZONGKHAGS[index]
+        seat = Seat(name=name, evm_voters=registered[index][0], postal_voters=registered[index][1])
+        postal = 0
+        while postal < turnout[index] and cursor < len(rows):
+            candidate, evm, post, total = rows[cursor]
+            if evm + post != total:
+                raise ValueError(f"{name} {candidate}: {evm} and {post} do not add up to {total}")
+            cursor += 1
+            postal += post
+            seat.rows.append(Row(len(seat.rows) + 1, name, "", candidate, evm, post, total, 0))
+        if postal != turnout[index]:
+            raise ValueError(f"{name}: candidates' postal votes {postal} differ from the {turnout[index]} voters")
+        seats.append(seat)
+    seats.sort(key=lambda seat: dzongkhag_index(seat.name))
+    if cursor != len(rows):
+        raise ValueError("candidates left over after the 20 dzongkhags")
+    # The profile table names each elected member beside sex and age; a dzongkhag's label can wrap onto other lines.
+    members: list[str] = []
+    for line in _section(text, "Table 1.21: Profile of Elected", "Table 1.22"):
+        found = re.match(r"^\s*(?:[A-Za-z]+(?: [A-Za-z]+)?\s{2,})?([A-Z][A-Za-z.' ]*?)\s{2,}[MF]\s+\d\d\b", line)
+        if found:
+            members.append(found[1].strip())
+    elected = [row.candidate for seat in seats for row in seat.rows if row.total == max(r.total for r in seat.rows)]
+    if len(elected) != 20 or sorted(members) != sorted(elected):
+        raise ValueError(f"the members declared elected {sorted(members)} differ from the leaders {sorted(elected)}")
+    for seat in seats:
+        best = max(row.total for row in seat.rows)
+        for row in seat.rows:
+            row.elected = row.total == best
+    return seats, invalid, {"registered": sum(sum(v) for v in registered.values()), "total": sum(r[3] for r in rows)}
