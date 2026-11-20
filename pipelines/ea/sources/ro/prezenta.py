@@ -239,8 +239,8 @@ class Contest:
     round_number: int = 1
     previous: str | None = None
     method: str = METHOD
-    # the contest of the EU-wide record this one supersedes: (election id, contest id, result set id, source id)
-    linked: tuple[str, str, str, str] | None = None
+    # the election and contest of the EU-wide record this one adds a finer set to, which hold the default set
+    linked: tuple[str, str] | None = None
 
 
 @dataclass
@@ -408,17 +408,14 @@ class Build:
                     "kind": "counted",
                     "source_id": AEP_SOURCE,
                     "status": "active",
-                    "is_default": True,
+                    # the EU-wide record's national set stays the default; this set adds its polling stations
+                    "is_default": [not c.linked for c in contests],
                     "completeness": 1.0,
-                    "supersedes_id": [c.linked[2] if c.linked else None for c in contests],
                 },
-                schema_overrides={"supersedes_id": pl.String},
             ),
         )
-        for c in contests:
-            if c.linked:
-                superseded(p, c.linked, set_ids[c.key])
         notes = [(set_ids[c.key], c.method) for c in contests]
+        notes += [(set_ids[c.key], LINKED_NOTE) for c in contests if c.linked]
         posted = {contest for contest, _, _, channel, _, _ in self.values if channel == POSTAL}
         notes += [(set_ids[name], POST_METHOD) for name in self.contests if name in posted]
         p.frame(
@@ -567,43 +564,38 @@ def _external(scheme: str, value: str) -> str:
 
 
 # The archive holds the 2024 European Parliament election in Romania as a national result set, from the pipeline that
-# covers every member state. The polling-station set supersedes it and reuses its election and contest.
-EU_SOURCE_PUBLISHER = "Biroul Electoral Central"
-EU_SOURCE_TITLE = (
-    "Proces-verbal privind centralizarea voturilor și atribuirea mandatelor la alegerile pentru membrii din România "
-    "în Parlamentul European din data de 09 iunie 2024"
-)
+# covers every member state. The polling-station set is a finer set of the same contest: it reuses that record's
+# election, contest, and ballot lines, and leaves its national set the default.
 EU_RECORD = (
     _external("eu.election", "RO:2024:european-parliament"),
     _external("eu.contest", "RO:2024:eu.member_state:RO"),
-    _external("eu.ep2024.result_set", "RO:2024"),
-    str(uuid5(package.NAMESPACE, f"source\x1f{EU_SOURCE_PUBLISHER}\x1f{EU_SOURCE_TITLE}")),
 )
-
-
-def superseded(p: Package, eu: tuple[str, str, str, str], result_set: str) -> None:
-    """Keep the EU-wide national totals as a superseded set, re-staged with its own election, contest, and source."""
-    election, contest, old, source = eu
-    p.add(
-        "result_set",
-        id=old,
-        election_id=election,
-        contest_id=contest,
-        stage="official",
-        kind="counted",
-        source_id=source,
-        status="superseded",
-        is_default=False,
-        completeness=None,
-    )
-    p.add(
-        "note",
-        id=key("note", result_set, "supersedes"),
-        entity_id=result_set,
-        kind="methodology",
-        body_md="This set holds the same contest by polling station. It supersedes the set of national totals.",
-        lang="en",
-    )
+# the ballot lines of the EU-wide record's contest, by ballot position and label
+EU_OPTIONS = {
+    "UNIUNEA DEMOCRATĂ MAGHIARĂ DIN ROMÂNIA": (1, "ba1f6b34-bc11-565c-964c-2f42e87032c3"),
+    "ALIANȚA ELECTORALĂ PSD PNL": (2, "a461c4ef-4d44-5b54-9335-0acd236771f3"),
+    "PARTIDUL REÎNNOIM PROIECTUL EUROPEAN AL ROMÂNIEI": (3, "1433eade-4ba2-5864-883f-1d424e72bbf5"),
+    "ALIANȚA AUR": (4, "0b8b4a2d-ac15-51fd-bbd5-a0d49d8fc5a8"),
+    "PARTIDUL UMANIST SOCIAL LIBERAL": (5, "eb4c2241-0325-5f5e-956b-7d131484d159"),
+    "ALIANȚA DREAPTA UNITĂ USR-PMP-FORȚA DREPTEI": (6, "a5638f3a-4320-546b-833a-81841672ef4d"),
+    "ROMÂNIA SOCIALISTĂ": (7, "76739e6d-920c-5629-a229-bf6d7e76cafa"),
+    "PARTIDUL ROMÂNIA MARE": (8, "3400fbf3-ef0d-58af-9cca-fb674db79d6d"),
+    "PARTIDUL PATRIOȚILOR": (9, "3d2f478e-6e03-5834-aa1e-4b96f9f984e1"),
+    "PARTIDUL ALTERNATIVA DREAPTĂ": (10, "9554dc6e-54f0-5820-8a68-d447df6614d0"),
+    "PARTIDUL S.O.S. ROMÂNIA": (11, "57e385c0-4f04-570a-945a-8cf2946f3c09"),
+    "PARTIDUL DIASPORA UNITĂ": (12, "75dee552-c61c-55d5-b0e9-6b728c9363b9"),
+    "PÎRVĂNESCU PAULA-MARINELA": (13, "9246f238-22de-50e6-8255-fc2f1e70ae36"),
+    "GHEORGHE VLAD-DAN": (14, "454aed6f-611a-5708-a790-c2c315664576"),
+    "ȘTEFĂNUȚĂ NICOLAE-BOGDĂNEL": (15, "276e30ac-213e-56d5-9565-3cb1c8cf890f"),
+    "ȘOȘOACĂ DUMITRU-SILVESTRU": (16, "b5e5ab6f-3ef8-5973-8968-5668f339035b"),
+}
+# the Central Electoral Bureau's national record: valid votes and the votes of each list and candidate
+EU_VALID = 8942629
+EU_VOTES = {"ALIANȚA ELECTORALĂ PSD PNL": 4341686, "ALIANȚA AUR": 1334905}
+LINKED_NOTE = (
+    "This set holds the contest by polling station. The national totals of the Central Electoral Bureau's record "
+    "remain the contest's default set, and the polling stations add up to them."
+)
 
 
 def accept(p: Package) -> None:
@@ -836,7 +828,7 @@ def european(parties: set[str]) -> tuple[Package, Build]:
     )
     p.artifact(raw.cached(SOURCE, URLS[name]), AEP_SOURCE)
     eid = EU_RECORD[0]
-    p.external |= {EU_RECORD[0], EU_RECORD[1], EU_RECORD[3]}
+    p.external |= {*EU_RECORD, *(option for _, option in EU_OPTIONS.values())}
     b = Build(p, day, parties)
     contest = f"european-{day}"
     b.contest(
@@ -860,12 +852,21 @@ def european(parties: set[str]) -> tuple[Package, Build]:
         accounting = {"registered": f.get("a") or None, "cast": f.get("b"), "valid": f.get("e"), "invalid": f.get("f")}
         b.record(contest, unit, accounting, False)
         for line in row.lines:
-            label = str(line["candidate"])
-            person = is_person(label, parties)
-            option = b.option(contest, label, None, person, independent=True if person else None)
+            label = canon(line["candidate"])
+            if label not in EU_OPTIONS:
+                raise ValueError(f"{label} is not a ballot line of the EU-wide record")
+            if not is_person(label, parties):
+                b.labels.add(tidy(line["candidate"]))
             votes = whole(line["votes"])
             if votes is not None:
-                b.values.append((contest, unit, option, 0, VOTES, votes))
+                b.values.append((contest, unit, EU_OPTIONS[label][1], 0, VOTES, votes))
+    totals: dict[str, int] = {}
+    for _, _, option, _, measure, value in b.values:
+        if measure in (VOTES, VALID):
+            totals[option or "valid"] = totals.get(option or "valid", 0) + value
+    for label, votes in [("valid", EU_VALID), *((EU_OPTIONS[k][1], v) for k, v in EU_VOTES.items())]:
+        if totals.get(label) != votes:
+            raise ValueError(f"{label}: the stations add up to {totals.get(label)}, the Bureau's record has {votes}")
     b.stage()
     accept(p)
     return p, b
