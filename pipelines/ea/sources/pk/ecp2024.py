@@ -54,6 +54,9 @@ SUFFIXES = {".pdf", ".jpg", ".jpeg", ".png"}
 # Drive files in the folders that hold nothing: PS-104's Form 49.
 EMPTY = {"1fx-Zpj0EyTgt2QzuOo-EfppaJbHh7h0X"}
 FORMS: dict[str, dict] = json.loads((Path(__file__).parent / "ecp2024.json").read_text())
+# Constituencies read from another form than the Form 49: the grand-total row of the returning officer's Form 48, or the
+# provisional Form 47, by seat code, with the Drive file, the figures, and the candidates' votes in column order.
+TOTALS_ONLY: dict[str, dict] = json.loads((Path(__file__).parent / "ecp2024_totals.json").read_text())
 
 
 def entries(folder: str) -> list[tuple[str, bool, str]]:
@@ -99,6 +102,8 @@ def fetch() -> None:
     raw.cached(SOURCE, PAGE)
     for _, id, path in crawl(True):
         raw.fetch(SOURCE, DRIVE.format(id), suffix=Path(path.lower()).suffix, check=_not_html)
+    for entry in TOTALS_ONLY.values():
+        raw.fetch(SOURCE, DRIVE.format(entry["id"]), suffix=".pdf", check=_not_html)
 
 
 PAGES = raw.DATA / "pages" / SOURCE
@@ -318,6 +323,8 @@ class Form(NamedTuple):
     candidates: list[Candidate]
     agreed: int
     notes: str
+    stage: str = "official"
+    kind: str = "49"
 
 
 def squash(text: str) -> str:
@@ -412,6 +419,39 @@ def form(code: str, url: str) -> Form:
         for (serial, name, text, votes), (page, box) in zip(printed, placed, strict=True)
     ]
     checked = Form(code, place(entry["name"]), url, figures, candidates, agreed, entry.get("notes", ""))
+    problems = check(checked, entry)
+    if problems:
+        raise ValueError(f"{code}: {'; '.join(problems)}")
+    return checked
+
+
+def totals_form(code: str) -> Form:
+    """One constituency's result from the typed grand-total row of its Form 48, or from its Form 47, as transcribed in
+    `ecp2024_totals.json`. Each figure is stored with the page it is on and the whole page as its box. Neither form
+    prints the candidates' parties on its grand-total row, and a Form 48 prints no registered voters."""
+    entry = TOTALS_ONLY[code]
+    url = DRIVE.format(entry["id"])
+    artifact = raw.cached(SOURCE, url)
+    last = page_count(artifact)
+    split = entry.get("split")
+    candidates = [
+        Candidate(
+            serial,
+            tidy(name),
+            text if text in PARTY_NAMES.values() or not text else party(text),
+            votes,
+            1 if split and serial <= split else last,
+            WHOLE,
+        )
+        for serial, name, text, votes in entry["candidates"]
+    ]
+    first = 1 if entry["form"] == "47" else last
+    figures: dict[str, tuple[int, int, Box]] = {
+        field: (entry[field], first, WHOLE) for field in ("registered", "valid", "invalid") if field in entry
+    }
+    checked = Form(
+        code, place(entry["name"]), url, figures, candidates, len(candidates), "", "preliminary", entry["form"]
+    )
     problems = check(checked, entry)
     if problems:
         raise ValueError(f"{code}: {'; '.join(problems)}")
@@ -710,19 +750,12 @@ TITLES = {
     "PK": "Khyber Pakhtunkhwa Provincial Assembly",
     "PB": "Balochistan Provincial Assembly",
 }
-# Constituencies whose poll of 8 February did not stand, and those whose folders hold no Form 49.
+# Constituencies whose poll of 8 February did not stand.
 NOT_POLLED = {
     "NA-8": "its poll was postponed on the death of a contesting candidate",
     "PK-22": "its poll was postponed on the death of a contesting candidate",
     "PK-91": "its poll was postponed on the death of a contesting candidate",
     "PP-266": "its poll was postponed on the death of a contesting candidate",
-    "NA-54": "its folder holds no Form 49",
-    "PK-105": "its folder holds no Form 49",
-    "PB-21": "its folder holds no Form 49",
-    "PS-104": "its Form 49 in the Commission's folder is an empty file",
-    "PS-52": "its Form 49 scan is too blurred to read the candidates' votes",
-    "PB-37": "one candidate's votes are illegible on its Form 49 scan",
-    "PP-219": "several faint votes on its Form 49 scan could not be read with certainty",
 }
 
 
@@ -732,7 +765,8 @@ def party_id(name: str) -> str:
 
 def forms() -> list[Form]:
     order = list(PREFIXES)
-    found = [form(code, url) for code, url in files().items() if code not in NOT_POLLED]
+    found = [form(code, url) for code, url in files().items() if code not in NOT_POLLED and code not in TOTALS_ONLY]
+    found += [totals_form(code) for code in TOTALS_ONLY]
     return sorted(found, key=lambda f: (order.index(f.code.split("-")[0]), int(f.code.split("-")[1])))
 
 
@@ -769,7 +803,7 @@ def registry(found: list[Form]) -> Package:
         id=ECP_2024,
         kind="official_body",
         publisher="Election Commission of Pakistan",
-        title="General Elections 2024: scanned Forms 45, 46, 48, and 49",
+        title="General Elections 2024: scanned Forms 45, 46, 47, 48, and 49",
         url="https://ecp.gov.pk/general-elections-2024",
         license="Official publication; reuse terms are not stated",
         attribution="Election Commission of Pakistan",
@@ -779,7 +813,7 @@ def registry(found: list[Form]) -> Package:
         p.artifact(raw.cached(SOURCE, url), ECP_2024)
     for f in found:
         p.artifact(raw.cached(SOURCE, f.url), ECP_2024)
-    for name in sorted({c.party for f in found for c in f.candidates} - {"Independent"}):
+    for name in sorted({c.party for f in found for c in f.candidates} - {"Independent", ""}):
         id = party_id(name)
         p.add("party", id=id, kind="party", polity_id=ecp.PAKISTAN)
         p.name(id, name, "en", "official")
@@ -813,8 +847,10 @@ def build(found: list[Form]) -> Package:
         entity_id=election,
         kind="context",
         body_md="The National Assembly and the provincial assemblies of the Punjab, Sindh, Khyber Pakhtunkhwa, and "
-        "Balochistan were elected on the same day. No Form 49 of this poll is stored for "
-        f"{len(NOT_POLLED)} constituencies: {listed}.",
+        "Balochistan were elected on the same day. The poll did not stand in "
+        f"{len(NOT_POLLED)} constituencies: {listed}. Seven constituencies whose Form 49 is missing or unreadable "
+        f"({', '.join(TOTALS_ONLY)}) are read from the grand-total row of their Form 48, or from their Form 47, and "
+        "stored at the preliminary stage.",
         lang="en",
     )
     values: list[dict[str, object]] = []
@@ -854,7 +890,7 @@ def add_seat(
     prefix = f.code.split("-")[0]
     body = ecp.ASSEMBLIES[PREFIXES[prefix]]
     contest = ecp.key("contest", STAMP, f.code)
-    label = f"{f.code} {f.name}"
+    label = f"{f.code} {f.name}".strip()
     p.add(
         "contest",
         id=contest,
@@ -874,14 +910,21 @@ def add_seat(
         id=result_set,
         election_id=election,
         contest_id=contest,
-        stage="official",
+        stage=f.stage,
         kind="counted",
         source_id=ECP_2024,
         status="active",
         is_default=True,
         completeness=1.0,
     )
-    p.add("note", id=ecp.key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
+    p.add(
+        "note",
+        id=ecp.key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=METHOD if f.kind == "49" else TOTALS_METHOD[f.kind],
+        lang="en",
+    )
     for index, caveat in enumerate(ACCOUNTED.get(f.code, {}).values()):
         p.add(
             "note",
@@ -964,12 +1007,29 @@ def add_seat(
             option_id=option,
             role="head",
             ballot_name=c.name,
-            member_of_party_id=None if independent else party_id(c.party),
+            member_of_party_id=None if independent or not c.party else party_id(c.party),
             is_independent=independent,
         )
         put(option, VOTES, c.votes, c.page, c.box)
 
 
+TOTALS_METHOD = {
+    "48": "The constituency's Form 49 is missing or cannot be read, so this set is read from the grand-total row of the "
+    "returning officer's consolidated statement of the count (Form 48) for the general election of 8 February 2024, "
+    "typed in English, from the Election Commission's scanned form. The row gives each candidate's valid votes, "
+    "tendered and challenged votes included, polling stations and postal ballots together, and the valid and invalid "
+    "votes. The form prints no party for a candidate and no registered voters, so none are stored. The scan has no "
+    "usable text layer, so each figure was transcribed from the page image and checked against the totals the row "
+    "prints; each is stored with its page, and the whole page stands for its box. The form does not name the "
+    "returned candidate, and none is stored. A final result (Form 49) would supersede it.",
+    "47": "The constituency has no Form 49 or Form 48 in the Commission's folders, so this set is read from the "
+    "provisional consolidated result (Form 47) of the returning officer for the general election of 8 February 2024, "
+    "written in Urdu, from the Election Commission's scanned form. The form gives the registered voters, the valid "
+    "and invalid votes, and each candidate's party and votes. Each figure was transcribed from the page image and "
+    "checked against the totals the form prints; each is stored with its page, and the whole page stands for its "
+    "box. The form does not name the returned candidate, and none is stored. A final result (Form 49) would "
+    "supersede it.",
+}
 METHOD = (
     "The final consolidated result of the constituency (Form 49) issued by its returning officer for the general "
     "election of 8 February 2024, read from the Election Commission's scanned form. The scan has no usable text layer, "
