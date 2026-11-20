@@ -7,13 +7,19 @@ Sevilla Don Bosco, and the eight referendum questions. The referendum questions 
 this module reads every other contest. The two sex groups are added here.
 
 Councils and parish boards were elected from closed lists, and the file gives the list votes only. It names every
-prefect, mayor, and Citizen Participation candidate, but declares no winners, so no outcomes are stored.
+prefect, mayor, and Citizen Participation candidate, but declares no winners. The Council's list of elected
+authorities does: the prefects, the mayors, and the urban and rural councillors and parish board members by seat.
+Those declarations are stored as outcomes. The list does not cover the Citizen Participation Council, so those three
+contests have none.
 """
 
 import functools
+import re
+import unicodedata
 from datetime import date
 from uuid import uuid5
 
+import fastexcel
 import polars as pl
 
 from ea import package, raw
@@ -30,6 +36,7 @@ VOTES, CAST, VALID, INVALID, BLANK = cne.VOTES, cne.CAST, cne.VALID, cne.INVALID
 key = cne.key
 area = cne.area
 CNE_SOURCE = cne.CNE_SOURCE
+WINNERS = "https://www.cne.gob.ec/wp-content/uploads/2024/07/Autoridades-electas-Elecciones-Seccionales-20231-1.xlsx"
 SCHEMES = ("ec.provincia", "ec.canton", "ec.parroquia")
 BASE = f"ec/{DAY}-local"
 
@@ -70,6 +77,7 @@ NOTE_CPCCS = (
 
 def fetch() -> None:
     raw.fetch(SOURCE, FILE, suffix=".sav")
+    raw.fetch(SOURCE, WINNERS, suffix=".xlsx")
 
 
 def packages() -> list[str]:
@@ -217,6 +225,9 @@ class Builder:
         self.paths: set[str] = set()
         self.units: dict[tuple[str, str], str] = {}
         self.contests = 0
+        self.heads: dict[str, dict[str, dict[str, str]]] = {}
+        self.sets: dict[str, str] = {}
+        self.declared: dict[str, int] = {}
 
     def path(self, *candidates: str) -> str:
         for tail in candidates:
@@ -285,6 +296,7 @@ class Builder:
             lang="en",
         )
         self.contests += 1
+        self.sets[token] = result_set
         return contest, result_set
 
     def values(
@@ -342,10 +354,14 @@ def candidates(b: Builder, dignity: int, token: str, frame: pl.DataFrame, contes
     if heads.filter(pl.col("_names") > 1).height:
         raise ValueError(f"{token}: an organization runs two candidates")
     options: dict[str, str] = {}
+    index = b.heads[token] = {"name": {}, "number": {}, "org": {}}
     ordered = heads.sort(pl.col("OP_LISTA").str.extract(r"^(\d+)", 1).cast(pl.Int64), "_option")
     for position, row in enumerate(ordered.iter_rows(named=True), 1):
         org = row["_option"]
         option = options[org] = key("option", DAY, token, org)
+        index["name"][fold(row["CANDIDATO_NOMBRE"])] = org
+        index["number"][fold(row["OP_LISTA"])] = org
+        index["org"][fold(row["OP_NOMBRE"])] = org
         name = cne.title(row["CANDIDATO_NOMBRE"])
         p.add(
             "contest_option",
@@ -383,10 +399,13 @@ def lists(b: Builder, token: str, frame: pl.DataFrame, contest: str, circ: str =
     if heads.filter(pl.col("_lists") > 1).height:
         raise ValueError(f"{token}: an organization holds two lists")
     options: dict[str, str] = {}
+    index = b.heads[token] = {"number": {}, "org": {}}
     ordered = heads.sort(pl.col("OP_LISTA").str.extract(r"^(\d+)", 1).cast(pl.Int64), "_option")
     for position, row in enumerate(ordered.iter_rows(named=True), 1):
         org = row["_option"]
         option = options[org] = key("option", DAY, token, org)
+        index["number"][fold(row["OP_LISTA"])] = org
+        index["org"][fold(row["OP_NOMBRE"])] = org
         p.add(
             "contest_option",
             id=option,
@@ -396,6 +415,159 @@ def lists(b: Builder, token: str, frame: pl.DataFrame, contest: str, circ: str =
             ballot_label=label(row),
         )
     b.values(contest_set(token), frame, "_option", options, True, circ)
+
+
+def fold(text: object) -> str:
+    """Upper case, without accents or punctuation, for matching names across the Council's two files."""
+    ascii_text = unicodedata.normalize("NFKD", str(text or "")).encode("ascii", "ignore").decode()
+    return re.sub(r"[^A-Z0-9]+", " ", ascii_text.upper().replace("%", "PCT ")).strip()
+
+
+@functools.cache
+def winners() -> dict[str, list[dict[str, str]]]:
+    """The elected authorities, by sheet, one dictionary per row keyed by the folded column names."""
+    book = fastexcel.read_excel(str(raw.cached(SOURCE, WINNERS).path))
+    out: dict[str, list[dict[str, str]]] = {}
+    for name in book.sheet_names:
+        sheet = book.load_sheet(name, header_row=None, dtypes="string").to_polars()
+        header = [fold(v) for v in sheet.row(2)]
+        out[name] = [
+            {h: cne.clean(v) for h, v in zip(header, row, strict=True)}
+            for row in sheet.slice(3).iter_rows()
+            if any(row)
+        ]
+    return out
+
+
+@functools.cache
+def lookup() -> tuple[dict[str, str], dict[tuple[str, str], str], dict[tuple[str, str], str]]:
+    """Province codes by folded name, cantons by province and name, and parishes by canton and name."""
+    provinces, cantons, parishes = places()
+    by_province = {fold(n): c for c, n in provinces.items()}
+    by_canton = {(p, fold(n)): c for c, (n, p) in cantons.items()}
+    by_parish = {(k, fold(n)): c for c, (n, k) in parishes.items()}
+    return by_province, by_canton, by_parish
+
+
+def found(sheet: str, row: dict[str, str]) -> tuple[str, str, str]:
+    """A winner row's province, canton, and parish codes; the codes it does not carry are empty."""
+    by_province, by_canton, by_parish = lookup()
+    province = by_province.get(fold(row["PROVINCIA"]))
+    if province is None:
+        raise ValueError(f"{sheet}: province {row['PROVINCIA']!r} is not in the results file")
+    canton = parish = ""
+    if "CANTON" in row:
+        canton = by_canton.get((province, fold(row["CANTON"])), "")
+        if not canton:
+            raise ValueError(f"{sheet}: canton {row['CANTON']!r} is not in the results file")
+    if "PARROQUIA" in row:
+        parish = by_parish.get((canton, fold(row["PARROQUIA"])), "")
+        if not parish:
+            raise ValueError(f"{sheet}: parish {row['PARROQUIA']!r} is not in the results file")
+    return province, canton, parish
+
+
+def winner(b: Builder, token: str, row: dict[str, str]) -> str:
+    """The organization a winner row names within one contest, by candidate, then list number, then name."""
+    index = b.heads[token]
+    number = row.get("LISTA") or row.get("OP LISTA")
+    for field, text in (
+        ("name", row.get("CANDIDATO NOMBRE")),
+        ("number", number),
+        ("org", row["ORGANIZACION POLITICA"]),
+    ):
+        if field in index and (found := index[field].get(fold(text))) is not None:
+            return found
+    raise ValueError(f"{token}: no option matches {row}")
+
+
+def declare(b: Builder) -> None:
+    """Store the Council's declared winners as outcomes of the contests built from its results file."""
+    p = b.p
+    book = winners()
+    for sheet, level, prefix in (
+        ("PREFECTA_PREFECTO", "province", "prefect"),
+        ("ALCALDESA_ALCALDE", "canton", "mayor"),
+    ):
+        done: set[str] = set()
+        for row in book[sheet]:
+            province, canton, _ = found(sheet, row)
+            token = f"{prefix}/{province if level == 'province' else canton}"
+            if token in done or token not in b.heads:
+                raise ValueError(f"{sheet}: {token} has no contest or two winners")
+            done.add(token)
+            org = winner(b, token, row)
+            p.add(
+                "outcome",
+                result_set_id=b.sets[token],
+                option_id=key("option", DAY, token, org),
+                kind="elected",
+            )
+        b.declared[prefix] = len(done)
+    for sheet, which in (
+        ("CONCEJALES URBANOS", "urban"),
+        ("CONCEJALES RURALES", "rural"),
+        ("VOCALES JUNTAS PARROQUIALES", "board"),
+    ):
+        seats: dict[tuple[str, str], list[tuple[str, dict[str, str]]]] = {}
+        for row in book[sheet]:
+            province, canton, parish = found(sheet, row)
+            if which == "board":
+                token = f"parish-board/{parish}"
+            else:
+                circ = circumscription(canton, row.get("CIRCUNSCRIPCION", "")) if which == "urban" else "0"
+                token = f"{which}-council/{canton}" + (f"/{circ}" if circ != "0" else "")
+            if token not in b.heads:
+                raise ValueError(f"{sheet}: {token} has no contest")
+            seats.setdefault((token, winner(b, token, row)), []).append((token, row))
+        for (token, org), members in sorted(seats.items()):
+            option = key("option", DAY, token, org)
+            p.add("outcome", result_set_id=b.sets[token], option_id=option, kind="won", seats=len(members))
+            for token, row in sorted(members, key=lambda m: int(m[1].get("ESCANIO") or m[1]["ESCANO"])):
+                number = int(row.get("ESCANIO") or row["ESCANO"])
+                person = key("person", DAY, token, org, number)
+                name = cne.title(row["CANDIDATO NOMBRE"])
+                p.add("person", id=person)
+                p.name(person, name, "es", "official")
+                candidacy = key("candidacy", DAY, token, org, number)
+                p.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=option,
+                    role="list_member",
+                    list_position=number,
+                    ballot_name=name,
+                )
+                p.add(
+                    "outcome",
+                    result_set_id=b.sets[token],
+                    option_id=option,
+                    candidacy_id=candidacy,
+                    kind="elected",
+                )
+        b.declared[which] = len(seats)
+
+
+@functools.cache
+def circumscriptions() -> dict[tuple[str, str], str]:
+    """The urban circumscription codes of each canton, by the folded name the results file gives them."""
+    frame = sav()[0].filter(pl.col("DIGNIDAD_CODIGO") == URBAN)
+    out: dict[tuple[str, str], str] = {}
+    for canton, circ, name in (
+        frame.select("CANTON_CODIGO", "CIRCUNSCRIPCION_CODIGO", "CIRCUNSCRIPCION_NOMBRE").unique().iter_rows()
+    ):
+        out[(cne.code(canton), fold(name))] = cne.code(circ)
+    return out
+
+
+def circumscription(canton: str, name: str) -> str:
+    if not name:
+        return "0"
+    try:
+        return circumscriptions()[(canton, fold(name))]
+    except KeyError:
+        raise ValueError(f"canton {canton} has no circumscription {name!r}") from None
 
 
 def prefects(b: Builder) -> None:
@@ -597,6 +769,8 @@ def build() -> Package:
     boards(b)
     cpccs(b)
     consultation(b)
+    p.uses(cne.artifact(WINNERS))
+    declare(b)
     t = b.tally
     if t.rows:
         p.accept(
