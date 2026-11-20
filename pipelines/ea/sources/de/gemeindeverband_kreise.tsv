@@ -1,0 +1,69 @@
+code	area_id	name
+07111	01a13bb5-c5a5-7588-aead-0cffc86d8d85	Koblenz, kreisfreie Stadt
+07131	01a13bb5-c5a5-7588-aead-0d00e546480f	Ahrweiler
+07132	01a13bb5-c5a5-7588-aead-0d018de9efef	Altenkirchen (Westerwald)
+07133	01a13bb5-c5a5-7588-aead-0d028eb9f624	Bad Kreuznach
+07134	01a13bb5-c5a5-7588-aead-0d03e8884a1a	Birkenfeld
+07135	01a13bb5-c5a5-7588-aead-0d04a31c5d44	Cochem-Zell
+07137	01a13bb5-c5a5-7588-aead-0d05798e1b0a	Mayen-Koblenz
+07138	01a13bb5-c5a5-7588-aead-0d063352e226	Neuwied
+07140	01a13bb5-c5a5-7588-aead-0d072663d9e6	Rhein-Hunsrück-Kreis
+07141	01a13bb5-c5a5-7588-aead-0d088b1afe64	Rhein-Lahn-Kreis
+07143	01a13bb5-c5a5-7588-aead-0d09d42a842d	Westerwaldkreis
+07211	01a13bb5-c5a5-7588-aead-0d0a47ce5eb8	Trier, kreisfreie Stadt
+07231	01a13bb5-c5a5-7588-aead-0d0b2fc9f775	Bernkastel-Wittlich
+07232	01a13bb5-c5a5-7588-aead-0d0c87cea938	Eifelkreis Bitburg-Prüm
+07233	01a13bb5-c5a5-7588-aead-0d0dc120eaff	Vulkaneifel
+07235	01a13bb5-c5a5-7588-aead-0d0e94f438aa	Trier-Saarburg
+07311	01a13bb5-c5a5-7588-aead-0d0ff666baa6	Frankenthal (Pfalz), kreisfreie Stadt
+07312	01a13bb5-c5a5-7588-aead-0d100b0bf543	Kaiserslautern, kreisfreie Stadt
+07313	01a13bb5-c5a5-7588-aead-0d111067bd17	Landau in der Pfalz, kreisfreie Stadt
+07314	01a13bb5-c5a5-7588-aead-0d12ab50a173	Ludwigshafen am Rhein, kreisfreie Stadt
+07315	01a13bb5-c5a5-7588-aead-0d1339d44e70	Mainz, kreisfreie Stadt
+07316	01a13bb5-c5a5-7588-aead-0d147e405b8e	Neustadt an der Weinstraße, kreisfreie Stadt
+07317	01a13bb5-c5a5-7588-aead-0d155423ff83	Pirmasens, kreisfreie Stadt
+07318	01a13bb5-c5a5-7588-aead-0d16981c0096	Speyer, kreisfreie Stadt
+07319	01a13bb5-c5a5-7588-aead-0d17b261cba6	Worms, kreisfreie Stadt
+07320	01a13bb5-c5a5-7588-aead-0d1825a70bec	Zweibrücken, kreisfreie Stadt
+07331	01a13bb5-c5a5-7588-aead-0d19081012bd	Alzey-Worms
+07332	01a13bb5-c5a5-7588-aead-0d1a1e3b1498	Bad Dürkheim
+07333	01a13bb5-c5a5-7588-aead-0d1b716d9766	Donnersbergkreis
+07334	01a13bb5-c5a5-7588-aead-0d1c45bb42bc	Germersheim
+07335	01a13bb5-c5a5-7588-aead-0d1d795dfd29	Kaiserslautern
+07336	01a13bb5-c5a5-7588-aead-0d1e9bc76b26	Kusel
+07337	01a13bb5-c5a5-7588-aead-0d1f2d8890f9	Südliche Weinstraße
+07338	01a13bb5-c5a5-7588-aead-0d208d549fc1	Rhein-Pfalz-Kreis
+07339	01a13bb5-c5a5-7588-aead-0d21e9e94745	Mainz-Bingen
+07340	01a13bb5-c5a5-7588-aead-0d22a5291e76	Südwestpfalz
+12051	01a13bb5-c5a5-7588-aead-0db6c92f5421	Brandenburg an der Havel, Stadt
+12052	01a13bb5-c5a5-7588-aead-0db7684a5da2	Cottbus, Stadt
+12053	01a13bb5-c5a5-7588-aead-0db8ed11358a	Frankfurt (Oder), Stadt
+12054	01a13bb5-c5a5-7588-aead-0db973b4281e	Potsdam, Stadt
+12060	01a13bb5-c5a5-7588-aead-0dba45f31423	Barnim
+12061	01a13bb5-c5a5-7588-aead-0dbb27fdd386	Dahme-Spreewald
+12062	01a13bb5-c5a5-7588-aead-0dbc9d096248	Elbe-Elster
+12063	01a13bb5-c5a5-7588-aead-0dbd9dd88e5d	Havelland
+12064	01a13bb5-c5a5-7588-aead-0dbee847941a	Märkisch-Oderland
+12065	01a13bb5-c5a5-7588-aead-0dbfd8c42d25	Oberhavel
+12066	01a13bb5-c5a5-7588-aead-0dc046b2218c	Oberspreewald-Lausitz
+12067	01a13bb5-c5a5-7588-aead-0dc1bb1724d3	Oder-Spree
+12068	01a13bb5-c5a5-7588-aead-0dc210dafab5	Ostprignitz-Ruppin
+12069	01a13bb5-c5a5-7588-aead-0dc3fd6a6e44	Potsdam-Mittelmark
+12070	01a13bb5-c5a5-7588-aead-0dc4eba75f7c	Prignitz
+12071	01a13bb5-c5a5-7588-aead-0dc52acbd92c	Spree-Neiße
+12072	01a13bb5-c5a5-7588-aead-0dc68bf59901	Teltow-Fläming
+12073	01a13bb5-c5a5-7588-aead-0dc7aae7ab04	Uckermark
+15001	01a13bb5-c5a5-7588-aead-0ddd796c1070	Dessau-Roßlau, Stadt
+15002	01a13bb5-c5a5-7588-aead-0dde5a5ed49c	Halle (Saale), Stadt
+15003	01a13bb5-c5a5-7588-aead-0ddf9a7808b2	Magdeburg, Landeshauptstadt
+15081	01a13bb5-c5a5-7588-aead-0de05f7b55a5	Altmarkkreis Salzwedel
+15082	01a13bb5-c5a5-7588-aead-0de1a550c6e3	Anhalt-Bitterfeld
+15083	01a13bb5-c5a5-7588-aead-0de20fb48c24	Börde
+15084	01a13bb5-c5a5-7588-aead-0de3b28123c5	Burgenlandkreis
+15085	01a13bb5-c5a5-7588-aead-0de4842c83d6	Harz
+15086	01a13bb5-c5a5-7588-aead-0de5c29d2e4d	Jerichower Land
+15087	01a13bb5-c5a5-7588-aead-0de654e4f6e5	Mansfeld-Südharz
+15088	01a13bb5-c5a5-7588-aead-0de72ce454ef	Saalekreis
+15089	01a13bb5-c5a5-7588-aead-0de84b44580e	Salzlandkreis
+15090	01a13bb5-c5a5-7588-aead-0de9587cb01b	Stendal
+15091	01a13bb5-c5a5-7588-aead-0deac50dabf2	Wittenberg
