@@ -1,4 +1,4 @@
-"""India's Lok Sabha general elections, 1951 to 2009, from the Election Commission of India's statistical reports.
+"""India's Lok Sabha general elections, 1951 to 2019, from the Election Commission of India's statistical reports.
 
 For each general election the Commission published a statistical report. Volume I holds the national and state
 abstracts (the list of participating parties, the list of successful candidates, and the party-wise summaries) and, in
@@ -11,6 +11,16 @@ The 2004 and 2009 reports are laid out differently (`ea.eci_report_2000s`): volu
 candidate's votes by channel, volume II's summary pages carry each constituency's electors, voters, valid votes, poll
 date, and winner, and volume III holds each candidate's votes in every assembly segment of a constituency and the
 postal ballots, which become reporting units under the constituency's.
+
+The 2014 and 2019 reports are read from the "Constituency Wise Detailed Result" workbook of each (`ea.eci_workbook`):
+a row per candidate with the votes on the machines, the postal votes, and the total, and the constituency's electors.
+The workbooks hold no constituency numbers, winners, or turnout, so a constituency is matched to the parliamentary
+constituencies of `in.geo` by state and name, each seat's winner is the candidate with the most votes, and the valid
+votes are the sum of the lines, "None of the Above" included. The 2014 workbook has no row for Chhattisgarh or Odisha
+(32 constituencies); the Commission's PDF print of the same table holds all 543, so those 32 are read from its text
+layer (each checked against the totals the PDF prints) and the rest of the PDF is compared with the workbook. Both
+elections already exist in the archive (from the polling-station pipelines), so these packages add their constituency
+results to them.
 
 The Commission's own site refuses scripted requests, so the reports are read from archived captures of the old site
 (eci.nic.in/eci_main/StatisticalReports), and each package cites the capture it read. The 1985 report holds the
@@ -28,7 +38,7 @@ from uuid import uuid5
 
 from ea import eci_report as reader
 from ea import eci_report_2000s as modern
-from ea import package, raw
+from ea import eci_workbook, package, raw
 from ea.changeset import slug
 from ea.package import Package
 
@@ -38,6 +48,7 @@ SITE = "https://www.eci.gov.in"
 ARCHIVE = "https://web.archive.org/web"
 OLD = "eci.nic.in/eci_main/StatisticalReports"
 VOTES, REGISTERED, BALLOTS, VALID = 1, 2, 3, 4
+ELECTION_DAY, POSTAL = 1, 3
 _IDS = Package(SOURCE, SOURCE, "ids")
 
 
@@ -65,11 +76,20 @@ class Edition:
     group: str = ""  # the places and parties package the election builds with ("" for the first one)
     volume3: str | None = None  # the assembly segments (2004 and later layout)
     check: str | None = None  # a table that is only compared with the parsed results, not cited
-    layout: str = "classic"  # "classic" or "modern" (the 2004 and 2009 reports)
+    layout: str = "classic"  # "classic", "modern" (the 2004 and 2009 reports), or "workbook" (2014 and 2019)
+    election: str | None = None  # the id of the election row the archive already holds, for a workbook edition
 
 
 NINETIES = "1990s"
 TWO_THOUSANDS = "2000s"
+TEENS = "2010s"
+GEO = "in.geo"
+PC_FILE = "eci_stat_pcs.json"
+
+
+# The 2019 workbook is the Commission's file as a public repository keeps it, pinned to a commit.
+GITHUB = "https://raw.githubusercontent.com/sunny-roshan/india-election"
+COMMIT = "5de0e0bd180445d7b9699596ae066aceca4bb252"
 
 
 def capture(stamp: str, path: str, port: bool = True) -> str:
@@ -164,6 +184,25 @@ EDITIONS = [
         check=f"{ARCHIVE}/20180712190437id_/http://eci.nic.in:80/eci_main/archiveofge2009/Stats/VOLII/STATE_PARTYWISESEATWONANDVOTES_LokSabha2009_24012014.pdf",
         layout="modern",
     ),
+    Edition(
+        2014,
+        16,
+        f"{ARCHIVE}/20180818091834id_/http://eci.nic.in:80/eci_main/archiveofge2014/33.ConstituencyWiseDetailedResultPC.xlsx",
+        f"{ARCHIVE}/20180712165919id_/http://eci.nic.in:80/eci_main/archiveofge2014/33%20-%20Constituency%20wise%20detailed%20result.pdf",
+        group=TEENS,
+        layout="workbook",
+        election=str(uuid5(package.NAMESPACE, "in.jensenius\x1felection\x1f2014")),
+    ),
+    Edition(
+        2019,
+        17,
+        f"{GITHUB}/{COMMIT}/election-data/eci-data/33.%20Constituency%20Wise%20Detailed%20Result.xls",
+        None,
+        group=TEENS,
+        check=f"{GITHUB}/{COMMIT}/election-data/eci-data/33.%20Constituency%20Wise%20Detailed%20Result.xlsx",
+        layout="workbook",
+        election=str(uuid5(package.NAMESPACE, "in.form20_wb\x1felection\x1f2019")),
+    ),
 ]
 BY_YEAR = {e.year: e for e in EDITIONS}
 ORDINALS = {
@@ -182,6 +221,8 @@ ORDINALS = {
     13: "thirteenth",
     14: "fourteenth",
     15: "fifteenth",
+    16: "sixteenth",
+    17: "seventeenth",
 }
 
 METHOD = (
@@ -227,7 +268,7 @@ def members(group: str) -> list[Edition]:
 
 
 def packages() -> list[str]:
-    keys = [group_key(kind, g) for g in groups() for kind in ("geo", "registry")]
+    keys = [group_key(kind, g) for g in groups() for kind in ("geo", "registry") if (kind, g) != ("geo", TEENS)]
     return [*keys, *(package_key(e.year) for e in EDITIONS)]
 
 
@@ -245,14 +286,21 @@ def urls() -> list[str]:
     return found
 
 
-def _pdf(path: Path) -> None:
-    if not path.read_bytes().startswith(b"%PDF"):
-        raise ValueError(f"{path.name} is not a PDF")
+MAGIC = {".pdf": b"%PDF", ".xlsx": b"PK", ".xls": b"\xd0\xcf\x11\xe0"}
+
+
+def suffix(url: str) -> str:
+    return "." + url.rsplit(".", 1)[1].lower()
+
+
+def _file(path: Path) -> None:
+    if not path.read_bytes().startswith(MAGIC[path.suffix]):
+        raise ValueError(f"{path.name} is not a {path.suffix[1:]} file")
 
 
 def fetch() -> None:
     for url in urls():
-        raw.fetch(SOURCE, url, suffix=".pdf", check=_pdf)
+        raw.fetch(SOURCE, url, suffix=suffix(url), check=_file)
 
 
 def emit() -> None:
@@ -261,7 +309,8 @@ def emit() -> None:
 
 def parse() -> None:
     for g in groups():
-        geo(g).write()
+        if g != TEENS:
+            geo(g).write()
         registry(g).write()
     for e in EDITIONS:
         election(e.year).write()
@@ -352,7 +401,7 @@ def unit(year: int, state: str, number: int) -> str:
 def party(code: str, group: str = "") -> str:
     """A party's id. A party the first packages hold keeps their id. The 2000s group mints its other parties under
     its own namespace, because the 1990s group mints parties from its own reports that this one cannot see."""
-    if group == TWO_THOUSANDS and code not in known_parties():
+    if group in (TWO_THOUSANDS, TEENS) and code not in known_parties():
         return key("party", group, code)
     return key("party", code)
 
@@ -443,6 +492,8 @@ def geo(group: str = "") -> Package:
 
 
 def registry(group: str = "") -> Package:
+    if group == TEENS:
+        return _registry_workbook(group)
     p = Package(
         group_key("registry", group),
         SOURCE,
@@ -480,7 +531,7 @@ def registry(group: str = "") -> Package:
         p.add(
             "external_id",
             entity_id=id,
-            scheme="in.eci_stat.party" if group != TWO_THOUSANDS else f"in.eci_stat.party.{group}",
+            scheme=f"in.eci_stat.party.{group}" if group in (TWO_THOUSANDS, TEENS) else "in.eci_stat.party",
             value=code,
         )
         p.name(id, title(name) if name else code, "en", "official" if name else "abbreviation")
@@ -571,6 +622,8 @@ def polls(e: Edition) -> dict[tuple[str, int], date | None]:
 
 def election(year: int) -> Package:
     e = BY_YEAR[year]
+    if e.layout == "workbook":
+        return _election_workbook(e)
     p = Package(
         package_key(year),
         SOURCE,
@@ -943,3 +996,398 @@ def table_2009() -> dict[str, object]:
         "parsed_seats": sum(seats.values()),
         "differ": differ,
     }
+
+
+# The 2014 and 2019 workbooks.
+
+STATES = {"NCT OF Delhi": "Delhi"}
+# The PDF spells two states otherwise than the workbooks do.
+PDF_STATES = {"Orissa": "Odisha", "Chattisgarh": "Chhattisgarh"}
+PLANS = {"2008", "pre"}
+# The census code of each state's constituencies in in.geo's codes. Telangana's seats keep the codes of the undivided
+# Andhra Pradesh they were numbered in, and the 2014 workbook files them under Andhra Pradesh.
+PREFIXES = {
+    "Andhra Pradesh": ("28",),
+    "Telangana": ("28",),
+    "Andaman & Nicobar Islands": ("35",),
+    "Arunachal Pradesh": ("12",),
+    "Assam": ("18",),
+    "Bihar": ("10",),
+    "Chandigarh": ("04",),
+    "Chhattisgarh": ("22",),
+    "Dadra & Nagar Haveli": ("26",),
+    "Daman & Diu": ("25",),
+    "Goa": ("30",),
+    "Gujarat": ("24",),
+    "Haryana": ("06",),
+    "Himachal Pradesh": ("02",),
+    "Jammu & Kashmir": ("01",),
+    "Jharkhand": ("20",),
+    "Karnataka": ("29",),
+    "Kerala": ("32",),
+    "Lakshadweep": ("31",),
+    "Madhya Pradesh": ("23",),
+    "Maharashtra": ("27",),
+    "Manipur": ("14",),
+    "Meghalaya": ("17",),
+    "Mizoram": ("15",),
+    "NCT OF Delhi": ("07",),
+    "Nagaland": ("13",),
+    "Odisha": ("21",),
+    "Puducherry": ("34",),
+    "Punjab": ("03",),
+    "Rajasthan": ("08",),
+    "Sikkim": ("11",),
+    "Tamil Nadu": ("33",),
+    "Tripura": ("16",),
+    "Uttar Pradesh": ("09",),
+    "Uttarakhand": ("05",),
+    "West Bengal": ("19",),
+}
+# The workbooks spell some constituencies otherwise than in.geo does (Local Government Directory spellings).
+ALIASES = {
+    "andamannicobarislands": "andamannicobar",
+    "anakapalli": "anakapalle",
+    "aruku": "araku",
+    "chelvella": "chevella",
+    "chevella": "chevella",
+    "secundrabad": "secunderabad",
+    "dadarnagarhaveli": "dadranagarhaveli",
+    "dadraandnagarhaveli": "dadranagarhaveli",
+    "palamau": "palamu",
+    "puducherry": "pondicherry",
+    "nainitaludhamsingh": "nainital",
+    "tonksawaimadhopu": "tonksawaimadhopur",
+    "sarguja": "surguja",
+    "ahmadnagar": "ahmednagar",
+    "thiruvallur": "tiruvallur",
+    "arambagh": "arambag",
+    "barrackpore": "barrackpur",
+    "burdwandurgapur": "bardhamandurgapur",
+    "joynagar": "jaynagar",
+    "srerampur": "sreerampur",
+}
+# A path is one to a place, and in.jensenius already files the 2014 constituencies of these states, and the 2019 ones
+# of Uttar Pradesh, under the path this pipeline would give them, so those contests keep theirs.
+HELD_PATHS = {
+    2014: {
+        "Andhra Pradesh",
+        "Bihar",
+        "Gujarat",
+        "Himachal Pradesh",
+        "Jharkhand",
+        "Madhya Pradesh",
+        "Punjab",
+        "Rajasthan",
+        "Uttarakhand",
+        "Uttar Pradesh",
+        "West Bengal",
+    },
+    2019: {"Uttar Pradesh"},
+}
+
+
+def _name_key(name: str) -> str:
+    text = re.sub(r"\((SC|ST)\)", "", name, flags=re.IGNORECASE)
+    text = re.sub(r"[^a-z]+", "", text.lower())
+    return ALIASES.get(text, text)
+
+
+def pdf_states() -> set[str]:
+    return set(PREFIXES) | set(PDF_STATES)
+
+
+@functools.cache
+def pcs() -> dict[str, tuple[str, str]]:
+    """in.geo's parliamentary constituencies in force at the 2014 and 2019 polls, by code: name and plan."""
+    found = json.loads(Path(__file__).with_name(PC_FILE).read_text())
+    return {code: (name, plan) for code, (name, plan) in found.items()}
+
+
+def geo_area(code: str) -> str:
+    return str(uuid5(package.NAMESPACE, "\x1f".join([GEO, "area", "in.pc", code, pcs()[code][1]])))
+
+
+def locate(state: str, name: str) -> str:
+    """The code of the in.geo constituency a workbook row names."""
+    wanted = _name_key(name)
+    hits = [
+        code for code, (geo_name, _) in pcs().items() if code[:2] in PREFIXES[state] and _name_key(geo_name) == wanted
+    ]
+    if len(hits) != 1:
+        raise ValueError(f"{state} {name}: {len(hits)} constituencies in in.geo")
+    return hits[0]
+
+
+@dataclass
+class Seat:
+    code: str
+    state: str
+    seat: eci_workbook.Seat
+    winner: eci_workbook.Line  # the candidate with the most votes
+    pdf: bool = False  # read from the PDF print, because the workbook has no row for the constituency
+
+
+@functools.cache
+def workbook(year: int) -> list[Seat]:
+    e = BY_YEAR[year]
+    rows = [(seat, False) for seat in eci_workbook.seats(raw.cached(SOURCE, e.volume1).path)]
+    if e.volume2:
+        have = {seat.state for seat, _ in rows}
+        for seat in eci_workbook.pdf_seats(raw.cached(SOURCE, e.volume2).path, pdf_states()):
+            state = PDF_STATES.get(seat.state, seat.state)
+            if state in have:
+                continue
+            printed = (
+                sum(x.postal for x in seat.lines),
+                sum(x.total for x in seat.lines),
+                sum(x.general for x in seat.lines),
+            )
+            if not seat.lines or seat.printed != printed:
+                raise ValueError(f"{seat.state} {seat.name}: the PDF's candidates do not add up to its printed totals")
+            seat.state = state
+            rows.append((seat, True))
+    found: list[Seat] = []
+    taken: set[str] = set()
+    for seat, pdf in rows:
+        code = locate(seat.state, seat.name)
+        if code in taken:
+            raise ValueError(f"{seat.state} {seat.name}: in.geo's {code} twice")
+        taken.add(code)
+        votes = [x.total for x in seat.candidates]
+        top = max(votes)
+        if votes.count(top) != 1:
+            raise ValueError(f"{seat.state} {seat.name}: {votes.count(top)} candidates share the most votes")
+        found.append(Seat(code, seat.state, seat, seat.candidates[votes.index(top)], pdf))
+    return found
+
+
+def check_workbook(year: int) -> dict[str, object]:
+    """Compare the primary workbook with the Commission's other copy of the table: 2019's .xlsx twin, or 2014's PDF
+    print, whose constituencies the workbook shares are compared by their votes."""
+    e = BY_YEAR[year]
+    mine = eci_workbook.seats(raw.cached(SOURCE, e.volume1).path)
+    found: dict[str, object] = {
+        "year": year,
+        "seats": len(mine),
+        "lines": sum(len(x.lines) for x in mine),
+        "votes": sum(line.total for x in mine for line in x.lines),
+    }
+    if e.check:
+        found["same_as_other"] = mine == eci_workbook.seats(raw.cached(SOURCE, e.check).path)
+    if e.volume2:
+        pdf = {
+            (PDF_STATES.get(x.state, x.state), _name_key(x.name)): x
+            for x in eci_workbook.pdf_seats(raw.cached(SOURCE, e.volume2).path, pdf_states())
+        }
+        same = differ = unread = unmatched = 0
+        for seat in mine:
+            other = pdf.get((seat.state, _name_key(seat.name)))
+            if other is None:
+                unmatched += 1
+            elif not other.lines:
+                unread += 1
+            elif (
+                sorted((x.general, x.postal, x.total) for x in other.lines)
+                == sorted((x.general, x.postal, x.total) for x in seat.lines)
+                and other.electors == seat.electors
+            ):
+                same += 1
+            else:
+                differ += 1
+        found |= {"pdf_same": same, "pdf_differ": differ, "pdf_unread": unread, "pdf_unmatched": unmatched}
+    return found
+
+
+def _words(text: str) -> str:
+    words: list[str] = []
+    for word in text.replace("\u00a0", " ").split():
+        if not word.isupper() or re.fullmatch(r"(?:[A-Z]\.)+[A-Z]?\.?", word) or word.strip("().") in KEEP:
+            words.append(word)
+        else:
+            words.append(
+                "-".join(part.capitalize() for part in word.rstrip(".").split("-"))
+                + ("." if word.endswith(".") and len(word) < 4 else "")
+            )
+    return " ".join(words)
+
+
+def _registry_workbook(group: str) -> Package:
+    p = Package(
+        group_key("registry", group),
+        SOURCE,
+        f"The parties that fielded candidates in the Lok Sabha elections of {span(group)}, beyond those the earlier "
+        "elections' registry holds",
+        depends=[],
+    )
+    p.external.add(INDIA)
+    p.external.add(BODY)
+    source_row(p)
+    codes: set[str] = set()
+    for e in members(group):
+        p.uses(raw.cached(SOURCE, e.volume1))
+        if e.volume2:
+            p.uses(raw.cached(SOURCE, e.volume2))
+        codes |= {x.party for seat in workbook(e.year) for x in seat.seat.candidates if x.party != "IND"}
+    p.external.update(party(code) for code in codes if code in known_parties())
+    _systems(p)
+    for code in sorted(codes):
+        if code in known_parties():
+            continue
+        id = party(code, group)
+        p.add("party", id=id, kind="party", polity_id=INDIA)
+        p.add("external_id", entity_id=id, scheme=f"in.eci_stat.party.{group}", value=code)
+        p.name(id, code, "en", "abbreviation")
+    return p
+
+
+def _election_workbook(e: Edition) -> Package:
+    assert e.election
+    year = e.year
+    p = Package(
+        package_key(year),
+        SOURCE,
+        f"The {year} Indian general election to the Lok Sabha, by parliamentary constituency, from the Election "
+        "Commission's constituency-wise detailed result",
+        depends=[group_key("registry", e.group)],
+    )
+    p.external |= {INDIA, BODY, SCHEME, e.election}
+    seats = workbook(year)
+    codes = {x.party for s in seats for x in s.seat.candidates if x.party != "IND"}
+    p.external.update(party(code) for code in codes if code in known_parties())
+    p.external.update(geo_area(s.code) for s in seats)
+    for url in (e.volume1, e.volume2):
+        if url and (url == e.volume1 or any(s.pdf for s in seats)):
+            p.artifact(raw.cached(SOURCE, url), SOURCE_ID)
+    for s in seats:
+        _seat_workbook(p, e, s)
+    return p
+
+
+METHOD_WORKBOOK = (
+    'Constituency result from the Election Commission of India\'s "Constituency Wise Detailed Result" for the {year} '
+    "general election: for each candidate the votes on the voting machines, the postal votes, and the total, and for "
+    '"None of the Above" the same, with the constituency\'s electors. The workbook does not mark the winner: the '
+    'member elected is the candidate with the most votes. The valid votes are the sum of every line, "None of the '
+    'Above" included.'
+)
+
+
+METHOD_PDF = (
+    " The workbook has no row for this constituency, so the figures are read from the text layer of the Commission's "
+    "PDF print of the same table; the candidates' votes add up to the totals the print gives for the constituency."
+)
+
+
+def _seat_workbook(p: Package, e: Edition, s: Seat) -> None:
+    assert e.election
+    year = e.year
+    state = STATES.get(s.state, s.state)
+    name = pcs()[s.code][0]
+    tag = f"{year}:{s.code}"
+    district = geo_area(s.code)
+    contest = key("contest", tag)
+    p.add(
+        "contest",
+        id=contest,
+        election_id=e.election,
+        kind="body_seats",
+        body_id=BODY,
+        district_area_id=district,
+        magnitude=1,
+        round_number=1,
+        electoral_system_id=FPTP,
+        default_result_kind="counted",
+    )
+    p.name(contest, f"{name}, {state}", "en", "official")
+    if state not in HELD_PATHS.get(year, set()):
+        path = f"in/{year}-general/{slug(state)}/{int(s.code[2:])}-{slug(name)}"
+        p.add("slug", path=path, entity_id=contest, is_current=True)
+    result_set = key("result_set", tag)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=e.election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=SOURCE_ID,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note",
+        id=key("note", result_set),
+        entity_id=result_set,
+        kind="methodology",
+        body_md=METHOD_WORKBOOK.format(year=year) + (METHOD_PDF if s.pdf else ""),
+        lang="en",
+    )
+    unit_id = key("unit", tag)
+    p.add(
+        "reporting_unit",
+        id=unit_id,
+        polity_id=INDIA,
+        scheme_code=SCHEME,
+        code=tag,
+        area_relation="equals",
+        area_id=district,
+        kind="standard",
+    )
+    _value(p, result_set, unit_id, None, REGISTERED, s.seat.electors)
+    channels = ((ELECTION_DAY, "general"), (POSTAL, "postal"))
+    for index, line in enumerate(s.seat.lines, start=1):
+        option = key("option", tag, index)
+        if line.party == "NOTA":
+            p.add("contest_option", id=option, contest_id=contest, kind="none_of_the_above", ballot_label="NOTA")
+        else:
+            who = key("person", tag, index)
+            coded = line.party != "IND"
+            full = _words(line.name)
+            p.add("person", id=who, gender=line.sex)
+            p.name(who, full, "en", "official")
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                party_id=party(line.party, e.group) if coded else None,
+                ballot_label=full,
+            )
+            p.add(
+                "candidacy",
+                id=key("candidacy", tag, index),
+                person_id=who,
+                option_id=option,
+                role="head",
+                ballot_name=full,
+                member_of_party_id=party(line.party, e.group) if coded else None,
+                is_independent=None if coded else True,
+            )
+            won = line is s.winner
+            p.add(
+                "outcome", result_set_id=result_set, option_id=option, kind="elected" if won else "lost", seats=int(won)
+            )
+        for channel, field_name in channels:
+            _channel_value(p, result_set, unit_id, option, channel, VOTES, getattr(line, field_name))
+    for channel, field_name in channels:
+        _channel_value(
+            p, result_set, unit_id, None, channel, VALID, sum(getattr(line, field_name) for line in s.seat.lines)
+        )
+
+
+def _channel_value(
+    p: Package, result_set: str, unit_id: str, option: str | None, channel: int, measure: int, value: int
+) -> None:
+    p.add(
+        "result_value",
+        result_set_id=result_set,
+        unit_id=unit_id,
+        option_id=option,
+        channel=channel,
+        measure=measure,
+        count_round=0,
+        flags=0,
+        value=value,
+    )
