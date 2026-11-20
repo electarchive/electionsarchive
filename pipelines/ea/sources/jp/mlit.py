@@ -20,14 +20,21 @@ PARSED = DATA / "parsed" / SOURCE
 BASE = "https://nlftp.mlit.go.jp/ksj/gml/data/N03"
 LANDING = "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-2026.html"
 PUBLISHER = "Ministry of Land, Infrastructure, Transport and Tourism"
-TITLE = "National Land Numerical Information, administrative areas (N03), 2007-2026"
+TITLE = "National Land Numerical Information, administrative areas (N03), 2000-2026"
+# The source keeps the id it was minted under with its first title, which covered 2007-2026.
+FIRST_TITLE = "National Land Numerical Information, administrative areas (N03), 2007-2026"
 LAW = "https://laws.e-gov.go.jp/law/325AC1000000100"
 LAW_XML = "https://laws.e-gov.go.jp/api/1/lawdata/325AC1000000100"
 LAW_PUBLISHER = "Digital Agency, e-Gov Law Search"
 LAW_TITLE = "Public Offices Election Act (Act No. 100 of 1950)"
 TOLERANCE = 0.0001
 CHANGED = 0.002
+# The 2005 files carry no date in their names or metadata. Their municipalities are those of 2006-01-01: the towns
+# merged away that day (Sadowara into Miyazaki, Hisai into Tsu, Sashiki into Nanjo) are gone and Nanjo is present,
+# while Atsushiokano and Shiokawa, merged into Kitakata on 2006-01-04, are still there.
 VINTAGES = {
+    "2000": ("2000", "001001", date(2000, 10, 1), True),
+    "2006": ("2005", "05", date(2006, 1, 1), True),
     "2007": ("2007", "070401", date(2007, 4, 1), True),
     "2009": ("2008", "090320", date(2009, 3, 20), True),
     "2010": ("2009", "100329", date(2010, 3, 29), True),
@@ -412,10 +419,10 @@ def build() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Japan, its prefectures, municipalities, designated-city wards, and House of Representatives "
-            "proportional blocks from MLIT N03 administrative areas, 2007-2026",
+            "proportional blocks from MLIT N03 administrative areas, 2000-2026",
             polity="JP",
         )
-        source = cs.source(PUBLISHER, TITLE)
+        source = cs.source(PUBLISHER, FIRST_TITLE)
         cs.add(
             "source",
             id=source,

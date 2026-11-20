@@ -483,9 +483,7 @@ def n03(vintage: str, prefecture: str) -> str:
 
 
 def bases(vintage: str) -> list[str]:
-    return (
-        mlit.urls(vintage) if vintage in mlit.VINTAGES else [n03(vintage, f"{number:02d}") for number in range(1, 48)]
-    )
+    return [n03(vintage, f"{number:02d}") for number in range(1, 48)] if vintage in N03 else mlit.urls(vintage)
 
 
 def formers() -> list[tuple[str, str]]:
@@ -502,7 +500,7 @@ def formers() -> list[tuple[str, str]]:
 def fetch() -> None:
     for table, spec in TABLES.items():
         raw.fetch(SOURCE, law_url(table), suffix=".htm" if "/" in spec.revision else ".xml")
-    for vintage in sorted({spec.n03 for spec in TABLES.values()} - set(mlit.VINTAGES)):
+    for vintage in sorted({spec.n03 for spec in TABLES.values()} & set(N03)):
         for url in bases(vintage):
             raw.fetch(SOURCE, url, suffix=".zip")
     for prefecture in [f"{number:02d}" for number in range(1, 48)]:
@@ -579,14 +577,14 @@ class Municipality:
 
 
 def layers(vintage: str) -> Path:
-    return (mlit.PARSED if vintage in mlit.VINTAGES else PARSED) / f"n03_{vintage}.parquet"
+    return (PARSED if vintage in N03 else mlit.PARSED) / f"n03_{vintage}.parquet"
 
 
 def municipalities(vintage: str) -> dict[str, Municipality]:
     frame = pl.read_parquet(layers(vintage), columns=["layer", "code", "parent", "name"])
     attributes: dict[str, tuple[str, str]] = {}
     for url in [*bases(vintage), *bases(OFFICES.get(vintage, vintage))]:
-        source = mlit.SOURCE if vintage in mlit.VINTAGES else SOURCE
+        source = SOURCE if vintage in N03 else mlit.SOURCE
         with zipfile.ZipFile(raw.cached(source, url).path) as archive:
             dbf = next(name for name in archive.namelist() if name.endswith(".dbf"))
             reader = shapefile.Reader(dbf=io.BytesIO(archive.read(dbf)), encoding="cp932")
@@ -981,7 +979,7 @@ def build(table: str) -> pl.DataFrame:
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    for vintage in sorted({spec.n03 for spec in TABLES.values()} - set(mlit.VINTAGES)):
+    for vintage in sorted({spec.n03 for spec in TABLES.values()} & set(N03)):
         if not layers(vintage).exists():
             mlit.layers(vintage, bases(vintage), SOURCE).write_parquet(layers(vintage))
     for table in sorted(TABLES, key=lambda table: TABLES[table].effective, reverse=True):
