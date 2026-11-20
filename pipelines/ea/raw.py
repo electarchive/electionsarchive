@@ -22,6 +22,7 @@ from ea.store import DATA
 
 USER_AGENT = "electionsarchive/0.1 (+https://electionsarchive.com)"
 HOST, _, ROOT = os.environ.get("EA_REMOTE", "").partition(":")
+PROXY = os.environ.get("EA_FETCH_PROXY") or None
 SSH = [
     "ssh",
     "-o",
@@ -265,6 +266,7 @@ def fetch(
                 follow_redirects=True,
                 timeout=600,
                 verify=verify,
+                proxy=PROXY,
             ) as response,
             partial.open("wb") as file,
         ):
@@ -323,7 +325,12 @@ def fetch_many(
     pending = [url for url in dict.fromkeys(urls) if url not in index]
     jar = None if keep_cookies else CookieJar(DefaultCookiePolicy(allowed_domains=[]))
     client = httpx.Client(
-        headers={"User-Agent": USER_AGENT}, follow_redirects=True, timeout=120, verify=verify, cookies=jar
+        headers={"User-Agent": USER_AGENT},
+        follow_redirects=True,
+        timeout=120,
+        verify=verify,
+        cookies=jar,
+        proxy=PROXY,
     )
 
     def one(url: str) -> tuple[str, dict[str, str | int | None]] | None:
