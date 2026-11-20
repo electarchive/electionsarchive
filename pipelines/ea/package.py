@@ -1725,15 +1725,21 @@ def _derive(conn: Connection, loaded: list[Loaded], meter: Meter) -> list[str]:
         total += n
     for index, batch in enumerate(batches):
         _rollup(conn, None, moved if index == 0 else [], repointed if index == 0 else [], batch)
-    steps = [meter.step(f"rollups ({len(batches)} passes)")]
+    steps = [_step(meter, f"rollups ({len(batches)} passes)")]
+    covers.uncover(conn, [item.changeset_id for item in loaded], moved, repointed, sets=sorted(sizes))
     for item in loaded:
-        covers.uncover(conn, item.changeset_id, item.moved, item.repointed, sets=sorted(item.sets))
         touched.recorded(conn, item.changeset_id)
-    steps.append(meter.step("covers"))
+    steps.append(_step(meter, "covers"))
     search.scope(conn, [item.changeset_id for item in loaded])
     search.refresh(conn)
-    steps.append(meter.step("search"))
+    steps.append(_step(meter, "search"))
     return steps
+
+
+def _step(meter: Meter, label: str) -> str:
+    text = meter.step(label)
+    print(f"step {text}", flush=True)
+    return text
 
 
 def _verify(conn: Connection, loaded: list[Loaded]) -> None:
@@ -1866,7 +1872,8 @@ def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: M
         if chunks[-1] and len(chunks[-1]) + len(group) > LOAD_CHUNK:
             chunks.append([])
         chunks[-1] += group
-    for chunk in chunks:
+    for number, chunk in enumerate(chunks, 1):
+        print(f"chunk {number} of {len(chunks)}: {len(chunk)} packages", flush=True)
         with conn.transaction():
             conn.execute("select pg_advisory_xact_lock_shared(hashtext('ea.search'))")
             conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
@@ -1876,13 +1883,13 @@ def load(conn: Connection, items: list[tuple[Path, dict[str, object]]], meter: M
                 for path, accepted in chunk
                 if (item := _facts(conn, path, accepted, referencing, batch)) is not None
             ]
-            steps = [meter.step("facts")]
+            steps = [_step(meter, "facts")]
             if loaded:
                 _retire(conn, loaded)
-                steps.append(meter.step("retire"))
+                steps.append(_step(meter, "retire"))
                 steps += _derive(conn, loaded, meter)
                 _verify(conn, loaded)
-                steps.append(meter.step("verify"))
+                steps.append(_step(meter, "verify"))
         for item in loaded:
             copy = folder(item.key) / f"v{item.version}"
             if copy.exists():
