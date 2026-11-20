@@ -1,4 +1,4 @@
-"""The nine German-speaking municipalities' 2018 council elections, from the German-speaking Community's results site.
+"""The nine German-speaking municipalities' 2018 and 2024 council elections, from the Community's results sites.
 
 The Walloon Region's results site leaves out the nine municipalities of the German-speaking Community (Amel,
 Büllingen, Burg-Reuland, Bütgenbach, Eupen, Kelmis, Lontzen, Raeren, Sankt Vith). The Community published their 2018
@@ -6,6 +6,10 @@ results on its own site: one page of list votes and seats per municipality, with
 cast, the blank and invalid ballots, and the valid votes, and one page per list with each candidate's preference
 votes. The site has no data download, so each municipality's pages were saved as one HTML bundle (every page of the
 site's mirror for that municipality, one after the other), and the pipeline reads those bundles from the raw cache.
+
+For 2024 the Community's site was saved as one bundle with each municipality's page of list votes, seats, registered
+voters, ballots cast, blank and invalid ballots, and valid votes. The bundle lists only the fifty leading candidates
+across the nine municipalities, not every candidate's preference votes, so the 2024 package holds lists and seats.
 
 The municipalities, the municipal council body, and the electoral system are the Walloon pipeline's, because the nine
 are Walloon municipalities with Statbel codes, so this package references their ids and adds the election, contests,
@@ -118,7 +122,7 @@ def seats_of(text: str) -> int | None:
     return int(found.group(1)) if found else None
 
 
-def page_of(code: str, html: str) -> Page:
+def page_of(code: str, html: str, totals: dict[str, str] = TOTALS, total: str = "Total") -> Page:
     table = rows_of(html)
     page = Page(code, COMMUNES[code], [])
     for cell in table:
@@ -126,8 +130,8 @@ def page_of(code: str, html: str) -> Page:
         if len(cell) >= 9 and re.fullmatch(r"\d+", cell[0]) and cell[1] and (votes := number(cell[3])) is not None:
             page.rows.append(Row(cell[0], cell[1], votes, seats_of(cell[-1])))
     for first, second in itertools.pairwise(table):
-        if first and first[0] in TOTALS and second and second[0] == "Total":
-            setattr(page, TOTALS[first[0]], number(second[1]))
+        if first and first[0] in totals and second and second[0] == total:
+            setattr(page, totals[first[0]], number(second[1]))
     return page
 
 
@@ -384,18 +388,191 @@ def verify(councils: list[Council]) -> None:
                 raise ValueError(f"{council.name} list {row.label}: elected candidates differ from seats")
 
 
+# ---- 2024 -------------------------------------------------------------------------------------------------------
+
+DAY24 = date(2024, 10, 13)
+HOST24 = "https://wahlen2024.mdg.be"
+# the Community's 2024 site, saved as one bundle: its overview, counting status, candidate hit list, and the nine
+# municipalities' results pages, one after the other
+BUNDLE24 = f"{HOST24}/de/wahlen3916.html?el=CG"
+TOTALS24 = {
+    "Wahlberechtigte": "registered",
+    "Abgegebene Stimmzettel": "cast",
+    "Stimmenthaltungen": "blank",
+    "Gültige Stimmen": "valid",
+}
+SOURCE24 = key("source", "results", DAY24.year)
+ELECTION24 = key("election", DAY24)
+METHOD24 = (
+    "Published by the German-speaking Community on its results site for the municipal council elections of "
+    "13 October 2024: list votes and seats per municipality, with the registered voters, the ballots cast, the "
+    "blank and invalid ballots, and the valid votes. The site prints blank and invalid ballots as one figure, under "
+    "the heading Stimmenthaltungen, which is stored as invalid ballots; it equals the ballots cast less the valid "
+    "votes in every municipality. Seats are as the site declares them; the archive stores them and does not "
+    "recompute them. Valid votes are the votes for lists."
+)
+
+
+def load24() -> list[Council]:
+    bundle = raw.cached(SOURCE, BUNDLE24).path.read_bytes().decode("utf-8")
+    pages: dict[str, str] = {}
+    for part in sections(bundle):
+        header = re.search(r'article-dataheader__title">Gemeinde ([^<]*)<', part)
+        if "<title>Ergebnisse in Zahlen" in part and header is not None:
+            pages[unescape(header.group(1)).strip()] = part
+    found = []
+    for code, name in COMMUNES.items():
+        if name not in pages:
+            raise LookupError(f"the 2024 bundle has no results page for {name}")
+        found.append(Council(code, name, page_of(code, pages[name], TOTALS24, "Gesamt")))
+    return found
+
+
+def verify24(councils: list[Council]) -> None:
+    """Fail when a page's own figures disagree: lists against valid votes, and valid and blank votes against the
+    ballots cast."""
+    if len(councils) != len(COMMUNES):
+        raise ValueError("the 2024 bundle does not hold all nine municipalities")
+    for council in councils:
+        page = council.page
+        if not page.rows or any(row.seats is None for row in page.rows):
+            raise ValueError(f"{council.name}: a 2024 list has no seat count")
+        if sum(row.votes for row in page.rows) != page.valid:
+            raise ValueError(f"{council.name}: list votes do not sum to the valid votes")
+        if (page.valid or 0) + (page.blank or 0) != page.cast:
+            raise ValueError(f"{council.name}: valid and blank votes do not sum to the ballots cast")
+        if page.registered is None or (page.cast or 0) > page.registered:
+            raise ValueError(f"{council.name}: the ballots cast exceed the registered voters")
+
+
+def election24() -> Package:
+    councils = load24()
+    verify24(councils)
+    p = Package(
+        f"{SOURCE}/{DAY24}",
+        SOURCE,
+        "The 2024 council elections of the nine German-speaking municipalities from the Community's results site",
+        depends=[f"{wallonie.SOURCE}/geo", f"{wallonie.SOURCE}/registry", f"{SOURCE}/{DAY}"],
+    )
+    p.external.add(BELGIUM)
+    p.uses(raw.cached(SOURCE, BUNDLE24))
+    p.add(
+        "source",
+        id=SOURCE24,
+        kind="official_body",
+        publisher="Deutschsprachige Gemeinschaft",
+        title="Gemeinderatswahlen 2024: Offizielle Ergebnisse",
+        url=f"{HOST24}/",
+        attribution="Deutschsprachige Gemeinschaft Belgiens",
+    )
+    p.artifact(raw.cached(SOURCE, BUNDLE24), SOURCE24)
+    base = f"be/{DAY24}-german-speaking-local"
+    p.add("election", id=ELECTION24, polity_id=BELGIUM, kind="local", date_from=DAY24, date_to=DAY24, status="held")
+    p.name(ELECTION24, "2024 municipal elections in the German-speaking Community", "en", "official")
+    p.name(ELECTION24, "Gemeinderatswahlen 2024 in der Deutschsprachigen Gemeinschaft", "de", "native", False)
+    p.add("slug", path=base, entity_id=ELECTION24, is_current=True)
+    # parties the 2018 package holds are referenced; a label on two or more 2024 lists that 2018 lacks is added
+    earlier = known_parties(load())
+    later = known_parties(councils)
+    for fold, text in sorted(later.items()):
+        if fold not in earlier:
+            p.add("party", id=party(text), kind="party", polity_id=BELGIUM)
+            p.name(party(text), text, "und", "official")
+    known = earlier | {f: t for f, t in later.items() if f not in earlier}
+
+    def value(result_set: str, unit: str, option: str | None, measure: int, amount: int) -> None:
+        p.add(
+            "result_value",
+            result_set_id=result_set,
+            unit_id=unit,
+            option_id=option,
+            channel=0,
+            measure=measure,
+            count_round=0,
+            flags=0,
+            value=amount,
+        )
+
+    for council in councils:
+        town = wallonie.area(wallonie.MUNICIPALITY, council.code)
+        tag = f"CGM{council.code}"
+        c = key("contest", DAY24, tag)
+        p.add(
+            "contest",
+            id=c,
+            election_id=ELECTION24,
+            kind="list_allocation",
+            body_id=wallonie.MUNICIPAL_BODY,
+            district_area_id=town,
+            magnitude=sum(row.seats or 0 for row in council.page.rows),
+            round_number=1,
+            electoral_system_id=wallonie.SYSTEM,
+            default_result_kind="counted",
+        )
+        p.name(c, f"{council.name} municipal council", "en", "official")
+        p.name(c, f"Gemeinderat {council.name}", "de", "native", False)
+        p.name(c, f"Conseil communal de {FRENCH[council.code]}", "fr", "native", False)
+        p.add("slug", path=f"{base}/municipal-councils/{changeset.slug(council.name)}", entity_id=c, is_current=True)
+        result_set = key("result_set", DAY24, tag)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=ELECTION24,
+            contest_id=c,
+            stage="official",
+            kind="counted",
+            source_id=SOURCE24,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD24, lang="en")
+        unit = key("unit", DAY24, tag)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=BELGIUM,
+            scheme_code=UNIT,
+            code=f"{DAY24}:{tag}",
+            area_relation="equals",
+            area_id=town,
+            kind="standard",
+        )
+        for attribute, measure in (("registered", REGISTERED), ("cast", BALLOTS), ("blank", INVALID), ("valid", VALID)):
+            amount = getattr(council.page, attribute)
+            if amount is not None:
+                value(result_set, unit, None, measure, amount)
+        for row in council.page.rows:
+            option = key("option", DAY24, tag, row.number)
+            fold = folded(row.label)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=c,
+                kind="list",
+                party_id=party(known[fold]) if fold in known else None,
+                ballot_position=int(row.number) if row.number else None,
+                ballot_label=row.label,
+            )
+            value(result_set, unit, option, 1, row.votes)
+            if row.seats:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=row.seats)
+    return p
+
+
 def fetch() -> None:
-    for url in [*PAGES.values(), INDEX]:
+    for url in [*PAGES.values(), INDEX, BUNDLE24]:
         raw.fetch(SOURCE, url, suffix=".html")
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/{DAY}"]
+    return [f"{SOURCE}/{DAY}", f"{SOURCE}/{DAY24}"]
 
 
 def parse() -> None:
     verify(load())
     election().write()
+    election24().write()
 
 
 def emit() -> None:
