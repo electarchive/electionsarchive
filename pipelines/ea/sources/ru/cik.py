@@ -580,8 +580,8 @@ def packages() -> list[str]:
 
 
 def precincts() -> ModuleType:
-    """The presidential elections of 2000 to 2024 by precinct, which `cik_uik` builds."""
-    return importlib.import_module("ea.sources.ru.cik_uik")
+    """The presidential elections of 2000 to 2024 by precinct, which `cik_president` builds."""
+    return importlib.import_module("ea.sources.ru.cik_president")
 
 
 def parse() -> None:
