@@ -261,6 +261,8 @@ class Build:
     people: dict[str, tuple[str, str]] = field(default_factory=dict)
     labels: set[str] = field(default_factory=set)
     shared: dict[str, str] = field(default_factory=dict)
+    # the polling stations another package of the same day declares, which this one only references
+    minted: set[str] = field(default_factory=set)
 
     def unit(self, row: Row, postal: bool = False) -> str:
         county = row.station_county or row.county or ""
@@ -324,16 +326,18 @@ class Build:
 
     def stage(self) -> None:
         p = self.p
+        own = {code: u for code, u in self.units.items() if u[0] not in self.minted}
+        p.external |= {u[0] for u in self.units.values() if u[0] in self.minted}
         p.frame(
             "reporting_unit",
             pl.DataFrame(
                 {
-                    "id": [u[0] for u in self.units.values()],
+                    "id": [u[0] for u in own.values()],
                     "polity_id": ROMANIA,
                     "scheme_code": "ro.sv",
-                    "code": list(self.units),
+                    "code": list(own),
                     "area_relation": "unlocated",
-                    "kind": [u[1] for u in self.units.values()],
+                    "kind": [u[1] for u in own.values()],
                 }
             ),
         )
@@ -341,9 +345,9 @@ class Build:
             "name",
             pl.DataFrame(
                 {
-                    "id": [p.id("name", u[0], "ro", "official", u[2]) for u in self.units.values()],
-                    "entity_id": [u[0] for u in self.units.values()],
-                    "text": [u[2] for u in self.units.values()],
+                    "id": [p.id("name", u[0], "ro", "official", u[2]) for u in own.values()],
+                    "entity_id": [u[0] for u in own.values()],
+                    "text": [u[2] for u in own.values()],
                     "lang": "ro",
                     "kind": "official",
                     "is_preferred": True,
@@ -942,7 +946,9 @@ def local_kind(row: Row) -> str:
     return code if code in LOCAL else row.category
 
 
-def local(day: str, parties: set[str]) -> tuple[Package, Build]:
+def local(day: str, parties: set[str], minted: set[str]) -> tuple[Package, Build]:
+    """The local elections of `day`; `minted` holds the polling stations the same day's European or presidential
+    package declares, since the voters of one station cast both ballots there."""
     name, first, kind, _ = LOCALS[day]
     runoff = kind == "runoff"
     english, romanian = LOCAL_NAMES[kind]
@@ -973,7 +979,7 @@ def local(day: str, parties: set[str]) -> tuple[Package, Build]:
             body_md=RUNOFF_NOTE if runoff else PARTIAL_NOTE,
             lang="en",
         )
-    b = Build(p, day, parties)
+    b = Build(p, day, parties, minted=minted)
     rows = signed(day)
     for row in rows:
         if row.scope != "PRCNCT":
@@ -1260,7 +1266,7 @@ def packages() -> list[str]:
     return [f"{SOURCE}/registry", *(f"{SOURCE}/{name}" for name in ELECTIONS)]
 
 
-def build(name: str, parties: set[str]) -> tuple[Package, Build]:
+def build(name: str, parties: set[str], minted: set[str]) -> tuple[Package, Build]:
     day, kind = name[:10], name[11:]
     if kind == "european":
         return european(parties)
@@ -1268,16 +1274,19 @@ def build(name: str, parties: set[str]) -> tuple[Package, Build]:
         return parliament(parties)
     if kind == "presidential":
         return presidential(day, parties)
-    return local(day, parties)
+    return local(day, parties, minted)
 
 
 def parse() -> None:
     parties = known_parties()
     labels: set[str] = set()
     people: dict[str, str] = {}
+    # each day's polling stations are declared by the first package of that day in `ELECTIONS`
+    minted: dict[str, set[str]] = {}
     mayors = 0
     for name in ELECTIONS:
-        p, b = build(name, parties)
+        p, b = build(name, parties, minted.get(name[:10], set()))
+        minted.setdefault(name[:10], set()).update(u[0] for u in b.units.values())
         p.write()
         labels |= b.labels
         people |= b.shared
