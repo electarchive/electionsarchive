@@ -1,6 +1,6 @@
 import html
 import re
-import subprocess
+import struct
 import time
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor
@@ -328,16 +328,85 @@ def _fold(text: str) -> str:
     return " ".join(word for word in words if word not in titles and len(word) > 1)
 
 
+def _word(path: Path) -> str:
+    """The main text of a Word 97 file: the pieces its piece table lists, each 8-bit (cp1252) or UTF-16, read from
+    the WordDocument stream of the compound file."""
+    data = path.read_bytes()
+    if data[:8] != bytes.fromhex("d0cf11e0a1b11ae1"):
+        raise ValueError(f"{path.name}: not a compound file")
+    size = 1 << struct.unpack_from("<H", data, 30)[0]
+    count, directory = struct.unpack_from("<II", data, 44)
+    if count > 109:
+        raise ValueError(f"{path.name}: {count} allocation sectors")
+
+    def sector(number: int) -> bytes:
+        return data[512 + number * size : 512 + (number + 1) * size]
+
+    links = [
+        link
+        for at in struct.unpack_from(f"<{count}I", data, 76)
+        for link in struct.unpack(f"<{size // 4}I", sector(at))
+    ]
+
+    def chain(number: int) -> bytes:
+        out = bytearray()
+        while number < 0xFFFFFFFA:
+            out += sector(number)
+            number = links[number]
+        return bytes(out)
+
+    streams: dict[str, bytes] = {}
+    entries = chain(directory)
+    cutoff = struct.unpack_from("<I", data, 56)[0]
+    for at in range(0, len(entries), 128):
+        entry = entries[at : at + 128]
+        name = entry[: max(struct.unpack_from("<H", entry, 64)[0] - 2, 0)].decode("utf-16-le")
+        start, length = struct.unpack_from("<II", entry, 116)
+        if name in ("WordDocument", "0Table", "1Table") and entry[66] == 2:
+            if length < cutoff:
+                raise ValueError(f"{path.name}: {name} is in the mini stream")
+            streams[name] = chain(start)[:length]
+    document = streams["WordDocument"]
+    if struct.unpack_from("<H", document, 0)[0] != 0xA5EC:
+        raise ValueError(f"{path.name}: not a Word 97 file")
+    table = streams["1Table" if struct.unpack_from("<H", document, 10)[0] & 0x200 else "0Table"]
+    text = struct.unpack_from("<i", document, 0x4C)[0]
+    at, size = struct.unpack_from("<II", document, 0x1A2)
+    clx = table[at : at + size]
+    while clx[0] == 1:
+        clx = clx[3 + struct.unpack_from("<H", clx, 1)[0] :]
+    if clx[0] != 2:
+        raise ValueError(f"{path.name}: no piece table")
+    plc = clx[5 : 5 + struct.unpack_from("<I", clx, 1)[0]]
+    pieces = (len(plc) - 4) // 12
+    cps = struct.unpack_from(f"<{pieces + 1}i", plc)
+    out: list[str] = []
+    for piece in range(pieces):
+        start, end = cps[piece], min(cps[piece + 1], text)
+        if start >= end:
+            break
+        fc = struct.unpack_from("<I", plc, 4 * (pieces + 1) + 8 * piece + 2)[0]
+        if fc & 0x40000000:
+            at = (fc & ~0x40000000) // 2
+            out.append(document[at : at + end - start].decode("cp1252"))
+        else:
+            out.append(document[fc : fc + 2 * (end - start)].decode("utf-16-le"))
+    return "".join(out)
+
+
 def _elected() -> list[str]:
+    """The elected members in each list's order: every line of the third column of its one table, whose cells end
+    in \\x07 and whose rows end in one more."""
     names: list[str] = []
     for url in ELECTED:
-        out = subprocess.run(
-            ["antiword", "-w", "0", str(raw.cached(SOURCE, url).path)], check=True, capture_output=True, text=True
-        ).stdout
-        for line in out.splitlines():
-            cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-            if len(cells) == 3 and cells[2] and cells[2] != "NAMA CALON TERPILIH":
-                names.append(cells[2])
+        cells = _word(raw.cached(SOURCE, url).path).split("\x07")
+        for row in range(0, len(cells) - 3, 4):
+            if cells[row + 3]:
+                raise ValueError(f"{url}: a row of more than 3 cells")
+            for line in re.split(r"[\r\x0b]", cells[row + 2]):
+                line = line.strip()
+                if line and line != "NAMA CALON TERPILIH":
+                    names.append(line)
     return names
 
 
@@ -464,7 +533,7 @@ def _title(dapil: str) -> str:
 
 
 def emit() -> Path:
-    from ea.changeset import Changeset
+    from ea.package import Draft
     from ea.store import connect
 
     summary = pl.read_parquet(PARSED / "summary.parquet")
@@ -474,7 +543,7 @@ def emit() -> Path:
     missing = {(dapil, party) for dapil, party, _ in pl.read_parquet(PARSED / "missing.parquet").rows()}
     elected = {(dapil, party, number) for dapil, party, number in winners.select("dapil", "party", "candidate").rows()}
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
