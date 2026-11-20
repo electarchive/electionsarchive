@@ -512,9 +512,9 @@ AN	1928-05-20	SPD	Sozialdemokratische Partei Deutschlands	84507	15	Q49768
 AN	1928-05-20	DNVP	Deutschnationale Volkspartei	13317	2	Q158227
 AN	1928-05-20	Z	Deutsche Zentrumspartei	2288	0	Q157537	13
 AN	1928-05-20	DVP	Deutsche Volkspartei	30867	6	Q316533
-AN	1928-05-20	KPD	Kommunistische Partei Deutschlands	15057	3	Q153401
+AN	1928-05-20	KPD	Kommunistische Partei Deutschlands	14957	3	Q153401
 AN	1928-05-20	DDP	Deutsche Demokratische Partei	8444	2	Q328195
-AN	1928-05-20	WP	Reichspartei des deutschen Mittelstandes (Wirtschaftspartei)	6679	1	Q541230
+AN	1928-05-20	WP	Reichspartei des deutschen Mittelstandes (Wirtschaftspartei)	6779	1	Q541230
 AN	1928-05-20	NS	Nationalsozialistische Deutsche Arbeiterpartei	4117	1	Q7320	18
 AN	1928-05-20	LANDVOLK	Landbundliste	21721	4		44		list_vehicle
 AN	1928-05-20	AUFWERTUNG	Reichspartei für Volksrecht u. Aufwertung	1932	0	Q896602	15
@@ -549,3 +549,22 @@ SL	1928-04-29	DDP	Deutsche Demokratische Partei	1971	1	Q328195
 SL	1928-04-29	ANDERE	Handwerkerbund	1799	1		59	L	party
 SL	1928-04-29	ANDERE	Deutschnationale u. Landbund	4141	3		59	L	list_vehicle
 SL	1928-04-29	ANDERE	Nationaler Block	1690	1		59	L	list_vehicle
+SN	1929-05-12	SPD	Sozialdemokratische Partei Deutschlands	922932	33	Q49768			
+SN	1929-05-12	DNVP	Deutschnationale Volkspartei	218309	8	Q158227			
+SN	1929-05-12	Z	Deutsche Zentrumspartei	25460	0	Q157537	14		
+SN	1929-05-12	DVP	Deutsche Volkspartei	363382	13	Q316533			
+SN	1929-05-12	KPD	Kommunistische Partei Deutschlands	345530	12	Q153401			
+SN	1929-05-12	DDP	Deutsche Demokratische Partei	115289	4	Q328195			
+SN	1929-05-12	WP	Reichspartei des deutschen Mittelstandes (Wirtschaftspartei)	304884	11	Q541230			
+SN	1929-05-12	NS	Nationalsozialistische Deutsche Arbeiterpartei (Hitlerbewegung)	133958	5	Q7320	15		
+SN	1929-05-12	LANDVOLK	Sächsisches Landvolk	140611	5	Q27926490	15a		
+SN	1929-05-12	AUFWERTUNG	Volksrechtpartei (Reichspartei für Volksrecht u. Aufwertung)	70131	3	Q896602	16		
+SN	1929-05-12	ANDERE	Alte Sozialdemokratische Partei	39568	2	Q436238	17	L	
+SN	1929-05-12	ANDERE	Kommunistische Partei Deutschlands (Opposition)	22129	0	Q487129	17	L	
+MS	1929-06-23	SPD	Sozialdemokratische Partei Deutschlands	120570	20	Q49768			
+MS	1929-06-23	KPD	Kommunistische Partei Deutschlands	16451	3	Q153401			
+MS	1929-06-23	DDP	Deutsche Demokratische Partei	8962	1	Q328195			
+MS	1929-06-23	NS	Nationalsozialisten (Deutsche Arbeiterpartei) (Hitlerbewegung)	12721	2	Q7320	40		
+MS	1929-06-23	LANDVOLK	Mecklenburgische Bauernpartei	8087	1		41		party
+MS	1929-06-23	ANDERE	Einheitsliste (Deutschnationale Volkspartei, Wirtschaftspartei, Landbund u. Deutschvölkische Freiheitsbewegung)	140151	23		42	R	list_vehicle
+MS	1929-06-23	ANDERE	Gruppe für Volkswohlfahrt	7461	1		42	R	party
