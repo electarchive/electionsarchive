@@ -1,4 +1,5 @@
 import csv
+import shutil
 import subprocess
 from collections import defaultdict
 from datetime import date
@@ -6,9 +7,10 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from PIL import Image
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.package import Draft
 from ea.store import DATA, connect
 
 SOURCE = "de.weimar_landtage"
@@ -164,11 +166,14 @@ def image(edition: int, page: int) -> tuple[str, int, int]:
     PAGES.mkdir(parents=True, exist_ok=True)
     png = PAGES / f"{artifact.sha256}.png"
     if not png.exists():
-        subprocess.run(["magick", str(artifact.path), "-resize", "1500x", str(png)], check=True)
-    out = subprocess.run(
-        ["magick", "identify", "-format", "%w %h", str(png)], check=True, capture_output=True, text=True
-    )
-    width, height = map(int, out.stdout.split())
+        if shutil.which("magick"):
+            subprocess.run(["magick", str(artifact.path), "-resize", "1500x", str(png)], check=True)
+        else:
+            with Image.open(artifact.path) as scan:
+                size = (1500, round(scan.height * 1500 / scan.width))
+                scan.resize(size, Image.Resampling.LANCZOS).save(png)
+    with Image.open(png) as render:
+        width, height = render.size
     return f"pages/{SOURCE}/{png.name}", width, height
 
 
@@ -189,7 +194,7 @@ def emit() -> Path:
         if sum(int(r["seats"]) for r in rows) != int(election["seats"]):
             raise ValueError(f"{election['state']}: seats do not add up")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
