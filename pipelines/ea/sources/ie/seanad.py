@@ -85,24 +85,44 @@ ORDINALS = [
 ]
 
 
+LOWER = {word.lower(): number for number, word in enumerate(ORDINALS, 1)}
+
+
 @dataclass(frozen=True)
 class Handbook:
     year: int
     url: str
     title: str
-    panels_close: date
-    first_poll: date
-    count_start: date
-    count_end: date
+    period: tuple[date, date]
+    precision: str
+    panels_close: date | None
+    first_poll: date | None
+    count_start: date | None
+    count_end: date | None
     electorate: int
     poll: int
 
 
 HANDBOOKS = {
+    2016: Handbook(
+        2016,
+        f"{HOST}/2017/2017-07-19_seanad-general-election-april-2016-and-bye-elections-to-2011-16_en.pdf",
+        "Seanad General Election, April 2016, and bye-elections to the 2011-16 Seanad: results handbook",
+        (date(2016, 4, 1), date(2016, 4, 30)),
+        "month",
+        None,
+        None,
+        None,
+        None,
+        1155,
+        1144,
+    ),
     2025: Handbook(
         2025,
         f"{HOST}/2026/2026-05-20_seanad-general-election-2025-results-handbook_en.pdf",
         "Seanad General Election, January 2025, and bye-elections to the 2020-2025 Seanad: results handbook",
+        (date(2025, 1, 29), date(2025, 1, 30)),
+        "day",
         date(2025, 1, 30),
         date(2025, 1, 29),
         date(2025, 1, 31),
@@ -139,7 +159,7 @@ class Panel:
     counts: int
 
 
-CELL = re.compile(r"[+-]?\d[\d,]*|–")
+CELL = re.compile(r"[+-]?\d[\d,]*|–|(?<!\S)-(?!\S)")
 CELLS = re.compile(rf"^\s*(?:{CELL.pattern})(?:\s+(?:{CELL.pattern}))*\s*$")
 NAMED = re.compile(r"^\s*(?P<name>[^\d(].*?)\s+\((?P<placing>\d+)\)\s+(?P<rest>\S.*?)\s*$")
 FILLERS = {
@@ -153,13 +173,14 @@ FILLER_ORDER = ("non_transferable", "fractions", "total")
 
 
 def text(artifact: raw.Artifact) -> str:
-    return subprocess.run(
+    out = subprocess.run(
         ["pdftotext", "-layout", str(artifact.path), "-"], check=True, capture_output=True, text=True
     ).stdout
+    return re.sub(r"[–−](?=\d)", "-", out)  # a few cells print their minus sign as a dash
 
 
 def number(cell: str) -> int:
-    return 0 if cell == "–" else int(cell.replace(",", ""))
+    return 0 if cell in {"–", "-"} else int(cell.replace(",", ""))
 
 
 def cells(text: str) -> list[int]:
@@ -167,10 +188,10 @@ def cells(text: str) -> list[int]:
 
 
 def header_counts(line: str) -> list[int] | None:
-    words = line.split()
-    if not words or any(word not in ORDINALS for word in words):
+    words = [word.lower() for word in line.split()]
+    if not words or any(word not in LOWER for word in words):
         return None
-    return [ORDINALS.index(word) + 1 for word in words]
+    return [LOWER[word] for word in words]
 
 
 def panel_text(document: str, label: str) -> list[str]:
@@ -218,6 +239,16 @@ def elected_members(document: str) -> dict[str, set[str]]:
     return found
 
 
+def named_members(lines: list[str]) -> set[str]:
+    """The names a panel's page prints as elected, forename first, folded in both orders for matching."""
+    start = next(i for i, line in enumerate(lines) if line.strip().startswith("Names of Candidates Elected"))
+    found = " ".join(
+        line.strip() for line in lines[start : next(i for i in range(start, len(lines)) if not lines[i].strip())]
+    )
+    names = re.split(r",\s*|\s+and\s+", found.partition(":")[2].strip().rstrip("."))
+    return {fold(name, "") for name in names if name}
+
+
 def figure(lines: list[str], label: str) -> int:
     for line in lines[:24]:
         if line.strip().startswith(label):
@@ -227,7 +258,7 @@ def figure(lines: list[str], label: str) -> int:
 
 def parse_panel(document: str, key: str) -> Panel:
     name, label, seats = PANELS[key]
-    members = elected_members(document)[key]
+    members = elected_members(document)[key] if "MEMBERS OF THE 27th SEANAD" in document else set()
     lines = panel_text(document, label)
     valid_votes = figure(lines, "Number of Valid Votes")
     value = figure(lines, "Value of Valid Votes")
@@ -250,6 +281,8 @@ def parse_panel(document: str, key: str) -> Panel:
             label_text = next(k for k in FILLERS if stripped.startswith(k))
             found = cells(stripped[len(label_text) :])
             width = len(counts) + (1 if first else 0)
+            if first and filler != "total" and len(found) == width - 1:
+                found = [found[0], 0, *found[1:]]  # the first count prints no value for these rows
             if len(found) != width:
                 raise ValueError(f"{name}: {len(found)} cells in {last!r}, expected {width}")
             for count, amount in zip(counts, found[1:] if first else found, strict=True):
@@ -263,7 +296,10 @@ def parse_panel(document: str, key: str) -> Panel:
             found = cells(named["rest"])
             if len(found) != len(counts) + 1:
                 raise ValueError(f"{name}: {len(found)} cells in {last!r}")
-            surname, _, forename = named["name"].partition(",")
+            if "," in named["name"]:
+                surname, _, forename = named["name"].partition(",")
+            else:  # one row prints no comma between the surname and the forename
+                surname, _, forename = named["name"].rpartition(" ")
             candidate = Candidate(surname.strip(), forename.strip(), int(named["placing"]))
             candidate.values = [found[1], *found[2:]]
             candidates.append(candidate)
@@ -290,7 +326,7 @@ def parse_panel(document: str, key: str) -> Panel:
             continue
         if done or counts is None or not line.strip():
             continue
-        if CELLS.match(line) and all(cell[0] in "+-" for cell in CELL.findall(line)):
+        if CELLS.match(line) and all(cell[0] in "+-" and len(cell) > 1 for cell in CELL.findall(line)):
             following = lines[index + 1] if index + 1 < len(lines) else ""
             if following.strip():
                 continue  # a line of transfers, which sits right above the row it changes
@@ -299,7 +335,7 @@ def parse_panel(document: str, key: str) -> Panel:
             take(line)
     if not done or first:
         raise ValueError(f"{name}: the last table has no total")
-    return finish(key, valid_votes, value, quota, seats, candidates, rows, members)
+    return finish(key, valid_votes, value, quota, seats, candidates, rows, members or named_members(lines))
 
 
 def finish(
@@ -330,8 +366,15 @@ def finish(
         if rows["total"][count] != value or held + transferable != value:
             raise ValueError(f"{name}: count {count} holds {held + transferable} of {value}")
         loss.append(transferable)
-    elected = [i for i, candidate in enumerate(candidates) if fold(candidate.surname, candidate.forename) in members]
-    if len(elected) != seats or {fold(c.surname, c.forename) for c in candidates} < members:
+
+    def match(candidate: Candidate) -> bool:
+        return {
+            fold(candidate.surname, candidate.forename),
+            fold(candidate.forename, candidate.surname),
+        } & members != set()
+
+    elected = [i for i, candidate in enumerate(candidates) if match(candidate)]
+    if len(elected) != seats or len(members) != seats:
         raise ValueError(
             f"{name}: {len(elected)} of {len(members)} members are among the candidates, for {seats} seats"
         )
@@ -353,7 +396,7 @@ class Summary:
 def summary(document: str) -> Summary:
     """The statistical summary of the vocational panels: electorate, poll, and papers rejected for each panel."""
     lines = document.splitlines()
-    start = next(i for i, line in enumerate(lines) if line.strip() == "VOCATIONAL PANELS")
+    start = next(i for i, line in enumerate(lines) if line.strip() in {"VOCATIONAL PANELS", "PANEL ELECTIONS"})
     end = next(i for i in range(start, len(lines)) if "UNIVERSITY CONSTITUENCIES" in lines[i])
     body = lines[start:end]
     electorate = poll = 0
@@ -367,13 +410,13 @@ def summary(document: str) -> Summary:
             electorate = number(stripped.split()[-1])
         elif stripped.startswith("Total Poll"):
             poll = number(stripped.split()[-1])
-        elif stripped.startswith("BALLOT PAPERS REJECTED"):
+        elif stripped.upper().startswith("BALLOT PAPERS REJECTED"):
             section = "rejected"
-        elif stripped.startswith("Quota"):
+        elif stripped.startswith(("Quota", "Valid Poll")):
             section = "quota"
         for key, (title, _, _) in PANELS.items():
             if stripped.startswith(title):
-                found = cells(stripped[len(title) :])
+                found = cells(re.sub(r"^\s*-\s*Quota", "", stripped[len(title) :]))
                 if section == "rejected" and len(found) == 1:
                     rejected[key] = found[0]
                 elif section == "quota" and len(found) == 2:
@@ -401,9 +444,16 @@ def proper_names(document: str, panels: dict[str, Panel]) -> None:
             continue
         if stripped.startswith(("RULES FOR THE COUNTING", "BYE-ELECTIONS")):
             break
-        match = re.match(r"^ {3,8}(?P<surname>[^\s,][^,]*?),(?:\s(?P<forename>\S.*?))?\s{2,}\S", line)
+        match = re.match(r"^ {3,8}(?P<surname>[^\s,](?:(?!\s{2})[^,])*?),(?:\s(?P<forename>\S.*?))?\s{2,}\S", line)
         if current and match:
             listed[current].append((apostrophes(match["surname"]), match["forename"]))
+        elif (
+            current
+            and (bare := re.match(r"^ {3,8}(?P<name>[^\s,](?:(?!\s{2})[^,])*?)\s{2,}\S", line))
+            and " " in bare["name"]
+        ):
+            surname, _, forename = bare["name"].rpartition(" ")  # a name printed with no comma
+            listed[current].append((apostrophes(surname), forename))
     for key, panel in panels.items():
         for candidate in panel.candidates:
             options = [
@@ -552,7 +602,8 @@ def decimal(value: int) -> Decimal:
 def panels_package(year: int) -> Package:
     handbook = HANDBOOKS[year]
     figures, panels = parse_handbook(year)
-    day = handbook.panels_close
+    start, end = handbook.period
+    stamp = f"{end}" if handbook.precision == "day" else f"{end:%Y-%m}"
     p = Package(
         f"{SOURCE}/panels-{year}",
         SOURCE,
@@ -568,26 +619,27 @@ def panels_package(year: int) -> Package:
         id=election,
         polity_id=IRELAND,
         kind="general",
-        date_from=handbook.first_poll,
-        date_to=day,
+        date_from=start,
+        date_to=end,
+        date_precision=handbook.precision,
         status="held",
     )
     p.name(election, f"{year} Seanad general election", "en", "official")
     p.add("external_id", entity_id=election, scheme=f"{SOURCE}.election", value=str(year))
-    base = f"ie/{day}-seanad-general"
+    base = f"ie/{stamp}-seanad-general"
     p.add("slug", path=base, entity_id=election, is_current=True)
-    p.add(
-        "note",
-        id=key("note", election),
-        entity_id=election,
-        kind="context",
-        body_md=(
+    if handbook.panels_close and handbook.first_poll and handbook.count_start and handbook.count_end:
+        context = (
             f"The polls for the university constituencies closed on {handbook.first_poll:%-d %B %Y} and the polls for "
-            f"the five vocational panels on {day:%-d %B %Y}. The panel counts ran from {handbook.count_start:%-d %B} "
-            f"to {handbook.count_end:%-d %B %Y}."
-        ),
-        lang="en",
-    )
+            f"the five vocational panels on {handbook.panels_close:%-d %B %Y}. The panel counts ran from "
+            f"{handbook.count_start:%-d %B} to {handbook.count_end:%-d %B %Y}."
+        )
+    else:
+        context = (
+            f"The results handbook dates this election only as {end:%B %Y}, so the election carries the month, "
+            "not a poll day."
+        )
+    p.add("note", id=key("note", election), entity_id=election, kind="context", body_md=context, lang="en")
     for panel, (title, _, seats) in PANELS.items():
         data = panels[panel]
         contest = key("contest", year, panel)
