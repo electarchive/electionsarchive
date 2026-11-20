@@ -473,6 +473,36 @@
       "url": "https://eur-lex.europa.eu/eli/reg/2019/788/oj",
       "kind": "official_body"
     },
+    "ep-pres-pv-2002": {
+      "title": "Minutes of the sitting of 15 January 2002: election of the President of the European Parliament",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/doceo/document/PV-5-2002-01-15_EN.pdf",
+      "kind": "official_body"
+    },
+    "ep-pres-pv-2014": {
+      "title": "Minutes of the sitting of 1 July 2014: election of the President of the European Parliament",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/doceo/document/PV-8-2014-07-01_EN.html",
+      "kind": "official_body"
+    },
+    "ep-pres-pv-2017": {
+      "title": "Minutes of the sitting of 17 January 2017: election of the President of the European Parliament",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/doceo/document/PV-8-2017-01-17_EN.html",
+      "kind": "official_body"
+    },
+    "ep-pres-pv-2019": {
+      "title": "Minutes of the sitting of 3 July 2019: election of the President of the European Parliament",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/doceo/document/PV-9-2019-07-03_EN.html",
+      "kind": "official_body"
+    },
+    "ep-pres-pv-2024": {
+      "title": "Minutes of the sitting of 16 July 2024: election of the President of the European Parliament",
+      "publisher": "European Parliament",
+      "url": "https://www.europarl.europa.eu/doceo/document/PV-10-2024-07-16_EN.html",
+      "kind": "official_body"
+    },
     "ep-pv-1994": {
       "title": "European Parliament, minutes of 21 July 1994 (PE 181.986), approval of the nominee for President of the Commission",
       "publisher": "European Parliament",
@@ -2665,9 +2695,9 @@
           "date": "2002-01-01",
           "precision": "year",
           "election_kind": "indirect",
-          "contests": 1,
-          "source": "ep-presidents",
-          "quote": "Pat Cox President from 2002-2004"
+          "contests": 3,
+          "source": "ep-pres-pv-2002",
+          "quote": "As Mr Cox had obtained an absolute majority of the votes cast, the oldest Member proclaimed him President of the European Parliament"
         },
         {
           "date": "2004-01-01",
@@ -2705,23 +2735,26 @@
           "date": "2014-01-01",
           "precision": "year",
           "election_kind": "indirect",
-          "note": "Martin Schulz re-elected at the start of the eighth term; the archive page shows one presidency for 2012-2017."
+          "note": "Martin Schulz re-elected at the start of the eighth term; the archive page shows one presidency for 2012-2017.",
+          "contests": 1,
+          "source": "ep-pres-pv-2014",
+          "quote": "Martin Schulz had obtained an absolute majority of the votes cast."
         },
         {
           "date": "2017-01-01",
           "precision": "year",
           "election_kind": "indirect",
-          "contests": 1,
-          "source": "ep-presidents",
-          "quote": "Antonio Tajani President from 2017-2019"
+          "contests": 4,
+          "source": "ep-pres-pv-2017",
+          "quote": "Since no candidate had obtained an absolute majority a second ballot was required."
         },
         {
           "date": "2019-01-01",
           "precision": "year",
           "election_kind": "indirect",
-          "contests": 1,
-          "source": "ep-presidents",
-          "quote": "David Maria Sassoli President from 2019-2022"
+          "contests": 2,
+          "source": "ep-pres-pv-2019",
+          "quote": "Since no candidate obtained an absolute majority, a second ballot was needed."
         },
         {
           "date": "2022-01-01",
@@ -2735,7 +2768,10 @@
           "date": "2024-01-01",
           "precision": "year",
           "election_kind": "indirect",
-          "note": "Roberta Metsola re-elected at the start of the tenth term (press release 20240710IPR22805)."
+          "note": "Roberta Metsola re-elected at the start of the tenth term (press release 20240710IPR22805).",
+          "contests": 1,
+          "source": "ep-pres-pv-2024",
+          "quote": "Roberta Metsola, having obtained an absolute majority of the votes cast, was elected President of the European Parliament."
         },
         {
           "date": "2027-01-01",
