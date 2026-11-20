@@ -32,11 +32,8 @@ BULLETIN_2024 = f"{cne.BASE}/2024/05/BOLETIN_DE_RESULTADOS_REFERENDUM_Y_CONSULTA
 VOTES, REGISTERED, CAST, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
 SCHEMES = ("ec.provincia", "ec.canton", "ec.parroquia")
 # The Council's own pipeline already holds most of these areas, under the same ids and with its own parent links: its
-# geo package holds all but a few, and its 2025 geo package holds the parishes below that its geo package lacks. This
-# source adds only the areas in neither, and references every other area by the id those packages loaded. The two
-# packages overlap, so the election packages depend on the first and name the second's few parishes as external ids.
-HELD = "ec.cne/geo"
-HELD_2025 = {"ec.parroquia": (4750, 4755, 4760, 4765, 9002)}
+# geo package holds all but a few, and its 2025 geo package holds the parishes its geo package lacks. This source adds
+# only the areas in neither, and references every other area by the id those packages loaded, as an external id.
 NEW_AREAS = {
     "ec.canton": (242, 291, 421, 461, 471, 491, 927, 998, 999),
     "ec.parroquia": (5460, 6940, 7540, 9010, 9041, 9048, 9064, 9074, 9079, 9080, 9082, 9083, 9085, 9088, 9998, 9999),
@@ -355,6 +352,20 @@ def artifact(url: str) -> raw.Artifact:
     return raw.cached(SOURCE, url)
 
 
+def held(url: str) -> bool:
+    """Whether the raw cache holds a file; the Council's host refuses some downloads, so a build uses what it has."""
+    try:
+        artifact(url)
+    except LookupError:
+        return False
+    return True
+
+
+def days() -> list[str]:
+    """The votes whose results file is in the raw cache, in date order."""
+    return [vote.day for vote in VOTES_BY_DAY if held(vote.url)]
+
+
 def fetch() -> None:
     for vote in VOTES_BY_DAY:
         raw.fetch(SOURCE, vote.url, suffix=vote.suffix)
@@ -363,13 +374,13 @@ def fetch() -> None:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in DAYS)]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{day}" for day in days())]
 
 
 def parse() -> None:
     geo().write()
     registry().write()
-    for day in DAYS:
+    for day in days():
         build(day).write()
 
 
@@ -485,9 +496,9 @@ def read(day: str) -> Read:
 
 
 def places_all() -> dict[str, dict[int, tuple[str, int | None]]]:
-    """Every area the four files list; a later file's spelling replaces an earlier one, and a parent may not change."""
+    """Every area the files in hand list; a later file's spelling replaces an earlier one, and a parent may not change."""
     found: dict[str, dict[int, tuple[str, int | None]]] = {scheme: {} for scheme in SCHEMES}
-    for day in DAYS:
+    for day in days():
         for level, code, name, parent in read(day).places.iter_rows():
             if code in found[level] and found[level][code][1] != parent:
                 raise ValueError(f"{level} {code} sits under {found[level][code][1]} and {parent}")
@@ -505,7 +516,6 @@ def geo() -> Package:
         SOURCE,
         "The cantons, parishes, and overseas units that Ecuador's referendum results files list and the Council's "
         "other files do not",
-        depends=[HELD],
     )
     p.external.update([ECUADOR, *SCHEMES])
     p.add(
@@ -519,19 +529,24 @@ def geo() -> Package:
         attribution=ATTRIBUTION,
     )
     for vote in VOTES_BY_DAY:
-        p.artifact(artifact(vote.url), CNE_SOURCE)
-        for url in vote.books:
-            p.artifact(artifact(url), CNE_SOURCE)
+        for url in (vote.url, *vote.books):
+            if held(url):
+                p.artifact(artifact(url), CNE_SOURCE)
     found = places_all()
     parent_scheme = {"ec.canton": "ec.provincia", "ec.parroquia": "ec.canton"}
     for scheme, codes in NEW_AREAS.items():
         for code in codes:
+            if code not in found[scheme]:
+                continue  # listed only by a file that is not in hand
             name, parent = found[scheme][code]
             id = area(scheme, code)
             p.add("area", id=id, scheme_code=scheme)
             p.add("area_code", area_id=id, code=str(code))
             if parent is not None:
-                p.add("area_parent", area_id=id, parent_id=area(parent_scheme[scheme], parent))
+                parent_id = area(parent_scheme[scheme], parent)
+                p.add("area_parent", area_id=id, parent_id=parent_id)
+                if parent not in NEW_AREAS.get(parent_scheme[scheme], ()):
+                    p.external.add(parent_id)
             p.name(id, cne.title(name), "es", "official")
     return p
 
@@ -572,14 +587,13 @@ def build(day: str) -> Package:
         f"{SOURCE}/{day}",
         SOURCE,
         f"The Ecuadorian referendum questions of {DAYS[day]} by parish, from the National Electoral Council's results file",
-        depends=[HELD, f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external.update([ECUADOR, COUNTRY, *SCHEMES])
     data = read(day)
-    used = set(data.results["parish"].unique().to_list())
-    p.external.update(area(s, c) for s, codes in HELD_2025.items() for c in codes if c in used)
     p.uses(artifact(vote.url))
-    for url in vote.books:
+    books = [url for url in vote.books if held(url)]
+    for url in books:
         p.uses(artifact(url))
     names = {code: name for code, (name, _) in places_all()["ec.parroquia"].items()}
     election = key("election", day)
@@ -604,6 +618,8 @@ def build(day: str) -> Package:
             p.external.add(units[code])
             continue
         unit = units[code] = key("unit", day, code)
+        if code not in NEW_AREAS["ec.parroquia"]:
+            p.external.add(area("ec.parroquia", code))
         p.add(
             "reporting_unit",
             id=unit,
@@ -615,7 +631,8 @@ def build(day: str) -> Package:
             kind="standard",
         )
         p.name(unit, cne.title(names[code]), "es", "official")
-    printed = PRINTED.get(day, {})
+    # The printed totals are declared only when the book that prints them is in hand, so each traces to a file.
+    printed = PRINTED.get(day, {}) if books else {}
     for asked in vote.questions:
         token = asked.token
         contest = key("contest", day, token)
