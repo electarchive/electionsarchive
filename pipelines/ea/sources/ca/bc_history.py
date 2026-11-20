@@ -10,6 +10,7 @@ import xlrd
 from ea import package, raw
 from ea.changeset import slug
 from ea.package import Draft
+from ea.sources.ca import bc_volumes
 from ea.sources.licenses import PUBLIC_RECORD
 from ea.store import DATA, connect
 
@@ -149,6 +150,7 @@ def map_of(day: date) -> str | None:
 
 
 def fetch() -> None:
+    bc_volumes.fetch()
     for url in (BY_AREA, BY_PLACE, COUNTS):
         raw.fetch(SOURCE, url, suffix=".csv")
     for url in STATEMENTS.values():
@@ -504,6 +506,8 @@ def statements(open_names: dict[str, str]) -> tuple[pl.DataFrame, pl.DataFrame]:
 
 
 def parse() -> None:
+    # The 1871 to 1990 elections, from the Electoral History volumes, are packages of their own that need no database.
+    bc_volumes.parse()
     rows = pl.concat([read(BY_AREA, "windows-1252"), read(BY_PLACE, "utf8").drop("ID")], how="vertical").with_columns(
         event=pl.col("EVENT_NAME").str.to_lowercase().str.replace("provincial ", "", literal=True),
         votes=pl.col("VOTES_CONSIDERED").cast(pl.Int64),
@@ -592,7 +596,7 @@ def person_name(text: str) -> str:
 
 
 def emit() -> None:
-    package.run("load", [KEY])
+    package.run("load", [*bc_volumes.packages(), KEY])
 
 
 def build() -> Path:
