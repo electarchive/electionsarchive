@@ -691,6 +691,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str, deferred: list[st
             ).format(staged)
         ).fetchone() != (False,):
             raise ValueError("a merge joins two types or targets an entity that is itself merged")
+        conn.execute(sql.SQL("create index if not exists entity_merge_into on {} (into_id, entity_id)").format(staged))
+        conn.execute(sql.SQL("analyze {}").format(staged))
         conn.execute(
             sql.SQL(
                 """with merging as (select entity_id from {0} union select into_id from {0}),
