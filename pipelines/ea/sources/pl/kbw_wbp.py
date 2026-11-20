@@ -8,9 +8,10 @@ from uuid import UUID
 
 import polars as pl
 
-from ea import raw
-from ea.changeset import Changeset, slug
+from ea import package, raw
+from ea.changeset import slug
 from ea.names import display
+from ea.package import Draft
 from ea.sources.pl.prg import VOIVODESHIPS
 from ea.store import connect
 
@@ -42,7 +43,10 @@ FILES = {
         "units1": "2018/samorzad/wbp/Itura.xlsx",
         "units2": "2018/samorzad/wbp/IItura.xlsx",
     },
-    2014: {"candidates": "2014/samorzad/1579520736_samo2014_kandydaci_na_WBP.xls"},
+    2014: {
+        "candidates": "2014/samorzad/1579520736_samo2014_kandydaci_na_WBP.xls",
+        "turnout": "2014/samorzad/samo2014-statystyki-wed%c5%82ug-gmin.zip",
+    },
     2010: {"candidates": "2010/samo2010/2010-WBP.xls", "turnout": "2010/2010-frekw-wbp-gm.xls"},
     2006: {"units": "2006/wbp/samo2006-wbp-obw.xlsx"},
     2002: {"candidates": "2002/wbp/wbp2002.zip"},
@@ -300,18 +304,65 @@ def year_2014() -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame]:
                 day=pl.lit(ELECTIONS[2014][round_ - 1]),
             )
         )
-    return pl.concat(rounds), empty_units(), empty_votes()
+    candidates = pl.concat(rounds)
+    archive = zipfile.ZipFile(raw.cached(SOURCE, url(2014, "turnout")).path)
+    turnout = pl.concat(
+        [
+            excel(archive.read(member)).select(
+                round=pl.lit(round_, pl.Int8),
+                teryt=pl.col("TERYT").str.zfill(6),
+                electors=number("Liczba wyborców"),
+                cast=number("Karty ważne"),
+                printed=number("Głosy ważne"),
+                invalid=number("Głosy nieważne"),
+            )
+            for round_, member in ((1, "samo2014 WBP I tura w gminach.xls"), (2, "samo2014 WBP II tura w gminach.xls"))
+        ]
+    )
+    return accounted(2014, candidates, turnout), empty_units(), empty_votes()
+
+
+def accounted(year: int, candidates: pl.DataFrame, turnout: pl.DataFrame) -> pl.DataFrame:
+    """Join a gmina turnout table to the candidate rows, checking that every contest has one row, that valid and
+    invalid votes add up to the ballots, and that the table's valid votes equal the ones the candidates carry."""
+    if turnout.select("round", "teryt").is_duplicated().any():
+        raise ValueError(f"{year}: a gmina is listed twice in the turnout table")
+    off = turnout.filter(pl.col("printed") + pl.col("invalid") != pl.col("cast"))
+    if off.height:
+        raise ValueError(f"{year}: valid and invalid votes do not add up to the ballots in {off.height} gminas\n{off}")
+    contests = candidates.select("round", "teryt").unique()
+    missing = contests.join(turnout, on=["round", "teryt"], how="anti")
+    extra = turnout.join(contests, on=["round", "teryt"], how="anti")
+    if missing.height or extra.height:
+        raise ValueError(f"{year}: {missing.height} contests without turnout, {extra.height} turnout rows without one")
+    joined = candidates.join(turnout.drop("invalid"), on=["round", "teryt"], how="left")
+    if "valid" in candidates.columns:
+        differs = joined.filter(pl.col("valid") != pl.col("printed")).select("round", "teryt").unique()
+        if differs.height:
+            raise ValueError(f"{year}: valid votes differ from the turnout table in {differs.height} contests")
+        joined = joined.drop("printed")
+    else:
+        joined = joined.rename({"printed": "valid"})
+    return joined
 
 
 def year_2010() -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame]:
     frame = excel(raw.cached(SOURCE, url(2010, "candidates")).path).slice(1)
     turnout = excel(raw.cached(SOURCE, url(2010, "turnout")).path).slice(1)
-    valid = pl.concat(
+    turnout = pl.concat(
         [
             turnout.select(
-                round=pl.lit(round_, pl.Int8), teryt=pl.col("Gmina").str.zfill(6), valid=number(column)
-            ).filter(pl.col("valid").is_not_null())
-            for round_, column in ((1, "__UNNAMED__8"), (2, "__UNNAMED__16"))
+                round=pl.lit(round_, pl.Int8),
+                teryt=pl.col("Gmina").str.zfill(6),
+                electors=number(columns[0]),
+                cast=number(columns[1]),
+                printed=number(columns[2]),
+                invalid=number(columns[3]),
+            ).filter(pl.col("printed").is_not_null())
+            for round_, columns in (
+                (1, ("I tura", "__UNNAMED__7", "__UNNAMED__8", "__UNNAMED__9")),
+                (2, ("II tura", "__UNNAMED__15", "__UNNAMED__16", "__UNNAMED__17")),
+            )
         ]
     )
     rounds = []
@@ -335,8 +386,7 @@ def year_2010() -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame]:
                 day=day,
             )
         )
-    out = pl.concat(rounds).join(valid, on=["round", "teryt"], how="left")
-    return out, empty_units(), empty_votes()
+    return accounted(2010, pl.concat(rounds), turnout), empty_units(), empty_votes()
 
 
 def year_2006() -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame]:
@@ -449,6 +499,8 @@ READERS = {
 
 
 def parse() -> None:
+    """Parse the years in WBP_YEAR (every year when it is unset), then build the package pl.kbw_wbp/all from every
+    year's parsed tables."""
     years = [int(y) for y in os.environ["WBP_YEAR"].split(",")] if "WBP_YEAR" in os.environ else list(READERS)
     PARSED.mkdir(parents=True, exist_ok=True)
     for year in years:
@@ -475,6 +527,7 @@ def parse() -> None:
             "votes",
             votes.height,
         )
+    print(build())
 
 
 METHOD = (
@@ -501,7 +554,19 @@ GMINA_ACCOUNTING = (
     " Electors, ballots cast (głosy oddane), and valid votes are as the file prints them for the gmina, and invalid is "
     "the ballots cast less the valid votes."
 )
-TURNOUT_2010 = " Valid votes come from the Krajowe Biuro Wyborcze's gmina turnout file (2010-frekw-wbp-gm.xls)."
+TURNOUT = {
+    2014: (
+        " Electors, ballots, and valid votes come from the Krajowe Biuro Wyborcze's gmina statistics for the round "
+        "(samo2014-statystyki-według-gmin.zip), whose valid votes equal the candidate file's; ballots are the valid "
+        "ballot papers taken from the box (karty ważne), and invalid is the ballots less the valid votes, which is "
+        "the invalid votes the table prints."
+    ),
+    2010: (
+        " Electors (upr.), ballots cast (gł. odd.), and valid votes come from the Krajowe Biuro Wyborcze's gmina "
+        "turnout file (2010-frekw-wbp-gm.xls), and invalid is the ballots cast less the valid votes, which is the "
+        "invalid votes the file prints."
+    ),
+}
 NO_AGAINST = " The candidate file prints only the votes for the sole candidate, so votes against are not stored."
 
 
@@ -523,23 +588,28 @@ def local(committee: str) -> bool:
     return upper.startswith(("KOMITET WYBORCZY WYBORCÓW", "KWW"))
 
 
-def emit() -> Path:
-    year = int(os.environ["WBP_YEAR"])
-    candidates = pl.read_parquet(PARSED / f"{year}-candidates.parquet")
-    units = pl.read_parquet(PARSED / f"{year}-units.parquet")
-    votes = pl.read_parquet(PARSED / f"{year}-votes.parquet")
-    first_day = ELECTIONS[year][0]
+KEY = f"{SOURCE}/all"
+SUMMARY = (
+    "Direct elections of wójts, burmistrzes, and city presidents, 2002 to 2024, both rounds, by gmina and (2006, 2018, "
+    "2024) polling district, with candidates, committees, and the elected heads, from the Krajowe Biuro Wyborcze's "
+    "files"
+)
+
+
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package pl.kbw_wbp/all from every year's parsed tables. It reads the database, through Draft, so the
+    rows it rebuilds keep the ids the changeset path gave them."""
     with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary=(
-                f"Direct elections of wójts, burmistrzes, and city presidents of {year}, both rounds, by gmina"
-                + (" and polling district" if units.height else "")
-                + ", with candidates, committees, and the elected heads, from the Krajowe Biuro Wyborcze's files"
-            ),
-            polity="PL",
+        cs = Draft(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="PL")
+        cs.accept(
+            "accounting.votes_valid",
+            "In the single-candidate contests of 2002 (96) and 2010 (303) the candidate file prints only the votes for "
+            "the sole candidate, not those against, so the votes stored fall short of the valid votes, which count "
+            "both; both are stored as printed.",
         )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
@@ -557,8 +627,9 @@ def emit() -> Path:
             license="Official public record, no license stated",
             attribution="Źródło danych: Państwowa Komisja Wyborcza, Krajowe Biuro Wyborcze.",
         )
-        for kind in FILES[year]:
-            cs.artifact(raw.cached(SOURCE, url(year, kind)), source)
+        for year, files in FILES.items():
+            for kind in files:
+                cs.artifact(raw.cached(SOURCE, url(year, kind)), source)
         if conn.execute("select 1 from scheme where code = 'pl.obwod'").fetchone() is None:
             raise ValueError("publish pl.kbw_sejm first")
 
@@ -588,11 +659,14 @@ def emit() -> Path:
                where a.scheme_code = 'pl.gmina'"""
         ).fetchall():
             prg[code[:6]] = (area, text, code[6:])
+        # Gminas the PRG lacked when this pipeline first wrote them (dissolved ones, such as Ostrowice) keep the
+        # polities it minted for them then, with no district area, rather than move to the PRG's later outline.
+        for teryt in [teryt for teryt in prg if ("pl.polity", f"gmina:{teryt}") in cs.own_keys]:
+            del prg[teryt]
         taken = {
             path: entity for path, entity in conn.execute("select path, entity_id from slug where path like 'pl/%%'")
         }
         paths = {entity: path for path, entity in taken.items()}
-        existing_parties = {row[0] for row in conn.execute("select id from party where polity_id is not null")}
 
         unit_rows: dict[UUID, dict[str, str | None]] = {}
         values: list[tuple[str, str, str | None, int, int]] = []
@@ -618,6 +692,9 @@ def emit() -> Path:
                     (str(result_set), str(unit), None if option is None else str(option), measure, int(value))
                 )
 
+        # Each entity is written once, from the first year (newest first, the order the changeset path wrote them
+        # in) that names it, so a party shared by several years keeps the label that first named it.
+        added: set[UUID] = set()
         parties: dict[tuple[str, str], UUID] = {}
 
         def party_for(committee: str, teryt: str, polity: UUID) -> UUID:
@@ -627,7 +704,8 @@ def emit() -> Path:
             if tag in parties:
                 return parties[tag]
             party = parties[tag] = cs.key("pl.party", f"{teryt}:{slug(label)}" if scoped else slug(label))
-            if party not in existing_parties:
+            if party in cs.minted and party not in added:
+                added.add(party)
                 cs.add(
                     "party",
                     id=party,
@@ -635,7 +713,6 @@ def emit() -> Path:
                     polity_id=polity if scoped else poland,
                 )
                 name(party, label, "pl")
-                existing_parties.add(party)
             return party
 
         polities: dict[str, tuple[UUID, str, str]] = {}
@@ -652,237 +729,245 @@ def emit() -> Path:
             town = known[1] if known is not None else bare(label)
             urban = known[2] == "1" if known is not None else label.startswith("m.") or label.endswith(", m.")
             english = town if urban else f"Gmina {town}"
-            if polity in cs.minted:
+            # The English name of a gmina the PRG lacks comes from each year's label, as it did on the changeset
+            # path, so it names that year's elections; the polity itself is written once, from the newest year.
+            if polity in cs.minted and polity not in added:
+                added.add(polity)
                 cs.add("polity", id=polity, kind="municipality", iso_code=None)
                 name(polity, english)
                 cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(f"PL-{teryt[:2]}"))
                 if known is not None:
                     cs.add("polity_territory", polity_id=polity, area_id=known[0])
                 path = f"pl/{slug(VOIVODESHIPS[teryt[:2]][0])}/{slug(english)}"
-                if path in taken:
+                if taken.get(path, polity) != polity:
                     path = f"{path}-{teryt}"
                 taken[path] = polity
+                paths[polity] = path
                 cs.add("slug", path=path, entity_id=polity)
             else:
                 path = paths[polity]
             polities[teryt] = (polity, path, english)
             return polities[teryt]
 
-        contests: dict[str, UUID] = {}
-        rounds1: dict[str, tuple[UUID, str]] = {}
-        umbrella = cs.key("pl.election", f"{first_day}:local")
-        if umbrella in cs.minted:
-            raise ValueError(f"publish the {year} pl.kbw_sejmik changeset first")
-        totals = units.group_by("round", "teryt").agg(pl.col("electors", "cast", "valid").sum())
-        accounts = {(row["round"], row["teryt"]): row for row in totals.iter_rows(named=True)}
-        unit_votes: dict[tuple[int, str], list[dict]] = {}
-        for row in votes.iter_rows(named=True):
-            unit_votes.setdefault((row["round"], row["teryt"]), []).append(row)
-        unit_lists: dict[tuple[int, str], list[dict]] = {}
-        for row in units.iter_rows(named=True):
-            unit_lists.setdefault((row["round"], row["teryt"]), []).append(row)
-        contest_count = {1: 0, 2: 0}
-        added: set[UUID] = set()
-        for (round_, teryt), group in sorted(
-            candidates.group_by("round", "teryt", maintain_order=True), key=lambda item: (item[0][0], item[0][1])
-        ):
-            round_, teryt = int(round_), str(teryt)
-            rows = group.sort("pos", "name", nulls_last=True).to_dicts()
-            day = rows[0]["day"]
-            polity, polity_path, english = polity_for(teryt, rows[0]["label"])
-            office = cs.key("pl.office", f"wbp:{teryt}")
-            if office in cs.minted and office not in added:
-                added.add(office)
-                cs.add("office", id=office, polity_id=polity, kind="mayor")
-                name(office, f"Mayor of {english}")
-                if rows[0]["title"] is not None:
-                    name(office, rows[0]["title"], "pl", "native")
-            if round_ == 1:
-                election = cs.key("pl.election", f"{day}:local:{teryt}")
-                cs.add(
-                    "election",
-                    id=election,
-                    polity_id=polity,
-                    parent_id=umbrella,
-                    kind="local",
-                    date_from=day,
-                    date_to=day,
-                    status="held",
-                )
-                name(election, f"{year} {english} local election")
-                election_path = f"{polity_path}/{day}-local"
-                rounds1[teryt] = (election, election_path)
-            else:
-                parent, _ = rounds1[teryt]
-                election = cs.key("pl.election", f"{day}:runoff:{teryt}")
-                cs.add(
-                    "election",
-                    id=election,
-                    polity_id=polity,
-                    parent_id=parent,
-                    kind="runoff",
-                    date_from=day,
-                    date_to=day,
-                    status="held",
-                )
-                name(election, f"{year} {english} mayoral election, second round")
-                election_path = f"{polity_path}/{day}-runoff"
-            cs.add("slug", path=election_path, entity_id=election)
-            standing = [row for row in rows if row["votes"] is not None]
-            single = len(standing) == 1
-            key = f"{day}:{teryt}"
-            contest = contests[f"{round_}:{teryt}"] = cs.key(f"{SOURCE}.contest", key)
-            contest_count[round_] += 1
-            cs.add(
-                "contest",
-                id=contest,
-                election_id=election,
-                kind="office",
-                office_id=office,
-                district_area_id=prg[teryt][0] if teryt in prg else None,
-                magnitude=1,
-                round_number=round_,
-                previous_round_id=contests.get(f"1:{teryt}") if round_ == 2 else None,
-                electoral_system_id=systems["single" if single else "two_round"],
-                default_result_kind="counted",
-            )
-            name(contest, f"{year} {english} mayoral election" + (", second round" if round_ == 2 else ""))
-            cs.add("slug", path=f"{election_path}/mayor", entity_id=contest)
-            result_set = cs.key(f"{SOURCE}.result_set", key)
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=election,
-                contest_id=contest,
-                stage="official",
-                kind="counted",
-                status="active",
-                source_id=source,
-                is_default=True,
-                completeness=1,
-            )
-            note = METHOD + (UNITS_METHOD if (round_, teryt) in accounts else "")
-            if (round_, teryt) not in accounts and rows[0]["electors"] is not None:
-                note += GMINA_ACCOUNTING
-            if year == 2010:
-                note += TURNOUT_2010
-            if single and standing[0]["against"] is None:
-                note += NO_AGAINST
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
-            gmina = gmina_unit(teryt)
-            put(result_set, gmina, None, VALID, rows[0]["valid"])
-            account = accounts.get((round_, teryt)) or (rows[0] if rows[0]["electors"] is not None else None)
-            if account is not None:
-                put(result_set, gmina, None, REGISTERED, account["electors"])
-                put(result_set, gmina, None, BALLOTS, account["cast"])
-                if account["cast"] is not None and rows[0]["valid"] is not None:
-                    put(result_set, gmina, None, INVALID, account["cast"] - rows[0]["valid"])
-            by_pos: dict[int, tuple[UUID, UUID | None]] = {}
-            winners = 0
-            for position, row in enumerate(rows, 1):
-                tag = f"{key}:{row['pos'] if row['pos'] is not None else slug(row['name'])}"
-                ballot = display(given_first(row["name"]), "pl")
-                person = cs.key(f"{SOURCE}.person", f"{year}:{teryt}:{slug(row['name'])}")
-                if person in cs.minted and person not in added:
-                    added.add(person)
-                    cs.add("person", id=person, gender=row["sex"])
-                    name(person, ballot)
-                party = party_for(row["committee"], teryt, polity) if row["committee"] else None
-                if single and row["votes"] is not None:
-                    yes = cs.key(f"{SOURCE}.option", f"{key}:yes")
-                    no = cs.key(f"{SOURCE}.option", f"{key}:no")
+        for year in READERS:
+            candidates = pl.read_parquet(PARSED / f"{year}-candidates.parquet")
+            units = pl.read_parquet(PARSED / f"{year}-units.parquet")
+            votes = pl.read_parquet(PARSED / f"{year}-votes.parquet")
+            first_day = ELECTIONS[year][0]
+            polities.clear()
+            contests: dict[str, UUID] = {}
+            rounds1: dict[str, tuple[UUID, str]] = {}
+            umbrella = cs.key("pl.election", f"{first_day}:local")
+            if umbrella in cs.minted:
+                raise ValueError(f"publish the {year} pl.kbw_sejmik changeset first")
+            totals = units.group_by("round", "teryt").agg(pl.col("electors", "cast", "valid").sum())
+            accounts = {(row["round"], row["teryt"]): row for row in totals.iter_rows(named=True)}
+            unit_votes: dict[tuple[int, str], list[dict]] = {}
+            for row in votes.iter_rows(named=True):
+                unit_votes.setdefault((row["round"], row["teryt"]), []).append(row)
+            unit_lists: dict[tuple[int, str], list[dict]] = {}
+            for row in units.iter_rows(named=True):
+                unit_lists.setdefault((row["round"], row["teryt"]), []).append(row)
+            contest_count = {1: 0, 2: 0}
+            for (round_, teryt), group in sorted(
+                candidates.group_by("round", "teryt", maintain_order=True), key=lambda item: (item[0][0], item[0][1])
+            ):
+                round_, teryt = int(round_), str(teryt)
+                rows = group.sort("pos", "name", nulls_last=True).to_dicts()
+                day = rows[0]["day"]
+                polity, polity_path, english = polity_for(teryt, rows[0]["label"])
+                office = cs.key("pl.office", f"wbp:{teryt}")
+                if office in cs.minted and office not in added:
+                    added.add(office)
+                    cs.add("office", id=office, polity_id=polity, kind="mayor")
+                    name(office, f"Mayor of {english}")
+                    if rows[0]["title"] is not None:
+                        name(office, rows[0]["title"], "pl", "native")
+                if round_ == 1:
+                    election = cs.key("pl.election", f"{day}:local:{teryt}")
                     cs.add(
-                        "contest_option",
-                        id=yes,
-                        contest_id=contest,
-                        kind="answer",
-                        party_id=party,
-                        ballot_position=1,
-                        ballot_label="Tak",
+                        "election",
+                        id=election,
+                        polity_id=polity,
+                        parent_id=umbrella,
+                        kind="local",
+                        date_from=day,
+                        date_to=day,
+                        status="held",
                     )
-                    cs.add(
-                        "contest_option",
-                        id=no,
-                        contest_id=contest,
-                        kind="answer",
-                        ballot_position=2,
-                        ballot_label="Nie",
-                    )
-                    option, against = yes, no
+                    name(election, f"{year} {english} local election")
+                    election_path = f"{polity_path}/{day}-local"
+                    rounds1[teryt] = (election, election_path)
                 else:
-                    option = cs.key(f"{SOURCE}.option", tag)
-                    against = None
+                    parent, _ = rounds1[teryt]
+                    election = cs.key("pl.election", f"{day}:runoff:{teryt}")
                     cs.add(
-                        "contest_option",
-                        id=option,
-                        contest_id=contest,
-                        kind="candidate",
-                        party_id=party,
-                        ballot_position=row["pos"] if row["pos"] is not None else position,
-                        ballot_label=ballot,
+                        "election",
+                        id=election,
+                        polity_id=polity,
+                        parent_id=parent,
+                        kind="runoff",
+                        date_from=day,
+                        date_to=day,
+                        status="held",
                     )
-                if row["pos"] is not None:
-                    by_pos[row["pos"]] = (option, against)
-                candidacy = cs.key(f"{SOURCE}.candidacy", tag)
+                    name(election, f"{year} {english} mayoral election, second round")
+                    election_path = f"{polity_path}/{day}-runoff"
+                cs.add("slug", path=election_path, entity_id=election)
+                standing = [row for row in rows if row["votes"] is not None]
+                single = len(standing) == 1
+                key = f"{day}:{teryt}"
+                contest = contests[f"{round_}:{teryt}"] = cs.key(f"{SOURCE}.contest", key)
+                contest_count[round_] += 1
                 cs.add(
-                    "candidacy",
-                    id=candidacy,
-                    person_id=person,
-                    option_id=option,
-                    role="head",
-                    ballot_name=row["name"],
-                    is_independent=False,
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="office",
+                    office_id=office,
+                    district_area_id=prg[teryt][0] if teryt in prg else None,
+                    magnitude=1,
+                    round_number=round_,
+                    previous_round_id=contests.get(f"1:{teryt}") if round_ == 2 else None,
+                    electoral_system_id=systems["single" if single else "two_round"],
+                    default_result_kind="counted",
                 )
-                put(result_set, gmina, option, VOTES, row["votes"])
-                if against is not None:
-                    put(result_set, gmina, against, VOTES, row["against"])
-                if row["votes"] is None:
-                    kind = "withdrew"
-                elif row["elected"]:
-                    kind = "elected"
-                    winners += 1
-                elif row["advanced"]:
-                    kind = "advanced"
-                elif round_ == 1 and not single and any(other["advanced"] for other in rows):
-                    kind = "eliminated"
-                else:
-                    kind = "lost"
+                name(contest, f"{year} {english} mayoral election" + (", second round" if round_ == 2 else ""))
+                cs.add("slug", path=f"{election_path}/mayor", entity_id=contest)
+                result_set = cs.key(f"{SOURCE}.result_set", key)
                 cs.add(
-                    "outcome",
-                    result_set_id=result_set,
-                    option_id=option,
-                    kind=kind,
-                    seats=1 if kind == "elected" else None,
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=True,
+                    completeness=1,
                 )
-            if winners > 1 or (winners == 0 and not single and round_ == 2):
-                raise ValueError(f"{key}: {winners} heads elected")
-            for unit_row in unit_lists.get((round_, teryt), []):
-                code = f"{day}:{teryt}:{unit_row['commission']}"
-                unit = cs.unit("pl.obwod", code)
-                unit_rows[unit] = {
-                    "scheme_code": "pl.obwod",
-                    "code": code,
-                    "parent_id": str(gmina),
-                    "area_relation": "unlocated",
-                    "area_id": None,
-                    "kind": "standard",
-                }
-                put(result_set, unit, None, REGISTERED, unit_row["electors"])
-                put(result_set, unit, None, BALLOTS, unit_row["cast"])
-                put(result_set, unit, None, VALID, unit_row["valid"])
-                if unit_row["cast"] is not None and unit_row["valid"] is not None:
-                    put(result_set, unit, None, INVALID, unit_row["cast"] - unit_row["valid"])
-            for vote in unit_votes.get((round_, teryt), []):
-                if vote["pos"] not in by_pos:
-                    if vote["votes"] or vote["against"]:
-                        raise ValueError(f"{key}: votes for candidate {vote['pos']} not in the candidate file")
-                    continue
-                option, against = by_pos[vote["pos"]]
-                unit = cs.unit("pl.obwod", f"{day}:{teryt}:{vote['commission']}")
-                put(result_set, unit, option, VOTES, vote["votes"])
-                if against is not None:
-                    put(result_set, unit, against, VOTES, vote["against"])
-        print(year, "contests", contest_count)
+                note = METHOD + (UNITS_METHOD if (round_, teryt) in accounts else "")
+                if (round_, teryt) not in accounts and rows[0]["electors"] is not None and year not in TURNOUT:
+                    note += GMINA_ACCOUNTING
+                note += TURNOUT.get(year, "")
+                if single and standing[0]["against"] is None:
+                    note += NO_AGAINST
+                cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
+                gmina = gmina_unit(teryt)
+                put(result_set, gmina, None, VALID, rows[0]["valid"])
+                account = accounts.get((round_, teryt)) or (rows[0] if rows[0]["electors"] is not None else None)
+                if account is not None:
+                    put(result_set, gmina, None, REGISTERED, account["electors"])
+                    put(result_set, gmina, None, BALLOTS, account["cast"])
+                    if account["cast"] is not None and rows[0]["valid"] is not None:
+                        put(result_set, gmina, None, INVALID, account["cast"] - rows[0]["valid"])
+                by_pos: dict[int, tuple[UUID, UUID | None]] = {}
+                winners = 0
+                for position, row in enumerate(rows, 1):
+                    tag = f"{key}:{row['pos'] if row['pos'] is not None else slug(row['name'])}"
+                    ballot = display(given_first(row["name"]), "pl")
+                    person = cs.key(f"{SOURCE}.person", f"{year}:{teryt}:{slug(row['name'])}")
+                    if person in cs.minted and person not in added:
+                        added.add(person)
+                        cs.add("person", id=person, gender=row["sex"])
+                        name(person, ballot)
+                    party = party_for(row["committee"], teryt, polity) if row["committee"] else None
+                    if single and row["votes"] is not None:
+                        yes = cs.key(f"{SOURCE}.option", f"{key}:yes")
+                        no = cs.key(f"{SOURCE}.option", f"{key}:no")
+                        cs.add(
+                            "contest_option",
+                            id=yes,
+                            contest_id=contest,
+                            kind="answer",
+                            party_id=party,
+                            ballot_position=1,
+                            ballot_label="Tak",
+                        )
+                        cs.add(
+                            "contest_option",
+                            id=no,
+                            contest_id=contest,
+                            kind="answer",
+                            ballot_position=2,
+                            ballot_label="Nie",
+                        )
+                        option, against = yes, no
+                    else:
+                        option = cs.key(f"{SOURCE}.option", tag)
+                        against = None
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="candidate",
+                            party_id=party,
+                            ballot_position=row["pos"] if row["pos"] is not None else position,
+                            ballot_label=ballot,
+                        )
+                    if row["pos"] is not None:
+                        by_pos[row["pos"]] = (option, against)
+                    candidacy = cs.key(f"{SOURCE}.candidacy", tag)
+                    cs.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=row["name"],
+                        is_independent=False,
+                    )
+                    put(result_set, gmina, option, VOTES, row["votes"])
+                    if against is not None:
+                        put(result_set, gmina, against, VOTES, row["against"])
+                    if row["votes"] is None:
+                        kind = "withdrew"
+                    elif row["elected"]:
+                        kind = "elected"
+                        winners += 1
+                    elif row["advanced"]:
+                        kind = "advanced"
+                    elif round_ == 1 and not single and any(other["advanced"] for other in rows):
+                        kind = "eliminated"
+                    else:
+                        kind = "lost"
+                    cs.add(
+                        "outcome",
+                        result_set_id=result_set,
+                        option_id=option,
+                        kind=kind,
+                        seats=1 if kind == "elected" else None,
+                    )
+                if winners > 1 or (winners == 0 and not single and round_ == 2):
+                    raise ValueError(f"{key}: {winners} heads elected")
+                for unit_row in unit_lists.get((round_, teryt), []):
+                    code = f"{day}:{teryt}:{unit_row['commission']}"
+                    unit = cs.unit("pl.obwod", code)
+                    unit_rows[unit] = {
+                        "scheme_code": "pl.obwod",
+                        "code": code,
+                        "parent_id": str(gmina),
+                        "area_relation": "unlocated",
+                        "area_id": None,
+                        "kind": "standard",
+                    }
+                    put(result_set, unit, None, REGISTERED, unit_row["electors"])
+                    put(result_set, unit, None, BALLOTS, unit_row["cast"])
+                    put(result_set, unit, None, VALID, unit_row["valid"])
+                    if unit_row["cast"] is not None and unit_row["valid"] is not None:
+                        put(result_set, unit, None, INVALID, unit_row["cast"] - unit_row["valid"])
+                for vote in unit_votes.get((round_, teryt), []):
+                    if vote["pos"] not in by_pos:
+                        if vote["votes"] or vote["against"]:
+                            raise ValueError(f"{key}: votes for candidate {vote['pos']} not in the candidate file")
+                        continue
+                    option, against = by_pos[vote["pos"]]
+                    unit = cs.unit("pl.obwod", f"{day}:{teryt}:{vote['commission']}")
+                    put(result_set, unit, option, VOTES, vote["votes"])
+                    if against is not None:
+                        put(result_set, unit, against, VOTES, vote["against"])
+            print(year, "contests", contest_count)
 
         minted = [
             {"id": str(unit), "polity_id": str(poland), **row} for unit, row in unit_rows.items() if unit in cs.minted
