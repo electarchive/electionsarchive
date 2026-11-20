@@ -378,33 +378,33 @@
      "url": "https://electionresults.govt.nz/electionresults_{year}/",
      "format": "csv",
      "access": "open",
-     "checked_at": "2026-11-17",
+     "checked_at": "2026-11-20",
      "first_date": "2002-07-27",
      "last_date": "2023-10-14",
      "finest": "nz.voting_place",
      "source": "ec_results",
-     "evidence": "Per-election CSV statistics (overall summary, electorate, and voting-place party and candidate votes) for 2002-2023; the archive's nz.ec packages were built from these files. The host answered HTTP 403 to a cloud session on 2026-11-17."
+     "evidence": "Per-election CSV statistics (overall summary, electorate, and voting-place party and candidate votes) for 2002-2023; the archive's nz.ec packages were built from these files. The host answered HTTP 403 to cloud sessions on 2026-11-17 and 2026-11-20."
     },
     {
      "platform": "Electoral Commission historical events",
      "url": "https://elections.nz/democracy-in-nz/historical-events/",
      "format": "html",
      "access": "browser",
-     "checked_at": "2026-11-17",
+     "checked_at": "2026-11-20",
      "first_date": "1853-01-01",
      "source": "ec_history",
-     "evidence": "Lists of general election dates and turnout from 1853, by-elections, and referendums with totals; elections.nz answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+     "evidence": "Lists of general election dates and turnout from 1853, by-elections, and referendums with totals; elections.nz answered a bot challenge to scripted requests on 2026-11-17 and 2026-11-20, not bypassed."
     },
     {
      "platform": "Papers Past: Appendix to the Journals of the House of Representatives",
      "url": "https://paperspast.natlib.govt.nz/parliamentary",
      "format": "pdf",
      "access": "browser",
-     "checked_at": "2026-11-17",
+     "checked_at": "2026-11-20",
      "first_date": "1853-01-01",
      "last_date": "1999-11-27",
      "source": "ajhr",
-     "evidence": "Returns of general elections, by-elections, and licensing polls printed as parliamentary papers (series H-33 and E-9); the site answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+     "evidence": "Returns of general elections, by-elections, and licensing polls printed as parliamentary papers (series H-33 and E-9); the site answered a bot challenge to scripted requests on 2026-11-17 and 2026-11-20, not bypassed."
     }
    ],
    "dates": [
@@ -735,33 +735,33 @@
      "url": "https://electionresults.govt.nz/electionresults_{year}/",
      "format": "csv",
      "access": "open",
-     "checked_at": "2026-11-17",
+     "checked_at": "2026-11-20",
      "first_date": "2004-07-10",
      "last_date": "2025-09-06",
      "finest": "nz.voting_place",
      "source": "ec_results",
-     "evidence": "By-election results pages and CSVs sit beside the general elections on the same host, which answered HTTP 403 to a cloud session on 2026-11-17."
+     "evidence": "By-election results pages and CSVs sit beside the general elections on the same host, which answered HTTP 403 to cloud sessions on 2026-11-17 and 2026-11-20."
     },
     {
      "platform": "Electoral Commission historical events",
      "url": "https://elections.nz/democracy-in-nz/historical-events/",
      "format": "html",
      "access": "browser",
-     "checked_at": "2026-11-17",
+     "checked_at": "2026-11-20",
      "first_date": "1853-01-01",
      "source": "ec_history",
-     "evidence": "Lists of general election dates and turnout from 1853, by-elections, and referendums with totals; elections.nz answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+     "evidence": "Lists of general election dates and turnout from 1853, by-elections, and referendums with totals; elections.nz answered a bot challenge to scripted requests on 2026-11-17 and 2026-11-20, not bypassed."
     },
     {
      "platform": "Papers Past: Appendix to the Journals of the House of Representatives",
      "url": "https://paperspast.natlib.govt.nz/parliamentary",
      "format": "pdf",
      "access": "browser",
-     "checked_at": "2026-11-17",
+     "checked_at": "2026-11-20",
      "first_date": "1853-01-01",
      "last_date": "1999-11-27",
      "source": "ajhr",
-     "evidence": "Returns of general elections, by-elections, and licensing polls printed as parliamentary papers (series H-33 and E-9); the site answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+     "evidence": "Returns of general elections, by-elections, and licensing polls printed as parliamentary papers (series H-33 and E-9); the site answered a bot challenge to scripted requests on 2026-11-17 and 2026-11-20, not bypassed."
     }
    ],
    "dates": [
@@ -978,33 +978,33 @@
      "url": "https://electionresults.govt.nz/electionresults_{year}/",
      "format": "csv",
      "access": "open",
-     "checked_at": "2026-11-17",
+     "checked_at": "2026-11-20",
      "first_date": "2011-11-26",
      "last_date": "2020-10-17",
      "finest": "nz.voting_place",
      "source": "ec_results",
-     "evidence": "Referendum results for 2011, the 2015-16 flag referendums, and 2020 by electorate and voting place; the host answered HTTP 403 to a cloud session on 2026-11-17."
+     "evidence": "Referendum results for 2011, the 2015-16 flag referendums, and 2020 by electorate and voting place; the host answered HTTP 403 to cloud sessions on 2026-11-17 and 2026-11-20."
     },
     {
      "platform": "Electoral Commission historical events",
      "url": "https://elections.nz/democracy-in-nz/historical-events/",
      "format": "html",
      "access": "browser",
-     "checked_at": "2026-11-17",
+     "checked_at": "2026-11-20",
      "first_date": "1853-01-01",
      "source": "ec_history",
-     "evidence": "Lists of general election dates and turnout from 1853, by-elections, and referendums with totals; elections.nz answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+     "evidence": "Lists of general election dates and turnout from 1853, by-elections, and referendums with totals; elections.nz answered a bot challenge to scripted requests on 2026-11-17 and 2026-11-20, not bypassed."
     },
     {
      "platform": "Papers Past: Appendix to the Journals of the House of Representatives",
      "url": "https://paperspast.natlib.govt.nz/parliamentary",
      "format": "pdf",
      "access": "browser",
-     "checked_at": "2026-11-17",
+     "checked_at": "2026-11-20",
      "first_date": "1853-01-01",
      "last_date": "1999-11-27",
      "source": "ajhr",
-     "evidence": "Returns of general elections, by-elections, and licensing polls printed as parliamentary papers (series H-33 and E-9); the site answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+     "evidence": "Returns of general elections, by-elections, and licensing polls printed as parliamentary papers (series H-33 and E-9); the site answered a bot challenge to scripted requests on 2026-11-17 and 2026-11-20, not bypassed."
     }
    ],
    "dates": [
@@ -1116,11 +1116,11 @@
      "url": "https://paperspast.natlib.govt.nz/parliamentary",
      "format": "pdf",
      "access": "browser",
-     "checked_at": "2026-11-17",
+     "checked_at": "2026-11-20",
      "first_date": "1853-01-01",
      "last_date": "1999-11-27",
      "source": "ajhr",
-     "evidence": "Returns of general elections, by-elections, and licensing polls printed as parliamentary papers (series H-33 and E-9); the site answered a bot challenge to a scripted request on 2026-11-17, not bypassed."
+     "evidence": "Returns of general elections, by-elections, and licensing polls printed as parliamentary papers (series H-33 and E-9); the site answered a bot challenge to scripted requests on 2026-11-17 and 2026-11-20, not bypassed."
     }
    ],
    "dates": [
