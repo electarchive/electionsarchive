@@ -1907,6 +1907,9 @@ PLACEHOLDERS = re.compile(
 )
 
 
+NULL_PART = re.compile(r"(^|\s)NULL(\s|$)")
+
+
 def words(text: str) -> tuple[str, frozenset[str]] | None:
     folded = "".join(
         c for c in unicodedata.normalize("NFKD", text.lower().replace("ı", "i")) if not unicodedata.combining(c)
@@ -2648,6 +2651,28 @@ def emit() -> Path:
             cs.add("name", **dict(zip(columns, row[:7], strict=True)) | {"id": None, "text": fixed}, is_preferred=True)
             displayed[row[7]] += 1
         print(f"{displayed.total()} preferred names in capitals take mixed case: {dict(displayed.most_common())}")
+        nulled = 0
+        for row in cs.rows.get("name", []):
+            if row.get("is_preferred") and row.get("id") is None and NULL_PART.search(str(row["text"])):
+                row["text"] = names.drop_null(str(row["text"]))
+        staged = {row["id"] for row in cs.rows.get("name", []) if row.get("id") is not None}
+        for row in conn.execute(
+            r"""select n.id, n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id from name n
+                join entity e on e.id = n.entity_id and e.type = 'person'
+                where n.is_preferred and n.valid_from is null and n.valid_to is null
+                  and n.text ~ '(^|\s)NULL(\s|$)'
+                  and not exists (select from entity_merge m where m.entity_id = n.entity_id)""",
+        ).fetchall():
+            if row[0] in staged:
+                continue
+            cs.add("name", **dict(zip(columns, row[:7], strict=True)), is_preferred=False)
+            cs.add(
+                "name",
+                **dict(zip(columns, row[:7], strict=True)) | {"id": None, "text": names.drop_null(row[2])},
+                is_preferred=True,
+            )
+            nulled += 1
+        print(f"{nulled} preferred names lose the NULL token a source wrote for a missing part")
         respaced = {row["id"] for row in cs.rows.get("name", []) if row.get("id") is not None}
         for row in cs.rows.get("name", []):
             if row.get("is_preferred") and row.get("id") is None:

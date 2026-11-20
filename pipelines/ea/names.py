@@ -178,3 +178,11 @@ def foreign_preferred(conn: Connection, cs: Changeset, pipeline: str) -> set[UUI
                 reason="another pipeline's preferred name stands for this person",
             )
     return held
+
+
+NULL_TOKEN = re.compile(r"(?:^|(?<=\s))NULL(?=\s|$)")
+
+
+def drop_null(text: str) -> str:
+    """A name without the literal NULL token some exports write for a missing part."""
+    return " ".join(NULL_TOKEN.sub(" ", text).split())

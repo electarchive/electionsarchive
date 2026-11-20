@@ -20,7 +20,7 @@ import polars as pl
 import shapely
 import shapely.geometry
 
-from ea import changeset, package, raw
+from ea import changeset, names, package, raw
 from ea.package import Package
 from ea.sources.cr.tse import dsr
 from ea.sources.iq import ihec_shapes
@@ -599,7 +599,7 @@ def election() -> Package:
         for row in sorted(candidates, key=lambda row: int(str(row["candidateid"]))):
             number = int(str(row["candidateid"]))
             option = key("option", number)
-            name = str(row["candidatename"]).strip()
+            name = names.drop_null(str(row["candidatename"]))
             p.add(
                 "contest_option",
                 id=option,
