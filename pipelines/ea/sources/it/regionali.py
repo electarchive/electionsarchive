@@ -9,14 +9,14 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import package, raw
 from ea.changeset import slug
 from ea.package import Draft
-from ea.sources.it import interno, istat
+from ea.sources.it import abolished, interno, istat
 from ea.sources.it.interno import BLANK, INVALID, REGISTERED, VOTERS, VOTES, proper
 from ea.sources.it.storico import EXISTING, NEW, cased
 from ea.store import DATA, connect
@@ -669,6 +669,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, held.allocation, suffix=".pdf")
     for seated in ELECTED.values():
         raw.fetch(SOURCE, seated.url, suffix=".html" if seated.endpoint == "table" else ".json", body=seated.body)
+    abolished.fetch(SOURCE)
 
 
 def regional(code: str, day: date, held: Regional) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame, pl.DataFrame]:
@@ -872,6 +873,13 @@ def parse() -> None:
             .drop("COMUNE")
         )
 
+    changes = abolished.changes()
+    gone = set(located["code"]) & set(extinct["code"])
+    endings = abolished.endings(changes, gone)
+    early = dict(endings.filter(pl.col("until") < abolished.UNTIL).select("code", "outline_to").iter_rows())
+    endings.write_parquet(PARSED / "endings.parquet")
+    abolished.lineage(changes, gone).write_parquet(PARSED / "lineage.parquet")
+    abolished.outlines(SOURCE, changes, early).write_parquet(PARSED / "outlines.parquet")
     extinct.write_parquet(PARSED / "extinct.parquet")
     transferred.write_parquet(PARSED / "transferred.parquet")
     coded(accounting).write_parquet(PARSED / "accounting.parquet")
@@ -899,6 +907,22 @@ def build() -> Path:
     seats = pl.read_parquet(PARSED / "seats.parquet")
     extinct = pl.read_parquet(PARSED / "extinct.parquet")
     transferred = pl.read_parquet(PARSED / "transferred.parquet")
+    endings = {
+        code: (until, precision, to)
+        for code, _, until, precision, to in pl.read_parquet(PARSED / "endings.parquet").iter_rows()
+    }
+    outlines = {
+        code: (vintage, geom, point)
+        for code, vintage, geom, point in pl.read_parquet(PARSED / "outlines.parquet").iter_rows()
+    }
+    lineage = pl.read_parquet(PARSED / "lineage.parquet")
+    last = dict(
+        pl.concat([frame.select("code", "day") for frame in (accounting, lists, candidates)])
+        .drop_nulls("code")
+        .group_by("code")
+        .agg(pl.col("day").max())
+        .iter_rows()
+    )
     nominated = {
         (day, region, surname, forename): lists
         for day, region, surname, forename, lists in pl.read_parquet(PARSED / "links.parquet")
@@ -919,7 +943,11 @@ def build() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Italian regional council and presidential elections 1970–2025 from the Interior Ministry's open data and the regions' own results, by municipality",
+            summary=(
+                "Italian regional council and presidential elections 1970–2025 from the Interior Ministry's open data "
+                "and the regions' own results, by municipality, with ISTAT's outlines and mergers for the comuni "
+                "abolished since 1991"
+            ),
             polity="IT",
         )
         cs.accept(
@@ -939,6 +967,16 @@ def build() -> Path:
         ministry = cs.survivors.get(MINISTRY, MINISTRY)
         for day in DAYS:
             cs.artifact(raw.cached(SOURCE, url(day)), ministry)
+
+        def licensed(source: UUID) -> dict[str, str | None]:
+            """The license the stored source row holds. The ISTAT sources below give theirs, so every source row has
+            the license columns, and a row whose license another pipeline recorded keeps it."""
+            found = conn.execute(
+                "select license, license_url, attribution from source where id = %s", [source]
+            ).fetchone()
+            license, license_url, attribution = found or (None, None, None)
+            return {"license": license, "license_url": license_url, "attribution": attribution}
+
         regional_sources: dict[tuple[str, date], UUID] = {}
         for place, held in REGIONAL.items():
             regional_sources[place] = cs.source(held.publisher, held.title)
@@ -949,6 +987,7 @@ def build() -> Path:
                 publisher=held.publisher,
                 title=held.title,
                 url=held.url,
+                **licensed(regional_sources[place]),
             )
             for link in (held.candidates, held.lists, held.allocation):
                 cs.artifact(raw.cached(SOURCE, link), regional_sources[place])
@@ -962,11 +1001,31 @@ def build() -> Path:
                 publisher=seated.publisher,
                 title=seated.title,
                 url=seated.site,
+                **licensed(seat_sources[place]),
             )
             cs.artifact(raw.cached(SOURCE, seated.url, seated.body), seat_sources[place])
         italy = cs.polity("IT")
         if italy in cs.minted:
             raise ValueError("publish it.interno before it.regionali")
+        boundary_sources: dict[date, UUID] = {}
+
+        def boundaries(vintage: date) -> UUID:
+            if vintage not in boundary_sources:
+                title = abolished.TITLES[vintage]
+                boundary_sources[vintage] = cs.source(istat.PUBLISHER, title)
+                cs.add(
+                    "source",
+                    id=boundary_sources[vintage],
+                    kind="official_body",
+                    publisher=istat.PUBLISHER,
+                    title=title,
+                    url=abolished.PAGE,
+                    license=istat.LICENSE,
+                    license_url=istat.LICENSE_URL,
+                    attribution=istat.ATTRIBUTION,
+                )
+                cs.artifact(raw.cached(SOURCE, abolished.VINTAGES[vintage]), boundary_sources[vintage])
+            return boundary_sources[vintage]
 
         parties: dict[tuple[str, str], UUID] = {}
 
@@ -1014,12 +1073,30 @@ def build() -> Path:
             if not fresh(unit):
                 continue
             _, label, region, until = ended[code]
+            day, precision, outline_to = endings[code]
+            if precision == "day":
+                # The change file leaves a few abolitions undated; the law it cites gives the day.
+                until = day
+            if until is not None and last[code] >= until:
+                raise ValueError(f"{code} {label} has results on {last[code]}, after its abolition on {until}")
             area = cs.area("it.comune", code)
             if fresh(area):
                 cs.add("area", id=area, scheme_code="it.comune")
                 cs.add("area_code", area_id=area, code=code, valid_from=None, valid_to=until)
                 cs.add("area_parent", area_id=area, parent_id=cs.area("it.regione", region), valid_from=None)
                 name(area, label, "it")
+                if code in outlines:
+                    vintage, geom, point = outlines[code]
+                    cs.add(
+                        "area_geometry",
+                        area_id=area,
+                        valid_from=None,
+                        valid_to=outline_to,
+                        geom=geom,
+                        label_point=point,
+                        quality="official",
+                        source_id=boundaries(vintage),
+                    )
             cs.add(
                 "reporting_unit",
                 id=unit,
@@ -1036,6 +1113,34 @@ def build() -> Path:
             area = cs.area("it.comune", code)
             cs.add("area_parent", area_id=area, parent_id=cs.area("it.regione", before), valid_from=None, valid_to=on)
             cs.add("area_parent", area_id=area, parent_id=cs.area("it.regione", after), valid_from=on, valid_to=None)
+
+        # it.istat's source for the change file already carries the file itself as its artifact.
+        variations = cs.source(istat.PUBLISHER, istat.TITLES[istat.VARIATIONS])
+        if variations in cs.minted:
+            raise ValueError("publish it.istat before it.regionali")
+        for (kind, day, precision, successor, notes), members in lineage.group_by(
+            "kind", "date", "precision", "successor", "notes", maintain_order=True
+        ):
+            areas = [
+                (code, cs.area("it.comune", code), role) for code, role in members.select("code", "role").iter_rows()
+            ]
+            missing = [code for code, area, _ in areas if area in cs.minted and area not in cs.own_entities]
+            if missing:
+                raise ValueError(f"{successor} {day}: no it.comune area for {missing}")
+            if not any(fresh(area) for _, area, role in areas if role == "from"):
+                continue
+            event = uuid5(package.NAMESPACE, "\x1f".join([SOURCE, "area_event", str(kind), str(day), str(successor)]))
+            cs.add(
+                "area_event",
+                id=event,
+                kind=kind,
+                date=day,
+                date_precision=precision,
+                source_id=variations,
+                notes=notes,
+            )
+            for _, area, role in areas:
+                cs.add("area_event_member", event_id=event, area_id=area, role=role)
 
         def result_set(key: str, election: UUID, contest: UUID | None, source: UUID) -> UUID:
             id = cs.key(f"{SOURCE}.result_set", key)
