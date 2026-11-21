@@ -27,6 +27,12 @@ TRASPARENZA = (
     "CAMERA_ITALIA_20220925_pluri.json"
 )
 ISTAT = "https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.csv"
+# ISTAT stopped updating the CSV list in January 2024; the spreadsheet is the current list. Its 2026 copy recodes
+# every Sardinian municipality for the 2025 provinces, so the CSV stays the list of record, and only the
+# municipalities created since are read from the spreadsheet, each on the day ISTAT's note of changes gives.
+ISTAT_CURRENT = "https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx"
+ISTAT_CHANGES = "https://www.istat.it/wp-content/uploads/2026/02/Novita-2026-2017-26febbraio2026.pdf"
+CREATED = {"024129": date(2026, 2, 21)}
 QUERY = """
 PREFIX ocd: <http://dati.camera.it/ocd/>
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
@@ -243,10 +249,24 @@ def born(text: str) -> date:
     return datetime.strptime(text.split()[0], "%d/%m/%Y").date()
 
 
+def comuni() -> dict[str, list[str]]:
+    """ISTAT's municipalities by code, each row in the CSV list's columns: the CSV list, and the municipalities
+    created since, from the current spreadsheet, which has the same columns up to the region's name."""
+    with raw.cached(SOURCE, ISTAT).path.open(encoding="latin-1", newline="") as file:
+        rows = {row[4]: row for row in list(csv.reader(file, delimiter=";"))[1:]}
+    sheet = pl.read_excel(raw.cached(SOURCE, ISTAT_CURRENT).path, infer_schema_length=0)
+    current = {row[4]: ["" if cell is None else cell for cell in row] for row in sheet.iter_rows()}
+    if set(CREATED) & set(rows) or not set(CREATED) <= set(current):
+        raise ValueError(f"the CSV list already has, or the spreadsheet lacks, one of {sorted(CREATED)}")
+    return rows | {code: current[code] for code in CREATED}
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, CAMERA, suffix=".zip")
     raw.fetch(SOURCE, REFERENDUM, suffix=".zip")
     raw.fetch(SOURCE, ISTAT, suffix=".csv")
+    raw.fetch(SOURCE, ISTAT_CURRENT, suffix=".xlsx")
+    raw.fetch(SOURCE, ISTAT_CHANGES, suffix=".pdf")
     raw.fetch(SOURCE, MANDATES, suffix=".json")
     raw.fetch(SOURCE, GROUPS, suffix=".json")
     raw.fetch(SOURCE, TRASPARENZA, suffix=".json")
