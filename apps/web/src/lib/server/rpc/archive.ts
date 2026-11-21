@@ -15906,10 +15906,11 @@ async function sketch(
           where x.scheme_code = bs.scheme_code and x.k = any(${sql.param([...ks, area.k])}::int[]) and c.credit is not null
         ) as credits,
         array(
-          select distinct x.k from (select area_id, valid from area_geometry where quality = 'synthetic' offset 0) g
-          join area x on x.id = g.area_id
-          where x.scheme_code = bs.scheme_code and g.valid @> coalesce(bs.as_of, ${day}::date)
+          select x.k from area x
+          where x.scheme_code = bs.scheme_code
             and x.k = any(${sql.param([...ks, ...absent.map((row) => row.k)])}::int[])
+            and exists (select from area_geometry g where g.area_id = x.id and g.quality = 'synthetic' and g.valid @> coalesce(bs.as_of, ${day}::date) offset 0)
+          order by x.k
         ) as approximate
       from boundary_set bs
       where bs.scheme_code in (${level}, (select scheme_code from area where id = ${area.id}::uuid))
