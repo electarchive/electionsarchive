@@ -86,14 +86,30 @@ STATE_DAYS = {
 # that gives it: the statement on the eve of polling, or the one that fixed the election's dates. For 2019 through
 # 2022 and the 2023 Kuala Terengganu poll the source is the Commission's "Stats@PRK" infographic of the election,
 # which prints the nomination, early-voting, and polling days. A by-election not listed here is dated to its year:
-# the Commission's media statements do not reach back before 2023, and the infographics start in 2019.
+# the Commission's own site holds media statements only from 2023, the Internet Archive's copies of the older site give
+# the four 2018 polls above, and the infographics start in 2019.
 STATEMENTS = "https://spr.gov.my/wp-content/uploads"
 INFOGRAPHICS = f"{STATEMENTS}/2024/10"
 PULAI = (
     f"{STATEMENTS}/2025/10/KM-BIL-31-2023-MENJELANG-PROSES-PENGUNDIAN-PRK-PARLIMEN-P161-PULAI-DAN-DEWAN-NEGERI-"
     "N13-SIMPANG-JERAM-JOHOR.pdf"
 )
+WAYBACK = "https://web.archive.org/web"
+ARCHIVE_2018 = f"{WAYBACK}/20191223051309/http://www.spr.gov.my/ms/pusat-media/kenyataan-media-0/arkib/2018"
+BALAKONG = (
+    f"{WAYBACK}/2019id_/http://www.spr.gov.my/sites/default/files/"
+    "KM%2075%20PENGUNDI%20BALAKONG%20DAN%20SERI%20SETIA%20DISERU%20KELUAR%20MENGUNDI%20A.pdf"
+)
 BY_DAYS: dict[tuple[str, int], tuple[date, str]] = {
+    # 2018 polls, dated by the Commission's eve-of-polling statements as the Internet Archive holds them; Sungai Kandis
+    # is dated by the title of its statement in the Commission's 2018 media-statement archive page.
+    ("N.49", 2018): (date(2018, 8, 4), ARCHIVE_2018),
+    ("N.27", 2018): (date(2018, 9, 8), BALAKONG),
+    ("N.32", 2018): (date(2018, 9, 8), BALAKONG),
+    ("P.132", 2018): (
+        date(2018, 10, 13),
+        f"{WAYBACK}/20181024151603id_/http://www.spr.gov.my/sites/default/files/KM88%20UNDI%20BIASA%20V2.pdf",
+    ),
     ("P.078", 2019): (date(2019, 1, 26), f"{INFOGRAPHICS}/SIRI-1-0312-PRK-CAMERON-HIGHLAND-01.webp"),
     ("N.24", 2019): (date(2019, 3, 2), f"{INFOGRAPHICS}/SIRI-2-0312-PRK-SEMENYIH-01.webp"),
     ("N.27", 2019): (date(2019, 4, 13), f"{INFOGRAPHICS}/SIRI-3-0312-APRIL-PRK-RANTAU-01.webp"),
