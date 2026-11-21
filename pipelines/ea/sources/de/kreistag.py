@@ -84,7 +84,7 @@ class Kreis(NamedTuple):
     registered: int | None
     voters: int | None
     invalid: int | None
-    seats: int
+    seats: int | None
     rows: list[Row]
     valid: int | None = None
 
@@ -426,9 +426,9 @@ class Land(NamedTuple):
 
 
 def lands() -> list[Land]:
-    from ea.sources.de import kreistag_ni, kreistag_nw, kreistag_sh
+    from ea.sources.de import kreistag_ni, kreistag_nw, kreistag_sh, kreistag_sl, kreistag_sn
 
-    return [kreistag_nw.LAND, kreistag_ni.LAND, kreistag_sh.LAND]
+    return [kreistag_nw.LAND, kreistag_ni.LAND, kreistag_sh.LAND, kreistag_sn.LAND, kreistag_sl.LAND]
 
 
 def land_party_key(land: Land, ags: str, row: Row) -> str:
@@ -561,7 +561,8 @@ def land_election(land: Land, edition: Edition) -> Package:
         p.name(contest, f"{day.year} {name} Kreistag election", "en", "official")
         p.name(contest, f"Kreistagswahl {name} {day.year}", "de", "native", False)
         p.add("slug", path=f"{path}/{slug(name)}-{ags[2:]}", entity_id=contest, is_current=True)
-        p.add("body_size", body_id=body, seats=kreis.seats, valid_from=day, valid_to=None)
+        if kreis.seats is not None:
+            p.add("body_size", body_id=body, seats=kreis.seats, valid_from=day, valid_to=None)
         p.add(
             "reporting_unit",
             id=unit,
