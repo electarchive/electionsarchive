@@ -11,8 +11,9 @@ The comparison needs the reference partitions of the archive (`data/reference/tr
 
 import gzip
 import json
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from typing import NamedTuple
+from uuid import uuid5
 
 import polars as pl
 
@@ -30,6 +31,7 @@ SITE = "https://sonuc.ysk.gov.tr"
 BOXES_URL = f"{SITE}/api/getSecimSandikSonucList?secimId=4290&secimTuru=3&yurtIciDisi=1"
 HEADERS_URL = f"{SITE}/api/getSandikSecimSonucBaslikList?secimId=4290&secimTuru=3&yurtIciDisi=1"
 REFERENCE = DATA / "reference" / "tr"
+MAYOR_BOXES = "tr.ysk_mayor_boxes"
 INBOX = DATA / "inbox" / "manual" / "tr-2009-council-boxes"
 TITLE = "Sandık Sonuçları: belediye meclisi üyeliği, 2009"
 NOTE = (
@@ -196,11 +198,6 @@ def councils() -> Package:
         if scheme == "tr.party"
     }
     party_names = dict(names.select("id", "name").iter_rows())
-    areas = {
-        int(value): entity
-        for scheme, value, entity in external.select("scheme", "value", "entity_id").iter_rows()
-        if scheme == f"tr.ysk.muhtarlik.{DAY.year}"
-    }
     mayors = {
         row["id"]: (row["election_id"], row["district_area_id"], row["name"]) for row in contests.iter_rows(named=True)
     }
@@ -309,21 +306,9 @@ def councils() -> Package:
         place = (row["il_ID"], row["ilce_ID"], row["belde_ID"])
         contest_key, contest, result_set = result_sets[place]
         key, mayor = chosen[place]
-        unit = p.id("unit", "tr.sandik", f"{DAY.year}:{row['code'][5:]}")
-        area = mayors[mayor][1] if row["cezaevi_ID"] or row["muhtarlik_ID"] not in areas else areas[row["muhtarlik_ID"]]
-        p.external.add(area)
-        p.add(
-            "reporting_unit",
-            id=unit,
-            polity_id=turkey,
-            scheme_code="tr.sandik",
-            code=row["code"],
-            area_relation="within",
-            area_id=area,
-            kind="standard",
-            valid_from=DAY,
-            valid_to=DAY + timedelta(days=1),
-        )
+        # The mayoral ballot-box source already holds these boxes as units, which it minted for the same codes.
+        unit = str(uuid5(package.NAMESPACE, f"{MAYOR_BOXES}\x1funit\x1f{row['code']}"))
+        p.external.add(unit)
         for measure, column in (
             (REGISTERED, "secmen_SAYISI"),
             (VOTERS, "oy_KULLANAN_SECMEN_SAYISI"),
