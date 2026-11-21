@@ -60,6 +60,11 @@ FIRST_DAY_2020 = date(2020, 6, 25)
 
 REGISTERED, CAST, INVALID, VOTES, VOTERS = 2, 3, 5, 1, 14
 
+# Subjects whose territory before 2008 differs from the one the layer draws: the four that absorbed autonomous okrugs
+# from 2005 to 2007 and Zabaykalsky Krai, formed in 2008 from the Chita Oblast and an okrug. Every other subject
+# keeps one area across the plans, so its code, parent, and outline run from the start.
+CHANGED = {"PER", "KYA", "KAM", "IRK", "ZAB"}
+
 # The 83 federal subjects within Russia's internationally recognized borders, by ISO 3166-2 suffix, with the name
 # the Commission's files print.
 SUBJECTS = {
@@ -264,11 +269,12 @@ def geo() -> Package:
     shapes = outlines()
     for iso, name in SUBJECTS.items():
         id = subject_area(iso)
+        since = PLAN_FROM if iso in CHANGED else None
         p.add("area", id=id, scheme_code=SUBJECT)
-        p.add("area_code", area_id=id, code=f"RU-{iso}", valid_from=PLAN_FROM, valid_to=None)
-        p.add("area_parent", area_id=id, parent_id=TERRITORY, valid_from=PLAN_FROM, valid_to=None)
+        p.add("area_code", area_id=id, code=f"RU-{iso}", valid_from=since, valid_to=None)
+        p.add("area_parent", area_id=id, parent_id=TERRITORY, valid_from=since, valid_to=None)
         p.name(id, name, "ru", "official")
-        _outline(p, id, shapes[iso])
+        _outline(p, id, shapes[iso], since)
     return p
 
 
@@ -285,14 +291,14 @@ def outlines() -> dict[str, shapely.Geometry]:
     return found
 
 
-def _outline(p: Package, id: str, shape: shapely.Geometry) -> None:
+def _outline(p: Package, id: str, shape: shapely.Geometry, since: date | None) -> None:
     gridded = shapely.set_precision(shapely.make_valid(shape), GRID)
     polygons = [part for part in shapely.get_parts(gridded) if shapely.get_type_id(part) == 3 and not part.is_empty]
     outline = shapely.set_srid(shapely.normalize(shapely.MultiPolygon(polygons)), 4326)
     p.add(
         "area_geometry",
         area_id=id,
-        valid_from=PLAN_FROM,
+        valid_from=since,
         valid_to=None,
         geom=shapely.to_wkb(outline, hex=True, include_srid=True),
         label_point=shapely.to_wkb(
