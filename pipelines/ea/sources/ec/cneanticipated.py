@@ -6,6 +6,13 @@ territory only, and the runoff's add the overseas circumscriptions. The tables a
 and each is checked against the totals printed under or beside it before it is stored. The Yasuní popular consultation
 of 20 August 2023, which the book prints by province, is stored with the first round as a ballot question. The Chocó
 Andino consultation of the same day is loaded by `ec.consultas`.
+
+The first round's package also holds the National Assembly contests of the day: the 15 national seats by province and
+overseas circumscription, the 116 provincial seats by canton (in ten circumscriptions of Guayas, Manabí, and
+Pichincha, by the cantons each one holds), and the 6 overseas seats by country. ``book2023`` reads their tables, and
+each is checked against the totals the book prints before it is stored. The book also prints the parishes of those
+circumscriptions; they are not stored, because the parish names in the book match more than one parish in the
+Council's lists without the canton each belongs to.
 """
 
 import functools
@@ -16,7 +23,7 @@ from typing import NamedTuple
 
 from ea import package, raw
 from ea.package import Package
-from ea.sources.ec import book2017, cne, cne2017
+from ea.sources.ec import book2017, book2023, cne, cne2017
 
 SOURCE = cne.SOURCE
 ECUADOR = cne.ECUADOR
@@ -50,6 +57,8 @@ CIRCUMSCRIPTIONS = {
 ALIASES = {
     "CORONEL MARCELINO MARIDUENAS": "CRNL MARCELINO MARIDUENAS",
     "GENERAL ANTONIO ELIZALDE": "GRAL A ELIZALDE",
+    "ALFREDO BAQUERIZO MORENO": "A BAQUERIZO MORENO",
+    "COREA SUR REPUBLICA DE COREA": "COREA SUR REPUBLICA DE",
 }
 METHOD = (
     "Counted by the National Electoral Council and published in its results book for the early elections of 2023, "
@@ -57,6 +66,19 @@ METHOD = (
     "electors on the roll, ballots cast are the voters who took part, and null and blank ballots are counted "
     "separately. Each voter casts one vote for a ticket, so valid votes are the votes the tickets received."
 )
+METHOD_LISTS = (
+    "Counted by the National Electoral Council and published in its results book for the early elections of 2023, "
+    "which prints each contest's votes by province, canton, or country, and by parish in the larger "
+    "circumscriptions. Registered voters are the electors on the roll, ballots cast are the voters who took part, "
+    "and null and blank ballots are counted separately. A voter in a legislative contest casts several votes, so no "
+    "valid-ballot figure is stored for those contests; each list's votes are the sum of its candidates' votes."
+)
+# the book's heading of each overseas circumscription, without accents or punctuation, and the Council's code for it
+EXTERIOR = {
+    "CANADA Y ESTADOS UNIDOS": "27",
+    "EUROPA OCEANIA Y ASIA": "26",
+    "LATINOAMERICA EL CARIBE Y AFRICA": "28",
+}
 
 
 SYSTEM_QUESTION = key("electoral_system", "early-2023", "question")
@@ -257,7 +279,7 @@ def nation() -> dict[str, int]:
 
 class Builder(cne2017.Builder):
     def result_set(self, contest: str, token: str, superseded: bool = False, supersedes: str | None = None) -> str:
-        result_set = key("result_set", self.day, token)
+        result_set = key("result_set", self.day, token + ("/parish" if supersedes else ""))
         self.p.add(
             "result_set",
             id=result_set,
@@ -266,14 +288,126 @@ class Builder(cne2017.Builder):
             stage="official",
             kind="counted",
             source_id=cne.CNE_SOURCE,
-            status="active",
-            is_default=True,
+            status="superseded" if superseded else "active",
+            is_default=not superseded,
             completeness=1.0,
+            supersedes_id=supersedes,
         )
+        method = METHOD if token == "president" else METHOD_LISTS
         self.p.add(
-            "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en"
+            "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=method, lang="en"
         )
         return result_set
+
+
+def canton_name(name: str) -> str:
+    text = book2017.norm(name)
+    return ALIASES.get(text, text)
+
+
+def circumscription_code(name: str) -> str:
+    return EXTERIOR[book2017.norm(name)]
+
+
+def check_group(group: book2017.Group) -> None:
+    """Make sure a contest's rows add up to the totals the book prints for it."""
+    count = len(group.entries)
+    total = group.total
+    if total is None:
+        raise ValueError(f"{group.head}: the table has no total row")
+    sums = [sum(r.numbers[i] for r in group.units) for i in range(count + 5)]
+    printed = list(total.numbers)
+    if sums != printed:
+        raise ValueError(f"{group.head}: the rows add up to {sums}, not the printed {printed}")
+    if printed[:count] != [e.votes for e in group.entries]:
+        raise ValueError(f"{group.head}: the list totals differ from the summary page")
+    box = (printed[count + 3], printed[count + 4], printed[count + 1], printed[count + 2])
+    if box != (group.info["registered"], group.info["cast"], group.info["blank"], group.info["null"]):
+        raise ValueError(f"{group.head}: the table's figures differ from the summary box")
+    if sum(printed[:count]) != printed[count]:
+        raise ValueError(f"{group.head}: valid votes differ from the lists' votes")
+
+
+def assembly(b: Builder) -> None:
+    """The National Assembly contests: the national seats, each province's or circumscription's, and the overseas."""
+    place = b.place
+    national, won = book2023.national()
+    nation_rows = []
+    for row in national.units:
+        text = book2017.norm(row.name)
+        code = EXTERIOR[text] if text in EXTERIOR else place.province(row.name)
+        nation_rows.append((b.province_unit(code), row))
+    count = len(national.entries)
+    sums = [sum(r.numbers[i] for r in national.units) for i in range(count + 1)]
+    if sums != list(national.total.numbers if national.total else ()):
+        raise ValueError(f"the national table adds up to {sums}, not to the printed total")
+    if sums[:count] != [e.votes for e in national.entries]:
+        raise ValueError("the national table differs from the national summary")
+    cne2017.lists(
+        b,
+        national,
+        "national",
+        "2023 Ecuadorian National Assembly election, national seats",
+        "Asambleístas nacionales del Ecuador 2023",
+        "national-assembly",
+        cne2017.ASSEMBLY,
+        nation_rows,
+        national=True,
+        seats_won=won,
+    )
+    groups = book2023.groups()
+
+    def where(head: str) -> str:
+        return place.province("PROVINCIA - " + head.removeprefix("PROVINCIA "))
+
+    seen: Counter[tuple[str, str]] = Counter()
+    for group in groups:
+        if group.head.startswith("PROVINCIA") and cne2017.circumscription(group.head):
+            province = where(group.head)
+            for row in group.units:
+                seen[(province, place.canton(province, canton_name(row.name)))] += 1
+    for group in groups:
+        check_group(group)
+        head = group.head
+        if head.startswith("PROVINCIA"):
+            province = where(head)
+            circ = cne2017.circumscription(head)
+            name = place.province_name(province)
+            rows = [
+                (
+                    b.canton_unit(
+                        province,
+                        canton_name(r.name),
+                        circ,
+                        partial=seen[(province, place.canton(province, canton_name(r.name)))] > 1,
+                    ),
+                    r,
+                )
+                for r in group.units
+            ]
+            if circ:
+                english = f"2023 Ecuadorian National Assembly election, {name} provincial seats, circumscription {circ}"
+                spanish = f"Asambleístas provinciales de {name} 2023, circunscripción {circ}"
+                tail = f"provincial/{cne.slug(name)}-{circ}"
+            else:
+                english = f"2023 Ecuadorian National Assembly election, {name} provincial seats"
+                spanish = f"Asambleístas provinciales de {name} 2023"
+                tail = f"provincial/{cne.slug(name)}"
+            cne2017.lists(b, group, f"province/{province}/{circ}", english, spanish, tail, cne2017.ASSEMBLY, rows)
+        else:
+            province = circumscription_code(head.split(":")[1])
+            rows = [(b.canton_unit(province, canton_name(r.name)), r) for r in group.units]
+            where_ = cne2017.PROVINCE_ENGLISH[province]
+            cne2017.lists(
+                b,
+                group,
+                f"overseas/{province}",
+                f"2023 Ecuadorian National Assembly election, overseas seats for {where_}",
+                f"Asambleístas del exterior de {cne2017.PROVINCE_NAMES[province]} 2023",
+                f"overseas/{cne.slug(cne2017.PROVINCE_NAMES[province])}",
+                cne2017.ASSEMBLY,
+                rows,
+            )
 
 
 def province_code(heading: str) -> str:
@@ -294,7 +428,7 @@ def build(day: str) -> Package:
             f"{SOURCE}/geo",
             f"{SOURCE}/geo-2017",
             f"{SOURCE}/registry",
-            *([f"{SOURCE}/{DAY1}"] if runoff else []),
+            *([f"{SOURCE}/{DAY1}"] if runoff else [f"{SOURCE}/registry-2017"]),
         ],
     )
     p.external.update([ECUADOR, COUNTRY, "world.country"])
@@ -431,6 +565,7 @@ def build(day: str) -> Package:
             lang="en",
         )
         yasuni(b)
+        assembly(b)
     if gaps:
         p.accept(
             "accounting.ballots_sum",

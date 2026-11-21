@@ -597,6 +597,7 @@ def lists(
     rows: list[tuple[str, book2017.Row]],
     national: bool = False,
     parishes: Parishes | None = None,
+    seats_won: Counter[str] | None = None,
 ) -> None:
     """One list-allocation contest: its lists, the seats and members each won, and its rows of votes.
 
@@ -604,7 +605,8 @@ def lists(
     supersedes the first, which keeps the canton rows alone.
     """
     p = b.p
-    seats = len(group.winners)
+    won = seats_won if seats_won is not None else Counter(w.number for w in group.winners)
+    seats = sum(won.values())
     contest = b.contest(
         token,
         english,
@@ -628,7 +630,6 @@ def lists(
             ballot_position=position,
             ballot_label=f"{cne.clean(entry.name)} ({entry.sigla}, list {entry.number})",
         )
-    won = Counter(w.number for w in group.winners)
     candidacies = []
     for winner in group.winners:
         name = cne.title(winner.name)
@@ -650,8 +651,8 @@ def lists(
     for target in (result_set, finer):
         if target is None:
             continue
-        for number, seats_won in won.items():
-            p.add("outcome", result_set_id=target, option_id=options[number], kind="won", seats=seats_won)
+        for number, count_won in won.items():
+            p.add("outcome", result_set_id=target, option_id=options[number], kind="won", seats=count_won)
         for winner, candidacy in candidacies:
             p.add(
                 "outcome",

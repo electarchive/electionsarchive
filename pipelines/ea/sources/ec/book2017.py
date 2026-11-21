@@ -78,6 +78,16 @@ def _joined(words: list[Word]) -> list[Word]:
         ):
             result[-1] = Word(last.x0, word.x1, last.y, last.text + word.text)
             continue
+        if (
+            last is not None
+            and abs(last.y - word.y) < 1.0
+            and word.x0 - last.x1 < 2.5
+            and re.fullmatch(r"\d{1,2}", last.text)
+            and re.fullmatch(r"\d\.\d{3}(?:\.\d{3})*", word.text)
+        ):
+            # a figure whose first digit the book set apart from the rest, such as 2 3.497
+            result[-1] = Word(last.x0, word.x1, last.y, last.text + word.text)
+            continue
         result.append(word)
     return result
 
@@ -166,7 +176,7 @@ def top(page: int) -> str:
 
 
 PERCENT = re.compile(r"^\d{1,3}[,.]\d\d%$")
-LISTNO = re.compile(r"^\d{1,2}(?:-\d{1,3})*$")
+LISTNO = re.compile(r"^\d{1,3}(?:-\d{1,3})*$")
 
 
 class Entry(NamedTuple):
@@ -176,7 +186,7 @@ class Entry(NamedTuple):
     votes: int
 
 
-def box(page: int) -> dict[str, int]:
+def box(page: int, book: str = BOOK_2017) -> dict[str, int]:
     """The INFORMACIÓN box of a summary page: voters on the roll, voters, blank ballots, and null ballots."""
     found: dict[str, int] = {}
     labels = (
@@ -188,7 +198,7 @@ def box(page: int) -> dict[str, int]:
         ("SUFRAGANTES", "cast"),
         ("JUNTAS", "stations"),
     )
-    for _, words in lines(page):
+    for _, words in lines(page, book):
         line = " ".join(w.text for w in words)
         for label, key in labels:
             if line.startswith(label) or (" " + label + " ") in " " + line + " " and line.split(label)[0].strip() == "":
@@ -209,9 +219,9 @@ def _header(ls: list[tuple[float, list[Word]]], names: tuple[str, ...]) -> dict[
     return found
 
 
-def summary(page: int) -> list[Entry]:
+def summary(page: int, book: str = BOOK_2017) -> list[Entry]:
     """The organizations of a summary page with their list numbers, abbreviations, and valid votes."""
-    ls = lines(page)
+    ls = lines(page, book)
     header = _header(ls, ("NOMBRE", "SIGLAS", "LISTA"))
     if not {"NOMBRE", "SIGLAS", "LISTA"} <= set(header):
         raise ValueError(f"page {page} has no organization table")
@@ -220,7 +230,9 @@ def summary(page: int) -> list[Entry]:
     sigla_c = (header["SIGLAS"].x0 + header["SIGLAS"].x1) / 2
     top_y = max(header["NOMBRE"].y, header["SIGLAS"].y, header["LISTA"].y) + 3
     total_y = next(
-        y for y, ws in ls if y > top_y and any(w.text == "TOTAL" for w in ws) and any(w.text == "100,00%" for w in ws)
+        y
+        for y, ws in ls
+        if y > top_y and any(w.text == "TOTAL" for w in ws) and any(w.text in ("100,00%", "100%") for w in ws)
     )
     mains: list[tuple[float, int]] = []
     starts: list[float] = []
@@ -230,6 +242,8 @@ def summary(page: int) -> list[Entry]:
             if not pct:
                 continue
             votes = [w for w in ws if NUM.match(w.text) and w.x1 < pct[0].x0]
+            if not votes:
+                continue  # a percentage label of a chart
             mains.append((y, number(votes[-1].text)))
             left = [w for w in ws if w.x1 < cut]
             if left:
@@ -266,12 +280,27 @@ def summary(page: int) -> list[Entry]:
         entries.append(
             Entry(
                 "".join(w.text for w in sorted(zone["list"], key=_order)),
-                "".join(w.text for w in sorted(zone["sigla"], key=_order)),
+                (
+                    "".join(w.text for w in sorted(zone["sigla"], key=_order))
+                    if book == BOOK_2017
+                    else _abbreviation(sorted(zone["sigla"], key=_order))
+                ),
                 " ".join(w.text for w in sorted(zone["name"], key=_order)),
                 votes,
             )
         )
     return entries
+
+
+def _abbreviation(words: list[Word]) -> str:
+    """An abbreviation read from the words of one cell: letters set apart join up, and other words keep their spaces."""
+    text = ""
+    for i, word in enumerate(words):
+        letters = len(word.text.strip('“”"')) == 1 and len(words[i - 1].text.strip('“”"')) == 1
+        if i and not (text.endswith("/") or word.text.startswith("/") or letters):
+            text += " "
+        text += word.text
+    return text
 
 
 def _order(word: Word) -> tuple[int, float]:
@@ -286,9 +315,9 @@ class Winner(NamedTuple):
     votes: int
 
 
-def winners(page: int) -> list[Winner]:
+def winners(page: int, book: str = BOOK_2017) -> list[Winner]:
     """The elected members a seats page lists, each with the list they won for and their individual votes."""
-    ls = lines(page)
+    ls = lines(page, book)
     header = _header(ls, ("NOMBRE", "SIGLAS", "LISTA", "GÉNERO"))
     if not {"NOMBRE", "SIGLAS", "LISTA", "GÉNERO"} <= set(header):
         return []
@@ -296,7 +325,7 @@ def winners(page: int) -> list[Winner]:
         (y, w)
         for y, ws in ls
         for w in ws
-        if w.text in ("MASCULINO", "FEMENINO") and abs(w.x0 - header["GÉNERO"].x0) < 40
+        if w.text in ("MASCULINO", "FEMENINO", "FEMENIO") and abs(w.x0 - header["GÉNERO"].x0) < 40
     ]
     left = max(header["LISTA"].x1, header["SIGLAS"].x1) + 2
     right = header["GÉNERO"].x0 - 2
