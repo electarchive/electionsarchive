@@ -145,8 +145,6 @@ def poll_file(number: int, division: str) -> str:
 
 
 BOUNDARIES = "https://www.elections.ab.ca/wp-content/uploads/2019Boundaries_ED-Shapefiles.zip"
-MAPS_PAGE = "https://www.elections.ab.ca/resources/maps/"
-VOTING_AREAS = "https://www.elections.ab.ca/uploads/EA_Voting_Area_Boundaries_2026.zip"
 FIRST = date(2019, 4, 16)
 RENAMED = {"17": "Calgary-Bhullar-McCall"}
 SITE = "https://officialresults.elections.ab.ca"
@@ -341,8 +339,6 @@ def fetch() -> None:
         SOURCE, [poll_file(number, division) for number in RESULTS for division in DIVISIONS], suffix=".xls", workers=4
     )
     raw.fetch(SOURCE, BOUNDARIES, suffix=".zip")
-    raw.fetch(SOURCE, MAPS_PAGE, suffix=".html")
-    raw.fetch(SOURCE, VOTING_AREAS, suffix=".zip")
 
 
 def totals(event: int, division: str) -> tuple[list[str], int, list[int], int, int, int, int]:
