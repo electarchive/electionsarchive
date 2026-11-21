@@ -1296,6 +1296,38 @@ def _demote(conn: Connection, path: Path, pipeline: str, owned: list[str]) -> li
     return demoted
 
 
+def _unit_clashes(conn: Connection, path: Path, pipeline: str) -> list[str]:
+    file = path / "reporting_unit.parquet"
+    if not file.exists():
+        return []
+    units = pl.read_parquet(file, columns=["id", "scheme_code", "code", "valid_from", "valid_to"])
+    if units.is_empty():
+        return []
+    rows = conn.execute(
+        """select s.scheme_code, s.code, t.id::text, c.pipeline
+           from unnest(%s::uuid[], %s::text[], %s::text[], %s::date[], %s::date[]) s(id, scheme_code, code, f, u)
+           join reporting_unit t on t.scheme_code = s.scheme_code and t.code = s.code
+             and t.valid && daterange(s.f, s.u, '[)') and t.id <> s.id
+           join changeset c on c.id = t.changeset_id and c.pipeline <> %s""",
+        [
+            [str(value) for value in units["id"]],
+            units["scheme_code"].to_list(),
+            units["code"].to_list(),
+            units["valid_from"].to_list(),
+            units["valid_to"].to_list(),
+            pipeline,
+        ],
+    ).fetchall()
+    if not rows:
+        return []
+    return [
+        (
+            f"ready.unit: {len(rows)} reporting units take the scheme and code of a unit another pipeline holds for"
+            f" an overlapping period; reuse that unit's id instead of minting one: {rows[:5]}"
+        )
+    ]
+
+
 def _clashes(conn: Connection, path: Path, pipeline: str) -> list[str]:
     file = path / "result_set.parquet"
     if not file.exists():
@@ -2268,6 +2300,7 @@ def _ready(source: Connection | Reference, key: str, batch: set[str], minted: se
             )
     if not isinstance(source, Reference):
         found += _clashes(source, path, str(manifest["pipeline"]))
+        found += _unit_clashes(source, path, str(manifest["pipeline"]))
     found += _held(source, path, str(manifest["pipeline"]))
     geometry = path / "area_geometry.parquet"
     if not isinstance(source, Reference) and geometry.exists():
