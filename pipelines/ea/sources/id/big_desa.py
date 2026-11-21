@@ -7,7 +7,7 @@ import httpx
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.package import Draft
 from ea.sources.id.big import EDITION, PUBLISHER, TITLE
 from ea.store import DATA, connect
 
@@ -158,15 +158,12 @@ def parse() -> None:
                 "where a.scheme_code = 'id.kabkota' and upper_inf(c.valid)"
             ).fetchall()
         }
-        conn.execute(
-            """create temp table shape on commit drop as
-               select code, kabkota, name, st_multi(st_collectionextract(st_makevalid(st_force2d(
-                        st_setsrid(st_geomfromgeojson(geojson), 4326))), 3)) as geom
-               from unnest(%s::text[], %s::text[], %s::text[], %s::text[]) as f(code, kabkota, name, geojson)""",
-            [list(column) for column in zip(*features, strict=True)],
-        )
         rows = conn.execute(
-            """with village as (
+            """with shape as (
+                 select code, kabkota, name, st_multi(st_collectionextract(st_makevalid(st_force2d(
+                          st_setsrid(st_geomfromgeojson(geojson), 4326))), 3)) as geom
+                 from unnest(%s::text[], %s::text[], %s::text[], %s::text[]) as f(code, kabkota, name, geojson)
+               ), village as (
                  select code, min(kabkota) as kabkota, count(distinct kabkota) as parents,
                         mode() within group (order by name) as name, st_union(geom) as geom
                  from shape group by code
@@ -174,7 +171,8 @@ def parse() -> None:
                select code, kabkota, parents, name, st_area(geom::geography) / 1e6,
                       encode(st_asewkb(st_multi(st_collectionextract(st_makevalid(geom), 3))), 'hex'),
                       encode(st_asewkb(st_pointonsurface(geom)), 'hex')
-               from village"""
+               from village""",
+            [list(column) for column in zip(*features, strict=True)],
         ).fetchall()
     frame = pl.DataFrame(
         rows,
@@ -214,7 +212,7 @@ def parse() -> None:
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "villages.parquet").sort("code")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
