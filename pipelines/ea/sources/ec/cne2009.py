@@ -8,6 +8,9 @@ total the table prints, gives every list the share the table prints to one decim
 those checks run again at every build. ``atlas2009.list_boxes`` finds each votes cell on the page, so every figure
 cites the cell it was read from.
 
+The Andean Parliament's national tables of 2009 and 2013 (``atlas2009_andean.json``, read the same way) add a contest
+to each election, with 5 seats by the Webster method.
+
 The atlas prints no candidates, no blank or null ballots, and no figures by canton, so each contest holds the lists'
 votes for its whole circumscription and the seats each list won. In 2013 Guayas, Manabí, and Pichincha elected their
 members in several districts each, and the atlas prints only the province's sum of its districts, so those three
@@ -22,7 +25,7 @@ from uuid import uuid5
 
 from ea import package, raw
 from ea.package import Package
-from ea.sources.ec import atlas2009, cne, cne2014
+from ea.sources.ec import atlas2009, cne, cne2014, cne2017
 
 SOURCE = cne.SOURCE
 ECUADOR = cne.ECUADOR
@@ -37,6 +40,8 @@ DAYS = {2009: "2009-04-26", 2013: "2013-02-17"}
 SYSTEM_WEBSTER = key("electoral_system", "assembly-2009", "webster")
 SYSTEM_DHONDT = key("electoral_system", "assembly-2013", "dhondt")
 TABLES = Path(__file__).with_name("atlas2009_assembly.json")
+ANDEAN_TABLES = Path(__file__).with_name("atlas2009_andean.json")
+ANDEAN = cne2017.ANDEAN
 REGISTRY = f"{SOURCE}/registry-2009"
 
 PROVINCES = cne.PROVINCES
@@ -87,9 +92,9 @@ def _int(text: str) -> int:
     return int(text.replace(".", ""))
 
 
-def tables() -> list[Table]:
+def tables(path: Path = TABLES) -> list[Table]:
     """The atlas's list tables, each checked against the totals, shares, and seats it prints."""
-    entries: list[dict[str, object]] = json.loads(TABLES.read_text(encoding="utf-8"))
+    entries: list[dict[str, object]] = json.loads(path.read_text(encoding="utf-8"))
     by_page: dict[int, int] = {}
     found: list[Table] = []
     for entry in entries:
@@ -137,9 +142,10 @@ def fetch() -> None:
 
 def parse() -> None:
     found = tables()
+    andean = tables(ANDEAN_TABLES)
     registry().write()
     for year in DAYS:
-        build(year, [t for t in found if t.year == year]).write()
+        build(year, [t for t in found if t.year == year], [t for t in andean if t.year == year]).write()
 
 
 def emit() -> None:
@@ -198,7 +204,7 @@ def registry() -> Package:
     return p
 
 
-def build(year: int, found: list[Table]) -> Package:
+def build(year: int, found: list[Table], andean: list[Table]) -> Package:
     day = DAYS[year]
     p = Package(
         f"{SOURCE}/{day}-assembly",
@@ -210,14 +216,14 @@ def build(year: int, found: list[Table]) -> Package:
     election = key("election", day)
     national_unit = key("unit", day, "national", "EC")
     # the country, the election, its national unit, the Assembly, and the provinces are production's rows
-    p.external.update([ECUADOR, COUNTRY, election, national_unit, ASSEMBLY, "ec.provincia", "world.country"])
+    p.external.update([ECUADOR, COUNTRY, election, national_unit, ASSEMBLY, ANDEAN, "ec.provincia", "world.country"])
     atlas = cne.artifact(atlas2009.ATLAS)
     p.uses(atlas)
     artifact_id = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{ATLAS_SOURCE}\x1f{atlas.storage_key}"))
     base = f"ec/{day}-general"
     found = [t for t in found if (year, t.circumscription) not in DISTRICTED]
     pages: dict[int, str] = {}
-    for table in found:
+    for table in [*found, *andean]:
         if table.page in pages:
             continue
         width, height = atlas2009.page_image(table.page)
@@ -231,9 +237,18 @@ def build(year: int, found: list[Table]) -> Package:
             width=width,
             height=height,
         )
-    for table in found:
+    for table in [*found, *andean]:
         circ = table.circumscription
-        if circ == "national":
+        is_andean = table in andean
+        if is_andean:
+            token = "andean"
+            english = f"{year} Ecuadorian election of members of the Andean Parliament"
+            spanish = f"Parlamentarios andinos del Ecuador {year}"
+            tail = "andean-parliament"
+            unit = national_unit
+            district = COUNTRY
+            system = SYSTEM_WEBSTER
+        elif circ == "national":
             token = "national"
             english = f"{year} Ecuadorian National Assembly election, national seats"
             spanish = f"Asambleístas nacionales del Ecuador {year}"
@@ -269,7 +284,7 @@ def build(year: int, found: list[Table]) -> Package:
                 kind="standard",
             )
             p.name(unit, native, "es", "official")
-        contest = key("contest", day, "assembly", token)
+        contest = key("contest", day, "andean" if is_andean else "assembly", token)
         p.add(
             "contest",
             id=contest,
@@ -277,7 +292,7 @@ def build(year: int, found: list[Table]) -> Package:
             kind="list_allocation",
             round_number=1,
             default_result_kind="counted",
-            body_id=ASSEMBLY,
+            body_id=ANDEAN if is_andean else ASSEMBLY,
             magnitude=table.seats,
             electoral_system_id=system,
             district_area_id=district,
