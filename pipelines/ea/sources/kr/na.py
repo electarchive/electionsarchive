@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 from uuid import UUID, uuid5
 
 import polars as pl
@@ -166,9 +166,46 @@ def jobs(days: tuple[str, ...] = DATES) -> list[tuple[str, str, str, str]]:
     return found
 
 
+WIKIPEDIA = "https://ko.wikipedia.org"
+# The lists of members of the National Assembly on Korean Wikipedia, for the elections whose winners the commission's
+# winners list leaves out.
+MEMBER_LISTS = {"19500530": "대한민국 제2대 국회의원 목록", "19580502": "대한민국 제4대 국회의원 목록"}
+# Constituencies the commission counts but leaves out of its winners list: (day, province, the count table's name) ->
+# the constituency and its member as the Wikipedia member list names them. 1958's 제8선거구 of Gyeonggi is 양주군 을:
+# its six candidates and their votes are those of the list's election page for 양주군 을.
+LISTED = {
+    ("19500530", "41", "제25선거구(장단군)"): ("장단군", "백상규"),
+    ("19500530", "41", "제27선거구(연백군 갑구)"): ("연백군 갑", "김경배"),
+    ("19500530", "41", "제28선거구(연백군 을구)"): ("연백군 을", "김태희"),
+    ("19500530", "41", "제29선거구(옹진군 갑구)"): ("옹진군 갑", "서범석"),
+    ("19500530", "41", "제30선거구(옹진군 을구)"): ("옹진군 을", "오의관"),
+    ("19500530", "42", "제3선거구(강릉군 갑구)"): ("강릉군 갑", "박세동"),
+    ("19580502", "41", "제8선거구"): ("양주군 을", "강성태"),
+}
+# The 1950 count table of 제29선거구(옹진군 갑구) holds the 14 candidates of both Ongjin constituencies, and the
+# commission has no table for 제30선거구(옹진군 을구): the first eight are 옹진군 갑's and the last six 옹진군 을's, as
+# the member list's election page lists them, and each part holds the votes of one member (7,997 and 10,832, which
+# sum to the 18,829 valid votes the table prints).
+SPLITS = {("19500530", "41", "제29선거구(옹진군 갑구)"): (8, "제30선거구(옹진군 을구)")}
+# The member list names 옹진군 을's member 오의관; the commission's count prints him as 오선관, the only candidate of
+# 옹진군 을 with votes.
+BALLOT_NAMES = {("19500530", "41", "제30선거구(옹진군 을구)", "오의관"): "오선관"}
+MEMBER_ROW = re.compile(
+    r'^!\s*(?:rowspan="\d+"\s*\|\s*)?\[\[(?:[^\]|]*\|)?([^\]]+)\]\]\s*\n\|\s*\[\[(?:[^\]|]*\|)?([^\]]+)\]\]',
+    re.MULTILINE,
+)
+
+
+def member_list(day: str) -> str:
+    query = {"action": "parse", "page": MEMBER_LISTS[day], "prop": "wikitext|revid", "format": "json"}
+    return f"{WIKIPEDIA}/w/api.php?{urlencode({**query, 'formatversion': '2'})}"
+
+
 def fetch() -> None:
     with ThreadPoolExecutor(4) as pool:
         list(pool.map(_job, jobs()))
+    for day in MEMBER_LISTS:
+        raw.fetch(SOURCE, member_list(day), suffix=".json")
     districts.fetch()
 
 
@@ -383,16 +420,97 @@ def _canon(name: str) -> str:
     return found.group(1) if found else name
 
 
+def _split(day: str, sido: str, listing: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Split a count table that holds two constituencies after its `at`-th candidate, checking that each part's votes
+    sum to its share of the printed valid votes."""
+    found = []
+    for row in listing:
+        if (day, sido, row["sgg"]) not in SPLITS:
+            found.append(row)
+            continue
+        at, second = SPLITS[day, sido, row["sgg"]]
+        names, slots = row["head"]
+        if row["invalid"] or sum(row["votes"]) != row["valid"]:
+            raise ValueError(f"{day} {sido} {row['sgg']}: the table to split does not add up")
+        for sgg, part, votes in ((row["sgg"], names[:at], row["votes"][:at]), (second, names[at:], row["votes"][at:])):
+            found.append({**row, "sgg": sgg, "head": (part, slots), "votes": votes, "valid": sum(votes)})
+    return found
+
+
+def _members(day: str) -> tuple[dict[str, list[str]], int]:
+    """The members the Wikipedia member list names for each constituency, and the page's revision."""
+    page = json.loads(raw.cached(SOURCE, member_list(day)).path.read_text())["parse"]
+    members: dict[str, list[str]] = {}
+    for constituency, member in MEMBER_ROW.findall(page["wikitext"]):
+        members.setdefault(constituency.strip(), []).append(member.strip())
+    return members, int(page["revid"])
+
+
+def _listed(
+    day: str, sido: str, elected: list[dict[str, Any]], listing: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Winners for the counted constituencies the commission's winners list leaves out, from the member list."""
+    declared = {_canon(str(won["sgg"])) for won in elected}
+    winners, citations = [], []
+    for found in listing:
+        where = (day, sido, found["sgg"])
+        if _canon(found["sgg"]) in declared:
+            if where in LISTED:
+                raise ValueError(f"{where}: the commission now lists a winner; drop the curated one")
+            continue
+        if where not in LISTED:
+            raise ValueError(f"{where}: counted without a winner")
+        constituency, member = LISTED[where]
+        members, revid = _members(day)
+        if members.get(constituency, [None])[0] != member:
+            raise ValueError(f"{where}: the member list names {members.get(constituency)} for {constituency}")
+        printed = BALLOT_NAMES.get((*where, member), member)
+        tickets = [index for index, name in enumerate(found["head"][0]) if _split_name(name)[1] == printed]
+        if len(tickets) != 1:
+            raise ValueError(f"{where}: {printed} is not one candidate of {found['head'][0]}")
+        party, name = _split_name(found["head"][0][tickets[0]])
+        winners.append(
+            {
+                "day": day,
+                "sido": sido,
+                "sgg": found["sgg"],
+                "party": party,
+                "name": name,
+                "birth": "",
+                "votes": found["votes"][tickets[0]],
+            }
+        )
+        citations.append(
+            {
+                "day": day,
+                "sido": sido,
+                "sgg": found["sgg"],
+                "page": MEMBER_LISTS[day],
+                "revid": revid,
+                "constituency": constituency,
+                "member": member,
+            }
+        )
+    return winners, citations
+
+
 def parse() -> None:
     results: list[dict[str, Any]] = []
     tickets: list[dict[str, Any]] = []
     winners: list[dict[str, Any]] = []
+    citations: list[dict[str, Any]] = []
     for day in DATES:
         for city, _ in cities(day):
             sido = _sido(city)
             elected = _winners(day, sido, raw.cached(SOURCE, key("winners", day, city)).path.read_text())
-            winners.extend(elected)
             listing = _counts(raw.cached(SOURCE, key("count", day, city)).path.read_text()) if _old(day) else []
+            if _old(day):
+                listing = _split(day, sido, listing)
+                # Appended after the commission's winners, so the contests it declares keep their order and slugs.
+                found, cited = _listed(day, sido, elected, listing)
+                elected.extend(found)
+                citations.extend(cited)
+            winners.extend(elected)
             if _old(day):
                 display = {_canon(str(won["sgg"])): str(won["sgg"]) for won in elected}
                 for found in listing:
@@ -428,6 +546,7 @@ def parse() -> None:
     pl.DataFrame(results).write_parquet(PARSED / "results.parquet")
     pl.DataFrame(tickets).unique().write_parquet(PARSED / "tickets.parquet")
     pl.DataFrame(winners).write_parquet(PARSED / "winners.parquet")
+    pl.DataFrame(citations).write_parquet(PARSED / "listed.parquet")
     print(pl.DataFrame(results).group_by("day").agg(pl.len(), pl.col("ballots").sum()).sort("day"))
     outlines = districts.build(pl.read_parquet(PARSED / "results.parquet"))
     outlines.write_parquet(PARSED / "districts.parquet")
@@ -451,6 +570,20 @@ WINNERS_TITLE = "선거통계시스템: 역대선거 국회의원선거 당선�
 LANDING = f"{BASE}/main/showDocument.xhtml?electionId=0000000000&topMenuId=VC&secondMenuId=VCCP08"
 WINNERS_LANDING = f"{BASE}/main/showDocument.xhtml?electionId=0000000000&topMenuId=EP&secondMenuId=EPEI01"
 LICENSE = "No license stated: public election statistics of the National Election Commission; facts published with attribution"
+LISTED_PUBLISHER = "Wikipedia (ko)"
+LISTED_TITLE = "대한민국 국회의원 목록 (제2대, 제4대)"
+LISTED_NOTE = (
+    "The National Election Commission counts this constituency but its winners list has no row for it, so the winner "
+    "is the member that Korean Wikipedia's list of members of the {number} National Assembly ({page}) names for "
+    "{constituency}: {member}."
+)
+SPLIT_NOTE = (
+    " The commission prints the candidates and votes of 옹진군 갑 and 옹진군 을 in one table under 제29선거구 and has "
+    "none for 제30선거구; the archive gives the first eight candidates to 옹진군 갑 and the last six to 옹진군 을, as "
+    "the member list's election page does, and each part holds the votes of one candidate (7,997 and 10,832, which sum "
+    "to the 18,829 valid votes the table prints)."
+)
+NAME_NOTE = " The commission prints the member's name as 오선관; the ballot name is kept as printed."
 SPECIAL = {2: "aggregate", 3: "postal_district", 4: "abroad_mission"}
 SYSTEM_NOTES = {
     "fptp": (
@@ -510,6 +643,9 @@ def emit() -> Path:
     results = pl.read_parquet(PARSED / "results.parquet")
     tickets = pl.read_parquet(PARSED / "tickets.parquet")
     winners = pl.read_parquet(PARSED / "winners.parquet")
+    listed = {
+        (row["day"], row["sido"], row["sgg"]): row for row in pl.read_parquet(PARSED / "listed.parquet").to_dicts()
+    }
     party_items: dict[str, list[tuple[str, str | None, str | None, str | None]]] = {}
     for row in _bindings(PARTIES_QUERY):
         party_items.setdefault(row["label"], []).append(
@@ -560,6 +696,19 @@ def emit() -> Path:
             license=LICENSE,
             license_url=BASE,
         )
+        listed_source = cs.source(LISTED_PUBLISHER, LISTED_TITLE)
+        cs.add(
+            "source",
+            id=listed_source,
+            kind="community",
+            publisher=LISTED_PUBLISHER,
+            title=LISTED_TITLE,
+            url=f"{WIKIPEDIA}/wiki/{quote(MEMBER_LISTS['19500530'].replace(' ', '_'))}",
+            license="CC BY-SA 4.0",
+            license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+            notes="The members Korean Wikipedia lists for the 2nd (1950) and 4th (1958) National Assembly, read from "
+            "the page revisions the citations name; used only for the winners the commission's winners list leaves out.",
+        )
         # The files the published counts were read from stay cited as first retrieved; a later fetch that stored the
         # same file again changes only the index's retrieval time. Files not cited yet are cited from the index.
         cited: dict[str, dict[str, Any]] = {}
@@ -582,7 +731,9 @@ def emit() -> Path:
             cs.add("source_artifact", **row)
         for address in raw.keys(SOURCE):
             artifact = raw.cached(SOURCE, address)
-            if not address.startswith(districts.BASE) and artifact.storage_key not in cited:
+            if address.startswith(WIKIPEDIA):
+                cs.artifact(artifact, listed_source)
+            elif not address.startswith(districts.BASE) and artifact.storage_key not in cited:
                 cs.artifact(artifact, winners_source if "EPEI01" in address else source)
 
         cs.add(
@@ -803,6 +954,30 @@ def emit() -> Path:
                 )
                 if number == 1:
                     cs.add("note", entity_id=contest, kind="caveat", body_md=NOTE)
+                if (day, sido, sgg) in listed:
+                    entry = listed[day, sido, sgg]
+                    cs.add(
+                        "citation",
+                        entity_id=result_set,
+                        source_id=listed_source,
+                        locator={
+                            "page": entry["page"],
+                            "revid": entry["revid"],
+                            "constituency": entry["constituency"],
+                            "member": entry["member"],
+                        },
+                    )
+                    caveat = LISTED_NOTE.format(
+                        number=f"{number}{'nd' if number == 2 else 'th'}",
+                        page=entry["page"],
+                        constituency=entry["constituency"],
+                        member=entry["member"],
+                    )
+                    if entry["constituency"].startswith("옹진군"):
+                        caveat += SPLIT_NOTE
+                    if entry["member"] in {member for *_, member in BALLOT_NAMES}:
+                        caveat += NAME_NOTE
+                    cs.add("note", entity_id=contest, kind="caveat", body_md=caveat)
                 options: list[UUID] = []
                 names = slate.filter((pl.col("sido") == sido) & (pl.col("sgg") == sgg))
                 if names.height != max(len(v) for v in rows["votes"].to_list()):
