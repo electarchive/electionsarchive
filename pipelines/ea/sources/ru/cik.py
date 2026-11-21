@@ -37,6 +37,7 @@ import xlrd
 
 from ea import changeset, package, raw
 from ea.package import Package
+from ea.sources.ru import cik_uik
 from ea.store import DATA
 
 SOURCE = "ru.cik"
@@ -54,6 +55,7 @@ META = f"{GEOBOUNDARIES}geoBoundaries-RUS-ADM1-metaData.json"
 MERGED = {"AGB", "UOB", "KOP", "KOR", "TAY", "EVE", "PER", "KYA", "KAM", "IRK", "CHI"}
 GRID = 1e-6
 
+UIK_GEO = f"{cik_uik.SOURCE}/geo"
 SUBJECT = "ru.subject"
 OKRUG = "ru.gd_okrug"
 TIK = "ru.tik"
@@ -233,7 +235,15 @@ def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
 
 
+def shared(iso: str) -> bool:
+    """Whether the subject keeps one area across the plans, which `ru.cik_uik` holds for the 2008 plan."""
+    return iso in cik_uik.SUBJECTS and iso not in cik_uik.CHANGED
+
+
 def subject_area(iso: str) -> str:
+    # Zabaykalsky Krai is `ru.cik_uik`'s too, with its code and outline running from its formation in 2008.
+    if shared(iso) or iso == "ZAB":
+        return cik_uik.subject_area(iso)
     return key("area", SUBJECT, iso)
 
 
@@ -621,6 +631,7 @@ def geo() -> Package:
         SOURCE,
         "Russia's 89 federal subjects of 1993 to 1999 and the State Duma's single-member districts of 1993, 1995, "
         "and 1999, from the Central Election Commission's results",
+        depends=[UIK_GEO],
     )
     p.external |= {RUSSIA, TERRITORY}
     _source(p)
@@ -659,6 +670,9 @@ def geo() -> Package:
     shapes = outlines()
     for s in SUBJECTS:
         id = subject_area(s.iso)
+        if shared(s.iso):
+            p.external.add(id)  # the subject `ru.cik_uik` holds, with its code, name, and outline from the start
+            continue
         p.add("area", id=id, scheme_code=SUBJECT)
         p.add("area_code", area_id=id, code=f"RU-{s.iso}")
         p.add("area_parent", area_id=id, parent_id=TERRITORY)
@@ -779,7 +793,7 @@ def registry() -> Package:
         SOURCE,
         "The State Duma, the Federation Council, the presidency, their electoral systems, and the parties and blocs "
         "on the federal lists of 1993, 1995, and 1999, from the Central Election Commission",
-        depends=[f"{SOURCE}/geo"],
+        depends=[f"{SOURCE}/geo", UIK_GEO],
     )
     p.external.add(RUSSIA)
     p.add("body", id=DUMA, polity_id=RUSSIA, kind="lower_house")
@@ -1007,7 +1021,7 @@ def vote_1993() -> Package:
         SOURCE,
         "The 12 December 1993 vote on the Constitution, State Duma election, and Federation Council election, by "
         "federal subject and district, from the Central Election Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", UIK_GEO],
     )
     p.external |= {RUSSIA, TERRITORY}
     for url in (REFERENDUM_1993, DUMA_1993, COUNCIL_1993):
@@ -1289,7 +1303,7 @@ def duma(year: int) -> Package:
         SOURCE,
         f"The {day:%-d %B %Y} State Duma election: federal lists by district and by TIK, and single-member districts "
         "by TIK, from the Central Election Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", UIK_GEO],
     )
     p.external |= {RUSSIA, TERRITORY}
     for url in (DUMA_LISTS[year], DUMA_TIK_DISTRICT[year], DUMA_TIK_LIST[year], PROTOCOL[year]):
@@ -1471,7 +1485,7 @@ def president() -> Package:
         SOURCE,
         "The 1996 presidential election, both rounds, by federal subject and by TIK, from the Central Election "
         "Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", UIK_GEO],
     )
     p.external |= {RUSSIA, TERRITORY}
     for url in (*PRESIDENT_SUBJECTS, *PRESIDENT_TIK, *PRESIDENT_PROTOCOL):

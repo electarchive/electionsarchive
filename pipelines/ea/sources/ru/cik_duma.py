@@ -379,7 +379,7 @@ def registry() -> Package:
         SOURCE,
         "The State Duma's federal list systems of 2007 and 2016 and the parties and blocs on the federal lists of "
         "2003 to 2026, from the Central Election Commission's precinct protocols",
-        depends=[GEO],
+        depends=[GEO, cik.UIK_GEO],
     )
     p.external.add(RUSSIA)
     p.add(
@@ -463,7 +463,7 @@ def election(e: Election) -> Package:
         SOURCE,
         f"The {year} State Duma election: the federal list vote by precinct election commission, from the Central "
         "Election Commission's precinct protocols",
-        depends=[GEO, f"{SOURCE}/registry"],
+        depends=[GEO, f"{SOURCE}/registry", cik.UIK_GEO],
     )
     p.external |= {RUSSIA, TERRITORY, DUMA, SUBJECT}
     p.artifact(raw.cached(SOURCE, results_url(year)), source_id())

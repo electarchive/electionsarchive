@@ -48,7 +48,7 @@ OCCUPIED_2022 = ("донецк", "луганск", "запорож", "херсо
 BAIKONUR = "baikonur"
 
 # Subjects formed by the mergers of 2005 to 2008. The ISO codes of Perm, Krasnoyarsk, Kamchatka, and Irkutsk passed
-# to the merged subjects, whose outlines geoBoundaries draws; Zabaykalsky Krai is new.
+# to the merged subjects, whose outlines geoBoundaries draws; Zabaykalsky Krai is new, and `ru.cik_uik` holds it.
 MERGERS = {
     "PER": date(2005, 12, 1),
     "KYA": date(2007, 1, 1),
@@ -56,7 +56,6 @@ MERGERS = {
     "IRK": date(2008, 1, 1),
     "ZAB": date(2008, 3, 1),
 }
-ZAB_NAME = "Забайкальский край"
 
 
 @dataclass(frozen=True)
@@ -244,9 +243,9 @@ def geo() -> Package:
     p = Package(
         GEO,
         SOURCE,
-        "The precinct election commission scheme, Zabaykalsky Krai, and the outlines of the five federal subjects "
-        "formed by the mergers of 2005 to 2008, for the presidential elections of 2000 to 2024",
-        depends=[f"{SOURCE}/geo"],
+        "The precinct election commission scheme and the outlines of the four federal subjects enlarged by the "
+        "mergers of 2005 to 2008, for the presidential elections of 2000 to 2024",
+        depends=[f"{SOURCE}/geo", cik.UIK_GEO],
     )
     p.external |= {cik.RUSSIA, cik.TERRITORY, cik.SHAPES}
     p.uses(raw.cached(SOURCE, cik.LAYER))
@@ -260,17 +259,14 @@ def geo() -> Package:
         noun="precinct election commission",
         code_system=None,
     )
-    zab = cik.subject_area("ZAB")
-    p.add("area", id=zab, scheme_code=cik.SUBJECT)
-    p.add("area_code", area_id=zab, code="RU-ZAB", valid_from=MERGERS["ZAB"])
-    p.add("area_parent", area_id=zab, parent_id=cik.TERRITORY, valid_from=MERGERS["ZAB"])
-    p.name(zab, ZAB_NAME, "ru", "official")
+    # Zabaykalsky Krai, with its code, name, and outline from 2008, is `ru.cik_uik`'s area.
+    p.external.add(cik.subject_area("ZAB"))
     shapes = cik.outlines()
     for iso, since in MERGERS.items():
-        area = cik.subject_area(iso)
         if iso != "ZAB":
+            area = cik.subject_area(iso)
             p.external.add(area)
-        _outline(p, area, shapes[iso], since)
+            _outline(p, area, shapes[iso], since)
     return p
 
 
@@ -346,7 +342,7 @@ def president(e: Election) -> Package:
         SOURCE,
         f"The {e.year} presidential election by precinct election commission (UIK), from the Central Election "
         "Commission's results portal",
-        depends=[GEO, REGISTRY, f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[GEO, REGISTRY, f"{SOURCE}/geo", f"{SOURCE}/registry", cik.UIK_GEO],
     )
     p.external |= {cik.RUSSIA, cik.TERRITORY}
     p.artifact(raw.cached(SOURCE, results_url(e.year)), PORTAL_SOURCE)
