@@ -15,14 +15,15 @@ import polars as pl
 import shapefile
 import shapely
 
-from ea import raw
-from ea.changeset import Changeset
+from ea import package, raw
+from ea.package import Draft
 from ea.sources.jp import mlit
 from ea.sources.jp.mlit import DESIGNATED, PREFECTURES
 from ea.store import DATA, connect
 
 SOURCE = "jp.hor_smd"
 VERSION = "1"
+KEY = f"{SOURCE}/all"
 PARSED = DATA / "parsed" / SOURCE
 PARTS = Path(__file__).with_name("hor_smd_parts.tsv")
 LAW_TITLE = (
@@ -30,7 +31,8 @@ LAW_TITLE = (
 )
 CREDIT = (
     "公職選挙法別表第一、「国土数値情報（行政区域データ）」（国土交通省）、"
-    "「国勢調査 小地域境界データ」（総務省統計局）、「大字・町丁目レベル位置参照情報」（国土交通省）を加工して作成"
+    "「国勢調査 小地域境界データ」（総務省統計局）、「大字・町丁目レベル位置参照情報」（国土交通省）、"
+    "「街区レベル位置参照情報」（国土交通省）を加工して作成"
 )
 LAW_API = "https://laws.e-gov.go.jp/api/2/law_data/325AC1000000100_{}?response_format=xml"
 SHUGIIN = "https://www.shugiin.go.jp/internet/itdb_housei.nsf/html/{}.htm"
@@ -79,6 +81,21 @@ def kanji(text: str) -> int:
     if "十" not in text:
         return NUMERALS[text]
     return (NUMERALS[tens] if tens else 1) * 10 + (NUMERALS[ones] if ones else 0)
+
+
+def numeral(text: str) -> int:
+    """A number written in digits or in kanji up to the thousands, such as 千三百十三."""
+    text = unicodedata.normalize("NFKC", text)
+    if text.isdigit():
+        return int(text)
+    total = current = 0
+    for char in text:
+        if char in NUMERALS:
+            current = NUMERALS[char]
+        else:
+            total += (current or 1) * {"十": 10, "百": 100, "千": 1000}[char]
+            current = 0
+    return total + current
 
 
 def law_url(table: str) -> str:
@@ -510,6 +527,9 @@ def fetch() -> None:
             raw.fetch(SOURCE, ISJ.format(version=version, prefecture=prefecture), suffix=".zip")
     for prefecture, vintage in formers():
         raw.fetch(SOURCE, n03(vintage, prefecture), suffix=".zip")
+    for table in TABLES:
+        for prefecture in restricted(table):
+            raw.fetch(SOURCE, ISJ.format(version=block_version(table), prefecture=prefecture), suffix=".zip")
 
 
 def estat_url(year: int, prefecture: str) -> str:
@@ -560,6 +580,107 @@ def items(text: str) -> list[tuple[str, str]]:
         else:
             current += char
     return found
+
+
+FIGURES = "0-9一二三四五六七八九十百千"
+ADDRESS = re.compile(rf"([{FIGURES}]+)(?:番地|番)?(?:([{FIGURES}]+)号?)?")
+Address = tuple[int, int | None]
+
+
+@dataclass(frozen=True)
+class Blocks:
+    """The blocks (番) or lots (番地) an annex note names within one chome or oaza, as inclusive ranges of
+    (number, sub-number) pairs. A sub-number is the 号 of a block or the branch of a lot; None covers the whole
+    block or lot. `only` is True for a note that keeps the area to those blocks (に限る) and False for one that
+    takes them out of it (を除く)."""
+
+    ranges: tuple[tuple[Address, Address], ...]
+    only: bool
+
+    def holds(self, number: int, sub: int | None) -> bool:
+        """Whether the note names the block or lot. A block the note names only in part, by some of its 号, counts
+        as named: the location reference points stop at the block."""
+        for (low, low_sub), (high, high_sub) in self.ranges:
+            if sub is None:
+                if low <= number <= high:
+                    return True
+            elif (low, low_sub or 0) <= (number, sub) <= (high, 10**9 if high_sub is None else high_sub):
+                return True
+        return False
+
+
+def address(text: str) -> Address | None:
+    found = ADDRESS.fullmatch(text)
+    if not found:
+        return None
+    return numeral(found[1]), None if found[2] is None else numeral(found[2])
+
+
+def blocks(note: str) -> Blocks | None:
+    """Read a note such as 一番から二十六番まで及び二十八番に限る or 27・29～41番に限る; None when the note is not a
+    list of blocks or lots, such as 字カキヲジ原に限る."""
+    text = unicodedata.normalize("NFKC", note).strip().rstrip("。")
+    if text.endswith("に限る"):
+        only, text = True, text.removesuffix("に限る")
+    elif text.endswith("を除く"):
+        only, text = False, text.removesuffix("を除く")
+    else:
+        return None
+    ranges: list[tuple[Address, Address]] = []
+    for part in re.split("、|及び|・", text.replace("~", "から")):
+        low, _, high = part.removesuffix("まで").partition("から")
+        first, last = address(low), address(high or low)
+        if first is None or last is None:
+            return None
+        ranges.append((first, last))
+    return Blocks(tuple(ranges), only) if ranges else None
+
+
+def lot(text: str) -> Address | None:
+    found = re.fullmatch(r"(\d+)(?:-(\d+))?", unicodedata.normalize("NFKC", text))
+    return None if found is None else (int(found[1]), None if found[2] is None else int(found[2]))
+
+
+def carve(
+    polygon: shapely.Geometry, base: int, rules: list[tuple[int, Blocks]], remainder: int, sites: pl.DataFrame
+) -> tuple[list[tuple[shapely.Geometry, int]], str | None]:
+    """Cut one census small area along the blocks its annex notes name. Each block point of the location reference
+    information takes the district its notes give it, or the area's own district, and the area is split into the
+    Voronoi cells of those points. Returns the pieces with their districts, and a note when the area stays whole."""
+    others = [district for district, rule in rules if rule.only]
+    labels: dict[tuple[float, float], list[int]] = {}
+    for x, y, block in sites.select("x", "y", "block").iter_rows():
+        found = lot(block)
+        if found is None:
+            continue
+        label = base
+        for district, rule in rules:
+            if rule.only and rule.holds(*found):
+                label = district
+            elif not rule.only and district == base and rule.holds(*found):
+                label = next((other for other in others if other != district), remainder)
+        labels.setdefault((x, y), []).append(label)
+    chosen = {
+        point: max(sorted(set(found)), key=lambda label: (found.count(label), label == base))
+        for point, found in labels.items()
+    }
+    if not chosen:
+        return [(polygon, base)], "no block points"
+    if len(set(chosen.values())) == 1:
+        label = next(iter(chosen.values()))
+        return [(polygon, label)], None if label != base else f"{len(labels)} block points, all in district {base}"
+    points = shapely.points(list(chosen))
+    cells = shapely.get_parts(shapely.voronoi_polygons(shapely.multipoints(points), extend_to=polygon))
+    tree = shapely.STRtree(points)
+    owners = dict(zip(*tree.query(cells, predicate="contains"), strict=True))
+    districts = list(chosen.values())
+    pieces: list[tuple[shapely.Geometry, int]] = []
+    for district in sorted(set(districts)):
+        members = [cell for index, cell in enumerate(cells) if districts[owners[index]] == district]
+        piece = shapely.intersection(polygon, shapely.union_all(members))
+        if not piece.is_empty:
+            pieces.append((piece, district))
+    return pieces, None
 
 
 def fields(record: shapefile._Record | None) -> dict[str, str]:
@@ -655,6 +776,39 @@ def points(version: str, prefecture: str) -> pl.DataFrame:
         pl.col("経度").cast(pl.Float64).alias("x"),
         pl.col("緯度").cast(pl.Float64).alias("y"),
     )
+
+
+def block_version(table: str) -> str:
+    return TABLES[table].isj.replace("b", "a")
+
+
+def block_points(version: str, prefecture: str) -> pl.DataFrame:
+    """The block-level location reference points (街区レベル位置参照情報): one or more points for each block (街区) of
+    the areas with residential addressing and for each lot (地番) elsewhere."""
+    with zipfile.ZipFile(raw.cached(SOURCE, ISJ.format(version=version, prefecture=prefecture)).path) as archive:
+        name = next(name for name in archive.namelist() if name.lower().endswith(".csv"))
+        frame = pl.read_csv(archive.read(name).decode("cp932").encode(), infer_schema=False)
+    return frame.select(
+        pl.col("市区町村名").alias("city"),
+        # The column is 大字・丁目名, 大字・町丁目名, or 大字・町丁目, depending on the release.
+        pl.col(next(column for column in frame.columns if column.startswith("大字"))).alias("name"),
+        pl.col("街区符号・地番").alias("block"),
+        pl.col("経度").cast(pl.Float64).alias("x"),
+        pl.col("緯度").cast(pl.Float64).alias("y"),
+    ).unique(maintain_order=True)
+
+
+def restricted(table: str) -> list[str]:
+    """The prefectures whose split units have annex notes that name blocks or lots, so their block points are
+    needed."""
+    found: set[str] = set()
+    for prefecture, _, path in annex(table):
+        if any(blocks(note) for _, note in items(path[-1]) if note):
+            found.add(prefecture)
+    for row in rows():
+        if row["table"] == table and row["kind"] == "chome" and any(blocks(note) for _, note in items(row["names"])):
+            found.add(row["prefecture"])
+    return sorted(found)
 
 
 def nearby(located: pl.DataFrame, code: str, shape: shapely.Geometry) -> pl.DataFrame:
@@ -767,7 +921,8 @@ def assign(
     areas: pl.DataFrame,
     located: pl.DataFrame,
     olds: dict[str, shapely.Geometry],
-) -> tuple[list[int], int, list[str]]:
+    sites: pl.DataFrame | None = None,
+) -> tuple[list[int], int, list[str], dict[int, list[tuple[shapely.Geometry, int]]]]:
     curated = parts(table).get((unit.code[:2], unit.name), [])
     lines: list[tuple[int, str, str]] = (
         [
@@ -791,6 +946,7 @@ def assign(
     remainder = rest[0]
     notes: list[str] = []
     listed: dict[str, int] = {}
+    rules: dict[str, list[tuple[int, Blocks]]] = {}
     shapes_: list[tuple[shapely.Geometry, int]] = []
     for district, kind, text in lines:
         if kind == "former":
@@ -809,8 +965,12 @@ def assign(
             )
         elif kind == "chome":
             for name, note in items(text):
+                rule = blocks(note) if note and sites is not None else None
+                if rule is not None:
+                    rules.setdefault(norm(name), []).append((district, rule))
                 if "限る" in note:
-                    notes.append(f"{unit.name} {name}（{note}）")
+                    if rule is None:
+                        notes.append(f"{unit.name} {name}（{note}）")
                 elif listed.setdefault(norm(name), district) != district:
                     raise ValueError(f"{table} {unit.code} {unit.name}: {name} in {listed[norm(name)]} and {district}")
         elif kind != "rest":
@@ -845,10 +1005,39 @@ def assign(
             chosen.append(max(set(votes[index]), key=votes[index].count))
         else:
             chosen.append(remainder)
+    carved: dict[int, list[tuple[shapely.Geometry, int]]] = {}
+    if rules and sites is not None:
+        city = norm(unit.name)
+        named = sites.filter(
+            pl.col("city").map_elements(lambda text: norm(text).endswith(city), return_dtype=pl.Boolean)
+        ).with_columns(pl.col("name").map_elements(norm, return_dtype=pl.String).alias("key"))
+        cut: set[str] = set()
+        for index, (name, polygon) in enumerate(zip(areas["name"], polygons, strict=True)):
+            key = norm(name)
+            if key not in rules:
+                continue
+            cut.add(key)
+            # An area the notes keep in part to a district lies, apart from those blocks, on the other side.
+            only = {district for district, rule in rules[key] if rule.only}
+            base = chosen[index]
+            if base in only:
+                base = next((district for district in (remainder, *sorted(set(chosen))) if district not in only), base)
+            pieces, why = carve(polygon, base, rules[key], remainder, named.filter(pl.col("key") == key))
+            if why is None:
+                carved[index] = pieces
+                notes.append(
+                    f"{unit.name} {name}: cut into districts {', '.join(str(d) for _, d in pieces)}"
+                    if len(pieces) > 1
+                    else f"{unit.name} {name}: drawn whole in district {pieces[0][1]} by its block points"
+                )
+            else:
+                notes.append(f"{unit.name} {name}: left whole, {why}")
+        for key in sorted(set(rules) - cut):
+            notes.append(f"{unit.name} {key}: blocks named, but no census small area of that name")
     missing = sorted(set(listed) - found)
     if missing:
         notes.append(f"{unit.name}: {len(missing)} listed names located nowhere: {'、'.join(missing)}")
-    return chosen, remainder, notes
+    return chosen, remainder, notes, carved
 
 
 def reconcile(table: str, towns: dict[str, Municipality], geometry: dict[str, shapely.Geometry]) -> None:
@@ -873,7 +1062,7 @@ def reconcile(table: str, towns: dict[str, Municipality], geometry: dict[str, sh
         towns[code].county, towns[code].city = county, False
 
 
-def build(table: str) -> pl.DataFrame:
+def draw(table: str) -> pl.DataFrame:
     spec = TABLES[table]
     towns = municipalities(spec.n03)
     geometry = shapes(spec.n03)
@@ -897,12 +1086,15 @@ def build(table: str) -> pl.DataFrame:
     areas: dict[str, pl.DataFrame] = {}
     located: dict[str, pl.DataFrame] = {}
     olds: dict[str, dict[str, shapely.Geometry]] = {}
+    sites: dict[str, pl.DataFrame | None] = {}
     vintages = formers()
+    needed = restricted(table)
     for code, lines in splits.items():
         prefecture = code[:2]
         if prefecture not in areas:
             areas[prefecture] = small_areas(spec.census, prefecture)
             located[prefecture] = points(spec.isj, prefecture)
+            sites[prefecture] = block_points(block_version(table), prefecture) if prefecture in needed else None
             olds[prefecture] = {
                 key: shape
                 for code, vintage in vintages
@@ -914,13 +1106,14 @@ def build(table: str) -> pl.DataFrame:
         inside = shapely.contains(geometry[code], shapely.point_on_surface(shapely.from_wkb(stale["geom"].to_numpy())))
         local = pl.concat([areas[prefecture].filter(pl.col("unit") == code), stale.filter(pl.Series(inside))])
         try:
-            chosen, remainder, unit_notes = assign(
+            chosen, remainder, unit_notes, carved = assign(
                 table,
                 towns[code],
                 lines,
                 local,
                 nearby(located[prefecture], code, geometry[code]),
                 olds[prefecture],
+                sites[prefecture],
             )
         except ValueError as error:
             errors.append(str(error))
@@ -928,17 +1121,25 @@ def build(table: str) -> pl.DataFrame:
         notes += unit_notes
         whole = geometry[code]
         polygons = shapely.from_wkb(local["geom"].to_numpy())
+        cells = [
+            cell
+            for index, (polygon, district) in enumerate(zip(polygons, chosen, strict=True))
+            for cell in carved.get(index, [(polygon, district)])
+        ]
         taken: list[shapely.Geometry] = []
-        for district in sorted(set(chosen) - {remainder}):
-            indices = [index for index, other in enumerate(chosen) if other == district]
+        for district in sorted({district for _, district in cells} - {remainder}):
             piece = shapely.intersection(
-                whole, shapely.simplify(shapely.union_all(polygons[indices], grid_size=1e-7), mlit.TOLERANCE)
+                whole,
+                shapely.simplify(
+                    shapely.union_all([cell for cell, other in cells if other == district], grid_size=1e-7),
+                    mlit.TOLERANCE,
+                ),
             )
             taken.append(piece)
             members.setdefault((prefecture, district), []).append(piece)
         rest = shapely.difference(whole, shapely.union_all(taken)) if taken else whole
         members.setdefault((prefecture, remainder), []).append(rest)
-        for district in sorted({*chosen, remainder}):
+        for district in sorted({*(district for _, district in cells), remainder}):
             described.setdefault((prefecture, district), []).append(f"{towns[code].name} (part)")
     for note in notes:
         print(f"{table}: {note}")
@@ -983,9 +1184,10 @@ def parse() -> None:
         if not layers(vintage).exists():
             mlit.layers(vintage, bases(vintage), SOURCE).write_parquet(layers(vintage))
     for table in sorted(TABLES, key=lambda table: TABLES[table].effective, reverse=True):
-        frame = build(table)
+        frame = draw(table)
         print(table, frame.height, "districts")
         frame.write_parquet(PARSED / f"districts_{table}.parquet")
+    print(build())
 
 
 def ordinal(number: int) -> str:
@@ -993,9 +1195,15 @@ def ordinal(number: int) -> str:
     return f"{number}{suffix}"
 
 
-def emit() -> Path:
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package jp.hor_smd/all from the parsed tables. It reads the database, through Draft, so the rows it
+    rebuilds keep the ids the changeset path gave them."""
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
@@ -1045,6 +1253,20 @@ def emit() -> Path:
                     ISJ.format(version=TABLES[table].isj, prefecture=prefecture)
                     for table in TABLES
                     for prefecture in used
+                ],
+            ),
+            (
+                mlit.PUBLISHER,
+                "Location reference information, block level (街区レベル位置参照情報)",
+                "https://nlftp.mlit.go.jp/isj/",
+                "MLIT location reference information terms (free use with credit)",
+                "https://nlftp.mlit.go.jp/isj/agreement.html",
+                "「街区レベル位置参照情報」（国土交通省）を加工して作成",
+                [
+                    ISJ.format(version=block_version(table), prefecture=prefecture)
+                    for table in TABLES
+                    for prefecture in restricted(table)
+                    if prefecture in used
                 ],
             ),
             (
@@ -1108,7 +1330,7 @@ def emit() -> Path:
             following = order.index(last) + 1
             end = TABLES[order[following]].effective if following < len(order) else None
             area = cs.area("jp.hor_smd", code)
-            span = {"valid_from": first, "valid_from_precision": "day", "valid_to": end, "valid_to_precision": "day"}
+            span = {"valid_from": first, "valid_to": end}
             cs.add("area", id=area, scheme_code="jp.hor_smd")
             cs.add("area_code", area_id=area, code=code, **span)
             cs.add("area_parent", area_id=area, parent_id=cs.area("jp.prefecture", prefecture), **span)
@@ -1125,6 +1347,8 @@ def emit() -> Path:
                     kind=kind,
                     is_preferred=kind == "official",
                     source_id=law,
+                    valid_from_precision="day",
+                    valid_to_precision="day",
                     **span,
                 )
             for index, (table, wkb) in enumerate(rows_.select("table", "geom").iter_rows()):
@@ -1142,9 +1366,7 @@ def emit() -> Path:
                     quality="official",
                     source_id=law,
                     valid_from=TABLES[table].effective,
-                    valid_from_precision="day",
                     valid_to=ends,
-                    valid_to_precision="day",
                 )
         for index, table in enumerate(order):
             start = TABLES[table].effective
