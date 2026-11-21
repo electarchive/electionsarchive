@@ -91,6 +91,10 @@ SHORT = (
     "The electoral court's candidate totals here fall {short} votes short of its count of valid nominal votes for "
     "this contest."
 )
+SHELL = (
+    "The electoral court's {year} municipal files list no candidates for this municipality, so the election has no "
+    "contests or results."
+)
 SECTIONED = (
     "The electoral court's municipal results files leave this contest out, so its votes are summed from the court's "
     "results by polling section, with votes for candidates whose registration the court denied or revoked counted as "
@@ -764,6 +768,22 @@ def emit() -> Path:
                 f"{year} {proper(labels[code])} municipal election" + (", second round" if round == "2" else ""),
                 "en",
             )
+        for (shell,) in conn.execute(
+            """
+            select e.id from external_id x
+            join election e on e.id = x.entity_id
+            join changeset w on w.id = e.changeset_id and w.pipeline = %s
+            join entity t on t.id = e.id and t.retired_by is null
+            where x.scheme = %s and x.value like %s and e.id <> all(%s::uuid[])
+              and not exists (select from contest k where k.election_id = e.id)
+              and not exists (select from result_set r where r.election_id = e.id)
+              and not exists (select from alliance a where a.election_id = e.id)
+              and not exists (select from election c where e.id in (c.parent_id, c.rerun_of_id) and c.id <> e.id)
+            order by e.id
+            """,
+            [SOURCE, f"{SOURCE}.election", f"{year}:%", [str(id) for id in elections.values()]],
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=shell, reason=SHELL.format(year=year))
 
         units: dict[str, str] = {}
         rows: list[dict[str, object]] = []
