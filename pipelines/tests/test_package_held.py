@@ -26,7 +26,7 @@ class Held(unittest.TestCase):
         patch.start()
         self.addCleanup(patch.stop)
 
-    def build(self, key: str, pipeline: str = "xx.test", **tables: Sequence[Mapping[str, str | bool]]) -> Path:
+    def build(self, key: str, pipeline: str = "xx.test", **tables: Sequence[Mapping[str, str | bool | None]]) -> Path:
         path = self.tmp / "packages" / key / "build"
         path.mkdir(parents=True)
         (path / "package.json").write_text(
@@ -36,12 +36,35 @@ class Held(unittest.TestCase):
             pl.DataFrame(rows).write_parquet(path / f"{table}.parquet")
         return path
 
-    def reference(self, **tables: Sequence[Mapping[str, str | bool]]) -> Reference:
+    def reference(self, **tables: Sequence[Mapping[str, str | bool | None]]) -> Reference:
         folder = self.tmp / "reference" / "xx"
         folder.mkdir(parents=True)
         for table, rows in tables.items():
             pl.DataFrame(rows).write_parquet(folder / f"{table}.parquet")
         return Reference(frozenset(), frozenset(), {}, self.tmp / "reference")
+
+    def clashes(self, supersedes: str | None) -> list[str]:
+        row: dict[str, str | bool | None] = {
+            "id": A, "election_id": B, "contest_id": C, "stage": "preliminary", "is_default": True,
+            "supersedes_id": supersedes,
+        }  # fmt: skip
+        path = self.build("xx.test/a", result_set=[row])
+        conn = mock.MagicMock()
+        conn.execute.return_value.fetchall.return_value = [
+            (B, C, "preliminary", "polling_station", "xx.other", A[:-1] + "9")
+        ]
+        with mock.patch.object(package, "_grains", return_value={A: "polling_station"}):
+            return package._clashes(conn, path, "xx.test")
+
+    def test_default_naming_the_set_it_replaces_is_not_a_clash(self) -> None:
+        self.assertEqual(self.clashes(A[:-1] + "9"), [])
+
+    def test_default_naming_another_set_is_still_a_clash(self) -> None:
+        found = self.clashes(A[:-1] + "8")
+        self.assertEqual([f.split(":")[0] for f in found], ["ready.default"])
+
+    def test_default_naming_nothing_is_still_a_clash(self) -> None:
+        self.assertEqual(len(self.clashes(None)), 1)
 
     def test_external_id_held_by_another_pipeline(self) -> None:
         path = self.build("xx.test/a", external_id=[{"entity_id": A, "scheme": "s", "value": "v"}])

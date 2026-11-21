@@ -1332,8 +1332,11 @@ def _clashes(conn: Connection, path: Path, pipeline: str) -> list[str]:
     file = path / "result_set.parquet"
     if not file.exists():
         return []
+    columns = ["id", "election_id", "contest_id", "stage", "is_default"]
+    if "supersedes_id" in pl.read_parquet_schema(file):
+        columns.append("supersedes_id")
     defaults = (
-        pl.read_parquet(file, columns=["id", "election_id", "contest_id", "stage", "is_default"])
+        pl.read_parquet(file, columns=columns)
         .filter(pl.col("is_default") & pl.col("contest_id").is_not_null())
         .to_dicts()
     )
@@ -1341,7 +1344,7 @@ def _clashes(conn: Connection, path: Path, pipeline: str) -> list[str]:
         return []
     grains = _grains(conn, path, [str(row["id"]) for row in defaults])
     held = conn.execute(
-        f"""select r.election_id::text, r.contest_id::text, r.stage::text, {GRAIN}, c.pipeline
+        f"""select r.election_id::text, r.contest_id::text, r.stage::text, {GRAIN}, c.pipeline, r.id::text
             from result_set r join changeset c on c.id = r.changeset_id
             where r.is_default and c.pipeline <> %s and (r.election_id, r.contest_id) in (
               select * from unnest(%s::uuid[], %s::uuid[]))""",
@@ -1350,16 +1353,17 @@ def _clashes(conn: Connection, path: Path, pipeline: str) -> list[str]:
     clashing = [
         f"{row['id']} ({row['stage']}, {grains[str(row['id'])]}) against {owner} ({grain})"
         for row in defaults
-        for election, contest, stage, grain, owner in held
+        for election, contest, stage, grain, owner, held_id in held
         if (election, contest, stage) == (str(row["election_id"]), str(row["contest_id"]), str(row["stage"]))
         and not (stage in LATER and grain == grains[str(row["id"])])
+        and str(row.get("supersedes_id")) != held_id
     ]
     if not clashing:
         return []
     return [
         (
             f"ready.default: {len(clashing)} default sets would take the default another pipeline holds for the same"
-            f" contest and stage without being a later official count at its grain; leave them non-default: {clashing[:5]}"
+            f" contest and stage without being a later official count at its grain or naming that set in supersedes_id; leave them non-default: {clashing[:5]}"
         )
     ]
 
