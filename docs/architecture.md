@@ -55,6 +55,7 @@ docs/                These guides
 ## Access
 
 - **Anyone**: every page, the API, MCP read tools, downloads, embeds, and feeds, all rate-limited per IP in Redis.
+- **Returning visitors**: once a page has loaded, the browser sends one `POST /visitor`, which sets `ea_v`, a first-party HttpOnly cookie that lasts a year and is signed with `VISITOR_SECRET`. The request guard (`apps/web/src/lib/server/guard.ts`) checks the signature and rate-limits a visitor with a valid cookie by that cookie instead of by IP, with the same limits. Under load, a process turns away new visitors without the cookie once 36 requests are in flight, and new visitors with one only at 44. During overload, Cloudflare challenges page requests that carry no `ea_v`, so a page request whose `ea_v` fails the check is an attempt to forge a way past the challenge: it gets a 403 response that deletes the cookie. Embeds and signed-in visitors never ask for the cookie. When `VISITOR_SECRET` is unset, no cookie is issued and nobody gets priority.
 - **Signed in**: saved views, settings sync, and API keys for higher limits.
 - **Roles**: `admin` is used for the API usage dashboard and the election-night controls.
 

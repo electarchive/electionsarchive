@@ -71,6 +71,11 @@ export const variables = defineEnvVars({
     description:
       "Cloudflare API token with Email Sending Write permission on that account",
   },
+  VISITOR_SECRET: {
+    schema: optional,
+    description:
+      "Key that signs the ea_v returning-visitor cookie; when unset, no cookie is issued and the guard gives no visitor priority",
+  },
   PROJECTION_TOKEN: {
     schema: optional,
     description:

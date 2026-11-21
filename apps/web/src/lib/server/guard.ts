@@ -6,6 +6,7 @@ import { BlockList, isIP } from "node:net";
 import { isTraining } from "#lib/server/crawlers.js";
 import { redis } from "#lib/server/redis.js";
 import { keyOwner } from "#lib/server/rpc/keyed.js";
+import { VISITOR, visitor } from "#lib/server/visitor.js";
 
 type Operator = {
   name: string;
@@ -124,6 +125,7 @@ const FETCHERS = 6;
 const PREVIEWS = 3;
 const SHED = 24;
 const CROWDED = 36;
+const CEILING = 44;
 const BURST = 240;
 const RATE = 4;
 const BUDGET = 300;
@@ -146,6 +148,8 @@ const FORBIDDEN =
 const BUSY = "The site is busy. Try again in a minute.";
 const LIMITED =
   "Too many requests from your address. Wait a moment and try again.";
+const FORGED =
+  "Your browser sent a visitor cookie this site did not issue, so we removed it. Reload the page to continue.";
 
 const pools = new Map<string, number>();
 const clients = new Map<string, Client>();
@@ -302,7 +306,7 @@ function flush() {
     total += entry.count;
   }
   console.warn(
-    `guard flagged: ${total} requests in ${reports.size} groups in the last ${REPORTED / 60_000} minutes; named and headerless were refused, declared is report-only`,
+    `guard flagged: ${total} requests in ${reports.size} groups in the last ${REPORTED / 60_000} minutes; named, headerless, and forged were refused, declared is report-only`,
   );
   for (const [key, entry] of ranked.slice(0, REPORT_LINES)) {
     const [rule, network, agent] = key.split("\t", 3);
@@ -397,6 +401,27 @@ function refuse(status: 403 | 429 | 503, wait = 60, scale = 1) {
         }),
       },
     },
+  );
+}
+
+function unsign() {
+  return new Response(FORGED, {
+    status: 403,
+    headers: {
+      "cache-control": "no-store",
+      "content-type": "text/plain; charset=utf-8",
+      "set-cookie": `${VISITOR}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax`,
+    },
+  });
+}
+
+function isNavigation(request: Request, url: URL) {
+  return (
+    request.method === "GET" &&
+    !MACHINE.test(url.pathname) &&
+    !url.searchParams.has("embed") &&
+    !/markdown|json/u.test(request.headers.get("accept") ?? "") &&
+    (request.headers.get("sec-fetch-mode") ?? "navigate") === "navigate"
   );
 }
 
@@ -518,7 +543,8 @@ async function keyed(headers: Headers) {
   return id;
 }
 
-async function admit(request: Request, pathname: string) {
+async function admit(request: Request, url: URL) {
+  const { pathname } = url;
   const address = request.headers
     .get("x-forwarded-for")
     ?.split(",", 1)[0]
@@ -571,10 +597,24 @@ async function admit(request: Request, pathname: string) {
       return { status: 403 } as const;
     }
   }
+  const visit = visitor(request.headers.get("cookie"));
+  if (visit.status === "forged" && isNavigation(request, url)) {
+    report("forged", agent, address, version, pathname);
+    return { status: 403, isForged: true } as const;
+  }
   const key = await keyed(request.headers);
   const scale = key == null ? 1 : KEYED;
-  const name = key == null ? bucket(address, version) : `key:${key}`;
-  if (key == null && inFlight >= CROWDED && !clients.has(name)) {
+  const name =
+    key != null
+      ? `key:${key}`
+      : visit.status === "valid"
+        ? `v:${visit.id}`
+        : bucket(address, version);
+  if (
+    key == null &&
+    inFlight >= (visit.status === "valid" ? CEILING : CROWDED) &&
+    !clients.has(name)
+  ) {
     return { status: 503 } as const;
   }
   const outcome = limit(name, scale);
@@ -584,7 +624,10 @@ async function admit(request: Request, pathname: string) {
 }
 
 export const guardHandle: Handle = async ({ event, resolve }) => {
-  const verdict = await admit(event.request, event.url.pathname);
+  const verdict = await admit(event.request, event.url);
+  if ("isForged" in verdict) {
+    return unsign();
+  }
   if (verdict.status === 403 || verdict.status === 503) {
     return refuse(verdict.status);
   }

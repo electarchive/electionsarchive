@@ -18,7 +18,7 @@ pnpm --filter @ea/db migrate
 pnpm dev
 ```
 
-Set `BETTER_AUTH_SECRET` in `.env` to any long random string. `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_EMAIL_TOKEN` are only needed to send sign-in emails, and the GitHub and Google keys are only needed for those sign-in buttons.
+Set `BETTER_AUTH_SECRET` in `.env` to any long random string. `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_EMAIL_TOKEN` are only needed to send sign-in emails, and the GitHub and Google keys are only needed for those sign-in buttons. `VISITOR_SECRET` is used to sign the returning-visitor cookie; leave it empty to turn that cookie off.
 
 The app runs at http://localhost:5173 and starts empty. To load real data, run a pipeline. Canada's federal elections since 1867 take a few minutes:
 

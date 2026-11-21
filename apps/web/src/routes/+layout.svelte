@@ -27,6 +27,7 @@
   } from "#lib/stores/confirmation.svelte.js";
   import { TEXT_PAGES } from "#lib/text-pages.js";
   import { cn } from "#lib/utils.js";
+  import { visit } from "#lib/visitor.js";
   import { localizeZone } from "#lib/zone.svelte.js";
   import type { LayoutData } from "./$types";
 
@@ -81,6 +82,12 @@
       null,
   );
   const herePath = $derived(page.url.pathname.replace(/^\/+|\/+$/gu, ""));
+
+  $effect(() => {
+    if (embed == null && data.user == null) {
+      return idle(visit);
+    }
+  });
 
   $effect(() => {
     if (embed == null || window.parent === window) {
