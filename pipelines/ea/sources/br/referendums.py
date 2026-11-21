@@ -11,7 +11,8 @@ from uuid import UUID, uuid5
 import polars as pl
 
 from ea import raw
-from ea.changeset import NAMESPACE, Changeset
+from ea.changeset import NAMESPACE
+from ea.package import Draft
 from ea.sources.br.tse import UFS
 from ea.store import DATA, connect
 
@@ -22,8 +23,15 @@ PAGES = DATA / "pages" / SOURCE
 VOTES, REGISTERED, INVALID, BLANK, VOTERS = 1, 2, 5, 6, 14
 DIGITIZED = 8
 PUBLISHER = "Tribunal Superior Eleitoral"
+TSE_LICENSE = "Creative Commons Attribution"
+PUBLIC_RECORD = "Public record"
 GLOSSARY_PLEBISCITE = "https://www.tse.jus.br/servicos-eleitorais/glossario/termos/plebiscito"
 GLOSSARY_REFERENDUM = "https://www.tse.jus.br/servicos-eleitorais/glossario/termos/referendo"
+# The TSE's site refuses scripts, so the glossary entries are read from their 2026 Wayback captures.
+CAPTURES = {
+    GLOSSARY_PLEBISCITE: f"https://web.archive.org/web/20260112181036id_/{GLOSSARY_PLEBISCITE}",
+    GLOSSARY_REFERENDUM: f"https://web.archive.org/web/20261004193731id_/{GLOSSARY_REFERENDUM}",
+}
 TABLE_1963 = "https://www.justicaeleitoral.jus.br/arquivos/referendo-de-1963/@@download/file/planilha-referendo.pdf"
 TABLE_1993 = "https://www.justicaeleitoral.jus.br/arquivos/plebiscito-de-1993/@@download/file/plebiscito-de-1993.pdf"
 PAGE_1963 = "https://www.tse.jus.br/eleicoes/plebiscitos-e-referendos/referendo-1963"
@@ -139,6 +147,43 @@ NAMES_1963 = {
     "Território de Rondônia": "Territory of Rondônia",
 }
 STATES_1993 = {label: uf for uf, label in UFS.items()} | {"Distrito Federal": "DF", "Exterior": "ZZ"}
+COLUMNS_1993 = (
+    "monarchy",
+    "republic",
+    "form_blank",
+    "form_null",
+    "parliamentary",
+    "presidential",
+    "system_blank",
+    "system_null",
+)
+# A regional electoral court's own result for its state: the court, the file's title, the archived file, and the page
+# with the state total. Its figures replace the TSE table's for that state only where the table's row does not add up.
+REGIONAL_1993 = {
+    "CE": (
+        "Tribunal Regional Eleitoral do Ceará",
+        "Resultado por município do Plebiscito - 1993",
+        "https://web.archive.org/web/20030319121035id_/http://www.tre-ce.gov.br:80/tre/download/Plebiscito%201993.pdf",
+        5,
+    ),
+}
+# The Archive Section's 2012 edition of the same table.
+TABLE_1993_2012 = "https://web.archive.org/web/20120802042337id_/http://www.tse.jus.br/arquivos/plebiscito-de-1993"
+# The cells corrected in the TSE table, as (table, corrected), from the state's regional result or else from the 2012
+# edition. Parse fails when the regional file's state total differs from the table's row in any other cell, or when
+# the 2012 edition differs from the table in any other cell of that question or in the ballots cast.
+CORRECTED_1993 = {"CE": {"form_blank": (313723, 312723)}, "MS": {"system_null": (None, 106750)}}
+NOTES_1993 = {
+    "CE": (
+        "Ceará's blank votes, 312,723, come from the Ceará regional electoral court's result by municipality, whose "
+        "state total equals the table's Ceará row in every other figure; the table prints 313,723."
+    ),
+    "MS": (
+        "Mato Grosso do Sul's null votes, 106,750, come from the 2012 edition of the same table, where the current "
+        "edition prints #VALOR!. That edition's blank and null votes for the state are the same on both questions, "
+        "and only the system question's add up to the ballots cast, so the form question's row stays out."
+    ),
+}
 SYSTEM = (
     "A national vote on a question put to the whole electorate. Voting is compulsory for literate voters aged 18 to "
     "70, and the winning option is the one with the most votes. The Superior Electoral Court (TSE) ran the 1963, "
@@ -172,8 +217,8 @@ NOTE_1993_STATES = (
     "are loaded; the other rows have a typing error that the table does not locate. The transit-voter column is not "
     "loaded."
 )
-OMITTED_FORM = "Ceará, Pará, Paraíba, Pernambuco, Rio Grande do Norte, Roraima, and Mato Grosso do Sul"
-OMITTED_SYSTEM = "Pernambuco, Rio Grande do Norte, Rio Grande do Sul, and Mato Grosso do Sul"
+OMITTED_FORM = "Pará, Paraíba, Pernambuco, Rio Grande do Norte, Roraima, and Mato Grosso do Sul"
+OMITTED_SYSTEM = "Pernambuco, Rio Grande do Norte, and Rio Grande do Sul"
 NOTE_2005 = (
     "National totals from the Superior Electoral Court's proclamation of 16 November 2005 (published in the Diário "
     "da Justiça), as the Federal Senate's 2005 report quotes it. Registered voters are the 122,042,825 the "
@@ -239,15 +284,41 @@ def table_rows(path: Path, minimum: int) -> dict[str, list[int | None]]:
     return rows
 
 
+def regional_1993(path: Path) -> tuple[dict[str, list[int]], list[int]]:
+    """A regional court's result by municipality: each municipality's ballots cast, abstentions, registered voters,
+    sections, sections counted, and the two questions' options, blank, and null votes, and the state total row."""
+    towns: dict[str, list[int]] = {}
+    total: list[int] = []
+    for line in layout(path).splitlines():
+        found = re.match(r"^\s*([A-ZÀ-Ý][A-ZÀ-Ý. ]*?)\s{2,}((?:\d[\d.]*\s*){13})$", line)
+        if found is None:
+            continue
+        figures = [number(token) for token in found[2].split()]
+        if found[1] == "RESULTADO GERAL":
+            total = figures
+        elif found[1] in towns:
+            raise ValueError(f"1993: {found[1]} twice in {path.name}")
+        else:
+            towns[found[1]] = figures
+    if not total:
+        raise ValueError(f"1993: no state total in {path.name}")
+    return towns, total
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, REPORT_2005, suffix=".pdf")
+    raw.fetch(SOURCE, TABLE_1993_2012, suffix=".pdf")
+    for _, _, url, _ in REGIONAL_1993.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
     raw.fetch(SOURCE, MANAGEMENT_2005, suffix=".pdf")
-    for url in (TABLE_1963, TABLE_1993, GLOSSARY_PLEBISCITE, GLOSSARY_REFERENDUM):
+    for capture in CAPTURES.values():
+        raw.fetch(SOURCE, capture, suffix=".html")
+    for url in (TABLE_1963, TABLE_1993):
         raw.cached(SOURCE, url)
 
 
 def parse() -> None:
-    plebiscite = text_of(raw.cached(SOURCE, GLOSSARY_PLEBISCITE).path)
+    plebiscite = text_of(raw.cached(SOURCE, CAPTURES[GLOSSARY_PLEBISCITE]).path)
     found = re.search(
         rf"FORMA DE GOVERNO República: {FIGURE} Monarquia: {FIGURE} Votos em branco: {FIGURE} Votos nulos: {FIGURE} "
         rf"SISTEMA DE GOVERNO Presidencialismo: {FIGURE} Parlamentarismo: {FIGURE} Votos em branco: {FIGURE} "
@@ -385,7 +456,7 @@ def parse() -> None:
         PARSED / "states_2005.parquet"
     )
 
-    referendum = text_of(raw.cached(SOURCE, GLOSSARY_REFERENDUM).path)
+    referendum = text_of(raw.cached(SOURCE, CAPTURES[GLOSSARY_REFERENDUM]).path)
     found = re.search(
         rf"6 de janeiro de 1963 Sim {FIGURE} Não {FIGURE} Votos em branco: {FIGURE} Votos nulos: {FIGURE} "
         rf"Eleitorado: {FIGURE} Votantes: {FIGURE}",
@@ -415,6 +486,40 @@ def parse() -> None:
     rows_1993.pop("TOTAL")
     if sorted(rows_1993) != sorted(STATES_1993):
         raise ValueError(f"1993: unexpected rows {sorted(set(rows_1993) ^ set(STATES_1993))}")
+    for uf, (_, _, url, _) in REGIONAL_1993.items():
+        towns, total = regional_1993(raw.cached(SOURCE, url).path)
+        if [sum(column) for column in zip(*towns.values(), strict=True)] != total:
+            raise ValueError(f"1993: the {uf} municipalities do not add up to the regional court's state total")
+        voters_, absent, registered_ = total[:3]
+        figures = total[5:13]
+        if registered_ != voters_ + absent or sum(figures[:4]) != voters_ or sum(figures[4:]) != voters_:
+            raise ValueError(f"1993: the regional court's {uf} total does not add up")
+        line = rows_1993[UFS[uf]]
+        if (line[8], line[9]) != (registered_, voters_):
+            raise ValueError(f"1993: the regional court's {uf} registered voters or ballots cast differ from the table")
+        changed = {
+            column: (table, regional)
+            for column, table, regional in zip(COLUMNS_1993, line[:8], figures, strict=True)
+            if table != regional
+        }
+        if changed != CORRECTED_1993[uf]:
+            raise ValueError(f"1993: the regional court's {uf} total corrects {changed}, not {CORRECTED_1993[uf]}")
+        print(f"1993: {uf} from the regional court's {len(towns)} municipalities corrects {changed}")
+        rows_1993[UFS[uf]] = [*figures, *line[8:]]
+    earlier = table_rows(raw.cached(SOURCE, TABLE_1993_2012).path, 12)
+    for uf, cells in CORRECTED_1993.items():
+        if uf in REGIONAL_1993:
+            continue
+        line, old = rows_1993[UFS[uf]], earlier[UFS[uf]]
+        for column, (table, corrected) in cells.items():
+            question = range(4) if column.startswith("form") or column in ("monarchy", "republic") else range(4, 8)
+            index = COLUMNS_1993.index(column)
+            if (line[index], old[index]) != (table, corrected) or any(
+                line[other] != old[other] for other in (*question, 9) if other != index
+            ):
+                raise ValueError(f"1993: the 2012 edition's {uf} {column} does not correct the table as expected")
+            print(f"1993: {uf} {column} from the 2012 edition: {table} to {corrected}")
+            line[index] = corrected
     rows = []
     for name, line in rows_1993.items():
         if STATES_1993[name] == "ZZ":
@@ -464,7 +569,7 @@ def emit() -> Path:
     municipalities_2005 = pl.read_parquet(PARSED / "municipalities_2005.parquet")
     pages_2005 = pl.read_parquet(PARSED / "pages_2005.parquet")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
@@ -479,9 +584,26 @@ def emit() -> Path:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
 
         def add_source(title: str, url: str, publisher: str = PUBLISHER, notes: str | None = None) -> UUID:
+            # The licenses the `licenses` pipeline gives these publishers, so the rows it stamped stay its own.
+            license = TSE_LICENSE if publisher.startswith(PUBLISHER) else PUBLIC_RECORD
             source = cs.source(publisher, title)
-            cs.add("source", id=source, kind="official_body", publisher=publisher, title=title, url=url, notes=notes)
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=publisher,
+                title=title,
+                url=url,
+                notes=notes,
+                license=license,
+            )
             return source
+
+        cs.accept(
+            "accounting.turnout",
+            "The TSE Archive Section's 1963 table prints 48,637 ballots cast in Brasília against 34,010 registered "
+            "voters; both are kept as printed.",
+        )
 
         brazil = cs.polity("BR")
         nation = cs.area("br.nation", "BR")
@@ -495,8 +617,9 @@ def emit() -> Path:
         report = add_source("Relatório da Presidência, 2005: J - Referendo de 2005", REPORT_2005, "Senado Federal")
         cs.artifact(raw.cached(SOURCE, TABLE_1963), table_1963)
         cs.artifact(raw.cached(SOURCE, TABLE_1993), table_1993)
-        cs.artifact(raw.cached(SOURCE, GLOSSARY_PLEBISCITE), glossary_1)
-        cs.artifact(raw.cached(SOURCE, GLOSSARY_REFERENDUM), glossary_2)
+        cs.artifact(raw.cached(SOURCE, TABLE_1993_2012), table_1993)
+        cs.artifact(raw.cached(SOURCE, CAPTURES[GLOSSARY_PLEBISCITE]), glossary_1)
+        cs.artifact(raw.cached(SOURCE, CAPTURES[GLOSSARY_REFERENDUM]), glossary_2)
         cs.artifact(raw.cached(SOURCE, REPORT_2005), report)
         management = add_source(
             "Relatório de Gestão – Referendo 2005",
@@ -506,6 +629,10 @@ def emit() -> Path:
                 "200.000 eleitores, last updated 22 November 2005."
             ),
         )
+        regional_1993 = {}
+        for uf, (court, title, url, page) in REGIONAL_1993.items():
+            regional_1993[uf] = (add_source(title, url, court), page)
+            cs.artifact(raw.cached(SOURCE, url), regional_1993[uf][0])
         management_artifact = cs.artifact(raw.cached(SOURCE, MANAGEMENT_2005), management)
         management_pages = {}
         for page in pages_2005.iter_rows(named=True):
@@ -525,15 +652,14 @@ def emit() -> Path:
         name(system, "Brazilian national referendums and plebiscites")
         cs.add("note", entity_id=system, kind="methodology", body_md=SYSTEM)
 
-        if conn.execute("select 1 from scheme where code = 'br.uf_1963'").fetchone() is None:
-            cs.add(
-                "scheme",
-                code="br.uf_1963",
-                polity_id=brazil,
-                kind="administrative",
-                rank=1,
-                noun="state or territory",
-            )
+        cs.add(
+            "scheme",
+            code="br.uf_1963",
+            polity_id=brazil,
+            kind="administrative",
+            rank=1,
+            noun="state or territory",
+        )
 
         def unit_for(scheme: str, code: str, label: str | None, relation: str, area: UUID | None, kind: str) -> UUID:
             unit = cs.unit(scheme, code)
@@ -752,6 +878,15 @@ def emit() -> Path:
             prefix = "form" if question == "form" else "system"
             first, second = (answer for answer in options)
             rows = states_1993.filter(pl.col(first).is_not_null())
+            left_out = [UFS[uf] for uf in states_1993.filter(pl.col(first).is_null())["unit"]]
+            if sorted(left_out) != sorted(re.split(r", (?:and )?", omitted)):
+                raise ValueError(f"1993: the {question} rows left out are {left_out}, not {omitted}")
+            corrected = {
+                uf: columns
+                for uf, columns in CORRECTED_1993.items()
+                if any(column.startswith(prefix) or column in options for column in columns)
+            }
+            regional = " ".join(NOTES_1993[uf] for uf in corrected)
             result_set = result_set_for(
                 election,
                 contest,
@@ -759,8 +894,18 @@ def emit() -> Path:
                 table_1993,
                 False,
                 min(1, round(rows["voters"].sum() / row["voters"], 4)),
-                f"{NOTE_1993_STATES} Left out for this question: {omitted}.",
+                " ".join(
+                    part for part in (NOTE_1993_STATES, regional, f"Left out for this question: {omitted}.") if part
+                ),
             )
+            for uf in sorted(corrected.keys() & regional_1993.keys()):
+                source, page = regional_1993[uf]
+                cs.add(
+                    "citation",
+                    entity_id=result_set,
+                    source_id=source,
+                    locator={"page": page, "row": "RESULTADO GERAL", "unit": uf},
+                )
             outcomes(result_set, options, row["first"])
             for state in rows.iter_rows(named=True):
                 put(
