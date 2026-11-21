@@ -3,20 +3,24 @@ import json
 import re
 import zipfile
 from collections.abc import Callable
-from datetime import date, timedelta
+from dataclasses import replace
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID, uuid5
 
 import polars as pl
 import shapefile
+from psycopg import Connection
 
-from ea import raw
-from ea.changeset import NAMESPACE, Changeset, slug
+from ea import package, raw
+from ea.changeset import NAMESPACE, slug
+from ea.package import Draft
 from ea.sources.licenses import PUBLIC_RECORD, UNLICENSED
 from ea.store import DATA, connect
 
 SOURCE = "ca.ab"
-VERSION = "3"
+KEY = f"{SOURCE}/all"
+VERSION = "4"
 DAY = date(2026, 10, 19)
 PAGE = "https://www.elections.ab.ca/elections/referendum/"
 ORDERS = {
@@ -28,6 +32,118 @@ RESULTS = {
     number: f"https://officialresults.elections.ab.ca/orEDResultsReferendum2026.cfm?EventId=2026{number:02d}&MODE=exED"
     for number in range(1, 11)
 }
+# Each question's wording and answers as the referendum page and the Orders in Council print them.
+QUESTIONS = [
+    (
+        1,
+        (
+            "Do you support the Government of Alberta taking increased control over immigration for the purposes of "
+            "decreasing immigration to more sustainable levels, prioritizing economic migration and giving Albertans "
+            "first priority on new employment opportunities?"
+        ),
+        ["Yes", "No"],
+    ),
+    (
+        2,
+        (
+            "Do you support the Government of Alberta introducing a law mandating that only Canadian citizens, permanent "
+            "residents and individuals with an Alberta-approved immigration status will be eligible for "
+            "provincially-funded programs, such as health care, education and other social services?"
+        ),
+        ["Yes", "No"],
+    ),
+    (
+        3,
+        (
+            "Assuming that all Canadian citizens and permanent residents continue to qualify for social support programs "
+            "as they do now, do you support the Government of Alberta introducing a law requiring all individuals with a "
+            "non-permanent legal immigration status to reside in Alberta for at least 12 months before qualifying for any "
+            "provincially-funded social support programs?"
+        ),
+        ["Yes", "No"],
+    ),
+    (
+        4,
+        (
+            "Assuming that all Canadian citizens and permanent residents continue to qualify for public health care and "
+            "education as they do now, do you support the Government of Alberta charging a reasonable fee or premium to "
+            "individuals with a non-permanent immigration status living in Alberta for their and their family’s use of "
+            "the healthcare and education systems?"
+        ),
+        ["Yes", "No"],
+    ),
+    (
+        5,
+        (
+            "Do you support the Government of Alberta introducing a law requiring individuals to provide proof of "
+            "citizenship, such as a passport, birth certificate or citizenship card, to vote in an Alberta provincial "
+            "election?"
+        ),
+        ["Yes", "No"],
+    ),
+    (
+        6,
+        (
+            "Do you support the Government of Alberta working with the governments of other willing provinces to amend "
+            "the Canadian Constitution to have provincial governments, and not the federal government, select the "
+            "justices appointed to provincial King’s Bench and Appeal courts?"
+        ),
+        ["Yes", "No"],
+    ),
+    (
+        7,
+        (
+            "Do you support the Government of Alberta working with the governments of other willing provinces to amend "
+            "the Canadian Constitution to abolish the unelected federal Senate?"
+        ),
+        ["Yes", "No"],
+    ),
+    (
+        8,
+        (
+            "Do you support the Government of Alberta working with the governments of other willing provinces to amend "
+            "the Canadian Constitution to allow provinces to opt out of federal programs that intrude on provincial "
+            "jurisdiction such as health care, education, and social services, without a province losing any of the "
+            "associated federal funding for use in its social programs?"
+        ),
+        ["Yes", "No"],
+    ),
+    (
+        9,
+        (
+            "Do you support the Government of Alberta working with the governments of other willing provinces to amend "
+            "the Canadian Constitution to better protect provincial rights from federal interference by giving a "
+            "province’s laws dealing with provincial or shared areas of constitutional jurisdiction priority over federal "
+            "laws when the province’s laws and federal laws conflict?"
+        ),
+        ["Yes", "No"],
+    ),
+    (
+        10,
+        (
+            "Should Alberta remain a province of Canada, or should the Government of Alberta commence the legal process "
+            "required under the Canadian Constitution to hold a binding provincial referendum on whether or not Alberta "
+            "should separate from Canada?"
+        ),
+        [
+            "Alberta should remain a province of Canada.",
+            (
+                "The Government of Alberta should commence the legal process required under the Canadian Constitution to "
+                "hold a binding provincial referendum on whether or not Alberta should separate from Canada."
+            ),
+        ],
+    ),
+]
+DIVISIONS = [f"{division:02d}" for division in range(1, 88)]
+# The polls a division reports besides its voting areas, with the letter that starts their unit codes and the kind
+# of reporting unit each becomes. Advance polls and special ballots serve the whole division.
+KINDS = {"Advance": ("A", "aggregate"), "Mobile": ("M", "mobile"), "Special Ballot": ("S", "aggregate")}
+
+
+def poll_file(number: int, division: str) -> str:
+    return f"{SITE}/orPollResultsReferendum2026.cfm?EventID=2026{number:02d}&ED={division}&MODE=exED"
+
+
 BOUNDARIES = "https://www.elections.ab.ca/wp-content/uploads/2019Boundaries_ED-Shapefiles.zip"
 FIRST = date(2019, 4, 16)
 RENAMED = {"17": "Calgary-Bhullar-McCall"}
@@ -117,6 +233,20 @@ BALLOTS_NOTE = (
     "Ballots cast here add all four, and invalid ballots add the spoiled, declined, and rejected ones. "
     "A declined ballot is one an elector returned to the officials without marking it."
 )
+POLLS_NOTE = (
+    "Elections Alberta reports each question for every voting area on election day, and for each electoral "
+    "division's advance polls, mobile polls, and special ballots, with valid, spoiled, declined, and rejected "
+    "ballots. Ballots cast here add all four, and invalid ballots add the spoiled, declined, and rejected ones. "
+    "Advance polls and special ballots serve the whole division and are stored as aggregate units of it; their "
+    "electors are on the voting areas' lists. The division totals are the sum of its polls and match the province "
+    "workbook."
+)
+SHARED_NOTE = (
+    "At {count} voting places, voting areas shared a ballot box, and Elections Alberta reports its votes against one "
+    "of those areas and zeros on every question for the others: {places}. Those areas are stored as counted with the "
+    "one that holds the votes, with their electors and no ballots of their own, so its ballots can exceed its own "
+    "electors."
+)
 COLORS = {
     "ndp": "#f37021",
     "ucp": "#1f4e99",
@@ -205,6 +335,9 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".pdf")
     for url in RESULTS.values():
         raw.fetch(SOURCE, url, suffix=".xlsx")
+    raw.fetch_many(
+        SOURCE, [poll_file(number, division) for number in RESULTS for division in DIVISIONS], suffix=".xls", workers=4
+    )
     raw.fetch(SOURCE, BOUNDARIES, suffix=".zip")
 
 
@@ -352,11 +485,116 @@ def parse_elections() -> None:
     )
 
 
+def parse_polls(results: pl.DataFrame) -> pl.DataFrame:
+    """Each question's results by voting area, advance poll, mobile poll, and special ballot count in each division,
+    checked against the workbook's subtotals and total row and against the division's row in the province workbook."""
+    rows: list[dict[str, object]] = []
+    names = ("electors", "first", "second", "valid", "spoiled", "declined", "rejected")
+    for number in RESULTS:
+        for division in DIVISIONS:
+            # The workbooks are xlsx files served as application/vnd.ms-excel, so they are read from their bytes.
+            sheet = pl.read_excel(
+                raw.cached(SOURCE, poll_file(number, division)).path.read_bytes(),
+                has_header=False,
+                infer_schema_length=0,
+            ).rows()
+            where = f"question {number} division {division}"
+            if not (sheet[2][0] or "").startswith(f"{division} - ") or not (sheet[3][0] or "").startswith(
+                f"Question {number}:"
+            ):
+                raise ValueError(f"{where}: titled {sheet[2][0]!r}, {sheet[3][0]!r}")
+            head = next(i for i, row in enumerate(sheet) if row[0] == "Voting Place / Voting Area")
+            if [re.sub(r"\s+", " ", cell or "") for cell in sheet[head][2:10]] != [
+                "Type",
+                "Number of Electors",
+                *(("Option 1", "Option 2") if number == 10 else ("Yes", "No")),
+                "Valid Ballots Cast",
+                "Spoiled Ballots",
+                "Declined Ballots",
+                "Rejected Ballots",
+            ]:
+                raise ValueError(f"{where}: columns {sheet[head]}")
+            end = next(i for i in range(head + 1, len(sheet)) if (sheet[i][0] or "").endswith(" Subtotal"))
+            seen: dict[str, int] = {}
+            found = []
+            for code, place, kind, electors, *cells in (row[:10] for row in sheet[head + 1 : end]):
+                first, second, valid, spoiled, declined, rejected = (count(cell) for cell in cells)
+                if kind == "Election Day":
+                    if not re.fullmatch(r"\d{3}", code or "") or electors is None:
+                        raise ValueError(f"{where}: voting area {code!r} at {place!r}")
+                    key = code
+                elif kind in KINDS and not code and electors is None:
+                    seen[kind] = seen.get(kind, 0) + 1
+                    key = f"{KINDS[kind][0]}{seen[kind]}"
+                else:
+                    raise ValueError(f"{where}: row {code!r} {place!r} {kind!r}")
+                if first + second != valid:
+                    raise ValueError(f"{where}: {key} answers do not add up to its valid ballots")
+                found.append(
+                    {
+                        "question": number,
+                        "division": int(division),
+                        "key": key,
+                        "place": re.sub(r"\s+", " ", place or "").strip(),
+                        "type": kind,
+                        "electors": None if electors is None else count(electors),
+                        "first": first,
+                        "second": second,
+                        "valid": valid,
+                        "spoiled": spoiled,
+                        "declined": declined,
+                        "rejected": rejected,
+                    }
+                )
+            frame = pl.DataFrame(found)
+            totals = {str(row[0]): row for row in sheet[end:] if row[0]}
+            for kind in ("Election Day", *KINDS):
+                part = frame.filter(pl.col("type") == kind)
+                printed = [count(cell) for cell in totals[f"{kind} Subtotal"][3:10]]
+                summed = [0 if part[name].is_null().all() else part[name].sum() for name in names]
+                if printed != summed:
+                    raise ValueError(f"{where}: {kind} rows sum to {summed}, subtotal {printed}")
+            printed = [count(cell) for cell in totals["Total Valid Vote"][3:10]]
+            if printed != [frame[name].sum() for name in names]:
+                raise ValueError(f"{where}: rows do not sum to the total row")
+            province = results.filter((pl.col("question") == number) & (pl.col("division") == int(division))).row(
+                0, named=True
+            )
+            if [province[name] for name in ("electors", "first", "second")] != printed[:3]:
+                raise ValueError(f"{where}: total row {printed[:3]} differs from the province workbook")
+            rows.extend(frame.to_dicts())
+    polls = pl.DataFrame(rows).with_columns(
+        cast=pl.col("valid") + pl.col("spoiled") + pl.col("declined") + pl.col("rejected")
+    )
+    # Every question lists the same polls with the same electors in each division.
+    shape = polls.select("division", "key", "place", "type", "electors").unique()
+    if shape.height != polls.filter(pl.col("question") == 1).height:
+        raise ValueError("the questions list different polls")
+    # Where voting areas shared a ballot box, Elections Alberta reports its votes against the first voting area at
+    # that voting place with ballots and zeros for the others: a voting area with no ballots on any question at a
+    # place where another area has them was counted with the first such area.
+    areas = (
+        polls.filter(pl.col("type") == "Election Day")
+        .group_by("division", "key", "place")
+        .agg(empty=pl.col("cast").max() == 0)
+    )
+    hosts = (
+        areas.filter(~pl.col("empty"))
+        .group_by("division", "place")
+        .agg(host=pl.col("key").min())
+        .join(areas.filter("empty"), on=["division", "place"])
+        .select("division", "key", "host")
+    )
+    print(
+        f"{polls.height} poll rows; {hosts.height} voting areas counted with another at "
+        f"{hosts.select('division', 'host').n_unique()} voting places"
+    )
+    return polls.join(hosts, on=["division", "key"], how="left")
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     parse_elections()
-    if not (PARSED / "questions.json").exists():
-        (PARSED / "questions.json").write_text((DATA / "tmp" / "nh-ab" / "questions.json").read_text())
     rows = []
     for number, url in RESULTS.items():
         sheet = pl.read_excel(raw.cached(SOURCE, url).path, has_header=False, infer_schema_length=0)
@@ -379,6 +617,8 @@ def parse() -> None:
             for code, name, _, electors, first, second, _ in divisions.iter_rows()
         )
     results = pl.DataFrame(rows)
+    polls = parse_polls(results)
+    polls.write_parquet(PARSED / "polls.parquet")
     with zipfile.ZipFile(raw.cached(SOURCE, BOUNDARIES).path) as z:
         parts = {
             name.rsplit(".", 1)[1].lower(): io.BytesIO(z.read(name))
@@ -391,17 +631,32 @@ def parse() -> None:
         for record, shape in zip(reader.records(), reader.shapes(), strict=True)
         if record is not None and shape is not None
     ]
+    # Reprojecting the same shapefile on another PROJ build moves vertices by 10 cm to 3 m, so an outline the archive
+    # already holds with the same rings and points, lying within about 10 m of the one rebuilt here, is kept as
+    # stored, and a rebuild rewrites no outline.
     with connect() as conn:
         shapes = pl.DataFrame(
             conn.execute(
                 """with ed as (
                      select code, name, st_multi(st_collectionextract(st_makevalid(st_transform(
                               st_setsrid(st_geomfromgeojson(geojson), 3401), 4326)), 3)) as geom
-                     from unnest(%s::text[], %s::text[], %s::text[]) as f(code, name, geojson))
-                   select code, name, encode(st_asewkb(geom), 'hex'), encode(st_asewkb(st_pointonsurface(geom)), 'hex'),
+                     from unnest(%s::text[], %s::text[], %s::text[]) as f(code, name, geojson)),
+                   stored as (
+                     select c.code, g.geom, g.label_point from area_code c
+                     join area a on a.id = c.area_id and a.scheme_code = 'ca.ab'
+                     join area_geometry g on g.area_id = a.id and g.valid_from = %s
+                     join changeset s on s.id = g.changeset_id and s.pipeline = %s
+                     where c.valid_from = %s),
+                   kept as (
+                     select ed.code, ed.name, ed.geom, s.geom is not null and st_numgeometries(s.geom) = st_numgeometries(ed.geom)
+                              and st_npoints(s.geom) = st_npoints(ed.geom)
+                              and st_hausdorffdistance(s.geom, ed.geom) < 1e-4 as same, s.geom as old, s.label_point
+                     from ed left join stored s using (code))
+                   select code, name, encode(st_asewkb(case when same then old else geom end), 'hex'),
+                          encode(st_asewkb(case when same then label_point else st_pointonsurface(geom) end), 'hex'),
                           st_x(st_centroid(geom)), st_y(st_centroid(geom))
-                   from ed order by code::int""",
-                [list(column) for column in zip(*records, strict=True)],
+                   from kept order by code::int""",
+                [*(list(column) for column in zip(*records, strict=True)), FIRST, SOURCE, FIRST],
             ).fetchall(),
             schema=["code", "name", "geom", "label_point", "x", "y"],
             orient="row",
@@ -421,20 +676,47 @@ def parse() -> None:
     results.write_parquet(PARSED / "results.parquet")
     shapes.drop("x", "y").write_parquet(PARSED / "shapes.parquet")
     print(f"{results.height} question rows, {shapes.height} divisions")
+    print(build())
 
 
-def emit() -> Path:
-    questions = json.loads((PARSED / "questions.json").read_text())["questions"]
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def retrieved(conn: Connection) -> Callable[[raw.Artifact], raw.Artifact]:
+    """A file the cache holds with the same bytes as a file the archive already cites keeps the retrieval time the
+    archive recorded for it, so a fresh copy of the cache rebuilds the same citation."""
+    stored: dict[tuple[str, str], datetime] = {
+        (str(url), str(digest)): at
+        for url, digest, at in conn.execute(
+            """select a.url, a.sha256, a.retrieved_at from source_artifact a
+               join changeset c on c.id = a.changeset_id where c.pipeline = %s""",
+            [SOURCE],
+        )
+    }
+
+    def pin(artifact: raw.Artifact) -> raw.Artifact:
+        at = stored.get((artifact.url, artifact.sha256))
+        return artifact if at is None else replace(artifact, retrieved_at=at)
+
+    return pin
+
+
+def build() -> Path:
+    """Write the package ca.ab/all from the parsed tables. It reads the database, through Draft, so the rows it
+    rebuilds keep the ids the changeset path gave them."""
     results = pl.read_parquet(PARSED / "results.parquet")
     shapes = pl.read_parquet(PARSED / "shapes.parquet")
+    polls = pl.read_parquet(PARSED / "polls.parquet")
     with connect() as conn:
-        cs = Changeset(
+        pin = retrieved(conn)
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Alberta's 2026 referendum, its general elections from 2008 to 2023, and its by-elections from 2009 "
-                "to 2026, with official results by electoral division from Elections Alberta"
+                "Alberta's 2026 referendum by voting area, its general elections from 2008 to 2023, and its "
+                "by-elections from 2009 to 2026 by electoral division, with official results from Elections Alberta"
             ),
             polity="CA-AB",
         )
@@ -442,6 +724,12 @@ def emit() -> Path:
         def name(entity: object, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
+        cs.accept(
+            "accounting.turnout",
+            "Elections Alberta's referendum workbooks print more ballots than electors on some questions in 16 voting "
+            "areas: 5 that hold the votes of a ballot box shared with other areas, which the result sets' note lists, "
+            "and 11 others, where electors who registered at the poll can exceed the list; stored as printed",
+        )
         alberta = cs.polity("CA-AB")
         if alberta in cs.minted:
             raise ValueError("run ca.elections first: Alberta must exist")
@@ -455,7 +743,7 @@ def emit() -> Path:
             url=PAGE,
             license=PUBLIC_RECORD,
         )
-        cs.artifact(raw.cached(SOURCE, PAGE), elections)
+        cs.artifact(pin(raw.cached(SOURCE, PAGE)), elections)
         orders = {}
         for number, url in ORDERS.items():
             orders[number] = cs.source("Alberta King's Printer", f"Order in Council {number}/2026")
@@ -468,7 +756,7 @@ def emit() -> Path:
                 url=url,
                 license=UNLICENSED,
             )
-            cs.artifact(raw.cached(SOURCE, url), orders[number])
+            cs.artifact(pin(raw.cached(SOURCE, url)), orders[number])
         official = cs.source("Elections Alberta", "2026 Referendum Official Results by Electoral Division")
         cs.add(
             "source",
@@ -480,7 +768,20 @@ def emit() -> Path:
             license=PUBLIC_RECORD,
         )
         for url in RESULTS.values():
-            cs.artifact(raw.cached(SOURCE, url), official)
+            cs.artifact(pin(raw.cached(SOURCE, url)), official)
+        by_area = cs.source("Elections Alberta", "2026 Referendum Official Poll Results")
+        cs.add(
+            "source",
+            id=by_area,
+            kind="official_body",
+            publisher="Elections Alberta",
+            title="2026 Referendum Official Poll Results",
+            url="https://officialresults.elections.ab.ca/",
+            license=PUBLIC_RECORD,
+        )
+        for number in RESULTS:
+            for division in DIVISIONS:
+                cs.artifact(pin(raw.cached(SOURCE, poll_file(number, division))), by_area)
         boundaries = cs.source("Elections Alberta", "2019 Electoral Division Boundaries (shapefiles)")
         cs.add(
             "source",
@@ -492,7 +793,7 @@ def emit() -> Path:
             license="Open Government Licence – Alberta",
             license_url="https://open.alberta.ca/licence",
         )
-        cs.artifact(raw.cached(SOURCE, BOUNDARIES), boundaries)
+        cs.artifact(pin(raw.cached(SOURCE, BOUNDARIES)), boundaries)
         province = cs.area("ca.province", "48")
         if province in cs.minted:
             raise ValueError("run ca.elections first: Alberta's province area must exist")
@@ -531,6 +832,38 @@ def emit() -> Path:
                 valid_from=DAY,
                 valid_to=DAY + timedelta(days=1),
             )
+        cs.add("scheme", code="ca.ab_va", polity_id=alberta, kind="precinct", rank=3, noun="voting area")
+        stations = polls.filter(pl.col("question") == 1)
+        places = {
+            (division, key): cs.unit("ca.ab_va", f"{DAY}:{division:02d}:{key}", DAY)
+            for division, key in stations.select("division", "key").iter_rows()
+        }
+        for row in stations.iter_rows(named=True):
+            kind = "standard" if row["type"] == "Election Day" else KINDS[row["type"]][1]
+            cs.add(
+                "reporting_unit",
+                id=places[row["division"], row["key"]],
+                polity_id=alberta,
+                scheme_code="ca.ab_va",
+                code=f"{DAY}:{row['division']:02d}:{row['key']}",
+                parent_id=units[row["division"]],
+                counted_with_id=None if row["host"] is None else places[row["division"], row["host"]],
+                area_relation="equals" if kind == "aggregate" else "within",
+                area_id=areas[row["division"]],
+                kind=kind,
+                valid_from=DAY,
+                valid_to=DAY + timedelta(days=1),
+            )
+        division_names = dict(shapes.select(pl.col("code").cast(pl.Int64), "name").iter_rows())
+        shared = [
+            f"{place} in {division_names[division]} (voting area {host}, with {listed(sorted(keys))})"
+            for division, place, host, keys in stations.filter(pl.col("host").is_not_null())
+            .group_by("division", "place", "host")
+            .agg("key")
+            .sort("division", "host")
+            .iter_rows()
+        ]
+        shared_note = SHARED_NOTE.format(count=len(shared), places="; ".join(shared))
         system = cs.key(f"{SOURCE}.electoral_system", "referendum")
         cs.add("electoral_system", id=system, polity_id=alberta, rules={"formula": "referendum"}, rules_version=1)
         name(system, "Alberta referendum")
@@ -538,8 +871,8 @@ def emit() -> Path:
         cs.add("election", id=election, polity_id=alberta, kind="referendum", date_from=DAY, date_to=DAY, status="held")
         name(election, "2026 Alberta referendum")
         cs.add("slug", path=f"ca/ab/{DAY}-referendum", entity_id=election)
-        for question in questions:
-            number = question["number"]
+        cs.add("note", entity_id=election, kind="methodology", body_md=POLLS_NOTE)
+        for number, text, answers in QUESTIONS:
             contest = cs.key(f"{SOURCE}.contest", f"{DAY}:{number}")
             cs.add(
                 "contest",
@@ -561,18 +894,27 @@ def emit() -> Path:
                 contest_id=contest,
                 stage="official",
                 kind="counted",
-                source_id=official,
+                source_id=by_area,
                 status="active",
                 is_default=True,
                 completeness=1,
             )
+            cs.add("note", entity_id=result_set, kind="caveat", body_md=shared_note)
             rows = results.filter(pl.col("question") == number)
             totals = {"first": rows["first"].sum(), "second": rows["second"].sum()}
-            values = [
-                {"unit": units[division], "option": None, "measure": 2, "value": electors}
-                for division, electors in rows.select("division", "electors").iter_rows()
-            ]
-            for position, (label, column) in enumerate(zip(question["options"], totals, strict=True), 1):
+            # A voting area counted with another keeps its electors and has no ballots of its own.
+            values = []
+            for row in polls.filter(pl.col("question") == number).iter_rows(named=True):
+                unit = places[row["division"], row["key"]]
+                if row["electors"] is not None:
+                    values.append({"unit": unit, "option": None, "measure": 2, "value": row["electors"]})
+                if row["host"] is None:
+                    invalid = row["spoiled"] + row["declined"] + row["rejected"]
+                    values.extend(
+                        {"unit": unit, "option": None, "measure": measure, "value": value}
+                        for measure, value in ((3, row["valid"] + invalid), (4, row["valid"]), (5, invalid))
+                    )
+            for position, (label, column) in enumerate(zip(answers, totals, strict=True), 1):
                 option = cs.key(f"{SOURCE}.option", f"{DAY}:{number}:{position}")
                 cs.add(
                     "contest_option",
@@ -588,9 +930,12 @@ def emit() -> Path:
                     option_id=option,
                     kind="won" if totals[column] == max(totals.values()) else "lost",
                 )
+                cs.add("declared", result_set_id=result_set, option_id=option, measure=1, value=totals[column])
                 values.extend(
-                    {"unit": units[division], "option": option, "measure": 1, "value": votes}
-                    for division, votes in rows.select("division", column).iter_rows()
+                    {"unit": places[division, key], "option": option, "measure": 1, "value": votes}
+                    for division, key, votes in polls.filter((pl.col("question") == number) & pl.col("host").is_null())
+                    .select("division", "key", column)
+                    .iter_rows()
                 )
             cs.frame(
                 "result_value",
@@ -618,7 +963,7 @@ def emit() -> Path:
                 ),
             )
             for kind, body, url, source in (
-                ("text", question["text"], PAGE, elections),
+                ("text", text, PAGE, elections),
                 ("link", None, ORDERS[order(number)], orders[order(number)]),
             ):
                 cs.add(
@@ -631,11 +976,17 @@ def emit() -> Path:
                     url=url,
                     source_id=source,
                 )
-        assembly_elections(cs, alberta, province, name)
+        assembly_elections(cs, alberta, province, name, pin)
         return cs.write()
 
 
-def assembly_elections(cs: Changeset, alberta: UUID, province: UUID, name: Callable[[object, str], None]) -> None:
+def assembly_elections(
+    cs: Draft,
+    alberta: UUID,
+    province: UUID,
+    name: Callable[[object, str], None],
+    pin: Callable[[raw.Artifact], raw.Artifact],
+) -> None:
     contests = pl.read_parquet(PARSED / "contests.parquet")
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
     parties = pl.read_parquet(PARSED / "parties.parquet")
@@ -706,8 +1057,8 @@ def assembly_elections(cs: Changeset, alberta: UUID, province: UUID, name: Calla
             url=event_page(event),
             license=PUBLIC_RECORD,
         )
-        cs.artifact(raw.cached(SOURCE, event_page(event)), source)
-        cs.artifact(raw.cached(SOURCE, winners_file(event)), source)
+        cs.artifact(pin(raw.cached(SOURCE, event_page(event))), source)
+        cs.artifact(pin(raw.cached(SOURCE, winners_file(event))), source)
         election = cs.key(f"{SOURCE}.election", day.isoformat())
         cs.add(
             "election",
@@ -727,7 +1078,7 @@ def assembly_elections(cs: Changeset, alberta: UUID, province: UUID, name: Calla
         values = []
         for row in rows.iter_rows(named=True):
             number = row["division"]
-            cs.artifact(raw.cached(SOURCE, row["url"]), source)
+            cs.artifact(pin(raw.cached(SOURCE, row["url"])), source)
             contest = cs.key(f"{SOURCE}.contest", f"{day}:{number}")
             cs.add(
                 "contest",
