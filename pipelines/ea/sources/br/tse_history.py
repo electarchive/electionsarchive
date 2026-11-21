@@ -1826,8 +1826,8 @@ def emit() -> Path:
 
 
 def polling_places(year: int) -> pl.DataFrame:
-    """Each first-round section of the year's polling-place file, with its place's key, its name and address folded
-    to letters and digits, and its point where the file gives one within Brazil."""
+    """Each section of the year's polling-place file in Brazil, once for each round, with its place's key, its name
+    and address folded to letters and digits, and its point where the file gives one within Brazil."""
     columns = [
         "NR_TURNO",
         "SG_UF",
@@ -1858,8 +1858,9 @@ def polling_places(year: int) -> pl.DataFrame:
 
     return (
         pl.concat(frames)
-        .filter((pl.col("NR_TURNO") == "1") & (pl.col("SG_UF") != "ZZ"))
+        .filter(pl.col("SG_UF") != "ZZ")
         .select(
+            round=pl.col("NR_TURNO").cast(pl.Int64),
             municipality=pl.col("CD_MUNICIPIO").str.zfill(5),
             zone=pl.col("NR_ZONA").cast(pl.Int64),
             number=pl.col("NR_SECAO").cast(pl.Int64),
@@ -1886,8 +1887,14 @@ def borrowed_points(year: int) -> tuple[pl.DataFrame, str]:
     its number within its municipality and zone from one election to the next, so where the 2022 file lists the same
     number there under the same name and the same address, with a single point, each of the place's 2018 sections takes
     that point. Of the 2018 places that do have coordinates and match a 2022 place this way, 99 percent lie within
-    200 meters of the 2022 point."""
-    own = polling_places(year).filter("principal")
+    200 meters of the 2022 point. As the parse does, a section the file locates in either round keeps its own point,
+    so a section takes a lent point only when the file gives it none in either round. A section's place is its
+    first-round place."""
+    rows = polling_places(year).filter("principal")
+    anywhere = rows.filter("located").select("section").unique()
+    own = rows.filter(pl.col("round") == 1)
+    if own["section"].is_duplicated().any():
+        raise ValueError(f"{year}: a section lies in two polling places")
     places = own.group_by(PLACE).agg(
         pl.col("located").any(),
         pl.col("located").all().alias("whole"),
@@ -1898,6 +1905,7 @@ def borrowed_points(year: int) -> tuple[pl.DataFrame, str]:
     )
     if places.filter(pl.col("located") != pl.col("whole")).height:
         raise ValueError(f"{year}: a polling place has sections with and without coordinates")
+    own = own.join(anywhere, on="section", how="anti")
     lender = (
         polling_places(BORROWED[year])
         .filter("located")
@@ -1919,13 +1927,11 @@ def borrowed_points(year: int) -> tuple[pl.DataFrame, str]:
         .select(*PLACE, "latitude", "longitude")
     )
     sections = own.select("section", *PLACE).join(matched, on=PLACE).select("section", "longitude", "latitude")
-    if sections["section"].is_duplicated().any():
-        raise ValueError(f"{year}: a section lies in two polling places")
     unlocated = places.filter(~pl.col("located"))
     note = (
         f"The electoral court's {year} polling-place file gives no coordinates for {unlocated.height:,} of its "
-        f"{places.height:,} polling places in Brazil, with {own.join(unlocated, on=PLACE, how='semi').height:,} "
-        f"sections. {matched.height:,} of them appear in its {BORROWED[year]} file under the same number in the same "
+        f"{places.height:,} polling places in Brazil, which hold {own.height:,} sections the file does not locate in "
+        f"either round. {matched.height:,} of these places appear in its {BORROWED[year]} file under the same number in the same "
         f"municipality and zone, with the same name and address, so their {sections.height:,} sections are mapped at "
         f"the {BORROWED[year]} place's point. The other sections have no point."
     )
@@ -1987,7 +1993,8 @@ def package_from_export() -> Path:
         own = (
             polling_places(year)
             .filter(pl.col("principal") & pl.col("located"))
-            .unique("section", keep="first")
+            .sort("round")
+            .unique("section", keep="first", maintain_order=True)
             .select("section", "longitude", "latitude")
         )
         stored = pl.DataFrame(
