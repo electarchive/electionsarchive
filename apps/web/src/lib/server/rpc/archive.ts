@@ -14870,6 +14870,7 @@ async function anchors(ks: Array<number>, day: string) {
               where a.k = any(${sql.param(ks)}::int[])
                 and (lower_inf(g.valid) or lower(g.valid) <= ${day}::date)
                 and (upper_inf(g.valid) or upper(g.valid) > ${day}::date)
+              offset 0
             ) y where pt is not null
           ) x where p is not null
         `),
