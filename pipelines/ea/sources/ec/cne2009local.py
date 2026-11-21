@@ -4,8 +4,9 @@ The atlas is a book of page images with no text layer. For each province it prin
 2009, on the page before the province's 2014 table: the canton, the winning organization, the mayor, the winner's
 votes, and the winner's share of the valid votes. ``atlas2009`` finds each ruled table and its votes cells, and every
 cell was read by eye from the page. The atlas prints no other candidate's votes and no canton's blank or null
-ballots, so each canton's contest holds the winner alone, as the 2014 contests do. The contests belong to the 2009
-general election the archive already holds.
+ballots, so each canton's contest holds the winner alone, as the 2014 contests do. The atlas also prints, for each
+province, a table of every list's votes for prefect, with the valid total; those contests are built as the 2014 ones
+are. The contests belong to the 2009 general election the archive already holds.
 """
 
 from ea import package, raw
@@ -51,12 +52,12 @@ def build() -> Package:
     p = Package(
         f"{SOURCE}/{DAY}-mayors",
         SOURCE,
-        "Ecuador's mayors elected in the sectional elections of 2009, from the National Electoral Council's 2009-2014 "
+        "Ecuador's mayors and prefects elected in the sectional elections of 2009, from the National Electoral Council's 2009-2014 "
         "electoral atlas",
     )
     election = key("election", DAY)
     # the country, the 2009 general election, the mayoralty, and the cantons are production's rows
-    p.external.update([ECUADOR, election, "ec.canton", cne.MAYORALTY])
+    p.external.update([ECUADOR, election, "ec.canton", cne.MAYORALTY, cne.PREFECTURE])
     atlas = cne.artifact(atlas2009.ATLAS)
     p.add(
         "source",
@@ -71,7 +72,8 @@ def build() -> Package:
     artifact_id = p.artifact(atlas, ATLAS_SOURCE)
     base = f"ec/{DAY}-general"
     pages: dict[int, str] = {}
-    for page in atlas2009.MAYOR_PAGES_2009:
+    prefects = atlas2009.prefects(2009)
+    for page in [*atlas2009.MAYOR_PAGES_2009, *(t.page for t in prefects)]:
         width, height = atlas2009.page_image(page)
         pages[page] = key("page", atlas.sha256, page)
         p.add(
@@ -196,4 +198,8 @@ def build() -> Package:
         p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=mayor.votes)
     if len(seen) != CANTONS:
         raise ValueError(f"{DAY}: mayors of {len(seen)} cantons")
+    if len(prefects) != cne2014.PREFECTURES:
+        raise ValueError(f"{DAY}: prefect tables for {len(prefects)} provinces")
+    for table in prefects:
+        cne2014.prefect(p, election, base, pages[table.page], table, DAY, 2009)
     return p

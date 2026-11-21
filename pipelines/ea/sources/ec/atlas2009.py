@@ -472,7 +472,10 @@ PREFECT_PAGES = {
     186: "18",
     188: "19",
 }
+# each province's 2009 prefect table is on the page before its 2014 table
+PREFECT_PAGES_2009 = {page - 1: province for page, province in PREFECT_PAGES.items()}
 PREFECTS = Path(__file__).with_name("atlas2009_prefects.json")
+PREFECTS_2009 = Path(__file__).with_name("atlas2009_prefects_2009.json")
 PREFECT_HEADER = 123  # the height of a prefect table's header, in pixels at 300 dpi
 
 
@@ -497,8 +500,10 @@ def prefect_table(image: Image.Image) -> PrefectTable:
     top = blocks[0][0]
     header = top + PREFECT_HEADER
     footer = next(b[0] for b in blocks if b[0] > header and b[1] - b[0] >= 40)
-    left = int(np.flatnonzero(wide[top : top + 10].any(axis=0))[0])
-    right = int(np.flatnonzero(wide[top : top + 10].any(axis=0))[-1]) + 700
+    # the table's edges are the ends of the header's solid fill, not of the wide windows that find it, which also start
+    # in the margin to its left, where a page's side tab has a rule of its own
+    left, right = max(_segments(dark[top + 6]), key=lambda s: s[1] - s[0])
+    right += 1
     shade = (np.asarray(image)[header + 8 : footer - 8, left - 10 : right + 10] < 165).mean(axis=0)
     verticals = [(a + left - 10, b + left - 10) for a, b in _segments(shade > 0.6)][:5]
     if len(verticals) != 5:
@@ -550,17 +555,18 @@ class Prefect(NamedTuple):
     lists: list[tuple[str, str, int, str, tuple[float, float, float, float]]]  # number, organization, votes, share, box
 
 
-def prefects() -> list[Prefect]:
-    """The 2014 prefect table of each province, with each list's votes cell on its page.
+def prefects(year: int = 2014) -> list[Prefect]:
+    """The prefect table of each province for the year, with each list's votes cell on its page.
 
-    ``atlas2009_prefects.json`` holds, by page, every cell as read by eye from the page: the list numbers, the
+    ``atlas2009_prefects.json`` (2014) and ``atlas2009_prefects_2009.json`` (2009) hold, by page, every cell as read by eye from the page: the list numbers, the
     organizations, the votes, and the shares, and the printed total of valid votes. The rows found on a page must be
     exactly those entered, the votes must add up to the printed total, and each share must be the list's share of the
     total to one decimal.
     """
-    entries: dict[str, dict[str, object]] = json.loads(PREFECTS.read_text(encoding="utf-8"))
+    source, pages = (PREFECTS_2009, PREFECT_PAGES_2009) if year == 2009 else (PREFECTS, PREFECT_PAGES)
+    entries: dict[str, dict[str, object]] = json.loads(source.read_text(encoding="utf-8"))
     found: list[Prefect] = []
-    for page, province in PREFECT_PAGES.items():
+    for page, province in pages.items():
         entry = entries.pop(str(page))
         image = render(page)
         table = prefect_table(image)

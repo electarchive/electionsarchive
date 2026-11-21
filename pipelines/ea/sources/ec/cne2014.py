@@ -235,14 +235,16 @@ def build() -> Package:
     return p
 
 
-def prefect(p: Package, election: str, base: str, page: str, table: atlas2009.Prefect) -> None:
+def prefect(
+    p: Package, election: str, base: str, page: str, table: atlas2009.Prefect, day: str = DAY, year: int = 2014
+) -> None:
     """One province's prefect contest: each list's votes, the valid total, and the list with the most votes elected."""
     code = table.province
     province = cne.PROVINCES[code]
     token = f"prefect/{code}"
     district = area("ec.provincia", code)
     p.external.add(district)
-    contest = key("contest", DAY, token)
+    contest = key("contest", day, token)
     p.add(
         "contest",
         id=contest,
@@ -254,10 +256,10 @@ def prefect(p: Package, election: str, base: str, page: str, table: atlas2009.Pr
         magnitude=1,
         district_area_id=district,
     )
-    p.name(contest, f"{province} prefect, 2014", "en", "official")
-    p.name(contest, f"Prefecto de {province} 2014", "es", "native", False)
+    p.name(contest, f"{province} prefect, {year}", "en", "official")
+    p.name(contest, f"Prefecto de {province} {year}", "es", "native", False)
     p.add("slug", path=f"{base}/{cne.slug(province)}-prefect", entity_id=contest, is_current=True)
-    result_set = key("result_set", DAY, token)
+    result_set = key("result_set", day, token)
     p.add(
         "result_set",
         id=result_set,
@@ -273,13 +275,13 @@ def prefect(p: Package, election: str, base: str, page: str, table: atlas2009.Pr
     p.add(
         "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD_PREFECT, lang="en"
     )
-    unit = key("unit", DAY, "province", code)
+    unit = key("unit", day, "province", code)
     p.add(
         "reporting_unit",
         id=unit,
         polity_id=ECUADOR,
         scheme_code="ec.provincia",
-        code=f"{DAY}:province:{code}",
+        code=f"{day}:province:{code}",
         area_relation="equals",
         area_id=district,
         kind="standard",
@@ -287,9 +289,9 @@ def prefect(p: Package, election: str, base: str, page: str, table: atlas2009.Pr
     p.name(unit, province, "es", "official")
     top = max(range(len(table.lists)), key=lambda i: table.lists[i][2])
     if sum(row[2] == table.lists[top][2] for row in table.lists) != 1:
-        raise ValueError(f"{DAY}: prefect of province {code} is a tie")
+        raise ValueError(f"{day}: prefect of province {code} is a tie")
     for position, (number, sigla, votes, _share, box) in enumerate(table.lists, 1):
-        option = key("option", DAY, token, number)
+        option = key("option", day, token, number)
         p.add(
             "contest_option",
             id=option,
