@@ -11,7 +11,6 @@ same ruling reproduces.
 import csv
 import io
 import re
-import struct
 import subprocess
 from collections.abc import Iterable
 from pathlib import Path
@@ -19,7 +18,7 @@ from pathlib import Path
 from ea import package, raw
 from ea.package import Package
 from ea.sources.id import kpu_pilpres
-from ea.store import DATA, connect
+from ea.store import connect
 
 SOURCE = "id.kpu_pilpres_2014"
 KEY = f"{SOURCE}/kabkota"
@@ -268,29 +267,6 @@ def _units() -> dict[str, tuple[str, str]]:
     return units
 
 
-def _page(p: Package, artifact: raw.Artifact, artifact_id: str, number: int) -> tuple[str, int, int]:
-    image = DATA / "pages" / SOURCE / f"{artifact.sha256}-{number}.png"
-    if not image.exists():
-        image.parent.mkdir(parents=True, exist_ok=True)
-        subprocess.run(
-            ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
-            + [str(artifact.path), str(image.with_suffix(""))],
-            check=True,
-        )
-    width, height = struct.unpack(">II", image.read_bytes()[16:24])
-    page = p.id("page", artifact.sha256, number)
-    p.add(
-        "source_page",
-        id=page,
-        artifact_id=artifact_id,
-        page_number=number,
-        image_key=f"pages/{SOURCE}/{image.name}",
-        width=width,
-        height=height,
-    )
-    return page, width, height
-
-
 def regencies() -> Package:
     p = Package(
         KEY,
@@ -302,7 +278,8 @@ def regencies() -> Package:
     book = raw.cached(SOURCE, BOOK)
     if raw.cached(kpu_pilpres.SOURCE, RULING).sha256 != ruling.sha256:
         raise ValueError("the ruling's copy differs from the one id.kpu_pilpres read its province rows from")
-    artifacts = {"ruling": p.artifact(ruling, RULING_SOURCE), "book": p.artifact(book, BOOK_SOURCE)}
+    p.artifact(ruling, RULING_SOURCE)
+    p.artifact(book, BOOK_SOURCE)
     p.external.update({CONTEST, ELECTION, *TICKETS.values(), RULING_SOURCE, BOOK_SOURCE})
     national = {
         (row["unit"], row["measure"], row["ticket"]): int(str(row["value"])) for row in kpu_pilpres._ruling_2014()
@@ -327,7 +304,6 @@ def regencies() -> Package:
         ),
     )
     p.add("note", id=p.id("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
-    pages: dict[tuple[str, int], tuple[str, int, int]] = {}
     seen: set[str] = set()
     for province, rows in tables.items():
         label = PROVINCES[province]
@@ -337,7 +313,6 @@ def regencies() -> Package:
                 continue
             if sum(cells[column][0] for cells in rows.values()) != national[label, measure, ticket]:
                 raise ValueError(f"{label} {column}: regencies do not sum to the national recapitulation's row")
-        artifact, artifact_id = (book, artifacts["book"]) if province == "34" else (ruling, artifacts["ruling"])
         for name, cells in rows.items():
             found = units.get(_key(name))
             if found is None or not found[1].startswith(f"{province}."):
@@ -347,32 +322,18 @@ def regencies() -> Package:
                 raise ValueError(f"{label}: two rows name the regency of {name}")
             seen.add(unit)
             p.external.add(unit)
-            for column, (value, word) in cells.items():
-                fact = {
-                    "result_set_id": result_set,
-                    "unit_id": unit,
-                    "option_id": TICKETS[int(column)] if column.isdigit() else None,
-                    "channel": 0,
-                    "measure": MEASURES["votes" if column.isdigit() else column],
-                    "count_round": 0,
-                }
+            for column, (value, _) in cells.items():
                 corrected = province == "13" and (name, column) in CORRECTIONS
-                p.add("result_value", **fact, flags=DERIVED if corrected else 0, value=value)
-                number = int(word["page_num"])
-                if (artifact.sha256, number) not in pages:
-                    pages[artifact.sha256, number] = _page(p, artifact, artifact_id, number)
-                page, width, height = pages[artifact.sha256, number]
-                left, top = float(word["left"]), float(word["top"])
-                right, bottom = left + float(word["width"]), top + float(word["height"])
-                scale = 100 / 72
                 p.add(
-                    "value_locator",
-                    **fact,
-                    page_id=page,
-                    x0=left * scale / width,
-                    y0=top * scale / height,
-                    x1=right * scale / width,
-                    y1=bottom * scale / height,
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=TICKETS[int(column)] if column.isdigit() else None,
+                    channel=0,
+                    measure=MEASURES["votes" if column.isdigit() else column],
+                    count_round=0,
+                    flags=DERIVED if corrected else 0,
+                    value=value,
                 )
     print(f"{KEY}: {len(seen)} regencies and cities")
     return p
