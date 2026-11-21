@@ -437,6 +437,7 @@
     <a
       class="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-input px-2.5 text-[0.8125rem] font-semibold block-8 hover:bg-secondary"
       href={resolve(`/compare?a=${id}`)}
+      rel="nofollow"
       ><ArrowLeftRightIcon class="block-3.5 inline-3.5" />{m.versus_action()}</a
     >
   </div>
@@ -915,6 +916,7 @@
         <a
           class="text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
           href={resolve(`/compare?a=${id}&b=${polity.parent ?? ""}`)}
+          rel="nofollow"
           >{m.polity_versus_all({
             place: polity.name,
             parent: versus.data?.places[1]?.name ?? above,

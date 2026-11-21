@@ -421,6 +421,7 @@
           <a
             class="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-input px-2.5 text-[0.8125rem] font-semibold block-8 hover:bg-secondary"
             href={resolve(`/compare?a=${data.id}`)}
+            rel="nofollow"
             ><ArrowLeftRightIcon
               class="block-3.5 inline-3.5"
             />{m.versus_action()}</a

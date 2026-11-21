@@ -1877,9 +1877,13 @@ export async function comparison(ids: Array<string>) {
           ? sql`
             with mine as materialized (
               select distinct o.contest_id, o.id as option
-              from candidacy cy join contest_option o on o.id = cy.option_id
-              left join entity_merge m on m.entity_id = cy.person_id
-              where cy.role = 'head' and coalesce(m.into_id, cy.person_id) = ${first.id}::uuid
+              from (
+                select ${first.id}::uuid as id where not exists (select from entity_merge m where m.entity_id = ${first.id}::uuid)
+                union all
+                select m.entity_id from entity_merge m where m.into_id = ${first.id}::uuid
+              ) p
+              join candidacy cy on cy.person_id = p.id and cy.role = 'head'
+              join contest_option o on o.id = cy.option_id
             ),
             places as materialized (
               select c.id as contest_id, rs.k as set, a.k as area
@@ -1913,11 +1917,12 @@ export async function comparison(ids: Array<string>) {
             select coalesce(m.into_id, cy.person_id) as id,
               count(distinct o.contest_id) filter (where x.place <= 2 and o.contest_id in (select contest_id from close)) as rank,
               count(distinct o.contest_id) as tie
-            from contest_option o
+            from (select distinct contest_id from mine) mc
+            cross join lateral (select o.id, o.contest_id from contest_option o where o.contest_id = mc.contest_id offset 0) o
             join candidacy cy on cy.option_id = o.id and cy.role = 'head'
             left join entity_merge m on m.entity_id = cy.person_id
             left join placed x on x.contest_id = o.contest_id and x.top = o.id
-            where o.contest_id in (select contest_id from mine) and coalesce(m.into_id, cy.person_id) <> ${first.id}::uuid
+            where coalesce(m.into_id, cy.person_id) <> ${first.id}::uuid
             group by 1
             order by rank desc, tie desc
             limit 6
@@ -1943,16 +1948,20 @@ export async function comparison(ids: Array<string>) {
             limit 6
           `;
   const rivals =
-    suggested == null
+    suggested == null || first == null
       ? null
-      : await db.execute<{ id: string; name: string }>(sql`
-        select r.id, (
-          select n.text from name n where n.entity_id = r.id
-          order by n.is_preferred desc, (n.lang = 'en') desc, n.recorded_from desc, n.id limit 1
-        ) as name
-        from (${suggested}) r
-        order by r.rank desc, r.tie desc
-      `);
+      : capped(
+          rows(`rivals:v1:${first.id}`, async () =>
+            db.execute<{ id: string; name: string }>(sql`
+              select r.id, (
+                select n.text from name n where n.entity_id = r.id
+                order by n.is_preferred desc, (n.lang = 'en') desc, n.recorded_from desc, n.id limit 1
+              ) as name
+              from (${suggested}) r
+              order by r.rank desc, r.tie desc
+            `),
+          ).catch(() => null),
+        );
   await Promise.race([
     work,
     new Promise((done) => {
@@ -1963,7 +1972,7 @@ export async function comparison(ids: Array<string>) {
     kind: "comparison" as const,
     sides: found.rows,
     examples: examples?.rows ?? [],
-    rivals: rivals?.rows ?? [],
+    rivals: (await rivals) ?? [],
     body: body(),
   };
 }
