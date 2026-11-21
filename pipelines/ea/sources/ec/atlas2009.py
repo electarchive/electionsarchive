@@ -443,3 +443,154 @@ def list_boxes(page: int) -> list[list[tuple[float, float, float, float]]]:
             ]
         )
     return boxes
+
+
+# the page of each province's 2014 prefect table, by the Council's province code; each follows its 2009 table, and the
+# table's own page names no province, so the 2009 page before it does
+PREFECT_PAGES = {
+    144: "1",
+    146: "2",
+    148: "3",
+    150: "4",
+    152: "6",
+    154: "5",
+    156: "7",
+    158: "8",
+    160: "9",
+    162: "10",
+    164: "11",
+    166: "12",
+    168: "13",
+    170: "14",
+    172: "15",
+    174: "22",
+    176: "16",
+    178: "17",
+    180: "24",
+    182: "23",
+    184: "21",
+    186: "18",
+    188: "19",
+}
+PREFECTS = Path(__file__).with_name("atlas2009_prefects.json")
+PREFECT_HEADER = 123  # the height of a prefect table's header, in pixels at 300 dpi
+
+
+class PrefectTable(NamedTuple):
+    rows: list[tuple[int, int]]  # each list's top and bottom
+    columns: list[tuple[int, int]]  # the list numbers, the organization, the votes, and the share
+    total: tuple[int, int]  # the total row's top and bottom
+
+
+def prefect_table(image: Image.Image) -> PrefectTable:
+    """The shaded four-column table of a prefect page.
+
+    Its header is the first long dark block under the page's title, the total row is the next such block after the
+    header, and the columns are split by the vertical rules. Each list's votes sit on one line, so the rows are the
+    lines of the votes column, and a list whose organizations wrap onto two lines is still one row.
+    """
+    dark = np.asarray(image) < 175
+    total = np.cumsum(dark, axis=1, dtype=np.int32)
+    wide = (total[:, 700:] - total[:, :-700]) >= 0.75 * 700
+    ys = np.flatnonzero(wide.any(axis=1))
+    blocks = _runs(ys[(ys > 600) & (ys < 3000)], gap=3)
+    top = blocks[0][0]
+    header = top + PREFECT_HEADER
+    footer = next(b[0] for b in blocks if b[0] > header and b[1] - b[0] >= 40)
+    left = int(np.flatnonzero(wide[top : top + 10].any(axis=0))[0])
+    right = int(np.flatnonzero(wide[top : top + 10].any(axis=0))[-1]) + 700
+    shade = (np.asarray(image)[header + 8 : footer - 8, left - 10 : right + 10] < 165).mean(axis=0)
+    verticals = [(a + left - 10, b + left - 10) for a, b in _segments(shade > 0.6)][:5]
+    if len(verticals) != 5:
+        raise ValueError(f"{len(verticals)} vertical rules in a prefect table")
+    columns = [(a[1] + 1, b[0] - 1) for a, b in itertools.pairwise(verticals)]
+    cell = np.asarray(image)[:, columns[2][0] + 6 : columns[2][1] - 6]
+    figures = (cell < 110).mean(axis=1)
+    lines = [(a, b) for a, b in _segments(figures > 0.01) if header + 4 < a and b < footer and b - a >= 8]
+    merged: list[tuple[int, int]] = []
+    for a, b in lines:
+        if merged and a - merged[-1][1] <= 6:
+            merged[-1] = (merged[-1][0], b)
+        else:
+            merged.append((a, b))
+    bounds = [header] + [(x[1] + y[0]) // 2 for x, y in itertools.pairwise(merged)] + [footer - 1]
+    rows = [(a + 2, b - 2) for a, b in itertools.pairwise(bounds)]
+    return PrefectTable(rows, columns, (footer, footer + 63))
+
+
+@functools.cache
+def prefect_reads(page: int) -> tuple[list[Read], Read]:
+    """Each list row of the page's 2014 prefect table as Tesseract reads it, and the total row."""
+    image = render(page)
+    table = prefect_table(image)
+    boxes = [[(left, top, right, bottom) for left, right in table.columns] for top, bottom in table.rows]
+
+    def one(i: int) -> Read:
+        row = boxes[i]
+        votes, vote_reads = _number(image, row[2], "0123456789.", VOTES)
+        share, share_reads = _number(image, row[3], "0123456789,%", SHARE)
+        lists = re.sub(r"[^0-9-]", "", _text(image, row[0], binary=True, language="eng"))
+        cells = (lists, _text(image, row[1], binary=True, language="eng"), "", votes, share)
+        return Read(i + 1, cells, (vote_reads, share_reads), row)
+
+    with ThreadPoolExecutor(os.cpu_count() or 2) as pool:
+        found = list(pool.map(one, range(len(boxes))))
+    top, bottom = table.total
+    cols = [(left, top, right, bottom) for left, right in table.columns]
+    votes, vote_reads = _number(image, cols[2], "0123456789.", VOTES)
+    share, share_reads = _number(image, cols[3], "0123456789,%", SHARE)
+    return found, Read(0, ("", "", "", votes, share), (vote_reads, share_reads), cols)
+
+
+class Prefect(NamedTuple):
+    page: int
+    province: str  # the Council's province code
+    total: int  # the table's printed total of valid votes
+    total_box: tuple[float, float, float, float]  # its votes cell, as fractions of the page's width and height
+    lists: list[tuple[str, str, int, str, tuple[float, float, float, float]]]  # number, organization, votes, share, box
+
+
+def prefects() -> list[Prefect]:
+    """The 2014 prefect table of each province, with each list's votes cell on its page.
+
+    ``atlas2009_prefects.json`` holds, by page, every cell as read by eye from the page: the list numbers, the
+    organizations, the votes, and the shares, and the printed total of valid votes. The rows found on a page must be
+    exactly those entered, the votes must add up to the printed total, and each share must be the list's share of the
+    total to one decimal.
+    """
+    entries: dict[str, dict[str, object]] = json.loads(PREFECTS.read_text(encoding="utf-8"))
+    found: list[Prefect] = []
+    for page, province in PREFECT_PAGES.items():
+        entry = entries.pop(str(page))
+        image = render(page)
+        table = prefect_table(image)
+        raw_lists = entry["lists"]
+        if not isinstance(raw_lists, list):
+            raise TypeError(f"page {page}: lists is not a list")
+        if len(raw_lists) != len(table.rows):
+            raise ValueError(f"page {page}: {len(table.rows)} rows on the page for {len(raw_lists)} lists")
+        total = int(str(entry["total"]).replace(".", ""))
+        votes_column = table.columns[2]
+
+        def box(top: int, bottom: int, column: tuple[int, int] = votes_column) -> tuple[float, float, float, float]:
+            return (column[0] / image.width, top / image.height, column[1] / image.width, bottom / image.height)
+
+        lists = []
+        for (number, sigla, votes, share), (top, bottom) in zip(raw_lists, table.rows, strict=True):
+            if (
+                not re.fullmatch(VOTES, votes)
+                or not re.fullmatch(SHARE, share)
+                or not re.fullmatch(r"\d+(-\d+)*", number)
+            ):
+                raise ValueError(f"page {page}: prefect row reads {number!r} {votes!r} {share!r}")
+            count = int(votes.replace(".", ""))
+            shown = f"{round(count * 1000 / total) / 10:.1f}".replace(".", ",") + "%"
+            if shown != share:
+                raise ValueError(f"page {page}: list {number} has {shown} of the votes, and the atlas prints {share}")
+            lists.append((number, sigla, count, share, box(top, bottom)))
+        if sum(row[2] for row in lists) != total:
+            raise ValueError(f"page {page}: the lists' votes do not add up to the printed total")
+        found.append(Prefect(page, province, total, box(*table.total), lists))
+    if entries:
+        raise ValueError(f"prefect pages the atlas does not have: {sorted(entries)}")
+    return found
