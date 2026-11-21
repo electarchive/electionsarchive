@@ -1,10 +1,9 @@
-<p align="center">
-  <a href="https://electionsarchive.com"><img src="apps/web/static/favicon.svg" width="64" height="64" alt="Elections Archive logo"></a>
-</p>
-
-<h1 align="center">Elections Archive</h1>
-
-<p align="center">Every election in the world, down to the ballot box, with every number traced to its source.</p>
+<a href="https://electionsarchive.com">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/banner-dark.webp">
+    <img src="docs/images/banner-light.webp" alt="Elections Archive: every election in the world, down to the ballot box." width="100%">
+  </picture>
+</a>
 
 <p align="center">
   <a href="https://electionsarchive.com">Website</a> ·
@@ -17,10 +16,6 @@
 <br>
 
 Elections Archive collects election results from each country's first election to its latest, down to the smallest unit that the official count reports, such as a precinct, a polling station, or a ballot box. One database serves the website, a REST API, an MCP server, Markdown and JSON versions of every page, and bulk downloads.
-
-<p align="center">
-  <img src="docs/images/map.webp" alt="County map of the 2024 United States presidential election on electionsarchive.com, shaded by margin, with a color key and a histogram of county margins" width="100%">
-</p>
 
 - **Sourced.** Every number links to the source that published it and to the change that brought it into the archive. Figures read from scanned books keep the page and the position on the page they came from.
 - **Stored as declared.** Official winners and seats are stored as the authority declared them. A seat engine recomputes them only to compare, and never overwrites them.
