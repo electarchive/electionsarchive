@@ -1,158 +1,85 @@
-<div align="center">
+<p align="center">
+  <a href="https://electionsarchive.com"><img src="apps/web/static/favicon.svg" width="64" height="64" alt="Elections Archive logo"></a>
+</p>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/banner-dark.webp">
-  <img src="docs/images/banner-light.webp" alt="Elections Archive: every election in the world, down to the ballot box. 964,460 contests, 224,962 elections, 67,416 places that hold elections, and the earliest election in 1787." width="100%">
-</picture>
+<h1 align="center">Elections Archive</h1>
 
-[![CI](https://github.com/electarchive/electionsarchive/actions/workflows/ci.yml/badge.svg)](https://github.com/electarchive/electionsarchive/actions/workflows/ci.yml)
-[![Code: AGPL-3.0](https://img.shields.io/badge/code-AGPL--3.0-15171a)](LICENSE)
-[![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-15171a)](https://creativecommons.org/licenses/by/4.0/)
-[![MCP server](https://img.shields.io/badge/MCP-ready-ffe03a)](https://electionsarchive.com/agents)
+<p align="center">Every election in the world, down to the ballot box, with every number traced to its source.</p>
 
-[Website](https://electionsarchive.com) · [API](https://electionsarchive.com/api/v1/openapi.json) · [Connect your agent](https://electionsarchive.com/agents) · [How the data gets in](docs/pipelines.md) · [Contributing](CONTRIBUTING.md)
+<p align="center">
+  <a href="https://electionsarchive.com">Website</a> ·
+  <a href="https://electionsarchive.com/agents">For agents</a> ·
+  <a href="https://electionsarchive.com/api/v1/openapi.json">API</a> ·
+  <a href="https://electionsarchive.com/downloads">Downloads</a> ·
+  <a href="https://electionsarchive.com/coverage">Coverage</a>
+</p>
 
-</div>
+<br>
 
-Elections Archive holds results for more than 960,000 contests in 224,000 elections, from the 1787 elections in the United States to this year's, by precinct, polling station, and ballot box where the official count goes that deep. Every number links to the source that published it.
+Elections Archive collects election results from each country's first election to its latest, down to the smallest unit that the official count reports, such as a precinct, a polling station, or a ballot box. One database serves the website, a REST API, an MCP server, Markdown and JSON versions of every page, and bulk downloads.
 
 <p align="center">
   <img src="docs/images/map.webp" alt="County map of the 2024 United States presidential election on electionsarchive.com, shaded by margin, with a color key and a histogram of county margins" width="100%">
 </p>
 
-- **Every number cites its source.** Each figure traces to a source and to the changeset that wrote it. Figures read from scanned books keep the page and the box on that page they came from.
-- **Down to the finest unit.** Precincts in the US, ballot boxes in Türkiye, polling stations in France, sections in Brazil, and polling districts in Germany.
-- **Declared, then checked.** Official winners and seats are stored as declared. A seat engine, tested against real elections, recomputes them for comparison and never overwrites them.
-- **Live on election night.** Returns update as counties report, and every race has a share card that redraws as the count moves.
-- **Built for agents.** Every page is also Markdown and JSON, the REST API is described by OpenAPI, and an MCP server and an agent skill expose the same data.
-- **Open to corrections.** Anyone can report a mistake or suggest a source through a GitHub issue form, and every fix is published as a changeset that cites its source.
+- **Sourced.** Every number links to the source that published it and to the change that brought it into the archive. Figures read from scanned books keep the page and the position on the page they came from.
+- **Stored as declared.** Official winners and seats are stored as the authority declared them. A seat engine recomputes them only to compare, and never overwrites them.
+- **Open.** The code is free software, the data is free to reuse with credit, and anyone can report a mistake.
 
-## What's inside
-
-| Country           | Since | Finest unit       |
-| ----------------- | ----- | ----------------- |
-| 🇺🇸 United States  | 1787  | precinct          |
-| 🇬🇧 United Kingdom | 1832  | ward              |
-| 🇨🇭 Switzerland    | 1848  | commune           |
-| 🇨🇦 Canada         | 1867  | polling division  |
-| 🇹🇷 Türkiye        | 1923  | ballot box        |
-| 🇮🇹 Italy          | 1948  | polling section   |
-| 🇩🇪 Germany        | 1949  | polling district  |
-| 🇫🇷 France         | 1958  | polling station   |
-| 🇪🇺 European Union | 1979  | member state      |
-| 🇮🇪 Ireland        | 1979  | Dáil constituency |
-| 🇧🇷 Brazil         | 1994  | section           |
-
-Depth varies by country and year. The [coverage page](https://electionsarchive.com/coverage) measures each country against an outside count of its elections and lists what is still missing.
-
-## Every race, ready to share
-
-<p align="center">
-  <img src="docs/images/share-card.webp" alt="Share card for the 2024 Pennsylvania US Senate race: both candidates with vote shares and totals, a winner tag, a share bar, and a county map shaded by the leading party" width="100%">
-</p>
-
-Each contest page has a card like this one, drawn from the same numbers as the page. Add `.png` to a page's path under `/og/live/` to get it; during a count it redraws every minute.
+The [coverage page](https://electionsarchive.com/coverage) shows which countries and years the archive holds and what is still missing.
 
 ## Use it
 
-Add `.md` or `.json` to any page:
+### In a browser
+
+Start at [electionsarchive.com](https://electionsarchive.com). Addresses follow the place, then the election, then the contest, then the reporting unit, as in [`/us/ga/2020-11-03-general/senate/fulton-county-ga`](https://electionsarchive.com/us/ga/2020-11-03-general/senate/fulton-county-ga).
+
+### As Markdown or JSON
+
+Add `.md` or `.json` to any page's address, or send an `Accept: text/markdown` or `Accept: application/json` header. Links in the Markdown lead to other Markdown pages, and [`/llms.txt`](https://electionsarchive.com/llms.txt) maps the whole site.
 
 ```bash
 curl https://electionsarchive.com/us/2024-11-05-general/president.md
 ```
 
-Search and query through REST:
+### With an agent
 
-```bash
-curl "https://electionsarchive.com/api/v1/search?q=istanbul"
-```
-
-### Connect your agent
-
-Install the skill, which teaches an agent the site's URLs, twins, and API:
+Install the skill, which teaches an agent the archive's data model, its addresses, and its tools:
 
 ```bash
 npx skills add electarchive/electionsarchive
 ```
 
-Or add the MCP server. In Claude Code:
+Or connect the MCP server at `https://electionsarchive.com/mcp`, which speaks streamable HTTP. In Claude Code:
 
 ```bash
 claude mcp add --transport http electionsarchive https://electionsarchive.com/mcp
 ```
 
-In any other client:
+[Connect your agent](https://electionsarchive.com/agents) has setup steps for other clients, the full list of tools, and example questions.
 
-```json
-{
-  "mcpServers": {
-    "electionsarchive": {
-      "type": "http",
-      "url": "https://electionsarchive.com/mcp"
-    }
-  }
-}
+### Through the API
+
+The REST API is at `https://electionsarchive.com/api/v1`, and its [OpenAPI description](https://electionsarchive.com/api/v1/openapi.json) lists every endpoint. Each MCP tool has a matching REST endpoint.
+
+```bash
+curl "https://electionsarchive.com/api/v1/search?q=istanbul"
 ```
 
-Reading needs no key. A key from [your settings](https://electionsarchive.com/settings/keys) gives your agent higher limits. The [agents page](https://electionsarchive.com/agents) has setup for other clients and example questions.
+Reading needs no key and no account. A key from [your settings](https://electionsarchive.com/settings/keys) raises your rate limits; send it in the `x-api-key` header.
 
-## How the data gets in
+### In bulk
 
-```mermaid
-flowchart LR
-  S["Official results, books, and scans"] --> P["Pipelines<br>fetch, parse, emit"]
-  P --> C["Packages and changesets"]
-  C --> A{"Checks and review"}
-  A --> D[("Postgres + PostGIS")]
-  D --> W["Website"]
-  D --> R["REST and MCP"]
-  D --> T["Markdown and JSON twins"]
-  D --> B["Bulk releases"]
-```
-
-One database is the source of truth, and every write to it is recorded as a changeset. Each source has a pipeline that fetches the official files into a raw cache and parses them. A new source builds packages, one Parquet folder per election. The packages are checked without a database and then loaded in bulk. Older pipelines and curated edits emit changesets, which pass the same checks before they publish. Scanned books are digitized page by page, and each figure keeps its page and position. [docs/pipelines.md](docs/pipelines.md) walks through both paths, using Canada's federal elections as the example you can run. [docs/architecture.md](docs/architecture.md) and [docs/data-model.md](docs/data-model.md) cover the rest.
+[Downloads](https://electionsarchive.com/downloads) has the whole archive as data files that you can query offline.
 
 ## Run it locally
 
-You need Node.js 24, pnpm 12, [uv](https://docs.astral.sh/uv/), and Docker (or Postgres 18 with PostGIS 3.6 and Redis 8).
+The archive is a SvelteKit app over one Postgres and PostGIS database, which Python pipelines fill from official sources. [CONTRIBUTING.md](CONTRIBUTING.md) covers setup, loading real data, and the checks to run before a pull request. To see how the pieces fit, read [architecture](docs/architecture.md), [data model](docs/data-model.md), and [pipelines](docs/pipelines.md).
 
-```bash
-pnpm install
-cp .env.example .env
-docker compose -f infra/compose.yaml up -d
-pnpm --filter @ea/db migrate
-pnpm dev
-```
+## Contribute
 
-The app runs at http://localhost:5173. Fill in `BETTER_AUTH_SECRET` in `.env` first, and `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_EMAIL_TOKEN` if you want sign-in emails. Then load real data, for example Canada's federal elections since 1867:
+To fix a wrong number, name, or boundary, open a [data error issue](https://github.com/electarchive/electionsarchive/issues/new?template=data-error.yml) and cite a source that shows the right value. To suggest a source the archive doesn't have yet, open a [new source issue](https://github.com/electarchive/electionsarchive/issues/new?template=new-source.yml). Code comes in through pull requests, as described in [CONTRIBUTING.md](CONTRIBUTING.md). Report security issues privately, as described in [SECURITY.md](SECURITY.md).
 
-```bash
-cd pipelines
-uv run ea fetch ca.elections
-uv run ea parse ca.elections
-uv run ea apply "$(uv run ea emit ca.elections)"
-```
+## License and citation
 
-[CONTRIBUTING.md](CONTRIBUTING.md) covers the seed dump, the checks, and the rest of the setup.
-
-## Repository
-
-| Path                 | Contents                                                               |
-| -------------------- | ---------------------------------------------------------------------- |
-| `apps/web`           | SvelteKit app: pages, RPC, REST, MCP, twins, and sign-in               |
-| `packages/db`        | SQL migrations and the Drizzle schema                                  |
-| `packages/engine`    | Seat allocation and referendum outcomes, tested against real elections |
-| `packages/analytics` | Comparisons between elections, change metrics, and indices             |
-| `packages/view-spec` | The JSON view spec schema                                              |
-| `pipelines`          | Python pipelines that fetch, parse, check, and load results            |
-| `infra`              | Docker Compose for local Postgres and Redis                            |
-| `spike`              | The schema spike: proven DDL and benchmarks                            |
-| `docs`               | Guides for contributors                                                |
-
-## Contributing
-
-Code comes in through pull requests, and data corrections come in through the site: open the page with the mistake, choose Edit, and cite your source. See [CONTRIBUTING.md](CONTRIBUTING.md), and report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
-
-## License
-
-The code is licensed under the [GNU Affero General Public License v3.0](LICENSE). The data is published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), except where a source's own license differs; each result set records its source's license.
+The code is licensed under the [GNU Affero General Public License v3.0](LICENSE). The data is published under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), except where a source's own license differs, and each result set records its source's license. To cite the archive, use a format from the [license page](https://electionsarchive.com/license), and credit the source of any figures you rely on.
