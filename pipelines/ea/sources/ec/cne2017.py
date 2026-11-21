@@ -14,6 +14,7 @@ import functools
 import json
 import re
 from collections import Counter
+from collections.abc import Callable
 from datetime import date
 from typing import NamedTuple
 from uuid import uuid5
@@ -102,6 +103,13 @@ ABBREVIATIONS = {
 }
 
 
+# a parish the Council's files cut short, by canton code: the book's spelling to the files' spelling
+PARISH_ALIASES = {
+    ("475", "LEONIDAS PLAZA GUTIERREZ"): "LEONIDAS PLAZA G.",
+    ("445", "GENERAL ELOY ALFARO DELGADO"): "GENERAL ELOY ALFARO DELGA",
+}
+
+
 def spellings(name: str) -> set[str]:
     """A parish name as the book might print it: whole, with its abbreviated words spelled out, and each side of a slash."""
     found: set[str] = set()
@@ -153,6 +161,7 @@ class Places:
     def parish(self, canton: str, name: str) -> str:
         """The code of the canton's parish that a name in the book spells, as the Council's files spell it."""
         found = spellings(name)
+        found |= spellings(PARISH_ALIASES.get((canton, book2017.norm(name)), ""))
         codes = [code for code, names in self.by_canton.get(canton, []) if names & found]
         if len(codes) != 1:
             raise KeyError(f"{len(codes)} parishes of canton {canton} match {name!r}")
@@ -696,16 +705,20 @@ def parish_rows(
     circ: str,
     cantons: list[tuple[str, book2017.Row]],
     shared: Counter[str],
+    alias: Callable[[str], str] = lambda name: name,
 ) -> Parishes:
-    """The reporting unit of each parish row in a circumscription's table, under the canton unit that holds it."""
+    """The reporting unit of each parish row in a circumscription's table, under the canton unit that holds it.
+
+    `alias` turns the book's spelling of a canton into the spelling the Council's files use.
+    """
     place = b.place
     unit_of = {id: row for id, row in cantons}
-    by_canton = {place.canton(province, row.name): id for id, row in cantons}
+    by_canton = {place.canton(province, alias(row.name)): id for id, row in cantons}
     count = len(group.entries)
     found: list[tuple[str, book2017.Row]] = []
     covered: set[str] = set()
     for canton in book2017.parish_tables(group):
-        code = place.canton(province, canton.row.name)
+        code = place.canton(province, alias(canton.row.name))
         parent = by_canton[code]
         if unit_of[parent].numbers[: count + 1] != canton.row.numbers[: count + 1]:
             raise ValueError(f"{group.head}: the parish table's {canton.row.name} differs from the canton table's")
@@ -713,7 +726,7 @@ def parish_rows(
             continue  # a special zone has no parishes of its own; its row is the canton's
         covered.add(parent)
         for row in canton.parishes:
-            parish = place.parish_code(province, canton.row.name, row.name)
+            parish = place.parish_code(province, alias(canton.row.name), row.name)
             partial = shared[parish] > 1
             title = cne.title(place.parishes[parish][0])
             unit = b.unit(
