@@ -395,6 +395,12 @@
       "url": "https://www.alberta.ca/types-of-municipalities-in-alberta",
       "kind": "official_body"
     },
+    "ns-guide": {
+      "title": "Guide for New Municipal Councillors, November 2024 (\"Currently, there are 49 municipalities and 21 villages in Nova Scotia\")",
+      "publisher": "Government of Nova Scotia, Department of Municipal Affairs and Housing",
+      "url": "https://www.novascotia.ca/sites/default/files/documents/1-1414/guide-new-municipal-councillors-en.pdf",
+      "kind": "official_body"
+    },
     "ab-msa": {
       "title": "Metis Settlements Act, RSA 2000, c. M-14",
       "publisher": "Alberta King's Printer",
@@ -661,6 +667,13 @@
           "value": 25,
           "source": "nu-municipal",
           "within": "CA-NU"
+        },
+        {
+          "date": "2024-11-01",
+          "value": 49,
+          "source": "ns-guide",
+          "within": "CA-NS",
+          "precision": "month"
         }
       ]
     },
