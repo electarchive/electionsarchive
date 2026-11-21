@@ -80,6 +80,7 @@ DAY_RULES = {
     "oct_fourth_wednesday": nth_weekday(10, 2, 4),
     "oct_third_saturday": nth_weekday(10, 5, 3),
     "nov_first_monday": nth_weekday(11, 0, 1),
+    "nov_second_wednesday": nth_weekday(11, 2, 2),
     "nov_second_monday": nth_weekday(11, 0, 2),
     "dec_second_monday": nth_weekday(12, 0, 2),
     "oct_third_thursday": nth_weekday(10, 3, 3),
