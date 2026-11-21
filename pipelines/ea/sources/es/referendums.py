@@ -4,20 +4,17 @@ import re
 import subprocess
 import unicodedata
 import zipfile
-from collections.abc import Callable
-from dataclasses import replace
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 from uuid import UUID
 
 import httpx
 import polars as pl
-from psycopg import Connection
 
 from ea import package, raw
 from ea.changeset import slug
 from ea.package import Draft
-from ea.sources.es.infoelectoral import APLIEXTR, DOCXL, PAGE
+from ea.sources.es.infoelectoral import APLIEXTR, DOCXL, PAGE, ministry, retrieved
 from ea.store import DATA, connect
 
 SOURCE = "es.referendums"
@@ -445,17 +442,6 @@ ARE_UNEVEN = (
 )
 
 
-def ministry(url: str) -> raw.Artifact:
-    """The ministry's file, or the Internet Archive's copy of it where the ministry refuses a request."""
-    keys = raw.keys("es.infoelectoral")
-    if url in keys:
-        return raw.cached("es.infoelectoral", url)
-    for key in sorted(keys):
-        if key.startswith("https://web.archive.org/web/") and key.endswith(f"/{url}"):
-            return raw.cached("es.infoelectoral", key)
-    raise LookupError(f"{url} is not in the es.infoelectoral raw cache; run `ea fetch {SOURCE}` first")
-
-
 def folded(text: str) -> str:
     """Text without case, punctuation, spacing, or the hyphens that break a word at a line's end, so a question
     reads the same in the decree's text layer, whose scanned pages carry stray marks."""
@@ -608,36 +594,13 @@ def emit() -> None:
     package.run("load", [KEY])
 
 
-def retrieved(conn: Connection) -> Callable[[raw.Artifact], raw.Artifact]:
-    """A file the cache holds with the same bytes as a file the archive already cites, fetched from its address or
-    from the Internet Archive's copy of that address, keeps the address and retrieval time the archive recorded for
-    it, so a fresh copy of the cache rebuilds the same citation."""
-    stored: dict[str, tuple[str, datetime]] = {
-        str(digest): (str(url), at)
-        for url, digest, at in conn.execute(
-            """select a.url, a.sha256, a.retrieved_at from source_artifact a
-               join changeset c on c.id = a.changeset_id where c.pipeline = %s""",
-            [SOURCE],
-        )
-    }
-
-    def pin(artifact: raw.Artifact) -> raw.Artifact:
-        if artifact.sha256 not in stored:
-            return artifact
-        url, at = stored[artifact.sha256]
-        archived = artifact.url.startswith("https://web.archive.org/web/") and artifact.url.endswith(f"/{url}")
-        return replace(artifact, url=url, retrieved_at=at) if artifact.url == url or archived else artifact
-
-    return pin
-
-
 def build() -> Path:
     """Write the package es.referendums/all from the parsed tables. It reads the database, through Draft, so the rows
     it rebuilds keep the ids the changeset path gave them."""
     provinces = pl.read_parquet(PARSED / "provinces.parquet")
     mesas = pl.read_parquet(PARSED / "mesas.parquet")
     with connect() as conn:
-        pin = retrieved(conn)
+        pin = retrieved(conn, SOURCE)
         cs = Draft(
             conn,
             pipeline=SOURCE,

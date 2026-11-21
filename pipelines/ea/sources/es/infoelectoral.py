@@ -1,6 +1,10 @@
 import zipfile
+from collections.abc import Callable
+from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
+
+from psycopg import Connection
 
 from ea import raw
 from ea.store import DATA
@@ -182,8 +186,42 @@ COUNTS = {
 }
 
 
+def ministry(url: str) -> raw.Artifact:
+    """The ministry's file, or the Internet Archive's copy of it where the ministry refuses a request."""
+    keys = raw.keys(SOURCE)
+    if url in keys:
+        return raw.cached(SOURCE, url)
+    for key in sorted(keys):
+        if key.startswith("https://web.archive.org/web/") and key.endswith(f"/{url}"):
+            return raw.cached(SOURCE, key)
+    raise LookupError(f"{url} is not in the {SOURCE} raw cache; run `ea fetch {SOURCE}` first")
+
+
+def retrieved(conn: Connection, pipeline: str) -> Callable[[raw.Artifact], raw.Artifact]:
+    """A file the cache holds with the same bytes as a file the pipeline already cites, fetched from its address or
+    from the Internet Archive's copy of that address, keeps the address and retrieval time the pipeline recorded for
+    it, so a fresh copy of the cache rebuilds the same citation."""
+    stored: dict[str, tuple[str, datetime]] = {
+        str(digest): (str(url), at)
+        for url, digest, at in conn.execute(
+            """select a.url, a.sha256, a.retrieved_at from source_artifact a
+               join changeset c on c.id = a.changeset_id where c.pipeline = %s""",
+            [pipeline],
+        )
+    }
+
+    def pin(artifact: raw.Artifact) -> raw.Artifact:
+        if artifact.sha256 not in stored:
+            return artifact
+        url, at = stored[artifact.sha256]
+        archived = artifact.url.startswith("https://web.archive.org/web/") and artifact.url.endswith(f"/{url}")
+        return replace(artifact, url=url, retrieved_at=at) if artifact.url == url or archived else artifact
+
+    return pin
+
+
 def archive(kind: str, process: str, extent: str) -> Path:
-    return raw.cached(SOURCE, f"{APLIEXTR}{kind}{process}_{extent}.zip").path
+    return ministry(f"{APLIEXTR}{kind}{process}_{extent}.zip").path
 
 
 def processes(kind: str) -> list[str]:
