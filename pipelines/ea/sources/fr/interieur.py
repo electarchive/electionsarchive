@@ -12,6 +12,7 @@ from psycopg import sql
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.fr.names import person_name
+from ea.sources.fr.regionales import REFORM, departements
 from ea.store import DATA, connect
 
 SOURCE = "fr.interieur"
@@ -398,6 +399,14 @@ def emit() -> Path:
         name(nation, "France", "en")
         cs.add("polity_territory", polity_id=france, area_id=nation)
 
+        def region(code: str) -> UUID:
+            area = cs.area("fr.region", code)
+            if area in cs.minted:
+                raise ValueError(f"region {code} is not in the database; load fr.regionales first")
+            return area
+
+        old_regions = departements(2004)
+        new_regions = departements(2015)
         departments: dict[str, UUID] = {}
         for department, label in circs.select("department", "department_label").unique().sort("department").iter_rows():
             if department == "ZZ":
@@ -405,8 +414,30 @@ def emit() -> Path:
             departments[department] = cs.area("fr.departement", department)
             cs.add("area", id=departments[department], scheme_code="fr.departement")
             cs.add("area_code", area_id=departments[department], code=department, valid_from=None)
-            cs.add("area_parent", area_id=departments[department], parent_id=nation, valid_from=None)
+            if department not in old_regions:
+                cs.add("area_parent", area_id=departments[department], parent_id=nation, valid_from=None)
+            elif old_regions[department] == new_regions[department]:
+                cs.add(
+                    "area_parent",
+                    area_id=departments[department],
+                    parent_id=region(old_regions[department]),
+                    valid_from=None,
+                )
+            else:
+                for parent, valid_from, valid_to in (
+                    (old_regions[department], None, REFORM),
+                    (new_regions[department], REFORM, None),
+                ):
+                    cs.add(
+                        "area_parent",
+                        area_id=departments[department],
+                        parent_id=region(parent),
+                        valid_from=valid_from,
+                        valid_to=valid_to,
+                    )
             name(departments[department], label)
+        if set(old_regions) - set(departments):
+            raise ValueError(f"départements missing from the results: {sorted(set(old_regions) - set(departments))}")
         areas: dict[str, UUID] = {}
         circ_units: dict[str, UUID] = {}
         current_areas = dict(
