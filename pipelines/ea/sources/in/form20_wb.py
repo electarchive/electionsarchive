@@ -23,12 +23,14 @@ import hashlib
 import json
 import re
 import statistics
+import time
 from collections import Counter
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import uuid5
 
+import httpx
 import polars as pl
 import pymupdf
 
@@ -46,6 +48,11 @@ CDX = (
     "&filter=statuscode:200&filter=mimetype:application/pdf&collapse=urlkey&fl=timestamp,original"
 )
 KARNATAKA_DIR = "http://ceo.karnataka.gov.in:80/form20_loksabhaelection2019/PDFS/"
+KARNATAKA_CDX = (
+    "https://web.archive.org/cdx/search/cdx?url=ceo.karnataka.gov.in/form20_loksabhaelection2019/PDFS/"
+    "&matchType=prefix&filter=statuscode:200&filter=mimetype:application/pdf&collapse=urlkey&fl=timestamp,original"
+)
+KARNATAKA_SHEET = re.compile(r"https?://ceo\.karnataka\.gov\.in(?::80)?/form20_loksabhaelection2019/PDFS/(\d+\.pdf)")
 PC_SCHEME = "in.pc"
 AC_SCHEME = "in.ac"
 STATION_SCHEME = "in.ps"
@@ -171,7 +178,48 @@ def _originals(listing: bytes) -> dict[str, str]:
 
 
 def fetch() -> None:
-    """Store the saved copies of the sheets under their original URLs, refusing any whose hash differs."""
+    """Store the saved copies of the sheets under their original URLs, then fill each Karnataka sheet still missing
+    from the archive's capture of its URL."""
+    if (INBOX / "index.json").exists():
+        _inbox()
+    _karnataka_captures()
+
+
+def _karnataka_captures() -> None:
+    """Store the earliest web.archive.org capture of each Karnataka sheet the cache lacks, under its original URL."""
+    held = files("KA")
+    listing = raw.fetch(SOURCE, KARNATAKA_CDX, suffix=".txt").path.read_text()
+    with httpx.Client(headers={"User-Agent": raw.USER_AGENT}, timeout=120, proxy=raw.PROXY) as client:
+        for line in listing.splitlines():
+            timestamp, original = line.split()
+            m = KARNATAKA_SHEET.fullmatch(original)
+            if m is None or int(m.group(1).removesuffix(".pdf")) in held:
+                continue
+            capture = f"https://web.archive.org/web/{timestamp}id_/{original}"
+            for attempt in range(4):
+                try:
+                    response = client.get(capture, follow_redirects=True)
+                    response.raise_for_status()
+                    break
+                except httpx.HTTPError:
+                    if attempt == 3:
+                        raise
+                    time.sleep(15 * (attempt + 1))
+            if not response.content.startswith(b"%PDF"):
+                raise ValueError(f"{capture} is not a PDF")
+            raw.store(
+                SOURCE,
+                KARNATAKA_DIR + m.group(1),
+                response.content,
+                suffix=".pdf",
+                retrieved_at=datetime.now(UTC),
+                media_type="application/pdf",
+            )
+            time.sleep(2)
+
+
+def _inbox() -> None:
+    """Store the saved copies in the source's inbox under their original URLs, refusing any whose hash differs."""
     index = json.loads((INBOX / "index.json").read_text())
     originals: dict[str, str] = {}
     for url in sorted(index, key=lambda u: u != CDX):
