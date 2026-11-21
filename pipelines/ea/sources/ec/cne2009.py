@@ -39,33 +39,7 @@ SYSTEM_DHONDT = key("electoral_system", "assembly-2013", "dhondt")
 TABLES = Path(__file__).with_name("atlas2009_assembly.json")
 REGISTRY = f"{SOURCE}/registry-2009"
 
-# the circumscriptions by the Council's province code, as the atlas heads their pages
-PROVINCES = {
-    "1": "Azuay",
-    "2": "Bolívar",
-    "3": "Cañar",
-    "4": "Carchi",
-    "5": "Cotopaxi",
-    "6": "Chimborazo",
-    "7": "El Oro",
-    "8": "Esmeraldas",
-    "9": "Guayas",
-    "10": "Imbabura",
-    "11": "Loja",
-    "12": "Los Ríos",
-    "13": "Manabí",
-    "14": "Morona Santiago",
-    "15": "Napo",
-    "16": "Pastaza",
-    "17": "Pichincha",
-    "18": "Tungurahua",
-    "19": "Zamora Chinchipe",
-    "20": "Galápagos",
-    "21": "Sucumbíos",
-    "22": "Orellana",
-    "23": "Santo Domingo de los Tsáchilas",
-    "24": "Santa Elena",
-}
+PROVINCES = cne.PROVINCES
 OVERSEAS = {
     "26": ("Europa, Asia y Oceanía", "Europe, Asia, and Oceania"),
     "27": ("Estados Unidos y Canadá", "the United States and Canada"),

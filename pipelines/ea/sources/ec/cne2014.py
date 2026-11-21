@@ -1,10 +1,15 @@
-"""Ecuador's mayors elected on 23 February 2014, from the National Electoral Council's 2009-2014 electoral atlas.
+"""Ecuador's prefects and mayors elected on 23 February 2014, from the National Electoral Council's 2009-2014 atlas.
 
 The atlas is a book of page images with no text layer. For each province it prints a table of the mayors elected in
 2014: the canton, the winning organization, the mayor, the winner's votes, and the winner's share of the valid votes.
 ``atlas2009`` reads those tables with Tesseract, and every reading was checked by eye against the printed page. The
 atlas prints no other candidate's votes and no canton's blank or null ballots, so each canton's contest holds the
 winner alone, as the 2004 contests from the 2002-2007 atlas do.
+
+For each province that elects a prefect, the atlas prints a table of the lists that ran: the list numbers (several when
+parties ran together), the organizations, each list's votes, its share of the valid votes, and the total of valid votes.
+It prints no candidate names, no blank or null ballots, and no figures by canton, so each prefect contest holds the lists'
+votes for the whole province, and the list with the most votes is the winner. Galápagos has no prefect.
 """
 
 from datetime import date
@@ -21,6 +26,7 @@ DIGITIZED = 8
 key = cne.key
 area = cne.area
 CANTONS = 221
+PREFECTURES = 23
 ATLAS_SOURCE = key("source", "atlas-2009-2014")
 
 METHOD = (
@@ -29,6 +35,15 @@ METHOD = (
     "votes. The other candidates' votes and the canton's blank and null ballots are not published there, so none is "
     "stored; the set's completeness is the winner's share. The atlas's pages are images, so the figures were read "
     "with OCR and each was checked by eye against the page."
+)
+
+
+METHOD_PREFECT = (
+    "Counted by the National Electoral Council and published in its 2009-2014 electoral atlas, which prints each list's "
+    "votes and its share of the valid votes for the whole province, and the total of valid votes. The atlas prints no "
+    "candidate names, no figures by canton, and no blank or null ballots, so none is stored. Where parties ran together, "
+    "the list is the alliance and carries every list number. The atlas's pages are images, so every figure was read by "
+    "eye from the page, and each table's figures add up to the total it prints and give the shares it prints."
 )
 
 
@@ -56,11 +71,11 @@ def build() -> Package:
     p = Package(
         f"{SOURCE}/{DAY}",
         SOURCE,
-        "Ecuador's mayors elected in the sectional elections of 2014, from the National Electoral Council's 2009-2014 "
+        "Ecuador's prefects and mayors elected in the sectional elections of 2014, from the National Electoral Council's 2009-2014 "
         "electoral atlas",
     )
     # the country, the mayoralty, and the cantons are production's rows
-    p.external.update([ECUADOR, "ec.canton", cne.MAYORALTY])
+    p.external.update([ECUADOR, "ec.canton", "ec.provincia", cne.MAYORALTY, cne.PREFECTURE])
     p.add(
         "source",
         id=ATLAS_SOURCE,
@@ -88,7 +103,8 @@ def build() -> Package:
     p.name(election, "2014 Ecuadorian sectional elections", "en", "official")
     p.name(election, "Elecciones seccionales del Ecuador 2014", "es", "native", False)
     pages: dict[int, str] = {}
-    for page in atlas2009.MAYOR_PAGES:
+    prefects = atlas2009.prefects()
+    for page in [*atlas2009.MAYOR_PAGES, *(t.page for t in prefects)]:
         width, height = atlas2009.page_image(page)
         pages[page] = key("page", atlas.sha256, page)
         p.add(
@@ -212,4 +228,102 @@ def build() -> Package:
         p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=mayor.votes)
     if len(seen) != CANTONS:
         raise ValueError(f"{DAY}: mayors of {len(seen)} cantons")
+    for table in prefects:
+        prefect(p, election, base, pages[table.page], table)
+    if len(prefects) != PREFECTURES:
+        raise ValueError(f"{DAY}: prefect tables for {len(prefects)} provinces")
     return p
+
+
+def prefect(p: Package, election: str, base: str, page: str, table: atlas2009.Prefect) -> None:
+    """One province's prefect contest: each list's votes, the valid total, and the list with the most votes elected."""
+    code = table.province
+    province = cne.PROVINCES[code]
+    token = f"prefect/{code}"
+    district = area("ec.provincia", code)
+    p.external.add(district)
+    contest = key("contest", DAY, token)
+    p.add(
+        "contest",
+        id=contest,
+        election_id=election,
+        kind="office",
+        round_number=1,
+        default_result_kind="counted",
+        office_id=cne.PREFECTURE,
+        magnitude=1,
+        district_area_id=district,
+    )
+    p.name(contest, f"{province} prefect, 2014", "en", "official")
+    p.name(contest, f"Prefecto de {province} 2014", "es", "native", False)
+    p.add("slug", path=f"{base}/{cne.slug(province)}-prefect", entity_id=contest, is_current=True)
+    result_set = key("result_set", DAY, token)
+    p.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage="official",
+        kind="counted",
+        source_id=ATLAS_SOURCE,
+        status="active",
+        is_default=True,
+        completeness=1.0,
+    )
+    p.add(
+        "note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD_PREFECT, lang="en"
+    )
+    unit = key("unit", DAY, "province", code)
+    p.add(
+        "reporting_unit",
+        id=unit,
+        polity_id=ECUADOR,
+        scheme_code="ec.provincia",
+        code=f"{DAY}:province:{code}",
+        area_relation="equals",
+        area_id=district,
+        kind="standard",
+    )
+    p.name(unit, province, "es", "official")
+    top = max(range(len(table.lists)), key=lambda i: table.lists[i][2])
+    if sum(row[2] == table.lists[top][2] for row in table.lists) != 1:
+        raise ValueError(f"{DAY}: prefect of province {code} is a tie")
+    for position, (number, sigla, votes, _share, box) in enumerate(table.lists, 1):
+        option = key("option", DAY, token, number)
+        p.add(
+            "contest_option",
+            id=option,
+            contest_id=contest,
+            kind="list",
+            ballot_position=position,
+            ballot_label=f"{sigla} (list {number})",
+        )
+        locate(p, result_set, unit, option, VOTES, votes, page, box)
+        p.add("declared", result_set_id=result_set, option_id=option, measure=VOTES, value=votes)
+        p.add("outcome", result_set_id=result_set, option_id=option, kind="elected" if position == top + 1 else "lost")
+    locate(p, result_set, unit, None, cne.VALID, table.total, page, table.total_box)
+    p.add("declared", result_set_id=result_set, option_id=None, measure=cne.VALID, value=table.total)
+
+
+def locate(
+    p: Package,
+    result_set: str,
+    unit: str,
+    option: str | None,
+    measure: int,
+    value: int,
+    page: str,
+    box: tuple[float, float, float, float],
+) -> None:
+    """A digitized value and the cell of the page it was read from."""
+    cell = {
+        "result_set_id": result_set,
+        "unit_id": unit,
+        "option_id": option,
+        "channel": 0,
+        "measure": measure,
+        "count_round": 0,
+    }
+    p.add("result_value", **cell, flags=DIGITIZED, value=value)
+    x0, y0, x1, y1 = box
+    p.add("value_locator", **cell, page_id=page, x0=round(x0, 4), y0=round(y0, 4), x1=round(x1, 4), y1=round(y1, 4))

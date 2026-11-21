@@ -36,6 +36,34 @@ METHOD = (
     "casts several votes, so no valid-ballot figure is stored for those contests."
 )
 
+# the provinces by the Council's province code, as the 2009-2014 atlas heads their pages
+PROVINCES = {
+    "1": "Azuay",
+    "2": "Bolívar",
+    "3": "Cañar",
+    "4": "Carchi",
+    "5": "Cotopaxi",
+    "6": "Chimborazo",
+    "7": "El Oro",
+    "8": "Esmeraldas",
+    "9": "Guayas",
+    "10": "Imbabura",
+    "11": "Loja",
+    "12": "Los Ríos",
+    "13": "Manabí",
+    "14": "Morona Santiago",
+    "15": "Napo",
+    "16": "Pastaza",
+    "17": "Pichincha",
+    "18": "Tungurahua",
+    "19": "Zamora Chinchipe",
+    "20": "Galápagos",
+    "21": "Sucumbíos",
+    "22": "Orellana",
+    "23": "Santo Domingo de los Tsáchilas",
+    "24": "Santa Elena",
+}
+
 
 def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
