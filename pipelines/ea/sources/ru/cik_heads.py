@@ -22,7 +22,6 @@ territory under Ukraine.
 
 import csv
 import io
-import json
 import re
 import time
 from dataclasses import dataclass
@@ -31,14 +30,13 @@ from urllib.parse import quote
 from uuid import uuid5
 
 import httpx
-import shapely
-import shapely.geometry
 
 from ea import package, raw
 from ea.package import Package
 from ea.sources.ru import cik_uik as base
 
 SOURCE = "ru.cik_heads"
+GEO = f"{base.SOURCE}/geo"
 RUSSIA = base.RUSSIA
 TERRITORY = base.TERRITORY
 SEVASTOPOL = base.SEVASTOPOL
@@ -51,14 +49,10 @@ FILES = f"{MIRROR}/-/raw/{COMMIT}/"
 NOTES = f"{FILES}README.md"
 INFO = f"{FILES}info.json"
 CANDIDATES = f"{FILES}candidates.tsv"
-LAYER = base.LAYER
-META = base.META
-GRID = 1e-6
 
 SUBJECT = base.SUBJECT
 TIK = base.TIK
 UIK = base.UIK
-PLAN_FROM = base.PLAN_FROM
 DAY = date(2025, 9, 14)
 
 REGISTERED, CAST, VALID, INVALID, VOTES = 2, 3, 4, 5, 1
@@ -97,12 +91,10 @@ def key(kind: str, *parts: object) -> str:
     return str(uuid5(package.NAMESPACE, "\x1f".join([SOURCE, kind, *(str(part) for part in parts)])))
 
 
-def subject_area(iso: str) -> str:
-    return key("area", SUBJECT, iso)
+subject_area = base.subject_area
 
 
 CIK = key("source", "cik")
-SHAPES = key("source", "geoboundaries")
 SYSTEM = key("electoral_system", "head")
 
 # ----------------------------------------------------------------------------------------------------------------
@@ -122,7 +114,7 @@ def _get(url: str, suffix: str) -> None:
 
 
 def fetch() -> None:
-    for url, suffix in ((NOTES, ".md"), (INFO, ".json"), (CANDIDATES, ".csv"), (LAYER, ".geojson"), (META, ".json")):
+    for url, suffix in ((NOTES, ".md"), (INFO, ".json"), (CANDIDATES, ".csv")):
         _get(url, suffix)
     for name in ELECTIONS.values():
         _get(file_url(name), ".csv")
@@ -138,11 +130,10 @@ def table(url: str) -> list[dict[str, str]]:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", f"{SOURCE}/2025-09-14"]
+    return [f"{SOURCE}/registry", f"{SOURCE}/2025-09-14"]
 
 
 def parse() -> None:
-    geo().write()
     registry().write()
     day_2025().write()
 
@@ -166,86 +157,6 @@ def _source(p: Package) -> None:
         notes=f"The Commission's tables as the open-data release of the single voting day of 14 September 2025 "
         f"keeps them, read from {MIRROR} at commit {COMMIT}; izbirkom.ru does not answer scripted requests from "
         "outside Russia.",
-    )
-
-
-def geo() -> Package:
-    p = Package(
-        f"{SOURCE}/geo",
-        SOURCE,
-        "Russia's 83 federal subjects since 2008 with their outlines, and the schemes of the Central Election "
-        "Commission's territorial and precinct commissions",
-    )
-    p.external |= {RUSSIA, TERRITORY}
-    for code, kind, rank, noun, system in (
-        (SUBJECT, "administrative", 1, "federal subject", "iso_3166_2"),
-        (TIK, "precinct", 3, "territorial election commission", None),
-        (UIK, "precinct", 4, "precinct election commission", None),
-    ):
-        p.add("scheme", code=code, polity_id=RUSSIA, kind=kind, rank=rank, noun=noun, code_system=system)
-    p.add(
-        "source",
-        id=SHAPES,
-        kind="academic",
-        publisher="geoBoundaries (William & Mary geoLab)",
-        title="geoBoundaries gbOpen Russia ADM1, 2017 (simplified)",
-        url="https://www.geoboundaries.org/",
-        license="Open Data Commons Open Database License 1.0",
-        license_url="https://opendatacommons.org/licenses/odbl/1-0/",
-        attribution="geoBoundaries (William & Mary geoLab); © OpenStreetMap contributors",
-        notes="OpenStreetMap boundaries of 2017 as geoBoundaries releases them; the federal subjects have not "
-        "changed within Russia's recognized borders since 2008.",
-    )
-    p.artifact(raw.cached(SOURCE, LAYER), SHAPES)
-    p.artifact(raw.cached(SOURCE, META), SHAPES)
-    p.add(
-        "boundary_set",
-        id=key("boundary_set", SUBJECT, 2008),
-        scheme_code=SUBJECT,
-        vintage="2008",
-        valid_from=PLAN_FROM,
-        valid_to=None,
-        as_of=DAY,
-    )
-    shapes = outlines()
-    for iso, name in SUBJECTS.items():
-        id = subject_area(iso)
-        p.add("area", id=id, scheme_code=SUBJECT)
-        p.add("area_code", area_id=id, code=f"RU-{iso}", valid_from=PLAN_FROM, valid_to=None)
-        p.add("area_parent", area_id=id, parent_id=TERRITORY, valid_from=PLAN_FROM, valid_to=None)
-        p.name(id, name, "ru", "official")
-        _outline(p, id, shapes[iso])
-    return p
-
-
-def outlines() -> dict[str, shapely.Geometry]:
-    """The layer's outlines by the ISO 3166-2 suffix it tags them with."""
-    features = json.loads(raw.cached(SOURCE, LAYER).path.read_text(encoding="utf-8"))["features"]
-    found: dict[str, shapely.Geometry] = {}
-    for feature in features:
-        iso = str(feature["properties"]["shapeISO"]).removeprefix("RU-")
-        found[iso] = shapely.make_valid(shapely.geometry.shape(feature["geometry"]))
-    missing = set(SUBJECTS) - set(found)
-    if missing:
-        raise LookupError(f"the geoBoundaries layer has no outline for {sorted(missing)}")
-    return found
-
-
-def _outline(p: Package, id: str, shape: shapely.Geometry) -> None:
-    gridded = shapely.set_precision(shapely.make_valid(shape), GRID)
-    polygons = [part for part in shapely.get_parts(gridded) if shapely.get_type_id(part) == 3 and not part.is_empty]
-    outline = shapely.set_srid(shapely.normalize(shapely.MultiPolygon(polygons)), 4326)
-    p.add(
-        "area_geometry",
-        area_id=id,
-        valid_from=PLAN_FROM,
-        valid_to=None,
-        geom=shapely.to_wkb(outline, hex=True, include_srid=True),
-        label_point=shapely.to_wkb(
-            shapely.set_srid(shapely.point_on_surface(outline), 4326), hex=True, include_srid=True
-        ),
-        quality="osm",
-        source_id=SHAPES,
     )
 
 
@@ -314,7 +225,7 @@ def registry() -> Package:
         SOURCE,
         "The offices of the federal subjects' heads, their electoral system, and the parties that nominated "
         "candidates on 14 September 2025, from the Central Election Commission",
-        depends=[f"{SOURCE}/geo"],
+        depends=[GEO],
     )
     p.external.add(RUSSIA)
     p.add(
@@ -464,7 +375,7 @@ def day_2025() -> Package:
         SOURCE,
         "The direct elections of 14 September 2025 for the heads of 20 federal subjects, by precinct election "
         "commission, from the Central Election Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
+        depends=[GEO, f"{SOURCE}/registry"],
     )
     p.external |= {RUSSIA, TERRITORY, SEVASTOPOL}
     _source(p)

@@ -308,7 +308,7 @@ def geo(wards: dict[str, Formation]) -> Package:
         SOURCE,
         "The municipal formations that held council or head elections on 14 September 2025, under their federal "
         "subjects",
-        depends=["ru.cik_heads/geo"],
+        depends=["ru.cik_uik/geo"],
     )
     p.external |= {RUSSIA, heads.SEVASTOPOL, base.CRIMEA}
     p.add(
@@ -484,7 +484,7 @@ def day(data: Release, wards: dict[str, Formation]) -> Package:
         SOURCE,
         "The municipal council and head elections of 14 September 2025, by precinct election commission, from the "
         "Central Election Commission",
-        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", "ru.cik_heads/geo"],
+        depends=[f"{SOURCE}/geo", f"{SOURCE}/registry", "ru.cik_uik/geo"],
     )
     p.external |= {RUSSIA, heads.SEVASTOPOL, base.CRIMEA}
     _source(p)
