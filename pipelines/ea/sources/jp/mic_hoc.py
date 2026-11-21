@@ -11,8 +11,9 @@ from uuid import UUID
 
 import polars as pl
 
-from ea import raw
-from ea.changeset import Changeset, slug
+from ea import package, raw
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.jp import mic
 from ea.sources.jp.mic import Places, dhondt, grid, party_key, party_label, person_name, plain, sheets
 from ea.sources.jp.mlit import PREFECTURES
@@ -40,6 +41,40 @@ PARSED_ELECTIONS = [22, 23, 24, 25, 26, 27]
 PREFECTURE_NAMES = [native for native, _ in PREFECTURES]
 TOTAL_ROW = re.compile(r"(合計|[都道府県]計|県計)$")
 SUBTOTAL_ROW = re.compile(r"計$")
+PLACE = re.compile(r"[市区町村]$")
+PRIVATE = re.compile(r"[-]")
+# A list candidate's votes in a counting district may carry three decimals (按分), and a district's candidate votes
+# in the party workbook are their exact sum.
+PLACE_SLACK = Decimal("0.0005")
+# Counting-district rows of the candidate sheets that disagree with the party workbook, corrected to the values that
+# make the row sum to the workbook's candidate votes there and the sheet's columns sum to its printed totals. Keyed
+# by (held, prefecture, party, district), in the sheet's column order.
+SHEET_FIXES: dict[tuple[str, str, str, str], list[str]] = {
+    # The first candidate's cell reads "c"; the party workbook's 169 candidate votes less the other three is 53.
+    ("2019-07-21", "千葉県", "社会民主党", "千葉市中央区"): ["53", "85", "9", "22"],
+    # The party's one candidate has 13 and 37 here against the workbook's 5 and 11, which also make the sheet's
+    # districts sum to its printed 125 and the candidate's districts to the national 15,257.
+    ("2025-07-20", "青森県", "日本改革党", "十和田市"): ["5"],
+    ("2025-07-20", "青森県", "日本改革党", "三沢市"): ["11"],
+}
+# Candidate sheets whose rows slip by one from a district on: that district repeats the row above it, each later
+# district holds the next one's row, and the last district's row is missing, so it is the printed total less the
+# other districts. Each shifted row then sums to the party workbook's candidate votes for its district.
+SHEET_SHIFTS: dict[tuple[str, str, str], str] = {("2025-07-20", "岩手県", "日本共産党"): "平泉町"}
+# Candidate sheets where one candidate's column also holds another's votes: in the 2019 Shizuoka sheet of the
+# Constitutional Democratic Party, おまた一平's column adds おしどりマコ's to his own in every district (643 votes),
+# so his districts sum to his national votes, and each district to the party workbook's, only once they come off.
+SHEET_COLUMNS: dict[tuple[str, str, str], tuple[str, str]] = {
+    ("2019-07-21", "静岡県", "立憲民主党"): ("おまた一平", "おしどりマコ"),
+}
+# Candidate sheets that print another prefecture's district names: the 2013 Ibaraki sheet of 生活の党 labels its 32
+# city rows with Iwate's municipalities, in Ibaraki's row order, so its rows take the labels of the workbook's other
+# sheets.
+SHEET_LABELS: set[tuple[str, str, str]] = {("2013-07-21", "茨城県", "生活の党")}
+# List candidates whose districts, as every prefecture's sheet prints them and sums them to its own totals, still
+# miss the national table: in 2016 新党改革's fifth candidate by the table's order is one vote short and its ninth
+# one vote over.
+NATIONAL_GAPS: dict[str, set[tuple[str, int]]] = {"2016-07-10": {("新党改革", 5), ("新党改革", 9)}}
 DROPPED: list[dict] = []
 UNCONFIRMED: list[dict] = []
 BOOK_VOTES = {
@@ -150,10 +185,15 @@ class Listing:
     totals: str
 
 
-def listing(number: int) -> Listing:
+def listing(number: int, fetching: bool = False) -> Listing:
+    """The ministry's files for one election, read from its index pages. When `fetching`, each page is fetched into
+    the cache before it is read, so a fetch works from an empty cache."""
     _, index_path, towns_path = ELECTIONS[number]
     index = f"{ROOT}/{index_path}"
     towns = f"{ROOT}/{towns_path}.html" if not towns_path.endswith(".html") else f"{ROOT}/{towns_path}"
+    if fetching:
+        raw.fetch(RAW, index, suffix=".html")
+        raw.fetch(RAW, towns, suffix=".html")
     named: dict[str, str] = {}
     for href, label in mic.anchors(index):
         if label not in named or not href.endswith(".pdf"):
@@ -168,6 +208,8 @@ def listing(number: int) -> Listing:
         ]
     pages = []
     for page in dict.fromkeys(subpages):
+        if fetching:
+            raw.fetch(RAW, page, suffix=".html")
         files = [url_of(page, href) for href, _ in mic.anchors(page) if "main_content" in href or "/pdf/" in href]
         pages.append((page, files))
     return Listing(index, pages, named[BOOK], named[SEATS], named[LISTS], named[PARTY_TOTALS])
@@ -261,7 +303,17 @@ def confirmed(text: str, votes: Decimal, mark: str) -> bool:
 
 
 def book_for(number: int) -> str:
-    return mic.book_text(listing(number).book)
+    """The 結果調 book's district table as plain text. Where pdftotext lacks the CJK encoding data the 2016 book's
+    fonts need, it returns almost nothing, and the text comes from PyMuPDF instead."""
+    url = listing(number).book
+    text = mic.book_text(url)
+    if len(CJK.findall(text)) >= 100 or not url.endswith(".pdf"):
+        return text
+    import pymupdf
+
+    with pymupdf.open(raw.cached(RAW, url).path) as document:
+        found = "".join(str(page.get_text()) for page in document)
+    return plain(unicodedata.normalize("NFKC", found))
 
 
 def districts(held: str) -> list[str]:
@@ -281,7 +333,7 @@ def sizes(text: str, held: str) -> dict[str, tuple[int, int]]:
 
 def fetch() -> None:
     for number in ELECTIONS:
-        found = listing(number)
+        found = listing(number, fetching=True)
         for url in [found.index, found.book, found.seats, found.lists, found.totals]:
             raw.fetch(RAW, url, suffix=mic.suffix(url))
         for page, files in found.pages:
@@ -302,7 +354,10 @@ def is_name(cell: str) -> bool:
     return bool(cell) and cell not in LABELS and not SUBHEAD.match(norm(cell).replace(" ", "").replace("\n", ""))
 
 
-def pr_party_sheet(rows: list[list[str]], held: str, prefecture: str) -> list[dict]:
+def pr_party_sheet(rows: list[list[str]], held: str, prefecture: str, blank: set[str] | None = None) -> list[dict]:
+    """Each party's total, party-only votes, and candidate votes by counting district. A counting district whose row
+    the workbook leaves empty (some 2025 workbooks do) gets no party values; its label goes into `blank`, since the
+    candidate sheets still hold its candidate votes."""
     out: list[dict] = []
     index = 0
     while index < len(rows):
@@ -316,6 +371,8 @@ def pr_party_sheet(rows: list[list[str]], held: str, prefecture: str) -> list[di
         )
         data = start + 1
         while data < len(rows) and (not rows[data][0] or not any(rows[data][1:])):
+            if blank is not None and PLACE.search(re.sub(r"\s+", "", rows[data][0])):
+                blank.add(re.sub(r"\s+", "", rows[data][0]))
             data += 1
         offsets = [j for j, cell in enumerate(rows[name_row]) if j > 0 and is_name(cell)]
         stop = data
@@ -327,6 +384,8 @@ def pr_party_sheet(rows: list[list[str]], held: str, prefecture: str) -> list[di
             label = re.sub(r"\s+", "", next((c for c in reversed(row[:base]) if c), ""))
             if label and any(row[base:]):
                 block.append((label, [amount(cell) for cell in row[base:]]))
+            elif blank is not None and PLACE.search(label):
+                blank.add(label)
         total = next((values for label, values in block if TOTAL_ROW.search(label)), None)
         leaves = leaves_of([row for row in block if not TOTAL_ROW.search(row[0])])
         for column in offsets:
@@ -336,13 +395,18 @@ def pr_party_sheet(rows: list[list[str]], held: str, prefecture: str) -> list[di
             if total is not None and not close(sums, total[at : at + 3]):
                 print(f"MISMATCH {held} {prefecture} {party}: {sums} against {total[at : at + 3]}")
             for label, values in leaves:
+                whole = values[at]
+                # Some workbooks (2016 Kumamoto) print a district's total to two decimals while its party and
+                # candidate votes keep three; their sum is the exact total.
+                if abs(whole - values[at + 1] - values[at + 2]) < Decimal("0.01"):
+                    whole = values[at + 1] + values[at + 2]
                 out.append(
                     {
                         "held": held,
                         "prefecture": prefecture,
                         "place": label,
                         "party": party,
-                        "total": str(values[at]),
+                        "total": str(whole),
                         "party_votes": str(values[at + 1]),
                         "candidate_votes": str(values[at + 2]),
                     }
@@ -351,44 +415,178 @@ def pr_party_sheet(rows: list[list[str]], held: str, prefecture: str) -> list[di
     return out
 
 
-def pr_candidate_sheets(path, held: str, prefecture: str, keep: set[str]) -> list[dict]:
+def shifted(block: list[tuple[str, list[Decimal]]], first: str) -> list[tuple[str, list[Decimal]]]:
+    """Undo a one-row slip in a candidate sheet (SHEET_SHIFTS): from `first` on, each district takes the row below
+    it, and the last district before the total takes the total less every other district."""
+    at = next(i for i, (label, _) in enumerate(block) if label == first)
+    end = next(i for i, (label, _) in enumerate(block) if TOTAL_ROW.search(label))
+    total = block[end][1]
+    rows = [(label, values) for label, values in block[:at]]
+    rows += [(block[i][0], block[i + 1][1]) for i in range(at, end - 1)]
+    rest = [sum((values[k] for _, values in rows), Decimal(0)) for k in range(len(total))]
+    rows.append((block[end - 1][0], [total[k] - rest[k] for k in range(len(total))]))
+    return rows + block[end:]
+
+
+def listed_person(named: dict[str, dict], text: str) -> dict | None:
+    """The national list entry a candidate sheet's column header names: the same name after folding width and
+    spaces, or else the one entry whose name starts with the header's."""
+    key = plain(norm(person_name(text)))
+    if key in named:
+        return named[key]
+    longer = [person for name, person in named.items() if len(key) >= 4 and name.startswith(key)]
+    if len(longer) == 1:
+        return longer[0]
+    # The national tables write some rare kanji as private-use characters (such as U+E074 for a variant of 辻).
+    gaiji = [
+        person
+        for name, person in named.items()
+        if PRIVATE.search(name) and re.fullmatch("".join("." if PRIVATE.match(c) else re.escape(c) for c in name), key)
+    ]
+    return gaiji[0] if len(gaiji) == 1 else None
+
+
+def pr_candidate_sheets(
+    path, held: str, prefecture: str, keep: set[str], places: list[dict], people: list[dict]
+) -> list[dict]:
+    """Each list candidate's personal votes by counting district, from the prefecture's workbook of one sheet per
+    party. The sheets number candidates by their registration number (整理番号), and the national table orders them
+    by votes, so each column is matched to its national entry by name. Each counting district is checked against the
+    party workbook's candidate votes there: the priority-quota (特定枠) candidates' votes count with the party's own
+    votes in some years, and a district whose row disagrees either way is left out, so the list keeps the votes
+    there as a remainder."""
+    named: dict[str, dict[str, dict]] = {}
+    for person in people:
+        named.setdefault(person["party"], {})[plain(norm(person["name"]))] = person
+    counted = {(row["place"], row["party"]): Decimal(row["candidate_votes"]) for row in places}
+    # A party workbook row whose total is not its party votes plus its candidate votes (2019 南箕輪村 prints 0, 0,
+    # and 19 for one party and 0, 34, and 0 for the next) settles nothing, so its candidate values stay out.
+    broken = {
+        (row["place"], row["party"])
+        for row in places
+        if Decimal(row["total"]) != Decimal(row["party_votes"]) + Decimal(row["candidate_votes"])
+    }
     out: list[dict] = []
+    first = grid(path, sheets(path)[0])
+    labels = [row[0] for row in first[next(i for i, row in enumerate(first) if row[0] == "整理番号") + 2 :]]
     for sheet in sheets(path):
         rows = grid(path, sheet)
+        named_party = party_name(rows[next(i for i, row in enumerate(rows) if row[0] == "政党等の名称") + 1][0])
+        if (held, prefecture, named_party) in SHEET_LABELS:
+            start = next(i for i, row in enumerate(rows) if row[0] == "整理番号") + 2
+            if len(rows) - start != len(labels):
+                raise ValueError(f"{held} {prefecture} {named_party}: {len(rows) - start} rows against {len(labels)}")
+            rows = [*rows[:start], *([label, *row[1:]] for label, row in zip(labels, rows[start:], strict=True))]
         number_row = next(i for i, row in enumerate(rows) if row[0] == "整理番号")
         party = party_name(rows[next(i for i, row in enumerate(rows) if row[0] == "政党等の名称") + 1][0])
         columns = [j for j, cell in enumerate(rows[number_row]) if j > 0 and cell]
+        persons = [listed_person(named.get(party, {}), rows[number_row + 1][j]) for j in columns]
+        if None in persons:
+            missing = [rows[number_row + 1][j] for j, person in zip(columns, persons, strict=True) if person is None]
+            raise LookupError(f"{held} {prefecture} {party}: no national list entry for {missing}")
+        regular = [k for k, person in enumerate(persons) if person is not None and not person["special"]]
         block = []
         for row in rows[number_row + 2 :]:
             label = re.sub(r"\s+", "", row[0])
             if label.endswith("区") and label not in keep:
-                label = next(iter(name for name in keep if name.endswith(label)), label)
-            if label and any(row[j] for j in columns):
+                # A ward printed without its city: 東区 is 福岡市東区, not 北九州市八幡東区.
+                label = next(iter(name for name in sorted(keep) if name.endswith("市" + label)), label)
+            if label:
                 block.append((label, [amount(row[j]) for j in columns]))
+        if (held, prefecture, party) in SHEET_SHIFTS:
+            block = shifted(block, SHEET_SHIFTS[held, prefecture, party])
+        if (held, prefecture, party) in SHEET_COLUMNS:
+            names = [plain(norm(person_name(rows[number_row + 1][j]))) for j in columns]
+            minuend, extra = (names.index(name) for name in SHEET_COLUMNS[held, prefecture, party])
+            block = [
+                (label, [value - values[extra] if k == minuend else value for k, value in enumerate(values)])
+                for label, values in block
+            ]
+        leaves = [
+            (label, [Decimal(value) for value in SHEET_FIXES.get((held, prefecture, party, label), values)])
+            for label, values in leaves_of([row for row in block if not TOTAL_ROW.search(row[0])], keep)
+        ]
+        everyone = list(range(len(columns)))
+        chosen: dict[str, list[int] | None] = {}
+        for label, values in leaves:
+            expected = counted.get((label, party))
+            if expected is None:
+                continue
+            if (label, party) in broken:
+                chosen[label] = None
+                DROPPED.append({"held": held, "prefecture": prefecture, "party": party, "place": label})
+            elif abs(sum(values) - expected) <= PLACE_SLACK:
+                chosen[label] = everyone
+            elif abs(sum((values[k] for k in regular), Decimal(0)) - expected) <= PLACE_SLACK:
+                chosen[label] = regular
+            else:
+                chosen[label] = None
+                DROPPED.append({"held": held, "prefecture": prefecture, "party": party, "place": label})
+        # One district left empty or wrong in a sheet is the printed total less the other districts, where that
+        # sums to the party workbook's candidate votes there.
         total = next((values for label, values in block if TOTAL_ROW.search(label)), None)
-        leaves = leaves_of([row for row in block if not TOTAL_ROW.search(row[0])], keep)
-        sums = [sum((values[k] for _, values in leaves), Decimal(0)) for k in range(len(columns))]
-        slack = Decimal(sum(1 for _, values in leaves if any(values))) / 2 + Decimal("0.01")
-        if total is not None and not all(abs(a - b) <= slack for a, b in zip(sums, total, strict=True)):
-            print(f"MISMATCH {held} {prefecture} {party} candidates: {sums} against {total}")
-            DROPPED.append({"held": held, "prefecture": prefecture, "party": party})
-            continue
-        for position, column in enumerate(columns):
-            number = int(rows[number_row][column])
-            ballot = person_name(rows[number_row + 1][column])
-            for label, values in leaves:
+        wrong = [label for label, choice in chosen.items() if choice is None and (label, party) not in broken]
+        if total is not None and len(wrong) == 1:
+            others = [values for label, values in leaves if label != wrong[0]]
+            rest = [total[k] - sum((values[k] for values in others), Decimal(0)) for k in everyone]
+            expected = counted[wrong[0], party]
+            for choice in (everyone, regular):
+                if min(rest) >= 0 and abs(sum((rest[k] for k in choice), Decimal(0)) - expected) <= PLACE_SLACK:
+                    print(f"FILLED {held} {prefecture} {party} {wrong[0]} from the sheet's total")
+                    leaves = [(label, rest if label == wrong[0] else values) for label, values in leaves]
+                    chosen[wrong[0]] = choice
+                    DROPPED.remove({"held": held, "prefecture": prefecture, "party": party, "place": wrong[0]})
+                    break
+        present = {label for label, _ in leaves}
+        for (label, owner), expected in counted.items():
+            if owner == party and expected and label not in present:
+                DROPPED.append({"held": held, "prefecture": prefecture, "party": party, "place": label})
+        # A district the party workbook leaves empty follows the sheet's other districts on the priority quota.
+        alone = regular if any(choice is regular and choice != everyone for choice in chosen.values()) else everyone
+        for label, values in leaves:
+            kept = chosen.get(label, alone)
+            if kept is None:
+                continue
+            for k in kept:
+                person = persons[k]
+                if person is None:
+                    continue
                 out.append(
                     {
                         "held": held,
                         "prefecture": prefecture,
                         "place": label,
                         "party": party,
-                        "number": number,
-                        "name": ballot,
-                        "votes": str(values[position]),
+                        "number": person["number"],
+                        "name": person["name"],
+                        "votes": str(values[k]),
                     }
                 )
     return out
+
+
+def nationally(rows: list[dict], people: list[dict], held: str) -> list[tuple[str, int]]:
+    """The list candidates whose votes by counting district do not sum to their national votes. A candidate in a
+    party whose sheet left a district out falls short there by design; any other gap means a column went to the
+    wrong candidate."""
+    sums: dict[tuple[str, int], Decimal] = {}
+    for row in rows:
+        if row["held"] == held:
+            key = (row["party"], row["number"])
+            sums[key] = sums.get(key, Decimal(0)) + Decimal(row["votes"])
+    short = {(row["party"]) for row in DROPPED if row["held"] == held}
+    off = []
+    for person in people:
+        key = (person["party"], person["number"])
+        if person["party"] == "合計" or person["special"]:
+            continue
+        gap = Decimal(person["votes"]) - sums.get(key, Decimal(0))
+        if abs(gap) > PLACE_SLACK and not (person["party"] in short and gap > 0):
+            off.append(key)
+            print(f"NATIONAL {held} {key}: districts sum {sums.get(key, Decimal(0))} against {person['votes']}")
+    if unexplained := sorted(set(off) - NATIONAL_GAPS.get(held, set())):
+        raise ValueError(f"{held}: list candidates whose districts miss their national votes: {unexplained}")
+    return off
 
 
 def national_lists(path, held: str) -> tuple[list[dict], list[dict]]:
@@ -1054,10 +1252,13 @@ def parse(numbers: list[int] | None = None) -> None:
                     parts[district] = (more, votes)
             party_path = raw.cached(RAW, files[1]).path
             parties_sheet = sheets(party_path)[0]
-            places = pr_party_sheet(grid(party_path, parties_sheet), held, prefecture)
+            blank: set[str] = set()
+            places = pr_party_sheet(grid(party_path, parties_sheet), held, prefecture, blank)
             pr_places += places
-            keep = {row["place"] for row in places}
-            pr_candidates += pr_candidate_sheets(raw.cached(RAW, files[2]).path, held, prefecture, keep)
+            keep = {row["place"] for row in places} | blank
+            pr_candidates += pr_candidate_sheets(raw.cached(RAW, files[2]).path, held, prefecture, keep, places, ranked)
+        if number != 22:
+            nationally(pr_candidates, ranked, held)
         for district, (more_, votes) in parts.items():
             more = more_
             won = sum(size[district])
@@ -1120,6 +1321,8 @@ def parse(numbers: list[int] | None = None) -> None:
         ("pr_candidates", pr_candidates),
     ):
         pl.DataFrame(rows).write_parquet(PARSED / f"{name}-v{VERSION}.parquet")
+    print(f"{sum(1 for row in DROPPED if 'place' in row)} counting districts left without list candidate votes")
+    print(build())
 
 
 TITLE = "参議院議員通常選挙結果調"
@@ -1158,8 +1361,12 @@ PR_NATIONAL_METHOD = (
 )
 PR_PLACE_METHOD = (
     "Votes by counting district from the ministry's tables by municipality: each party's total, its party-only "
-    "votes, and each candidate's personal votes. A candidate with no personal votes in a district has no value "
-    "there."
+    "votes, and each candidate's personal votes, matched to the national list by name. A candidate with no personal "
+    "votes in a district has no value there. Where the party table counts the priority-quota (特定枠) candidates' "
+    "votes with the party's own votes, those candidates have no values by district. Where a party's candidate sheet "
+    "disagrees with its party table in a district and the totals cannot settle which is right, the district holds "
+    "that party's candidate votes on the list as a whole, without a split by candidate. Where the party table "
+    "leaves a district blank, the district holds the candidates' votes only."
 )
 PR_ENGINE = (
     "The declared seats differ from a plain D'Hondt count on the party totals. Declared, then D'Hondt alone: {moved}."
@@ -1179,7 +1386,21 @@ def codes_of(district: str) -> list[str]:
     return [f"{number:02d}" for number, (native, _) in enumerate(PREFECTURES, 1) if native in district]
 
 
-def emit() -> Path:
+KEY = f"{SOURCE}/all"
+SUMMARY = (
+    "Japan's House of Councillors regular elections 2010-2025 from the Ministry of Internal Affairs and "
+    "Communications: prefectural district candidates and national list votes by counting district, with declared "
+    "winners and seats"
+)
+
+
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package jp.mic_hoc/all from the parsed tables. It reads the database, through Draft, so the rows it
+    rebuilds keep the ids the changeset path gave them."""
     candidates = pl.read_parquet(PARSED / f"candidates-v{VERSION}.parquet")
     smd = pl.read_parquet(PARSED / f"smd-v{VERSION}.parquet")
     parties = pl.read_parquet(PARSED / f"parties-v{VERSION}.parquet")
@@ -1188,15 +1409,7 @@ def emit() -> Path:
     pr_people = pl.read_parquet(PARSED / f"pr_candidates-v{VERSION}.parquet")
     english = dict(PREFECTURES)
     with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary="Japan's House of Councillors regular elections 2010-2025 from the Ministry of Internal Affairs "
-            "and Communications: prefectural district candidates and national list votes by counting district, with "
-            "declared winners and seats",
-            polity="JP",
-        )
+        cs = Draft(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="JP")
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official", preferred: bool = True) -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=preferred)
@@ -1234,6 +1447,11 @@ def emit() -> Path:
             found = party_key(text, held)
             if found is None:
                 return None
+            # A party this pipeline minted under its own key keeps it after jp.mic gives the label a Wikidata item;
+            # joining it to the item's party is jp.mic_parties' merge, not a rewrite of these rows.
+            local = (f"{mic.SOURCE}.party", party_label(text))
+            if found[0] == "wikidata" and local in cs.own_keys:
+                found = local
             if found not in keyed:
                 entity = keyed[found] = cs.key(*found)
                 if entity in cs.minted:
@@ -1266,12 +1484,18 @@ def emit() -> Path:
         def prefecture_unit(code: str) -> UUID:
             return unit("jp.prefecture", code, None, cs.area("jp.prefecture", code), "equals", cs.polity(f"JP-{code}"))
 
+        # A district candidate's name comes from the earliest election from 2013 on: the 2010 tables, read from
+        # their PDF layout, space some names differently.
+        printed: dict[str, str] = {}
+        for row in sorted(candidates.iter_rows(named=True), key=lambda row: (row["held"] < "2013", row["held"])):
+            printed.setdefault(f"smd:{row['district']}:{plain(row['name'])}", row["name"])
+
         def person(key: str, text: str) -> UUID:
             entity = cs.key(f"{SOURCE}.person", key)
             if entity in cs.minted and entity not in added:
                 added.add(entity)
                 cs.add("person", id=entity)
-                name(entity, text, "ja")
+                name(entity, printed.get(key, text), "ja")
             return entity
 
         nation = unit("jp.nation", "JP", None, cs.area("jp.nation", "JP"), "equals", japan)
