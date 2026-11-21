@@ -29,6 +29,7 @@ import shapely.geometry
 from ea import package, raw
 from ea.changeset import slug
 from ea.package import Package
+from ea.sources.us import ga_certified_local as local
 from ea.store import DATA
 
 SOURCE = "us.ga_certified_2026"
@@ -485,6 +486,130 @@ def district_attorneys(
     return geo, p
 
 
+LOCAL_METHOD = (
+    "County totals from the Secretary of State's results portal, which marks the election's results official "
+    "(published November 20, 2026). The portal reports a county or city contest under the county that ran it, so "
+    "the county's unit carries the votes cast in the contest, whether it covers the whole county or one district or "
+    "city. The portal marks no winner, so no outcome is stored here. Write-in votes are not in the portal's files."
+)
+
+
+def local_results(
+    ref: Reference,
+    data: dict[str, Any],
+    stamp: datetime,
+    fips_of: dict[str, str],
+    name_of: dict[str, str],
+    county_ref: dict[str, tuple[str, str, str]],
+    known: set[tuple[str, str]],
+    statewide: set[str],
+) -> Package:
+    """Certified results of the county and city contests that the archive's county elections already hold."""
+    src = key("source", "results")
+    contests = local.county_contests()
+    p = Package(
+        f"{SOURCE}/local",
+        SOURCE,
+        "Certified results of the county and city contests in Georgia's November 3, 2026 general election by "
+        "county and by precinct",
+        depends=[UNITS],
+    )
+    for url in (EVENT, EXPORT):
+        p.uses(raw.cached(SOURCE, url))
+    matched: list[tuple[dict[str, Any], str, dict[str, Any], local.Local]] = []
+    for locality in data["localResults"]:
+        fips = fips_of[locality["id"]]
+        taken: set[str] = set()
+        for item in locality["ballotItems"]:
+            if item["id"] in statewide:
+                continue
+            found = local.match(fips, item, contests.get(fips, []), taken)
+            if found is not None:
+                taken.add(found.id)
+                matched.append((locality, fips, item, found))
+    held = local.held([found.id for *_, found in matched])
+    extra: dict[tuple[str, str], str] = {}
+    rows: list[tuple[str, str, str, int, int]] = []
+    for locality, fips, item, found in matched:
+        county = county_ref[fips][1]
+        options: dict[str, str] = {}
+        for option in item["ballotOptions"]:
+            options[option["id"]] = found.options[local.person(option["name"])]
+        p.external |= {found.election, found.id, county, *options.values()}
+        county_set = p.id("result_set", fips, item["id"], "county")
+        precinct_set = p.id("result_set", fips, item["id"], "precinct")
+        for result_set, default in ((county_set, found.id not in held), (precinct_set, False)):
+            p.add(
+                "result_set",
+                id=result_set,
+                election_id=found.election,
+                contest_id=found.id,
+                stage="certified",
+                kind="counted",
+                source_id=src,
+                status="active",
+                is_default=default,
+                completeness=1.0,
+                as_of=stamp,
+            )
+            p.add(
+                "note",
+                id=p.id("note", result_set),
+                entity_id=result_set,
+                kind="methodology",
+                body_md=LOCAL_METHOD if result_set == county_set else PRECINCT_METHOD,
+                lang="en",
+            )
+        for option in item["ballotOptions"]:
+            oid = options[option["id"]]
+            rows.append((county_set, county, oid, 0, option["voteCount"]))
+            p.add("declared", result_set_id=county_set, option_id=oid, measure=1, value=option["voteCount"])
+            for precinct in option["precinctResults"] or []:
+                if (locality["id"], precinct["id"]) not in known:
+                    extra[locality["id"], precinct["id"]] = precinct["name"]
+                unit = key("unit", precinct_code(fips, name_of[fips], precinct["id"]))
+                for channel, amount in split(option, precinct["groupResults"], precinct["voteCount"]).items():
+                    rows.append((precinct_set, unit, oid, channel, amount))
+    p.external |= {county_ref[fips][2] for _, fips, _, _ in matched}
+    for (lid, pid), name in sorted(extra.items()):
+        fips = fips_of[lid]
+        code = precinct_code(fips, name_of[fips], pid)
+        p.add(
+            "reporting_unit",
+            id=key("unit", code),
+            polity_id=ref.polity,
+            scheme_code="us.precinct",
+            code=code,
+            parent_id=county_ref[fips][1],
+            area_relation="within",
+            area_id=county_ref[fips][2],
+            kind="standard",
+            valid_from=DAY,
+            valid_to=DAY + timedelta(days=1),
+        )
+        p.name(key("unit", code), name, "en", "official")
+    p.external |= {ref.polity, "us.precinct"}
+    p.frame("result_value", values(rows))
+    return p
+
+
+def values(rows: list[tuple[str, str, str, int, int]]) -> pl.DataFrame:
+    return pl.DataFrame(
+        [(*row[:4], 1, 0, 0, row[4]) for row in rows],
+        schema={
+            "result_set_id": pl.String,
+            "unit_id": pl.String,
+            "option_id": pl.String,
+            "channel": pl.Int16,
+            "measure": pl.Int16,
+            "count_round": pl.Int16,
+            "flags": pl.Int16,
+            "value": pl.Int64,
+        },
+        orient="row",
+    )
+
+
 def build() -> list[Package]:
     ref = reference()
     meta = event()
@@ -701,11 +826,12 @@ def build() -> list[Package]:
         ),
     )
     circuits, attorneys = district_attorneys(ref, data, stamp, fips_of, name_of, county_ref, precincts)
-    return [units, p, circuits, attorneys]
+    locals_ = local_results(ref, data, stamp, fips_of, name_of, county_ref, set(precincts), set(statewide))
+    return [units, p, circuits, attorneys, locals_]
 
 
 def packages() -> list[str]:
-    return [UNITS, f"{SOURCE}/general", CIRCUITS, ATTORNEYS]
+    return [UNITS, f"{SOURCE}/general", CIRCUITS, ATTORNEYS, f"{SOURCE}/local"]
 
 
 def parse() -> None:
