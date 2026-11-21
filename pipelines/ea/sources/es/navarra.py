@@ -9,12 +9,14 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+import pymupdf
 
-from ea import raw
-from ea.changeset import Changeset
+from ea import package, raw
+from ea.package import Draft
 from ea.store import DATA, connect
 
 SOURCE = "es.navarra"
+KEY = f"{SOURCE}/all"
 VERSION = "1"
 PUBLISHER = "Gobierno de Navarra"
 TITLE = "Resultados de las elecciones al Parlamento de Navarra agrupados por municipios (datosabiertos.navarra.es)"
@@ -71,6 +73,152 @@ PROCLAMATION = {
         WAYBACK.format(stamp="2") + SITE + "contenido-estatico-archivos/Acta%20de%20proclamaci%C3%B3n%202023.pdf",
         ".pdf",
     ),
+}
+# The Boletín Oficial del Parlamento de Navarra that opens each legislature lists its members with their lists: from
+# 1995 the relation the Junta Electoral Provincial sent to the Chamber, and in 1987 and 1991 the members in the order
+# they presented their credentials. As (file, the issue as printed, the pages of the list).
+BULLETINS = {
+    1987: ("B1987201.pdf", "II Legislatura, núm. 1, 23 de julio de 1987", (2, 3)),
+    1991: ("B1991301.pdf", "III Legislatura, núm. 1, 5 de julio de 1991", (2, 3)),
+    1995: ("B1995401.pdf", "IV Legislatura, núm. 1, 3 de julio de 1995", (2, 3)),
+    1999: ("B1999501.pdf", "V Legislatura, núm. 1, 6 de julio de 1999", (2, 3)),
+    2003: ("B2003602.pdf", "VI Legislatura, núm. 2, 27 de junio de 2003", (4,)),
+    2007: ("B20077001.pdf", "VII Legislatura, núm. 1, 25 de junio de 2007", (3,)),
+    2011: ("B20118001.pdf", "VIII Legislatura, núm. 1, 23 de junio de 2011", (3,)),
+}
+BULLETIN_BASE = "https://parlamentodenavarra.es/sites/default/files/boletines/"
+# The lists as the bulletins print them in the Junta Electoral's relation.
+LABELS = {
+    "UPN": "upn",
+    "PSN-PSOE": "psn",
+    "CDN": "cdn",
+    "IU": "iu",
+    "IUN-NEB": "iu",
+    "HB": "hb",
+    "EA": "ea",
+    "EH": "eh",
+    "EA / EAJ-PNV": "eapnv",
+    "EA/EAJ-PNV": "eapnv",
+    "Aralar": "aralar",
+    "Nafarroa-Bai": "nabai",
+    "Nafarroa Bai 2011": "nabai",
+    "Bildu": "bildu",
+    "PP": "pp",
+    "Izquierda-Ezkerra": "ie",
+}
+# The 1987 and 1991 bulletins are scans with a misread text layer, so their lists of members by order of credentials
+# are read from the page: each member with the list the party column gives, which the composition of the
+# parliamentary groups in the same bulletin confirms. The scans print surnames in capitals (1987) or misread letters
+# (1991: "All¡", "Oiite", "lñaki", "ltziar", "Granda", "tu" for IU); names are spelled as the bulletin's own clean
+# printings give them (the 1987 spokespersons list prints "Arbeloa Suberviola" and "Urquía Braña"), with the accents of
+# surnames in capitals taken from the 1991 and 1995 bulletins. A list of (list, name) in the order of credentials; the
+# first SCANNED_SPLIT[year] stand on the first page of the list.
+SCANNED_SPLIT = {1987: 7, 1991: 12}
+SCANNED = {
+    1987: [
+        ("upn", "Rafael Gurrea Induráin"),
+        ("upn", "José Javier Viñes Rueda"),
+        ("upn", "Balbino Bados Artiz"),
+        ("udf", "Calixto Ayesa Dianda"),
+        ("ee", "Ramón Arozarena Sanzberro"),
+        ("upn", "José Javier Pomés Ruiz"),
+        ("upn", "Ignacio Javier Gómara Granada"),
+        ("upn", "Juan Cruz Alli Aranguren"),
+        ("udf", "José Ignacio López Borderías"),
+        ("upn", "Félix Armañanzas Echarri"),
+        ("upn", "Javier Luis del Castillo Bandrés"),
+        ("ea", "Fermín Ciáurriz Gómez"),
+        ("upn", "Jesús Javier Marcotegui Ros"),
+        ("upn", "Miguel Sanz Sesma"),
+        ("upn", "Juan José Manero Sainz"),
+        ("upn", "M.ª Rosario Villanueva Iturralde"),
+        ("fap", "Juan Cruz Cruz"),
+        ("upn", "Andrés Basterra Layana"),
+        ("psn", "José Gómez Lara"),
+        ("fap", "Miguel Urquía Braña"),
+        ("psn", "Jesús Malón Nicolao"),
+        ("psn", "José Antonio Asiáin Ayala"),
+        ("psn", "Francisco San Martín Sala"),
+        ("cds", "José María Martínez-Peñuela Virseda"),
+        ("cds", "José Antonio Eder Esarte"),
+        ("cds", "Juan José Otamendi Rodríguez-Bethencourt"),
+        ("psn", "Federico Tajadura Iso"),
+        ("psn", "José Javier Arraiza Meoqui"),
+        ("psn", "Antonio Aragón Elizalde"),
+        ("upn", "Félix Sánchez Cornago"),
+        ("psn", "M.ª Soledad Elizari Garayoa"),
+        ("psn", "Javier Asiáin Ayala"),
+        ("psn", "Camino Oslé Guerendiain"),
+        ("psn", "Román Felones Morrás"),
+        ("psn", "Javier Otano Cid"),
+        ("psn", "M.ª Dolores Eguren Apesteguía"),
+        ("ea", "Iñaki Cabasés Hita"),
+        ("cds", "Pablo García Tellechea"),
+        ("udf", "José M.ª Jiménez Jiménez"),
+        ("psn", "Miguel Angel Ancízar Eceolaza"),
+        ("ea", "Félix Irurzun Olaizola"),
+        ("psn", "Gabriel Urralburu Tainta"),
+        ("hb", "Guillermo Arbeloa Suberviola"),
+        ("hb", "Iñaki Aldecoa Azarloza"),
+        ("hb", "Florencio Aoiz Monreal"),
+        ("hb", "Sagrario Alemán Astiz"),
+        ("hb", "Mauricio Olite Ariz"),
+        ("hb", "Francisco Erdozain Beroiz"),
+        ("ea", "Gregorio Monreal Zia"),
+        ("hb", "Fernando Sáez García-Falces"),
+    ],
+    1991: [
+        ("upn", "Rafael Gurrea Induráin"),
+        ("ea", "Fermín Ciáurriz Gómez"),
+        ("upn", "Juan González Mateo"),
+        ("upn", "José Ignacio Palacios Zuasti"),
+        ("upn", "Calixto Ayesa Dianda"),
+        ("psn", "José Luis Uriz Iglesias"),
+        ("psn", "Alfonso Estévez Jiménez"),
+        ("psn", "Javier Asiáin Ayala"),
+        ("psn", "María Urmeneta Fernández"),
+        ("psn", "M.ª Dolores Eguren Apesteguía"),
+        ("upn", "M.ª Rosario Villanueva Iturralde"),
+        ("upn", "Carlos García Adanero"),
+        ("upn", "José Javier Pomés Ruiz"),
+        ("psn", "Manuel López Mazuelas"),
+        ("psn", "M.ª Lourdes Gorricho Ríos"),
+        ("psn", "Javier Marín Ordoqui"),
+        ("upn", "Santiago Barrios Escamilla"),
+        ("upn", "José Ignacio López Borderías"),
+        ("psn", "Aladino Colín Rodríguez"),
+        ("iu", "Félix María Taberna Monzón"),
+        ("iu", "Martín Landa Marco"),
+        ("psn", "José Antonio Asiáin Ayala"),
+        ("ea", "Iñaki Cabasés Hita"),
+        ("upn", "José M.ª Jiménez Jiménez"),
+        ("upn", "Pilar Abadía Gauna"),
+        ("upn", "Ignacio Javier Gómara Granada"),
+        ("upn", "Amadeo Sánchez de Muniáin Solano"),
+        ("upn", "J. Javier Marcotegui Ros"),
+        ("ea", "Estebe Petrizán Iriarte"),
+        ("psn", "Jesús María Ramírez Sánchez"),
+        ("psn", "Javier Otano Cid"),
+        ("psn", "Federico Tajadura Iso"),
+        ("psn", "Joaquín Pérez de Obanos Liso"),
+        ("upn", "Juan Cruz Alli Aranguren"),
+        ("psn", "Antonio Aragón Elizalde"),
+        ("upn", "Miguel Sanz Sesma"),
+        ("upn", "Luis Campoy Zueco"),
+        ("upn", "Fernando Labarga Gracia"),
+        ("upn", "Alberto Catalán Higueras"),
+        ("psn", "Joaquín Pascal Lozano"),
+        ("psn", "Jesús Malón Nicolao"),
+        ("psn", "Gabriel Urralburu Tainta"),
+        ("psn", "M.ª Pilar Aramburo González"),
+        ("upn", "Félix Armañanzas Echarri"),
+        ("hb", "Zutoia Michel Arbizu"),
+        ("hb", "Patxi Zabaleta Zabaleta"),
+        ("hb", "Itziar Gómez López"),
+        ("hb", "Mauricio Olite Ariz"),
+        ("hb", "Adolfo Araiz Flamarique"),
+        ("hb", "Florencio Aoiz Monreal"),
+    ],
 }
 MEMBERS_2023 = {
     "upn": [
@@ -499,6 +647,8 @@ def fetch() -> None:
     for link, suffix in PROCLAMATION.values():
         raw.fetch(SOURCE, link, suffix=suffix)
     raw.fetch(SOURCE, BOE_1983, suffix=".pdf")
+    for file, *_ in BULLETINS.values():
+        raw.fetch(SOURCE, BULLETIN_BASE + file, suffix=".pdf")
 
 
 def number(text: str) -> int:
@@ -603,6 +753,40 @@ def members(year: int) -> list[dict]:
     return out
 
 
+def bulletin_members(year: int) -> list[dict]:
+    """The members a legislature's first bulletin lists with their lists, in the order it prints them."""
+    if year in SCANNED:
+        return [
+            {"year": year, "key": key, "position": None, "name": name, "page": 2 if i <= SCANNED_SPLIT[year] else 3}
+            for i, (key, name) in enumerate(SCANNED[year], 1)
+        ]
+    file, _, pages = BULLETINS[year]
+    out: list[dict] = []
+    with pymupdf.open(raw.cached(SOURCE, BULLETIN_BASE + file).path) as doc:
+        for number in pages:
+            collecting, pending = False, []
+            for line in str(doc[number - 1].get_text()).splitlines():
+                line = line.strip()
+                if line == "Partido":
+                    collecting, pending = True, []
+                elif not collecting or not line or line in ("Nombre", "Nº") or line.isdigit():
+                    continue
+                elif line in LABELS:
+                    name = " ".join(pending)
+                    if "," in name:  # 1995 prints the surnames first
+                        surnames, given = name.split(",", 1)
+                        name = f"{given.strip()} {surnames.strip()}"
+                    out.append({"year": year, "key": LABELS[line], "position": None, "name": name, "page": number})
+                    pending = []
+                elif line.startswith(("B. O.", "B.O.", "Relación", "Composición", "Serie")):
+                    if pending:
+                        raise ValueError(f"{year}: {pending} has no list")
+                    collecting = False
+                else:
+                    pending.append(re.sub(r"\s+\d+$", "", line))
+    return out
+
+
 def dhondt(votes: dict[str, int], valid: int, year: int) -> Counter[str]:
     eligible = {code: count for code, count in votes.items() if count >= THRESHOLD.get(year, 0.03) * valid}
     quotients = sorted(
@@ -642,12 +826,23 @@ def parse() -> None:
             per = Counter(row["key"] for row in found)
             declared = Counter({party_key(label): seat for label, (_, seat) in lists.items() if seat})
             print(year, "members", len(found), "match", per == declared)
+        if year in BULLETINS:
+            found = bulletin_members(year)
+            people += found
+            per = Counter(row["key"] for row in found)
+            declared = Counter({party_key(label): seat for label, (_, seat) in lists.items() if seat})
+            if per != declared:
+                raise ValueError(f"{year}: the bulletin lists {dict(per)} against the seats {dict(declared)}")
+            folded = Counter(fold(row["name"]) for row in found)
+            if max(folded.values()) > 1 or min(len(row["name"].split()) for row in found) < 2:
+                raise ValueError(f"{year}: a name twice or cut short in {sorted(folded)}")
+            print(year, "members", len(found), "from the bulletin, by list", dict(per))
     for year, table in ((1983, MEMBERS_1983), (2023, MEMBERS_2023)):
         for key, names in table.items():
             people += [
                 {"year": year, "key": key, "position": index, "name": name} for index, name in enumerate(names, 1)
             ]
-    for year in (1983, 2015, 2019, 2023):
+    for year in ELECTIONS:
         per = Counter(row["key"] for row in people if row["year"] == year)
         declared = Counter({party_key(label): seat for label, (_, seat) in OFFICIAL[year][1].items() if seat})
         if per != declared:
@@ -656,6 +851,7 @@ def parse() -> None:
         frame = pl.DataFrame(rows, infer_schema_length=None)
         frame.write_parquet(PARSED / f"{name}.parquet")
         print(f"{name}: {frame.height} rows")
+    build()
 
 
 SYSTEM_1983 = (
@@ -690,6 +886,22 @@ MEMBERS_NOTE = (
     " The elected members are those the Junta Electoral Provincial de Navarra proclaimed, as read to the Chamber at "
     "its constitutive session."
 )
+BULLETIN_NOTE = (
+    " The elected members are those the Boletín Oficial del Parlamento de Navarra lists with their lists at the start "
+    "of the legislature ({printed}), {how}; each list's members equal its seats."
+)
+BULLETIN_HOW = {
+    1987: (
+        "in the order the members presented their credentials, read from the scanned page and confirmed by the "
+        "composition of the parliamentary groups in the same issue, with names in capitals written in small letters "
+        "and the accents the Parliament's later bulletins print"
+    ),
+    1991: (
+        "in the order the members presented their credentials, read from the scanned page and confirmed by the "
+        "composition of the parliamentary groups in the same issue, with the letters the scan's text misreads restored"
+    ),
+}
+JUNTA_HOW = "as the relation of members the Junta Electoral Provincial sent to the Chamber"
 MUNICIPIO_METHOD = (
     "List votes and ballot counts by municipality from the Gobierno de Navarra's open-data results file, with the "
     "votes of residents abroad (CERA) on a separate row. Municipalities sit on the INE municipality codes. The "
@@ -697,22 +909,35 @@ MUNICIPIO_METHOD = (
 )
 
 
-def emit() -> Path:
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package es.navarra/all from the parsed tables. It reads the database, through Draft, so the rows it
+    rebuilds keep the ids the changeset path gave them."""
     units = pl.read_parquet(PARSED / "unit.parquet")
     votes = pl.read_parquet(PARSED / "votes.parquet")
     seats = pl.read_parquet(PARSED / "seats.parquet")
     people = pl.read_parquet(PARSED / "people.parquet")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary=(
                 "Parlamento de Navarra elections of 1983 to 2023 by municipality, with the seats each list was "
-                "declared to have won and the members proclaimed elected in 1983, 2015, 2019, and 2023, from the Gobierno de "
-                "Navarra's results files and the Parlamento de Navarra's results pages"
+                "declared to have won and the members elected in each, from the Gobierno de Navarra's results files and "
+                "the Parlamento de Navarra's results pages, records, and bulletins"
             ),
             polity="ES",
+        )
+        cs.accept(
+            "accounting.ballots_sum",
+            "The Gobierno de Navarra's municipality files give ballots cast that differ from the sum of votes to "
+            "candidacies, blank, and null ballots in 13 municipality rows, and the Parlamento de Navarra's own totals "
+            "do the same for 2015 (342,173 against 342,175) and 2019 (350,370 against 350,362); all are stored as "
+            "published.",
         )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
@@ -765,14 +990,32 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, link), parliament)
         for link, _ in PROCLAMATION.values():
             cs.artifact(raw.cached(SOURCE, link), parliament)
+        bulletins: dict[int, UUID] = {}
+        for year, (file, printed, _) in BULLETINS.items():
+            title = f"Boletín Oficial del Parlamento de Navarra, {printed}: relación de Parlamentarios Forales"
+            bulletin = bulletins[year] = cs.source(PARLIAMENT, title)
+            cs.add(
+                "source",
+                id=bulletin,
+                kind="official_body",
+                publisher=PARLIAMENT,
+                title=title,
+                url=BULLETIN_BASE + file,
+                license=None,
+                license_url=None,
+                attribution=f"Fuente: Boletín Oficial del Parlamento de Navarra, {printed}.",
+            )
+            cs.artifact(raw.cached(SOURCE, BULLETIN_BASE + file), bulletin)
 
         parties: dict[str, UUID] = {}
         for key, (native, english) in PARTIES.items():
             parties[key] = cs.key(f"{SOURCE}.party", key)
-            cs.add("party", id=parties[key], kind="party", polity_id=navarre)
-            name(parties[key], native, "es", "official")
-            if english != native:
-                name(parties[key], english, "en", "english")
+            # A party merged into another pipeline's party is that pipeline's row; only the pipeline's own are written.
+            if parties[key] in cs.minted:
+                cs.add("party", id=parties[key], kind="party", polity_id=navarre)
+                name(parties[key], native, "es", "official")
+                if english != native:
+                    name(parties[key], english, "en", "english")
 
         body = cs.key("es.body", "navarre-parliament")
         cs.add("body", id=body, polity_id=navarre, kind="unicameral")
@@ -899,7 +1142,9 @@ def emit() -> Path:
             )
             note += CORRECTED.get(year, "")
             declared = people.filter(pl.col("year") == year)
-            if not declared.is_empty():
+            if year in BULLETINS:
+                note += BULLETIN_NOTE.format(printed=BULLETINS[year][1], how=BULLETIN_HOW.get(year, JUNTA_HOW))
+            elif not declared.is_empty():
                 note += MEMBERS_NOTE
 
             def make_set(label: str, default: bool, completeness: float, text: str, origin: UUID) -> UUID:
@@ -962,7 +1207,21 @@ def emit() -> Path:
                     member_of_party_id=party,
                     is_independent=False,
                 )
+                if year in bulletins:
+                    cs.add(
+                        "citation",
+                        entity_id=cs.key(f"{SOURCE}.candidacy", person_key),
+                        source_id=bulletins[year],
+                        locator={"page": member["page"]},
+                    )
                 cs.add("outcome", result_set_id=navarre_set, option_id=option, kind="elected")
+            if year in bulletins:
+                cs.add(
+                    "citation",
+                    entity_id=navarre_set,
+                    source_id=bulletins[year],
+                    locator={"page": BULLETINS[year][2][0]},
+                )
 
             municipio_set = make_set(
                 "municipio",
