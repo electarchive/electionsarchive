@@ -134,6 +134,11 @@ def held() -> dict[str, object]:
         area.filter(pl.col("scheme_code") == "mx.municipio"), left_on="entity_id", right_on="id"
     )
     states = coded.filter(pl.col("scheme_code") == "mx.entidad")
+    # The federal district areas mx.mge and mx.historicos hold, with the validity of each code; mx.historicos dates
+    # the 1996 and 2005 plans' outlines.
+    districts = coded.filter(pl.col("scheme_code") == "mx.distrito_federal").select(
+        "code", "area_id", "valid_from", "valid_to"
+    )
     return {
         "parties": parties,
         "body": body,
@@ -145,7 +150,23 @@ def held() -> dict[str, object]:
         "state_areas": dict(states.select("code", "area_id").iter_rows()),
         "state_names": dict(states.select("code", "name").iter_rows()),
         "towns": dict(towns.select("value", "entity_id").iter_rows()),
+        "districts": list(districts.iter_rows()),
+        "nation_area": coded.filter((pl.col("scheme_code") == "mx.nation") & (pl.col("code") == "MX"))[
+            "area_id"
+        ].item(),
     }
+
+
+def district_areas(day: date) -> dict[str, str]:
+    """The federal district areas by code whose code is valid on the day."""
+    rows = held()["districts"]
+    assert isinstance(rows, list)
+    found: dict[str, str] = {}
+    for code, area, begin, end in rows:
+        valid = (begin is None or begin <= day) and (end is None or day < end)
+        if valid and found.setdefault(code, area) != area:
+            raise ValueError(f"federal district {code} names two areas on {day}")
+    return found
 
 
 def party_id(abbrev: str) -> str:
@@ -209,6 +230,111 @@ def system_id(name: str) -> str:
 
 def line_members(abbrev: str) -> tuple[str, ...]:
     return COALITIONS.get(abbrev, (abbrev,))
+
+
+# The years whose list ballot is stored by casilla, with the note on that set. In 2003 the votes marked for the
+# Alianza para Todos are distributed between the PRI and the PVEM by the shares of the coalition's agreement (acuerdo
+# CG220/2003, considerando 16), which INE's file does not give, so 2003 has no casilla set for the lists.
+LIST_CASILLAS = {
+    2006: (
+        "Polling-station results of the list ballot from INE's file of the district counts for proportional "
+        "representation. A special casilla's two actas, the one for voters inside the district (whose ballot counts "
+        "for the district and the list) and the one for voters from outside it (list only), are added together. Each "
+        "coalition ran a single list, so each line of the file is one list. These are the counts before the electoral "
+        "tribunal's annulments, so they add up to slightly more than the Consejo General's declared national vote, "
+        "which is the default result." + DIFFERENCE_NOTE
+    ),
+}
+
+
+def list_casillas(
+    year: int,
+    by_code: dict[str, tuple[str, int]],
+    options: dict[str, str],
+    write_in: str,
+    result_set: str,
+    declared: dict[str, int],
+) -> pl.DataFrame:
+    """The list ballot by casilla from INE's file for proportional representation, on the national list contest's
+    options, at the casilla units of the district contests: a special casilla's district (SMR) and list-only (SRP)
+    actas share its unit."""
+    columns: dict[str, tuple[str, ...]] = d.ELECTIONS[year]["columns"]
+    lists = {tuple(sorted(line_members(abbrev))): abbrev for abbrev in declared}
+    line = {column: lists[tuple(sorted(members))] for column, members in columns.items()}
+    votes = pl.read_parquet(d.PARSED / f"rp_{year}_votes.parquet")
+    casillas = pl.read_parquet(d.PARSED / f"rp_{year}_casillas.parquet")
+    casillas = casillas.filter((pl.col("casilla") != "") | (pl.col("total") > 0))
+    unknown = set(votes.filter(pl.col("kind") == "list")["option"]) - set(columns)
+    if unknown:
+        raise ValueError(f"{year} list file: columns without a list: {sorted(unknown)}")
+    placed, printed = [], {}
+    for row in casillas.iter_rows(named=True):
+        state = f"{int(row['state']):02d}"
+        district = int(row["district"]) if row["district"].isdigit() else 0
+        code = (
+            f"{year}:{state}-{district:02d}-{int(row['section']):04d}-"
+            f"{ine.casilla_code(year, re.sub(r'^S(?:MR|RP)', 'S', row['casilla']) or 'X')}"
+        )
+        if code not in by_code:
+            raise ValueError(f"{year} list file: casilla {code} is not in the district file")
+        printed.setdefault(code, []).append(row["casilla"])
+        placed.append((*(row[k] for k in ine.KEYS), *by_code[code]))
+    for code, labels in printed.items():
+        if len(labels) > 1 and sorted(label[:3] for label in labels) != ["SMR", "SRP"]:
+            raise ValueError(f"{year} list file: casilla {code} appears as {labels}")
+    units = pl.DataFrame(
+        placed,
+        schema=[*((k, pl.String) for k in ine.KEYS), ("unit_id", pl.String), ("channel", pl.Int16)],
+        orient="row",
+    )
+    located = casillas.join(units, on=ine.KEYS)
+    joined = votes.join(units, on=ine.KEYS)
+    empty = pl.lit(None, pl.String)
+    by_unit = located.group_by("unit_id", "channel").agg(
+        registered=pl.col("registered").fill_null(0).sum(), total=pl.col("total").sum()
+    )
+    group = ["unit_id", "channel"]
+    invalid = joined.filter(pl.col("kind") == "invalid").group_by(group).agg(value=pl.col("votes").sum())
+    valid = joined.filter(pl.col("kind") != "invalid").group_by(group).agg(value=pl.col("votes").sum())
+    unregistered = joined.filter(pl.col("kind") == "unregistered").group_by(group).agg(value=pl.col("votes").sum())
+    listed = (
+        joined.filter(pl.col("kind") == "list")
+        .with_columns(option_id=pl.col("option").replace_strict({c: options[a] for c, a in line.items()}))
+        .group_by(*group, "option_id")
+        .agg(value=pl.col("votes").sum())
+        .filter(pl.col("value") != 0)
+    )
+    parts = [
+        by_unit.filter(pl.col("registered") > 0).select(
+            *group, option_id=empty, measure=pl.lit(REGISTERED), value="registered"
+        ),
+        by_unit.select(*group, option_id=empty, measure=pl.lit(BALLOTS), value="total"),
+        invalid.select(*group, option_id=empty, measure=pl.lit(INVALID), value="value"),
+        valid.select(*group, option_id=empty, measure=pl.lit(VALID), value="value"),
+        unregistered.filter(pl.col("value") != 0).select(
+            *group, option_id=pl.lit(write_in), measure=pl.lit(VOTES), value="value"
+        ),
+        listed.select(*group, "option_id", measure=pl.lit(VOTES), value="value"),
+    ]
+    frame = pl.concat(
+        [
+            part.select(
+                result_set_id=pl.lit(result_set),
+                unit_id="unit_id",
+                option_id=pl.col("option_id").cast(pl.String),
+                measure=pl.col("measure").cast(pl.Int16),
+                value=pl.col("value").cast(pl.Int64),
+                channel=pl.col("channel").cast(pl.Int16),
+            )
+            for part in parts
+        ]
+    )
+    national = dict(
+        frame.filter(pl.col("measure") == VOTES).group_by("option_id").agg(pl.col("value").sum()).iter_rows()
+    )
+    gaps = {abbrev: national.get(options[abbrev], 0) - count for abbrev, count in declared.items()}
+    print(year, "list casillas", units["unit_id"].n_unique(), "units; file less declared", gaps, flush=True)
+    return frame
 
 
 def build(year: int) -> Package:
@@ -325,6 +451,7 @@ def build(year: int) -> Package:
     reused = 0
     placed = []
     codes: set[str] = set()
+    by_code: dict[str, tuple[str, int]] = {}
     for row in casillas.iter_rows(named=True):
         state = f"{int(row['state']):02d}"
         district = int(row["district"]) if row["district"].isdigit() else 0
@@ -369,6 +496,7 @@ def build(year: int) -> Package:
                 }
             )
         placed.append((*(row[k] for k in ine.KEYS), unit_id, channel))
+        by_code[code] = (unit_id, channel)
     p.external.update(areas)
     units = pl.DataFrame(
         placed,
@@ -381,6 +509,15 @@ def build(year: int) -> Package:
     print(year, "casillas", units.height, "reused", reused, "new", len(new_units))
 
     annulled: dict[tuple[str, int], str] = config.get("annulled", {})
+    plan = district_areas(day)
+
+    def district_area(ss: str, dd: int) -> str:
+        area = plan.get(f"{ss}{dd:02d}")
+        if area is None:
+            raise ValueError(f"{year}: no federal district area {ss}{dd:02d} on {day}")
+        p.external.add(str(area))
+        return str(area)
+
     winners: dict[str, int] = {}
     frames: list[pl.DataFrame] = []
     district_rows: list[dict[str, object]] = []
@@ -391,12 +528,14 @@ def build(year: int) -> Package:
         seen_districts.add((ss, dd))
         state_name = str(state_names[ss])
         contest = p.id("contest", f"{day}:dip:mr:{ss}{dd:02d}")
+        area = district_area(ss, dd)
         p.add(
             "contest",
             id=contest,
             election_id=election,
             kind="body_seats",
             body_id=body,
+            district_area_id=area,
             magnitude=1,
             electoral_system_id=mr_system,
             default_result_kind="counted",
@@ -417,8 +556,8 @@ def build(year: int) -> Package:
                 "scheme_code": "mx.distrito_federal",
                 "code": f"{year}:{ss}-{dd:02d}",
                 "parent_id": state_ids[ss],
-                "area_relation": "within",
-                "area_id": str(state_areas[ss]),
+                "area_relation": "equals",
+                "area_id": area,
                 "kind": "aggregate",
             }
         )
@@ -490,6 +629,7 @@ def build(year: int) -> Package:
             election_id=election,
             kind="body_seats",
             body_id=body,
+            district_area_id=district_area(ss, dd),
             magnitude=1,
             electoral_system_id=mr_system,
             default_result_kind="counted",
@@ -516,6 +656,7 @@ def build(year: int) -> Package:
         election_id=election,
         kind="list_allocation",
         body_id=body,
+        district_area_id=str(ref["nation_area"]),
         magnitude=200,
         electoral_system_id=rp_system,
         default_result_kind="counted",
@@ -570,6 +711,10 @@ def build(year: int) -> Package:
     values.append((national_set, nation, write_in, VOTES, unregistered, 0))
     for measure, value in ((BALLOTS, total), (VALID, total - null), (INVALID, null)):
         values.append((national_set, nation, None, measure, value, 0))
+    p.external.add(str(ref["nation_area"]))
+    if year in LIST_CASILLAS:
+        rp_set = make_set(national, "rp:casilla", False, ine_source, LIST_CASILLAS[year])
+        frames.append(list_casillas(year, by_code, rp_options, write_in, rp_set, listed))
     seat_total = 0
     for number in range(1, 6):
         contest = p.id("contest", f"{day}:dip:rp:{number}")
