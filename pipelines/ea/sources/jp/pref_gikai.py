@@ -1,5 +1,6 @@
 import itertools
 import re
+import subprocess
 import unicodedata
 from dataclasses import dataclass
 from datetime import date
@@ -90,6 +91,19 @@ def grid(path: Path) -> list[dict[int, str]]:
             cells = {i: unicodedata.normalize("NFKC", v).strip() for i, v in enumerate(row) if v is not None}
             rows.append({i: v for i, v in cells.items() if v})
     return rows
+
+
+def squeeze(line: str) -> str:
+    """A line with the spaces between two non-ASCII characters taken out, which is how typesetting spaces out a
+    heading or a name. Runs of several spaces between words survive."""
+    return re.sub(r"(?<=[^\x00-\x7f]) (?=[^\x00-\x7f])", "", line).rstrip()
+
+
+def pdftext(path: Path) -> list[str]:
+    """The text layer of a PDF as `pdftotext -layout` prints it, one NFKC-normalized string per line, with its
+    columns kept at the same offsets."""
+    out = subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True).stdout
+    return [unicodedata.normalize("NFKC", line).rstrip() for line in out.replace("\f", "\n").splitlines()]
 
 
 def amount(row: dict[int, str], whole: int, fraction: int | None) -> Decimal:
