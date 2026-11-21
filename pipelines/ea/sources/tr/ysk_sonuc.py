@@ -75,7 +75,9 @@ METHOD = (
     "boxes listed under each district of the 81 provinces. They hold no boxes at customs gates or abroad, and the "
     "council's printed total for the whole country is higher than the boxes here, by 56,429 valid votes in 2007 and "
     "158,697 in 2010. Where a box's voters exceed its registered voters, both are kept as printed. A box's place is its neighborhood where the council's "
-    "neighborhood number is one the archive holds from the 2009 local elections, else its district, else its province."
+    "neighborhood number is one the archive holds from the 2009 local elections, or, for the 2007 files, whose "
+    "province, district, and neighborhood name match one of the 2009 local elections (the 2007 numbers are the council's "
+    "own and differ from the 2009 ones), else its district, else its province."
 )
 
 
