@@ -77,7 +77,7 @@ where cs.pipeline is not null
 group by 1, 2
 """
 FINER_SQL = """
-select cs.pipeline, count(*) filter (where rs.completeness is not null)::int, count(*)::int
+select cs.pipeline, count(*) filter (where rs.completeness is not null and not rs.is_default)::int, count(*)::int
 from result_set rs
 join changeset cs on cs.id = rs.changeset_id
 where rs.status = 'active' and cs.pipeline is not null
