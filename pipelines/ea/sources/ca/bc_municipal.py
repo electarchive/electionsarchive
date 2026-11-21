@@ -32,6 +32,7 @@ import shapely.geometry
 
 from ea import package, raw
 from ea.package import Package
+from ea.sources.ca import bc_vancouver
 
 SOURCE = "ca.bc_municipal"
 BOUNDS = "ca.bc_municipal.bounds"
@@ -56,6 +57,9 @@ LAYER_PAGES = {
     "trust_area": "local-trust-areas-legally-defined-administrative-areas-of-bc",
     "school_district": "school-district-boundaries-edited",
 }
+# General local elections only the city of Vancouver's own results cover: those before CivicInfo BC's reports begin,
+# and the latest.
+EARLIER = {2002: date(2002, 11, 16), 2005: date(2005, 11, 19), 2026: date(2026, 10, 17)}
 DAYS = {
     2008: date(2008, 11, 15),
     2011: date(2011, 11, 19),
@@ -133,6 +137,7 @@ def key(kind: str, *parts: object) -> str:
 
 
 CIVICINFO_SOURCE = key("source", "civicinfo")
+CITY_SOURCE = key("source", "vancouver")
 BOUNDS_SOURCE = key("source", "bounds")
 PLURALITY = key("electoral_system", "plurality")
 BLOCK = key("electoral_system", "block")
@@ -168,16 +173,21 @@ def fetch() -> None:
         raw.fetch(SOURCE, turnout_url(year), suffix=".html")
     for layer in LAYERS:
         raw.fetch(BOUNDS, layer_url(layer), suffix=".json")
+    bc_vancouver.fetch()
+
+
+def days() -> dict[int, date]:
+    return {**EARLIER, **DAYS}
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{year}" for year in DAYS)]
+    return [f"{SOURCE}/geo", f"{SOURCE}/registry", *(f"{SOURCE}/{year}" for year in days())]
 
 
 def parse() -> None:
     geo().write()
     registry().write()
-    for year in DAYS:
+    for year in days():
         election(year).write()
 
 
@@ -672,6 +682,19 @@ def registry() -> Package:
     for year in DAYS:
         p.artifact(raw.cached(SOURCE, candidates_url(year)), CIVICINFO_SOURCE)
         p.artifact(raw.cached(SOURCE, turnout_url(year)), CIVICINFO_SOURCE)
+    p.add(
+        "source",
+        id=CITY_SOURCE,
+        kind="official_body",
+        publisher="City of Vancouver",
+        title="Municipal election results",
+        url=bc_vancouver.PAGE,
+        license="Open Government Licence - Vancouver",
+        license_url="https://opendata.vancouver.ca/pages/licence/",
+        attribution="Contains information licensed under the Open Government Licence - Vancouver",
+    )
+    for year in bc_vancouver.FILES:
+        p.artifact(raw.cached(bc_vancouver.SOURCE, bc_vancouver.FILES[year]), CITY_SOURCE)
     for system, formula, title in (
         (PLURALITY, "fptp", "British Columbia local plurality voting"),
         (BLOCK, "block", "British Columbia local block voting"),
@@ -697,6 +720,12 @@ def registry() -> Package:
             if row.organization:
                 government = governments_[(row.government, row.jurisdiction)]
                 seen[organization(government, row.organization)] = (government, row.organization)
+    for year in bc_vancouver.FILES:
+        for race in bc_vancouver.count(year).races:
+            for candidate in race.candidates:
+                government = governments()[VANCOUVER[race.office]]
+                if race.office != "question" and (id := vancouver_party(government, candidate.party)):
+                    seen[id] = (government, candidate.party)
     for id, (government, text) in sorted(seen.items()):
         p.add("party", id=id, kind="party", polity_id=polity(government))
         p.name(id, text, "en", "official")
@@ -728,6 +757,8 @@ def groups(year: int) -> tuple[dict[Group, list[Row]], list[str]]:
     found: dict[Group, list[Row]] = defaultdict(list)
     omitted: Counter[str] = Counter()
     lookup = governments()
+    if year not in DAYS:
+        return found, []
     for row in candidates(year):
         office = OFFICES[row.office]
         government = lookup[(row.government, row.jurisdiction)]
@@ -750,8 +781,29 @@ def contest_title(group: Group) -> str:
     return f"{title} ({group.label})" if group.label else title
 
 
+VANCOUVER = {
+    "mayor": ("Vancouver", "City"),
+    "councillor": ("Vancouver", "City"),
+    "question": ("Vancouver", "City"),
+    "plebiscite": ("Vancouver", "City"),
+    "commissioner": ("Vancouver", "Park Board"),
+    "trustee": ("Vancouver", "School District"),
+}
+NO_PARTY = {"", "np", "ind", "independent", "non partisan", "non-partisan", "n/a"}
+
+
+def vancouver_party(government: Government, text: str) -> str | None:
+    return organization(government, text) if fold(text) not in NO_PARTY else None
+
+
+def vancouver(year: int) -> bc_vancouver.Count | None:
+    return bc_vancouver.count(year) if year in bc_vancouver.FILES else None
+
+
 def election(year: int) -> Package:
-    day = DAYS[year]
+    day = days()[year]
+    city = vancouver(year)
+    covered = {(VANCOUVER[race.office], race.office) for race in city.races} if city else set()
     close = day + timedelta(days=1)
     p = Package(
         f"{SOURCE}/{year}",
@@ -762,9 +814,12 @@ def election(year: int) -> Package:
         depends=[f"{SOURCE}/geo", f"{SOURCE}/registry"],
     )
     p.external |= {CANADA, BC}
-    p.uses(raw.cached(SOURCE, candidates_url(year)))
-    p.uses(raw.cached(SOURCE, turnout_url(year)))
-    by_government, area_turnout = turnout(year)[0], turnout(year)[1]
+    if year in DAYS:
+        p.uses(raw.cached(SOURCE, candidates_url(year)))
+        p.uses(raw.cached(SOURCE, turnout_url(year)))
+    if city:
+        p.uses(raw.cached(bc_vancouver.SOURCE, bc_vancouver.FILES[year]))
+    by_government, area_turnout = (turnout(year)[0], turnout(year)[1]) if year in DAYS else ({}, {})
     contests, _ = groups(year)
     umbrella = key("election", year)
     p.add("election", id=umbrella, polity_id=BC, kind="local", date_from=day, date_to=day, status="held")
@@ -777,6 +832,8 @@ def election(year: int) -> Package:
     for group, rows in sorted(contests.items(), key=lambda item: (item[0].government, item[0].office, item[0].label)):
         government = group.government
         gid = (government.name, government.jurisdiction)
+        if (gid, group.office) in covered:
+            continue
         if gid not in elections:
             vote = elections[gid] = key("election", year, *gid)
             p.add(
@@ -893,7 +950,9 @@ def election(year: int) -> Package:
                 _value(p, result_set, unit, None, 2, known.eligible)
             if known.ballots is not None and known.eligible and known.ballots > known.eligible:
                 over.add((government.name, group.label))
-    _questions(p, year, elections, umbrella, taken)
+    if city:
+        _vancouver(p, year, city, elections, umbrella, taken, contests)
+    _questions(p, year, elections, umbrella, taken, skip=("Vancouver", "City") if city else None)
     if over:
         p.accept(
             "accounting.turnout",
@@ -926,13 +985,20 @@ def question_type(text: str) -> str:
     return "optional_referendum"
 
 
-def _questions(p: Package, year: int, elections: dict[tuple[str, str], str], umbrella: str, taken: set[str]) -> None:
+def _questions(
+    p: Package,
+    year: int,
+    elections: dict[tuple[str, str], str],
+    umbrella: str,
+    taken: set[str],
+    skip: tuple[str, str] | None = None,
+) -> None:
     """The referendum and assent questions the turnout report lists, each a yes-or-no contest of its government."""
-    day = DAYS[year]
+    day = DAYS[year] if year in DAYS else EARLIER[year]
     lookup = governments()
     counts: Counter[tuple[str, str]] = Counter()
-    for question in turnout(year)[2]:
-        if question.yes is None or question.no is None:
+    for question in turnout(year)[2] if year in DAYS else []:
+        if question.yes is None or question.no is None or (question.government, question.jurisdiction) == skip:
             continue
         government = lookup[(question.government, question.jurisdiction)]
         gid = (government.name, government.jurisdiction)
@@ -1018,3 +1084,198 @@ def _questions(p: Package, year: int, elections: dict[tuple[str, str], str], umb
             _value(p, result_set, unit, options[answer], 1, votes)
         if question.passed in ("YES", "NO"):
             p.add("outcome", result_set_id=result_set, option_id=options[question.passed.lower()], kind="won")
+
+
+def _unit(p: Package, day: date, units: dict[str, str], code: str, name: str) -> str:
+    if code not in units:
+        unit = units[code] = key("unit", day, "vancouver", code)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=CANADA,
+            scheme_code="ca-bc.result_unit",
+            code=f"{day}:vancouver:{code}",
+            area_relation="within",
+            area_id=area(governments()[("Vancouver", "City")]),
+            kind="standard",
+            valid_from=day,
+            valid_to=day + timedelta(days=1),
+        )
+        if name and name != code:
+            p.name(unit, name, "en", "official")
+    return units[code]
+
+
+def _elected(race: bc_vancouver.Race, rows: list[Row]) -> set[int]:
+    """The candidates of a Vancouver race that CivicInfo BC reports elected, found by their votes, or by their names
+    where the report's votes are not the city's final count."""
+    won = Counter(row.votes for row in rows if row.elected and row.votes)
+    totals = Counter(candidate.total for candidate in race.candidates)
+    picked = {
+        i for i, candidate in enumerate(race.candidates) if candidate.total in won and totals[candidate.total] == 1
+    }
+    if len(picked) == race.seats and sum(won.values()) == race.seats:
+        return picked
+    picked = set()
+    for row in (row for row in rows if row.elected):
+        last, first = fold(row.last), (fold(row.first).split() or [""])[0]
+        found = [
+            i
+            for i, candidate in enumerate(race.candidates)
+            if fold(candidate.name).endswith(last) and fold(candidate.name).startswith(first)
+        ]
+        if len(found) == 1:
+            picked.add(found[0])
+    return picked if len(picked) == race.seats and sum(row.elected for row in rows) == race.seats else set()
+
+
+def _vancouver(
+    p: Package,
+    year: int,
+    city: bc_vancouver.Count,
+    elections: dict[tuple[str, str], str],
+    umbrella: str,
+    taken: set[str],
+    contests: dict[Group, list[Row]],
+) -> None:
+    """The city's own results by voting division or place, in place of the report's totals for the same races."""
+    day = days()[year]
+    lookup = governments()
+    units: dict[str, str] = {}
+    counts: Counter[str] = Counter()
+    for race in city.races:
+        gid = VANCOUVER[race.office]
+        government = lookup[gid]
+        if gid not in elections:
+            vote = elections[gid] = key("election", year, *gid)
+            p.add(
+                "election",
+                id=vote,
+                polity_id=polity(government),
+                parent_id=umbrella,
+                kind="local",
+                date_from=day,
+                date_to=day,
+                status="held",
+            )
+            p.name(vote, f"{year} {government.title} election", "en", "official")
+            p.add("slug", path=f"{government.path}/{day}-local", entity_id=vote, is_current=True)
+        question = race.office in ("question", "plebiscite")
+        if question:
+            counts[race.office] += 1
+        number = counts[race.office]
+        tag = f"vancouver:{race.office}" + (f":{number}" if question else "")
+        contest = key("contest", year, tag)
+        mayoral = race.office == "mayor"
+        p.add(
+            "contest",
+            id=contest,
+            election_id=elections[gid],
+            kind="ballot_question" if question else ("office" if mayoral else "body_seats"),
+            office_id=mayoralty(government) if mayoral else None,
+            body_id=None if mayoral or question else body(government),
+            district_area_id=area(government),
+            magnitude=None if question else race.seats,
+            round_number=1,
+            electoral_system_id=PLURALITY if race.seats == 1 else BLOCK,
+            default_result_kind="counted",
+        )
+        if question:
+            plebiscite = race.office == "plebiscite"
+            p.add("ballot_question", contest_id=contest, type="plebiscite" if plebiscite else "mandatory_referendum")
+            label = f"{'Plebiscite question' if plebiscite else 'Question'} {number}"
+            p.name(contest, f"{government.title}: {label}", "en", "official")
+            path = f"{government.path}/{day}-local/{race.office}-{number}"
+            p.add(
+                "ballot_question_text",
+                id=key("question_text", year, tag),
+                contest_id=contest,
+                kind="text",
+                lang="en",
+                body=race.title,
+                source_id=CITY_SOURCE,
+            )
+        else:
+            names = {
+                "mayor": "Mayor",
+                "councillor": "Councillor",
+                "commissioner": "Park board commissioner",
+                "trustee": "School trustee",
+            }
+            p.name(contest, f"{government.title}: {names[race.office]}", "en", "official")
+            path = f"{government.path}/{day}-local/{race.office}"
+        while path in taken:
+            path += "-2"
+        taken.add(path)
+        p.add("slug", path=path, entity_id=contest, is_current=True)
+        result_set = key("result_set", year, tag)
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=elections[gid],
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=CITY_SOURCE,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        rows = next(
+            (
+                r
+                for g, r in contests.items()
+                if (g.government.name, g.government.jurisdiction) == gid and g.office == race.office
+            ),
+            [],
+        )
+        won = _elected(race, rows) if not question else set()
+        for position, candidate in enumerate(race.candidates, 1):
+            seq = f"{tag}:{position}"
+            option = key("option", year, seq)
+            if question:
+                answer = candidate.name.strip().lower()
+                if answer not in ("yes", "no"):
+                    raise ValueError(f"{year}: question {number} has the answer {candidate.name!r}")
+                name = answer.title()
+                p.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="answer",
+                    ballot_position=position,
+                    ballot_label=name,
+                )
+            else:
+                name = candidate.name
+                person = key("person", year, seq)
+                party = vancouver_party(government, candidate.party)
+                p.add("person", id=person, birth_precision=None)
+                p.name(person, name, "en", "official")
+                p.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=party,
+                    ballot_position=None,
+                    ballot_label=name,
+                )
+                p.add(
+                    "candidacy",
+                    id=key("candidacy", year, seq),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=name,
+                    member_of_party_id=party,
+                )
+            if position - 1 in won:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+            for code, votes in candidate.votes.items():
+                _value(p, result_set, _unit(p, day, units, code, city.units.get(code, code)), option, 1, votes)
+            if candidate.total is not None:
+                p.add("declared", result_set_id=result_set, option_id=option, measure=1, value=candidate.total)
+        for measure, figures in ((3, race.ballots), (2, race.registered)):
+            for code, value in figures.items():
+                _value(p, result_set, _unit(p, day, units, code, city.units.get(code, code)), None, measure, value)
