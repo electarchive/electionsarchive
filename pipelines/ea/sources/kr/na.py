@@ -572,6 +572,11 @@ def emit() -> Path:
         ).fetchall():
             row = dict(zip(columns, values, strict=True))
             cited[str(row["storage_key"])] = row
+        absent = sorted(key for key in cited if not (DATA / key).is_file())
+        if absent:
+            raise FileNotFoundError(
+                f"{SOURCE}: {len(absent)} cited files are not in the raw cache, such as {absent[0]}; fetch them again"
+            )
         for row in cited.values():
             cs.artifacts.add(row["id"])
             cs.add("source_artifact", **row)
