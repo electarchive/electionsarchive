@@ -5,10 +5,11 @@ Berichte (B7350C), for each Landkreis: registered voters, voters, invalid ballot
 votes, the ballot-equivalent (weighted) votes, and the seats. Each Landkreis is one contest.
 """
 
+import importlib
 import re
 import subprocess
-from datetime import date
 from collections.abc import Callable
+from datetime import date
 from functools import cache
 from typing import NamedTuple
 
@@ -77,14 +78,12 @@ class Row(NamedTuple):
     group: bool = False
 
 
-
-
 class Kreis(NamedTuple):
     number: str
     name: str
-    registered: int
-    voters: int
-    invalid: int
+    registered: int | None
+    voters: int | None
+    invalid: int | None
     seats: int
     rows: list[Row]
     valid: int | None = None
@@ -453,7 +452,7 @@ def land_registry(land: Land) -> Package:
         f"The Kreise of {land.name} as county polities with their Kreistage, and the nominations of their Kreistag elections",
     )
     p.external |= {GERMANY, land.polity, *(known[ags] for ags in pool)}
-    scheme = f"{SCHEME}.{land.key}"
+    scheme = f"{SCHEME}_{land.key}"
     p.add("scheme", code=scheme, polity_id=land.polity, kind="electoral_district", rank=1, noun="Kreis electorate")
     for edition in land.editions():
         source = p.id("source", land.key, edition.year)
@@ -513,6 +512,9 @@ def land_election(land: Land, edition: Edition) -> Package:
         f"The Kreistag elections of {edition.day:%B} {edition.day.day}, {edition.year} in {land.name}, one contest per Kreis",
         depends=[f"{SOURCE}/registry-{land.key}"],
     )
+    accepted = getattr(importlib.import_module(f"ea.sources.de.kreistag_{land.key}"), "ACCEPTED", {})
+    if edition.year in accepted:
+        p.accept(*accepted[edition.year])
     p.external |= {GERMANY, land.polity}
     p.external |= {known[ags] for ags in pool}
     p.external |= {p.id("polity", ags) for ags in pool}
@@ -525,11 +527,16 @@ def land_election(land: Land, edition: Edition) -> Package:
     for url in edition.files:
         p.uses(raw.cached(SOURCE, url))
     source = p.id("source", land.key, edition.year)
-    scheme = f"{SCHEME}.{land.key}"
+    scheme = f"{SCHEME}_{land.key}"
     election_id = p.id("election", land.key, edition.year)
     day = edition.day
     p.add("election", id=election_id, polity_id=land.polity, kind="local", date_from=day, date_to=day, status="held")
-    p.name(election_id, f"{day:%B} {day.day}, {day.year} {land.name} district council (Kreistag) elections", "en", "official")
+    p.name(
+        election_id,
+        f"{day:%B} {day.day}, {day.year} {land.name} district council (Kreistag) elections",
+        "en",
+        "official",
+    )
     p.name(election_id, f"Kreistagswahlen in {land.name} am {day:%d.%m.%Y}", "de", "native", False)
     path = f"de/{day}-{slug(land.name)}-kreistagswahlen"
     p.add("slug", path=path, entity_id=election_id, is_current=True)
@@ -578,7 +585,14 @@ def land_election(land: Land, edition: Edition) -> Package:
             completeness=1.0,
         )
         if edition.note:
-            p.add("note", id=p.id("note", result_set), entity_id=result_set, kind="methodology", body_md=edition.note, lang="en")
+            p.add(
+                "note",
+                id=p.id("note", result_set),
+                entity_id=result_set,
+                kind="methodology",
+                body_md=edition.note,
+                lang="en",
+            )
         figures = ((2, kreis.registered), (3, kreis.voters), (5, kreis.invalid), (4, kreis.valid))
         for measure, value in figures:
             if value is None:
