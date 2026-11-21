@@ -561,11 +561,25 @@ def _external(scheme: str, value: str) -> str:
 class National:
     election: str
     contest: str
+    result_set: str  # the national totals another pipeline holds as the default
+
+
+# Production's national sets, by year: the European University Institute's for 2013 to 2019 and the commission's for 2024.
+NATIONAL_SETS = {
+    2013: "36d4daa2-8c9f-5cad-b5a1-5b5867b8cfd8",
+    2014: "6b81941a-6882-58fc-9931-c6130a9b4af5",
+    2019: "038f660b-1c07-520c-a294-f3aa57bf8427",
+    2024: "4d21dc1c-8194-5a3e-949d-a6c698e2ceb9",
+}
 
 
 def national(year: int) -> National:
     contest = f"HR:{year}:eu.member_state:HR"
-    return National(_external("eu.election", f"HR:{year}:european-parliament"), _external("eu.contest", contest))
+    return National(
+        _external("eu.election", f"HR:{year}:european-parliament"),
+        _external("eu.contest", contest),
+        NATIONAL_SETS[year],
+    )
 
 
 def elected_url(d: Day) -> str:
@@ -1445,7 +1459,7 @@ def election(d: Day) -> Package:
         "predsjednik": "general" if d.round == 1 else "runoff",
     }.get(d.family, "referendum")
     if eu is not None:
-        p.external |= {eu.election, eu.contest}
+        p.external |= {eu.election, eu.contest, eu.result_set}
         p.artifact(raw.cached(SOURCE, elected_url(d)), SOURCE_ID)
         election_id = eu.election
     else:
@@ -1508,8 +1522,9 @@ def election(d: Day) -> Package:
             kind="counted",
             source_id=SOURCE_ID,
             status="active",
-            is_default=eu is None,
+            is_default=True,
             completeness=1.0,
+            supersedes_id=eu.result_set if eu is not None else None,
         )
         p.add("note", id=key("note", result_set), entity_id=result_set, kind="methodology", body_md=METHOD, lang="en")
         if eu is not None:
@@ -1541,10 +1556,10 @@ def election(d: Day) -> Package:
 
 
 def _supersede(p: Package, d: Day, result_set: str) -> None:
-    """Note on a polling-station set staged beside the national set another pipeline holds as the default.
+    """Note on a polling-station set that supersedes the national set another pipeline holds.
 
-    The national set is another pipeline's row, so this package neither restates nor demotes it; the
-    polling-station set stays non-default.
+    The national set is another pipeline's row, so this package neither restates it nor touches its outcomes;
+    the loader demotes it through `supersedes_id`.
     """
     p.add(
         "note",
@@ -1552,8 +1567,8 @@ def _supersede(p: Package, d: Day, result_set: str) -> None:
         entity_id=result_set,
         kind="methodology",
         body_md="This set holds the same contest by polling station, with each candidate's preference votes and the "
-        "seats and elected members from the commission's decision on the distribution of seats. It sits beside "
-        "the set of national totals, which another source holds as the default.",
+        "seats and elected members from the commission's decision on the distribution of seats. It supersedes "
+        "the set of national totals.",
         lang="en",
     )
     if d.year == 2019:
