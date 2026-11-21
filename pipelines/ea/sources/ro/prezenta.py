@@ -632,7 +632,9 @@ PRESIDENTIAL = {
 }
 
 
-def presidential(day: str, parties: set[str]) -> tuple[Package, Build]:
+def presidential(day: str, parties: set[str], minted: set[str]) -> tuple[Package, Build]:
+    """The presidential election round of `day`; `minted` holds the polling stations the same day's local package
+    declares, which this one references."""
     name, first, round_number = PRESIDENTIAL[day]
     runoff = round_number == 2
     p = package_of(
@@ -661,7 +663,7 @@ def presidential(day: str, parties: set[str]) -> tuple[Package, Build]:
     )
     if annulled:
         p.add("note", id=key("note", eid, "annulled"), entity_id=eid, kind="caveat", body_md=ANNULLED, lang="en")
-    b = Build(p, day, parties)
+    b = Build(p, day, parties, minted=minted)
     contest = f"president-{day}"
     b.contest(
         Contest(
@@ -823,7 +825,9 @@ def allocate(b: Build, day: str) -> None:
 # European Parliament
 
 
-def european(parties: set[str]) -> tuple[Package, Build]:
+def european(parties: set[str], minted: set[str]) -> tuple[Package, Build]:
+    """The European Parliament election of 9 June 2024; `minted` holds the polling stations the same day's local
+    package declares, which this one references."""
     day, name = "2024-06-09", "europarlamentare09062024"
     p = package_of(
         f"{day}-european",
@@ -833,7 +837,7 @@ def european(parties: set[str]) -> tuple[Package, Build]:
     p.artifact(raw.cached(SOURCE, URLS[name]), AEP_SOURCE)
     eid = EU_RECORD[0]
     p.external |= {*EU_RECORD, *(option for _, option in EU_OPTIONS.values())}
-    b = Build(p, day, parties)
+    b = Build(p, day, parties, minted=minted)
     contest = f"european-{day}"
     b.contest(
         Contest(
@@ -946,9 +950,9 @@ def local_kind(row: Row) -> str:
     return code if code in LOCAL else row.category
 
 
-def local(day: str, parties: set[str], minted: set[str]) -> tuple[Package, Build]:
-    """The local elections of `day`; `minted` holds the polling stations the same day's European or presidential
-    package declares, since the voters of one station cast both ballots there."""
+def local(day: str, parties: set[str]) -> tuple[Package, Build]:
+    """The local elections of `day`. They declare every polling station they report, including the ones the same
+    day's European or presidential package also reports, since the voters of one station cast both ballots there."""
     name, first, kind, _ = LOCALS[day]
     runoff = kind == "runoff"
     english, romanian = LOCAL_NAMES[kind]
@@ -979,7 +983,7 @@ def local(day: str, parties: set[str], minted: set[str]) -> tuple[Package, Build
             body_md=RUNOFF_NOTE if runoff else PARTIAL_NOTE,
             lang="en",
         )
-    b = Build(p, day, parties, minted=minted)
+    b = Build(p, day, parties)
     rows = signed(day)
     for row in rows:
         if row.scope != "PRCNCT":
@@ -1269,22 +1273,24 @@ def packages() -> list[str]:
 def build(name: str, parties: set[str], minted: set[str]) -> tuple[Package, Build]:
     day, kind = name[:10], name[11:]
     if kind == "european":
-        return european(parties)
+        return european(parties, minted)
     if kind == "general":
         return parliament(parties)
     if kind == "presidential":
-        return presidential(day, parties)
-    return local(day, parties, minted)
+        return presidential(day, parties, minted)
+    return local(day, parties)
 
 
 def parse() -> None:
     parties = known_parties()
     labels: set[str] = set()
     people: dict[str, str] = {}
-    # each day's polling stations are declared by the first package of that day in `ELECTIONS`
+    # A polling station that reports two elections of one day is declared by that day's local package and referenced
+    # by the other. The database holds them that way, and a package that stops declaring the stations it holds there
+    # would delete them on load, so the local package of each day is built first and keeps declaring them.
     minted: dict[str, set[str]] = {}
     mayors = 0
-    for name in ELECTIONS:
+    for name in sorted(ELECTIONS, key=lambda name: (name[:10], not name.endswith("-local"))):
         p, b = build(name, parties, minted.get(name[:10], set()))
         minted.setdefault(name[:10], set()).update(u[0] for u in b.units.values())
         p.write()

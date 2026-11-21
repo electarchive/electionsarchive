@@ -2301,6 +2301,7 @@ def _ready(source: Connection | Reference, key: str, batch: set[str], minted: se
     if not isinstance(source, Reference):
         found += _clashes(source, path, str(manifest["pipeline"]))
         found += _unit_clashes(source, path, str(manifest["pipeline"]))
+        found += _given_up(source, manifest, batch)
     found += _held(source, path, str(manifest["pipeline"]))
     geometry = path / "area_geometry.parquet"
     if not isinstance(source, Reference) and geometry.exists():
@@ -2362,6 +2363,63 @@ def _ready(source: Connection | Reference, key: str, batch: set[str], minted: se
                 if column not in known
             ]
     return found
+
+
+def _uuid(value: str) -> bool:
+    try:
+        return str(UUID(value)) == value
+    except ValueError:
+        return False
+
+
+def _given_up(conn: Connection, manifest: Manifest, batch: set[str]) -> list[str]:
+    """Rows a package lists as external that its loaded versions hold in the database.
+
+    A load deletes the rows its earlier versions hold and the new build no longer declares before it reads the
+    build's values, so a reporting unit handed to another package that way is gone when the values that reference it
+    resolve. The rows stay only when a package this one depends on declares them in the same run and loads first,
+    taking them over; a package of the run whose build is unchanged is skipped and takes nothing.
+    """
+    external = sorted({str(value) for value in manifest["external"] if _uuid(str(value))})
+    if not external:
+        return []
+    owned = [
+        str(id)
+        for (id,) in conn.execute("select id from changeset where scope->>'package' = %s", [manifest["key"]]).fetchall()
+    ] + [str(id) for id in manifest.get("adopts", [])]
+    if not owned:
+        return []
+    held: dict[str, str] = {}
+    for table, (key_columns, _) in TABLES.items():
+        if key_columns != ("id",) or "changeset_id" not in _columns(conn, table):
+            continue
+        rows = conn.execute(
+            sql.SQL("select id::text from {} where id = any(%s::uuid[]) and changeset_id = any(%s::uuid[])").format(
+                sql.Identifier(table)
+            ),
+            [external, owned],
+        ).fetchall()
+        held |= {str(id): table for (id,) in rows}
+    for depend in manifest["depends"]:
+        if depend not in batch or not held:
+            continue
+        other = _resolve(depend)
+        loaded = conn.execute(
+            "select scope->>'digest' from changeset where scope->>'package' = %s order by created_at desc limit 1",
+            [depend],
+        ).fetchone()
+        if loaded is None or loaded[0] != _manifest(other)["digest"]:
+            taken = _minted([other])
+            held = {id: table for id, table in held.items() if id not in taken}
+    if not held:
+        return []
+    tables = sorted(set(held.values()))
+    problem = (
+        f"ready.given_up: {len(held):,} rows ({', '.join(tables)}) this package lists as external are held in the "
+        "database by its loaded version, so its load would delete them before resolving the values that use them: "
+        f"{sorted(held)[:5]}; keep declaring them here and reference them from the other package instead"
+    )
+    return [problem]
 
 
 def _declared_twice(keys: list[str]) -> list[str]:
