@@ -5413,7 +5413,30 @@ async function places(
     const defaults = sets.rows
       .filter((row) => row.isDefault)
       .map((row) => row.k);
+    const counted = sets.rows.map((row) => row.k).toSorted((a, b) => a - b);
     const within = [area.id, ...kids.map((kid) => kid.id)];
+    const scope = await remember(
+      `scope:${counted.join(",")}`,
+      async () =>
+        rowsOf(
+          await db.execute<{ size: number; pools: Array<number> }>(sql`
+            with v as materialized (
+              select distinct v.unit_k from result_value v
+              where v.result_set_k = any(${sql.param(counted)}::int[]) and v.measure = any(${COUNTED})
+            )
+            select (select count(*)::int from v) as size,
+              array(select u.k from v join reporting_unit u on u.k = v.unit_k where u.area_id is null and u.kind <> 'standard') as pools
+          `),
+        )[0] ?? { size: 0, pools: [] },
+      false,
+      undefined,
+      true,
+    );
+    const reach = await db.execute<{ reach: number }>(sql`
+      select (select count(*) from (select from reporting_unit u where u.area_id = any(${sql.param(within)}::uuid[]) limit ${scope.size + 1}::int) a)::int
+        + (select count(*) from (select from reporting_unit_area m where m.area_id = any(${sql.param(within)}::uuid[]) limit ${scope.size + 1}::int) a)::int as reach
+    `);
+    const channel = sql`(select v.channel from result_value v where v.result_set_k = any(${sql.param(counted)}::int[]) and v.unit_k = u.k and v.measure = any(${COUNTED}) and v.option_k <> 0 limit 1) as channel`;
     const units = await db.execute<{
       k: number;
       id: string;
@@ -5423,26 +5446,46 @@ async function places(
       kind: (typeof POOLS)[number];
       channel: number | null;
       isDefault: boolean;
-    }>(sql`
-      select u.k, u.id, u.code, u.scheme_code as scheme, s.noun, ${POOL} as kind,
-        (select v.channel from result_value v where v.result_set_k = any(${sql.param(sets.rows.map((row) => row.k))}::int[]) and v.unit_k = u.k and v.measure = any(${COUNTED}) and v.option_k <> 0 limit 1) as channel,
-        exists (
-          select from result_value v
-          where v.result_set_k = any(${sql.param(defaults)}::int[]) and v.unit_k = u.k
-            and v.measure = any(${COUNTED})
-        ) as "isDefault"
-      from (
-        select distinct v.unit_k from result_value v
-        where v.result_set_k = any(${sql.param(sets.rows.map((row) => row.k))}::int[]) and v.measure = any(${COUNTED})
-      ) v
-      join reporting_unit u on u.k = v.unit_k
-      join scheme s on s.code = u.scheme_code
-      where u.area_id is null and u.kind <> 'standard'
-        or u.area_relation = 'within' and (
-          u.area_id = any(${sql.param(within)}::uuid[])
-          or exists (select from reporting_unit_area m where m.unit_id = u.id and m.area_id = any(${sql.param(within)}::uuid[]))
-        )
-    `);
+    }>(
+      (rowsOf(reach)[0]?.reach ?? 0) > scope.size
+        ? sql`
+          select u.k, u.id, u.code, u.scheme_code as scheme, s.noun, ${POOL} as kind, ${channel},
+            exists (
+              select from result_value v
+              where v.result_set_k = any(${sql.param(defaults)}::int[]) and v.unit_k = u.k
+                and v.measure = any(${COUNTED})
+            ) as "isDefault"
+          from (
+            select distinct v.unit_k from result_value v
+            where v.result_set_k = any(${sql.param(counted)}::int[]) and v.measure = any(${COUNTED})
+          ) v
+          join reporting_unit u on u.k = v.unit_k
+          join scheme s on s.code = u.scheme_code
+          where u.area_id is null and u.kind <> 'standard'
+            or u.area_relation = 'within' and (
+              u.area_id = any(${sql.param(within)}::uuid[])
+              or exists (select from reporting_unit_area m where m.unit_id = u.id and m.area_id = any(${sql.param(within)}::uuid[]))
+            )
+        `
+        : sql`
+          with cand as materialized (
+            select u.id, u.k, u.code, u.scheme_code, u.kind from reporting_unit u
+            where u.area_id = any(${sql.param(within)}::uuid[]) and u.area_relation = 'within'
+            union
+            select u.id, u.k, u.code, u.scheme_code, u.kind from reporting_unit_area m
+            join reporting_unit u on u.id = m.unit_id
+            where m.area_id = any(${sql.param(within)}::uuid[]) and u.area_relation = 'within'
+            union
+            select u.id, u.k, u.code, u.scheme_code, u.kind from reporting_unit u
+            where u.k = any(${sql.param(scope.pools)}::int[])
+          )
+          select u.k, u.id, u.code, u.scheme_code as scheme, s.noun, ${POOL} as kind, ${channel},
+            coalesce((select true from result_value v where v.result_set_k = any(${sql.param(defaults)}::int[]) and v.unit_k = u.k and v.measure = any(${COUNTED}) limit 1), false) as "isDefault"
+          from cand u
+          join scheme s on s.code = u.scheme_code
+          where (select true from result_value v where v.result_set_k = any(${sql.param(counted)}::int[]) and v.unit_k = u.k and v.measure = any(${COUNTED}) limit 1)
+        `,
+    );
     let schemes: Array<typeof units.rows> = [];
     for (const pool of [
       units.rows.filter((row) => row.isDefault),
