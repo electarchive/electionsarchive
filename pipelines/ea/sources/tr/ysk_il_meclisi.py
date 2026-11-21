@@ -24,7 +24,7 @@ import polars as pl
 
 from ea import package, raw
 from ea.changeset import slug
-from ea.package import Package
+from ea.package import NAMESPACE, Package
 from ea.sources.tr.ysk import INDEPENDENTS, INVALID, LICENSE, PUBLISHER, REGISTERED, VALID, VOTERS, VOTES, title
 from ea.sources.tr.ysk_meclis import DATED, PARTIES
 from ea.sources.tr.ysk_muhtarlik import API, DAYS, HEADERS
@@ -347,6 +347,11 @@ def build(year: int) -> Package:
         .select("id", "code")
         .iter_rows()
     }
+    # Boxes the mayoral pipelines already loaded for the same day keep their ids; the reference tables predate them.
+    held = Path(__file__).with_name("ysk_il_meclisi_held.tsv")
+    for code, owner in pl.read_csv(held, separator="\t").iter_rows():
+        if code.startswith(f"{year}:") and code not in units:
+            units[code] = str(uuid5(NAMESPACE, f"{owner}\x1funit\x1f{code}"))
     by_number, by_slug = ilce_areas()
 
     def area_of(place: Place) -> str:
