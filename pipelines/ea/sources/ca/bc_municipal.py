@@ -59,7 +59,13 @@ LAYER_PAGES = {
 }
 # General local elections only the city of Vancouver's own results cover: those before CivicInfo BC's reports begin,
 # and the latest.
-EARLIER = {2002: date(2002, 11, 16), 2005: date(2005, 11, 19), 2026: date(2026, 10, 17)}
+EARLIER = {
+    1996: date(1996, 11, 16),
+    1999: date(1999, 11, 20),
+    2002: date(2002, 11, 16),
+    2005: date(2005, 11, 19),
+    2026: date(2026, 10, 17),
+}
 DAYS = {
     2008: date(2008, 11, 15),
     2011: date(2011, 11, 19),

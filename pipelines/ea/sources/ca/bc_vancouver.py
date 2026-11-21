@@ -19,6 +19,8 @@ SOURCE = "ca.bc_municipal.vancouver"
 PAGE = "https://opendata.vancouver.ca/explore/dataset/municipal-election-results/"
 WAYBACK = "https://web.archive.org/web/"
 FILES = {
+    1996: WAYBACK + "20260818030041id_/https://webtransfer.vancouver.ca/OpenData/csv/1996MunicipalElectionResults.csv",
+    1999: WAYBACK + "20260818030038id_/https://webtransfer.vancouver.ca/OpenData/csv/1999MunicipalElectionResults.csv",
     2002: WAYBACK + "20260818030036id_/https://webtransfer.vancouver.ca/OpenData/csv/2002MunicipalElectionResults.csv",
     2005: WAYBACK + "20260818030032id_/https://webtransfer.vancouver.ca/OpenData/csv/2005MunicipalElectionResults.csv",
     2008: WAYBACK + "20260818030030id_/https://webtransfer.vancouver.ca/OpenData/csv/2008MunicipalElectionResults.csv",
@@ -35,6 +37,7 @@ OFFICES = {
     "mayor": "mayor",
     "councillor": "councillor",
     "councilor": "councillor",
+    "school trustees": "trustee",
     "park commissioner": "commissioner",
     "park board": "commissioner",
     "school trustee": "trustee",
@@ -194,6 +197,107 @@ def _wide(rows: list[list[str]]) -> Count:
     return Count(races, units)
 
 
+def _plain(text: str) -> str:
+    """A name the early files print with the surname in capitals, in the order a ballot prints it."""
+    words = []
+    for word in " ".join(text.split()).split(" "):
+        if len(word) > 1 and word.isupper() and word.replace(".", "").isalpha():
+            word = re.sub(r"(?<=['-])([a-z])", lambda m: m.group(1).upper(), word.title())
+            word = re.sub(r"\bMc([a-z])", lambda m: "Mc" + m.group(1).upper(), word)
+        words.append(word)
+    return " ".join(words)
+
+
+def _kind(title: str) -> str:
+    return OFFICES.get(re.sub(r"\s+", " ", title.strip().lower()), "question")
+
+
+def _seats(office: str) -> int:
+    return {"councillor": 10, "commissioner": 7, "trustee": 9}.get(office, 1)
+
+
+def _all_columns(rows: list[list[str]]) -> Count:
+    """The 1999 file: one heading row of voting divisions, then a block for each race with a row for each candidate."""
+    columns = {j: _code(cell) for j, cell in enumerate(rows[0]) if j > 1 and cell.strip()}
+    races: list[Race] = []
+    title = ""
+    candidates: list[Candidate] = []
+    ballots: dict[str, int] = {}
+    registered: dict[str, int] = {}
+
+    def close() -> None:
+        if candidates:
+            office = _kind(title)
+            races.append(Race(office, title, _seats(office), list(candidates), dict(ballots), dict(registered)))
+
+    for row in rows[1:]:
+        if not row or not any(cell.strip() for cell in row):
+            continue
+        label = row[0].strip()
+        numbers = {code: _cell(row[j]) for j, code in columns.items() if j < len(row)}
+        if not any(n is not None for n in numbers.values()):
+            close()
+            title, candidates = label, []
+            ballots, registered = {}, {}
+        elif label.lower().startswith("registered"):
+            registered.update({c: n for c, n in numbers.items() if n is not None and DIVISION.fullmatch(c)})
+        elif label.lower().startswith("ballots cast"):
+            ballots.update({c: n for c, n in numbers.items() if n is not None})
+        else:
+            name = _plain(label)
+            if _kind(title) == "question":
+                name = name.title()
+            candidates.append(
+                Candidate(name, row[1].strip(), None, {c: n for c, n in numbers.items() if n is not None})
+            )
+    close()
+    return Count(races, {code: code for code in columns.values()})
+
+
+def _lettered(rows: list[list[str]]) -> Count:
+    """The 1996 file: every line starts with a letter that says what it holds."""
+    heading = next(row for row in rows if row and row[0] == "P")
+    columns = {j: _code(cell) for j, cell in enumerate(heading) if j >= 5 and cell.strip()}
+    total = next(j for j, cell in columns.items() if cell.upper().startswith("ELECTION SUM"))
+    del columns[total]
+    races: list[Race] = []
+    title, code = "", 0
+    candidates: list[Candidate] = []
+    ballots: dict[str, int] = {}
+
+    def close() -> None:
+        if candidates:
+            office = _kind(title)
+            races.append(Race(office, title, _seats(office), list(candidates), dict(ballots), {}))
+
+    for row in rows:
+        if not row or not row[0]:
+            continue
+        kind = row[0]
+        if kind == "R":
+            close()
+            code, title, candidates, ballots = int(row[1]), " ".join(row[3].split()), [], {}
+            if code >= 100:
+                title = f"Method of electing: {title}"
+        elif kind == "T":
+            ballots = {c: n for j, c in columns.items() if j < len(row) and (n := _cell(row[j])) is not None}
+        elif kind == "C":
+            numbers = {c: _cell(row[j]) for j, c in columns.items() if j < len(row)}
+            name = _plain(row[3])
+            if _kind(title) == "question" or title.startswith("Method"):
+                name = name.title()
+            candidates.append(
+                Candidate(
+                    name,
+                    row[4].strip(),
+                    _number(row[total]) if total < len(row) else None,
+                    {c: n for c, n in numbers.items() if n is not None},
+                )
+            )
+    close()
+    return Count(races, {code: code for code in columns.values()})
+
+
 def _places(rows: list[list[str]], title: str, office: str, seats: int) -> tuple[Race, dict[str, str]]:
     """One race laid out with a row for each voting place and a column for each candidate or answer."""
     head = next(i for i, row in enumerate(rows) if row and row[0].strip().startswith(("Voting Place ID", "Precinct")))
@@ -280,11 +384,16 @@ def count(year: int) -> Count:
             more = _zip(raw.cached(SOURCE, PLEBISCITE[year]).path.as_posix(), plebiscite=True)
             found = Count(found.races + more.races, {**found.units, **more.units})
         return found
-    return _wide(_rows(_text(path.read_bytes())))
+    rows = _rows(_text(path.read_bytes()))
+    if year == 1996:
+        return _lettered(rows)
+    return _all_columns(rows) if year == 1999 else _wide(rows)
 
 
 def day(year: int) -> date:
     return {
+        1996: date(1996, 11, 16),
+        1999: date(1999, 11, 20),
         2002: date(2002, 11, 16),
         2005: date(2005, 11, 19),
         2008: date(2008, 11, 15),
