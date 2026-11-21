@@ -129,6 +129,7 @@ export const allianceMember = pgTable("alliance_member", {
 		name: "alliance_member_party_id_fkey"
 	}),
 	index("alliance_member_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
+	index("alliance_member_party_idx").using("btree", table.partyId.asc().nullsLast()),
 ]);
 
 export const area = pgTable("area", {
@@ -809,6 +810,7 @@ export const candidacy = pgTable("candidacy", {
 	index("candidacy_independent_idx").using("btree", table.optionId.asc().nullsLast()).where(sql`is_independent`),
 	index("candidacy_option_idx").using("btree", table.optionId.asc().nullsLast()),
 	index("candidacy_person_idx").using("btree", table.personId.asc().nullsLast()),
+	index("candidacy_member_of_party_idx").using("btree", table.memberOfPartyId.asc().nullsLast()).where(sql`(member_of_party_id IS NOT NULL)`),
 	unique("candidacy_preference_option_key").on(table.preferenceOptionId),
 check("candidacy_ballot_lines_check", sql`((ballot_lines >= 1) AND (ballot_lines <= 3))`),check("candidacy_preference_option_check", sql`(preference_option_id IS DISTINCT FROM option_id)`),]);
 
@@ -837,6 +839,7 @@ export const candidacyNomination = pgTable("candidacy_nomination", {
 	}),
 	index("candidacy_nomination_backing_idx").using("btree", table.candidacyId.asc().nullsLast(), table.partyId.asc().nullsLast()).where(sql`(kind = ANY (ARRAY['endorsed'::nomination_kind, 'supported'::nomination_kind]))`),
 	index("candidacy_nomination_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
+	index("candidacy_nomination_party_idx").using("btree", table.partyId.asc().nullsLast()),
 ]);
 
 export const censusClass = pgTable("census_class", {
@@ -1274,6 +1277,7 @@ export const contest = pgTable("contest", {
 	}),
 	index("contest_allocation_parent_idx").using("btree", table.allocationParentId.asc().nullsLast()),
 	index("contest_body_idx").using("btree", table.bodyId.asc().nullsLast()),
+	index("contest_party_scope_idx").using("btree", table.partyScopeId.asc().nullsLast()).where(sql`(party_scope_id IS NOT NULL)`),
 	index("contest_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
 	index("contest_district_area_idx").using("btree", table.districtAreaId.asc().nullsLast()),
 	index("contest_election_body_idx").using("btree", table.electionId.asc().nullsLast(), table.bodyId.asc().nullsLast()),
@@ -3564,6 +3568,7 @@ export const tenureAffiliation = pgTable("tenure_affiliation", {
 		name: "tenure_affiliation_tenure_id_fkey"
 	}).onDelete("cascade"),
 	index("tenure_affiliation_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast()),
+	index("tenure_affiliation_party_idx").using("btree", table.partyId.asc().nullsLast()),
 	unique("tenure_affiliation_key").on(table.tenureId, table.kind, table.partyId, table.valid),]);
 
 export const tenureEvent = pgTable("tenure_event", {
