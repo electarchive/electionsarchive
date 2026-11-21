@@ -143,13 +143,36 @@ def groups() -> list[Group]:
                 cut = 0.0
             here = [r for r in book2017.rows(p, count + 5, 0, cut, BOOK) if len(r.numbers) == count + 5]
             rows.extend(here)
-            parishes.extend(book2017.rows(p, count + 1, cut, 1e9, BOOK))
+            # the table's heading shares a line with its first canton's row
+            parishes.extend(
+                r._replace(name=r.name.removeprefix("CANTÓN/PARROQUIA ").strip())
+                for r in book2017.rows(p, count + 1, cut, 1e9, BOOK)
+            )
             split = split or cut < 1e9
         total = next((r for r in rows if r.name.startswith("TOTAL")), None)
         units = [r for r in rows if r is not total]
         head = heading(start)
-        result.append(Group(start, head, found, box(start), elected, units, total, parishes, pages_))
+        group = Group(start, head, found, box(start), elected, units, total, parishes, pages_)
+        result.append(in_order(group) if parishes else group)
     return result
+
+
+def in_order(group: Group) -> Group:
+    """The group with its parish rows' list columns in the order of the summary page.
+
+    A parish table prints its lists in the order of the canton table, but in one circumscription two lists swap
+    places. The lists are told apart by their votes, which each table adds up to the summary page's figure.
+    """
+    count = len(group.entries)
+    wanted = [e.votes for e in group.entries]
+    sums = [sum(c.row.numbers[i] for c in book2017.parish_tables(group)) for i in range(count)]
+    if sums == wanted:
+        return group
+    if len(set(wanted)) != count or sorted(sums) != sorted(wanted):
+        raise ValueError(f"{group.head}: the parish rows' list votes {sums} differ from the summary page's {wanted}")
+    order = [sums.index(votes) for votes in wanted]
+    rows = [r._replace(numbers=tuple(r.numbers[i] for i in order) + tuple(r.numbers[count:])) for r in group.parishes]
+    return group._replace(parishes=rows)
 
 
 NATIONAL_SUMMARY, NATIONAL_SEATS, NATIONAL_TABLE = 139, 140, 141

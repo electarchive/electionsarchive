@@ -11,8 +11,8 @@ The first round's package also holds the National Assembly contests of the day: 
 overseas circumscription, the 116 provincial seats by canton (in ten circumscriptions of Guayas, Manabí, and
 Pichincha, by the cantons each one holds), and the 6 overseas seats by country. ``book2023`` reads their tables, and
 each is checked against the totals the book prints before it is stored. The book also prints the parishes of those
-circumscriptions; they are not stored, because the parish names in the book match more than one parish in the
-Council's lists without the canton each belongs to.
+circumscriptions, with the canton each belongs to; each is matched to the Council's parish lists within its canton,
+and a second result set per circumscription holds the parish rows and supersedes the one that keeps the canton rows.
 """
 
 import functools
@@ -366,6 +366,16 @@ def assembly(b: Builder) -> None:
             province = where(group.head)
             for row in group.units:
                 seen[(province, place.canton(province, canton_name(row.name)))] += 1
+    shared: Counter[str] = Counter()  # the circumscriptions each parish appears in
+    for group in groups:
+        if group.head.startswith("PROVINCIA") and group.parishes:
+            province = where(group.head)
+            shared.update(
+                place.parish_code(province, canton_name(c.row.name), r.name)
+                for c in book2017.parish_tables(group)
+                for r in c.parishes
+                if not place.is_zone(c.row.name)
+            )
     for group in groups:
         check_group(group)
         head = group.head
@@ -393,7 +403,14 @@ def assembly(b: Builder) -> None:
                 english = f"2023 Ecuadorian National Assembly election, {name} provincial seats"
                 spanish = f"Asambleístas provinciales de {name} 2023"
                 tail = f"provincial/{cne.slug(name)}"
-            cne2017.lists(b, group, f"province/{province}/{circ}", english, spanish, tail, cne2017.ASSEMBLY, rows)
+            finer = (
+                cne2017.parish_rows(b, group, province, circ, rows, shared, canton_name)
+                if circ and group.parishes
+                else None
+            )
+            cne2017.lists(
+                b, group, f"province/{province}/{circ}", english, spanish, tail, cne2017.ASSEMBLY, rows, parishes=finer
+            )
         else:
             province = circumscription_code(head.split(":")[1])
             rows = [(b.canton_unit(province, canton_name(r.name)), r) for r in group.units]
