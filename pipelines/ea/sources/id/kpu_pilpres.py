@@ -630,8 +630,9 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Indonesia's direct presidential elections of 2014, 2019, and 2024 from KPU's national result decrees: "
-                "by province and abroad, 2014 from KPU's recapitulation as the Constitutional Court's ruling reproduces it"
+                "Indonesia's direct presidential elections from KPU's result decrees and the Constitutional Court's "
+                "rulings: the first round of 2004 nationally, and 2014, 2019, and 2024 by province and abroad, 2014 "
+                "from KPU's recapitulation as the Constitutional Court's ruling reproduces it"
             ),
             polity="ID",
         )
