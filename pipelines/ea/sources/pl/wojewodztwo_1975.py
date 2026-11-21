@@ -50,6 +50,8 @@ FROM = date(1975, 6, 1)
 UNTIL = date(1999, 1, 1)
 PRG = "https://opendata.geoportal.gov.pl/prg/granice_archiwalne/PRG_jednostki_administracyjne_2005.zip"
 PRG_PAGE = "https://www.geoportal.gov.pl/pl/dane/panstwowy-rejestr-granic-prg/"
+# The 2005 set's source row, as `geo` mints it, for other packages whose outlines are drawn on the same gminas.
+PRG_SOURCE = str(uuid5(NAMESPACE, f"{SOURCE}\x1fsource\x1fprg-2005"))
 PRG_LICENSE = "Free for any use (Dane PRG są dostępne bezpłatnie i do dowolnego wykorzystania)"
 KBW_1997 = kbw.BASE + "1997/sejm/sejm1997obw.xls"
 KBW_1994 = kbw.BASE + "1994/samo1994/samo1994gm.xls"
@@ -261,6 +263,13 @@ def membership(
     gminas: dict[str, tuple[int, str]], names: dict[str, str], outlines: dict[str, shapely.Geometry]
 ) -> dict[str, int]:
     """The voivodeship of each gmina of 2005."""
+    return matches(gminas, names, outlines)[0]
+
+
+def matches(
+    gminas: dict[str, tuple[int, str]], names: dict[str, str], outlines: dict[str, shapely.Geometry]
+) -> tuple[dict[str, int], dict[str, str]]:
+    """The voivodeship of each gmina of 2005, and the gmina of 2005 each gmina of the 1997 list is drawn as."""
     by_name: dict[str, list[str]] = defaultdict(list)
     for code, text in names.items():
         by_name[_norm(text)].append(code)
@@ -284,10 +293,12 @@ def membership(
             raise KeyError(f"{old} {name} has no gmina in the 2005 set")
         candidates[old] = found
     assigned: dict[str, int] = {}
+    drawn: dict[str, str] = {}
 
     def take(code: str, woj: int, old: str) -> None:
         if assigned.setdefault(code, woj) != woj:
             raise ValueError(f"{names[code]} ({code}) falls in voivodeships {assigned[code]} and {woj}")
+        drawn[old] = code
         if code not in MERGED:
             taken.add(code)
 
@@ -317,7 +328,7 @@ def membership(
         assigned[code] = woj
     if missing := set(outlines) - set(assigned):
         raise ValueError(f"gminas of 2005 in no voivodeship: {sorted((code, names[code]) for code in missing)}")
-    return assigned
+    return assigned, drawn
 
 
 def multipolygon(shape: shapely.Geometry) -> shapely.MultiPolygon:
@@ -337,16 +348,21 @@ def outlines() -> dict[int, shapely.MultiPolygon]:
     groups: dict[int, list[shapely.Geometry]] = defaultdict(list)
     for code, woj in assigned.items():
         groups[woj].append(shapes[code])
+    return cover(groups)
+
+
+def cover[K: (int, str)](groups: dict[K, list[shapely.Geometry]]) -> dict[K, shapely.MultiPolygon]:
+    """Unite each group of outlines in EPSG:2180, simplify the groups as one coverage, and project them to WGS 84."""
     order = sorted(groups)
-    united = [shapely.make_valid(shapely.set_precision(shapely.union_all(groups[woj]), 0.01)) for woj in order]
+    united = [shapely.make_valid(shapely.set_precision(shapely.union_all(groups[key]), 0.01)) for key in order]
     simple = shapely.coverage_simplify(np.array(united, dtype=object), TOLERANCE)
     back = Transformer.from_crs(2180, 4326, always_xy=True)
-    result: dict[int, shapely.MultiPolygon] = {}
-    for woj, shape in zip(order, simple, strict=True):
+    result: dict[K, shapely.MultiPolygon] = {}
+    for key, shape in zip(order, simple, strict=True):
         if shapely.is_empty(shape):
-            raise ValueError(f"voivodeship {woj} simplified to nothing")
+            raise ValueError(f"outline {key} simplified to nothing")
         projected = shapely.transform(shape, lambda xy: np.column_stack(back.transform(xy[:, 0], xy[:, 1])))
-        result[woj] = multipolygon(shapely.set_precision(projected, 1e-7))
+        result[key] = multipolygon(shapely.set_precision(projected, 1e-7))
     return result
 
 
@@ -359,7 +375,9 @@ def geo() -> Package:
     p.external |= {POLAND, COUNTRY}
     acts = p.id("source", "acts")
     kbw_source = p.id("source", "kbw")
-    prg = p.id("source", "prg-2005")
+    prg = PRG_SOURCE
+    if prg != p.id("source", "prg-2005"):
+        raise ValueError("PRG_SOURCE differs from the id geo mints")
     p.add(
         "source",
         id=acts,
