@@ -10,7 +10,8 @@ from uuid import UUID, uuid5
 import polars as pl
 
 from ea import raw
-from ea.changeset import NAMESPACE, Changeset, slug
+from ea.changeset import NAMESPACE, slug
+from ea.package import Draft
 from ea.sources.fr.names import head_parts, person_name
 from ea.store import DATA, connect
 
@@ -787,7 +788,7 @@ def emit() -> Path:
     totals = pl.read_parquet(PARSED / "totals.parquet")
     lists = pl.read_parquet(PARSED / "lists.parquet")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
