@@ -1,0 +1,9 @@
+{
+  "version": "2026.12",
+  "date": "2026-12-07",
+  "items": [
+    { "polity": "in", "tier": 1 },
+    { "polity": "pk", "tier": 1 },
+    { "polity": "ng", "tier": 1 }
+  ]
+}

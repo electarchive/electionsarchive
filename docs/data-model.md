@@ -216,7 +216,7 @@ A payload takes one of two forms. The `ops` form holds small edits as JSON opera
 
 The apply path loads the payload into staging, runs the checks, and then publishes the changeset in one transaction or queues it for review. A pipeline changeset from a registered official source, and any `match` changeset, publishes automatically when every check passes and the diff stays inside its declared scope. Everything else waits in `pending_review`, including every changeset that a person or an agent submits.
 
-A release is every changeset published on or before its watermark. The `release` table stores the calendar-version label, the watermark changeset, an optional DOI, and a manifest. A `release` changeset records a built release: `ea release --record --calver <calver>` stages the row from the release's `manifest.json`, publishing inserts it with `changeset_id` set to that changeset (an existing calver is left alone), and reverting the changeset deletes the row.
+A release is every changeset published on or before its watermark. The `release` table stores the calendar-version label, the watermark changeset, an optional DOI, and a manifest. A `release` changeset records a published release: `ea release publish <version>` stages the row from the release's `manifest.json` and applies it, publishing inserts the row with `changeset_id` set to that changeset (an existing label is left alone), and reverting the changeset deletes the row. Candidates (`-rc.N` labels) are never recorded. The manifest lists each country's tier, and `ea release status` compares current tiers against the latest recorded release.
 
 ## Main tables
 

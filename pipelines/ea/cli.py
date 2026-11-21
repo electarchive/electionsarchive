@@ -103,14 +103,18 @@ def main() -> None:
         "queued (on ea-fsn2 from ea-names-model.timer, through anthropic-batch); quote: estimate what model costs",
     ).add_argument("action", choices=("latin", "model", "quote"))
     releasing = commands.add_parser(
-        "release", help="write the bulk release bundles (Parquet, CSV, and GeoParquet) to data/releases/"
+        "release",
+        help="status: write each country's tier and blockers to data/ops/completeness.json; plan: write the tiers, "
+        "target, changes, and review sample of a version to data/releases/<version>/plan.json and review.json "
+        "without exporting; build: write the bundles (Parquet, CSV, and GeoParquet), manifest, and CHANGES.md; "
+        "check: verify a build and write check.json; publish: put a checked build on GitHub, the Storage Box, and "
+        "Dataverse, then record it",
     )
-    releasing.add_argument("--calver", help="release label, today's date by default")
+    releasing.add_argument("action", choices=("status", "plan", "build", "check", "publish"))
     releasing.add_argument(
-        "--record",
-        action="store_true",
-        help="instead of building, write a changeset that records the built release --calver in the release table",
+        "version", nargs="?", help="YYYY.MM, YYYY.MM.N for a fix, or either with -rc.N for a candidate"
     )
+    releasing.add_argument("--reason", help="what a fix release fixes, for its changelog")
     commands.add_parser("parties", help="rebuild the precomputed party pages the app serves")
     commands.add_parser("mosaics", help="rebuild the precomputed national map mosaics the app serves")
     recording = commands.add_parser(
@@ -379,7 +383,20 @@ def main() -> None:
         case "release":
             from ea import release
 
-            print(release.record(args.calver) if args.record else release.build(args.calver))
+            if args.action == "status":
+                from ea import completeness
+
+                print(completeness.status())
+            elif args.version is None:
+                raise SystemExit(f"ea release {args.action} needs a version")
+            elif args.action == "build":
+                print(release.build(args.version, args.reason))
+            else:
+                print(
+                    {"plan": release.plan, "check": release.check, "publish": release.publish}[args.action](
+                        args.version
+                    )
+                )
         case "parties":
             subprocess.run(
                 ["node", "scripts/party-pages.js"], cwd=Path(__file__).resolve().parents[2] / "apps" / "web", check=True

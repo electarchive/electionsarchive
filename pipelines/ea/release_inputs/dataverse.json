@@ -1,0 +1,8 @@
+{
+  "server": "https://dataverse.harvard.edu",
+  "datasets": {
+    "cc-by": null,
+    "cc-by-sa": null,
+    "odbl": null
+  }
+}

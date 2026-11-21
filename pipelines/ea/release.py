@@ -3,20 +3,34 @@ import gzip
 import hashlib
 import json
 import os
+import re
 import resource
 import shutil
+import subprocess
+import time
 from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 
+import httpx
 import polars as pl
 from psycopg import Connection, sql
 
 from ea.cache import _class
 from ea.changeset import Changeset
-from ea.store import DATA, connect
+from ea.completeness import ATTESTATIONS, FORMAT, INPUTS, TARGETS, US_FEDERAL, compute
+from ea.store import DATA, checkout, connect
 
 RELEASES = DATA / "releases"
+DATAVERSE = INPUTS / "dataverse.json"
+VERSION = re.compile(r"^\d{4}\.(0[1-9]|1[0-2])(\.[1-9]\d*)?(-rc\.[1-9]\d*)?$")
+REPOSITORY = "electarchive/electionsarchive"
+BOX = "storagebox:releases"
+SITE = "https://electionsarchive.com/"
+KEEP = ("plan.json", "review.json")
+FREE = 40 << 30
+EXPECTED = 20 << 30
+VERDICTS = ("pass", "fail")
 GAPS = Path(__file__).parent / "coverage_inputs" / "coverage-gaps.tsv"
 GAP_COLUMNS = [
     "polity",
@@ -32,7 +46,7 @@ GAP_COLUMNS = [
     "sources",
     "checked",
 ]
-SHARED = ("ATTRIBUTION.md", "manifest.json", "electionsarchive.sql", "gaps.csv")
+SHARED = ("ATTRIBUTION.md", "manifest.json", "electionsarchive.sql", "gaps.csv", "CHANGES.md")
 BUNDLES = {
     "cc-by": (
         "CC BY 4.0",
@@ -211,18 +225,24 @@ class Writer:
         part: str,
         columns: list[tuple[str, sql.Composable, pl.DataType]],
         query: sql.Composable,
+        order: list[str],
     ) -> int:
         stem = f"{bundle}_{table}" + (f"_{part}" if part else "")
-        select = sql.SQL("copy (select {} from ({}) q) to stdout (format csv, header)").format(
+        select = sql.SQL("copy (select {} from ({}) q order by {}) to stdout (format csv, header)").format(
             sql.SQL(", ").join(sql.SQL("{} as {}").format(expr, sql.Identifier(name)) for name, expr, _ in columns),
             query,
+            sql.SQL(", ").join(sql.SQL("q.{}").format(sql.Identifier(name)) for name in order),
         )
         csv = self.folder / f"{stem}.csv.gz"
         pieces: list[Path] = []
         header = b""
         size = 0
         file = None
-        with gzip.open(csv, "wb", compresslevel=6) as target, self.conn.cursor().copy(select) as copy:
+        with (
+            csv.open("wb") as raw,
+            gzip.GzipFile(filename="", mode="wb", compresslevel=6, fileobj=raw, mtime=0) as target,
+            self.conn.cursor().copy(select) as copy,
+        ):
             for chunk in copy:
                 data = bytes(chunk)
                 target.write(data)
@@ -575,6 +595,21 @@ def _chunks(decades: dict[int, int]) -> list[tuple[str, list[int]]]:
     return [(label(chunk), chunk) for chunk in chunks]
 
 
+def _order(conn: Connection, table: str, columns: list[tuple[str, sql.Composable, pl.DataType]]) -> list[str]:
+    keys = [
+        row[0]
+        for row in conn.execute(
+            "select a.attname from pg_index i "
+            "join pg_attribute a on a.attrelid = i.indrelid and a.attnum = any(i.indkey::int2[]) "
+            "where i.indrelid = %s::regclass and i.indisprimary "
+            "order by array_position(i.indkey::int2[], a.attnum)",
+            [table],
+        )
+    ]
+    exported = {name for name, _, _ in columns}
+    return keys if keys and set(keys) <= exported else [name for name, _, _ in columns]
+
+
 def _select(table: str, columns: list[tuple[str, sql.Composable, pl.DataType]]) -> sql.Composable:
     query = sql.SQL("select * from {} t").format(sql.Identifier(table))
     if any(name == "changeset_id" for name, _, _ in columns):
@@ -582,18 +617,375 @@ def _select(table: str, columns: list[tuple[str, sql.Composable, pl.DataType]]) 
     return query
 
 
-def build(calver: str | None = None) -> str:
-    calver = calver or datetime.now(UTC).strftime("%Y.%m.%d")
-    folder = RELEASES / calver
-    if folder.exists():
-        shutil.rmtree(folder)
-    folder.mkdir(parents=True)
+PREVIOUS_SQL = """
+select r.calver, r.watermark_changeset_id::text, w.published_at,
+    coalesce(jsonb_array_length(r.manifest -> 'files'), 0)::int,
+    coalesce((select sum((f ->> 'bytes')::bigint) from jsonb_array_elements(r.manifest -> 'files') f), 0)::bigint
+from release r
+join changeset w on w.id = r.watermark_changeset_id
+order by r.created_at desc
+limit 1
+"""
+CHANGES_SQL = """
+select coalesce(cs.pipeline, cs.kind::text), count(distinct cs.id)::int, count(rs.k)::int, count(rs.supersedes_id)::int
+from changeset cs
+left join result_set rs on rs.changeset_id = cs.id
+where cs.status = 'published' and cs.published_at > coalesce(%(since)s::timestamptz, '-infinity')
+group by 1
+order by 2 desc, 1
+"""
+KINDS_SQL = """
+select kind::text, count(*)::int
+from changeset
+where status = 'published' and published_at > coalesce(%(since)s::timestamptz, '-infinity')
+group by 1
+order by 2 desc, 1
+"""
+SAMPLE_SQL = """
+with picked as (
+    select lower(p.iso_code) as code, c.id, c.election_id, k.key, rs.source_id, e.date_from,
+        max(e.date_from) over (partition by k.id) as latest,
+        k.valid_to is null or k.valid_to > current_date as current
+    from contest_class cc
+    join census_class k on k.id = cc.class_id
+    join polity p on p.id = k.polity_id
+    join contest c on c.id = cc.contest_id
+    join election e on e.id = c.election_id
+    join lateral (
+        select source_id from result_set
+        where contest_id = c.id and is_default and status = 'active'
+        order by k
+        limit 1
+    ) rs on true
+    where lower(p.iso_code) = any(%(codes)s)
+        and (k.goal = 'national' or (p.iso_code = 'US' and k.key = any(%(federal)s)))
+),
+ranked as (
+    select *, row_number() over (partition by code order by md5(%(version)s || id::text)) as n
+    from picked
+    where (date_from = latest and current) or not code = any(%(latest)s)
+)
+select x.code, ea_public_id('contest'::entity_type, x.id), x.key, x.date_from,
+    coalesce(
+        (select s.path from slug s where s.entity_id = x.id and s.is_current order by s.path limit 1),
+        (select s.path from slug s where s.entity_id = x.election_id and s.is_current order by s.path limit 1)
+    ),
+    src.url, coalesce(src.attribution, src.publisher, src.title)
+from ranked x
+join source src on src.id = x.source_id
+where x.n <= %(per)s
+order by x.code, x.n
+"""
+MIGRATION_SQL = "select name from migrations order by applied_at desc nulls last, id desc limit 1"
+SAMPLE = 3
+
+
+def _kind(version: str) -> tuple[str, Path]:
+    if not VERSION.match(version):
+        raise ValueError(f"{version}: expected YYYY.MM, YYYY.MM.N for a fix, or either with -rc.N for a candidate")
+    base = version.split("-")[0]
+    return ("rc" if "-rc." in version else "fix" if base.count(".") == 2 else "release"), RELEASES / version
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as file:
+        while chunk := file.read(1 << 24):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _json(path: Path) -> dict[str, object]:
+    found = json.loads(path.read_text())
+    if not isinstance(found, dict):
+        raise TypeError(f"{path}: expected a JSON object")
+    return found
+
+
+def _write(path: Path, value: object) -> None:
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(json.dumps(value, indent=1, ensure_ascii=False, default=str) + "\n")
+    temporary.replace(path)
+
+
+def _list(value: object) -> list[dict[str, object]]:
+    return [item for item in value if isinstance(item, dict)] if isinstance(value, list) else []
+
+
+def _strings(value: object) -> list[str]:
+    return [str(item) for item in value] if isinstance(value, list) else []
+
+
+def _int(value: object) -> int | None:
+    return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+
+def _sections(conn: Connection, version: str, kind: str, folder: Path) -> dict[str, object]:
+    if conn.execute("select from release where calver = %s", [version]).fetchone() is not None:
+        raise ValueError(f"{version} is already recorded in the release table; labels are never reused")
+    found = compute(conn)
+    previous = conn.execute(PREVIOUS_SQL).fetchone()
+    since = previous[2] if previous is not None else None
+    entries = _list(found["polities"])
+    rising = [
+        str(entry["code"])
+        for entry in entries
+        if (tier := _int(entry["tier"])) is not None and tier >= 1 and tier > (_int(entry["released_tier"]) or 0)
+    ]
+    latest = [str(entry["code"]) for entry in entries if str(entry["code"]) in rising and entry["tier"] == 1]
+    answered: dict[str, dict[str, object]] = {}
+    old: dict[str, object] = {}
+    if (folder / "review.json").exists():
+        old = _json(folder / "review.json")
+        answered = {str(item["contest"]): item for item in _list(old.get("items"))}
+    items: list[dict[str, object]] = []
+    for code, contest, key, held_on, path, url, source in conn.execute(
+        SAMPLE_SQL,
+        {"version": version, "codes": rising, "latest": latest, "federal": sorted(US_FEDERAL), "per": SAMPLE},
+    ).fetchall():
+        before = answered.get(contest, {})
+        items.append(
+            {
+                "polity": code,
+                "contest": contest,
+                "class": key,
+                "date": held_on.isoformat() if held_on is not None else None,
+                "page": SITE + path if path else None,
+                "source": source,
+                "source_url": url,
+                "verdict": before.get("verdict"),
+                "note": before.get("note"),
+            }
+        )
+    review = {"version": version, "by": old.get("by"), "on": old.get("on"), "items": items}
+    states: dict[str, str] = {}
+    for code in rising:
+        verdicts = [item["verdict"] for item in items if item["polity"] == code]
+        states[code] = (
+            "fail" if "fail" in verdicts else "pass" if verdicts and all(v == "pass" for v in verdicts) else "pending"
+        )
+    polities: list[dict[str, object]] = []
+    changed: list[dict[str, object]] = []
+    for entry in entries:
+        code = str(entry["code"])
+        computed = _int(entry["tier"]) or 0
+        before = _int(entry["released_tier"])
+        state = states.get(code)
+        held = state == "fail" or (state == "pending" and kind != "rc")
+        tier = (before if before is not None else 0) if held else computed
+        polities.append(
+            {
+                **{key: value for key, value in entry.items() if key != "released_tier"},
+                "tier": tier,
+                "computed_tier": computed,
+                "previous_tier": before,
+                "provisional": tier < 1,
+                "review": state,
+            }
+        )
+        if before is not None and before != tier:
+            changed.append({"code": code, "name": entry["name"], "from": before, "to": tier})
+    final = {str(entry["code"]): int(str(entry["tier"])) for entry in polities}
+    target = found["target"]
+    assert isinstance(target, dict)
+    reached = [
+        {**item, "reached": final.get(str(item["polity"]), -1) >= int(str(item["tier"]))}
+        for item in _list(target["items"])
+    ]
+    pipelines = [
+        {"pipeline": pipeline, "changesets": count, "result_sets": sets, "superseding": superseding}
+        for pipeline, count, sets, superseding in conn.execute(CHANGES_SQL, {"since": since}).fetchall()
+    ]
+    return {
+        "format": FORMAT,
+        "version": version,
+        "kind": kind,
+        "computed_at": found["computed_at"],
+        "coverage_built_at": found["coverage_built_at"],
+        "watermark": found["watermark"],
+        "previous": {
+            "version": previous[0],
+            "watermark_changeset_id": previous[1],
+            "watermark_published_at": previous[2].isoformat(),
+            "files": previous[3],
+            "bytes": previous[4],
+        }
+        if previous is not None
+        else None,
+        "tiers": found["tiers"],
+        "target": {**target, "items": reached, "met": all(item["reached"] for item in reached)},
+        "polities": polities,
+        "changes": {
+            "since": previous[0] if previous is not None else None,
+            "baseline": previous is not None and all(entry["released_tier"] is None for entry in entries),
+            "changesets": sum(int(row["changesets"]) for row in pipelines),
+            "result_sets": sum(int(row["result_sets"]) for row in pipelines),
+            "superseding": sum(int(row["superseding"]) for row in pipelines),
+            "kinds": dict(conn.execute(KINDS_SQL, {"since": since}).fetchall()),
+            "tiers": changed,
+            "pipelines": pipelines,
+        },
+        "review": review,
+    }
+
+
+def plan(version: str) -> str:
+    kind, folder = _kind(version)
+    with connect() as conn:
+        conn.execute("set transaction isolation level repeatable read, read only")
+        sections = _sections(conn, version, kind, folder)
+    folder.mkdir(parents=True, exist_ok=True)
+    _write(folder / "plan.json", {**sections, "planned_at": datetime.now(UTC).isoformat(timespec="seconds")})
+    _write(folder / "review.json", sections["review"])
+    return _report(folder, sections)
+
+
+def _report(folder: Path, sections: dict[str, object]) -> str:
+    target = sections["target"]
+    changes = sections["changes"]
+    review = sections["review"]
+    assert isinstance(target, dict) and isinstance(changes, dict) and isinstance(review, dict)
+    tiers: dict[int, int] = defaultdict(int)
+    for entry in _list(sections["polities"]):
+        tiers[int(str(entry["tier"]))] += 1
+    ladder = ", ".join(f"T{tier}: {tiers[tier]}" for tier in range(6) if tiers[tier])
+    goal = ", ".join(
+        f"{item['polity']} T{item['tier']} {'reached' if item['reached'] else 'missed'}"
+        for item in _list(target["items"])
+    )
+    return (
+        f"{folder}: {ladder}, not surveyed: {tiers[-1]}; target {target.get('version')} "
+        f"{'met' if target['met'] else 'partial'} ({goal}); {changes['changesets']:,} changesets and "
+        f"{changes['result_sets']:,} result sets since {changes['since']}; "
+        f"{len(_list(review['items']))} contests to review"
+    )
+
+
+def _names(names: list[str]) -> str:
+    if len(names) <= 2:
+        return " and ".join(names)
+    return ", ".join(names[:-1]) + ", and " + names[-1]
+
+
+def _changes(manifest: dict[str, object]) -> str:
+    target = manifest["target"]
+    changes = manifest["changes"]
+    watermark = manifest["watermark"]
+    assert isinstance(target, dict) and isinstance(changes, dict) and isinstance(watermark, dict)
+    polities = _list(manifest["polities"])
+    names = {str(entry["code"]): str(entry["name"]) for entry in polities}
+    previous = str(changes["since"]) if changes["since"] is not None else "none (first release with tiers)"
+    items = _list(target["items"])
+    by_tier: dict[int, list[str]] = defaultdict(list)
+    for item in items:
+        by_tier[int(str(item["tier"]))].append(names.get(str(item["polity"]), str(item["polity"]).upper()))
+    wanted = "; ".join(f"{_names(group)} at T{tier}" for tier, group in sorted(by_tier.items()))
+    missed = _names(
+        [
+            f"{names.get(str(item['polity']), str(item['polity']).upper())} reached T"
+            + str(next((entry["tier"] for entry in polities if entry["code"] == item["polity"]), -1))
+            for item in items
+            if not item["reached"]
+        ]
+    )
+    goal = (
+        f"Target met: {wanted}."
+        if target["met"]
+        else f"Partial release. The target was {wanted}; {missed}."
+        if items
+        else ""
+    )
+    status = {
+        "rc": f"Release candidate for {target.get('version')}. A candidate is for checking only, and the next scheduled release replaces it.",
+        "fix": f"Fix for {str(manifest['version']).split('-')[0].rsplit('.', 1)[0]}: {manifest.get('reason')}.",
+    }.get(str(manifest["kind"]), "")
+    lines = [
+        f"# electionsarchive.com data {manifest['version']}",
+        "",
+        "\n\n".join(line for line in (status, goal) if line),
+        "",
+        (
+            f"This release holds every result the archive had published by {str(watermark['published_at'])[:10]} "
+            f"(changeset `{watermark['changeset_id']}`). Data format: {manifest['format']}. Previous release: {previous}."
+        ),
+        "",
+        "## Completeness by country",
+        "",
+        "Each country has a tier, computed from the coverage census. A country reaches a tier only when it meets every tier below it.",
+        "",
+        "- T0, surveyed: the census lists the country's national offices and bodies.",
+        "- T1, latest national: the archive holds the latest national election of every office and body the census lists.",
+        "- T2, national history: the archive holds every national election back to the first one, and a person has checked the census against the official record.",
+        "- T3, finest unit: national results reach the finest unit the official source publishes.",
+        "- T4, subnational: state, province, and regional elections, referendums, and European Parliament elections are complete.",
+        "- T5, local: local elections are complete.",
+        "",
+        "A contest counts as done when the archive holds it at the required level of detail, or when the gap register explains why no one can get it. Countries below T1 are provisional.",
+        "",
+    ]
+    for tier in range(5, -1, -1):
+        group = sorted(str(entry["name"]) for entry in polities if entry["tier"] == tier)
+        if group:
+            lines.append(f"- T{tier} ({len(group)}): {', '.join(group)}")
+    lines += ["", f"## Tier changes since {previous}", ""]
+    moved = _list(changes["tiers"])
+    if changes["baseline"]:
+        lines.append(f"{previous} had no tiers, so this release sets the baseline.")
+    elif moved:
+        lines += [f"- {row['name']}: T{row['from']} to T{row['to']}." for row in moved]
+    else:
+        lines.append("No country changed tier.")
+    pipelines = _list(changes["pipelines"])
+    lines += [
+        "",
+        f"## Changes since {previous}",
+        "",
+        (
+            f"{int(str(changes['changesets'])):,} changesets from {len(pipelines):,} pipelines were published since {previous}. "
+            f"They added {int(str(changes['result_sets'])):,} result sets, {int(str(changes['superseding'])):,} of which replace an earlier set."
+        ),
+        "",
+    ]
+    files = _list(manifest["files"])
+    size = sum(int(str(entry["bytes"])) for entry in files)
+    lines += [
+        "## Files",
+        "",
+        (
+            f"{len(files) + len(SHARED) + 1:,} files, {size / (1 << 30):.1f} GiB in total, in three license bundles. "
+            "ATTRIBUTION.md credits each source. SHA256SUMS lists a checksum for every file, and manifest.json describes each file, table, and country."
+        ),
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def build(version: str, reason: str | None = None) -> str:
+    kind, folder = _kind(version)
+    if kind == "fix" and not reason:
+        raise ValueError(f"{version} is a fix release; give --reason for the changelog")
+    folder.mkdir(parents=True, exist_ok=True)
+    for path in folder.iterdir():
+        if path.name in KEEP:
+            continue
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
     with connect() as conn:
         conn.execute("set transaction isolation level repeatable read")
         conn.execute("set local work_mem = '512MB'")
-        watermark, published_at = conn.execute(
-            "select id::text, published_at from changeset where status = 'published' order by published_at desc limit 1"
-        ).fetchone() or (None, None)
+        sections = _sections(conn, version, kind, folder)
+        previous = sections["previous"]
+        expected = int(str(previous["bytes"])) if isinstance(previous, dict) and previous["bytes"] else EXPECTED
+        free = shutil.disk_usage(folder).free
+        if free < FREE + expected:
+            raise RuntimeError(
+                f"{free / (1 << 30):.0f} GiB free; a build needs {(FREE + expected) / (1 << 30):.0f} GiB "
+                f"(40 GiB to spare plus about {expected / (1 << 30):.0f} GiB)"
+            )
+        watermark = sections["watermark"]
+        assert isinstance(watermark, dict)
+        migration = conn.execute(MIGRATION_SQL).fetchone()
         conn.execute(
             "create temp table release_published as select id from changeset where status = 'published'; "
             "alter table release_published add primary key (id)"
@@ -655,6 +1047,7 @@ def build(calver: str | None = None) -> str:
 
         writer = Writer(conn, folder)
         value_columns = _columns(conn, "result_value")
+        value_order = _order(conn, "result_value", value_columns)
         for target, part in result_parts:
             writer.table(
                 target,
@@ -663,13 +1056,14 @@ def build(calver: str | None = None) -> str:
                 value_columns,
                 sql.SQL(
                     "select v.* from result_value v join release_set s on s.k = v.result_set_k "
-                    "where s.bundle = {} and s.part = {} "
-                    "order by v.result_set_k, v.unit_k, v.option_k, v.measure, v.channel, v.count_round"
+                    "where s.bundle = {} and s.part = {}"
                 ).format(sql.Literal(target), sql.Literal(part)),
+                value_order,
             )
             print(f"results {target} {part}", flush=True)
         for table, column in BY_RESULT_SET.items():
             columns = _columns(conn, table)
+            order = _order(conn, table, columns)
             join = "k" if column.endswith("_k") or column == "k" else "id"
             for target in BUNDLES:
                 writer.table(
@@ -681,11 +1075,13 @@ def build(calver: str | None = None) -> str:
                         "select t.* from {} t join result_set rs on rs.{} = t.{} "
                         "join release_set s on s.k = rs.k where s.bundle = {}"
                     ).format(sql.Identifier(table), sql.SQL(join), sql.Identifier(column), sql.Literal(target)),
+                    order,
                 )
             print(table, flush=True)
         cited = ["result_set"]
         for table in ENTITIES:
             columns = _columns(conn, table)
+            order = _order(conn, table, columns)
             query = _select(table, columns)
             if any(name == "source_id" for name, _, _ in columns):
                 cited.append(table)
@@ -699,9 +1095,10 @@ def build(calver: str | None = None) -> str:
                             "select q.* from ({}) q left join release_source r on r.id = q.source_id "
                             "where coalesce(r.bundle, case when q.source_id is null then 'cc-by' end) = {}"
                         ).format(query, sql.Literal(target)),
+                        order,
                     )
             else:
-                writer.table("cc-by", table, "", columns, query)
+                writer.table("cc-by", table, "", columns, query, order)
             print(table, flush=True)
         used = {
             row[0]
@@ -725,6 +1122,7 @@ def build(calver: str | None = None) -> str:
             "",
             _columns(conn, "source", SOURCE_COLUMNS),
             sql.SQL("select * from source where id = any({})").format(sql.Literal(sorted(used))),
+            ["id"],
         )
         writer.table(
             "cc-by",
@@ -732,13 +1130,14 @@ def build(calver: str | None = None) -> str:
             "",
             _columns(conn, "changeset", CHANGESET_COLUMNS),
             sql.SQL("select * from changeset where status = 'published'"),
+            ["id"],
         )
         _geometry(conn, writer)
     if len(writer.files) + len(SHARED) + 1 > MAX_FILES:
         raise RuntimeError(f"{len(writer.files) + len(SHARED) + 1} files, over the {MAX_FILES}-file release limit")
 
     lines = [
-        f"# Attribution\n\nelectionsarchive.com release {calver}. Each bundle carries the license below; credit these sources when you use it.\n"
+        f"# Attribution\n\nelectionsarchive.com release {version}. Each bundle carries the license below; credit these sources when you use it.\n"
     ]
     for target, (name, url, scope) in BUNDLES.items():
         lines.append(f"\n## {target}: {name}\n\n{scope}. License: {url}\n")
@@ -751,10 +1150,30 @@ def build(calver: str | None = None) -> str:
             lines.append(f"- {credit}" + (f", {url}" if url else "") + (f" ({license})" if license else ""))
     (folder / "ATTRIBUTION.md").write_text("\n".join(lines) + "\n")
     manifest = {
-        "release": calver,
+        "format": FORMAT,
+        "version": version,
+        "release": version,
+        "kind": kind,
+        "reason": reason,
         "created_at": datetime.now(UTC).isoformat(timespec="seconds"),
-        "watermark_changeset_id": watermark,
-        "watermark_published_at": published_at.isoformat() if published_at else None,
+        "code_commit": checkout()["sha"],
+        "migration": migration[0] if migration is not None else None,
+        "inputs": {path.name: _sha256(path) for path in (TARGETS, ATTESTATIONS)},
+        "watermark_changeset_id": watermark["changeset_id"],
+        "watermark_published_at": watermark["published_at"],
+        **{
+            key: sections[key]
+            for key in (
+                "watermark",
+                "previous",
+                "coverage_built_at",
+                "tiers",
+                "target",
+                "polities",
+                "changes",
+                "review",
+            )
+        },
         "bundles": {
             target: {"license": name, "license_url": url, "scope": scope}
             for target, (name, url, scope) in BUNDLES.items()
@@ -770,6 +1189,8 @@ def build(calver: str | None = None) -> str:
         "files": writer.files,
     }
     (folder / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
+    (folder / "CHANGES.md").write_text(_changes(manifest))
+    _write(folder / "review.json", sections["review"])
     tables: dict[str, list[str]] = defaultdict(list)
     for entry in writer.files:
         if str(entry["file"]).endswith(".parquet"):
@@ -788,7 +1209,7 @@ def build(calver: str | None = None) -> str:
         sums.append(f"{hashlib.sha256((folder / name).read_bytes()).hexdigest()}  {name}")
     (folder / "SHA256SUMS").write_text("\n".join(sums) + "\n")
     size = sum(int(str(entry["bytes"])) for entry in writer.files)
-    return f"{folder}: {len(writer.files) + len(SHARED) + 1} files, {size / (1 << 30):.2f} GiB"
+    return f"{_report(folder, sections)}; {len(writer.files) + len(SHARED) + 1} files, {size / (1 << 30):.2f} GiB"
 
 
 def gaps(folder: Path) -> dict[str, object]:
@@ -815,25 +1236,269 @@ def gaps(folder: Path) -> dict[str, object]:
     }
 
 
-def record(calver: str | None = None) -> str:
-    calver = calver or datetime.now(UTC).strftime("%Y.%m.%d")
-    manifest = json.loads((RELEASES / calver / "manifest.json").read_text())
+def _sums(folder: Path) -> dict[str, str]:
+    found: dict[str, str] = {}
+    for line in (folder / "SHA256SUMS").read_text().splitlines():
+        digest, _, name = line.partition("  ")
+        found[name] = digest
+    return found
+
+
+def check(version: str) -> str:
+    kind, folder = _kind(version)
+    manifest = _json(folder / "manifest.json")
+    checks: list[dict[str, object]] = []
+
+    def note(name: str, problems: list[str]) -> None:
+        checks.append({"check": name, "ok": not problems, "problems": problems[:50], "count": len(problems)})
+
+    required = ("format", "version", "kind", "code_commit", "watermark", "tiers", "target", "polities", "changes")
+    note(
+        "manifest",
+        [f"missing {key}" for key in required if key not in manifest]
+        + ([f"format {manifest.get('format')}, expected {FORMAT}"] if manifest.get("format") != FORMAT else [])
+        + ([f"version {manifest.get('version')}"] if manifest.get("version") != version else [])
+        + ([f"kind {manifest.get('kind')}, expected {kind}"] if manifest.get("kind") != kind else []),
+    )
+    files = _list(manifest.get("files"))
+    sums = _sums(folder)
+    named = {str(entry["file"]): str(entry["sha256"]) for entry in files}
+    present = {path.name for path in folder.iterdir() if path.is_file()}
+    problems = [f"{name} is listed but missing" for name in sorted(set(sums) - present)]
+    problems += [f"{name} is not in SHA256SUMS" for name in sorted(set(named) | set(SHARED)) if name not in sums]
+    problems += [
+        f"{name} is in the folder but not in SHA256SUMS"
+        for name in sorted(present - set(sums) - {"SHA256SUMS", "check.json", *KEEP})
+    ]
+    problems += [
+        f"{name}: manifest and SHA256SUMS differ" for name, digest in named.items() if sums.get(name) != digest
+    ]
+    problems += [
+        f"{name}: checksum does not match"
+        for name, digest in sums.items()
+        if name in present and _sha256(folder / name) != digest
+    ]
+    note("checksums", problems)
+    note(
+        "limits",
+        ([f"{len(sums) + 1} files, over {MAX_FILES}"] if len(sums) + 1 > MAX_FILES else [])
+        + [f"{name} is over 2 GiB" for name in sorted(present) if (folder / name).stat().st_size >= MAX_BYTES],
+    )
+    parquet = {
+        str(entry["file"]): int(str(entry["rows"])) for entry in files if str(entry["file"]).endswith(".parquet")
+    }
+    note(
+        "rows",
+        [
+            f"{name}: {rows:,} rows, manifest says {expected:,}"
+            for name, expected in parquet.items()
+            if (folder / name).exists()
+            and (rows := int(pl.scan_parquet(folder / name).select(pl.len()).collect().item())) != expected
+        ],
+    )
+    sets = [folder / name for name in parquet if "_result_set" in name and name.endswith("_result_set.parquet")]
+    ids = pl.concat([pl.read_parquet(path, columns=["k", "source_id"]) for path in sets]) if sets else None
+    duplicates = 0 if ids is None else ids.height - ids["k"].n_unique()
+    note("bundles", [f"{duplicates:,} result sets sit in more than one bundle"] if duplicates else [])
+    sources = pl.read_parquet(folder / "cc-by_source.parquet") if (folder / "cc-by_source.parquet").exists() else None
+    held = []
+    if sources is None:
+        held.append("cc-by_source.parquet is missing")
+    else:
+        held += [
+            f"source {row['id']} ({row['publisher']}) is held by license"
+            for row in sources.iter_rows(named=True)
+            if bundle(row["license"], row["publisher"]) is None
+        ]
+        if ids is not None:
+            listed = set(sources["id"].to_list())
+            held += [
+                f"result sets cite source {source}, which is not in the source table"
+                for source in sorted(set(ids["source_id"].drop_nulls().unique().to_list()) - listed)
+            ]
+    note("licenses", held)
+    inputs = manifest.get("inputs")
+    note(
+        "inputs",
+        [
+            f"{path.name} changed after the build"
+            for path in (TARGETS, ATTESTATIONS)
+            if not isinstance(inputs, dict) or inputs.get(path.name) != _sha256(path)
+        ],
+    )
+    review = manifest.get("review")
+    unanswered = []
+    if kind != "rc":
+        if not isinstance(review, dict) or not review.get("by") or not review.get("on"):
+            unanswered.append("the review has no reviewer or date")
+        unanswered += [
+            f"{item['polity']} {item['contest']} has no verdict"
+            for item in _list(review.get("items") if isinstance(review, dict) else None)
+            if item.get("verdict") not in VERDICTS
+        ]
+    note("review", unanswered)
+    ok = all(entry["ok"] for entry in checks)
+    _write(
+        folder / "check.json",
+        {
+            "version": version,
+            "checked_at": datetime.now(UTC).isoformat(timespec="seconds"),
+            "ok": ok,
+            "sums": _sha256(folder / "SHA256SUMS"),
+            "failures": [f"{entry['check']}: {problem}" for entry in checks for problem in _strings(entry["problems"])],
+            "checks": checks,
+        },
+    )
+    failed = [f"{entry['check']} ({entry['count']})" for entry in checks if not entry["ok"]]
+    return f"{folder}: {'passed' if ok else 'failed: ' + ', '.join(failed)}"
+
+
+def _gh(*args: str) -> str:
+    return subprocess.run(
+        ["gh", *args, "-R", REPOSITORY], check=True, capture_output=True, text=True, timeout=3600
+    ).stdout
+
+
+def _github(folder: Path, version: str, kind: str, names: list[str]) -> None:
+    tag = f"data-{version}"
+    seen = subprocess.run(
+        ["gh", "release", "view", tag, "-R", REPOSITORY, "--json", "isDraft,assets"],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    uploaded: set[str] = set()
+    if seen.returncode == 0:
+        found = json.loads(seen.stdout)
+        if not found["isDraft"]:
+            raise RuntimeError(f"{tag} is already published")
+        uploaded = {str(asset["name"]) for asset in found["assets"]}
+    else:
+        _gh(
+            "release",
+            "create",
+            tag,
+            "--draft",
+            "--title",
+            f"Data {version}",
+            "--notes-file",
+            str(folder / "CHANGES.md"),
+            *(["--prerelease"] if kind == "rc" else []),
+        )
+    waiting = [folder / name for name in names if name not in uploaded]
+    for start in range(0, len(waiting), 20):
+        _gh("release", "upload", tag, *(str(path) for path in waiting[start : start + 20]))
+        print(f"uploaded {min(start + 20, len(waiting))} of {len(waiting)}", flush=True)
+    _gh("release", "edit", tag, "--draft=false", *(["--latest=false"] if kind == "rc" else ["--latest"]))
+
+
+def _md5(path: Path) -> str:
+    digest = hashlib.md5(usedforsecurity=False)
+    with path.open("rb") as file:
+        while chunk := file.read(1 << 24):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _dataverse(folder: Path, manifest: dict[str, object], version: str) -> str:
+    config = _json(DATAVERSE)
+    datasets = config.get("datasets")
+    token = os.environ.get("DATAVERSE_TOKEN")
+    if not isinstance(datasets, dict) or any(not isinstance(pid, str) for pid in datasets.values()) or not token:
+        return "Dataverse skipped: dataverse.json has no dataset ids, or DATAVERSE_TOKEN is unset"
+    shared = [*SHARED, "SHA256SUMS"]
+    done = []
+    with httpx.Client(base_url=str(config["server"]), headers={"X-Dataverse-key": token}, timeout=3600) as client:
+
+        def wait(pid: str) -> None:
+            for _ in range(240):
+                locks = client.get("/api/datasets/:persistentId/locks", params={"persistentId": pid})
+                locks.raise_for_status()
+                if not locks.json()["data"]:
+                    return
+                time.sleep(5)
+            raise RuntimeError(f"{pid} stayed locked for 20 minutes")
+
+        for target, pid in datasets.items():
+            wanted = {
+                name: _md5(folder / name)
+                for name in [
+                    *(str(entry["file"]) for entry in _list(manifest["files"]) if entry["bundle"] == target),
+                    *shared,
+                ]
+                if name.endswith(".parquet") or name in shared
+            }
+            listed = client.get("/api/datasets/:persistentId/versions/:latest/files", params={"persistentId": pid})
+            listed.raise_for_status()
+            have = {
+                str(row["dataFile"]["filename"]): (
+                    row["dataFile"]["id"],
+                    row["dataFile"].get("md5") or row["dataFile"].get("checksum", {}).get("value"),
+                )
+                for row in listed.json()["data"]
+            }
+            stale = [(name, identifier) for name, (identifier, md5) in have.items() if wanted.get(name) != md5]
+            fresh = [name for name, md5 in wanted.items() if have.get(name, (None, None))[1] != md5]
+            for name, identifier in stale:
+                client.delete(f"/api/files/{identifier}").raise_for_status()
+            for name in fresh:
+                with (folder / name).open("rb") as handle:
+                    client.post(
+                        "/api/datasets/:persistentId/add",
+                        params={"persistentId": pid},
+                        files={"file": (name, handle)},
+                        data={
+                            "jsonData": json.dumps(
+                                {"description": f"electionsarchive.com data {version}", "tabIngest": False}
+                            )
+                        },
+                    ).raise_for_status()
+                wait(pid)
+            if stale or fresh:
+                wait(pid)
+                client.post(
+                    "/api/datasets/:persistentId/actions/:publish", params={"persistentId": pid, "type": "major"}
+                ).raise_for_status()
+            done.append(
+                f"{target}: {len(fresh)} files added, {len(stale)} removed, {len(wanted) - len(fresh)} carried over"
+            )
+    return "Dataverse " + "; ".join(done)
+
+
+def publish(version: str) -> str:
+    kind, folder = _kind(version)
+    checked = _json(folder / "check.json") if (folder / "check.json").exists() else None
+    if checked is None or not checked.get("ok") or checked.get("sums") != _sha256(folder / "SHA256SUMS"):
+        raise RuntimeError(f"{version} has no passing check of its current files; run ea release check {version}")
+    manifest = _json(folder / "manifest.json")
+    names = [*_sums(folder), "SHA256SUMS"]
+    _github(folder, version, kind, names)
+    if kind == "rc":
+        return f"data-{version}: published on GitHub as a prerelease"
+    subprocess.run(["rsync", "-a", "--partial", f"{folder}/", f"{BOX}/{version}/"], check=True)
+    deposited = _dataverse(folder, manifest, version)
+    recorded = record(version, manifest)
+    for entry in _list(manifest["files"]):
+        (folder / str(entry["file"])).unlink(missing_ok=True)
+    return f"data-{version}: on GitHub and the Storage Box; {deposited}; release changeset {recorded}"
+
+
+def record(version: str, manifest: dict[str, object]) -> str:
+    from ea.apply import apply
+
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline="release",
             version="1",
-            summary=f"Record release {calver} at watermark {manifest['watermark_changeset_id']}",
+            summary=f"Record release {version} at watermark {manifest['watermark_changeset_id']}",
             polity=None,
             kind="release",
         )
-        cs.add(
-            "release",
-            calver=manifest["release"],
-            watermark_changeset_id=manifest["watermark_changeset_id"],
-            manifest=manifest,
-        )
-        return str(cs.write())
+        cs.add("release", calver=version, watermark_changeset_id=manifest["watermark_changeset_id"], manifest=manifest)
+        folder = cs.write()
+    return f"{folder.name} {apply(folder)}"
 
 
 def _geometry(conn: Connection, writer: Writer) -> None:
