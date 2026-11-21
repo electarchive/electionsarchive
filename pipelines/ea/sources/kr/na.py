@@ -7,12 +7,13 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.package import NAMESPACE, Draft
+from ea.sources.kr import na_districts as districts
 from ea.sources.kr.nec import BASE, PARTIES_QUERY, REPORT, SIDO, _bindings, _get
 from ea.store import DATA, connect
 
@@ -168,6 +169,7 @@ def jobs(days: tuple[str, ...] = DATES) -> list[tuple[str, str, str, str]]:
 def fetch() -> None:
     with ThreadPoolExecutor(4) as pool:
         list(pool.map(_job, jobs()))
+    districts.fetch()
 
 
 PARSED = DATA / "parsed" / SOURCE
@@ -427,6 +429,19 @@ def parse() -> None:
     pl.DataFrame(tickets).unique().write_parquet(PARSED / "tickets.parquet")
     pl.DataFrame(winners).write_parquet(PARSED / "winners.parquet")
     print(pl.DataFrame(results).group_by("day").agg(pl.len(), pl.col("ballots").sum()).sort("day"))
+    outlines = districts.build(pl.read_parquet(PARSED / "results.parquet"))
+    outlines.write_parquet(PARSED / "districts.parquet")
+    print(
+        outlines.group_by("day")
+        .agg(
+            pl.len().alias("constituencies"),
+            pl.col("named").sum(),
+            pl.col("missing").list.len().sum().alias("unmatched"),
+            pl.col("filled").sum(),
+            pl.col("shared").sum(),
+        )
+        .sort("day")
+    )
 
 
 VERSION = "1"
@@ -454,6 +469,29 @@ NOTE = (
 )
 
 
+ACCEPTED = {
+    "accounting.turnout": (
+        "The commission prints ballots without registered voters for its rows of misplaced ballots (잘못 투입·구분된 "
+        "투표지, 2004–2024) and of early votes cast outside the voter's district (관외사전투표), which have no "
+        "register of their own, and for a few polling districts of 1973–1988 it prints more ballots than registered "
+        "voters; the counts are stored as printed."
+    ),
+    "accounting.ballots_sum": (
+        "The constituency tables of 1950 to 1967 print no ballots cast (0) beside the registered voters and the valid "
+        "and invalid votes of some constituencies, and one 1950 constituency prints 3,700; the counts are stored as "
+        "printed."
+    ),
+    "accounting.votes_valid": (
+        "Three constituencies (제23선거구 용인군 in 1948, 제19선거구 화성군 을구 and 천안군 in 1950) print a valid "
+        "total larger than the sum of their candidates' votes; the counts are stored as printed."
+    ),
+}
+
+
+def _day(text: str) -> date:
+    return date(int(text[:4]), int(text[4:6]), int(text[6:]))
+
+
 def _slug_sido(code: str) -> str:
     return SIDO[code][2].lower().replace(" ", "-")
 
@@ -478,7 +516,7 @@ def emit() -> Path:
             (row["party"].rsplit("/", 1)[1], row.get("english"), row.get("start"), row.get("end"))
         )
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
@@ -489,6 +527,9 @@ def emit() -> Path:
             ),
             polity="KR",
         )
+
+        for code, reason in ACCEPTED.items():
+            cs.accept(code, reason)
 
         def name(entity: UUID, text: str, lang: str = "ko", kind: str = "official", preferred: bool = True) -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=preferred)
@@ -519,8 +560,30 @@ def emit() -> Path:
             license=LICENSE,
             license_url=BASE,
         )
+        # The files the published counts were read from stay cited as first retrieved; a later fetch that stored the
+        # same file again changes only the index's retrieval time. Files not cited yet are cited from the index.
+        cited: dict[str, dict[str, Any]] = {}
+        columns = ("id", "source_id", "url", "sha256", "retrieved_at", "storage_key", "media_type", "bytes")
+        for values in conn.execute(
+            """select a.id, a.source_id, a.url, a.sha256, a.retrieved_at, a.storage_key, a.media_type, a.bytes
+               from source_artifact a join changeset c on c.id = a.changeset_id
+               where c.pipeline = %s and c.status = 'published' and a.source_id = any(%s::uuid[])""",
+            [SOURCE, [source, winners_source]],
+        ).fetchall():
+            row = dict(zip(columns, values, strict=True))
+            cited[str(row["storage_key"])] = row
+        absent = sorted(key for key in cited if not (DATA / key).is_file())
+        if absent:
+            raise FileNotFoundError(
+                f"{SOURCE}: {len(absent)} cited files are not in the raw cache, such as {absent[0]}; fetch them again"
+            )
+        for row in cited.values():
+            cs.artifacts.add(row["id"])
+            cs.add("source_artifact", **row)
         for address in raw.keys(SOURCE):
-            cs.artifact(raw.cached(SOURCE, address), winners_source if "EPEI01" in address else source)
+            artifact = raw.cached(SOURCE, address)
+            if not address.startswith(districts.BASE) and artifact.storage_key not in cited:
+                cs.artifact(artifact, winners_source if "EPEI01" in address else source)
 
         cs.add(
             "scheme",
@@ -532,8 +595,84 @@ def emit() -> Path:
             kinds=None,
             code_system=None,
         )
-        sidos = {code: cs.area("kr.sido", code) for code in SIDO}
+        # Two pipelines hold a kr.sido area for each province code, so a province keeps the area this pipeline's own
+        # units already point at.
+        pairs = conn.execute(
+            """select distinct a.code, u.area_id from reporting_unit u
+               join changeset c on c.id = u.changeset_id
+               join area_code a on a.area_id = u.area_id
+               join area s on s.id = u.area_id and s.scheme_code = 'kr.sido'
+               where c.pipeline = %s""",
+            [SOURCE],
+        ).fetchall()
+        placed = dict(pairs)
+        if len(placed) != len(pairs):
+            raise ValueError(f"{SOURCE}: a province's units point at two areas")
+        sidos = {code: placed.get(code) or cs.area("kr.sido", code) for code in SIDO}
         units: dict[tuple[str, str], UUID] = {}
+
+        drawn = {
+            (str(day), str(sido), str(sgg)): (str(geom), str(point))
+            for day, sido, sgg, geom, point in pl.read_parquet(PARSED / "districts.parquet")
+            .select("day", "sido", "sgg", "geom", "label_point")
+            .iter_rows()
+        }
+        outlines = cs.source(districts.PUBLISHER, districts.TITLE)
+        cs.add(
+            "source",
+            id=outlines,
+            kind="academic",
+            publisher=districts.PUBLISHER,
+            title=districts.TITLE,
+            url=districts.REPOSITORY,
+            license=districts.LICENSE,
+            license_url=districts.LICENSE_URL,
+            attribution=districts.ATTRIBUTION,
+            notes=districts.NOTES,
+        )
+        for code in districts.vintages():
+            cs.artifact(raw.cached(SOURCE, districts.url(code)), outlines)
+        plans: dict[str, tuple[UUID, date, date | None]] = {}
+        for at, day in enumerate(DATES):
+            if day not in districts.VINTAGES:
+                continue
+            start = _day(day)
+            end = _day(DATES[at + 1]) if at + 1 < len(DATES) else None
+            plan = uuid5(NAMESPACE, f"{SOURCE}\x1fboundary_set\x1fkr.constituency\x1f{day}")
+            plans[day] = (plan, start, end)
+            cs.add(
+                "boundary_set",
+                id=plan,
+                scheme_code="kr.constituency",
+                vintage=str(start.year),
+                valid_from=start,
+                valid_to=end,
+                as_of=start,
+            )
+
+        def district(day: str, sido: str, sgg: str, where: str) -> UUID | None:
+            """The constituency's area for the plan of the election, with its outline."""
+            if (day, sido, sgg) not in drawn:
+                return None
+            area = cs.area("kr.constituency", where)
+            if area in cs.minted:
+                _, start, end = plans[day]
+                span = {"valid_from": start, "valid_to": end}
+                geom, point = drawn[day, sido, sgg]
+                cs.add("area", id=area, scheme_code="kr.constituency")
+                cs.add("area_code", area_id=area, code=where, **span)
+                cs.add("area_parent", area_id=area, parent_id=sidos[sido], **span)
+                name(area, sgg)
+                cs.add(
+                    "area_geometry",
+                    area_id=area,
+                    geom=geom,
+                    label_point=point,
+                    quality="academic",
+                    source_id=outlines,
+                    **span,
+                )
+            return area
 
         def unit(
             scheme: str, code: str, parent: UUID | None, area: UUID, relation: str, kind: str = "standard"
@@ -633,12 +772,15 @@ def emit() -> Path:
                 won = elected.filter((pl.col("sido") == sido) & (pl.col("sgg") == sgg))
                 magnitude = won.height
                 contest = cs.key(f"{SOURCE}.contest", where)
+                area = district(day, sido, sgg, where)
                 cs.add(
                     "contest",
                     id=contest,
                     election_id=election,
                     kind="body_seats",
                     body_id=body,
+                    district_area_id=area,
+                    boundary_set_id=plans[day][0] if area is not None else None,
                     magnitude=magnitude,
                     electoral_system_id=systems["sntv" if magnitude > 1 else "fptp"],
                     default_result_kind="counted",
