@@ -5,7 +5,7 @@ from uuid import UUID
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.package import Draft
 from ea.sources.licenses import UNLICENSED
 from ea.store import connect
 
@@ -152,7 +152,7 @@ def parse() -> None:
 def emit() -> Path:
     check()
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,

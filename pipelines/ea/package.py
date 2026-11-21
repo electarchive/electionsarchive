@@ -9,6 +9,7 @@ import threading
 import time
 from collections.abc import Iterable, Iterator
 from contextlib import suppress
+from dataclasses import replace
 from datetime import UTC, date, datetime
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
@@ -3130,6 +3131,18 @@ class Draft(Changeset):
         if id in self.own_entities:
             self.minted.add(id)
         return id
+
+    def artifact(self, artifact: Artifact, source_id: UUID) -> UUID:
+        """A file fetched again with the same bytes keeps the retrieval time its stored artifact row has, so a rebuild
+        on a machine whose raw cache was refilled matches the export."""
+        stored = self.conn.execute(
+            """select a.retrieved_at from source_artifact a join changeset c on c.id = a.changeset_id
+               where a.source_id = %s and a.storage_key = %s and a.sha256 = %s and c.pipeline = %s""",
+            [source_id, artifact.storage_key, artifact.sha256, str(self.manifest["pipeline"])],
+        ).fetchone()
+        if stored is not None and stored[0] is not None:
+            artifact = replace(artifact, retrieved_at=stored[0])
+        return super().artifact(artifact, source_id)
 
     def absorbed(self) -> list[str]:
         """The pipeline's own entities that a merge folded others into. A merge turns the names and slugs of the
