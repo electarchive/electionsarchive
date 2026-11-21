@@ -1,22 +1,35 @@
+import json
 import re
 import subprocess
-from datetime import date
+from dataclasses import replace
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import NAMESPACE, Changeset, slug
+from ea.changeset import NAMESPACE, slug
+from ea.package import Draft
 from ea.store import DATA, connect
 
 SOURCE = "ie.referendums"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 BOOKLET = "https://assets.gov.ie/static/documents/referendum-results-1937-2024.pdf"
 PAGE = "https://www.gov.ie/en/department-of-housing-local-government-and-heritage/publications/1937-2024-referendum-results/"
 PUBLISHER = "Department of Housing, Local Government and Heritage"
 TITLE = "Referendum Results 1937–2024"
+# The booklet as first fetched. A later fetch of the same file keeps that retrieval time, so the package's citation
+# stays the one the archive has held since.
+RETRIEVED = (
+    "53f3675c001b289d7e6fc2258055a7218c82517b05c8df559e7c5b67fd7b97aa",
+    datetime(2026, 11, 10, 11, 57, 49, 182105, UTC),
+)
+OIREACHTAS = "Houses of the Oireachtas"
+BILLS_TITLE = "Bills and Acts"
+BILLS_PAGE = "https://www.oireachtas.ie/en/bills/"
+BILL = "https://api.oireachtas.ie/v1/legislation?bill_year={year}&bill_no={number}"
 VOTES, REGISTERED, BALLOTS, VALID, INVALID = 1, 2, 3, 4, 5
 QUESTIONS = [
     (date(1937, 7, 1), "Draft Constitution", "Draft Constitution"),
@@ -237,10 +250,217 @@ SYSTEM = (
     "local or European Parliament election is held the same day, and reported to the referendum returning officer."
 )
 QUESTION = "Do you approve of the proposal to amend the Constitution contained in the undermentioned Bill?\n\n{bill}"
+# The Houses of the Oireachtas' year and number of each referendum's Bill, in the order of QUESTIONS after the 1937
+# plebiscite, which put the draft Constitution itself rather than a Bill. The parse checks each against the Bill's
+# English title in QUESTIONS and its fate against REJECTED.
+BILLS = [
+    (1958, 25),
+    (1968, 5),
+    (1968, 6),
+    (1971, 36),
+    (1972, 14),
+    (1972, 26),
+    (1978, 45),
+    (1979, 15),
+    (1982, 35),
+    (1984, 11),
+    (1986, 15),
+    (1987, 8),
+    (1992, 12),
+    (1992, 24),
+    (1992, 25),
+    (1992, 26),
+    (1995, 43),
+    (1996, 49),
+    (1997, 38),
+    (1998, 1),
+    (1998, 24),
+    (1999, 24),
+    (2001, 16),
+    (2001, 18),
+    (2001, 19),
+    (2001, 48),
+    (2002, 32),
+    (2004, 15),
+    (2008, 14),
+    (2009, 49),
+    (2011, 44),
+    (2011, 47),
+    (2012, 23),
+    (2012, 78),
+    (2013, 63),
+    (2013, 79),
+    (2015, 5),
+    (2015, 6),
+    (2018, 29),
+    (2018, 87),
+    (2016, 57),
+    (2023, 91),
+    (2023, 92),
+]
+# Slips in the Houses of the Oireachtas' Irish titles, set right from the same list: its year printed twice, a word
+# run into the next, and the séú (sixth) its 1978 and 1996 Bills spell with a síneadh fada.
+IRISH = {
+    "An Bille um an Ochtú Leasú is Fiche ar an mBunreacht 2008 2008": (
+        "An Bille um an Ochtú Leasú is Fiche ar an mBunreacht 2008"
+    ),
+    "An Bille um an gCeathrú Leasú is Tríocha ar an mBunreacht (ComhionannasPósta), 2015": (
+        "An Bille um an gCeathrú Leasú is Tríocha ar an mBunreacht (Comhionannas Pósta), 2015"
+    ),
+    "An Bille um an Seú Leasú is Tríocha ar an mBunreacht 2018": (
+        "An Bille um an Séú Leasú is Tríocha ar an mBunreacht 2018"
+    ),
+}
+# A statement for the information of voters follows the first line of its question's account that ends in a colon,
+# and runs to the note on the Act that prescribed it or to the count; eight accounts refer to an appendix instead.
+STATEMENT_END = re.compile(r"^(?:\((?:This|The) statement was prescribed|The total number of votes)")
+APPENDIX = re.compile(r"^APPENDIX (\d+)$", re.IGNORECASE)
+REFERRED = re.compile(r"\bAppendix (\d+)\.")
+# pdftotext reads a raised o or a ring as a letter or a lone character, and sets a raised ordinal apart.
+DEGREE = re.compile(r"(\d) ?[oO](?=[\s.,;:)])")
+ORDINAL = re.compile(r"(\d) (st|nd|rd|th)\b")
+OPENING, CLOSING = '‘“"', '’”"'
+ROMAN = re.compile(r"^[ivx]+\.? ")
+ARTICLE = re.compile(r"^[`‘“\"]?(?:Article|Airteagal) \d+[A-Z]?\.?$")
+SUBSECTION = re.compile(r"^\d+[°˚º] ")
 
 
 def fetch() -> None:
     raw.fetch(SOURCE, BOOKLET, suffix=".pdf")
+    for year, number in BILLS:
+        raw.fetch(SOURCE, BILL.format(year=year, number=number), suffix=".json")
+
+
+def booklet() -> raw.Artifact:
+    artifact = raw.cached(SOURCE, BOOKLET)
+    return replace(artifact, retrieved_at=RETRIEVED[1]) if artifact.sha256 == RETRIEVED[0] else artifact
+
+
+def normalized(title: str) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
+
+
+def bills() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    rejected = {
+        question
+        for question, (day, _, _) in enumerate(QUESTIONS, 1)
+        if (day, sum(1 for d, _, _ in QUESTIONS[:question] if d == day)) in REJECTED
+    }
+    for question, ((_, _, title), (year, number)) in enumerate(zip(QUESTIONS[1:], BILLS, strict=True), 2):
+        url = BILL.format(year=year, number=number)
+        results = json.loads(raw.cached(SOURCE, url).path.read_bytes())["results"]
+        if len(results) != 1:
+            raise ValueError(f"{url}: {len(results)} Bills")
+        bill = results[0]["bill"]
+        if normalized(bill["shortTitleEn"]) != normalized(title):
+            raise ValueError(f"{url} is the {bill['shortTitleEn']}, not the {title}")
+        if (bill["status"] != "Enacted") != (question in rejected):
+            raise ValueError(f"{url}: the {title} is {bill['status']}")
+        irish = re.sub(r"\(\s+|\s+\)", lambda m: m[0].strip(), re.sub(r"\s+", " ", bill["shortTitleGa"]).strip())
+        rows.append({"question": question, "url": url, "irish": IRISH.get(irish, irish)})
+    return rows
+
+
+def lines(page: str) -> list[str]:
+    """A page's lines with their spacing collapsed, dropping the page number."""
+    return [
+        "" if text.isdigit() else text for text in (re.sub(r"\s+", " ", line).strip() for line in page.splitlines())
+    ]
+
+
+def statement(block: list[tuple[int, str]]) -> str:
+    """The statement's text, its paragraphs apart and each one's lines run together. A paragraph a page break cuts
+    goes on when the next page opens in lower case, other than on an item numbered i, ii, and so on; an Article's
+    heading keeps its own lines, and a subsection that opens a line after a full stop starts a new one."""
+    kept: list[str] = []
+    for index, (_, text) in enumerate(block):
+        if not text:
+            previous = next(((p, t) for p, t in reversed(block[:index]) if t), None)
+            following = next(((p, t) for p, t in block[index:] if t), None)
+            if (
+                previous
+                and following
+                and previous[0] != following[0]
+                and following[1][0].islower()
+                and not ROMAN.match(following[1])
+            ):
+                continue
+        kept.append(text)
+    pieces: list[str] = []
+    for index, text in enumerate(kept):
+        before = kept[index - 1] if index else ""
+        nxt = kept[index + 1] if index + 1 < len(kept) else ""
+        heading = ARTICLE.match(text) or ARTICLE.match(before)
+        titled = ARTICLE.match(nxt) and not before.endswith((".", ",", ";", ":"))
+        subsection = SUBSECTION.match(text) and before.endswith((".", ";", ":"))
+        if not text:
+            pieces.append("\n\n")
+        elif not pieces or pieces[-1] == "\n\n":
+            pieces.append(text)
+        else:
+            pieces.append(("\n" if heading or titled or subsection else " ") + text)
+    paragraphs = "".join(pieces).split("\n\n")
+    body = "\n\n".join(paragraph.strip() for paragraph in paragraphs if paragraph.strip())
+    body = ORDINAL.sub(r"\1\2", DEGREE.sub(r"\1°", body.replace("˚", "°").replace("º", "°")))
+    if body[0] in OPENING:
+        body = body[1:].rstrip()
+        if body[-1] in CLOSING:
+            body = body[:-1].rstrip()
+    elif body.endswith('"') and body.count('"') % 2:
+        body = body[:-1].rstrip()
+    return body
+
+
+def statements(pages: list[str]) -> dict[int, tuple[int, str]]:
+    """Each question's statement for the information of voters and the page it starts on, from its account or from
+    the appendix that account names."""
+    accounts: dict[int, list[tuple[int, str]]] = {}
+    appendices: dict[int, list[tuple[int, str]]] = {}
+    section = 0
+    appendix = 0
+    reading = False
+    for number, page in enumerate(pages, 1):
+        texts = lines(page)
+        if appendix and not any(texts):
+            break
+        for text in texts:
+            heading = HEADING.match(text)
+            if heading and "..." not in text and "…" not in text and (section or heading[1] == "8"):
+                section += 1
+                accounts[section] = []
+                reading = True
+                continue
+            if found := APPENDIX.match(text):
+                appendix = int(found[1])
+                appendices[appendix] = []
+                continue
+            if appendix:
+                appendices[appendix].append((number, text))
+            elif reading:
+                if "The following table contains" in text or "Electorate" in text:
+                    reading = False
+                    continue
+                accounts[section].append((number, text))
+    found_statements: dict[int, tuple[int, str]] = {}
+    for question, account in accounts.items():
+        texts = [text for _, text in account]
+        opened = next((i for i, text in enumerate(texts) if text.endswith(":")), None)
+        referred = REFERRED.search(" ".join(texts))
+        if referred:
+            block = appendices.pop(int(referred[1]))
+        elif opened is None:
+            continue
+        else:
+            block = account[opened + 1 :]
+        end = next((i for i, (_, text) in enumerate(block) if STATEMENT_END.match(text)), len(block))
+        block = block[:end]
+        while block and not block[0][1]:
+            block = block[1:]
+        found_statements[question] = (block[0][0], statement(block))
+    if appendices:
+        raise ValueError(f"appendices no account names: {sorted(appendices)}")
+    return found_statements
 
 
 def number(text: str) -> int:
@@ -260,7 +480,7 @@ def local(group: str | None, label: str) -> tuple[str, str]:
 
 def parse() -> None:
     text = subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, BOOKLET).path), "-"],
+        ["pdftotext", "-layout", str(booklet().path), "-"],
         check=True,
         capture_output=True,
         text=True,
@@ -346,23 +566,35 @@ def parse() -> None:
     unbalanced = frame.filter(pl.col("poll") != pl.col("yes") + pl.col("no") + pl.col("spoilt"))
     if set(unbalanced["question"]) - set(REMARKS):
         raise ValueError(f"unbalanced rows: {unbalanced}")
+    found = statements(text.split("\f"))
+    if sorted(found) != list(range(2, len(QUESTIONS) + 1)):
+        raise ValueError(f"statements for questions {sorted(found)}, not for every referendum")
+    texts = pl.DataFrame(
+        [{"question": question, "page": page, "body": body} for question, (page, body) in sorted(found.items())]
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "units.parquet")
     totals.write_parquet(PARSED / "totals.parquet")
+    texts.write_parquet(PARSED / "statements.parquet")
+    pl.DataFrame(bills()).write_parquet(PARSED / "bills.parquet")
     print(frame.group_by("scheme").agg(pl.len(), pl.col("code").n_unique()))
 
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "units.parquet")
     totals = pl.read_parquet(PARSED / "totals.parquet")
+    statements = {row["question"]: row for row in pl.read_parquet(PARSED / "statements.parquet").iter_rows(named=True)}
+    bills = {row["question"]: row for row in pl.read_parquet(PARSED / "bills.parquet").iter_rows(named=True)}
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary=(
                 "Ireland's 1937 plebiscite on the draft Constitution and its 43 constitutional referendums from 1959 "
-                "to 2024 by constituency or city and county, from the Department of Housing's results booklet"
+                "to 2024 by constituency or city and county, with each referendum's statement for the information of "
+                "voters, from the Department of Housing's results booklet, and each Bill's Irish title from the Houses "
+                "of the Oireachtas"
             ),
             polity="IE",
         )
@@ -374,15 +606,10 @@ def emit() -> Path:
         nation = cs.area("ie.nation", "IE")
         if nation in cs.minted:
             raise ValueError("publish ie.returning_officer before the referendums")
-        if conn.execute("select 1 from scheme where code = 'ie.local_authority'").fetchone() is None:
-            cs.add(
-                "scheme",
-                code="ie.local_authority",
-                polity_id=ireland,
-                kind="administrative",
-                rank=2,
-                noun="city or county",
-            )
+        cs.add(
+            "scheme", code="ie.local_authority", polity_id=ireland, kind="administrative", rank=2, noun="city or county"
+        )
+        cs.accept("accounting.ballots_sum", REMARKS[25])
         source = cs.source(PUBLISHER, TITLE)
         cs.add(
             "source",
@@ -398,7 +625,22 @@ def emit() -> Path:
                 "reused under CC BY 4.0."
             ),
         )
-        cs.artifact(raw.cached(SOURCE, BOOKLET), source)
+        cs.artifact(booklet(), source)
+        oireachtas = cs.source(OIREACHTAS, BILLS_TITLE)
+        cs.add(
+            "source",
+            id=oireachtas,
+            kind="official_body",
+            publisher=OIREACHTAS,
+            title=BILLS_TITLE,
+            url=BILLS_PAGE,
+            license="Oireachtas (Open Data) PSI Licence, CC BY 4.0 terms",
+            license_url="https://creativecommons.org/licenses/by/4.0/",
+            attribution="Bills and Acts, Houses of the Oireachtas (oireachtas.ie), reused under the Oireachtas (Open "
+            "Data) PSI Licence.",
+        )
+        for bill in bills.values():
+            cs.artifact(raw.cached(SOURCE, bill["url"]), oireachtas)
         system = cs.key("ie.electoral_system", "constitutional-referendum")
         cs.add("electoral_system", id=system, polity_id=ireland, rules={"formula": "referendum"}, rules_version=1)
         name(system, "Irish constitutional referendums")
@@ -476,6 +718,27 @@ def emit() -> Path:
                     source_id=source,
                     locator={"page": rows["page"].min()},
                 )
+                if question in statements:
+                    cs.add(
+                        "ballot_question_text",
+                        contest_id=contest,
+                        kind="summary",
+                        lang="en",
+                        body=statements[question]["body"],
+                        url=BOOKLET,
+                        source_id=source,
+                        locator={"page": statements[question]["page"]},
+                    )
+                if question in bills:
+                    cs.add(
+                        "name",
+                        entity_id=contest,
+                        text=bills[question]["irish"],
+                        lang="ga",
+                        kind="official",
+                        is_preferred=True,
+                        source_id=oireachtas,
+                    )
                 options = {}
                 for answer, label in ((1, "Yes"), (2, "No")):
                     options[answer] = cs.key("ie.option", f"{contest_key}:{label.lower()}")
