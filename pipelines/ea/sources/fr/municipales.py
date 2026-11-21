@@ -81,6 +81,10 @@ OVER_SEVERAL = " The archive records no seats or elected councilors for this rou
 TURNOUT_CAVEAT = (
     "The ministry's results file reports more voters ({voters}) than registered voters ({registered}) in this commune."
 )
+NEGATIVE_CAVEAT = (
+    "The ministry's results file gives {value} null ballots in this commune, a negative count (its voters less its "
+    "valid and blank ballots), so the null ballot count is left out."
+)
 VOTE_FIXES = {
     (1, "62413"): (
         {2: 928, 3: 1558},
@@ -448,6 +452,13 @@ def emit() -> Path:
             if fix_note is not None:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=fix_note)
             for field, measure in ACCOUNTING.items():
+                if row[field] is not None and row[field] < 0:
+                    if field != "Nuls":
+                        raise ValueError(f"{unit_code} round {round_}: the file gives {row[field]} {field}")
+                    cs.add(
+                        "note", entity_id=result_set, kind="caveat", body_md=NEGATIVE_CAVEAT.format(value=row[field])
+                    )
+                    continue
                 values.append(
                     {
                         "result_set_id": str(result_set),
