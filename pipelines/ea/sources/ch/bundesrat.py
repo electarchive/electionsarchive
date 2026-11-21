@@ -12,7 +12,8 @@ from uuid import UUID
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.licenses import PUBLIC_RECORD
 from ea.store import connect
 
@@ -96,6 +97,61 @@ WIKIDATA_TITLE = "Members of the Swiss Federal Council (P39 Q11811941) and Swiss
 LIST_ALIASES = {"Wahlen Fritz Traugott": "Wahlen Friedrich Traugott", "Kläti": "Klöti", "Koechelin": "Koechlin"}
 SURNAMES = {"Brunschwig Graf Martine": "Martine Brunschwig Graf"}
 PICKS = {("05.12.1973", "Schmid"): "Schmid Arthur", ("01.12.1989", "Weber"): "Weber Monika"}
+# The list of members prints each member's party in the abbreviation of its time. Each maps to the party's key in the
+# Federal Statistical Office's series of party strengths since 1919, which counts the Free Democrats from the
+# Freisinnige, the Christian Democrats from the Catholic Conservatives and the Conservative Christian Socials, and the
+# Swiss People's Party from the Farmers', Trades' and Citizens' Party (BGB). "FPD" is a misprint of FDP.
+PARTY_LABELS = {
+    "Freis.": "FDP",
+    "FDP": "FDP",
+    "FPD": "FDP",
+    "Kath.": "CVP",
+    "Kons.chr.": "CVP",
+    "CVP": "CVP",
+    "BGB": "SVP",
+    "SVP": "SVP",
+    "Soz.": "SP",
+    "Soz": "SP",
+    "SP": "SP",
+    "Lib.": "LPS",
+}
+CANTONS = {
+    "ZH": "Zurich",
+    "BE": "Bern",
+    "LU": "Lucerne",
+    "UR": "Uri",
+    "SZ": "Schwyz",
+    "OW": "Obwalden",
+    "NW": "Nidwalden",
+    "GL": "Glarus",
+    "ZG": "Zug",
+    "FR": "Fribourg",
+    "SO": "Solothurn",
+    "BS": "Basel-Stadt",
+    "BL": "Basel-Landschaft",
+    "SH": "Schaffhausen",
+    "AR": "Appenzell Ausserrhoden",
+    "AI": "Appenzell Innerrhoden",
+    "SG": "St. Gallen",
+    "GR": "Graubünden",
+    "AG": "Aargau",
+    "TG": "Thurgau",
+    "TI": "Ticino",
+    "VD": "Vaud",
+    "VS": "Valais",
+    "NE": "Neuchâtel",
+    "GE": "Geneva",
+    "JU": "Jura",
+}
+# The text layer reads Ticino's TI as "Tl", and Walther Stampfli's Solothurn as "SC".
+CANTON_FIXES = {"Tl": "TI", "SC": "SO"}
+CANTON_NOTE = (
+    "The Parliamentary Services' list of members of the Federal Council gives the canton as {canton} ({code})."
+)
+BRACKET_NOTE = (
+    " The list puts the canton in parentheses because the rule that no two members may come from the same canton was "
+    "repealed in 1999."
+)
 
 
 def fetch() -> None:
@@ -163,9 +219,17 @@ def members(lines: list[str]) -> list[dict[str, Any]]:
     end = next(i for i, line in enumerate(lines) if i > start and line.startswith("Bundespräsidenten seit 1848"))
     out = []
     for line in lines[start:end]:
-        found = [re.sub(r"(\d\d\.\d\d)[. ](\d{4})", r"\1.\2", d) for d in LOOSE.findall(line)]
+        dates = list(LOOSE.finditer(line))
+        found = [re.sub(r"(\d\d\.\d\d)[. ](\d{4})", r"\1.\2", d[0]) for d in dates]
         row = re.match(r"(\S.*?)\s{2,}\d\d\.\d\d[. ]\d{4}", line)
         if row and len(found) >= 2:
+            # Between the birth and election dates come the place of citizenship, the canton, and the party. A long
+            # place runs into the canton column, so the canton is the token before the party, and the footnote mark
+            # "*)" after a canton is dropped.
+            words = [word for word in line[dates[0].end() : dates[1].start()].split() if word != "*)"]
+            canton = CANTON_FIXES.get(words[-2].strip("()"), words[-2].strip("()"))
+            if canton not in CANTONS or words[-1] not in PARTY_LABELS:
+                raise ValueError(f"{row[1]}: canton {words[-2]!r} or party {words[-1]!r} is not known")
             out.append(
                 {
                     "name": row[1].replace("MarceI", "Marcel"),
@@ -173,6 +237,9 @@ def members(lines: list[str]) -> list[dict[str, Any]]:
                     "elected": found[1],
                     "left": found[2] if len(found) > 2 else None,
                     "died": found[3] if len(found) > 3 else None,
+                    "canton": canton,
+                    "bracketed": words[-2].startswith("("),
+                    "party": PARTY_LABELS[words[-1]],
                 }
             )
     return out
@@ -581,12 +648,22 @@ def emit() -> Path:
         return f"{name_[cut:].strip()} {name_[:cut].strip()}"
 
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary="Federal Council elections by the United Federal Assembly, 1919–2025, with every ballot",
             polity="CH",
+        )
+        cs.accept(
+            "accounting.votes_valid",
+            "seven ballots print votes for candidates and scattered votes that do not add up to their valid votes; "
+            "each is stored as printed, with a caveat note on its contest",
+        )
+        cs.accept(
+            "accounting.ballots_sum",
+            "three ballots print blank, invalid, and valid ballots that do not add up to the ballots received; "
+            "each is stored as printed, with a caveat note on its contest",
         )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
@@ -653,6 +730,14 @@ def emit() -> Path:
         name(system, "Election of the Federal Council by the United Federal Assembly")
         cs.add("note", entity_id=system, kind="methodology", body_md=SYSTEM_NOTE)
 
+        # Parties are the national parties other Swiss pipelines already hold under the same keys.
+        held = cs.foreign("ch.party")
+        missing = sorted(set(PARTY_LABELS.values()) - held)
+        if missing:
+            raise LookupError(f"the archive holds no ch.party {missing}")
+        parties = {code: cs.key("ch.party", code) for code in sorted(set(PARTY_LABELS.values()))}
+        member_of = {fulls[member["name"]]: member for member in people if member["name"] in fulls}
+
         persons: dict[str, UUID] = {}
         items_of: dict[str, str] = {}
 
@@ -692,6 +777,8 @@ def emit() -> Path:
             prefix = fold(seat["surname"] if "surname" in seat else seat["full"])
             rounds = seat["rounds"]
             previous = None
+            # Each ballot's absolute majority sits in contest.rules_override, which the changeset path wrote and the
+            # package format leaves in place.
             for index, col in enumerate(rounds, 1):
                 key = f"{day_}:federal-council:{number_}:{index}"
                 contest = cs.key("ch.contest", key)
@@ -706,7 +793,6 @@ def emit() -> Path:
                     round_number=index,
                     previous_round_id=previous,
                     electoral_system_id=system,
-                    rules_override={"required": col["required"]} if "required" in col else {},
                     default_result_kind="counted",
                 )
                 label = f"Seat {number_}" if len(rounds) == 1 else f"Seat {number_}, ballot {index}"
@@ -773,11 +859,13 @@ def emit() -> Path:
                         ballot_label=label_,
                     )
                     if is_winner or entry is not None:
+                        member = member_of.get(seat["full"]) if entry is None else entry["member"]
                         cs.add(
                             "candidacy",
                             id=cs.key("ch.candidacy", f"{key}:{slug(label_)}"),
                             person_id=winner_id if entry is None else person(full_name(entry, label_)),
                             option_id=option,
+                            member_of_party_id=None if member is None else parties[member["party"]],
                         )
                     if is_winner:
                         won = option
@@ -881,9 +969,20 @@ def emit() -> Path:
             if died is None and item is not None:
                 died = deaths.get(item)
             near = [c for (who, d), c in first_contest.items() if who == full and abs((d - start).days) <= 14]
+            tenure = cs.key(f"{SOURCE}.tenure", f"{start}:{slug(full)}")
+            member = member_of.get(full)
+            if member is not None:
+                code = member["canton"]
+                cs.add(
+                    "note",
+                    entity_id=tenure,
+                    kind="context",
+                    body_md=CANTON_NOTE.format(canton=CANTONS[code], code=code)
+                    + (BRACKET_NOTE if member["bracketed"] else ""),
+                )
             cs.add(
                 "tenure",
-                id=cs.key(f"{SOURCE}.tenure", f"{start}:{slug(full)}"),
+                id=tenure,
                 person_id=persons[full],
                 office_id=office,
                 from_date=start,
