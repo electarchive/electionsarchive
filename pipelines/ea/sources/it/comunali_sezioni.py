@@ -6,7 +6,6 @@ adds them under the contests, options, and elections `it.comunali` already publi
 the grain of the polling section, and for 2026 the council candidates, their preference votes, and who was elected.
 """
 
-import csv
 import re
 import zipfile
 from datetime import date
@@ -75,6 +74,7 @@ def fetch() -> None:
     for day in DAYS:
         raw.fetch(comunali.SOURCE, url(day), suffix=".zip")
     raw.fetch(interno.SOURCE, interno.ISTAT, suffix=".csv")
+    raw.fetch(interno.SOURCE, interno.ISTAT_CURRENT, suffix=".xlsx")
     raw.fetch(istat.SOURCE, istat.VARIATIONS, suffix=".zip")
 
 
@@ -458,8 +458,7 @@ def area_on(areas: dict[str, list[tuple[str, date | None, date | None]]], code: 
 
 
 def comune_names() -> dict[str, str]:
-    with raw.cached(interno.SOURCE, interno.ISTAT).path.open(encoding="latin-1", newline="") as file:
-        names = {row[4]: row[5] for row in list(csv.reader(file, delimiter=";"))[1:]}
+    names = {code: row[5] for code, row in interno.comuni().items()}
     _, extinct, _ = regionali.municipalities()
     for code, label, _, _ in extinct.iter_rows():
         names.setdefault(code, label)

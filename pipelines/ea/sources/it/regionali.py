@@ -592,8 +592,7 @@ def folded(text: str) -> str:
 
 
 def municipalities() -> tuple[Callable[[str, str, date], str], pl.DataFrame, pl.DataFrame]:
-    with raw.cached(interno.SOURCE, interno.ISTAT).path.open(encoding="latin-1", newline="") as file:
-        current = {row[4]: row for row in list(csv.reader(file, delimiter=";"))[1:]}
+    current = interno.comuni()
     with zipfile.ZipFile(raw.cached(istat.SOURCE, istat.VARIATIONS).path) as archive:
         changes = list(csv.reader(io.StringIO(archive.read(istat.VARIATIONS_CSV).decode("cp1252")), delimiter=";"))[1:]
     named: dict[tuple[str, str], set[str]] = {}

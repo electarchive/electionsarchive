@@ -202,6 +202,8 @@ def url(day: date) -> str:
 def fetch() -> None:
     for day in DAYS:
         raw.fetch(SOURCE, url(day), suffix=".zip")
+    raw.fetch(interno.SOURCE, interno.ISTAT_CURRENT, suffix=".xlsx")
+    raw.fetch(interno.SOURCE, interno.ISTAT_CHANGES, suffix=".pdf")
 
 
 REGIONS = {
@@ -354,7 +356,6 @@ UNPLACED = {
     ("03", "POZZUOLO MILANESE"),
     ("05", "VILLAFRANCA PADOVANA (GRANDE)"),
     ("05", "VILLAFRANCA PADOVANA (PICCOLO)"),
-    ("05", "CASTEGNERO NANTO"),
     ("05", "TRETTO"),
     ("07", "SAN BARTOLOMEO DEL CERVO"),
     ("18", "SAMBIASE"),
@@ -740,8 +741,7 @@ def build() -> Path:
     accounting = pl.read_parquet(PARSED / "accounting.parquet")
     lists = pl.read_parquet(PARSED / "lists.parquet")
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
-    with raw.cached(interno.SOURCE, interno.ISTAT).path.open(encoding="latin-1", newline="") as file:
-        current = {row[4]: (row[0], row[5]) for row in list(csv.reader(file, delimiter=";"))[1:]}
+    current = {code: (row[0], row[5]) for code, row in interno.comuni().items()}
     _, extinct, _ = regionali.municipalities()
     ended = {code: (region, label, until) for code, label, region, until in extinct.iter_rows()}
     held = (
@@ -823,6 +823,24 @@ def build() -> Path:
             cs.artifact(pin(raw.cached(SOURCE, where)), source)
             return source
 
+        istat: list[UUID] = []
+
+        def istat_source() -> UUID:
+            """it.interno's source for ISTAT's list of municipalities, citing the current spreadsheet and the note of
+            changes that dates the municipalities created since the CSV list."""
+            if not istat:
+                found = conn.execute(
+                    """select s.id from source s join changeset c on c.id = s.changeset_id
+                       where c.pipeline = %s and s.publisher = %s and s.title = %s""",
+                    [interno.SOURCE, "ISTAT", "Elenco dei comuni italiani"],
+                ).fetchone()
+                if found is None:
+                    raise ValueError("publish it.interno before it.comunali")
+                istat.append(found[0])
+                for where in (interno.ISTAT_CURRENT, interno.ISTAT_CHANGES):
+                    cs.artifact(pin(raw.cached(interno.SOURCE, where)), found[0])
+            return istat[0]
+
         regions: dict[str, tuple[UUID, str]] = {}
 
         def region_of(code: str) -> tuple[UUID, str]:
@@ -848,13 +866,21 @@ def build() -> Path:
             if code in towns:
                 return towns[code]
             region, label, until = ended.get(code) or (*current[code], None)
+            since = interno.CREATED.get(code)
             area = cs.area("it.comune", code)
             unit = cs.unit("it.comune", code)
             if area in cs.minted:
                 cs.add("area", id=area, scheme_code="it.comune")
-                cs.add("area_code", area_id=area, code=code, valid_from=None, valid_to=until)
-                cs.add("area_parent", area_id=area, parent_id=cs.area("it.regione", region), valid_from=None)
+                cs.add("area_code", area_id=area, code=code, valid_from=since, valid_to=until)
+                cs.add("area_parent", area_id=area, parent_id=cs.area("it.regione", region), valid_from=since)
                 name(area, label, "it")
+                if since is not None:
+                    cs.add(
+                        "citation",
+                        entity_id=area,
+                        source_id=istat_source(),
+                        locator={"url": interno.ISTAT_CURRENT, "Codice Comune formato alfanumerico": code},
+                    )
             if unit in cs.minted:
                 cs.add(
                     "reporting_unit",
@@ -865,6 +891,7 @@ def build() -> Path:
                     area_relation="equals",
                     area_id=area,
                     kind="standard",
+                    valid_from=since,
                     valid_to=until,
                 )
                 name(unit, label, "it")
