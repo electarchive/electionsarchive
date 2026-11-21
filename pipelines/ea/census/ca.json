@@ -7012,6 +7012,8 @@
           "phase": 0,
           "month": 11,
           "term_years": 4,
+          "day_rule": "nov_second_wednesday",
+          "valid_from": "2024-01-01",
           "called": false
         }
       ],
