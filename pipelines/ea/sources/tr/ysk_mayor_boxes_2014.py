@@ -13,7 +13,11 @@ from ea.store import DATA
 SOURCE = "tr.ysk_mayor_boxes_2014"
 KEY = f"{SOURCE}/mayor-2014"
 INBOX = DATA / "inbox" / SOURCE
-REFERENCE = DATA / "reference" / "tr"
+# The reference partition downloaded beside the snapshot, or else the folder `ea package reference` publishes into.
+REFERENCE = next(
+    (folder for folder in (DATA / "reference" / "tr", DATA / "ops" / "reference" / "tr") if folder.exists()),
+    DATA / "reference" / "tr",
+)
 DAY = date(2014, 3, 30)
 LATER = date(2019, 3, 31)
 ARCHIVE = "browser://20261120-002149-a3a8a6/ysk-tr-local-2009-2014-mayoral-sandik.zip"
@@ -35,7 +39,8 @@ ANNULLED_CAVEAT = (
     "vote of March 30."
 )
 # The municipalities whose March 30 mayoral race the archive lacked, as their contest key, then the place the
-# results service gives as its province, district, and belde ids.
+# results service gives as its province, district, and belde ids. YSK annulled each of these races and held it again
+# on June 1, 2014 (tr.ysk_yenileme).
 PLACES = {
     "agri": (4, 11, 0),
     "aydin-buharkent": (9, 674, 0),
@@ -51,7 +56,7 @@ PLACES = {
     "bayburt-aydintepe": (69, 660, 0),
     "yalova": (77, 609, 0),
 }
-ANNULLED = {"agri", "tokat-yesilyurt"}
+ANNULLED = set(PLACES)
 Row = dict[str, object]
 
 
@@ -135,7 +140,11 @@ def build() -> Package:
     units = {
         code: id
         for id, code in pl.read_parquet(REFERENCE / "reporting_unit.parquet")
-        .filter((pl.col("scheme_code") == "tr.sandik") & pl.col("code").str.starts_with(f"{DAY.year}:"))
+        .filter(
+            (pl.col("scheme_code") == "tr.sandik")
+            & pl.col("code").str.starts_with(f"{DAY.year}:")
+            & (pl.col("pipeline") != SOURCE)
+        )
         .select("id", "code")
         .iter_rows()
     }
