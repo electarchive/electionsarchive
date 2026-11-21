@@ -571,7 +571,10 @@ def seats_package(
     state_election = held(con, "us.election", f"{DAY}:TX")
     if texas is None or state_election is None:
         raise LookupError("the reference lacks Texas or its November 3, 2026 election")
-    p.external |= {str(texas[0]), state_election}
+    systems = {name: held(con, "us.electoral_system", name) for name in ("fptp", "block")}
+    if None in systems.values():
+        raise LookupError("the reference lacks the fptp or block electoral system")
+    p.external |= {str(texas[0]), state_election, *(str(i) for i in systems.values())}
     made: dict[tuple[str, str], tuple[str, Contest, dict[str, str]]] = {}
     for gov in GOVERNMENTS:
         seats = [(seat, *found[(gov.county, seat.title)]) for seat in gov.seats if (gov.county, seat.title) in found]
@@ -642,6 +645,7 @@ def seats_package(
                 body_id=body,
                 district_area_id=district,
                 magnitude=seat.seats,
+                electoral_system_id=systems["fptp" if seat.seats == 1 else "block"],
             )
             p.add("external_id", entity_id=contest, scheme="us.contest", value=f"{DAY}:TX:{seat.tail}")
             p.name(contest, seat.name, "en", "official")
