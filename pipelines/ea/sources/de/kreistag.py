@@ -426,9 +426,29 @@ class Land(NamedTuple):
 
 
 def lands() -> list[Land]:
-    from ea.sources.de import kreistag_ni, kreistag_nw, kreistag_sh, kreistag_sl, kreistag_sn
+    from ea.sources.de import (
+        kreistag_bb,
+        kreistag_mv,
+        kreistag_ni,
+        kreistag_nw,
+        kreistag_sh,
+        kreistag_sl,
+        kreistag_sn,
+        kreistag_st,
+        kreistag_th,
+    )
 
-    return [kreistag_nw.LAND, kreistag_ni.LAND, kreistag_sh.LAND, kreistag_sn.LAND, kreistag_sl.LAND]
+    return [
+        kreistag_nw.LAND,
+        kreistag_ni.LAND,
+        kreistag_sh.LAND,
+        kreistag_sn.LAND,
+        kreistag_sl.LAND,
+        kreistag_bb.LAND,
+        kreistag_mv.LAND,
+        kreistag_st.LAND,
+        kreistag_th.LAND,
+    ]
 
 
 def land_party_key(land: Land, ags: str, row: Row) -> str:
