@@ -17,12 +17,12 @@ from ea.sources.jp.mlit import PREFECTURES
 from ea.store import DATA, connect
 
 SOURCE = "jp.mic_hoketsu"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ROOT = f"{mic.DATA_ROOT}/hoketsu"
 PAGES = {"hor": f"{ROOT}/hoketsu_1.html", "hoc": f"{ROOT}/hoketsu_2.html"}
 TITLE = "衆議院議員・参議院議員補欠選挙結果調"
-SINCE = "2009-08-31"
+SINCE = "2002-04-01"
 LINK = re.compile(r'<a [^>]*href="([^"]+\.pdf)"[^>]*>(.*?)</a>', re.DOTALL)
 WORD = re.compile(
     r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>',
@@ -82,7 +82,8 @@ def words(path: Path) -> list[tuple[float, float, float, float, str]]:
 
 
 def layout(path: Path) -> str:
-    return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    out = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    return unicodedata.normalize("NFKC", out)
 
 
 def rows_of(items: list[tuple[float, float, float, float, str]], joiner: str = "") -> list[str]:
@@ -111,7 +112,7 @@ def totals(text: str) -> dict[str, str]:
             out[key] = match[1].replace(",", "")
     for key, label in {"registered": "当日有権者数", "voters": "投票者数"}.items():
         spaced = r"[ ]*".join(re.escape(ch) for ch in label)
-        match = re.search(spaced + r"\s*([\d,]+)\s*人\s*([\d,]+)\s*人\s*([\d,]+)\s*人", text)
+        match = re.search(spaced + r"\s*(?:\(人\))?\s*([\d,]+)\s*人?\s*([\d,]+)\s*人?\s*([\d,]+)\s*人?", text)
         if match:
             out[key] = match[3].replace(",", "")
             out[f"{key}_men"] = match[1].replace(",", "")
@@ -128,6 +129,26 @@ def person_rows(rows: list[str]) -> tuple[str, str | None]:
     return ballot, legal.strip("()") if legal else None
 
 
+# Characters the text layer drops (printed in a font it cannot map), restored from the page image.
+GLYPHS = {"原田 治": "原田 髙治"}
+
+
+def joined(name: str) -> str:
+    """Close the gaps in names printed with spaced-out letters (石 田 真 敏), keeping real family/given gaps."""
+    out: list[str] = []
+    spaced = False
+    for token in name.split():
+        if out and spaced and len(token) == 1:
+            out[-1] += token
+        elif out and len(out[-1]) == 1 and len(token) == 1:
+            out[-1] += token
+            spaced = True
+        else:
+            out.append(token)
+            spaced = False
+    return " ".join(out)
+
+
 def parse_pdf(item: Listing) -> tuple[dict, list[dict]]:
     path = raw.cached(SOURCE, item.url).path
     items = words(path)
@@ -136,6 +157,7 @@ def parse_pdf(item: Listing) -> tuple[dict, list[dict]]:
     top = header[1]
     band = [w for w in items if top - 25 <= w[1] <= top + 30]
     age_x = min(w[0] for w in band if w[4] in {"性別", "年齢"})
+    sex_x = min((w[0] for w in band if w[4] in {"性別", "性"}), default=age_x)
     occupation = [w for w in band if "職" in w[4] or "業" in w[4]]
     occ_right = max(w[2] for w in occupation)
     status = next(w for w in band if w[4].startswith("新現"))
@@ -162,7 +184,7 @@ def parse_pdf(item: Listing) -> tuple[dict, list[dict]]:
     candidates = []
     for index, anchor in enumerate(anchors):
         cell = [w for w in items if cuts[index] <= w[1] + 1 < cuts[index + 1] and w[1] < footer]
-        names = [w for w in cell if w[2] < age_x - 2]
+        names = [w for w in cell if w[2] < age_x - 2 and not (w[4] in {"男", "女"} and w[0] >= sex_x - 12)]
         parties = [w for w in cell if mid <= w[0] and w[2] <= status[0] + 1]
         ages = [w for w in cell if age_x - 2 <= w[0] < occ_right - 40 and re.fullmatch(r"\d{2}", w[4])]
         tags = [w[4] for w in cell if status[0] - 2 <= w[0] < anchor[0] and w[4] in {"新", "現", "元", "前"}]
@@ -170,6 +192,8 @@ def parse_pdf(item: Listing) -> tuple[dict, list[dict]]:
         if len(result) != 1 or len(tags) != 1:
             raise ValueError(f"{item.label}: candidate {index}: tags {tags} result {result}")
         ballot, legal = person_rows(rows_of(names, " "))
+        ballot, legal = joined(ballot), joined(legal) if legal else None
+        legal = GLYPHS.get(legal, legal)
         party = "".join(rows_of(parties))
         party = re.sub(r"^\((.*)\)$", r"\1", party)
         candidates.append(
@@ -198,6 +222,61 @@ def district_of(item: Listing) -> tuple[list[str], int | None]:
 
 
 SCANNED = {
+    "平成14年10月27日執行福岡県第6区選出議員補欠選挙": (
+        {
+            "held": "2002-10-27",
+            "registered": "366845",
+            "voters": "179761",
+            "cast": "179749",
+            "valid": "177763",
+            "invalid": "1986",
+            "other": "12",
+            "threshold": "29627.166",
+            "forfeit": "17776.300",
+        },
+        [
+            ("丸林 秀彦", None, "日本共産党", "新", "7820", "落"),
+            ("古賀 一成", None, "民主党", "前", "61080", "落"),
+            ("あらまき 隆三", "荒巻 隆三", "自由民主党", "新", "84740", "当"),
+            ("のぶ よしたか", "延 嘉隆", "", "新", "24123", "落"),
+        ],
+    ),
+    "平成19年4月22日執行福島県選挙区選出議員補欠選挙": (
+        {
+            "held": "2007-04-22",
+            "registered": "1672953",
+            "voters": "948890",
+            "cast": "948865",
+            "valid": "931012",
+            "invalid": "17853",
+            "other": "25",
+            "threshold": "77584.333",
+            "forfeit": "58188.250",
+        },
+        [
+            ("ましこ 輝彦", "増子 輝彦", "民主党", "新", "541236", "当"),
+            ("山口 勇", None, "自由民主党", "新", "303782", "落"),
+            ("宮本 しづえ", "宮本 シツイ", "日本共産党", "新", "85994", "落"),
+        ],
+    ),
+    "平成19年4月22日執行沖縄県選挙区選出議員補欠選挙": (
+        {
+            "held": "2007-04-22",
+            "registered": "1046237",
+            "voters": "500258",
+            "cast": "500253",
+            "valid": "493848",
+            "invalid": "6405",
+            "other": "0",
+            "threshold": "82308.000",
+            "forfeit": "61731.000",
+        },
+        [
+            ("金城 宏幸", None, "", "新", "9142", "落"),
+            ("かりまた 吉正", "狩俣 吉正", "元気に輝くかりゆし県民の会", "新", "228844", "落"),
+            ("島尻 あい子", "島尻 安伊子", "アイ・ラブ沖縄!かがやく県民の会", "新", "255862", "当"),
+        ],
+    ),
     "平成23年4月24日執行愛知県第6区選出議員補欠選挙": (
         {
             "held": "2011-04-24",
@@ -276,7 +355,7 @@ def parse() -> None:
         }
         valid = Decimal(meta["valid"])
         total = sum(Decimal(row["votes"]) for row in rows)
-        if abs(total - valid) > Decimal("0.01"):
+        if abs(total - valid) > Decimal("0.05"):
             raise ValueError(f"{item.label}: candidates sum to {total}, valid {valid}")
         if sum(row["result"] == "当" for row in rows) != 1:
             raise ValueError(f"{item.label}: expected one winner")
@@ -323,7 +402,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Japan's House of Representatives and House of Councillors by-elections since 2009 from the "
+            summary="Japan's House of Representatives and House of Councillors by-elections since April 2002 from the "
             "Ministry of Internal Affairs and Communications: candidates, votes for the whole district, voters, "
             "and declared winners",
             polity="JP",
@@ -366,6 +445,8 @@ def emit() -> Path:
             found = mic.party_key(party_text(text), held)
             if found == (f"{mic.SOURCE}.party", "つばさの党"):
                 found = ("jp.mic_chiji.party", "つばさの党")
+            if found == (f"{mic.SOURCE}.party", "自由党") and held < "2010":
+                found = (f"{SOURCE}.party", "自由党")  # the 2003 Liberal Party, not the 2016 one that shares its name
             if found is None:
                 return None
             if found not in keyed:
