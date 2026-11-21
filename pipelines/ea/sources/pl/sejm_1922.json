@@ -1,0 +1,2202 @@
+{
+ "national": {
+  "entitled": 12989718,
+  "cast": 8821675,
+  "invalid": 58977,
+  "valid": 8762698,
+  "lists": {
+   "1": 1153397,
+   "2": 906537,
+   "3": 963385,
+   "4": 81152,
+   "5": 121448,
+   "6": 46317,
+   "7": 473676,
+   "8": 2551582,
+   "10": 38160,
+   "11": 13889,
+   "12": 259956,
+   "13": 59104,
+   "14": 29653,
+   "15": 115515,
+   "16": 1398250,
+   "17": 175904,
+   "18": 11871,
+   "20": 53666,
+   "22": 48451
+  }
+ },
+ "constituencies": {
+  "1": {
+   "page": 35,
+   "title": "M. st. Warszawa",
+   "districts": 340,
+   "inhabitants": 936713,
+   "entitled": 564331,
+   "cast": 403795,
+   "invalid_district": 2696,
+   "invalid_constituency": 2291,
+   "valid": 401504,
+   "lists": {
+    "2": 83241,
+    "4": 18986,
+    "5": 26920,
+    "7": 5081,
+    "8": 168582,
+    "10": 16804,
+    "11": 1208,
+    "12": 6476,
+    "16": 50558,
+    "20": 23204,
+    "23": 45,
+    "24": 181,
+    "26": 108,
+    "27": 86,
+    "28": 8,
+    "30": 16
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "„Ratujcie Polskę!”",
+    "24": "Wszechpolska organizacja bezpartyjnych",
+    "26": "Liga Obrony Pracy",
+    "27": "Zjednoczony Komitet Wyborczy Poale Sjon i Cejrej Sjon",
+    "28": "Kontuszowcy",
+    "30": "Niezależni Socjaliści w Polsce"
+   }
+  },
+  "2": {
+   "page": 36,
+   "title": "Powiaty: Warszawa pow., Radzymin, Mińsk Mazowiecki",
+   "districts": 146,
+   "inhabitants": 350131,
+   "entitled": 167219,
+   "cast": 127558,
+   "invalid_district": 1953,
+   "invalid_constituency": 1653,
+   "valid": 125905,
+   "lists": {
+    "1": 11226,
+    "2": 14469,
+    "3": 11569,
+    "4": 1060,
+    "5": 1425,
+    "8": 70684,
+    "12": 2062,
+    "15": 34,
+    "16": 12189,
+    "20": 1130,
+    "23+24+25": 57
+   },
+   "footnotes": [
+    {
+     "list": "23",
+     "name": "Zjednoczony Komitet wyborczy Poale Sjon i Cejrej Sjon",
+     "votes": 17
+    },
+    {
+     "list": "24",
+     "name": "Związek Ludowy Wolnej Polski",
+     "votes": 22
+    },
+    {
+     "list": "25",
+     "name": "Bezpartyjny Związek Rolników-Chrześcijan",
+     "votes": 18
+    }
+   ],
+   "local_names": {
+    "23": "Zjednoczony Komitet wyborczy Poale Sjon i Cejrej Sjon",
+    "24": "Związek Ludowy Wolnej Polski",
+    "25": "Bezpartyjny Związek Rolników-Chrześcijan"
+   }
+  },
+  "3": {
+   "page": 37,
+   "title": "Powiaty: Siedlce, Sokołów, Węgrów",
+   "districts": 101,
+   "inhabitants": 257314,
+   "entitled": 126349,
+   "cast": 99147,
+   "invalid_district": 843,
+   "invalid_constituency": 284,
+   "valid": 98863,
+   "lists": {
+    "1": 10715,
+    "2": 7895,
+    "3": 10379,
+    "4": 763,
+    "5": 233,
+    "7": 624,
+    "8": 54353,
+    "11": 1043,
+    "12": 4601,
+    "16": 7852,
+    "20": 405
+   },
+   "footnotes": [],
+   "local_names": {}
+  },
+  "4": {
+   "page": 37,
+   "title": "Powiaty: Ostrów, Bielsk, Białowieża, Wysokie Mazowieckie",
+   "districts": 146,
+   "inhabitants": 312527,
+   "entitled": 165510,
+   "cast": 110337,
+   "invalid_district": 1040,
+   "invalid_constituency": 418,
+   "valid": 109919,
+   "lists": {
+    "1": 1437,
+    "2": 4048,
+    "3": 16438,
+    "4": 817,
+    "7": 128,
+    "8": 62501,
+    "12": 3026,
+    "15": 852,
+    "16": 18883,
+    "20": 16,
+    "23": 158,
+    "24": 1615
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Wyborcy okręgu wyborczego Nr. 4",
+    "24": "Związek Włościan Trudowików Obszarów Wschodnich Polski"
+   }
+  },
+  "5": {
+   "page": 38,
+   "title": "Powiaty: Białystok, Sokółka, Wołkowysk",
+   "districts": 165,
+   "inhabitants": 392279,
+   "entitled": 206994,
+   "cast": 139487,
+   "invalid_district": 723,
+   "invalid_constituency": 610,
+   "valid": 138877,
+   "lists": {
+    "1": 20280,
+    "2": 2984,
+    "3": 3773,
+    "4": 5545,
+    "5": 1147,
+    "6": 3566,
+    "7": 4764,
+    "8": 31808,
+    "12": 30051,
+    "15": 234,
+    "16": 33072,
+    "20": 645,
+    "23": 247,
+    "24": 758,
+    "25+26": 3
+   },
+   "footnotes": [
+    {
+     "list": "25",
+     "name": "Centralny Komitet Wyborczy Niezależnych Socjalistów w Polsce",
+     "votes": 2
+    },
+    {
+     "list": "26",
+     "name": "luźna d-ra Klimaszewskiego",
+     "votes": 1
+    }
+   ],
+   "local_names": {
+    "23": "Poale Sjon i Cejrej Sjon",
+    "24": "Związek Włościan Trudowików Obszarów Wschodnich Polski",
+    "25": "Centralny Komitet Wyborczy Niezależnych Socjalistów w Polsce",
+    "26": "luźna d-ra Klimaszewskiego"
+   }
+  },
+  "6": {
+   "page": 40,
+   "title": "Powiaty: Grodno, Suwałki, Sejny, Augustów",
+   "districts": 153,
+   "inhabitants": 306881,
+   "entitled": 156417,
+   "cast": 103008,
+   "invalid_district": 1178,
+   "invalid_constituency": 624,
+   "valid": 102384,
+   "lists": {
+    "1": 21507,
+    "2": 2892,
+    "3": 12566,
+    "4": 500,
+    "5": 4425,
+    "7": 1125,
+    "8": 27968,
+    "10": 680,
+    "12": 3452,
+    "16": 26732,
+    "18": 271,
+    "20": 111,
+    "23": 155
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "„Narodowa Partja Pracy”"
+   }
+  },
+  "7": {
+   "page": 41,
+   "title": "Powiaty: Łomża, Kolno, Ostrołęka, Szczuczyn",
+   "districts": 129,
+   "inhabitants": 297535,
+   "entitled": 147446,
+   "cast": 115808,
+   "invalid_district": 538,
+   "invalid_constituency": 501,
+   "valid": 115307,
+   "lists": {
+    "1": 8242,
+    "2": 7751,
+    "3": 15223,
+    "4": 507,
+    "8": 64641,
+    "11": 524,
+    "12": 4427,
+    "15": 1422,
+    "16": 12333,
+    "20": 133,
+    "23": 104
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Poale Sjon"
+   }
+  },
+  "8": {
+   "page": 41,
+   "title": "Powiaty: Ciechanów, Mława, Pułtusk, Przasnysz, Maków",
+   "districts": 175,
+   "inhabitants": 378384,
+   "entitled": 182416,
+   "cast": 151004,
+   "invalid_district": 982,
+   "invalid_constituency": 328,
+   "valid": 150676,
+   "lists": {
+    "1": 9110,
+    "2": 16157,
+    "3": 20927,
+    "4": 778,
+    "5": 709,
+    "7": 357,
+    "8": 83140,
+    "12": 4506,
+    "15": 1017,
+    "16": 13968,
+    "20": 7
+   },
+   "footnotes": [],
+   "local_names": {}
+  },
+  "9": {
+   "page": 43,
+   "title": "Powiaty: Płock, Sierpc, Rypin, Płońsk",
+   "districts": 155,
+   "inhabitants": 331451,
+   "entitled": 158345,
+   "cast": 131919,
+   "invalid_district": 1480,
+   "invalid_constituency": 198,
+   "valid": 131721,
+   "lists": {
+    "1": 6585,
+    "2": 24182,
+    "3": 17478,
+    "4": 588,
+    "5": 1047,
+    "7": 210,
+    "8": 61788,
+    "10": 716,
+    "11": 320,
+    "12": 1746,
+    "16": 17052,
+    "23+24": 9
+   },
+   "footnotes": [
+    {
+     "list": "23",
+     "name": "Jedność wiejska",
+     "votes": 9
+    },
+    {
+     "list": "24",
+     "name": "Równość",
+     "votes": 0
+    }
+   ],
+   "local_names": {
+    "23": "Jedność wiejska",
+    "24": "Równość"
+   }
+  },
+  "10": {
+   "page": 44,
+   "title": "Powiaty: Włocławek, Nieszawa, Lipno",
+   "districts": 139,
+   "inhabitants": 320226,
+   "entitled": 150373,
+   "cast": 122859,
+   "invalid_district": 742,
+   "invalid_constituency": 453,
+   "valid": 122406,
+   "lists": {
+    "1": 3992,
+    "2": 20626,
+    "3": 20005,
+    "4": 1160,
+    "7": 576,
+    "8": 49687,
+    "11": 306,
+    "12": 6705,
+    "15": 34,
+    "16": 19009,
+    "20": 129,
+    "23": 29,
+    "25": 148
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Lista Bezpartyjna gminy Skępe",
+    "25": "Poale Sjon i Cejrej Sjon"
+   }
+  },
+  "11": {
+   "page": 44,
+   "title": "Powiaty: Łowicz, Kutno, Gostynin, Sochaczew",
+   "districts": 154,
+   "inhabitants": 342990,
+   "entitled": 160461,
+   "cast": 135114,
+   "invalid_district": 1924,
+   "invalid_constituency": 363,
+   "valid": 134751,
+   "lists": {
+    "1": 30722,
+    "2": 23838,
+    "3": 13758,
+    "4": 1134,
+    "5": 971,
+    "7": 646,
+    "8": 46879,
+    "11": 286,
+    "12": 1451,
+    "15": 892,
+    "16": 13749,
+    "20": 401,
+    "23": 24
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Rolnicza"
+   }
+  },
+  "12": {
+   "page": 45,
+   "title": "Powiaty: Błonie (Grodzisk), Skierniewice, Rawa, Grójec",
+   "districts": 162,
+   "inhabitants": 389615,
+   "entitled": 185332,
+   "cast": 152074,
+   "invalid_district": 3138,
+   "invalid_constituency": 564,
+   "valid": 151510,
+   "lists": {
+    "1": 18924,
+    "2": 27235,
+    "3": 29655,
+    "4": 1347,
+    "5": 2138,
+    "7": 1934,
+    "8": 52486,
+    "10": 1377,
+    "12": 1960,
+    "16": 13507,
+    "20": 810,
+    "23": 137
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Bezpartyjna"
+   }
+  },
+  "13": {
+   "page": 46,
+   "title": "Miasto Łódź",
+   "districts": 168,
+   "inhabitants": 451974,
+   "entitled": 274443,
+   "cast": 223495,
+   "invalid_district": 749,
+   "invalid_constituency": 507,
+   "valid": 222988,
+   "lists": {
+    "2": 19296,
+    "4": 12492,
+    "5": 14049,
+    "7": 43691,
+    "8": 62452,
+    "11": 2621,
+    "14": 3361,
+    "16": 60117,
+    "20": 4800,
+    "23": 28,
+    "24": 77,
+    "25": 4
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Poale Sjon i Cejrej Sjon",
+    "24": "Centralny Komitet Wyborczy Niezależnych Socjalistów",
+    "25": "Narodowa Partja Pracy"
+   }
+  },
+  "14": {
+   "page": 47,
+   "title": "Powiaty: Łódź, Łask, Sieradz",
+   "districts": 187,
+   "inhabitants": 414463,
+   "entitled": 201227,
+   "cast": 176816,
+   "invalid_district": 677,
+   "invalid_constituency": 502,
+   "valid": 176314,
+   "lists": {
+    "1": 28288,
+    "2": 15406,
+    "3": 18618,
+    "4": 557,
+    "5": 1733,
+    "7": 11524,
+    "8": 63476,
+    "11": 455,
+    "12": 1622,
+    "14": 634,
+    "16": 33773,
+    "15+18": 46,
+    "23": 182
+   },
+   "footnotes": [
+    {
+     "list": "15",
+     "name": "Chłopskie Stronnictwo Radykalne",
+     "votes": 6
+    },
+    {
+     "list": "18",
+     "name": "Komitet Wyborczy Inwalidów i Zdemobilizowanych Wojskowych",
+     "votes": 40
+    }
+   ],
+   "local_names": {
+    "23": "Poale Sjon i Cejrej Sjon"
+   }
+  },
+  "15": {
+   "page": 48,
+   "title": "Powiaty: Konin, Koło, Słupca, Łęczyca",
+   "districts": 193,
+   "inhabitants": 429851,
+   "entitled": 195038,
+   "cast": 170005,
+   "invalid_district": 2437,
+   "invalid_constituency": 449,
+   "valid": 169556,
+   "lists": {
+    "1": 15063,
+    "2": 25798,
+    "3": 28973,
+    "4": 699,
+    "5": 1861,
+    "7": 3193,
+    "8": 55804,
+    "11": 637,
+    "12": 12433,
+    "15": 225,
+    "16": 24865,
+    "23": 5
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Narodowa Partja Pracy"
+   }
+  },
+  "16": {
+   "page": 49,
+   "title": "Powiaty: Kalisz, Turek, Wieluń",
+   "districts": 198,
+   "inhabitants": 463820,
+   "entitled": 207420,
+   "cast": 176414,
+   "invalid_district": 1397,
+   "invalid_constituency": 523,
+   "valid": 175891,
+   "lists": {
+    "1": 23925,
+    "2": 19564,
+    "3": 42223,
+    "4": 660,
+    "7": 1022,
+    "8": 51799,
+    "11": 708,
+    "12": 10407,
+    "14": 937,
+    "15": 3820,
+    "16": 20677,
+    "18+20": 68,
+    "23": 81
+   },
+   "footnotes": [
+    {
+     "list": "18",
+     "name": "Komitet Wyborczy Inwalidów i Zdemobilizowanych Wojskowych",
+     "votes": 46
+    },
+    {
+     "list": "20",
+     "name": "Żydowski Demokratyczny Blok Ludowy",
+     "votes": 22
+    }
+   ],
+   "local_names": {
+    "23": "Poale Sjon i Cejrej Sjon"
+   }
+  },
+  "17": {
+   "page": 50,
+   "title": "Powiaty: Częstochowa, Radomsko",
+   "districts": 166,
+   "inhabitants": 404739,
+   "entitled": 187464,
+   "cast": 162697,
+   "invalid_district": 447,
+   "invalid_constituency": 581,
+   "valid": 162116,
+   "lists": {
+    "1": 5758,
+    "2": 18066,
+    "3": 47045,
+    "4": 462,
+    "5": 1325,
+    "7": 3874,
+    "8": 51409,
+    "12": 16034,
+    "16": 14500,
+    "20": 9,
+    "23": 2680,
+    "24": 954
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Niezależni Socjaliści w Polsce",
+    "24": "Polski Bezpartyjny Komitet Wyborczy"
+   },
+   "caveat": "A footnote to the total row says that a comparison with the commission's report found 103 votes whose validity the constituency commission restored left out of the count, so that the true figures are 478 invalid and 162,219 valid votes. The list votes the table prints add up to 162,116, so the printed 581 invalid and 162,116 valid votes are stored."
+  },
+  "18": {
+   "page": 50,
+   "title": "Powiaty: Piotrków, Brzeziny",
+   "districts": 144,
+   "inhabitants": 322814,
+   "entitled": 153796,
+   "cast": 126241,
+   "invalid_district": 666,
+   "invalid_constituency": 702,
+   "valid": 125539,
+   "lists": {
+    "1": 16826,
+    "2": 12071,
+    "3": 11879,
+    "4": 2009,
+    "7": 9072,
+    "8": 47854,
+    "10": 859,
+    "11": 916,
+    "12": 1795,
+    "15": 150,
+    "16": 21728,
+    "20": 208,
+    "24": 172
+   },
+   "footnotes": [],
+   "local_names": {
+    "24": "Rolnicy"
+   }
+  },
+  "19": {
+   "page": 51,
+   "title": "Powiaty: Radom, Końskie, Opoczno",
+   "districts": 196,
+   "inhabitants": 460966,
+   "entitled": 219594,
+   "cast": 175569,
+   "invalid_district": 950,
+   "invalid_constituency": 670,
+   "valid": 174899,
+   "lists": {
+    "1": 41055,
+    "2": 20506,
+    "3": 23524,
+    "4": 1520,
+    "5": 1885,
+    "6": 1770,
+    "7": 1547,
+    "8": 60151,
+    "11": 305,
+    "12": 2011,
+    "16": 18458,
+    "20": 2102,
+    "23+24": 65
+   },
+   "footnotes": [
+    {
+     "list": "23",
+     "name": "Bezimienną",
+     "votes": 34
+    },
+    {
+     "list": "24",
+     "name": "Bezimienną",
+     "votes": 31
+    }
+   ],
+   "local_names": {
+    "23": "Bezimienna",
+    "24": "Bezimienna"
+   }
+  },
+  "20": {
+   "page": 52,
+   "title": "Powiaty: Kielce, Jędrzejów, Włoszczowa",
+   "districts": 164,
+   "inhabitants": 370908,
+   "entitled": 169942,
+   "cast": 144182,
+   "invalid_district": 603,
+   "invalid_constituency": 424,
+   "valid": 143758,
+   "lists": {
+    "1": 12466,
+    "2": 14164,
+    "3": 54838,
+    "5": 212,
+    "7": 1177,
+    "8": 39496,
+    "11": 804,
+    "12": 1152,
+    "15": 4627,
+    "16": 14812,
+    "23+24+25+26": 10
+   },
+   "footnotes": [
+    {
+     "list": "23",
+     "name": "Bezimienną",
+     "votes": 1
+    },
+    {
+     "list": "24",
+     "name": "Bezpartyjną",
+     "votes": 5
+    },
+    {
+     "list": "25",
+     "name": "Bezimienną",
+     "votes": 0
+    },
+    {
+     "list": "26",
+     "name": "Bezimienną",
+     "votes": 4
+    }
+   ],
+   "local_names": {
+    "23": "Bezimienna",
+    "24": "Bezpartyjna",
+    "25": "Bezimienna",
+    "26": "Bezimienna"
+   }
+  },
+  "21": {
+   "page": 53,
+   "title": "Powiat Będzin",
+   "districts": 157,
+   "inhabitants": 386432,
+   "entitled": 198115,
+   "cast": 159179,
+   "invalid_district": 882,
+   "invalid_constituency": 798,
+   "valid": 158381,
+   "lists": {
+    "1": 158,
+    "2": 40117,
+    "3": 6723,
+    "4": 173,
+    "5": 33006,
+    "7": 8447,
+    "8": 45831,
+    "10": 2653,
+    "14": 2929,
+    "15": 230,
+    "16": 17490,
+    "23": 136,
+    "24": 487,
+    "25": 1
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Włościańska Bezpartyjnych Chrześćjan",
+    "24": "Stowarzyszenie Lokatorów Zagłębia Dąbrowskiego",
+    "25": "Rolnik"
+   }
+  },
+  "22": {
+   "page": 54,
+   "title": "Powiaty: Sandomierz, Stopnica, Pińczów",
+   "districts": 163,
+   "inhabitants": 372889,
+   "entitled": 171944,
+   "cast": 141242,
+   "invalid_district": 790,
+   "invalid_constituency": 683,
+   "valid": 140559,
+   "lists": {
+    "1": 33504,
+    "2": 14726,
+    "3": 49673,
+    "8": 24925,
+    "12": 1173,
+    "15": 480,
+    "16": 15563,
+    "20": 510,
+    "23": 5
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Bezpartyjna"
+   }
+  },
+  "23": {
+   "page": 55,
+   "title": "Powiaty: Iłża (Wierzbnik), Kozienice, Opatów",
+   "districts": 186,
+   "inhabitants": 424097,
+   "entitled": 192772,
+   "cast": 157277,
+   "invalid_district": 695,
+   "invalid_constituency": 446,
+   "valid": 156831,
+   "lists": {
+    "1": 22773,
+    "2": 18650,
+    "3": 54728,
+    "4": 511,
+    "7": 2818,
+    "8": 25167,
+    "11": 580,
+    "12": 8111,
+    "15": 6442,
+    "16": 14995,
+    "18": 429,
+    "20": 449,
+    "23": 1178
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Bezimienna"
+   }
+  },
+  "24": {
+   "page": 56,
+   "title": "Powiaty: Łuków, Garwolin, Puławy",
+   "districts": 170,
+   "inhabitants": 410071,
+   "entitled": 191963,
+   "cast": 151400,
+   "invalid_district": 9009,
+   "invalid_constituency": 8664,
+   "valid": 142736,
+   "lists": {
+    "1": 19771,
+    "3": 42532,
+    "5": 1690,
+    "8": 41179,
+    "12": 5990,
+    "15": 15528,
+    "16": 14809,
+    "23": 716,
+    "24": 295,
+    "25": 226
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Związek Drobnych Rolników",
+    "24": "Poale Sjon i Ceirej Sjon",
+    "25": "Apodyktyczne Stronnictwo Chłopskie"
+   }
+  },
+  "25": {
+   "page": 57,
+   "title": "Powiaty: Biała Podlaska, Radzyń, Konstantynów, Włodawa",
+   "districts": 144,
+   "inhabitants": 289674,
+   "entitled": 155062,
+   "cast": 115982,
+   "invalid_district": 1512,
+   "invalid_constituency": 600,
+   "valid": 115382,
+   "lists": {
+    "1": 23599,
+    "2": 7347,
+    "3": 14230,
+    "4": 4084,
+    "6": 801,
+    "7": 630,
+    "8": 36935,
+    "12": 2267,
+    "15": 1291,
+    "16": 22947,
+    "20": 1061,
+    "25": 136,
+    "23+24+26": 54
+   },
+   "footnotes": [
+    {
+     "list": "23",
+     "name": "Bezpartyjną",
+     "votes": 20
+    },
+    {
+     "list": "24",
+     "name": "Włościańską",
+     "votes": 14
+    },
+    {
+     "list": "26",
+     "name": "Partja Prawosławnych Obywateli Rzeczypospolitej Polskiej",
+     "votes": 20
+    }
+   ],
+   "local_names": {
+    "23": "Bezpartyjna",
+    "24": "Włościańska",
+    "25": "Poale Sjon i Ceirej Sjon",
+    "26": "Partja Prawosławnych Obywateli Rzeczypospolitej Polskiej"
+   }
+  },
+  "26": {
+   "page": 58,
+   "title": "Powiaty: Lublin, Chełm, Lubartów",
+   "districts": 177,
+   "inhabitants": 452030,
+   "entitled": 220735,
+   "cast": 160915,
+   "invalid_district": 724,
+   "invalid_constituency": 473,
+   "valid": 160442,
+   "lists": {
+    "1": 23343,
+    "2": 26539,
+    "3": 33784,
+    "4": 4754,
+    "5": 1118,
+    "6": 1555,
+    "8": 18536,
+    "11": 347,
+    "12": 6828,
+    "15": 11956,
+    "16": 28738,
+    "20": 2652,
+    "23": 290,
+    "24+25+26": 2
+   },
+   "footnotes": [
+    {
+     "list": "24",
+     "name": "Stronnictwa Włościańskiego Drobnych Rolników",
+     "votes": 0
+    },
+    {
+     "list": "25",
+     "name": "Poale Sjon i Ceirej Sjon",
+     "votes": 0
+    },
+    {
+     "list": "26",
+     "name": "Katolickie Centrum Polskie",
+     "votes": 2
+    }
+   ],
+   "local_names": {
+    "23": "Bezpartyjna",
+    "24": "Stronnictwo Włościańskie Drobnych Rolników",
+    "25": "Poale Sjon i Ceirej Sjon",
+    "26": "Katolickie Centrum Polskie"
+   }
+  },
+  "27": {
+   "page": 59,
+   "title": "Powiaty: Zamość, Biłgoraj, Tomaszów",
+   "districts": 142,
+   "inhabitants": 326439,
+   "entitled": 164180,
+   "cast": 121121,
+   "invalid_district": 690,
+   "invalid_constituency": 1096,
+   "valid": 120025,
+   "lists": {
+    "1": 9161,
+    "2": 13912,
+    "3": 25017,
+    "4": 965,
+    "8": 11819,
+    "13": 84,
+    "15": 29986,
+    "16": 28461,
+    "18": 395,
+    "20": 63,
+    "23+24+25+26": 162
+   },
+   "footnotes": [
+    {
+     "list": "23",
+     "name": "Koła Rudecznickich Włościan Rolników",
+     "votes": 54
+    },
+    {
+     "list": "24",
+     "name": "Poale Sjon i Ceirej Sjon",
+     "votes": 87
+    },
+    {
+     "list": "25",
+     "name": "Prawosławna Partja Grażdan Rzeczypospolitej Polskiej",
+     "votes": 19
+    },
+    {
+     "list": "26",
+     "name": "Włościan Bezpartyjnych",
+     "votes": 2
+    }
+   ],
+   "local_names": {
+    "23": "Koła Rudecznickich Włościan Rolników",
+    "24": "Poale Sjon i Ceirej Sjon",
+    "25": "Prawosławna Partja Grażdan Rzeczypospolitej Polskiej",
+    "26": "Włościan Bezpartyjnych"
+   }
+  },
+  "28": {
+   "page": 60,
+   "title": "Powiaty: Krasnystaw, Hrubieszów, Janów",
+   "districts": 145,
+   "inhabitants": 352423,
+   "entitled": 169367,
+   "cast": 125065,
+   "invalid_district": 917,
+   "invalid_constituency": 356,
+   "valid": 124709,
+   "lists": {
+    "1": 5534,
+    "2": 19515,
+    "3": 37341,
+    "6": 426,
+    "8": 7119,
+    "12": 3140,
+    "15": 25252,
+    "16": 25846,
+    "18": 482,
+    "20": 54
+   },
+   "footnotes": [],
+   "local_names": {}
+  },
+  "29": {
+   "page": 61,
+   "title": "Powiaty: Tczew, Starogard, Gniew, Kościerzyna, Kartuzy, Wejherowo, Puck",
+   "districts": 182,
+   "inhabitants": 311577,
+   "entitled": 140262,
+   "cast": 115470,
+   "invalid_district": 847,
+   "invalid_constituency": 239,
+   "valid": 115231,
+   "lists": {
+    "1": 2281,
+    "2": 1885,
+    "7": 25609,
+    "8": 71776,
+    "14": 607,
+    "16": 13073
+   },
+   "footnotes": [],
+   "local_names": {}
+  },
+  "30": {
+   "page": 62,
+   "title": "Powiaty: Grudziądz m., Grudziądz pow., Świecie, Tuchola, Chojnice, Sępolno",
+   "districts": 236,
+   "inhabitants": 293508,
+   "entitled": 130771,
+   "cast": 105951,
+   "invalid_district": 370,
+   "invalid_constituency": 332,
+   "valid": 105619,
+   "lists": {
+    "1": 4041,
+    "2": 1659,
+    "5": 56,
+    "7": 25517,
+    "8": 49646,
+    "14": 1052,
+    "16": 23648
+   },
+   "footnotes": [],
+   "local_names": {}
+  },
+  "31": {
+   "page": 64,
+   "title": "Powiaty: Toruń m., Toruń pow., Chełmno, Wąbrzeźno, Brodnica, Lubawa, Działdowo",
+   "districts": 191,
+   "inhabitants": 330654,
+   "entitled": 145694,
+   "cast": 120172,
+   "invalid_district": 1773,
+   "invalid_constituency": 1952,
+   "valid": 118220,
+   "lists": {
+    "1": 4270,
+    "7": 30791,
+    "8": 67444,
+    "14": 472,
+    "16": 15243
+   },
+   "footnotes": [],
+   "local_names": {}
+  },
+  "32": {
+   "page": 66,
+   "title": "Powiaty: Bydgoszcz m., Bydgoszcz pow., Inowrocław, Szubin, Wyrzysk, Strzelno, Żnin",
+   "districts": 462,
+   "inhabitants": 404704,
+   "entitled": 191792,
+   "cast": 163673,
+   "invalid_district": 729,
+   "invalid_constituency": 509,
+   "valid": 163164,
+   "lists": {
+    "1": 1782,
+    "2": 5796,
+    "7": 44053,
+    "8": 77459,
+    "14": 1156,
+    "16": 32483,
+    "23": 435
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Partja Niezależnych Socjalistów w Polsce"
+   }
+  },
+  "33": {
+   "page": 67,
+   "title": "Powiaty: Gniezno, Mogilno, Września, Środa, Witkowo, Wągrowiec, Oborniki",
+   "districts": 576,
+   "inhabitants": 336071,
+   "entitled": 151677,
+   "cast": 133436,
+   "invalid_district": 583,
+   "invalid_constituency": 286,
+   "valid": 133150,
+   "lists": {
+    "1": 5358,
+    "2": 3142,
+    "3": 1672,
+    "7": 41043,
+    "8": 64544,
+    "14": 271,
+    "16": 17120
+   },
+   "footnotes": [],
+   "local_names": {},
+   "caveat": "The total row prints 41,013 votes for list 7, but its town and rural subtotals (8,895 and 32,148), its seven powiat rows, its valid votes, and the volume's own total for list 7 in the Poznań voivodeship all give 41,043, which is stored."
+  },
+  "34": {
+   "page": 68,
+   "title": "Miasto Poznań",
+   "districts": 86,
+   "inhabitants": 169422,
+   "entitled": 97080,
+   "cast": 80866,
+   "invalid_district": 446,
+   "invalid_constituency": 268,
+   "valid": 80598,
+   "lists": {
+    "2": 2893,
+    "5": 1679,
+    "7": 13418,
+    "8": 61245,
+    "14": 1357,
+    "16": 6
+   },
+   "footnotes": [],
+   "local_names": {}
+  },
+  "35": {
+   "page": 69,
+   "title": "Powiaty: Poznań-Wschód, Poznań-Zachód, Śrem, Kościan, Leszno, Rawicz",
+   "districts": 511,
+   "inhabitants": 306009,
+   "entitled": 140256,
+   "cast": 122758,
+   "invalid_district": 344,
+   "invalid_constituency": 325,
+   "valid": 122433,
+   "lists": {
+    "1": 8003,
+    "2": 500,
+    "7": 37700,
+    "8": 62319,
+    "14": 493,
+    "16": 13418
+   },
+   "footnotes": [],
+   "local_names": {}
+  },
+  "36": {
+   "page": 70,
+   "title": "Powiaty: Szamotuły, Czarnków, Chodzież, Międzychód, Nowy Tomyśl, Grodzisk, Wolsztyn, Śmigiel",
+   "districts": 556,
+   "inhabitants": 346166,
+   "entitled": 160472,
+   "cast": 144550,
+   "invalid_district": 365,
+   "invalid_constituency": 354,
+   "valid": 144196,
+   "lists": {
+    "1": 3227,
+    "2": 168,
+    "7": 40576,
+    "8": 67725,
+    "14": 217,
+    "16": 32260,
+    "17": 23
+   },
+   "footnotes": [],
+   "local_names": {}
+  },
+  "37": {
+   "page": 71,
+   "title": "Powiaty: Ostrów, Odolanów, Ostrzeszów, Kępno, Pleszew, Jarocin, Koźmin, Krotoszyn, Gostyń",
+   "districts": 586,
+   "inhabitants": 404862,
+   "entitled": 186602,
+   "cast": 165864,
+   "invalid_district": 387,
+   "invalid_constituency": 261,
+   "valid": 165603,
+   "lists": {
+    "1": 32218,
+    "2": 673,
+    "7": 51481,
+    "8": 62447,
+    "14": 1068,
+    "16": 17716
+   },
+   "footnotes": [],
+   "local_names": {}
+  },
+  "38": {
+   "page": 73,
+   "title": "Powiaty: Huta Królewska, Świętochłowice, Lubliniec, Tarnowskie Góry",
+   "districts": 134,
+   "inhabitants": 317966,
+   "entitled": 159811,
+   "cast": 107194,
+   "invalid_district": 622,
+   "invalid_constituency": 596,
+   "valid": 106598,
+   "lists": {
+    "1": 363,
+    "2": 11086,
+    "7": 9665,
+    "8": 43666,
+    "16": 38942,
+    "23": 2875,
+    "24": 1
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Komunistyczna Partja Górnego Śląska",
+    "24": "Socjalistyczny Blok Wyborczy"
+   }
+  },
+  "39": {
+   "page": 74,
+   "title": "Powiaty: Katowice m., Katowice pow., Ruda",
+   "districts": 139,
+   "inhabitants": 312139,
+   "entitled": 166253,
+   "cast": 114933,
+   "invalid_district": 816,
+   "invalid_constituency": 681,
+   "valid": 114252,
+   "lists": {
+    "1": 676,
+    "2": 21591,
+    "7": 17854,
+    "8": 34249,
+    "16": 37364,
+    "23": 2518
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Komunistyczna Partja Górnego Śląska"
+   }
+  },
+  "40": {
+   "page": 75,
+   "title": "Powiaty: Cieszyn, Bielsko m., Bielsko pow., Pszczyna, Rybnik",
+   "districts": 298,
+   "inhabitants": 407640,
+   "entitled": 215892,
+   "cast": 133702,
+   "invalid_district": 618,
+   "invalid_constituency": 421,
+   "valid": 133281,
+   "lists": {
+    "1": 9547,
+    "2": 24384,
+    "5": 457,
+    "7": 23256,
+    "8": 51413,
+    "16": 24211,
+    "23": 13
+   },
+   "footnotes": [],
+   "local_names": {}
+  },
+  "41": {
+   "page": 77,
+   "title": "Miasto Kraków",
+   "districts": 70,
+   "inhabitants": 183706,
+   "entitled": 109641,
+   "cast": 73166,
+   "invalid_district": 266,
+   "invalid_constituency": 287,
+   "valid": 72879,
+   "lists": {
+    "2": 19272,
+    "4": 1376,
+    "5": 358,
+    "7": 1817,
+    "8": 27629,
+    "10": 2287,
+    "11": 108,
+    "14": 793,
+    "18": 456,
+    "23": 152,
+    "24": 577,
+    "25": 16910,
+    "26": 1023,
+    "27+28": 121
+   },
+   "footnotes": [
+    {
+     "list": "27",
+     "name": "Poale Sjon i Cejrej Sjon",
+     "votes": 87
+    },
+    {
+     "list": "28",
+     "name": "Związek Pracy",
+     "votes": 34
+    }
+   ],
+   "local_names": {
+    "23": "Komitet Wyborczy Niezależnych Socjalistów",
+    "24": "Komitet Obywatelski",
+    "25": "Związek Narodowo-Żydowski",
+    "26": "Komitet Wyborczy Pracowników Publicznych",
+    "27": "Poale Sjon i Cejrej Sjon",
+    "28": "Związek Pracy"
+   },
+   "minority_list": 25
+  },
+  "42": {
+   "page": 77,
+   "title": "Powiaty: Kraków, Chrzanów, Oświęcim, Podgórze, Olkusz, Miechów",
+   "districts": 412,
+   "inhabitants": 560162,
+   "entitled": 257792,
+   "cast": 196631,
+   "invalid_district": 987,
+   "invalid_constituency": 801,
+   "valid": 195830,
+   "lists": {
+    "1": 31847,
+    "2": 52874,
+    "3": 38212,
+    "5": 1082,
+    "7": 3476,
+    "8": 40302,
+    "10": 4596,
+    "12": 3225,
+    "13": 4283,
+    "18": 1994,
+    "27": 13351,
+    "29": 380,
+    "23+24+25+26+28+30": 208
+   },
+   "footnotes": [
+    {
+     "list": "23",
+     "name": "Bezpartyjna z Libiąża Małego",
+     "votes": 44
+    },
+    {
+     "list": "24",
+     "name": "Bezpartyjna",
+     "votes": 28
+    },
+    {
+     "list": "25",
+     "name": "Bezpartyjna „Piłsudczyk”",
+     "votes": 39
+    },
+    {
+     "list": "26",
+     "name": "Ziemi Krakowskiej",
+     "votes": 34
+    },
+    {
+     "list": "28",
+     "name": "Stronnictwo „Wola Ludu”",
+     "votes": 35
+    },
+    {
+     "list": "30",
+     "name": "Bezpartyjna Zagłębia Chrzanowskiego",
+     "votes": 28
+    }
+   ],
+   "local_names": {
+    "23": "Bezpartyjna z Libiąża Małego",
+    "24": "Bezpartyjna",
+    "25": "Bezpartyjna „Piłsudczyk”",
+    "26": "Ziemi Krakowskiej",
+    "27": "Związek Narodowo-Żydowski",
+    "28": "Stronnictwo „Wola Ludu”",
+    "29": "Chłopsko-Małomieszczańska (bezpart.)",
+    "30": "Bezpartyjna Zagłębia Chrzanowskiego"
+   }
+  },
+  "43": {
+   "page": 79,
+   "title": "Powiaty: Wadowice, Biała, Myślenice, Żywiec, Nowy Targ, Spisz-Orawa",
+   "districts": 382,
+   "inhabitants": 469494,
+   "entitled": 228367,
+   "cast": 148259,
+   "invalid_district": 845,
+   "invalid_constituency": 1038,
+   "valid": 147221,
+   "lists": {
+    "1": 41714,
+    "2": 25475,
+    "3": 14394,
+    "5": 114,
+    "7": 1975,
+    "8": 32245,
+    "12": 17968,
+    "14": 2820,
+    "18": 1484,
+    "23": 320,
+    "24": 102,
+    "25": 459,
+    "26": 3383,
+    "27": 4413,
+    "28": 355
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Bezpartyjna samodzielna",
+    "24": "Bez nazwy",
+    "25": "Bez nazwy",
+    "26": "Bez nazwy",
+    "27": "Związek Narodowo-Żydowski",
+    "28": "Bez nazwy"
+   }
+  },
+  "44": {
+   "page": 82,
+   "title": "Powiaty: Nowy Sącz, Limanowa, Bochnia, Wieliczka",
+   "districts": 521,
+   "inhabitants": 385377,
+   "entitled": 178765,
+   "cast": 129510,
+   "invalid_district": 918,
+   "invalid_constituency": 578,
+   "valid": 128932,
+   "lists": {
+    "1": 57909,
+    "2": 18188,
+    "3": 433,
+    "5": 45,
+    "8": 18184,
+    "12": 18956,
+    "13": 2720,
+    "14": 3099,
+    "18": 1354,
+    "23": 16,
+    "24": 8028
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Partja Niezależnych Socjalistów w Polsce",
+    "24": "Związek Narodowo-Żydowski"
+   }
+  },
+  "45": {
+   "page": 83,
+   "title": "Powiaty: Tarnów, Pilzno, Brzesko, Dąbrowa, Grybów, Gorlice",
+   "districts": 537,
+   "inhabitants": 445655,
+   "entitled": 212802,
+   "cast": 161039,
+   "invalid_district": 469,
+   "invalid_constituency": 445,
+   "valid": 160594,
+   "lists": {
+    "1": 81645,
+    "2": 12087,
+    "3": 180,
+    "4": 869,
+    "7": 959,
+    "8": 6362,
+    "12": 28265,
+    "13": 7919,
+    "23": 4288,
+    "25": 11343,
+    "26": 6677
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Chłopski Komitet Bezpartyjny",
+    "25": "Związek Narodowo-Żydowski",
+    "26": "Łączność Narodowa"
+   }
+  },
+  "46": {
+   "page": 85,
+   "title": "Powiaty: Jasło, Ropczyce, Strzyżów, Mielec, Kolbuszowa, Tarnobrzeg",
+   "districts": 505,
+   "inhabitants": 429420,
+   "entitled": 198100,
+   "cast": 153735,
+   "invalid_district": 943,
+   "invalid_constituency": 834,
+   "valid": 152901,
+   "lists": {
+    "1": 59848,
+    "2": 7582,
+    "3": 3875,
+    "5": 6555,
+    "8": 10891,
+    "12": 15312,
+    "13": 14507,
+    "14": 5160,
+    "15": 8674,
+    "24": 1594,
+    "28": 218,
+    "29": 2190,
+    "30": 11896,
+    "31": 1696,
+    "32": 2797,
+    "23+25+26+27": 106
+   },
+   "footnotes": [
+    {
+     "list": "23",
+     "name": "Bez nazwy",
+     "votes": 50
+    },
+    {
+     "list": "25",
+     "name": "Bez nazwy",
+     "votes": 49
+    },
+    {
+     "list": "26",
+     "name": "Bez nazwy",
+     "votes": 6
+    },
+    {
+     "list": "27",
+     "name": "Bez nazwy",
+     "votes": 1
+    }
+   ],
+   "local_names": {
+    "23": "Bez nazwy",
+    "24": "Niezawisła",
+    "25": "Bez nazwy",
+    "26": "Bez nazwy",
+    "27": "Bez nazwy",
+    "28": "Partja Ludowo-Robotnicza",
+    "29": "Bezpartyjna",
+    "30": "Związek Narodowo-Żydowski",
+    "31": "Chłopsko-Robotnicza",
+    "32": "Partja Małorolnicza"
+   }
+  },
+  "47": {
+   "page": 87,
+   "title": "Powiaty: Rzeszów, Jarosław, Przeworsk, Łańcut, Nisko",
+   "districts": 387,
+   "inhabitants": 487480,
+   "entitled": 221846,
+   "cast": 153120,
+   "invalid_district": 1079,
+   "invalid_constituency": 580,
+   "valid": 152540,
+   "lists": {
+    "1": 76908,
+    "2": 8223,
+    "3": 12334,
+    "5": 88,
+    "7": 1472,
+    "8": 21836,
+    "12": 2107,
+    "13": 5651,
+    "14": 1595,
+    "15": 2352,
+    "18": 1324,
+    "24": 471,
+    "26": 905,
+    "27": 1865,
+    "28": 15409
+   },
+   "footnotes": [],
+   "local_names": {
+    "24": "Ludowcy Bezpartyjni z okręgu Nr. 47",
+    "26": "Kandydaci powiatowi bezpartyjni okręgu Nr. 47",
+    "27": "Związek gmin powiatu Łańcut",
+    "28": "Zjednoczone Stronnictwo Narodowo-Żydowskie"
+   },
+   "minority_list": 28
+  },
+  "48": {
+   "page": 90,
+   "title": "Powiaty: Przemyśl, Dobromil, Sanok, Brzozów, Krosno",
+   "districts": 423,
+   "inhabitants": 478742,
+   "entitled": 222631,
+   "cast": 131464,
+   "invalid_district": 800,
+   "invalid_constituency": 818,
+   "valid": 130646,
+   "lists": {
+    "1": 36414,
+    "2": 13594,
+    "3": 8123,
+    "4": 403,
+    "5": 813,
+    "8": 21418,
+    "10": 3691,
+    "12": 1938,
+    "13": 20642,
+    "17": 15438,
+    "18": 1057,
+    "26": 643,
+    "27": 2421,
+    "29": 3549,
+    "30": 457,
+    "23+24+25+28+31": 45
+   },
+   "footnotes": [
+    {
+     "list": "23",
+     "name": "Bez nazwy",
+     "votes": 12
+    },
+    {
+     "list": "24",
+     "name": "Bez nazwy",
+     "votes": 4
+    },
+    {
+     "list": "25",
+     "name": "Bez nazwy",
+     "votes": 4
+    },
+    {
+     "list": "28",
+     "name": "Bez nazwy",
+     "votes": 22
+    },
+    {
+     "list": "31",
+     "name": "Grupa ortodoksów w Przemyślu",
+     "votes": 3
+    }
+   ],
+   "local_names": {
+    "23": "Bez nazwy",
+    "24": "Bez nazwy",
+    "25": "Bez nazwy",
+    "26": "Bez nazwy",
+    "27": "Bez nazwy",
+    "28": "Bez nazwy",
+    "29": "Polska Jedność Państwowa",
+    "30": "Zawodowa Bezpartyjna",
+    "31": "Grupa ortodoksów w Przemyślu"
+   }
+  },
+  "49": {
+   "page": 92,
+   "title": "Powiaty: Sambor, Stary Sambor, Lisko, Rudki, Mościska, Gródek Jagielloński",
+   "districts": 408,
+   "inhabitants": 481158,
+   "entitled": 215849,
+   "cast": 96619,
+   "invalid_district": 1545,
+   "invalid_constituency": 1223,
+   "valid": 95396,
+   "lists": {
+    "1": 32351,
+    "2": 5924,
+    "3": 2315,
+    "4": 109,
+    "7": 574,
+    "8": 17279,
+    "12": 1606,
+    "13": 927,
+    "17": 14381,
+    "23": 116,
+    "24": 173,
+    "25": 16,
+    "26": 19625
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Bezpartyjna Ludowa",
+    "24": "Bezpartyjna",
+    "25": "Zjednoczony Komitet Wyborczy Niezależnych Socjalistów Wschodniej Małopolski",
+    "26": "Niezależny Ukraiński Chłopski Komitet"
+   },
+   "minority_list": 26
+  },
+  "50": {
+   "page": 95,
+   "title": "Miasto Lwów",
+   "districts": 72,
+   "inhabitants": 219388,
+   "entitled": 137214,
+   "cast": 78407,
+   "invalid_district": 327,
+   "invalid_constituency": 324,
+   "valid": 78083,
+   "lists": {
+    "1": 244,
+    "2": 13951,
+    "4": 3491,
+    "5": 326,
+    "8": 33485,
+    "11": 313,
+    "14": 1632,
+    "17": 24169,
+    "23": 115,
+    "24": 357
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Zjednoczony Komitet Wyborczy Niezależnych Socjalistów Wschodniej Małopolski",
+    "24": "Związek Kobiet Polskich"
+   }
+  },
+  "51": {
+   "page": 95,
+   "title": "Powiaty: Lwów, Żółkiew, Sokal, Rawa Ruska, Jaworów, Cieszanów",
+   "districts": 497,
+   "inhabitants": 609295,
+   "entitled": 277540,
+   "cast": 97692,
+   "invalid_district": 1166,
+   "invalid_constituency": 1117,
+   "valid": 96575,
+   "lists": {
+    "1": 41131,
+    "2": 9669,
+    "3": 513,
+    "4": 1398,
+    "5": 42,
+    "8": 14880,
+    "11": 578,
+    "12": 5352,
+    "13": 1052,
+    "17": 17106,
+    "23": 4844,
+    "24": 10
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Ukraiński Niezależny Chłopski Komitet Wyborczy",
+    "24": "Zjednoczony Komitet Wyborczy Niezależnych Socjalistów Wschodniej Małopolski"
+   }
+  },
+  "52": {
+   "page": 98,
+   "title": "Powiaty: Stryj, Drohobycz, Turka, Skole, Dolina, Kałusz",
+   "districts": 449,
+   "inhabitants": 549796,
+   "entitled": 253553,
+   "cast": 100741,
+   "invalid_district": 859,
+   "invalid_constituency": 1101,
+   "valid": 99640,
+   "lists": {
+    "1": 15477,
+    "2": 19916,
+    "4": 364,
+    "8": 20624,
+    "10": 95,
+    "11": 699,
+    "17": 25308,
+    "18": 851,
+    "23": 3569,
+    "24": 11864,
+    "25": 873
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Niezawisłość Partyjna",
+    "24": "Partja Ukraińska „Chliborobów”",
+    "25": "Lista Zawodowa Bezpartyjna"
+   },
+   "minority_list": 24
+  },
+  "53": {
+   "page": 100,
+   "title": "Powiaty: Stanisławów, Tłumacz, Bohorodczany, Nadwórna, Kołomyja, Horodenka, Śniatyn, Kosów, Peczeniżyn",
+   "districts": 504,
+   "inhabitants": 775489,
+   "entitled": 363213,
+   "cast": 114015,
+   "invalid_district": 572,
+   "invalid_constituency": 583,
+   "valid": 113432,
+   "lists": {
+    "1": 15681,
+    "2": 7593,
+    "3": 513,
+    "4": 3582,
+    "5": 120,
+    "8": 23195,
+    "10": 2619,
+    "11": 73,
+    "17": 25428,
+    "18": 1346,
+    "25": 433,
+    "26": 73,
+    "27": 1385,
+    "29": 31028,
+    "32": 363
+   },
+   "footnotes": [],
+   "local_names": {
+    "25": "Lista leśników",
+    "26": "Bez nazwy",
+    "27": "Zjednoczony Komitet Wyborczy Niezależnych Socjalistów Wschodniej Małopolski",
+    "29": "Partja Agrarna Ukrańsko-Chłopska",
+    "32": "Polskie Centrum"
+   },
+   "minority_list": 29
+  },
+  "54": {
+   "page": 104,
+   "title": "Powiaty: Tarnopol, Zbaraż, Trembowla, Skałat, Podhajce, Czortków, Buczacz, Husiatyn, Borszczów, Zaleszczyki",
+   "districts": 678,
+   "inhabitants": 863870,
+   "entitled": 417360,
+   "cast": 144666,
+   "invalid_district": 983,
+   "invalid_constituency": 992,
+   "valid": 143674,
+   "lists": {
+    "1": 62655,
+    "2": 2896,
+    "3": 909,
+    "4": 894,
+    "5": 205,
+    "8": 34167,
+    "10": 1783,
+    "13": 1319,
+    "15": 11,
+    "17": 26065,
+    "23": 1790,
+    "24": 10957,
+    "25": 23
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Zjednoczony Komitet Wyborczy Niezależnych Socjalistów Wschodniej Małopolski",
+    "24": "Ukraiński Niezawisły Chłopski Komitet",
+    "25": "Bez nazwy"
+   }
+  },
+  "55": {
+   "page": 109,
+   "title": "Powiaty: Złoczów, Zborów, Kamionka Strumiłowa, Brody, Radziechów, Bóbrka, Przemyślany, Rohatyn, Żydaczów, Brzeżany",
+   "districts": 789,
+   "inhabitants": 834489,
+   "entitled": 391754,
+   "cast": 131947,
+   "invalid_district": 2061,
+   "invalid_constituency": 2248,
+   "valid": 129699,
+   "lists": {
+    "1": 47804,
+    "2": 3600,
+    "3": 3448,
+    "4": 64,
+    "8": 36449,
+    "17": 27986,
+    "23": 660,
+    "24": 219,
+    "25": 194,
+    "26": 9275
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Bez nazwy",
+    "24": "Bezpartyjna",
+    "25": "Narodowa Partja Pracy",
+    "26": "Ukraiński Niezależny Chłopski Komitet"
+   }
+  },
+  "56": {
+   "page": 113,
+   "title": "Powiaty: Kowel, Luboml, Włodzimierz, Horochów",
+   "districts": 157,
+   "inhabitants": 405090,
+   "entitled": 197469,
+   "cast": 109400,
+   "invalid_district": 1060,
+   "invalid_constituency": 1473,
+   "valid": 107927,
+   "lists": {
+    "2": 2486,
+    "3": 2981,
+    "6": 3574,
+    "12": 3493,
+    "16": 91174,
+    "20": 1134,
+    "22": 3038,
+    "23+24+25": 47
+   },
+   "footnotes": [
+    {
+     "list": "23",
+     "name": "Ukraińska Lista Kresowa Wołynia",
+     "votes": 13
+    },
+    {
+     "list": "24",
+     "name": "Ukraińska Jedność Narodowa",
+     "votes": 10
+    },
+    {
+     "list": "25",
+     "name": "Ukrańskie Zjednoczenie",
+     "votes": 24
+    }
+   ],
+   "local_names": {
+    "23": "Ukraińska Lista Kresowa Wołynia",
+    "24": "Ukraińska Jedność Narodowa",
+    "25": "Ukrańskie Zjednoczenie"
+   }
+  },
+  "57": {
+   "page": 114,
+   "title": "Powiaty: Łuck, Równe",
+   "districts": 227,
+   "inhabitants": 534065,
+   "entitled": 201444,
+   "cast": 118218,
+   "invalid_district": 1098,
+   "invalid_constituency": 1595,
+   "valid": 116623,
+   "lists": {
+    "2": 1442,
+    "3": 4386,
+    "6": 10653,
+    "8": 5854,
+    "16": 77322,
+    "18": 152,
+    "20": 3049,
+    "22": 4782,
+    "23": 8970,
+    "24+25": 13
+   },
+   "footnotes": [
+    {
+     "list": "24",
+     "name": "Włościańskie Rolnicze Stronnictwo",
+     "votes": 7
+    },
+    {
+     "list": "25",
+     "name": "Związek Lokatorów",
+     "votes": 6
+    }
+   ],
+   "local_names": {
+    "23": "Ukrańska Ludowa Partja",
+    "24": "Włościańskie Rolnicze Stronnictwo",
+    "25": "Związek Lokatorów"
+   }
+  },
+  "58": {
+   "page": 115,
+   "title": "Powiaty: Krzemieniec, Dubno, Ostróg",
+   "districts": 199,
+   "inhabitants": 498752,
+   "entitled": 221421,
+   "cast": 139240,
+   "invalid_district": 597,
+   "invalid_constituency": 901,
+   "valid": 138339,
+   "lists": {
+    "3": 1009,
+    "6": 862,
+    "8": 4237,
+    "16": 121009,
+    "18": 190,
+    "20": 1620,
+    "22": 9148,
+    "23": 264
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Grupa Drobnych Rolników na Wołyniu"
+   }
+  },
+  "59": {
+   "page": 116,
+   "title": "Powiaty: Brześć n. Bugiem, Kobryń, Prużana, Kossów, Drohiczyn, Kamień Koszyrski",
+   "districts": 202,
+   "inhabitants": 416261,
+   "entitled": 233339,
+   "cast": 113913,
+   "invalid_district": 2318,
+   "invalid_constituency": 2344,
+   "valid": 111569,
+   "lists": {
+    "2": 20948,
+    "3": 13577,
+    "4": 1870,
+    "5": 8660,
+    "6": 3713,
+    "11": 771,
+    "16": 44722,
+    "20": 880,
+    "22": 8806,
+    "25": 4214,
+    "27": 1934,
+    "29": 1299,
+    "23+26+28+30": 175
+   },
+   "footnotes": [
+    {
+     "list": "23",
+     "name": "Bez nazwy",
+     "votes": 19
+    },
+    {
+     "list": "26",
+     "name": "Bezpartyjni z Kresowego Obywatelstwa Rzeczypospolitej Polskiej",
+     "votes": 22
+    },
+    {
+     "list": "28",
+     "name": "Związek Włościańsko-Rolniczy Ziem Wschodnich",
+     "votes": 93
+    },
+    {
+     "list": "30",
+     "name": "Reduta Wschodnia w Brześciu n/Bugiem",
+     "votes": 41
+    }
+   ],
+   "local_names": {
+    "23": "Bez nazwy",
+    "26": "Bezpartyjni z Kresowego Obywatelstwa Rzeczypospolitej Polskiej",
+    "28": "Związek Włościańsko-Rolniczy Ziem Wschodnich",
+    "30": "Reduta Wschodnia w Brześciu n/Bugiem"
+   }
+  },
+  "60": {
+   "page": 117,
+   "title": "Powiaty: Pińsk, Łuniniec, Sarny",
+   "districts": 192,
+   "inhabitants": 464637,
+   "entitled": 208610,
+   "cast": 125497,
+   "invalid_district": 2748,
+   "invalid_constituency": 1165,
+   "valid": 124332,
+   "lists": {
+    "2": 52981,
+    "3": 26515,
+    "4": 2302,
+    "6": 2156,
+    "11": 287,
+    "16": 30974,
+    "20": 333,
+    "22": 3527,
+    "23": 704,
+    "24": 4553
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Poale Sjon i Ceirej Sjon",
+    "24": "Zjednoczenie Krajowe Polesia w Pińsku"
+   }
+  },
+  "61": {
+   "page": 118,
+   "title": "Powiaty: Nowogródek, Stołpce, Nieśwież, Baranowicze, Słonim",
+   "districts": 208,
+   "inhabitants": 493702,
+   "entitled": 245925,
+   "cast": 133701,
+   "invalid_district": 2232,
+   "invalid_constituency": 2824,
+   "valid": 130877,
+   "lists": {
+    "3": 41346,
+    "4": 962,
+    "6": 9069,
+    "12": 7197,
+    "16": 59785,
+    "20": 796,
+    "22": 11501,
+    "23": 221
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Poale Sjon i Ceirej Sjon"
+   }
+  },
+  "62": {
+   "page": 119,
+   "title": "Powiaty: Lida, Oszmiana, Wołożyn, Wilejka",
+   "districts": 239,
+   "inhabitants": 518310,
+   "entitled": 264737,
+   "cast": 152807,
+   "invalid_district": 1965,
+   "invalid_constituency": 1814,
+   "valid": 150993,
+   "lists": {
+    "1": 34344,
+    "3": 51668,
+    "5": 4284,
+    "6": 1631,
+    "8": 18112,
+    "16": 40677,
+    "24": 159,
+    "23+26+27": 118
+   },
+   "footnotes": [
+    {
+     "list": "23",
+     "name": "Zjednoczenie Białoruskich Bezpartyjnych Aktywistów i „Zielonego Dębu”",
+     "votes": 61
+    },
+    {
+     "list": "26",
+     "name": "Centrala zrzeszeń lokatorskich",
+     "votes": 2
+    },
+    {
+     "list": "27",
+     "name": "Poale Sjon i Ceirej Sjon",
+     "votes": 55
+    }
+   ],
+   "local_names": {
+    "23": "Zjednoczenie Białoruskich Bezpartyjnych Aktywistów i „Zielonego Dębu”",
+    "24": "Polski Związek Ludowy „Odrodzenie”",
+    "26": "Centrala zrzeszeń lokatorskich",
+    "27": "Poale Sjon i Ceirej Sjon"
+   }
+  },
+  "63": {
+   "page": 120,
+   "title": "Powiaty: Wilno m., Wilno-Troki (wraz z pasem neutralnym)",
+   "districts": 126,
+   "inhabitants": 292356,
+   "entitled": 158280,
+   "cast": 105443,
+   "invalid_district": 750,
+   "invalid_constituency": 490,
+   "valid": 104953,
+   "lists": {
+    "1": 16555,
+    "2": 13064,
+    "3": 13991,
+    "4": 1397,
+    "5": 670,
+    "6": 2417,
+    "8": 32031,
+    "16": 12785,
+    "20": 3591,
+    "22": 6489,
+    "23": 1942,
+    "24": 21
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Polski Związek Ludowy „Odrodzenie”",
+    "24": "Zjednoczenie Białoruskich Bezpartyjnych Aktywistów i „Zielonego Dębu”"
+   }
+  },
+  "64": {
+   "page": 121,
+   "title": "Powiaty: Święciany, Brasław, Duniłowicze, Dzisna",
+   "districts": 217,
+   "inhabitants": 484586,
+   "entitled": 241249,
+   "cast": 124166,
+   "invalid_district": 1320,
+   "invalid_constituency": 1417,
+   "valid": 122749,
+   "lists": {
+    "1": 5140,
+    "3": 58092,
+    "6": 4124,
+    "12": 11111,
+    "16": 37635,
+    "20": 3342,
+    "22": 1160,
+    "23": 2145
+   },
+   "footnotes": [],
+   "local_names": {
+    "23": "Polski Związek Ludowy „Odrodzenie”"
+   }
+  }
+ }
+}
