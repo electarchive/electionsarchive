@@ -19,7 +19,11 @@ URL_1968 = (
     "https://www.gvoon.de/art/dokumente/1969/verfassung-ddr-dokumente-kommentar-1969-band-1/pdf/"
     "verfassung-ddr-dokumente-kommentar-1969-band-1-seite_191.pdf"
 )
-D1951, D1951_END, D1968 = date(1951, 6, 3), date(1951, 6, 6), date(1968, 4, 6)
+URL_1946 = (
+    "https://www.gvoon.de/art/dokumente/1956/statistisches-jahrbuch-ddr-1956-1/pdf/"
+    "statistisches-jahrbuch-ddr-1956-1-seite_135.pdf"
+)
+D1946, D1951, D1951_END, D1968 = date(1946, 6, 30), date(1951, 6, 3), date(1951, 6, 6), date(1968, 4, 6)
 VOTES, REGISTERED, CAST, VALID, INVALID, VOTE_SHARE = 1, 2, 3, 4, 5, 13
 SHARE_ONLY = 4
 SYSTEM = (
@@ -59,6 +63,28 @@ NOTE_1968 = (
     "and the Bezirke add up to the republic. The commission counted 94.49 percent of those entitled to vote as "
     "Yes. Under the enabling law the constitution passed if a majority of those entitled to vote approved it."
 )
+SYSTEM_1946 = (
+    "A vote of everyone entitled to vote in the Land Sachsen, then in the Soviet occupation zone, on a law the Land's "
+    "administration put to them. The ballot offered a Yes and a No."
+)
+NOTE_1946 = (
+    "Volksentscheid of 30 June 1946 in the Land Sachsen on the law transferring the enterprises of war and Nazi "
+    "criminals to the people, as the Statistisches Jahrbuch der Deutschen Demokratischen Republik 1956 prints it "
+    "(page 135, table VII.1). The table gives the number of citizens entitled to vote and, for each part, the "
+    "turnout, the shares of valid and invalid ballots, and the shares of Yes and No in the valid ballots, as "
+    "percentages. The Yes and No counts are not printed, so the archive stores the shares as printed and does not "
+    "derive counts from them. For the Land: 3,693,511 entitled to vote, a turnout of 93.71 percent, 94.18 percent "
+    "of the ballots valid, and 82.42 percent Yes. The table also prints the urban districts together (Stadtkreise: "
+    "1,172,636 entitled, 91.58 percent turnout, 94.75 percent valid, 81.36 percent Yes) and the rural districts "
+    "together (Landkreise: 2,520,875 entitled, 94.70 percent turnout, 93.92 percent valid, 82.90 percent Yes); these "
+    "two groups are not areas and are not stored as units."
+)
+# Entitled to vote, turnout, valid share of the ballots cast, Yes and No shares of the valid ballots.
+SACHSEN_1946 = {
+    "Stadtkreise": (1172636, 91.58, 94.75, 81.36, 18.64),
+    "Landkreise": (2520875, 94.70, 93.92, 82.90, 17.10),
+    "SN": (3693511, 93.71, 94.18, 82.42, 17.58),
+}
 LANDS = {
     "BB": ("Brandenburg", "Brandenburg"),
     "MV": ("Mecklenburg", "Mecklenburg"),
@@ -138,9 +164,28 @@ def check() -> None:
                 raise ValueError(f"1951 {code}: the shares do not add up to 100")
     if ALL_1951["DDR"][0] != ADULTS_1951["DDR"][0] + YOUTH_1951["DDR"][0]:
         raise ValueError("1951: the age groups do not add up to all citizens")
+    parts = [row for code, row in SACHSEN_1946.items() if code != "SN"]
+    land = SACHSEN_1946["SN"]
+    for code, (_, turnout, valid, yes, no) in SACHSEN_1946.items():
+        if abs(yes + no - 100) > 0.005 or not 0 < turnout <= 100 or not 0 < valid <= 100:
+            raise ValueError(f"1946 {code}: the shares do not add up")
+    if sum(row[0] for row in parts) != land[0]:
+        raise ValueError("1946: the Stadtkreise and Landkreise do not add up to the Land")
+    # The groups' shares, weighted by the counts they imply, give the Land's shares to within rounding.
+    cast = sum(row[0] * row[1] / 100 for row in parts)
+    valid = sum(row[0] * row[1] / 100 * row[2] / 100 for row in parts)
+    yes = sum(row[0] * row[1] / 100 * row[2] / 100 * row[3] / 100 for row in parts)
+    for label, implied, printed in (
+        ("turnout", 100 * cast / land[0], land[1]),
+        ("valid", 100 * valid / cast, land[2]),
+        ("Yes", 100 * yes / valid, land[3]),
+    ):
+        if abs(implied - printed) > 0.01:
+            raise ValueError(f"1946: the groups give a {label} share of {implied:.3f}, the Land {printed}")
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, URL_1946, suffix=".pdf")
     raw.fetch(SOURCE, URL_1951, suffix=".pdf")
     raw.fetch(SOURCE, URL_1968, suffix=".pdf")
 
@@ -156,7 +201,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="GDR plebiscites: the 1951 Volksbefragung by Land and the 1968 constitutional Volksentscheid by Bezirk",
+            summary="GDR plebiscites: the 1946 Saxony Volksentscheid, the 1951 Volksbefragung by Land, and the 1968 "
+            "constitutional Volksentscheid by Bezirk",
             polity="DE",
         )
 
@@ -193,6 +239,11 @@ def emit() -> Path:
         cs.add("electoral_system", id=system, polity_id=germany, rules={"formula": "referendum"}, rules_version=1)
         name(system, "GDR plebiscites")
         cs.add("note", entity_id=system, kind="methodology", body_md=SYSTEM)
+        saxony = cs.polity("DE-SN")
+        system_1946 = cs.key("de.electoral_system", "sachsen-volksentscheid-1946")
+        cs.add("electoral_system", id=system_1946, polity_id=saxony, rules={"formula": "referendum"}, rules_version=1)
+        name(system_1946, "Saxony referendum of 1946")
+        cs.add("note", entity_id=system_1946, kind="methodology", body_md=SYSTEM_1946)
 
         def add_source(publisher: str, title: str, url: str, notes: str) -> UUID:
             source = cs.source(publisher, title)
@@ -224,15 +275,24 @@ def emit() -> Path:
             "Printed on page 191 of Die Verfassung der Deutschen Demokratischen Republik: Dokumente, Kommentar, "
             "volume 1 (Staatsverlag der DDR, 1969); a scan hosted by gvoon.de.",
         )
+        yearbook_1956 = add_source(
+            "Staatliche Zentralverwaltung für Statistik",
+            "Statistisches Jahrbuch der Deutschen Demokratischen Republik 1956",
+            URL_1946,
+            "VII. Wahlen und Volksvertretungen, table 1: Volksentscheid im Land Sachsen am 30. Juni 1946, printed "
+            "page 135; a scan of the yearbook hosted by gvoon.de.",
+        )
 
         values: list[tuple[str, str, str | None, int, float, int]] = []
 
-        def election_for(start: date, end: date, english: str, german: str, key: str) -> tuple[UUID, str]:
+        def election_for(
+            start: date, end: date, english: str, german: str, key: str, polity: UUID = germany, slug: str = ""
+        ) -> tuple[UUID, str]:
             election = cs.key("de.election", f"{start}:{key}")
             cs.add(
                 "election",
                 id=election,
-                polity_id=germany,
+                polity_id=polity,
                 kind="referendum",
                 date_from=start,
                 date_to=end,
@@ -240,7 +300,7 @@ def emit() -> Path:
             )
             name(election, english)
             name(election, german, "de", "native")
-            path = f"de/{start}-{key}"
+            path = slug or f"de/{start}-{key}"
             cs.add("slug", path=path, entity_id=election)
             return election, path
 
@@ -255,6 +315,7 @@ def emit() -> Path:
             text_de: str | None,
             url: str,
             source: UUID,
+            rules: UUID = system,
         ) -> tuple[UUID, UUID, UUID]:
             contest = cs.key("de.contest", key)
             cs.add(
@@ -262,7 +323,7 @@ def emit() -> Path:
                 id=contest,
                 election_id=election,
                 kind="ballot_question",
-                electoral_system_id=system,
+                electoral_system_id=rules,
                 round_number=1,
                 default_result_kind="counted",
             )
@@ -315,6 +376,35 @@ def emit() -> Path:
             cs.add("outcome", result_set_id=result_set, option_id=outcome[0], kind="won")
             cs.add("outcome", result_set_id=result_set, option_id=outcome[1], kind="lost")
             return result_set
+
+        election, path = election_for(
+            D1946,
+            D1946,
+            "June 1946 Saxony referendum on expropriating war and Nazi criminals",
+            "Volksentscheid in Sachsen 1946",
+            "volksentscheid-sachsen",
+            saxony,
+            f"de/sn/{D1946}-volksentscheid",
+        )
+        contest, yes, no = contest_for(
+            election,
+            path,
+            f"{D1946}:volksentscheid-sachsen",
+            "Transfer of the enterprises of war and Nazi criminals to the people",
+            "Gesetz zur Übergabe von Betrieben der Kriegs- und Naziverbrecher an das Volk",
+            "referendum",
+            None,
+            None,
+            URL_1946,
+            yearbook_1956,
+            system_1946,
+        )
+        result_set = result_set_for(election, contest, f"{D1946}:sachsen", yearbook_1956, True, NOTE_1946, (yes, no))
+        registered, _, _, yes_share, no_share = SACHSEN_1946["SN"]
+        row = (str(result_set), str(lands["SN"]))
+        values.append((*row, None, REGISTERED, registered, 0))
+        values.append((*row, str(yes), VOTE_SHARE, yes_share, SHARE_ONLY))
+        values.append((*row, str(no), VOTE_SHARE, no_share, SHARE_ONLY))
 
         election, path = election_for(
             D1951,
