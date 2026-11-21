@@ -10,7 +10,8 @@ from uuid import UUID, uuid5
 import polars as pl
 
 from ea import raw
-from ea.changeset import NAMESPACE, Changeset, slug
+from ea.changeset import NAMESPACE, slug
+from ea.package import Draft
 from ea.sources.fr.names import head_parts, person_name
 from ea.store import DATA, connect
 
@@ -103,6 +104,13 @@ FIELDS = {
     "Sièges": "seats",
 }
 OVERSEAS = {"ZA": "971", "ZB": "972", "ZC": "973", "ZD": "974"}
+ELUS_LABEL = 25
+ELUS = {
+    2004: FILES[2004, 1, "region"][0],
+    2010: FILES[2010, 1, "region"][0],
+    2015: FILES[2015, 2, "region"][0],
+    2017: CORSE_FILES[2],
+}
 TOTALS = {
     "Inscrits": "registered",
     "Votants": "voters",
@@ -323,6 +331,50 @@ def read_corse() -> tuple[list[dict[str, object]], list[dict[str, object]]]:
     return totals, lists
 
 
+def read_elus(year: int) -> list[dict[str, object]]:
+    """The councillors each list won, from the Elus sheet: the list, its section (the département, or one of the
+    sections of Martinique and French Guiana from 2015), the place on the section's list, and the name as printed."""
+    frame = pl.read_excel(
+        raw.cached(SOURCE, ELUS[year]).path,
+        sheet_name="Elus",
+        engine="calamine",
+        has_header=False,
+        infer_schema_length=0,
+    )
+    rows = [list(row) for row in frame.iter_rows()]
+    start = next(i for i, row in enumerate(rows) if "Désignation" in row)
+    header = [str(cell).strip() if cell is not None else "" for cell in rows[start]]
+    section = next((field for field in ("Dpt", "Sect._Elec.") if field in header), None)
+    found: list[dict[str, object]] = []
+    for row in rows[start + 1 :]:
+        cells = dict(zip(header, row, strict=False))
+        if cells["Désignation"] is None:
+            continue
+        civility, printed = str(cells["Désignation"]).strip().split(" ", 1)
+        if civility not in ("M.", "Mme"):
+            raise ValueError(f"{year} Elus: no civility in {cells['Désignation']!r}")
+        position = int(str(cells["N°_candidat"]))
+        code = "94" if year == 2017 else code_of(cells["Région"])
+        part = None if section is None or cells[section] is None else code_of(cells[section])
+        born = cells.get("Né(e)_le")
+        found.append(
+            {
+                "year": year,
+                "region": code,
+                "section": OVERSEAS.get(part, part) if part else None,
+                "list": " ".join(str(cells["Libellé_de_la_liste"]).split()),
+                "position": position,
+                "name": " ".join(printed.split()),
+                "gender": "male" if civility == "M." else "female",
+                "head": cells["Tête de liste"] == "O" if "Tête de liste" in cells else position == 1,
+                "incumbent": cells["Sortant"] == "O",
+                "round": int(str(cells["Tour"])),
+                "born": None if born is None else date.fromisoformat(str(born)[:10]),
+            }
+        )
+    return found
+
+
 def parse() -> None:
     totals: list[dict[str, object]] = []
     lists: list[dict[str, object]] = []
@@ -334,9 +386,11 @@ def parse() -> None:
     found_totals, found_lists = read_corse()
     totals += found_totals
     lists += found_lists
+    elus = [row for year in ELUS for row in read_elus(year)]
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(totals, infer_schema_length=None).write_parquet(PARSED / "totals.parquet")
     pl.DataFrame(lists, infer_schema_length=None).write_parquet(PARSED / "lists.parquet")
+    pl.DataFrame(elus, infer_schema_length=None).write_parquet(PARSED / "elus.parquet")
 
 
 OLD_REGIONS = {
@@ -730,6 +784,12 @@ METHOD = (
     "Results by region from the Interior Ministry's results file. The ministry's figures by département, loaded "
     "as a second result set, add up exactly to these totals."
 )
+METHOD_ELUS = (
+    "The councillors each list elected come from the ministry's list of those elected (the Elus sheet of the same "
+    "file), with each one's sex, whether they sat in the outgoing council, and, from 2015, their birth date. Outside "
+    "Corsica, lists were divided into sections, one for each département (from 2015, the sections of Martinique and "
+    "French Guiana), so a councillor's list position is their place on their section's list."
+)
 METHOD_1998 = (
     "Votes by list from the Interior Ministry's 1998 results file by département. Heads of list come from the "
     "Sciences Po CDSP file of the same results by constituency, matched to each list by its votes in the département."
@@ -787,14 +847,15 @@ def emit() -> Path:
     totals = pl.read_parquet(PARSED / "totals.parquet")
     lists = pl.read_parquet(PARSED / "lists.parquet")
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary=(
                 "French regional elections of 1998 by département constituency, and of 2004, 2010, 2015, and 2021, "
                 "and the Corsican territorial election of 2017, both rounds, by region and by département with each "
-                "list's seats, from the Interior Ministry's results files"
+                "list's seats, and the councillors elected in 2004, 2010, 2015, and 2017, from the Interior Ministry's "
+                "results files"
             ),
             polity="FR",
         )
@@ -965,16 +1026,38 @@ def emit() -> Path:
             ).fetchall()
         }
 
+        people: dict[UUID, dict[str, object]] = {}
+
         def person_for(head: str) -> UUID:
             forename, surname = head_name(head)
             key = slug(f"{surname} {forename or ''}")
             if key not in persons:
                 persons[key] = cs.key(f"{SOURCE}.person", key)
                 if persons[key] in cs.minted:
-                    cs.add("person", id=persons[key])
+                    people[persons[key]] = {}
             if persons[key] in cs.minted or persons[key] in owned:
                 spellings[persons[key]] = person_name(*head_parts(head))
             return persons[key]
+
+        def describe(person: UUID, member: Mapping[str, object]) -> None:
+            """Give a person the sex and birth date the Elus sheet prints, unless another sheet disagrees. A person
+            whose row another pipeline has since rewritten, such as a matcher or a source of birth dates, keeps it."""
+            if person not in people or person in cs.own_entities and person not in owned:
+                return
+            facts = people[person]
+            found = {"gender": member["gender"]}
+            if member["born"] is not None:
+                found |= {"birth_date": member["born"], "birth_precision": "day"}
+            for field, value in found.items():
+                if facts.get(field, value) != value:
+                    raise ValueError(f"{person}: the Elus sheets disagree on {field}")
+                facts[field] = value
+
+        elus = pl.read_parquet(PARSED / "elus.parquet")
+        elected: dict[tuple[int, str], dict[str, list[dict[str, object]]]] = {}
+        for member in elus.iter_rows(named=True):
+            region = elected.setdefault((int(member["year"]), str(member["region"])), {})
+            region.setdefault(str(member["list"]), []).append(member)
 
         bodies: dict[str, UUID] = {}
         sizes: dict[str, list[tuple[int, date]]] = {}
@@ -1238,6 +1321,8 @@ def emit() -> Path:
                             mismatched.append(f"{year} {code} {label}: declared {declared}, computed {computed}")
                     options: dict[tuple[str | None, str | None], UUID] = {}
                     outcomes: list[tuple[UUID, str, int | None]] = []
+                    chosen: list[tuple[UUID, UUID]] = []
+                    sheet = elected.pop((year, code), None) if round_ == decisive else None
                     next_heads = set(rows[2]["head"].drop_nulls()) if round_ == 1 and 2 in held else set()
                     for entry in entries.iter_rows(named=True):
                         order = str(entry["order"])
@@ -1259,17 +1344,72 @@ def emit() -> Path:
                         if entry["long"] and entry["short"] and entry["long"] != entry["short"]:
                             name(option, entry["short"], "fr", "short")
                         head = str(entry["head"])
+                        head_person = person_for(head)
+                        head_candidacy = cs.key(f"{SOURCE}.candidacy", f"{contest_key}:{order}")
+                        labels_of = {" ".join(str(entry[field]).split()) for field in ("short", "long") if entry[field]}
+                        # The Elus sheet cuts a list's name to 25 characters, as the results sheets do its short name.
+                        matched = [
+                            label
+                            for label in sheet or {}
+                            if label in labels_of
+                            or len(label) == ELUS_LABEL
+                            and any(text.startswith(label) for text in labels_of)
+                        ]
+                        won_by = [member for label in matched for member in (sheet or {}).pop(label)]
+                        if len(won_by) != int(entry["seats"] or 0) and sheet is not None:
+                            raise ValueError(
+                                f"{contest_key} {entry['short']}: {len(won_by)} elected, {entry['seats']} seats"
+                            )
+                        heading = [member for member in won_by if member["head"]]
+                        if (
+                            len(heading) > 1
+                            or heading
+                            and slug(person_name(*head_parts(str(heading[0]["name"]))))
+                            != slug(person_name(*head_parts(head)))
+                        ):
+                            raise ValueError(f"{contest_key} {entry['short']}: the Elus sheet's head is not {head}")
                         cs.add(
                             "candidacy",
-                            id=cs.key(f"{SOURCE}.candidacy", f"{contest_key}:{order}"),
-                            person_id=person_for(head),
+                            id=head_candidacy,
+                            person_id=head_person,
                             option_id=option,
                             role="head",
                             list_position=1,
                             ballot_name=head,
                             member_of_party_id=None,
                             is_independent=False,
+                            is_incumbent=bool(heading[0]["incumbent"]) if heading else None,
                         )
+                        for member in won_by:
+                            if member["head"]:
+                                describe(head_person, member)
+                                chosen.append((option, head_candidacy))
+                                continue
+                            printed = str(member["name"])
+                            forename, surname = head_parts(printed)
+                            person = cs.key(f"{SOURCE}.person", f"{year}:{code}:{slug(f'{surname} {forename or ""}')}")
+                            if person in cs.minted:
+                                people.setdefault(person, {})
+                                # The 2004 sheet gives a married woman's birth name after "NÉE".
+                                spellings[person] = re.sub(r"\bNée\b", "née", person_name(forename, surname))
+                                describe(person, member)
+                            section = member["section"] or "-"
+                            candidacy = cs.key(
+                                f"{SOURCE}.candidacy", f"{contest_key}:{order}:{section}:{member['position']}"
+                            )
+                            cs.add(
+                                "candidacy",
+                                id=candidacy,
+                                person_id=person,
+                                option_id=option,
+                                role="list_member",
+                                list_position=member["position"],
+                                ballot_name=printed,
+                                member_of_party_id=None,
+                                is_independent=False,
+                                is_incumbent=bool(member["incumbent"]),
+                            )
+                            chosen.append((option, candidacy))
                         if round_ == decisive:
                             won = declared[order]
                             outcomes.append((option, "won" if won else "lost", won or None))
@@ -1281,6 +1421,8 @@ def emit() -> Path:
                             outcomes.append((option, "eliminated", None))
                         if round_ == 1:
                             round_one_heads.add(head)
+                    if sheet:
+                        raise ValueError(f"{contest_key}: Elus lists {sorted(sheet)} match no list")
                     for level, default in (("region", True), ("departement", False)):
                         result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:{level}")
                         cs.add(
@@ -1296,9 +1438,18 @@ def emit() -> Path:
                             completeness=1,
                         )
                         if default:
-                            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
+                            method = f"{METHOD} {METHOD_ELUS}" if chosen else METHOD
+                            cs.add("note", entity_id=result_set, kind="methodology", body_md=method)
                             if round_ != decisive:
                                 cs.add("note", entity_id=result_set, kind="context", body_md=ROUND_ONE_NOTE)
+                            for option, candidacy in chosen:
+                                cs.add(
+                                    "outcome",
+                                    result_set_id=result_set,
+                                    option_id=option,
+                                    candidacy_id=candidacy,
+                                    kind="elected",
+                                )
                         for option, kind, won in outcomes:
                             cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=won)
                         if level == "region":
@@ -1355,6 +1506,11 @@ def emit() -> Path:
                                 )
         if mismatched:
             raise ValueError("seat allocation does not match:\n" + "\n".join(mismatched))
+        if elected:
+            raise ValueError(f"Elus sheets for {sorted(elected)} match no decisive round")
+        for person, facts in people.items():
+            if person not in cs.own_entities or person in owned:
+                cs.add("person", id=person, **facts)
         for body_key, history in sizes.items():
             if body_key == "94":
                 history = [item for item in history if item[1].year != 2021]
