@@ -8,8 +8,6 @@ ballots, so each canton's contest holds the winner alone, as the 2014 contests d
 general election the archive already holds.
 """
 
-from uuid import uuid5
-
 from ea import package, raw
 from ea.package import Package
 from ea.sources.ec import atlas2009, cne, cne2014
@@ -60,8 +58,17 @@ def build() -> Package:
     # the country, the 2009 general election, the mayoralty, and the cantons are production's rows
     p.external.update([ECUADOR, election, "ec.canton", cne.MAYORALTY])
     atlas = cne.artifact(atlas2009.ATLAS)
-    p.uses(atlas)
-    artifact_id = str(uuid5(package.NAMESPACE, f"source_artifact\x1f{ATLAS_SOURCE}\x1f{atlas.storage_key}"))
+    p.add(
+        "source",
+        id=ATLAS_SOURCE,
+        kind="official_body",
+        publisher="Consejo Nacional Electoral del Ecuador",
+        title="Atlas Electoral del Ecuador 2009-2014",
+        url=atlas2009.ATLAS,
+        license="Official publication; reuse terms are not stated",
+        attribution="Consejo Nacional Electoral del Ecuador",
+    )
+    artifact_id = p.artifact(atlas, ATLAS_SOURCE)
     base = f"ec/{DAY}-general"
     pages: dict[int, str] = {}
     for page in atlas2009.MAYOR_PAGES_2009:
