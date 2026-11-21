@@ -8,6 +8,7 @@ votes, the ballot-equivalent (weighted) votes, and the seats. Each Landkreis is 
 import re
 import subprocess
 from datetime import date
+from collections.abc import Callable
 from functools import cache
 from typing import NamedTuple
 
@@ -73,6 +74,9 @@ class Row(NamedTuple):
     votes: int | None
     ballots: int | None
     seats: int | None
+    group: bool = False
+
+
 
 
 class Kreis(NamedTuple):
@@ -83,6 +87,7 @@ class Kreis(NamedTuple):
     invalid: int
     seats: int
     rows: list[Row]
+    valid: int | None = None
 
 
 def number(token: str) -> int | None:
@@ -182,6 +187,8 @@ def short(name: str) -> str:
 
 def fetch() -> None:
     raw.fetch(SOURCE, BY_FINAL, suffix=".pdf")
+    for land in lands():
+        land.fetch()
 
 
 def registry() -> Package:
@@ -374,13 +381,254 @@ def election() -> Package:
 
 
 def packages() -> list[str]:
-    return [f"{SOURCE}/registry-by", f"{SOURCE}/by-2026"]
+    keys = [f"{SOURCE}/registry-by", f"{SOURCE}/by-2026"]
+    for land in lands():
+        keys.append(f"{SOURCE}/registry-{land.key}")
+        keys.extend(f"{SOURCE}/{land.key}-{e.year}" for e in land.editions())
+    return keys
 
 
 def parse() -> None:
     registry().write()
     election().write()
+    for land in lands():
+        land_registry(land).write()
+        for edition in land.editions():
+            land_election(land, edition).write()
 
 
 def emit() -> None:
     package.run("load", packages())
+
+
+class Edition(NamedTuple):
+    """One Kreistag election of a Land: the day, the source files it was read from, and its results per Kreis."""
+
+    year: int
+    day: date
+    page: str
+    title: str
+    files: list[str]
+    kreise: Callable[[], dict[str, Kreis]]
+    formula: str | None = None
+    note: str = ""
+
+
+class Land(NamedTuple):
+    key: str
+    polity: str
+    name: str
+    publisher: str
+    license: str
+    license_url: str | None
+    editions: Callable[[], list[Edition]]
+    fetch: Callable[[], None]
+    methodology: str = ""
+
+
+def lands() -> list[Land]:
+    from ea.sources.de import kreistag_ni, kreistag_nw, kreistag_sh
+
+    return [kreistag_nw.LAND, kreistag_ni.LAND, kreistag_sh.LAND]
+
+
+def land_party_key(land: Land, ags: str, row: Row) -> str:
+    return f"{land.key}:{ags}:{row.label.casefold()}" if row.group else f"{land.key}:{row.label.casefold()}"
+
+
+def land_pool(land: Land) -> dict[str, Kreis]:
+    """Every Kreis that held a Kreistag election in any edition, with its latest name."""
+    pool: dict[str, Kreis] = {}
+    for edition in sorted(land.editions(), key=lambda e: e.year):
+        pool |= edition.kreise()
+    return pool
+
+
+def land_registry(land: Land) -> Package:
+    pool = land_pool(land)
+    known = areas()
+    p = Package(
+        f"{SOURCE}/registry-{land.key}",
+        SOURCE,
+        f"The Kreise of {land.name} as county polities with their Kreistage, and the nominations of their Kreistag elections",
+    )
+    p.external |= {GERMANY, land.polity, *(known[ags] for ags in pool)}
+    scheme = f"{SCHEME}.{land.key}"
+    p.add("scheme", code=scheme, polity_id=land.polity, kind="electoral_district", rank=1, noun="Kreis electorate")
+    for edition in land.editions():
+        source = p.id("source", land.key, edition.year)
+        p.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=land.publisher,
+            title=edition.title,
+            url=edition.page,
+            license=land.license,
+            license_url=land.license_url,
+            attribution=land.publisher,
+        )
+        for url in edition.files:
+            p.artifact(raw.cached(SOURCE, url), source)
+        if edition.formula:
+            system = p.id("electoral_system", land.key, edition.year, edition.formula)
+            p.add(
+                "electoral_system",
+                id=system,
+                polity_id=land.polity,
+                valid_from=edition.day,
+                valid_to=edition.day,
+                rules={"formula": edition.formula},
+                rules_version=1,
+            )
+    for ags, kreis in sorted(pool.items()):
+        polity = p.id("polity", ags)
+        p.add("polity", id=polity, kind="county", iso_code=None)
+        p.add("polity_parent", polity_id=polity, parent_id=land.polity, valid_from=None, valid_to=None)
+        p.add("polity_territory", polity_id=polity, area_id=known[ags], valid_from=None, valid_to=None)
+        p.name(polity, kreis.name, "de", "official")
+        body = p.id("body", ags)
+        p.add("body", id=body, polity_id=polity, kind="council")
+        p.name(body, f"Kreistag {kreis.name}", "de", "official")
+    seen: dict[str, tuple[str, str]] = {}
+    for edition in land.editions():
+        for ags, kreis in edition.kreise().items():
+            for row in kreis.rows:
+                key = land_party_key(land, ags, row)
+                seen.setdefault(key, (row.label, "independent_group" if row.group else "party"))
+    for key, (label, kind) in sorted(seen.items()):
+        id = p.id("party", key)
+        p.add("party", id=id, kind=kind, polity_id=land.polity)
+        p.add("external_id", entity_id=id, scheme="de.kreistag.group", value=key)
+        p.name(id, label, "de", "official")
+    return p
+
+
+def land_election(land: Land, edition: Edition) -> Package:
+    pool = edition.kreise()
+    known = areas()
+    p = Package(
+        f"{SOURCE}/{land.key}-{edition.year}",
+        SOURCE,
+        f"The Kreistag elections of {edition.day:%B} {edition.day.day}, {edition.year} in {land.name}, one contest per Kreis",
+        depends=[f"{SOURCE}/registry-{land.key}"],
+    )
+    p.external |= {GERMANY, land.polity}
+    p.external |= {known[ags] for ags in pool}
+    p.external |= {p.id("polity", ags) for ags in pool}
+    p.external |= {p.id("body", ags) for ags in pool}
+    p.external.add(p.id("source", land.key, edition.year))
+    system = p.id("electoral_system", land.key, edition.year, edition.formula) if edition.formula else None
+    if system:
+        p.external.add(system)
+    p.external |= {p.id("party", land_party_key(land, ags, row)) for ags, k in pool.items() for row in k.rows}
+    for url in edition.files:
+        p.uses(raw.cached(SOURCE, url))
+    source = p.id("source", land.key, edition.year)
+    scheme = f"{SCHEME}.{land.key}"
+    election_id = p.id("election", land.key, edition.year)
+    day = edition.day
+    p.add("election", id=election_id, polity_id=land.polity, kind="local", date_from=day, date_to=day, status="held")
+    p.name(election_id, f"{day:%B} {day.day}, {day.year} {land.name} district council (Kreistag) elections", "en", "official")
+    p.name(election_id, f"Kreistagswahlen in {land.name} am {day:%d.%m.%Y}", "de", "native", False)
+    path = f"de/{day}-{slug(land.name)}-kreistagswahlen"
+    p.add("slug", path=path, entity_id=election_id, is_current=True)
+    for ags, kreis in sorted(pool.items()):
+        name = kreis.name
+        contest = p.id("contest", edition.year, ags)
+        unit = p.id("unit", edition.year, ags)
+        result_set = p.id("result_set", edition.year, ags)
+        body = p.id("body", ags)
+        p.add(
+            "contest",
+            id=contest,
+            election_id=election_id,
+            kind="list_allocation",
+            body_id=body,
+            district_area_id=known[ags],
+            magnitude=kreis.seats,
+            round_number=1,
+            electoral_system_id=system,
+            default_result_kind="counted",
+        )
+        p.name(contest, f"{day.year} {name} Kreistag election", "en", "official")
+        p.name(contest, f"Kreistagswahl {name} {day.year}", "de", "native", False)
+        p.add("slug", path=f"{path}/{slug(name)}-{ags[2:]}", entity_id=contest, is_current=True)
+        p.add("body_size", body_id=body, seats=kreis.seats, valid_from=day, valid_to=None)
+        p.add(
+            "reporting_unit",
+            id=unit,
+            polity_id=p.id("polity", ags),
+            scheme_code=scheme,
+            code=f"{day}:{ags}",
+            area_relation="equals",
+            area_id=known[ags],
+            kind="standard",
+        )
+        p.add(
+            "result_set",
+            id=result_set,
+            election_id=election_id,
+            contest_id=contest,
+            stage="official",
+            kind="counted",
+            source_id=source,
+            status="active",
+            is_default=True,
+            completeness=1.0,
+        )
+        if edition.note:
+            p.add("note", id=p.id("note", result_set), entity_id=result_set, kind="methodology", body_md=edition.note, lang="en")
+        figures = ((2, kreis.registered), (3, kreis.voters), (5, kreis.invalid), (4, kreis.valid))
+        for measure, value in figures:
+            if value is None:
+                continue
+            p.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=unit,
+                option_id=None,
+                channel=0,
+                measure=measure,
+                count_round=0,
+                flags=0,
+                value=value,
+            )
+        ranked = sorted(kreis.rows, key=lambda r: (-(r.votes or 0), -(r.seats or 0), r.label))
+        for position, row in enumerate(ranked, start=1):
+            option = p.id("option", edition.year, ags, row.label)
+            p.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="list",
+                party_id=p.id("party", land_party_key(land, ags, row)),
+                ballot_position=position,
+                ballot_label=row.label,
+            )
+            if row.votes is not None:
+                p.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=option,
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    flags=0,
+                    value=row.votes,
+                )
+            if row.seats:
+                p.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=row.seats)
+                p.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=option,
+                    channel=0,
+                    measure=16,
+                    count_round=0,
+                    flags=0,
+                    value=row.seats,
+                )
+    return p
