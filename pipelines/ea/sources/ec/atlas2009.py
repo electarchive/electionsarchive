@@ -56,11 +56,15 @@ MAYOR_PAGES = {
     240: "Tungurahua",
     242: "Zamora Chinchipe",
 }
+# the page of each province's 2009 mayor table, the page before its 2014 table (Guayas's table is two pages ahead)
+MAYOR_PAGES_2009 = {page - (2 if page == 213 else 1): province for page, province in MAYOR_PAGES.items()}
 DPI = 300
 IMAGE_DPI = 150  # the page images stored for the site, at the atlas's own resolution
 ENV = {**os.environ, "OMP_THREAD_LIMIT": "1"}
 WINDOW = 600  # the shortest run of dark pixels that counts as a rule
 CORRECTIONS = Path(__file__).with_name("atlas2009_mayors.json")
+# the 2009 tables, whose every cell was read by eye from the page and entered here with the Council's canton code
+TABLES_2009 = Path(__file__).with_name("atlas2009_mayors_2009.json")
 
 type Box = tuple[int, int, int, int]
 
@@ -309,6 +313,49 @@ def reads(page: int) -> list[Read]:
 
 
 FIELDS = ("canton", "sigla", "name", "votes", "share")
+
+
+def mayors2009() -> list[Mayor]:
+    """The elected mayor of each canton in 2009, with the winner's votes and share of the valid votes.
+
+    The ruled tables are found on each page as for 2014, and ``atlas2009_mayors_2009.json`` holds for each row, by page
+    and row number, the Council's code for its canton and every cell as read by eye from the page. The rows found on a
+    page must be exactly those entered, and every figure must be shaped as the column prints it.
+    """
+    checked: dict[str, dict[str, object]] = json.loads(TABLES_2009.read_text(encoding="utf-8"))
+    result: list[Mayor] = []
+    for page, province in MAYOR_PAGES_2009.items():
+        image = render(page)
+        found = tables(image)
+        if len(found) != 1:
+            raise ValueError(f"page {page}: {len(found)} mayor tables")
+        table = found[0]
+        for i, (top, bottom) in enumerate(table.rows, 1):
+            key = f"{page}/{i}"
+            entry = checked.pop(key)
+            cells = entry["read"]
+            if not isinstance(cells, dict) or set(cells) != set(FIELDS):
+                raise TypeError(f"{key}: cells are not the five fields")
+            if not re.fullmatch(VOTES, cells["votes"]) or not re.fullmatch(SHARE, cells["share"]):
+                raise ValueError(f"mayor row {key} reads {cells}")
+            left, right = table.columns[3]
+            box = (left / image.width, top / image.height, right / image.width, bottom / image.height)
+            result.append(
+                Mayor(
+                    page,
+                    province,
+                    str(entry["code"]),
+                    cells["canton"],
+                    cells["sigla"],
+                    cells["name"],
+                    int(cells["votes"].replace(".", "")),
+                    cells["share"],
+                    box,
+                )
+            )
+    if checked:
+        raise ValueError(f"checked rows the tables do not have: {sorted(checked)}")
+    return result
 
 
 def mayors() -> list[Mayor]:
