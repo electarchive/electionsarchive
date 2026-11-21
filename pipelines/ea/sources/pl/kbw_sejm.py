@@ -7,15 +7,18 @@ from collections import Counter
 from datetime import date
 from pathlib import Path
 from typing import NamedTuple
-from uuid import UUID
+from uuid import UUID, uuid5
 
+import numpy as np
 import polars as pl
 import shapely
+from pyproj import Transformer
 
 from ea import package, raw
 from ea.changeset import slug
 from ea.names import display
-from ea.package import Draft
+from ea.package import NAMESPACE, Draft
+from ea.sources.pl import wojewodztwo_1975
 from ea.store import connect
 
 SOURCE = "pl.kbw_sejm"
@@ -23,7 +26,61 @@ KEY = f"{SOURCE}/all"
 VERSION = "1"
 SUMMARY = (
     "Sejm elections of 1991-2023 by constituency, gmina, and polling district, with committees, candidates, declared "
-    "seats, elected members, and the 2001 constituency outlines, from the Krajowe Biuro Wyborcze's data files"
+    "seats, elected members, and the constituency outlines of 1991, 1993, and 2001, from the Krajowe Biuro Wyborcze's "
+    "data files"
+)
+SCHEME = "pl.okreg_sejm"
+
+
+class Vintage(NamedTuple):
+    """A plan of Sejm constituencies, valid from the day the electoral act that drew it came into force to the day the
+    next one did (the Sejm's ELI service gives both dates)."""
+
+    valid_from: date
+    valid_to: date | None
+    as_of: date
+    act: str
+
+
+VINTAGES = {
+    "1991": Vintage(
+        date(1991, 7, 3),
+        date(1993, 6, 15),
+        date(1991, 10, 27),
+        "the Ordynacja wyborcza do Sejmu of 28 June 1991 (Dz.U. 1991 nr 59 poz. 252), in force from 3 July 1991 to "
+        "14 June 1993",
+    ),
+    "1993": Vintage(
+        date(1993, 6, 15),
+        date(2001, 5, 31),
+        date(1997, 9, 21),
+        "the Ordynacja wyborcza do Sejmu of 28 May 1993 (Dz.U. 1993 nr 45 poz. 205), in force from 15 June 1993 to "
+        "30 May 2001",
+    ),
+    "2001": Vintage(
+        date(2001, 5, 31),
+        None,
+        date(2023, 10, 15),
+        "the Ordynacja wyborcza do Sejmu i do Senatu of 12 April 2001 (Dz.U. 2001 nr 46 poz. 499), in force from 31 "
+        "May 2001, and the Kodeks wyborczy that kept its 41 constituencies",
+    ),
+}
+VINTAGE_OF = {1991: "1991", 1993: "1993", 1997: "1993"}
+# The voivodeships of 1975-1998 that the constituencies of 1991-1997 split: warszawskie into the city of Warsaw and
+# the rest, and katowickie into three.
+SPLIT = {1, 14}
+# Wesoła, a gmina of warszawskie outside the city until 2002, lies inside the 2005 outline of Warsaw; it is cut out
+# with the outline of Warsaw's district of that name (TERYT 1465158).
+WARSAW_2005, WESOLA_1997, WESOLA = "1465011", "01267", "1465158"
+# Gminas of the 2005 set made after September 1997, in a split voivodeship, with the gmina of 2005 they came from:
+# Radzionków left Bytom on 1 January 1998.
+SPLIT_FROM = {"2413031": "Bytom"}
+SLIVER = 10_000.0
+EARLY_NOTE = (
+    "The constituency is drawn as the union of the gminas it held, from the electoral commission's lists of polling "
+    "districts of 1991, 1993, and 1997, on the gmina outlines of the boundary register's earliest set, of 2005, as "
+    "the voivodeships of 1975 to 1998 are. Gmina boundary changes from 1991 to 2005 are not drawn. It is valid under "
+    "{act}."
 )
 PUBLISHER = "Krajowe Biuro Wyborcze"
 TITLE = "Dane wyborcze: wybory do Sejmu"
@@ -1536,6 +1593,7 @@ def build() -> Path:
             "not every valid vote cast.",
         )
         build_okregi(cs)
+        build_okregi_early(cs)
         # People of this pipeline whose row another pipeline has since written (a crosswalk match that added a
         # gender, say) keep that row.
         taken = {
@@ -1588,12 +1646,14 @@ def build_okregi(cs: Draft) -> None:
         raise ValueError(f"powiats without a shape: {sorted(missing)}")
     if set(shapes) - set(members["powiat"]):
         raise ValueError(f"powiats in no constituency: {sorted(set(shapes) - set(members['powiat']))}")
+    plan = VINTAGES["2001"]
     # An outline equal to the stored one keeps the stored bytes: a union can start its rings at another vertex.
     stored = {
         area: text
         for area, text in conn.execute(
             "select g.area_id, g.geom::text from area_geometry g join area a on a.id = g.area_id"
-            " where a.scheme_code = 'pl.okreg_sejm' and g.valid_from is null"
+            " where a.scheme_code = 'pl.okreg_sejm' and (g.valid_from is null or g.valid_from = %s)",
+            [plan.valid_from],
         ).fetchall()
     }
     for entry in districts.sort("district").iter_rows(named=True):
@@ -1603,10 +1663,15 @@ def build_okregi(cs: Draft) -> None:
         if len(regions) != 1:
             raise ValueError(f"constituency {number} spans voivodeships {sorted(regions)}")
         shape = shapely.set_srid(shapely.union_all([shapes[code] for code in parts], grid_size=1e-7), 4326)
-        area = cs.area("pl.okreg_sejm", str(number))
-        cs.add("area", id=area, scheme_code="pl.okreg_sejm")
-        cs.add("area_code", area_id=area, code=str(number), valid_from=None)
-        cs.add("area_parent", area_id=area, parent_id=cs.area("pl.wojewodztwo", regions.pop()), valid_from=None)
+        area = cs.area(SCHEME, str(number), plan.valid_from)
+        cs.add("area", id=area, scheme_code=SCHEME)
+        cs.add("area_code", area_id=area, code=str(number), valid_from=plan.valid_from)
+        cs.add(
+            "area_parent",
+            area_id=area,
+            parent_id=cs.area("pl.wojewodztwo", regions.pop()),
+            valid_from=plan.valid_from,
+        )
         for text, lang, kind in (
             (f"Okręg wyborczy nr {number} ({entry['seat']})", "pl", "official"),
             (f"Sejm constituency {number} ({entry['seat']})", "en", "english"),
@@ -1616,24 +1681,204 @@ def build_okregi(cs: Draft) -> None:
         cs.add(
             "area_geometry",
             area_id=area,
-            valid_from=None,
+            valid_from=plan.valid_from,
             geom=stored[area] if same else shapely.to_wkb(shape, hex=True, include_srid=True),
-            label_point=shapely.to_wkb(
-                shapely.set_srid(max(shapely.get_parts(shape), key=shapely.area).representative_point(), 4326),
-                hex=True,
-                include_srid=True,
-            ),
+            label_point=label(shape),
             quality="official",
             source_id=prg,
         )
+    boundary_set(cs, "2001")
+
+
+def label(shape: shapely.Geometry) -> str:
+    point = max(shapely.get_parts(shape), key=shapely.area).representative_point()
+    return shapely.to_wkb(shapely.set_srid(point, 4326), hex=True, include_srid=True)
+
+
+def boundary_set(cs: Draft, vintage: str) -> None:
+    """A vintage's boundary set keeps the id it has, so bounding its valid time updates it in place."""
+    plan = VINTAGES[vintage]
+    found = cs.conn.execute(
+        "select id from boundary_set where scheme_code = %s and vintage = %s", [SCHEME, vintage]
+    ).fetchone()
     cs.add(
         "boundary_set",
-        scheme_code="pl.okreg_sejm",
-        vintage="2001",
-        valid_from=None,
-        valid_to=None,
-        as_of=ELECTIONS[2023],
+        id=found[0] if found else uuid5(NAMESPACE, f"boundary_set\x1f{SCHEME}\x1f{vintage}"),
+        scheme_code=SCHEME,
+        vintage=vintage,
+        valid_from=plan.valid_from,
+        valid_to=plan.valid_to,
+        as_of=plan.as_of,
     )
+
+
+def early_area(vintage: str, number: int) -> UUID:
+    """A constituency of 1991-1997, with the id `Changeset.area` gives a code on the day its plan came into force."""
+    return uuid5(NAMESPACE, f"area:{SCHEME}@{VINTAGES[vintage].valid_from}\x1f{number}")
+
+
+def early_pieces(cs: Draft) -> list[tuple[shapely.Geometry, int, dict[int, int]]]:
+    """The gmina outlines of 2005 in EPSG:2180, each with its voivodeship of 1975-1998 and its constituency in 1991,
+    1993, and 1997.
+
+    A voivodeship that no constituency splits goes whole to the one constituency its polling districts report to. In
+    warszawskie and katowickie each gmina of 2005 takes the constituency of the gminas of the 1997 list it is drawn
+    from. The 1991 and 1993 lists use the same gmina codes; every code they share with 1997 reports to the
+    constituency that holds it in 1997 (1991 numbers them otherwise), and the few they lack were renamed or recoded
+    within one constituency (Skrzeszew, now Wieliszew; Tułowice, now Brochów; Pilica; Sośnicowice; Tąpkowice; and
+    the Warsaw districts of before 1994), so one split serves all three years."""
+    gminas = wojewodztwo_1975.gminas_1997()
+    names, shapes = wojewodztwo_1975.gminas_2005()
+    assigned, drawn = wojewodztwo_1975.matches(gminas, names, shapes)
+    reported = {
+        year: dict(
+            pl.read_parquet(PARSED / str(year) / "units.parquet")
+            .select("gmina", "district")
+            .unique()
+            .filter(pl.col("gmina").str.contains(r"^\d{5}$"))
+            .rows()
+        )
+        for year in VINTAGE_OF
+    }
+    if set(reported[1997]) != set(gminas):
+        raise ValueError("the 1997 polling districts and the 1997 gmina list hold different gminas")
+
+    def voivodeship(code: str) -> int:
+        return (int(code[:2]) + 1) // 2
+
+    whole: dict[int, dict[int, int]] = {}
+    link: dict[int, dict[int, int]] = {}
+    for year, districts in reported.items():
+        by_woj: dict[int, set[int]] = {}
+        for code, district in districts.items():
+            by_woj.setdefault(voivodeship(code), set()).add(district)
+        if {woj for woj, found in by_woj.items() if len(found) > 1} != SPLIT:
+            raise ValueError(f"{year}: constituencies split other voivodeships than {sorted(SPLIT)}")
+        whole[year] = {woj: min(found) for woj, found in by_woj.items() if woj not in SPLIT}
+        pairs = {
+            (reported[1997][code], district)
+            for code, district in districts.items()
+            if voivodeship(code) in SPLIT and code in reported[1997]
+        }
+        link[year] = dict(pairs)
+        if len(link[year]) != len(pairs) or len(set(link[year].values())) != len(pairs):
+            raise ValueError(f"{year}: the split voivodeships' gminas report otherwise than in 1997")
+        # Warsaw's districts of before 1994 share no code with its gminas of 1997, so the city's constituency is the
+        # one left on each side.
+        stray = {
+            district
+            for code, district in districts.items()
+            if voivodeship(code) in SPLIT and code not in reported[1997] and district not in link[year].values()
+        }
+        split = {district for code, district in reported[1997].items() if voivodeship(code) in SPLIT}
+        unlinked = split - set(link[year])
+        if len(stray) != len(unlinked) or len(stray) > 1:
+            raise ValueError(f"{year}: constituencies {sorted(stray)} match none of 1997's {sorted(unlinked)}")
+        link[year] |= dict(zip(unlinked, stray, strict=True))
+    sources: dict[str, list[str]] = {}
+    for old, new in drawn.items():
+        sources.setdefault(new, []).append(old)
+    by_name = {names[code]: code for code, woj in assigned.items() if woj in SPLIT}
+    for new, parent in SPLIT_FROM.items():
+        sources[new] = sources[by_name[parent]]
+    [(wesola,)] = cs.conn.execute(
+        "select ST_AsBinary(g.geom) from area a join area_code c on c.area_id = a.id"
+        " join area_geometry g on g.area_id = a.id where a.scheme_code = 'pl.dzielnica_warszawy' and c.code = %s",
+        [WESOLA],
+    ).fetchall()
+    project = Transformer.from_crs(4326, 2180, always_xy=True)
+    wesola = shapely.transform(
+        shapely.from_wkb(wesola), lambda xy: np.column_stack(project.transform(xy[:, 0], xy[:, 1]))
+    )
+    pieces: list[tuple[shapely.Geometry, int, dict[int, int]]] = []
+
+    def put(shape: shapely.Geometry, woj: int, district: int) -> None:
+        pieces.append(
+            (shape, woj, {year: link[year][district] if woj in SPLIT else whole[year][woj] for year in VINTAGE_OF})
+        )
+
+    for code, woj in sorted(assigned.items()):
+        if woj not in SPLIT:
+            put(shapes[code], woj, whole[1997][woj])
+            continue
+        if code == WARSAW_2005:
+            city = {reported[1997][old] for old in sources[code] if old != WESOLA_1997}
+            if len(city) != 1 or reported[1997][WESOLA_1997] in city:
+                raise ValueError(f"Warsaw's gminas report to constituencies {sorted(city)}")
+            put(polygons(shapely.difference(shapes[code], wesola)), woj, city.pop())
+            put(polygons(shapely.intersection(shapes[code], wesola)), woj, reported[1997][WESOLA_1997])
+            continue
+        found = {reported[1997][old] for old in sources[code]}
+        if len(found) != 1:
+            raise ValueError(f"{names[code]} ({code}) lies in constituencies {sorted(found)}")
+        put(shapes[code], woj, found.pop())
+    return pieces
+
+
+def polygons(shape: shapely.Geometry) -> shapely.MultiPolygon:
+    """The polygons of a cut of two outlines from different sets, without the slivers of under a hectare where their
+    lines part."""
+    parts = [part for part in shapely.get_parts(shape) if shapely.get_type_id(part) == 3 and part.area >= SLIVER]
+    if not parts:
+        raise ValueError("a cut outline holds no polygon")
+    return shapely.MultiPolygon(parts)
+
+
+def build_okregi_early(cs: Draft) -> None:
+    """The 37 constituencies of 1991 and the 52 of 1993 and 1997, each a union of gmina outlines."""
+    pieces = early_pieces(cs)
+    for vintage in ("1991", "1993"):
+        plan = VINTAGES[vintage]
+        year = min(year for year, of in VINTAGE_OF.items() if of == vintage)
+        districts = pl.read_parquet(PARSED / str(year) / "districts.parquet").sort("district")
+        groups: dict[int, list[shapely.Geometry]] = {}
+        regions: dict[int, set[int]] = {}
+        for shape, woj, district in pieces:
+            groups.setdefault(district[year], []).append(shape)
+            regions.setdefault(district[year], set()).add(woj)
+        if set(groups) != set(districts["district"]):
+            raise ValueError(f"{vintage}: outlines for constituencies {sorted(groups)}")
+        outlines = wojewodztwo_1975.cover(groups)
+        for entry in districts.iter_rows(named=True):
+            number = entry["district"]
+            area = early_area(vintage, number)
+            shape = outlines[number]
+            cs.add("area", id=area, scheme_code=SCHEME)
+            cs.add("area_code", area_id=area, code=str(number), valid_from=plan.valid_from, valid_to=plan.valid_to)
+            # A constituency within one voivodeship lies in it while the voivodeship lasts; one that joins several
+            # lies in the country.
+            woj = min(regions[number]) if len(regions[number]) == 1 else None
+            until = plan.valid_to or wojewodztwo_1975.UNTIL
+            cs.add(
+                "area_parent",
+                area_id=area,
+                parent_id=wojewodztwo_1975.COUNTRY if woj is None else wojewodztwo_1975.area(woj),
+                valid_from=plan.valid_from,
+                valid_to=until if woj is None else min(until, wojewodztwo_1975.UNTIL),
+            )
+            for text, lang, kind in (
+                (f"Okręg wyborczy nr {number} ({entry['seat']})", "pl", "official"),
+                (f"Sejm constituency {number} ({entry['seat']})", "en", "english"),
+            ):
+                cs.add("name", entity_id=area, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=plan.valid_from,
+                valid_to=plan.valid_to,
+                geom=shapely.to_wkb(shape, hex=True, include_srid=True),
+                label_point=label(shape),
+                quality="official",
+                source_id=wojewodztwo_1975.PRG_SOURCE,
+            )
+            note = EARLY_NOTE.format(act=plan.act)
+            if woj == 1:
+                note += (
+                    " Wesoła, a gmina of warszawskie outside the city until 2002, is cut from the 2005 outline of "
+                    "Warsaw along the boundary register's present outline of Warsaw's district of that name."
+                )
+            cs.add("note", entity_id=area, kind="caveat", body_md=note)
+        boundary_set(cs, vintage)
 
 
 def build_year(cs: Draft, year: int, written: set[UUID], taken: set[UUID]) -> None:
@@ -1843,18 +2088,22 @@ def build_year(cs: Draft, year: int, written: set[UUID], taken: set[UUID]) -> No
     values: list[tuple[str, str, str | None, int, int]] = []
     # A gmina unit equals the area whose 7-digit TERYT code starts with its 6 digits. Warsaw's 18 districts
     # (146502-146519) report as gminas but are areas of their own scheme, inside the gmina 1465011.
+    # A gmina whose type changed holds a dated code for each type, with the same prefix, so prefixes are matched to
+    # areas, not to codes.
     codes = conn.execute(
         "select c.code, a.id from area a join area_code c on c.area_id = a.id "
         "where a.scheme_code in ('pl.gmina', 'pl.dzielnica_warszawy')"
     ).fetchall()
-    areas = {code[:6]: area for code, area in codes}
-    counts = Counter(code[:6] for code, _ in codes)
+    areas: dict[str, set[UUID]] = {}
+    for code, area in codes:
+        areas.setdefault(code[:6], set()).add(area)
     gmina_units: dict[str, UUID] = {}
 
     def gmina_unit(code: str) -> UUID:
         if code not in gmina_units:
             unit = gmina_units[code] = cs.unit("pl.gmina", code)
-            area = areas.get(code) if counts[code] == 1 else None
+            found = areas.get(code, set())
+            area = min(found) if len(found) == 1 else None
             unit_rows[unit] = {
                 "scheme_code": "pl.gmina",
                 "code": code,
@@ -1929,13 +2178,16 @@ def build_year(cs: Draft, year: int, written: set[UUID], taken: set[UUID]) -> No
                 alliance_id=None if bloc is None else blocs[bloc],
                 ballot_label=" ".join(row["committee"].split()),
             )
-        district_unit = cs.unit("pl.okreg_sejm", key)
+        district_unit = cs.unit(SCHEME, key)
+        district_area = (
+            early_area(VINTAGE_OF[year], number) if early else cs.area(SCHEME, str(number), VINTAGES["2001"].valid_from)
+        )
         unit_rows[district_unit] = {
-            "scheme_code": "pl.okreg_sejm",
+            "scheme_code": SCHEME,
             "code": key,
             "parent_id": None,
-            "area_relation": "unlocated" if early else "equals",
-            "area_id": None if early else str(cs.area("pl.okreg_sejm", str(number))),
+            "area_relation": "equals",
+            "area_id": str(district_area),
             "kind": "standard",
         }
         here = accounting.filter(pl.col("district") == number)
