@@ -2,7 +2,7 @@ import csv
 import io
 import re
 import zipfile
-from datetime import date
+from datetime import date, timedelta
 from typing import NamedTuple
 from uuid import uuid5
 
@@ -505,6 +505,7 @@ def build(year: int) -> Package:
     p.frame("contest_option", pl.DataFrame(option_rows))
 
     seen: set[str] = set()
+    affiliated: set[str] = set()
     for group in groups.values():
         for entry in group:
             members = [str(c) for c in entry.lines]
@@ -521,13 +522,19 @@ def build(year: int) -> Package:
             p.name(id, named[0] if named else f"Coalición {fallback} ({year})", "es", "official")
             p.name(id, named[1] if named else f"{fallback} coalition ({year})", "en", "english", False)
             for member in parties:
+                member_id = party(member, year)
+                if member_id in affiliated:
+                    continue
+                affiliated.add(member_id)
                 p.add(
                     "party_affiliation",
-                    party_id=party(member, year),
+                    party_id=member_id,
                     parent_party_id=id,
                     kind="coalition",
                     valid_from=day,
                     valid_from_precision="day",
+                    valid_to=day + timedelta(days=1),
+                    valid_to_precision="day",
                 )
 
     unit_rows: list[dict[str, object]] = []
