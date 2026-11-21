@@ -32,6 +32,7 @@ AGS_2015_COUNT = (
     "https://web.archive.org/web/20160520000120id_/"
     "http://computos2015-ags.ine.mx:80/JSON/DIPUTADO/NACIONAL/diputados_nacional.json"
 )
+DOF_2003 = "https://dof.gob.mx/nota_detalle.php?codigo=690614&fecha=22/09/2003"
 DIFFERS = {
     (2006, "7", "6", "2", "8", "B"),
     (2006, "7", "6", "86", "1238", "E01"),
@@ -54,6 +55,11 @@ EXCLUDED = {
 # the state, district, municipality, section, and casilla of an earlier row. Each is a separate acta with its own
 # counts (no two are identical), kept in file order as -r2, -r3, as mx.senado codes its 1991 casillas.
 REPEATS = {(1991, "MR"): 197}
+# The 2003 list file prints two actas for special casilla 1 of section 1494 in Tonalá, Chiapas district 7, both
+# marked SMR1 (the ballot for district deputies). The district file holds only the first, and every other special
+# casilla has one SMR and one SRP acta (761 of each, but 760 SRP in the list file), so the second row is this
+# casilla's acta for the list ballot, mislabeled. It is read as SRP1.
+RELABELED = {(2003, "RP", "7", "7", "97", "1494", "SMR1", 2): "SRP1"}
 
 
 def siceef_url(kind: str, year: int) -> str:
@@ -110,6 +116,7 @@ def table(kind: str, year: int) -> tuple[pl.DataFrame, pl.DataFrame]:
     units, votes = [], []
     seen: dict[tuple[object, ...], int] = {}
     excluded: set[tuple[object, ...]] = set()
+    relabeled = 0
     for row in rows:
         counts = {option: ine.number(row[option]) for option in options}
         key = (year, *unit_key(row))
@@ -121,7 +128,10 @@ def table(kind: str, year: int) -> tuple[pl.DataFrame, pl.DataFrame]:
         unit = {k: ine.clean(row[k]).lstrip("0") or "0" if k != "casilla" else ine.clean(row[k]) for k in ine.KEYS}
         seen[key] = seen.get(key, 0) + 1
         if seen[key] > 1:
-            unit["casilla"] = f"{unit['casilla']}~{seen[key]}"
+            relabel = RELABELED.get((year, kind, *key[1:], seen[key]))
+            if relabel is not None:
+                relabeled += 1
+            unit["casilla"] = relabel or f"{unit['casilla']}~{seen[key]}"
         unit["circunscripcion"] = ine.clean(row["circunscripcion"])
         units.append(
             unit
@@ -147,7 +157,7 @@ def table(kind: str, year: int) -> tuple[pl.DataFrame, pl.DataFrame]:
                     "votes": value,
                 }
             )
-    repeats = sum(count - 1 for count in seen.values())
+    repeats = sum(count - 1 for count in seen.values()) - relabeled
     if repeats != REPEATS.get((year, kind), 0):
         raise ValueError(f"{year} {kind}: {repeats} rows repeat an earlier casilla")
     if excluded != {key for key in EXCLUDED if key[:2] == (year, kind)}:
@@ -172,6 +182,9 @@ def parse() -> None:
             votes.write_parquet(PARSED / f"{kind.lower()}_{year}_votes.parquet")
             national = votes.group_by("option").agg(pl.col("votes").sum()).sort("votes", descending=True)
             print(year, kind, units.height, "casillas", units["total"].sum(), "votes", dict(national.rows()))
+    from ea.sources.mx import diputados_packages
+
+    diputados_packages.parse()
 
 
 # Convergencia took the name Movimiento Ciudadano in 2011, and the Partido Socialdemócrata was Alternativa
@@ -195,6 +208,129 @@ MR_TITLE = "Cómputos distritales de la elección de Diputados por mayoría rela
 THRESHOLD = 2
 
 ELECTIONS: dict[int, dict] = {
+    # 2006 and 2003 are built as packages (ea.sources.mx.diputados_packages); the changeset emit leaves them out.
+    2006: {
+        "day": date(2006, 7, 2),
+        "packaged": True,
+        "encoding": "latin-1",
+        "columns": {
+            "PAN": ("PAN",),
+            "APM": ("PRI", "PVEM"),
+            "PBT": ("PRD", "PT", "CONV"),
+            "NVA_ALIANZA": ("NA",),
+            "ASDC": ("PSD",),
+        },
+        "acuerdo": (
+            "https://repositoriodocumental.ine.mx/xmlui/bitstream/handle/123456789/86346/CGe230806ap2.pdf",
+            (
+                "CG163/2006: Acuerdo del Consejo General del Instituto Federal Electoral por el que se efectúa el "
+                "cómputo total, se declara la validez de la elección de Diputados por el Principio de Representación "
+                "Proporcional y se asignan a los partidos políticos Acción Nacional, Revolucionario Institucional, de "
+                "la Revolución Democrática, del Trabajo, Verde Ecologista de México, Convergencia, Nueva Alianza y "
+                "Alternativa Socialdemócrata y Campesina, los Diputados que por este principio les corresponden de "
+                "acuerdo con la votación obtenida por cada uno de ellos en el proceso electoral federal del año dos "
+                "mil seis"
+            ),
+            {"votes": 35, "seats": 45},
+        ),
+        # The acuerdo counts each coalition's list as one line.
+        "votes": {
+            "PAN": 13845122,
+            "APM": 11676598,
+            "PBT": 12013360,
+            "NA": 1883494,
+            "PSD": 850985,
+            "unregistered": 128825,
+            "null": 1037578,
+            "total": 41435962,
+        },
+        "seats": {
+            "PAN": (17, 19, 10, 11, 12),
+            "APM": (14, 12, 14, 8, 10),
+            "PBT": (7, 7, 14, 18, 14),
+            "NA": (2, 2, 1, 2, 2),
+            "PSD": (0, 0, 1, 1, 2),
+        },
+        # What the district counts in INE's file give by plurality, and what the acuerdo's table of majority seats
+        # (considerando 36) declares; one district differs.
+        "district_winners": {"PAN": 137, "CONV–PRD–PT": 99, "PRI–PVEM": 64},
+        "winners_note": (
+            " By plurality the counts in INE's file give the PAN 137 districts, the Por el Bien de Todos coalition "
+            "99, and the Alianza por México 64; the Consejo General's table of majority seats (CG163/2006, "
+            "considerando 36) declares 137, 98, and 65, so the file's count differs from the declared result in one "
+            "district."
+        ),
+    },
+    2003: {
+        "day": date(2003, 7, 6),
+        "packaged": True,
+        "encoding": "latin-1",
+        "columns": {
+            "PAN": ("PAN",),
+            "PRI": ("PRI",),
+            "PRD": ("PRD",),
+            "PT": ("PT",),
+            "PVEM": ("PVEM",),
+            "CONV": ("CONV",),
+            "PSN": ("PSN",),
+            "PAS": ("PAS",),
+            "MP": ("MP",),
+            "PLM": ("PLM",),
+            "FC": ("FC",),
+            "APT": ("PRI", "PVEM"),
+        },
+        "acuerdo": (
+            DOF_2003,
+            (
+                "CG220/2003: Acuerdo del Consejo General del Instituto Federal Electoral por el que se efectúa el "
+                "cómputo total, se declara la validez de la elección de Diputados por el principio de "
+                "Representación Proporcional y se asignan a los partidos políticos nacionales los Diputados que por "
+                "este principio les corresponden (Diario Oficial de la Federación, 22 de septiembre de 2003)"
+            ),
+            {"votes": "considerando 16", "seats": "considerando 29", "annulled": "considerando 31"},
+        ),
+        # Considerando 16 distributes the votes marked for the Alianza para Todos coalition between the PRI and the
+        # PVEM, and takes the party counts as the base of the allocation.
+        "votes": {
+            "PAN": 8264646,
+            "PRI": 9294527,
+            "PRD": 4741382,
+            "PT": 643781,
+            "PVEM": 1653362,
+            "CONV": 607909,
+            "PSN": 72567,
+            "PAS": 198677,
+            "MP": 244035,
+            "PLM": 109219,
+            "FC": 124511,
+            "unregistered": 16498,
+            "null": 903664,
+            "total": 26874778,
+        },
+        "seats": {
+            "PAN": (16, 16, 14, 13, 12),
+            "PRI": (16, 15, 14, 9, 10),
+            "PRD": (4, 4, 7, 13, 13),
+            "PT": (1, 2, 1, 1, 0),
+            "PVEM": (3, 3, 2, 3, 3),
+            "CONV": (0, 0, 2, 1, 2),
+        },
+        "annulled": {
+            ("16", 5): "SUP-REC-034/2003",
+            ("05", 6): "SUP-REC-009/2003 and SUP-REC-010/2003",
+        },
+        "national_method": (
+            "National vote for the party lists as INE's Consejo General declared it in its acuerdo on the "
+            "proportional allocation (considerando 16), after the district counts and the rulings on challenges. "
+            "The votes marked for the Alianza para Todos coalition are distributed between the PRI and the PVEM, as "
+            "the acuerdo does before it allocates seats."
+        ),
+        "seats_method": (
+            "Seats by party as the Consejo General assigned them to this circunscripción, from the final table in "
+            "considerando 29 of its acuerdo (Diario Oficial de la Federación, 22 September 2003). The acuerdo "
+            "deducts ten list seats from the PRI under the limit on over-representation (considerando 24)."
+        ),
+    },
     2015: {
         "day": date(2015, 6, 7),
         "columns": {
@@ -626,7 +762,7 @@ def district_frame(
 
 
 def emit() -> Path:
-    years = sorted(ELECTIONS)
+    years = sorted(year for year in ELECTIONS if not ELECTIONS[year].get("packaged"))
     with connect() as conn:
         cs = Draft(
             conn,
