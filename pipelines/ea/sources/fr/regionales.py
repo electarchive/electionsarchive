@@ -1,4 +1,5 @@
 import csv
+import html
 import io
 import re
 import zipfile
@@ -25,6 +26,44 @@ R98 = f"{STATIC}/0d/899afa4aedca3c4077239ef7c346de3e38c9acbc1ee2adcff3425251e531
 CDSP = f"{STATIC}/resources/elections-regionales-1986-2010/community/20150204-171427/REGIONALES_1986-2010-csv.zip"
 CDSP_1998 = "REGIONALES_1986-2010-csv/cdsp_regio1998_circ.csv"
 DAY_1998 = date(1998, 3, 15)
+# The Interior Ministry's own pages of the 1998 results, one per region, as the Wayback Machine captured them on
+# 23 June 1998: each nuance's votes and seats on the mainland, each list's in Guadeloupe, Martinique, and French
+# Guiana. "FR" is the page for all France.
+PAGES_1998 = {
+    "42": ("19980623083713", "alsace"),
+    "72": ("19980623083720", "aquitaine"),
+    "83": ("19980623083730", "auvergne"),
+    "25": ("19980623083902", "basse_normandie"),
+    "26": ("19980623083741", "bourgogne"),
+    "53": ("19980623083748", "bretagne"),
+    "24": ("19980623083755", "centre"),
+    "21": ("19980623083802", "champage_ardenne"),
+    "43": ("19980623083809", "franche_comte"),
+    "23": ("19980623083910", "haute_normandie"),
+    "11": ("19980623083817", "ile_de_france"),
+    "91": ("19980623083825", "languedoc_roussillon"),
+    "74": ("19980623083834", "limousin"),
+    "41": ("19980623083841", "loraine"),
+    "73": ("19980623083848", "midi_pyrenees"),
+    "31": ("19980623083855", "nord_pas_de_calais"),
+    "93": ("19980623083939", "paca"),
+    "52": ("19980623083918", "pays_de_la_loire"),
+    "22": ("19980623083926", "picardie"),
+    "54": ("19980623083932", "poitou_charente"),
+    "82": ("19980623083946", "rhone_alpes"),
+    "01": ("19980623083955", "guadelo"),
+    "02": ("19980623084006", "martini"),
+    "03": ("19980623084013", "guyane"),
+    "04": ("19980623084020", "reunion"),
+    "FR": ("19980623083650", "france"),
+}
+
+
+def page_1998(code: str) -> str:
+    stamp, page = PAGES_1998[code]
+    return f"https://web.archive.org/web/{stamp}id_/http://www.interieur.gouv.fr:80/pages/informa/electio/{page}.htm"
+
+
 ROUNDS = {
     2004: (date(2004, 3, 21), date(2004, 3, 28)),
     2010: (date(2010, 3, 14), date(2010, 3, 21)),
@@ -125,6 +164,8 @@ def fetch() -> None:
     for url in [url for url, _ in FILES.values()] + list(CORSE_FILES.values()):
         raw.fetch(SOURCE, url, suffix=Path(url).suffix)
     raw.fetch(SOURCE, CDSP, suffix=".zip")
+    for code in PAGES_1998:
+        raw.fetch(SOURCE, page_1998(code), suffix=".htm")
 
 
 def number(value: object) -> int | None:
@@ -375,6 +416,94 @@ def read_elus(year: int) -> list[dict[str, object]]:
     return found
 
 
+# The labels the 1998 pages print beside each nuance code, which prove the one code they misprint.
+LABELS_1998 = {
+    "LXG": "Liste d'extrême-gauche",
+    "LPC": "Liste du parti communiste",
+    "LMA": "Liste de la majorité",
+    "LPS": "Liste socialiste",
+    "LDG": "Liste divers gauche",
+    "LEC": "Liste ecologiste",
+    "LRG": "Liste régionaliste",
+    "LDV": "Liste divers",
+    "LDR": "Liste de droite",
+    "LDF": "Liste droite-front national",
+    "LFN": "Liste du front national",
+    "LXD": "Liste d'extrême-droite",
+}
+TYPOS_1998 = {"LGD": "LDG"}
+# The French Guiana page prints 361 votes at 2.89 percent of 19,394, which is 561; with 561 its rows add up to the
+# valid votes it prints.
+VOTE_TYPOS_1998 = {("03", 3, 361): 561}
+
+
+def folded(text: str) -> str:
+    return " ".join(text.lower().replace("é", "e").replace("è", "e").replace("ê", "e").replace("-", " ").split())
+
+
+def read_pages_1998() -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    """Each region's totals, and the votes and seats on each row of the ministry's 1998 pages. A mainland page has one
+    row per nuance, with its label; the Guadeloupe, Martinique, and French Guiana pages have one row per list, without
+    labels (`by_list`). A seat cell left blank means none, except on the Réunion page, which prints no seats at all
+    (seats null). Two cells misplace a space ("998 75" for 99 875, "57 0661" for 570 661), so a figure is read with
+    its spaces removed, and the Île-de-France and Languedoc-Roussillon pages print LGD for LDG beside the label
+    "Liste divers gauche"."""
+    regions: list[dict[str, object]] = []
+    rows: list[dict[str, object]] = []
+    for code in PAGES_1998:
+        text = raw.cached(SOURCE, page_1998(code)).path.read_bytes().decode("cp1252")
+        plain = " ".join(html.unescape(re.sub(r"<[^>]+>", " ", text)).split())
+        if "ELECTIONS REGIONALES DU 15 MARS 19" not in plain:
+            raise ValueError(f"1998 page {code}: not the results page")
+        entry: dict[str, object] = {"region": code}
+        for field, key in (("inscrits", "registered"), ("Votants", "voters"), ("Exprimés", "valid")):
+            pattern = rf"{field} ?: ([\d ]+)" if key == "registered" else rf"{field} ?: ([\d ]+?) [\d,]+ ?%"
+            found = re.search(pattern, plain)
+            if found is None:
+                raise ValueError(f"1998 page {code}: no {field}")
+            entry[key] = int(found.group(1).replace(" ", ""))
+        found_rows: list[dict[str, object]] = []
+        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", text, re.DOTALL | re.IGNORECASE):
+            cells = [
+                " ".join(html.unescape(re.sub(r"<[^>]+>", " ", cell)).split())
+                for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL | re.IGNORECASE)
+            ]
+            if len(cells) not in (4, 5) or not re.fullmatch(r"L[A-Z]{2}", cells[0]):
+                continue
+            nuance = TYPOS_1998.get(cells[0], cells[0]) if len(cells) == 5 else cells[0]
+            if nuance not in NUANCES[1998]:
+                raise ValueError(f"1998 page {code}: nuance {cells[0]}")
+            if len(cells) == 5 and folded(cells[3]) != folded(LABELS_1998[nuance]):
+                raise ValueError(f"1998 page {code}: {cells[0]} is labeled {cells[3]!r}")
+            votes = int(cells[1].replace(" ", ""))
+            found_rows.append(
+                {
+                    "region": code,
+                    "order": len(found_rows) + 1,
+                    "nuance": nuance,
+                    "votes": VOTE_TYPOS_1998.get((code, len(found_rows) + 1, votes), votes),
+                    "seats": cells[-1],
+                    "by_list": len(cells) == 4,
+                }
+            )
+        if len({row["by_list"] for row in found_rows}) != 1:
+            raise ValueError(f"1998 page {code}: mixed rows")
+        by_list = bool(found_rows[0]["by_list"])
+        printed = any(row["seats"] for row in found_rows)
+        for row in found_rows:
+            row["seats"] = (int(str(row["seats"])) if row["seats"] else 0) if printed else None
+        nuances = sorted(str(row["nuance"]) for row in found_rows)
+        if not by_list and nuances != sorted(NUANCES[1998]):
+            raise ValueError(f"1998 page {code}: nuances {nuances}")
+        if sum(int(str(row["votes"])) for row in found_rows) != entry["valid"]:
+            raise ValueError(f"1998 page {code}: rows add to {sum(int(str(r['votes'])) for r in found_rows)}")
+        entry["by_list"] = by_list
+        entry["seats"] = sum(int(str(row["seats"])) for row in found_rows) if printed else None
+        regions.append(entry)
+        rows += found_rows
+    return regions, rows
+
+
 def parse() -> None:
     totals: list[dict[str, object]] = []
     lists: list[dict[str, object]] = []
@@ -391,6 +520,9 @@ def parse() -> None:
     pl.DataFrame(totals, infer_schema_length=None).write_parquet(PARSED / "totals.parquet")
     pl.DataFrame(lists, infer_schema_length=None).write_parquet(PARSED / "lists.parquet")
     pl.DataFrame(elus, infer_schema_length=None).write_parquet(PARSED / "elus.parquet")
+    regions_1998, seats_1998 = read_pages_1998()
+    pl.DataFrame(regions_1998).write_parquet(PARSED / "regions_1998.parquet")
+    pl.DataFrame(seats_1998).write_parquet(PARSED / "seats_1998.parquet")
 
 
 OLD_REGIONS = {
@@ -794,11 +926,69 @@ METHOD_1998 = (
     "Votes by list from the Interior Ministry's 1998 results file by département. Heads of list come from the "
     "Sciences Po CDSP file of the same results by constituency, matched to each list by its votes in the département."
 )
-NOTE_1998 = (
-    "Until 2004 each département elected its share of the regional council as a separate constituency. Neither "
-    "the Interior Ministry's results file nor any other official source found online gives the seats each list won, "
-    "so no outcomes are recorded. Corsica's 1998 election was annulled by the Conseil d'État and held again in 1999."
+METHOD_SEATS_1998 = (
+    "Each list's seats come from the ministry's results page for the region, as the Wayback Machine captured it on "
+    "23 June 1998. That page prints the ministry's figures of the time, a few votes off the final file, so each of its "
+    "rows is matched to the list of the same nuance nearest to it in votes."
 )
+NOTE_1998 = (
+    "Until 2004 each département elected its share of the regional council as a separate constituency. The "
+    "Interior Ministry's results file gives no seats. Its results pages of 1998, kept by the Wayback Machine, give "
+    "each list's seats only for Guadeloupe, Martinique, and French Guiana, which are recorded as outcomes. For the "
+    "mainland regions they give the seats each nuance won across the region, which each regional election's note "
+    "lists, and the page for Réunion gives none, so those contests record no outcomes. Corsica's 1998 election was "
+    "annulled by the Conseil d'État and held again in 1999."
+)
+TITLE_1998 = "Élections régionales du 15 mars 1998 : résultats par région"
+PAGES_URL_1998 = (
+    "https://web.archive.org/web/19980623083650/http://www.interieur.gouv.fr:80/pages/informa/electio/france.htm"
+)
+
+
+def check_pages_1998(regions: Mapping[str, Mapping[str, object]], rows: pl.DataFrame) -> None:
+    """Each region's printed seats must fill its council, and the page for all France must hold, nuance by nuance,
+    at least the seats of the regional pages, with the rest (Réunion's, which its own page leaves out) filling
+    Réunion's 45."""
+    nation: dict[str, int] = {}
+    for code, (_, codes) in OLD_REGIONS.items():
+        if code == "94":
+            continue
+        size = sum(SEATS_1992[d] for d in codes.split())
+        seats = regions[code]["seats"]
+        if seats is None:
+            continue
+        if seats != size:
+            raise ValueError(f"1998 page {code}: seats add to {seats}, the council has {size}")
+        for row in rows.filter(pl.col("region") == code).iter_rows(named=True):
+            nation[str(row["nuance"])] = nation.get(str(row["nuance"]), 0) + int(row["seats"])
+    france = {
+        str(row["nuance"]): int(row["seats"]) for row in rows.filter(pl.col("region") == "FR").iter_rows(named=True)
+    }
+    rest = {nuance: france[nuance] - nation.get(nuance, 0) for nuance in france}
+    missing = [code for code, region in regions.items() if code != "FR" and region["seats"] is None]
+    left = sum(SEATS_1992[d] for code in missing for d in OLD_REGIONS[code][1].split())
+    if min(rest.values()) < 0 or sum(rest.values()) != left:
+        raise ValueError(f"1998 France page: {rest} left for {missing}")
+
+
+def seats_by_list_1998(region: str, entries: pl.DataFrame, rows: pl.DataFrame) -> dict[str, int]:
+    """Each list's seats from a page with one row per list, by the list's order in the results file. Rows pair with
+    the département's lists of the same nuance in order of votes, and each row must be nearest in votes to its list."""
+    page = [row for row in rows.iter_rows(named=True) if row["region"] == region]
+    lists = list(entries.iter_rows(named=True))
+    seats: dict[str, int] = {}
+    for nuance in sorted({str(entry["nuance"]) for entry in lists} | {str(row["nuance"]) for row in page}):
+        mine = sorted((e for e in lists if e["nuance"] == nuance), key=lambda e: -int(e["votes"]))
+        theirs = sorted((r for r in page if r["nuance"] == nuance), key=lambda r: -int(r["votes"]))
+        if len(mine) != len(theirs):
+            raise ValueError(f"1998 {region} {nuance}: {len(mine)} lists, {len(theirs)} rows on the page")
+        for entry, row in zip(mine, theirs, strict=True):
+            if min(mine, key=lambda e: abs(int(e["votes"]) - int(row["votes"]))) is not entry:
+                raise ValueError(f"1998 {region} {nuance}: the row with {row['votes']} votes is nearest another list")
+            seats[str(entry["order"])] = int(row["seats"])
+    return seats
+
+
 SIZE_1992 = date(1992, 3, 22)
 ROUND_ONE_NOTE = (
     "No list won an absolute majority, so no seats were allocated in this round. Lists that stood again in the "
@@ -1091,6 +1281,24 @@ def emit() -> Path:
             license_url=None,
         )
         cs.artifact(raw.cached(SOURCE, CDSP), cdsp)
+        pages = cs.source("Ministère de l'Intérieur", TITLE_1998)
+        cs.add(
+            "source",
+            id=pages,
+            kind="official_body",
+            publisher="Ministère de l'Intérieur",
+            title=TITLE_1998,
+            url=PAGES_URL_1998,
+            license="Public record",
+            license_url=None,
+        )
+        for region in PAGES_1998:
+            cs.artifact(raw.cached(SOURCE, page_1998(region)), pages)
+        page_regions = {
+            str(row["region"]): row for row in pl.read_parquet(PARSED / "regions_1998.parquet").iter_rows(named=True)
+        }
+        page_rows = pl.read_parquet(PARSED / "seats_1998.parquet")
+        check_pages_1998(page_regions, page_rows)
         umbrella = cs.key(f"{SOURCE}.election", "1998")
         cs.add(
             "election",
@@ -1126,6 +1334,27 @@ def emit() -> Path:
             )
             name(election, f"1998 {ENGLISH.get(label, label)} regional election", "en")
             cs.add("slug", path=f"{path}/{DAY_1998}-general", entity_id=election)
+            page = page_regions[code]
+            printed = {
+                str(row["nuance"]): int(row["seats"])
+                for row in page_rows.filter(pl.col("region") == code).iter_rows(named=True)
+                if row["seats"] is not None and not row["by_list"]
+            }
+            if printed:
+                ranked = sorted(((n, s) for n, s in printed.items() if s), key=lambda item: (-item[1], item[0]))
+                cs.add(
+                    "note",
+                    entity_id=election,
+                    kind="context",
+                    body_md=(
+                        f"The Interior Ministry's results page for {label} gives the seats each nuance won across its "
+                        f"départements: {', '.join(f'{NUANCES[1998][n]} {s}' for n, s in ranked)}, {page['seats']} in "
+                        "all. It gives no seats by list, so the contests record none. The highest-average allocation "
+                        "in each département, among the lists with 5 percent of its valid votes, reproduces every "
+                        "one of these totals."
+                    ),
+                )
+            computed_nuances: dict[str, int] = {}
             for dept in codes.split():
                 total = held_1998[dept]
                 dept_label = dept_names[dept]
@@ -1159,7 +1388,8 @@ def emit() -> Path:
                     is_default=True,
                     completeness=1,
                 )
-                cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD_1998)
+                method = f"{METHOD_1998} {METHOD_SEATS_1998}" if page["by_list"] else METHOD_1998
+                cs.add("note", entity_id=result_set, kind="methodology", body_md=method)
                 unit = cs.unit("fr.departement", dept, DAY_1998)
                 for field, measure in (("registered", 2), ("voters", 14), ("valid", 4), ("invalid", 5)):
                     values.append(
@@ -1176,9 +1406,34 @@ def emit() -> Path:
                 ).sort("order")
                 if entries["votes"].sum() != total["valid"]:
                     raise ValueError(f"1998 {dept}: lists add to {entries['votes'].sum()}, valid {total['valid']}")
+                computed = allocate(
+                    {str(entry["order"]): int(entry["votes"]) for entry in entries.iter_rows(named=True)},
+                    int(total["valid"]),
+                    SEATS_1992[dept],
+                    None,
+                    False,
+                )
+                for entry in entries.iter_rows(named=True):
+                    nuance = str(entry["nuance"])
+                    computed_nuances[nuance] = computed_nuances.get(nuance, 0) + computed.get(str(entry["order"]), 0)
+                declared_1998 = seats_by_list_1998(code, entries, page_rows) if page["by_list"] else None
+                if declared_1998 is not None:
+                    if sum(declared_1998.values()) != SEATS_1992[dept]:
+                        raise ValueError(f"1998 {dept}: the page's seats add to {sum(declared_1998.values())}")
+                    if computed != {order: seats for order, seats in declared_1998.items() if seats}:
+                        mismatched.append(f"1998 {dept}: declared {declared_1998}, computed {computed}")
                 for entry in entries.iter_rows(named=True):
                     order = str(entry["order"])
                     option = cs.key(f"{SOURCE}.option", f"{contest_key}:{order}")
+                    if declared_1998 is not None:
+                        won = declared_1998[order]
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=option,
+                            kind="won" if won else "lost",
+                            seats=won or None,
+                        )
                     cs.add(
                         "contest_option",
                         id=option,
@@ -1212,6 +1467,8 @@ def emit() -> Path:
                             "value": entry["votes"],
                         }
                     )
+            if printed and {n: s for n, s in computed_nuances.items() if s} != {n: s for n, s in printed.items() if s}:
+                mismatched.append(f"1998 {code}: declared {printed}, computed {computed_nuances}")
 
         for year, days in ROUNDS.items():
             regions = OLD_REGIONS if year < 2015 else {"94": NEW_REGIONS["94"]} if year == 2017 else NEW_REGIONS
