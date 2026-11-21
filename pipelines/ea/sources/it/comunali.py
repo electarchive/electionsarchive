@@ -1,16 +1,20 @@
 import csv
 import io
-import os
 import re
 import zipfile
+from collections import Counter
+from collections.abc import Callable
+from dataclasses import replace
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from psycopg import Connection
 
-from ea import raw
-from ea.changeset import Changeset, slug
+from ea import package, raw
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.it import interno, regionali
 from ea.sources.it.interno import BLANK, INVALID, REGISTERED, VOTERS, VOTES, proper
 from ea.sources.it.storico import EXISTING
@@ -18,6 +22,7 @@ from ea.store import DATA, connect
 
 SOURCE = "it.comunali"
 VERSION = "1"
+KEY = f"{SOURCE}/all"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/comunali"
 DAYS = [
@@ -401,6 +406,64 @@ RUNOFF = (
     "No candidate won an absolute majority, so the top two went to a runoff on the second Sunday after "
     "(TUEL art. 72); the runoff date is that rule's, as the open data gives only the first round's date."
 )
+# The 9 June 2024 file as the ministry republished it in November 2026 prints #NOME? (a spreadsheet's error for text
+# that starts with "+") for these lists, one per municipality; the file it replaced printed their labels.
+MANGLED = "#NOME?"
+LABELS = {
+    (date(2024, 6, 9), "001078"): "+EUROPA",
+    (date(2024, 6, 9), "024008"): "+FUTURO",
+    (date(2024, 6, 9), "036022"): "+MIRANDOLA",
+    (date(2024, 6, 9), "038008"): "+FERRARA IN EUROPA - PSI",
+    (date(2024, 6, 9), "048017"): "+EUROPA",
+    (date(2024, 6, 9), "061034"): "+VERDE CUORE AMBIENTALISTA",
+    (date(2024, 6, 9), "063083"): "+EUROPA",
+    (date(2024, 6, 9), "065079"): "+ RETE",
+    (date(2024, 6, 9), "100005"): "+EUROPA-PARTITO REPUBBLICANO ITALIANO",
+}
+REGISTER = "https://dait.interno.gov.it/documenti/storico_amministratori_comuni31122024.csv"
+NETTUNO = (
+    "https://servizionline.comune.nettuno.roma.it/cmsnettuno/portale/delibere/deliberericerca.aspx?P=700"
+    "#consiglio-2024-1/VERBALE_01_ODG.pdf"
+)
+# Council seats per list where the open data gives none, from the act that declares them. Nettuno's runoff file
+# prints seats that overfill the council for every opposition list, so they are not read; Cosoleto and Sparanise
+# had no runoff, and the first-round file has no seat column.
+DECLARED: dict[tuple[date, str], tuple[str, dict[str, int]]] = {
+    (date(2024, 11, 17), "058072"): (
+        NETTUNO,
+        {
+            "PATTO PER NETTUNO": 1,
+            "ANTONIO TAURELLI SINDACO": 1,
+            "BURRINI SINDACO": 6,
+            "LEALI A NETTUNO": 1,
+            "PARTITO DEMOCRATICO": 8,
+            "MOVIMENTO 5 STELLE": 0,
+            "NOI MODERATI": 0,
+            "FORZA ITALIA - PPE": 1,
+            "FRATELLI D'ITALIA": 2,
+            "LEGA SALVINI PREMIER": 0,
+            "DIALOGO": 0,
+            "NETTUNO PROGETTO COMUNE": 0,
+            "SIMONA SANETTI SINDACO DI NETTUNO": 1,
+        },
+    ),
+    (date(2024, 11, 17), "080030"): (REGISTER, {"PUNTO E A CAPO": 10}),
+    (date(2024, 11, 17), "061089"): (REGISTER, {"CAMBIAMO SPARANISE": 8, "SPARANISE IN MOVIMENTO": 3}),
+}
+NETTUNO_SEATS = (
+    "Seats are the council seats the central electoral office proclaimed for each list, as read into the minutes of "
+    "the council's first sitting (resolution no. 1 of 21 December 2024, page 1); the open data's runoff file gives "
+    "more seats than the council has. They do not include the mayor, or the three defeated candidates for mayor who "
+    "took a seat on the council."
+)
+REGISTER_SEATS = (
+    "Seats are the councillors of each list in the Interior Ministry's register of local administrators in office on "
+    "31 December 2024, all in office since the election; the open data gives no seats for this election. They do not "
+    "include the mayor, or defeated candidates for mayor who took a seat on the council."
+)
+CC_LICENSE = (
+    "No license stated. Official acts of public administrations are excluded from copyright (art. 5 of Law 633/1941)."
+)
 COUNTS = ("registered", "voters", "blank", "null", "contested")
 NUMBERS = (*COUNTS, "list_votes", "seats", "candidate_votes")
 SKIPPED = re.compile(r"(?i)legenda|preferenze|votanti|livsez|_sez\.csv|candidati_sindaco")
@@ -509,6 +572,11 @@ def parse() -> None:
     unplaced.write_parquet(PARSED / "unplaced.parquet")
     for stem, frame in frames.items():
         frame.write_parquet(PARSED / f"{stem}.parquet")
+    build()
+
+
+def emit() -> None:
+    package.run("load", [KEY])
 
 
 def collect(days: list[date]) -> tuple[dict[str, pl.DataFrame], pl.DataFrame]:
@@ -560,13 +628,29 @@ def collect(days: list[date]) -> tuple[dict[str, pl.DataFrame], pl.DataFrame]:
                         pl.col("candidate_votes").sum(), *[pl.col(c).max() for c in extra]
                     )
                 candidates.append(rows)
-    return locate(
+    frames, unplaced = locate(
         {
             "accounting": pl.concat(accounting, how="diagonal_relaxed"),
             "lists": pl.concat(lists, how="diagonal_relaxed"),
             "candidates": pl.concat(candidates, how="diagonal_relaxed"),
         }
     )
+    mangled = frames["lists"].filter(pl.col("list") == MANGLED)
+    if mangled.height and sorted(mangled.select("day", "code").iter_rows()) != sorted(LABELS):
+        raise ValueError(f"lists printed as {MANGLED} differ from the labels known: {mangled.rows()}")
+    if mangled.height:
+        labels = pl.DataFrame(
+            [(day, code, label) for (day, code), label in LABELS.items()],
+            schema={"day": pl.Date, "code": pl.String, "label": pl.String},
+            orient="row",
+        )
+        frames["lists"] = (
+            frames["lists"]
+            .join(labels, on=["day", "code"], how="left", maintain_order="left")
+            .with_columns(list=pl.when(pl.col("list") == MANGLED).then(pl.col("label")).otherwise(pl.col("list")))
+            .drop("label")
+        )
+    return frames, unplaced
 
 
 def locate(frames: dict[str, pl.DataFrame]) -> tuple[dict[str, pl.DataFrame], pl.DataFrame]:
@@ -606,13 +690,56 @@ def label_of(day: date) -> str:
     return f"{day.day} {MONTHS[day.month - 1]} {day.year}"
 
 
-def emit() -> Path:
-    year = int(os.environ["IT_YEAR"])
-    days = [day for day in DAYS if day.year == year]
-    picked = pl.col("day").dt.year() == year
-    accounting = pl.read_parquet(PARSED / "accounting.parquet").filter(picked)
-    lists = pl.read_parquet(PARSED / "lists.parquet").filter(picked)
-    candidates = pl.read_parquet(PARSED / "candidates.parquet").filter(picked)
+def retrieved(conn: Connection) -> Callable[[raw.Artifact], raw.Artifact]:
+    """A file the cache holds with the same bytes and address as a file the archive already cites keeps the
+    retrieval time the archive recorded for it, so a fresh copy of the cache rebuilds the same citation."""
+    stored: dict[tuple[str, str], datetime] = {
+        (str(url), str(digest)): at
+        for url, digest, at in conn.execute(
+            """select a.url, a.sha256, a.retrieved_at from source_artifact a
+               join changeset c on c.id = a.changeset_id where c.pipeline = %s""",
+            [SOURCE],
+        )
+    }
+
+    def pin(artifact: raw.Artifact) -> raw.Artifact:
+        at = stored.get((artifact.url, artifact.sha256))
+        return artifact if at is None else replace(artifact, retrieved_at=at)
+
+    return pin
+
+
+def registered(day: date, code: str, defeated: set[tuple[str, str]]) -> Counter[str]:
+    """The councillors of each list in the ministry's register of administrators in office on 31 December 2024 for
+    the council elected on the day, leaving out defeated candidates for mayor, who sit by that right and not on a
+    list's seat. Every councillor must have taken office within a week of the election, so none is a substitute."""
+    with raw.cached(SOURCE, REGISTER).path.open(encoding="utf-8", newline="") as file:
+        rows = [
+            row
+            for row in csv.DictReader(file, delimiter=";")
+            if row["ISTAT_CODICE_COMUNE"] == code
+            and row["DATA_ELEZIONE"] == f"{day:%d/%m/%Y}"
+            and row["DESCRIZIONE_CARICA"] == "Consigliere"
+        ]
+    late = [
+        row["COGNOME"]
+        for row in rows
+        if datetime.strptime(row["DATA_INIZIO_CARICA"], "%d/%m/%Y").date() > day + timedelta(days=7)
+    ]
+    if not rows or late:
+        raise ValueError(f"{code} {day}: the register lists no councillors, or substitutes ({late})")
+    return Counter(
+        row["LISTA_APPARTENENZA/COLLEGAMENTO"] for row in rows if (row["COGNOME"], row["NOME"]) not in defeated
+    )
+
+
+def build() -> Path:
+    """Write the package it.comunali/all from the parsed tables. It reads the database, through Draft, so the rows
+    it rebuilds keep the ids the changeset path gave them."""
+    days = DAYS
+    accounting = pl.read_parquet(PARSED / "accounting.parquet")
+    lists = pl.read_parquet(PARSED / "lists.parquet")
+    candidates = pl.read_parquet(PARSED / "candidates.parquet")
     with raw.cached(interno.SOURCE, interno.ISTAT).path.open(encoding="latin-1", newline="") as file:
         current = {row[4]: (row[0], row[5]) for row in list(csv.reader(file, delimiter=";"))[1:]}
     _, extinct, _ = regionali.municipalities()
@@ -623,24 +750,78 @@ def emit() -> Path:
         .sort("day", "code")
     )
     with connect() as conn:
-        cs = Changeset(
+        pin = retrieved(conn)
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary=f"Italian municipal councils and mayors elected in {year}, from the Interior Ministry's open data, by municipality",
+            summary=(
+                "Italian municipal councils and mayors elected from 1964 to 2026, from the Interior Ministry's open "
+                "data, by municipality"
+            ),
             polity="IT",
+        )
+        cs.accept(
+            "accounting.turnout",
+            "The open data prints more voters than registered electors for some municipalities; both are stored as "
+            "printed, and the result set's note says so",
         )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
 
-        ministry = cs.source("Ministero dell'Interno", "Eligendo: archivio storico delle elezioni, open data")
-        if ministry in cs.minted:
+        # it.eligendo and it.eligendo_referendum hold sources under the same publisher and title, so the source is
+        # it.interno's by its pipeline.
+        found = conn.execute(
+            """select s.id from source s join changeset c on c.id = s.changeset_id
+               where c.pipeline = %s and s.publisher = %s and s.title = %s""",
+            [interno.SOURCE, "Ministero dell'Interno", "Eligendo: archivio storico delle elezioni, open data"],
+        ).fetchone()
+        if found is None:
             raise ValueError("publish it.interno before it.comunali")
+        ministry: UUID = found[0]
         for day in days:
-            cs.artifact(raw.cached(SOURCE, url(day)), ministry)
+            cs.artifact(pin(raw.cached(SOURCE, url(day))), ministry)
         italy = cs.polity("IT")
-        taken = {path for (path,) in conn.execute("select path from slug where path like 'it/%%'")}
+        # A municipality's slug takes its code when another entity holds the plain path. The module's own
+        # municipalities keep the slugs they hold, so a rebuild does not count a municipality's slug against itself.
+        taken: set[str] = set()
+        held_paths: dict[UUID, str] = {}
+        for path, entity, in_use in conn.execute(
+            "select path, entity_id, is_current from slug where path like 'it/%%'"
+        ):
+            taken.add(path)
+            if in_use and entity in cs.own_entities:
+                held_paths[entity] = path
+
+        def declared_source(where: str) -> UUID:
+            if where == NETTUNO:
+                publisher, title, home, license = (
+                    "Comune di Nettuno",
+                    "Deliberazione del Consiglio comunale n. 1 del 21 dicembre 2024, con il verbale della seduta",
+                    NETTUNO.split("#")[0],
+                    CC_LICENSE,
+                )
+            else:
+                publisher, title, home, license = (
+                    "Ministero dell'Interno",
+                    "Anagrafe degli amministratori locali: amministratori dei comuni in carica al 31 dicembre 2024",
+                    REGISTER,
+                    interno.INTERNO_LICENSE,
+                )
+            source = cs.source(publisher, title)
+            if source in cs.minted or source in cs.own_entities:
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=home,
+                    license=license,
+                )
+            cs.artifact(pin(raw.cached(SOURCE, where)), source)
+            return source
 
         regions: dict[str, tuple[UUID, str]] = {}
 
@@ -648,7 +829,7 @@ def emit() -> Path:
             if code not in regions:
                 iso, path, native = REGION_POLITIES[code]
                 polity = cs.polity(iso)
-                if polity in cs.minted:
+                if polity in cs.minted or polity in cs.own_entities:
                     native, english = REGION_NAMES[iso]
                     cs.add("polity", id=polity, kind="region", iso_code=iso)
                     cs.add("slug", path=f"it/{path}", entity_id=polity)
@@ -690,10 +871,11 @@ def emit() -> Path:
             polity = cs.key(f"{SOURCE}.polity", code)
             if polity in cs.minted:
                 parent, prefix = region_of(region)
-                path = f"{prefix}/{slug(label)}"
-                if path in taken:
-                    path = f"{path}-{code}"
-                taken.add(path)
+                path = held_paths.get(polity) or f"{prefix}/{slug(label)}"
+                if polity not in held_paths:
+                    if path in taken:
+                        path = f"{path}-{code}"
+                    taken.add(path)
                 cs.add("polity", id=polity, kind="municipality", iso_code=None)
                 name(polity, label, "it")
                 cs.add("polity_parent", polity_id=polity, parent_id=parent)
@@ -734,18 +916,29 @@ def emit() -> Path:
             return parties[spec]
 
         persons: dict[str, UUID] = {}
+        # One person can stand in files that give a birth date and files that don't. A person the archive holds
+        # keeps the birth date it was published with; a new one takes the first date a file gives. A person whose
+        # row another pipeline has since rewritten, as the crosswalk does for the people it merges, keeps that row.
+        births: dict[UUID, date | None] = {}
+        published: dict[UUID, date | None] = {}
+        elsewhere: set[UUID] = set()
+        for id, born, ours in conn.execute(
+            """select p.id, p.birth_date, c.pipeline = %s from person p join changeset c on c.id = p.changeset_id
+               join entity e on e.id = p.id join changeset m on m.id = e.changeset_id where m.pipeline = %s""",
+            [SOURCE, SOURCE],
+        ):
+            if ours:
+                published[id] = born
+            else:
+                elsewhere.add(id)
 
         def person_of(key: str, given: str, family: str, born: date | None) -> UUID:
             if key not in persons:
                 persons[key] = cs.key(f"{SOURCE}.person", key)
-                if persons[key] in cs.minted:
-                    cs.add(
-                        "person",
-                        id=persons[key],
-                        birth_date=born,
-                        birth_precision="day" if born is not None else None,
-                    )
-                    name(persons[key], f"{given} {family}".strip(), "it")
+                id = persons[key]
+                if id in cs.minted:
+                    births[id] = published[id] if id in published else births.get(id) or born
+                    name(id, f"{given} {family}".strip(), "it")
             return persons[key]
 
         def result_set(key: str, election: UUID, contest: UUID | None, notes: list[str]) -> UUID:
@@ -795,6 +988,7 @@ def emit() -> Path:
             for code in places["code"].to_list():
                 polity, path, label, body, area = town_of(code)
                 running = running_by.get((day, code))
+                first_round = None if running is None else running.filter(pl.col("round") == 1)
                 rounds = sorted(set(running["round"])) if running is not None else [1]
                 elections: dict[int, UUID] = {}
                 for round_ in rounds:
@@ -841,6 +1035,19 @@ def emit() -> Path:
                 voters = by_place.get((day, code, 1))
                 voted = None if voters is None else voters["voters"][0]
                 slate = lists_by.get((day, code))
+                declared = DECLARED.get((day, code))
+                if slate is not None and declared is not None:
+                    where, seats_of = declared
+                    if sorted(slate["list"]) != sorted(seats_of):
+                        raise ValueError(f"{code} {day}: the declared seats name other lists than the open data")
+                    if where == REGISTER:
+                        defeated = (
+                            set() if first_round is None else set(first_round.select("surname", "forename").iter_rows())
+                        )
+                        found = registered(day, code, defeated)
+                        if found != Counter({label: n for label, n in seats_of.items() if n}):
+                            raise ValueError(f"{code} {day}: the register gives {dict(found)}, not {seats_of}")
+                    slate = slate.with_columns(seats=pl.col("list").replace_strict(seats_of, return_dtype=pl.Int64))
                 if slate is not None:
                     seats = slate["seats"].fill_null(0).sum()
                     most_voted_seats = slate.sort("list_votes", descending=True)["seats"][0]
@@ -864,10 +1071,30 @@ def emit() -> Path:
                         "note",
                         entity_id=contest,
                         kind="context",
-                        body_md=" ".join([COUNTED, COUNCIL_SEATS if seated else NO_SEATS]),
+                        body_md=" ".join(
+                            [
+                                COUNTED,
+                                NO_SEATS
+                                if not seated
+                                else COUNCIL_SEATS
+                                if declared is None
+                                else NETTUNO_SEATS
+                                if declared[0] == NETTUNO
+                                else REGISTER_SEATS,
+                            ]
+                        ),
                     )
                     over = voted is not None and slate["list_votes"].sum() > voted
                     council_set = result_set(f"{day}:{code}:council", elections[1], contest, [OVER] if over else [])
+                    if declared is not None:
+                        cs.add(
+                            "citation",
+                            entity_id=council_set,
+                            source_id=declared_source(declared[0]),
+                            locator={"url": NETTUNO, "pdf_pages": [1]}
+                            if declared[0] == NETTUNO
+                            else {"url": REGISTER, "ISTAT_CODICE_COMUNE": code},
+                        )
                     for row in slate.sort("list_votes", "list", descending=[True, False]).iter_rows(named=True):
                         leader = " ".join(
                             str(row.get(c) or "")
@@ -965,6 +1192,9 @@ def emit() -> Path:
                             cs.add("outcome", result_set_id=mayor_set, option_id=option, kind="elected")
                         elif round_ < final and who in finalists:
                             cs.add("outcome", result_set_id=mayor_set, option_id=option, kind="advanced")
+        for id, born in births.items():
+            if id not in elsewhere:
+                cs.add("person", id=id, birth_date=born, birth_precision="day" if born is not None else None)
         cs.frame(
             "result_value",
             pl.DataFrame(values, schema_overrides={"value": pl.Int64, "option_id": pl.String}).with_columns(
