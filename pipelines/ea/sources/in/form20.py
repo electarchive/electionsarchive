@@ -23,7 +23,8 @@ The election, the Lok Sabha, and every constituency contest of both States, with
 totals, are already held by in.eci_results. Each Form 20 result set attaches to that contest and its options, matched
 by the names the sheets print, and stays beside its default declared count.
 
-Maharashtra's 2019 sheets, which the Chief Electoral Officer still posts, are read by `form20_mh`, built from here.
+Maharashtra's 2019 sheets, which the Chief Electoral Officer still posts, are read by `form20_mh`, built from here,
+and Tamil Nadu's 2019 sheets, saved from the Chief Electoral Officer's site, by `form20_tn`.
 """
 
 import functools
@@ -53,6 +54,7 @@ from ea.package import Package
 from ea.store import DATA
 
 form20_mh = importlib.import_module("ea.sources.in.form20_mh")
+form20_tn = importlib.import_module("ea.sources.in.form20_tn")
 
 SOURCE = "in.form20"
 INDIA = str(uuid5(package.NAMESPACE, "polity\x1fIN"))
@@ -727,7 +729,11 @@ def package_key(s: State) -> str:
 
 def packages() -> list[str]:
     """The packages with at least one constituency whose sheets check out."""
-    return [*(package_key(s) for s in STATES.values() if constituencies(s)), *form20_mh.packages()]
+    return [
+        *(package_key(s) for s in STATES.values() if constituencies(s)),
+        *form20_mh.packages(),
+        *form20_tn.packages(),
+    ]
 
 
 def constituencies(s: State) -> list[Constituency]:
@@ -930,9 +936,12 @@ def parse() -> None:
             election(s).write()
     if form20_mh.packages():
         form20_mh.election().write()
+    if form20_tn.packages():
+        form20_tn.election().write()
     package.folder(SOURCE).mkdir(parents=True, exist_ok=True)
     (package.folder(SOURCE) / "coverage.json").write_text(json.dumps(coverage(), indent=1))
     (package.folder(SOURCE) / "coverage-mh-2019.json").write_text(json.dumps(form20_mh.coverage(), indent=1))
+    (package.folder(SOURCE) / "coverage-tn-2019.json").write_text(json.dumps(form20_tn.coverage(), indent=1))
 
 
 def emit() -> None:
