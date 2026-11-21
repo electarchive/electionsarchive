@@ -1,22 +1,25 @@
-import os
 import re
 import unicodedata
 from collections import Counter
 from datetime import date
+from functools import cache
 from pathlib import Path
 from uuid import UUID
 
 import polars as pl
 
-from ea import raw
-from ea.changeset import Changeset, slug
+from ea import package
+from ea.changeset import slug
 from ea.names import display
-from ea.sources.es.infoelectoral import APLIEXTR, PAGE, records
+from ea.package import Draft
+from ea.sources.es.infoelectoral import APLIEXTR, PAGE, ministry, records, retrieved
 from ea.store import DATA, connect
 
 SOURCE = "es.congreso"
+KEY = f"{SOURCE}/all"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
+TMP = DATA / "tmp" / SOURCE
 PUBLISHER = "Ministerio del Interior"
 TITLE = "Resultados electorales: Congreso de los Diputados (ficheros de datos)"
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, BLANK = 1, 2, 3, 4, 5, 6
@@ -174,17 +177,20 @@ def fold(text: str) -> str:
     return " ".join(re.sub(r"[^A-Z0-9]+", " ", plain).split())
 
 
+def spelling(entry: tuple[str, str]) -> tuple[int, bool, str, str]:
+    """How well a file prints a person's name: the files from 1977 to 2000 print names in capitals without accents
+    (ALVAREZ for Álvarez), which no casing can restore, so the spelling with the most accented letters ranks first,
+    then one in mixed case, then the later file."""
+    stamp, full = entry
+    return sum(not c.isascii() for c in full), any(c.islower() for c in full), stamp, full
+
+
 def party_key(abbrev: str, name: str) -> str:
     short = fold(abbrev).replace(" ", "")
     for key, (_item, aliases, fragment, *_rest) in PARTIES.items():
         if short in aliases and fragment in fold(name):
             return key
     return "n:" + fold(name)
-
-
-def wanted() -> list[str]:
-    chosen = os.environ.get("ES_CONGRESO", "")
-    return [stamp for stamp in DAYS if not chosen or stamp in chosen.split(",")]
 
 
 def fetch() -> None:
@@ -298,6 +304,11 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     for table, rows in tables.items():
         pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / f"{table}.parquet")
+    build()
+
+
+def emit() -> None:
+    package.run("load", [KEY])
 
 
 def dhondt(votes: dict[int, int], valid: int, seats: int) -> Counter[int]:
@@ -309,10 +320,13 @@ def dhondt(votes: dict[int, int], valid: int, seats: int) -> Counter[int]:
     return Counter(code for *_, code in quotients[:seats])
 
 
-def emit() -> Path:
-    stamps = wanted()
+def build() -> Path:
+    """Write the package es.congreso/all from the parsed tables. It reads the database, through Draft, so the rows
+    it rebuilds keep the ids the changeset path gave them."""
+    stamps = list(DAYS)
+    ident = cache(str)
     frames = {
-        table: pl.read_parquet(PARSED / f"{table}.parquet").filter(pl.col("stamp").is_in(stamps))
+        table: pl.read_parquet(PARSED / f"{table}.parquet")
         for table in (
             "lists",
             "candidates",
@@ -325,16 +339,28 @@ def emit() -> Path:
         )
     }
     with connect() as conn:
-        years = ", ".join(str(DAYS[stamp].year) for stamp in stamps)
-        cs = Changeset(
+        pin = retrieved(conn, SOURCE)
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                f"Congreso de los Diputados elections ({years}) by province, municipality, and polling station, with "
-                "lists, candidates, declared seats, and elected deputies, from the Ministry of the Interior's data files"
+                "Congreso de los Diputados elections (1977 to 2023) by province, municipality, and polling station, "
+                "with lists, candidates, declared seats, and elected deputies, from the Ministry of the Interior's data "
+                "files"
             ),
             polity="ES",
+        )
+        cs.accept(
+            "accounting.votes_valid",
+            "In some mesas, municipalities, and provinces the ministry's files print list votes that do not add up to "
+            "their own total of votes to candidacies; both are stored as printed, and each result set's note gives "
+            "the count",
+        )
+        cs.accept(
+            "accounting.turnout",
+            "In some mesas and municipalities the ministry's files print more ballots cast than registered voters; "
+            "they are stored as printed, and each result set's note gives the count",
         )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
@@ -358,7 +384,7 @@ def emit() -> Path:
         )
         for stamp in stamps:
             for extent in ("TOTA", "MESA"):
-                cs.artifact(raw.cached("es.infoelectoral", f"{APLIEXTR}02{stamp}_{extent}.zip"), source)
+                cs.artifact(pin(ministry(f"{APLIEXTR}02{stamp}_{extent}.zip")), source)
 
         systems = {}
         for key, rules, english, body in (
@@ -384,15 +410,18 @@ def emit() -> Path:
             name(systems[key], english)
             cs.add("note", entity_id=systems[key], kind="methodology", body_md=body)
 
-        by_item = dict(
-            conn.execute(
+        # Parties other pipelines hold under the Wikidata item; the parties this pipeline wrote itself are rebuilt in
+        # full below, with their keys and names.
+        by_item = {
+            item: entity
+            for item, entity in conn.execute(
                 """select x.value, x.entity_id from external_id x join party p on p.id = x.entity_id
                    where x.scheme = 'wikidata' and p.polity_id = %s
                    and not exists (select from entity_merge m where m.entity_id = p.id)""",
                 (spain,),
             ).fetchall()
-        )
-        existing = {row[0] for row in conn.execute("select id from party where polity_id = %s", (spain,))}
+            if entity not in cs.own_entities
+        }
         parties: dict[str, UUID] = {}
 
         def party_for(abbrev: str, label: str) -> UUID:
@@ -404,7 +433,8 @@ def emit() -> Path:
                 party = parties[key] = by_item[entry[0]]
                 return party
             party = parties[key] = cs.key("es.party", key)
-            if party in existing:
+            if party not in cs.minted:
+                # The key leads, through a merge, to a party another pipeline holds.
                 return party
             cs.add("party", id=party, kind="party", polity_id=spain)
             if entry is None:
@@ -416,17 +446,21 @@ def emit() -> Path:
                     name(party, english, "en", "english")
                 cs.add("external_id", entity_id=party, scheme="wikidata", value=item)
             name(party, " ".join(abbrev.split()), "es", "abbreviation")
-            existing.add(party)
             return party
 
+        # The 2025 map, as the methodology notes say: es.ine also holds the sections and municipalities that ceased
+        # before it, under the same codes.
+        current = "and (c.valid is null or c.valid @> date '2025-01-01')"
         sections = dict(
             conn.execute(
-                "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'es.seccion'"
+                "select c.code, a.id from area a join area_code c on c.area_id = a.id "
+                f"where a.scheme_code = 'es.seccion' {current}"
             ).fetchall()
         )
         municipality_areas = dict(
             conn.execute(
-                "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'es.municipio'"
+                "select c.code, a.id from area a join area_code c on c.area_id = a.id "
+                f"where a.scheme_code = 'es.municipio' {current}"
             ).fetchall()
         )
         unit_rows: dict[UUID, tuple[UUID, str, str, UUID | None, str, UUID | None, str]] = {}
@@ -445,6 +479,26 @@ def emit() -> Path:
             return municipality_units[code]
 
         values: list[tuple[str, str, str | None, int, int, int]] = []
+        TMP.mkdir(parents=True, exist_ok=True)
+
+        def flush(stamp: str) -> None:
+            """Write one election's values to a part, so the 17 million values of all elections never sit in memory
+            at once."""
+            part = TMP / f"result_value-{stamp}.parquet"
+            pl.DataFrame(
+                values,
+                schema={
+                    "result_set_id": pl.String,
+                    "unit_id": pl.String,
+                    "option_id": pl.String,
+                    "measure": pl.Int16,
+                    "value": pl.Int64,
+                    "channel": pl.Int16,
+                },
+                orient="row",
+            ).with_columns(count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)).write_parquet(part)
+            values.clear()
+            cs.part("result_value", part)
 
         def accounting(result_set: UUID, unit: UUID, row: dict[str, int], channel: int = 0) -> None:
             figures = {
@@ -456,7 +510,7 @@ def emit() -> Path:
             }
             for measure, value in figures.items():
                 if measure != REGISTERED or value:
-                    values.append((str(result_set), str(unit), None, measure, value, channel))
+                    values.append((ident(result_set), ident(unit), None, measure, value, channel))
 
         def over(frame: pl.DataFrame, votes: pl.DataFrame) -> str:
             count = frame.filter(
@@ -483,6 +537,10 @@ def emit() -> Path:
             .iter_rows()
         )
         mismatched, unmatched = [], 0
+        # Each person's name as each file prints it, keyed by the person after merges, so a person the files print
+        # in several elections takes one preferred spelling from them all.
+        printed: dict[UUID, list[tuple[str, str]]] = {}
+        genders: dict[UUID, set[str | None]] = {}
         for stamp in stamps:
             day = DAYS[stamp]
             lists = {row["list"]: row for row in frames["lists"].filter(pl.col("stamp") == stamp).iter_rows(named=True)}
@@ -567,7 +625,9 @@ def emit() -> Path:
                 unit = province_units[province]
                 accounting(province_set, unit, total)
                 for entry in rows.iter_rows(named=True):
-                    values.append((str(province_set), str(unit), str(options[entry["list"]]), VOTES, entry["votes"], 0))
+                    values.append(
+                        (ident(province_set), ident(unit), ident(options[entry["list"]]), VOTES, entry["votes"], 0)
+                    )
                     if entry["seats"]:
                         cs.add(
                             "outcome",
@@ -589,8 +649,8 @@ def emit() -> Path:
                     )
                     tag = f"{key}:{person_row['list']}:{person_row['kind']}{person_row['position']}"
                     person = cs.key(f"{SOURCE}.person", tag)
-                    cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(person_row["sex"]))
-                    name(person, display(full, "es"))
+                    genders.setdefault(person, set()).add({"M": "male", "F": "female"}.get(person_row["sex"]))
+                    printed.setdefault(person, []).append((stamp, full))
                     candidacy = cs.key(f"{SOURCE}.candidacy", tag)
                     cs.add(
                         "candidacy",
@@ -632,9 +692,9 @@ def emit() -> Path:
                         raise ValueError(f"{key}: municipality {row['code']} has votes for list {row['list']}")
                     values.append(
                         (
-                            str(municipality_set),
-                            str(municipality_unit(row["code"])),
-                            str(options[row["list"]]),
+                            ident(municipality_set),
+                            ident(municipality_unit(row["code"])),
+                            ident(options[row["list"]]),
                             VOTES,
                             row["votes"],
                             0,
@@ -687,7 +747,28 @@ def emit() -> Path:
                 for row in unit_votes.iter_rows(named=True):
                     unit, channel = mesa_units[row["code"]]
                     option = options[recoded.get(row["list"], row["list"])]
-                    values.append((str(mesa_set), str(unit), str(option), VOTES, row["votes"], channel))
+                    values.append((ident(mesa_set), ident(unit), ident(option), VOTES, row["votes"], channel))
+            flush(stamp)
+
+        conflicting = 0
+        for person, given in genders.items():
+            # Some files print no sex (1977 to 1996, 2004, and 2016), so a person on several files keeps the one the
+            # others print.
+            known = given - {None}
+            conflicting += len(known) > 1
+            cs.add("person", id=person, gender=known.pop() if len(known) == 1 else None)
+        print(f"{conflicting} persons the files give two sexes; their gender is left empty")
+        cs.names_in_full(printed)
+        for person, spellings in printed.items():
+            preferred, *others = sorted(set(spellings), key=spelling, reverse=True)
+            text = display(preferred[1], "es")
+            name(person, text, "es")
+            seen = {fold(text)}
+            for _stamp, full in others:
+                text = display(full, "es")
+                if fold(text) not in seen:
+                    seen.add(fold(text))
+                    cs.add("name", entity_id=person, text=text, lang="es", kind="official", is_preferred=False)
 
         print(f"D'Hondt differs from the declared seats in {len(mismatched)} contests: {mismatched}")
         print(f"{unmatched} candidates on lists with no votes in their province")
@@ -709,19 +790,4 @@ def emit() -> Path:
             cs.frame(
                 "reporting_unit", pl.DataFrame(minted, schema_overrides={"parent_id": pl.String, "area_id": pl.String})
             )
-        cs.frame(
-            "result_value",
-            pl.DataFrame(
-                values,
-                schema={
-                    "result_set_id": pl.String,
-                    "unit_id": pl.String,
-                    "option_id": pl.String,
-                    "measure": pl.Int16,
-                    "value": pl.Int64,
-                    "channel": pl.Int16,
-                },
-                orient="row",
-            ).with_columns(count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)),
-        )
         return cs.write()

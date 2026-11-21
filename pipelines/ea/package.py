@@ -3080,9 +3080,24 @@ class Draft(Changeset):
         # Changesets the package takes over besides the pipeline's published ones the database lists, so a build
         # without a database still names them and `ready.area_geometry` counts their outlines as its own.
         self.adopts: list[str] = []
+        self.parts: dict[str, list[Path]] = {}
+        self.named: set[str] = set()
 
     def accept(self, code: str, reason: str) -> None:
         self.accepted[code] = reason
+
+    def names_in_full(self, entities: Iterable[UUID]) -> None:
+        """The module writes every name these entities carry from this pipeline, merge survivors included: their stored
+        names, preferred or not, are not carried over, so the build's names replace them."""
+        self.named |= {str(entity) for entity in entities}
+
+    def part(self, table: str, path: Path) -> None:
+        """Stage a Parquet file of fact rows too large to hold in memory; write streams it into the build. Parts skip
+        the changeset path's tacit check, which marks a counted result set whose values are all zero as tacit, so a
+        module that stages parts must not depend on it."""
+        if table not in FACTS:
+            raise ValueError(f"{table} is not a fact table; stage its rows with add or frame")
+        self.parts.setdefault(table, []).append(path)
 
     def key(self, scheme: str, value: str) -> UUID:
         pair = (scheme, value)
@@ -3240,13 +3255,25 @@ class Draft(Changeset):
             if table in REDIRECTED
             else ""
         )
+        named = table == "name" and bool(self.named)
         rows = self.conn.execute(
             sql.SQL(
                 """select {} from {} t join changeset c on c.id = t.changeset_id
                    where c.pipeline = %s and c.status = 'published'
-                     and (t.{} in (select entity_id from entity_merge){}{})"""
-            ).format(_select(schema, absent), sql.Identifier(table), sql.Identifier(column), foreign, redirected),
-            [pipeline, self.absorbed()] if table in REDIRECTED else [pipeline],
+                     and (t.{} in (select entity_id from entity_merge){}{}){}"""
+            ).format(
+                _select(schema, absent),
+                sql.Identifier(table),
+                sql.Identifier(column),
+                foreign,
+                redirected,
+                sql.SQL(" and t.entity_id <> all(%s::uuid[])" if named else ""),
+            ),
+            [
+                pipeline,
+                *([self.absorbed()] if table in REDIRECTED else []),
+                *([sorted(self.named)] if named else []),
+            ],
         ).fetchall()
         if not rows:
             return None
@@ -3306,7 +3333,8 @@ class Draft(Changeset):
                 pl.col(column).str.to_uppercase() for column in GEOMETRY_COLUMNS if column in final.columns
             )
             if table in REDIRECTED:
-                final = final.filter(~pl.col("entity_id").is_in(self.absorbed()))
+                redirects = [entity for entity in self.absorbed() if table != "name" or entity not in self.named]
+                final = final.filter(~pl.col("entity_id").is_in(redirects))
             carried = self._carry(table, schema)
             if carried is not None:
                 kept = TABLES[table][0]
@@ -3318,6 +3346,31 @@ class Draft(Changeset):
             if table in OPTIONAL:
                 _trim(table, out / f"{table}.parquet")
             counts[table] = final.height
+        for table, paths in self.parts.items():
+            schema = FACTS[table]
+            defaults = self.defaults.get(table, {})
+            pieces = [pl.scan_parquet(path) for path in paths]
+            if table in counts:
+                pieces.insert(0, pl.scan_parquet(out / f"{table}.parquet"))
+            pieces = [
+                _conform(
+                    piece.with_columns(
+                        pl.lit(defaults[column]).alias(column)
+                        for column in schema
+                        if column in defaults and column not in piece.collect_schema().names()
+                    ),
+                    schema,
+                    True,
+                )
+                for piece in pieces
+            ]
+            kind = _settle(pieces, table)
+            staged = out / f".{table}.parquet"
+            pl.concat([piece.with_columns(pl.col("value").cast(kind)) for piece in pieces]).sink_parquet(
+                staged, statistics=False
+            )
+            staged.replace(out / f"{table}.parquet")
+            counts[table] = int(pl.scan_parquet(out / f"{table}.parquet").select(pl.len()).collect().item())
         for table, (_, schema) in TABLES.items():
             if table in counts:
                 continue
