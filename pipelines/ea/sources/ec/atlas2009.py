@@ -539,7 +539,7 @@ def prefect_reads(page: int) -> tuple[list[Read], Read]:
     cols = [(left, top, right, bottom) for left, right in table.columns]
     votes, vote_reads = _number(image, cols[2], "0123456789.", VOTES)
     share, share_reads = _number(image, cols[3], "0123456789,%", SHARE)
-    return found, Read(0, ("", "", "", votes, share), (vote_reads, share_reads), cols[2])
+    return found, Read(0, ("", "", "", votes, share), (vote_reads, share_reads), cols)
 
 
 class Prefect(NamedTuple):
