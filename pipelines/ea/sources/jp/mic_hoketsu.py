@@ -9,15 +9,17 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+import pymupdf
 
-from ea import raw
-from ea.changeset import Changeset, slug
-from ea.sources.jp import mic, mic_hoc
+from ea import package, raw
+from ea.changeset import slug
+from ea.package import Draft
+from ea.sources.jp import hoketsu_local, mic, mic_hoc
 from ea.sources.jp.mlit import PREFECTURES
 from ea.store import DATA, connect
 
 SOURCE = "jp.mic_hoketsu"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 ROOT = f"{mic.DATA_ROOT}/hoketsu"
 PAGES = {"hor": f"{ROOT}/hoketsu_1.html", "hoc": f"{ROOT}/hoketsu_2.html"}
@@ -71,9 +73,13 @@ def fetch() -> None:
         raw.fetch(SOURCE, page, suffix=".html")
     for item in listings():
         raw.fetch(SOURCE, item.url, suffix=".pdf")
+    hoketsu_local.fetch()
 
 
-def words(path: Path) -> list[tuple[float, float, float, float, str]]:
+Word = tuple[float, float, float, float, str]
+
+
+def poppler_words(path: Path) -> list[Word]:
     xml = subprocess.run(["pdftotext", "-bbox", str(path), "-"], capture_output=True, text=True, check=True).stdout
     return [
         (float(a), float(b), float(c), float(d), unicodedata.normalize("NFKC", t))
@@ -81,9 +87,43 @@ def words(path: Path) -> list[tuple[float, float, float, float, str]]:
     ]
 
 
+def mupdf_words(path: Path, gap: float = 0.2) -> list[Word]:
+    """Words as pdftotext -bbox splits them, read with MuPDF, whose bundled CMaps decode the Adobe-Japan1 fonts of
+    the older summaries where a poppler without its language pack reads nothing. A word breaks at a space or at a gap
+    wider than `gap` times the font size, which splits names and furigana as pdftotext does on every summary both
+    can read."""
+    found: list[Word] = []
+    with pymupdf.open(path) as document:
+        for page in document:
+            for block in page.get_text("rawdict")["blocks"]:
+                for line in block.get("lines", []):
+                    for span in line["spans"]:
+                        word: list[tuple[float, float, float, float, str]] = []
+                        for char in span["chars"]:
+                            x0, y0, x1, y1 = char["bbox"]
+                            if word and (char["c"].isspace() or x0 - word[-1][2] > span["size"] * gap):
+                                found.append(_joined(word))
+                                word = []
+                            if not char["c"].isspace():
+                                word.append((x0, y0, x1, y1, char["c"]))
+                        if word:
+                            found.append(_joined(word))
+    return [(a, b, c, d, unicodedata.normalize("NFKC", t)) for a, b, c, d, t in found]
+
+
+def _joined(chars: list[Word]) -> Word:
+    return (chars[0][0], min(c[1] for c in chars), chars[-1][2], max(c[3] for c in chars), "".join(c[4] for c in chars))
+
+
+def words(path: Path) -> list[Word]:
+    return poppler_words(path) or mupdf_words(path)
+
+
 def layout(path: Path) -> str:
     out = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
-    return unicodedata.normalize("NFKC", out)
+    if out.strip() or not mupdf_words(path):
+        return unicodedata.normalize("NFKC", out)
+    return "\n".join(rows_of(mupdf_words(path), " "))
 
 
 def rows_of(items: list[tuple[float, float, float, float, str]], joiner: str = "") -> list[str]:
@@ -347,11 +387,14 @@ def parse() -> None:
         else:
             meta, rows = parse_pdf(item)
         prefectures, district = district_of(item)
+        codes = [CODES[prefecture] for prefecture in prefectures]
         meta |= {
             "label": item.label,
             "prefectures": "・".join(prefectures),
             "district": district,
             "rerun": "再選挙" in item.label,
+            "codes": ",".join(codes),
+            "key": f"{meta['held']}:{item.chamber}:{''.join(codes)}" + (f":{district}" if district else ""),
         }
         valid = Decimal(meta["valid"])
         total = sum(Decimal(row["votes"]) for row in rows)
@@ -362,8 +405,15 @@ def parse() -> None:
         contests.append(meta)
         candidates += [row | {"held": meta["held"], "chamber": item.chamber, "label": item.label} for row in rows]
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(contests).write_parquet(PARSED / f"contests-v{VERSION}.parquet")
-    pl.DataFrame(candidates).write_parquet(PARSED / f"candidates-v{VERSION}.parquet")
+    contest_frame, candidate_frame = pl.DataFrame(contests), pl.DataFrame(candidates)
+    contest_frame.write_parquet(PARSED / f"contests-v{VERSION}.parquet")
+    candidate_frame.write_parquet(PARSED / f"candidates-v{VERSION}.parquet")
+    with connect() as conn:
+        # mic.Places keeps the first code of a name in the order its query returns rows, and a server-side prepared
+        # plan, which psycopg switches to after five runs, can return them in another order.
+        conn.prepare_threshold = None
+        local = hoketsu_local.parse(conn, contest_frame, candidate_frame)
+    local.write_parquet(PARSED / f"local-v{VERSION}.parquet")
 
 
 NHK = "NHKと裁判してる党弁護士法72条違反で"
@@ -380,6 +430,22 @@ METHOD = (
     "candidates share are apportioned (按分) and carry decimals. The candidates' votes were checked against the "
     "valid votes (有効投票数)."
 )
+MEASURES = {"registered": 2, "voters": 14, "cast": 3, "valid": 4, "invalid": 5}
+MEASURE_NAMES = {
+    "registered": "electors on the day (当日有権者数)",
+    "voters": "voters (投票者数)",
+    "cast": "ballots cast (投票総数)",
+    "valid": "valid votes (有効投票数)",
+    "invalid": "invalid votes (無効投票数)",
+}
+LOCAL_METHOD = (
+    "Candidate votes by counting district (開票区) from the {publisher}'s count of the by-election. Each counting "
+    "district is a municipality or a ward of a designated city; a city the district shares with another district is "
+    "held as its part in the district, within the city. The candidates' votes summed over the counting districts equal "
+    "the ministry's district totals (補欠選挙結果調), which this result set supersedes; votes apportioned between "
+    "namesakes (按分) keep the fractions the commission prints. A turnout figure is kept only where its counting "
+    "districts sum to the ministry's figure."
+)
 SMD_SYSTEM_NOTE = "A by-election fills one vacant seat in the single-member district by a plurality of votes."
 HOC_NOTE = (
     "A by-election for a House of Councillors district seat, held when a seat in the district falls vacant; the "
@@ -393,19 +459,31 @@ def party_text(text: str) -> str:
     return mic.party_label(mic_hoc.ALIASES.get(text, text))
 
 
-def emit() -> Path:
+KEY = f"{SOURCE}/all"
+SUMMARY = (
+    "Japan's House of Representatives and House of Councillors by-elections since April 2002 from the Ministry of "
+    "Internal Affairs and Communications: candidates, votes for the whole district, voters, and declared winners"
+)
+
+
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def build() -> Path:
+    """Write the package jp.mic_hoketsu/all from the parsed tables. It reads the database, through Draft, so the rows
+    it rebuilds keep the ids the changeset path gave them."""
     contests = pl.read_parquet(PARSED / f"contests-v{VERSION}.parquet")
     candidates = pl.read_parquet(PARSED / f"candidates-v{VERSION}.parquet")
+    local = pl.read_parquet(PARSED / f"local-v{VERSION}.parquet")
     english = dict(PREFECTURES)
     with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary="Japan's House of Representatives and House of Councillors by-elections since April 2002 from the "
-            "Ministry of Internal Affairs and Communications: candidates, votes for the whole district, voters, "
-            "and declared winners",
-            polity="JP",
+        cs = Draft(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="JP")
+        cs.accept(
+            "accounting.votes_valid",
+            "Chiba 5 (2023), Shizuoka 4 (2020), and Kagoshima 5 (2004): the summaries print candidate votes with the "
+            "fractions of apportioned ballots (按分) for candidates who share a name, and the fractions sum to 0.002 "
+            "to 0.022 below the whole valid votes the summary prints",
         )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official", preferred: bool = True) -> None:
@@ -479,6 +557,83 @@ def emit() -> Path:
 
         def prefecture_unit(code: str) -> UUID:
             return unit("jp.prefecture", code, None, cs.area("jp.prefecture", code), "equals", cs.polity(f"JP-{code}"))
+
+        records = {record.key: record for record in hoketsu_local.RECORDS}
+
+        def commission_count(
+            key: str,
+            day: date,
+            election: UUID,
+            contest: UUID,
+            superseded: UUID,
+            options: dict[int, tuple[UUID, bool]],
+            counted: pl.DataFrame,
+        ) -> list[tuple[UUID, UUID, UUID | None, int, Decimal]]:
+            """The prefectural commission's count by counting district, as a result set that supersedes the
+            ministry's district totals."""
+            record = records[key]
+            publisher, license, license_url, attribution = record.commission()
+            source = cs.source(publisher, record.title)
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=publisher,
+                title=record.title,
+                url=record.page,
+                license=license,
+                license_url=license_url,
+                attribution=attribution,
+            )
+            for url in record.files:
+                cs.artifact(raw.cached(SOURCE, url), source)
+            result_set = cs.key(f"{SOURCE}.result_set", f"{key}:local")
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                source_id=source,
+                status="active",
+                is_default=True,
+                completeness=1,
+                supersedes_id=superseded,
+            )
+            kept = sorted(set(counted["measure"]) - {"votes"}, key=list(MEASURES).index)
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=LOCAL_METHOD.format(publisher=publisher)
+                + (
+                    f" Turnout figures by counting district: {', '.join(MEASURE_NAMES[m] for m in kept)}."
+                    if kept
+                    else " The commission's tables give no turnout figure that sums to the ministry's."
+                ),
+            )
+            for option, elected in options.values():
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=option,
+                    kind="elected" if elected else "lost",
+                    seats=1 if elected else None,
+                )
+            out = []
+            for row in counted.iter_rows(named=True):
+                code = row["code"]
+                polity = cs.polity(f"JP-{code[:2]}")
+                area = cs.area(row["scheme"], code, day)
+                place = unit(row["scheme"], code, prefecture_unit(code[:2]), area, "equals", polity)
+                if row["piece"]:
+                    place = unit(mic.PIECES, f"{day}:{code}:{row['piece']}", place, area, "within", polity)
+                if row["measure"] == "votes":
+                    out.append((result_set, place, options[row["order"]][0], 1, Decimal(row["value"])))
+                else:
+                    out.append((result_set, place, None, MEASURES[row["measure"]], Decimal(row["value"])))
+            return out
 
         values: list[tuple[UUID, UUID, UUID | None, int, Decimal]] = []
         elections: dict[tuple[str, str], UUID] = {}
@@ -554,6 +709,7 @@ def emit() -> Path:
             if meta["rerun"]:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=RERUN_NOTE)
             result_set = cs.key(f"{SOURCE}.result_set", key)
+            counted = local.filter(pl.col("key") == key)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -562,8 +718,8 @@ def emit() -> Path:
                 stage="official",
                 kind="counted",
                 source_id=source,
-                status="active",
-                is_default=True,
+                status="superseded" if counted.height else "active",
+                is_default=not counted.height,
                 completeness=1,
             )
             cs.artifact(raw.cached(SOURCE, meta["url"]), source)
@@ -585,8 +741,10 @@ def emit() -> Path:
                     "(有効投票数), and voters equal ballots cast plus ballots taken home.",
                 )
             seen: set[str] = set()
+            options: dict[int, tuple[UUID, bool]] = {}
             for row in candidates.filter(pl.col("label") == meta["label"]).iter_rows(named=True):
                 option = cs.key(f"{SOURCE}.option", f"{key}:{row['order']}")
+                options[row["order"]] = (option, row["result"] == "当")
                 member = party(row["party"], held) if row["party"] else None
                 plain_name = mic.plain(row["name"])
                 suffix = f":{row['order']}" if plain_name in seen else ""
@@ -627,8 +785,10 @@ def emit() -> Path:
                     seats=1 if elected else None,
                 )
                 values.append((result_set, district_unit, option, 1, Decimal(row["votes"])))
-            for field, measure in {"registered": 2, "voters": 14, "cast": 3, "valid": 4, "invalid": 5}.items():
+            for field, measure in MEASURES.items():
                 values.append((result_set, district_unit, None, measure, Decimal(meta[field])))
+            if counted.height:
+                values += commission_count(key, day, election, contest, result_set, options, counted)
         for result_set, place, option, measure, amount in values:
             cs.add(
                 "result_value",
