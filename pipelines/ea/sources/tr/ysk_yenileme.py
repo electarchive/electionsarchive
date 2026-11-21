@@ -21,6 +21,7 @@ from ea import package, raw
 from ea.package import Package
 from ea.sources.tr.ysk import INDEPENDENTS, INVALID, LICENSE, PUBLISHER, REGISTERED, VALID, VOTERS, VOTES, title
 from ea.sources.tr.ysk_il_meclisi import TURKEY
+from ea.sources.tr.ysk_mayor_boxes_2014 import ANNULLED
 from ea.sources.tr.ysk_meclis import EMPTY, PARTIES, SITE
 from ea.sources.tr.ysk_muhtarlik import API, HEADERS, get
 from ea.store import connect
@@ -31,13 +32,33 @@ MARCH = date(2014, 3, 30)
 KEY = f"{SOURCE}/{DAY}"
 GENERAL = 11979  # the service's id of the local elections of March 30, 2014
 MAYOR, COUNCIL = 2, 3
-# The reruns of the mayoral and council races that YSK annulled, as the contest key of the place, then the rerun's
-# election id in the rerun list, and the service's province and district ids. The list's other reruns that day are
-# mayoral races alone, and Ağrı's and Yeşilyurt's provincial council reruns are left to the provincial council
-# pipeline.
+
+
+class Rerun(NamedTuple):
+    secim: int  # the rerun's election id in the rerun list
+    il: int  # the service's province, district, and belde ids of the place
+    ilce: int
+    belde: int = 0
+    races: tuple[int, ...] = (MAYOR,)
+
+
+# The reruns of the races that YSK annulled, as the contest key of the place. Ağrı and Yeşilyurt reran their mayoral
+# and council races; their provincial council reruns are left to the provincial council pipeline. The other reruns
+# that day are mayoral races alone, four of them in a belde.
 RERUNS = {
-    "agri": (12921, 4, 11),
-    "tokat-yesilyurt": (12897, 60, 751),
+    "agri": Rerun(12921, 4, 11, races=(MAYOR, COUNCIL)),
+    "tokat-yesilyurt": Rerun(12897, 60, 751, races=(MAYOR, COUNCIL)),
+    "aydin-buharkent": Rerun(13059, 9, 674),
+    "bitlis-guroymak": Rerun(12846, 13, 691),
+    "cankiri-sabanozu": Rerun(12871, 18, 542),
+    "corum-ortakoy-astavul": Rerun(12773, 19, 449, 4747),
+    "erzincan-tercan-cadirkaya": Rerun(12908, 24, 568, 4895),
+    "eskisehir-mahmudiye": Rerun(12939, 26, 401),
+    "kastamonu-catalzeytin": Rerun(12923, 37, 136),
+    "nigde-merkez-baglama": Rerun(12922, 51, 437, 3626),
+    "yozgat-sorgun-eymir": Rerun(13018, 66, 528, 4010),
+    "bayburt-aydintepe": Rerun(12866, 69, 660),
+    "yalova": Rerun(13060, 77, 609),
 }
 TITLE = "Sandık Sonuçları: 1 Haziran 2014 yenileme seçimleri"
 NOTE = (
@@ -85,7 +106,7 @@ def results(il: int, ilce: int | str) -> dict[str, int | str]:
     }
 
 
-def crawl(client: httpx.Client, secim: int, il: int) -> list[tuple[str, object]]:
+def crawl(client: httpx.Client, secim: int, il: int, races: tuple[int, ...]) -> list[tuple[str, object]]:
     out: list[tuple[str, object]] = []
 
     def call(path: str, query: dict[str, int | str]) -> list[dict[str, int | str]]:
@@ -93,7 +114,7 @@ def crawl(client: httpx.Client, secim: int, il: int) -> list[tuple[str, object]]
         out.append((f"{API}{path}?{urlencode(query)}", rows))
         return rows
 
-    for turu in (MAYOR, COUNCIL):
+    for turu in races:
         base: dict[str, int | str] = {"secimId": encoded(secim), "secimTuru": turu}
         call("getIlList", base | {"sandikTuru": -1, "yurtIciDisi": 1})
         places = call("getIlceList", base | {"ilId": il, "secimCevresiId": "", "sandikTuru": -1, "yurtIciDisi": 1})
@@ -126,13 +147,13 @@ def fetch() -> None:
                 retrieved_at=datetime.now(UTC),
                 media_type="application/json",
             )
-        for secim, il, _ in RERUNS.values():
-            url = bundle_url(secim)
+        for rerun in RERUNS.values():
+            url = bundle_url(rerun.secim)
             if url in have:
                 continue
             lines = "".join(
                 json.dumps({"url": request, "response": response}, ensure_ascii=False) + "\n"
-                for request, response in crawl(client, secim, il)
+                for request, response in crawl(client, rerun.secim, rerun.il, rerun.races)
             )
             raw.store(
                 SOURCE,
@@ -157,8 +178,9 @@ def num(value: object) -> int:
     return int(str(value or 0))
 
 
-def read(secim: int, il: int, ilce: int) -> dict[int, Race]:
+def read(rerun: Rerun) -> dict[int, Race]:
     """Each race of one rerun, by the service's race type."""
+    secim, place = rerun.secim, (rerun.il, rerun.ilce, rerun.belde)
     found: dict[int, Race] = {}
     with gzip.open(raw.cached(SOURCE, bundle_url(secim)).path, "rt") as file:
         for line in file:
@@ -171,7 +193,7 @@ def read(secim: int, il: int, ilce: int) -> dict[int, Race]:
             response = data["response"]
             match parsed.path.rsplit("/", 1)[1]:
                 case "getIlceList":
-                    if [(num(r["il_ID"]), num(r["ilce_ID"]), num(r["belde_ID"])) for r in response] != [(il, ilce, 0)]:
+                    if [(num(r["il_ID"]), num(r["ilce_ID"]), num(r["belde_ID"])) for r in response] != [place]:
                         raise ValueError(f"election {secim}: unexpected places {response}")
                     race.seats = num(response[0]["secilecek_ADAY_SAYISI"])
                 case "getSandikSecimSonucBaslikList":
@@ -188,7 +210,7 @@ def read(secim: int, il: int, ilce: int) -> dict[int, Race]:
                         race.boxes += response
                     else:
                         (race.total,) = response
-    if set(found) != {MAYOR, COUNCIL} or not all(race.seats and race.total and race.boxes for race in found.values()):
+    if set(found) != set(rerun.races) or not all(race.seats and race.total and race.boxes for race in found.values()):
         raise ValueError(f"election {secim}: races {sorted(found)} incomplete")
     return found
 
@@ -216,7 +238,8 @@ def reference() -> Reference:
                    where x.scheme = 'tr.election' and x.value = %s and c.kind = 'office'""",
                 [f"{MARCH}:{key}-mayor"],
             ).fetchall()
-            if len(row) != 1 or row[0][2] != "annulled":
+            # The March 30 race is annulled in the archive, or becomes so when its package loads with this one.
+            if len(row) != 1 or key not in ANNULLED or row[0][2] not in ("annulled", "held"):
                 raise ValueError(f"{key}: the archive holds {row} for March 30")
             march[key] = dict(zip(("election", "polity", "status", "path", "office", "area", "english"), row[0]))
         parties = {
@@ -252,8 +275,8 @@ def build() -> Package:
     p = Package(
         KEY,
         SOURCE,
-        "Turkey's June 1, 2014 reruns of the annulled mayoral and council races of Ağrı and Tokat Yeşilyurt, by "
-        "ballot box, from YSK's Sandık Sonuçları",
+        f"Turkey's June 1, 2014 reruns of the annulled mayoral races of {len(RERUNS)} municipalities, and the council "
+        "races of Ağrı and Tokat Yeşilyurt, by ballot box, from YSK's Sandık Sonuçları",
     )
     source = p.id("source", TITLE)
     p.add(
@@ -289,14 +312,15 @@ def build() -> Package:
     unit_rows: list[Row] = []
     values: list[tuple[str, str, str | None, int, int]] = []
     summary = []
-    for key, (secim, il, ilce) in RERUNS.items():
-        entries = [r for r in listed if num(r["secim_ID"]) == secim]
-        if {num(r["secim_TURU_KODU"]) for r in entries} < {MAYOR, COUNCIL} or {
+    for key, rerun in RERUNS.items():
+        il, ilce, belde = rerun.il, rerun.ilce, rerun.belde
+        entries = [r for r in listed if num(r["secim_ID"]) == rerun.secim]
+        if {num(r["secim_TURU_KODU"]) for r in entries} < set(rerun.races) or {
             r["secim_TARIHI"][:10] for r in entries
         } != {str(DAY)}:
             raise ValueError(f"{key}: the rerun list gives {entries}")
-        races = read(secim, il, ilce)
-        p.artifact(raw.cached(SOURCE, bundle_url(secim)), source)
+        races = read(rerun)
+        p.artifact(raw.cached(SOURCE, bundle_url(rerun.secim)), source)
         march = ref.march[key]
         english = str(march["english"]).removeprefix("Mayor of ")
         path = str(march["path"]).replace(f"/{MARCH}-local", f"/{DAY}-local")
@@ -313,8 +337,14 @@ def build() -> Package:
             status="held",
             rerun_of_id=march["election"],
         )
-        p.name(election, f"{DAY.year} {english} local election rerun", "en", "official")
-        p.name(election, f"{english} Belediye Başkanlığı ve Belediye Meclisi Yenileme Seçimi", "tr", "native", False)
+        if COUNCIL in rerun.races:
+            p.name(election, f"{DAY.year} {english} local election rerun", "en", "official")
+            p.name(
+                election, f"{english} Belediye Başkanlığı ve Belediye Meclisi Yenileme Seçimi", "tr", "native", False
+            )
+        else:
+            p.name(election, f"{DAY.year} {english} mayoral election rerun", "en", "official")
+            p.name(election, f"{english} Belediye Başkanlığı Yenileme Seçimi", "tr", "native", False)
         p.add("slug", path=path, entity_id=election, is_current=True)
         p.add("external_id", entity_id=election, scheme="tr.election", value=f"{DAY}:{key}-mayor")
 
@@ -394,7 +424,7 @@ def build() -> Package:
 
             sums: Counter[str] = Counter()
             for row in sorted(race.boxes, key=lambda r: num(r["sandik_ID"])):
-                if (num(row["il_ID"]), num(row["ilce_ID"]), num(row["belde_ID"])) != (il, ilce, 0):
+                if (num(row["il_ID"]), num(row["ilce_ID"]), num(row["belde_ID"])) != (il, ilce, belde):
                     raise ValueError(f"{key}: a box outside the municipality: {row['sandik_ID']}")
                 code = f"{DAY}:{il:02d}:{ilce}:{row['sandik_NO']}"
                 if code not in units:
@@ -479,8 +509,9 @@ def build() -> Package:
     p.external |= external
     p.accept(
         "accounting.turnout",
-        "In two boxes, one in each municipality, the service gives four more voters than registered voters in both "
-        "races; the boxes are stored as the service publishes them.",
+        "In five boxes, one each in Ağrı, Yeşilyurt, Buharkent, Mahmudiye, and Yalova, the service gives one to six "
+        "more voters than registered voters, in both races where there are two; the boxes are stored as the service "
+        "publishes them.",
     )
     print("\n".join(summary))
     print(f"{len(units)} boxes, {len(values)} values")
