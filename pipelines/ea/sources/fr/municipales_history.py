@@ -14,6 +14,7 @@ from psycopg import Connection
 
 from ea import package, raw
 from ea.changeset import Changeset, slug
+from ea.sources.fr import municipales
 from ea.sources.fr.names import person_name
 from ea.store import DATA, connect
 
@@ -1182,6 +1183,21 @@ SUMMARY = "French municipal elections from 2001 to 2026, both rounds, by commune
 # Rows that belong to an entity: the package adds them only for the entities the overseas rows mint, so an entity
 # the archive holds keeps its names, notes, slugs, and keys as published.
 ENTITY_ROWS = ("name", "note", "slug", "external_id", "citation")
+# Only findings that the ministry's own figures cause may be accepted.
+ACCEPTABLE = ("accounting.", "outcomes.")
+ACCEPTED = {
+    "accounting.votes_valid": "as the ministry's files give them: the 2008 files of communes under 3,500 list only "
+    "the elected candidates, so their votes fall short of the valid votes (caveat on each result set), and in one "
+    "2020 commune and some 30 of 2026 the lists' votes differ from the file's own valid vote total",
+    "accounting.turnout": "the 2026 results file gives one commune more voters than registered voters (caveat on the "
+    "result set)",
+    "outcomes.seats_magnitude": "as the 2026 results file gives them: since 2026 a list in a commune under 1,000 "
+    "inhabitants may have fewer candidates than seats and the seats it cannot fill stay vacant, so the lists' seats "
+    "add up to less than the council; in a few communes the file's seats differ from its elected councilors "
+    "(caveat on each)",
+    "outcomes.list_members": "the 2026 file of elected councilors names a different number of a list's candidates "
+    "than the seats the results file gives it (caveat on each result set)",
+}
 
 
 def overseas(code: str) -> bool:
@@ -1196,6 +1212,37 @@ def derived_id(table: str, row: dict[str, object]) -> str:
         parts += [column, chr(30) if value is None else str(value).lower() if isinstance(value, bool) else str(value)]
     digest = hashlib.md5(chr(31).join(parts).encode()).hexdigest()
     return str(UUID(f"{digest[:12]}8{digest[13:16]}8{digest[17:]}"))
+
+
+def leave_out_negatives(out: Path, defaults: dict[str, object]) -> dict[str, int]:
+    """The 2026 results file gives a negative count of null ballots in a few communes (its voters less its valid and
+    blank ballots), which the changeset path stored as given. As `municipales.emit` now does, the package leaves each
+    negative count out and adds a caveat on its result set saying so."""
+    file = out / "result_value.parquet"
+    values = pl.read_parquet(file)
+    negative = values.filter(pl.col("value") < 0)
+    if not negative.height:
+        return {}
+    if negative.filter((pl.col("measure") != 5) | pl.col("option_id").is_not_null()).height:
+        raise ValueError(f"{KEY}: negative values other than null ballots\n{negative}")
+    print(f"{KEY}: {negative.height} negative null ballot counts left out", flush=True)
+    kept = values.filter(pl.col("value").is_null() | (pl.col("value") >= 0))
+    kept.write_parquet(file, statistics=False)
+    rows = [
+        {"entity_id": result_set, "kind": "caveat", "body_md": municipales.NEGATIVE_CAVEAT.format(value=value)}
+        for result_set, value in negative.select("result_set_id", "value").iter_rows()
+    ]
+    staged = pl.DataFrame(rows).with_columns(id=pl.Series([derived_id("note", row) for row in rows], dtype=pl.String))
+    file = out / "note.parquet"
+    notes = pl.read_parquet(file)
+    schema = package.TABLES["note"][1]
+    added = (
+        staged.select(package._column(staged, column, schema[column], defaults.get(column)) for column in notes.columns)
+        .cast({column: kind for column, kind in notes.schema.items()})
+        .join(notes.select("id"), on="id", how="anti")
+    )
+    pl.concat([notes, added]).write_parquet(file, statistics=False)
+    return {"result_value": kept.height, "note": notes.height + added.height}
 
 
 def package_from_export() -> Path:
@@ -1255,11 +1302,14 @@ def package_from_export() -> Path:
         if table in package.OPTIONAL:
             package._trim(table, file)
         counts[table] = frame.height
+    counts.update(leave_out_negatives(out, cs.defaults.get("note", {})))
     built = package._seal(KEY, SOURCE, SUMMARY, out, counts, manifest["adopts"], cited, None)
     after = {code: n for code, n, _ in package.check(out)}
     print(f"{KEY}: check findings {before} before the overseas rows, {after} after", flush=True)
     if set(after) - set(before):
         raise ValueError(f"{KEY}: the overseas rows add the findings {sorted(set(after) - set(before))}")
-    built["accepted"] = manifest["accepted"]
+    if refused := [code for code in after if not code.startswith(ACCEPTABLE)]:
+        raise ValueError(f"{KEY}: findings that cannot be accepted: {refused}")
+    built["accepted"] = {code: ACCEPTED.get(code, manifest["accepted"][code]) for code in after}
     (out / "package.json").write_text(json.dumps(built, indent=1) + "\n")
     return out
