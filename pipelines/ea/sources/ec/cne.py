@@ -357,6 +357,13 @@ def book() -> tuple[dict[int, tuple[str, str]], dict[int, list[tuple[str, str, s
 SEAT = re.compile(
     rf"(?P<list>\d{{1,3}}(?:-\d{{1,3}})*) {{2,}}(?:(?P<org>{WORD}) {{2,}})?(?P<name>{WORD}) {{2,}}(?P<votes>{NUMBER}) +(?P<seat>\d{{1,2}}) *$"
 )
+# the Galapagos rural table prints the seat before the votes
+SEAT_FIRST = re.compile(
+    rf"(?P<list>\d{{1,3}}(?:-\d{{1,3}})*) {{2,}}(?:(?P<org>{WORD}) {{2,}})?(?P<name>{WORD}) {{2,}}(?P<seat>\d{{1,2}}) {{2,}}(?P<votes>{NUMBER}) *$"
+)
+# a name that wraps prints its first words beside the list and its last words beside the votes
+HEAD = re.compile(rf"(?P<list>\d{{1,3}}(?:-\d{{1,3}})*) {{2,}}(?P<org>{WORD}) {{2,}}(?P<name>{WORD}) *$")
+TAIL = re.compile(rf"^ *(?:\S+ +)?(?P<name>{WORD}) {{2,}}(?P<votes>{NUMBER}) +(?P<seat>\d{{1,2}}) *$")
 # the heading above each table of councillors names its dignity: urban, by urban circumscription, or rural
 COUNCIL_HEADS = (("CONCEJALES URBANOS", "5"), ("CONCEJALES POR CIRCUNSCRIPCI", "5"), ("CONCEJALES RURALES", "3"))
 
@@ -381,21 +388,34 @@ def councillors() -> list[tuple[list[Councillor], str]]:
     end = next(i for i, line in enumerate(lines) if "Composición de las juntas parroquiales" in line)
     groups: list[tuple[list[Councillor], str]] = []
     dignity, current, around = "", [], []
+    seat_first, pending, gap, started = False, None, 0, 0
     for line in lines[start:end]:
         if "RESULTADOS ELECTORALES" in line or "<" in line:
+            seat_first = "GALÁPAGOS" in line and "RURALES" in line
             for head, value in COUNCIL_HEADS:
                 if head in line:
                     dignity = value
-        found = SEAT.search(line)
+        found = (SEAT_FIRST if seat_first else SEAT).search(line)
+        name, org = (found["name"], found["org"] or "") if found else ("", "")
+        if not found and pending is not None and (tail := TAIL.match(line)):
+            found, name, org = tail, f"{pending['name']} {tail['name']}", pending["org"]
+        wrapped = bool(pending) and found is not None and "list" not in found.groupdict()
+        if found:
+            pending = None
+        elif head := HEAD.search(line):
+            pending, gap, started = head, 0, len(around)
+        elif line.strip():
+            gap += 1
+            if gap > 1:
+                pending = None
         if not found:
             around.append(line)
             continue
-        row = Councillor(
-            dignity, int(found["votes"].replace(".", "")), clean(found["name"]), found["org"] or "", int(found["seat"])
-        )
+        row = Councillor(dignity, int(found["votes"].replace(".", "")), clean(name), org, int(found["seat"]))
         if row.seat == 1 and current:
-            groups.append((current, " ".join(around)))
-            current, around = [], []
+            keep = started if wrapped else len(around)
+            groups.append((current, " ".join(around[:keep])))
+            current, around = [], around[keep:]
         current.append(row)
         around.append(line[: found.start()])
     if current:
