@@ -1,6 +1,6 @@
 import html
 import re
-import subprocess
+import struct
 import time
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor
@@ -87,7 +87,6 @@ MANUAL = {
     "Dra. Hj. Mustika Rahim": ("SULTRA", 20),
     "Alexander Litaay": ("MALUKU", 18),
 }
-SHORT = {"JAWA BARAT - X": 1}
 ABBREVIATIONS = {
     "NAD": "Nanggroe Aceh Darussalam",
     "SUMUT": "Sumatera Utara",
@@ -118,19 +117,30 @@ METHODOLOGY = (
     "Party-only votes and candidate votes by electoral district and party, from KPU's results pages as archived by "
     "the Internet Archive between August 2004 and 2006. On each page the candidate votes sum to the printed votes for "
     "party and candidate, and these plus the party-only votes equal the party's total in KPU's district summary. "
-    "Party-only votes are KPU's own remainder (total less candidate votes) and are negative on a few pages; they are "
-    "stored as printed. Elected members are from KPU's list of 3 August 2004, after the Constitutional Court's rulings "
-    "on disputed results, matched to the candidates by name. Seats are those of the elected members, which differ in "
-    "a few districts from the 11 June 2004 seat table because of those rulings."
+    "Party-only votes are KPU's own remainder (total less candidate votes); where that remainder is negative it is "
+    "left out (see the district's caveat). Elected members are from KPU's list of 3 August 2004, after the "
+    "Constitutional Court's rulings on disputed results, matched to the candidates by name. Seats are those of the "
+    "elected members, which differ in a few districts from the 11 June 2004 seat table because of those rulings."
 )
 MISSING = (
     "The Internet Archive holds no copy of KPU's candidate page for some parties in this district. Their total votes "
     "come from KPU's district summary and are not split into party-only and candidate votes; their elected members "
     "are listed without a ballot number or votes."
 )
+MEMBERS = f"{WAYBACK}20091004072227id_/http://www.dpr.go.id:80/id/arsip/anggota2004"
+# Members KPU's list of 3 August 2004 leaves out, by district and party: the name, district, and fraksi as the DPR's
+# list of its 2004-2009 members prints them.
+ADDED = {("JAWA BARAT - X", 20): ("Ferdiansyah, SE, MM.", "Jabar10", "PG")}
 SHORTFALL = (
-    "KPU's list of elected members of 3 August 2004 names 9 members for this district, but its seat table sums to 550 "
-    "only with 10 here, and the Hare quota gives Golkar a third seat. The tenth member is not recorded."
+    "KPU's list of elected members of 3 August 2004 names 9 members for this district, though its seat table sums to "
+    "550 only with 10 here and the Hare quota gives Golkar a third seat. The tenth member is from the DPR's list of "
+    "its 2004-2009 members, which names Ferdiansyah among Golkar's three members for the district. No candidate here "
+    "reached the quota, so Golkar's seats went to its first three candidates, and Ferdiansyah was third on its list."
+)
+NEGATIVE = (
+    "KPU's candidate page for {party} prints party-only votes of \N{MINUS SIGN}{over:,}: its candidates' votes add up to "
+    "{over:,} more than the party's total of {total:,} in KPU's district summary. The negative figure is left out, so "
+    "the party's votes here are its candidates' votes."
 )
 CONTINUED = {"Adjie Massaid"}
 SWAPPED = ("BANGKA BELITUNG", "KEPULAUAN RIAU")
@@ -142,7 +152,9 @@ TITLES = {
         "Pemilihan Umum Tahun 2004 (kpu.go.id, as archived 11 June 2004)"
     ),
     "elected": "Nama-nama Calon Terpilih Anggota Dewan Perwakilan Rakyat Pemilihan Umum 2004 (KPU, 3 August 2004)",
+    "members": "Anggota DPR Periode 2004-2009 (dpr.go.id, as archived 4 October 2009)",
 }
+DPR = "Sekretariat Jenderal Dewan Perwakilan Rakyat Republik Indonesia"
 
 
 def _get(url: str, suffix: str) -> raw.Artifact | None:
@@ -200,7 +212,7 @@ def _page(prop: str, pml: str, party: int, stamp: str) -> str:
 
 
 def fetch() -> None:
-    for url in (SUMMARY, NATIONAL, CDX, ANNOUNCED, *ELECTED):
+    for url in (SUMMARY, NATIONAL, CDX, ANNOUNCED, *ELECTED, MEMBERS):
         _get(url, ".doc" if url.endswith(".doc") else ".txt" if url == CDX else ".html")
     captures = _captures()
     known = raw.keys(SOURCE)
@@ -328,17 +340,95 @@ def _fold(text: str) -> str:
     return " ".join(word for word in words if word not in titles and len(word) > 1)
 
 
+def _word(path: Path) -> str:
+    """The main text of a Word 97 file: the pieces its piece table lists, each 8-bit (cp1252) or UTF-16, read from
+    the WordDocument stream of the compound file."""
+    data = path.read_bytes()
+    if data[:8] != bytes.fromhex("d0cf11e0a1b11ae1"):
+        raise ValueError(f"{path.name}: not a compound file")
+    size = 1 << struct.unpack_from("<H", data, 30)[0]
+    count, directory = struct.unpack_from("<II", data, 44)
+    if count > 109:
+        raise ValueError(f"{path.name}: {count} allocation sectors")
+
+    def sector(number: int) -> bytes:
+        return data[512 + number * size : 512 + (number + 1) * size]
+
+    links = [
+        link
+        for at in struct.unpack_from(f"<{count}I", data, 76)
+        for link in struct.unpack(f"<{size // 4}I", sector(at))
+    ]
+
+    def chain(number: int) -> bytes:
+        out = bytearray()
+        while number < 0xFFFFFFFA:
+            out += sector(number)
+            number = links[number]
+        return bytes(out)
+
+    streams: dict[str, bytes] = {}
+    entries = chain(directory)
+    cutoff = struct.unpack_from("<I", data, 56)[0]
+    for at in range(0, len(entries), 128):
+        entry = entries[at : at + 128]
+        name = entry[: max(struct.unpack_from("<H", entry, 64)[0] - 2, 0)].decode("utf-16-le")
+        start, length = struct.unpack_from("<II", entry, 116)
+        if name in ("WordDocument", "0Table", "1Table") and entry[66] == 2:
+            if length < cutoff:
+                raise ValueError(f"{path.name}: {name} is in the mini stream")
+            streams[name] = chain(start)[:length]
+    document = streams["WordDocument"]
+    if struct.unpack_from("<H", document, 0)[0] != 0xA5EC:
+        raise ValueError(f"{path.name}: not a Word 97 file")
+    table = streams["1Table" if struct.unpack_from("<H", document, 10)[0] & 0x200 else "0Table"]
+    text = struct.unpack_from("<i", document, 0x4C)[0]
+    at, size = struct.unpack_from("<II", document, 0x1A2)
+    clx = table[at : at + size]
+    while clx[0] == 1:
+        clx = clx[3 + struct.unpack_from("<H", clx, 1)[0] :]
+    if clx[0] != 2:
+        raise ValueError(f"{path.name}: no piece table")
+    plc = clx[5 : 5 + struct.unpack_from("<I", clx, 1)[0]]
+    pieces = (len(plc) - 4) // 12
+    cps = struct.unpack_from(f"<{pieces + 1}i", plc)
+    out: list[str] = []
+    for piece in range(pieces):
+        start, end = cps[piece], min(cps[piece + 1], text)
+        if start >= end:
+            break
+        fc = struct.unpack_from("<I", plc, 4 * (pieces + 1) + 8 * piece + 2)[0]
+        if fc & 0x40000000:
+            at = (fc & ~0x40000000) // 2
+            out.append(document[at : at + end - start].decode("cp1252"))
+        else:
+            out.append(document[fc : fc + 2 * (end - start)].decode("utf-16-le"))
+    return "".join(out)
+
+
 def _elected() -> list[str]:
+    """The elected members in each list's order: every line of the third column of its one table, whose cells end
+    in \\x07 and whose rows end in one more."""
     names: list[str] = []
     for url in ELECTED:
-        out = subprocess.run(
-            ["antiword", "-w", "0", str(raw.cached(SOURCE, url).path)], check=True, capture_output=True, text=True
-        ).stdout
-        for line in out.splitlines():
-            cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
-            if len(cells) == 3 and cells[2] and cells[2] != "NAMA CALON TERPILIH":
-                names.append(cells[2])
+        cells = _word(raw.cached(SOURCE, url).path).split("\x07")
+        for row in range(0, len(cells) - 3, 4):
+            if cells[row + 3]:
+                raise ValueError(f"{url}: a row of more than 3 cells")
+            for line in re.split(r"[\r\x0b]", cells[row + 2]):
+                line = line.strip()
+                if line and line != "NAMA CALON TERPILIH":
+                    names.append(line)
     return names
+
+
+def _members() -> set[tuple[str, str, str]]:
+    """The DPR's list of its 2004-2009 members: (name, district, fraksi) as it prints them."""
+    text = raw.cached(SOURCE, MEMBERS).path.read_bytes().decode("utf-8")
+    rows = re.findall(
+        r"<tr align='center' id=\d+><td><b>\+</b></td><td>(.*?)</a></td><td>(.*?)</td><td>(.*?)</td></tr>", text
+    )
+    return {(html.unescape(name).strip(), code.strip(), fraksi.strip()) for name, code, fraksi in rows}
 
 
 def parse() -> None:
@@ -425,15 +515,34 @@ def parse() -> None:
         elif ratio < 0.8:
             print(f"  weak match {name!r} in {dapil} -> party {party} number {number} ({ratio:.2f})")
         elected.append({"dapil": dapil, "party": party, "candidate": number, "listed": name, "score": round(ratio, 3)})
+    members = _members()
+    for (dapil, party), (name, code, fraksi) in ADDED.items():
+        if (name, code, fraksi) not in members:
+            raise ValueError(f"the DPR's list names no {fraksi} member {name!r} for {code}")
+        ratio, number = max(
+            (SequenceMatcher(None, _fold(name), fold).ratio(), number)
+            for listed_party, number, fold in by_dapil[dapil]
+            if listed_party == party
+        )
+        if ratio < 0.8:
+            raise ValueError(f"{name!r} matches no candidate of party {party} in {dapil} (best {ratio:.2f})")
+        elected.append({"dapil": dapil, "party": party, "candidate": number, "listed": name, "score": round(ratio, 3)})
+        numbers = sorted(
+            int(str(row["candidate"])) for row in elected if (row["dapil"], row["party"]) == (dapil, party)
+        )
+        quota = summary.filter(pl.col("dapil") == dapil)["total"].sum() / sum(row["dapil"] == dapil for row in elected)
+        top = int(str(pool.filter((pl.col("dapil") == dapil) & (pl.col("party") == party))["votes"].max()))
+        if numbers != list(range(1, len(numbers) + 1)) or top >= quota:
+            raise ValueError(f"{dapil}: party {party}'s members {numbers} are not its first candidates in list order")
     winners = pl.DataFrame(elected)
     duplicated = winners.filter(
         pl.col("candidate").is_not_null() & pl.struct("dapil", "party", "candidate").is_duplicated()
     )
     if duplicated.height:
         raise ValueError(f"matched twice: {duplicated.rows()}")
-    if winners.height + sum(SHORT.values()) != SEATS:
+    if winners.height != SEATS:
         winners.write_parquet(PARSED / "elected.parquet")
-        raise ValueError(f"{winners.height} elected, not {SEATS - sum(SHORT.values())}")
+        raise ValueError(f"{winners.height} elected, not {SEATS}")
     seats = winners.group_by("dapil", "party").len("seats")
     national = {
         int(number): int(count)
@@ -464,7 +573,7 @@ def _title(dapil: str) -> str:
 
 
 def emit() -> Path:
-    from ea.changeset import Changeset
+    from ea.package import Draft
     from ea.store import connect
 
     summary = pl.read_parquet(PARSED / "summary.parquet")
@@ -473,8 +582,14 @@ def emit() -> Path:
     seats = {(dapil, party): count for dapil, party, count in pl.read_parquet(PARSED / "seats.parquet").rows()}
     missing = {(dapil, party) for dapil, party, _ in pl.read_parquet(PARSED / "missing.parquet").rows()}
     elected = {(dapil, party, number) for dapil, party, number in winners.select("dapil", "party", "candidate").rows()}
+    added = {
+        (dapil, party, number)
+        for dapil, party, number, listed in winners.select("dapil", "party", "candidate", "listed").rows()
+        if ADDED.get((dapil, party), ("",))[0] == listed
+    }
+    labels = dict(pl.read_parquet(PARSED / "parties.parquet").rows())
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
@@ -496,19 +611,27 @@ def emit() -> Path:
             raise ValueError("publish id.kpu_dpd_early and id.kpu before id.kpu_dpr_2004")
 
         sources: dict[str, UUID] = {}
-        urls = {"summary": SUMMARY, "national": NATIONAL, "elected": ELECTED[0], "pages": f"{SITE}suara/"}
+        urls = {
+            "summary": SUMMARY,
+            "national": NATIONAL,
+            "elected": ELECTED[0],
+            "pages": f"{SITE}suara/",
+            "members": "http://www.dpr.go.id/id/arsip/anggota2004",
+        }
         for key, title in TITLES.items():
-            found = sources[key] = cs.source(KPU, title)
+            publisher = DPR if key == "members" else KPU
+            found = sources[key] = cs.source(publisher, title)
             cs.add(
                 "source",
                 id=found,
                 kind="official_body",
-                publisher=KPU,
+                publisher=publisher,
                 title=title,
                 url=urls[key],
                 license=LICENSE,
-                license_url="https://www.kpu.go.id",
+                license_url="https://www.dpr.go.id" if key == "members" else "https://www.kpu.go.id",
             )
+        cs.artifact(raw.cached(SOURCE, MEMBERS), sources["members"])
         for url in (SUMMARY,):
             cs.artifact(raw.cached(SOURCE, url), sources["summary"])
         cs.artifact(raw.cached(SOURCE, NATIONAL), sources["national"])
@@ -584,7 +707,7 @@ def emit() -> Path:
                 body_id=body,
                 district_area_id=area if whole else None,
                 term="full",
-                magnitude=sum(won.values()) + SHORT.get(dapil, 0),
+                magnitude=sum(won.values()),
                 round_number=1,
                 previous_round_id=None,
                 electoral_system_id=system,
@@ -609,7 +732,7 @@ def emit() -> Path:
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHODOLOGY)
             if any(where == dapil for where, _ in missing):
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=MISSING)
-            if dapil in SHORT:
+            if any(where == dapil for where, _ in ADDED):
                 cs.add("note", entity_id=contest, kind="caveat", body_md=SHORTFALL)
             rows = results.filter(pl.col("dapil") == dapil)
             totals = summary.filter((pl.col("dapil") == dapil) & (pl.col("total") > 0)).select("party", "total").rows()
@@ -699,9 +822,24 @@ def emit() -> Path:
                     .rows()
                 ):
                     if number is None:
-                        value(legend, votes)
+                        if votes < 0:
+                            cs.add(
+                                "note",
+                                entity_id=result_set,
+                                kind="caveat",
+                                body_md=NEGATIVE.format(party=labels[party], over=-votes, total=total),
+                            )
+                        else:
+                            value(legend, votes)
                         continue
                     option = candidate(listed, party, str(number), number, ballot)
+                    if (dapil, party, number) in added:
+                        cs.add(
+                            "citation",
+                            entity_id=cs.key("id.candidacy", f"{key}:{party}:{number}"),
+                            source_id=sources["members"],
+                            locator={"daerah_pemilihan": ADDED[dapil, party][1], "fraksi": ADDED[dapil, party][2]},
+                        )
                     cs.add(
                         "outcome",
                         result_set_id=result_set,
