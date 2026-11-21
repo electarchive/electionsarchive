@@ -1,21 +1,23 @@
 import csv
+import hashlib
 import io
 import json
 import multiprocessing
 import os
 import shutil
+import struct
 import time
 import unicodedata
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import httpx
 import polars as pl
 
-from ea import raw
+from ea import package, raw
 from ea.changeset import Changeset
 from ea.sources.br.identity import namesakes
 from ea.sources.br.tse import ANNULLED, COORDINATES, NOT_OPENED, SEATS, UFS, proper
@@ -41,6 +43,10 @@ POLLING_PLACES = {
     year: f"{TSE}eleitorado_locais_votacao/eleitorado_local_votacao_{year}.zip"
     for year in (2010, 2014, 2018, 2022, 2026)
 }
+# The polling-place file of a later election that lends its points to the places an election's own file leaves
+# without coordinates (see `borrowed_points`).
+BORROWED = {2018: 2022}
+PLACE = ["municipality", "zone", "place"]
 SECTION_YEARS = (1998, 2002, 2006, 2010, 2014, 2018, 2026)
 SECTIONS = {
     year: {
@@ -1036,6 +1042,16 @@ def sections(year: int) -> None:
         .unique("section", keep="first")
         .select("section", location=pl.format("SRID=4326;POINT({} {})", "NR_LONGITUDE", "NR_LATITUDE"))
     )
+    if year in BORROWED:
+        lent, _ = borrowed_points(year)
+        points = pl.concat(
+            [
+                points,
+                lent.join(points, on="section", how="anti").select(
+                    "section", location=pl.format("SRID=4326;POINT({} {})", "longitude", "latitude")
+                ),
+            ]
+        )
     units = (
         sheet.sort("contest")
         .unique("section", keep="first")
@@ -1155,6 +1171,8 @@ def emit() -> Path:
             *([POLLING_PLACES[section_year]] if section_year in POLLING_PLACES else []),
         ]:
             cs.artifact(raw.cached(SOURCE, url), results[section_year])
+        if section_year in BORROWED:
+            cs.artifact(raw.cached(SOURCE, POLLING_PLACES[BORROWED[section_year]]), results[BORROWED[section_year]])
         feed = None
         if votes.filter(pl.col("contest").str.starts_with("2026:2:")).height:
             feed = cs.source("Tribunal Superior Eleitoral", "Resultados - 2026, 2º turno")
@@ -1802,4 +1820,248 @@ def emit() -> Path:
             .with_columns(**common)
             .collect(),
         )
+        if section_year in BORROWED:
+            cs.add("note", entity_id=cycles[section_year], kind="context", body_md=borrowed_points(section_year)[1])
         return cs.write()
+
+
+def polling_places(year: int) -> pl.DataFrame:
+    """Each first-round section of the year's polling-place file, with its place's key, its name and address folded
+    to letters and digits, and its point where the file gives one within Brazil."""
+    columns = [
+        "NR_TURNO",
+        "SG_UF",
+        "CD_MUNICIPIO",
+        "NR_ZONA",
+        "NR_SECAO",
+        "NR_LOCAL_VOTACAO",
+        "NM_LOCAL_VOTACAO",
+        "DS_ENDERECO",
+        "DS_TIPO_SECAO_AGREGADA",
+        *COORDINATES,
+    ]
+    frames: list[pl.DataFrame] = []
+    with zipfile.ZipFile(raw.cached(SOURCE, POLLING_PLACES[year]).path) as archive:
+        for member in archive.namelist():
+            if member.endswith(".csv"):
+                frames.append(
+                    pl.read_csv(
+                        io.TextIOWrapper(archive.open(member), encoding="latin-1").read().encode(),
+                        separator=";",
+                        infer_schema=False,
+                        columns=columns,
+                    )
+                )
+
+    def folded(column: str) -> pl.Expr:
+        return pl.col(column).str.normalize("NFKD").str.to_uppercase().str.replace_all(r"[^A-Z0-9]", "")
+
+    return (
+        pl.concat(frames)
+        .filter((pl.col("NR_TURNO") == "1") & (pl.col("SG_UF") != "ZZ"))
+        .select(
+            municipality=pl.col("CD_MUNICIPIO").str.zfill(5),
+            zone=pl.col("NR_ZONA").cast(pl.Int64),
+            number=pl.col("NR_SECAO").cast(pl.Int64),
+            place=pl.col("NR_LOCAL_VOTACAO").cast(pl.Int64),
+            principal=pl.col("DS_TIPO_SECAO_AGREGADA") == "Principal",
+            name=folded("NM_LOCAL_VOTACAO"),
+            address=folded("DS_ENDERECO"),
+            latitude=pl.col("NR_LATITUDE").str.replace(",", ".").cast(pl.Float64),
+            longitude=pl.col("NR_LONGITUDE").str.replace(",", ".").cast(pl.Float64),
+        )
+        .with_columns(
+            section=pl.concat_str("municipality", "zone", "number", separator=":"),
+            located=pl.col("latitude").is_between(*COORDINATES["NR_LATITUDE"])
+            & pl.col("longitude").is_between(*COORDINATES["NR_LONGITUDE"]),
+        )
+    )
+
+
+def borrowed_points(year: int) -> tuple[pl.DataFrame, str]:
+    """The points a later polling-place file lends to the sections of the places the year's own file leaves without
+    coordinates, and a note saying so.
+
+    The electoral court's 2018 file gives no coordinates (-1) for about a fifth of its polling places. A place keeps
+    its number within its municipality and zone from one election to the next, so where the 2022 file lists the same
+    number there under the same name and the same address, with a single point, each of the place's 2018 sections takes
+    that point. Of the 2018 places that do have coordinates and match a 2022 place this way, 99 percent lie within
+    200 meters of the 2022 point."""
+    own = polling_places(year).filter("principal")
+    places = own.group_by(PLACE).agg(
+        pl.col("located").any(),
+        pl.col("located").all().alias("whole"),
+        pl.col("name").first(),
+        pl.col("address").first(),
+        pl.col("name").n_unique().alias("names"),
+        pl.col("address").n_unique().alias("addresses"),
+    )
+    if places.filter(pl.col("located") != pl.col("whole")).height:
+        raise ValueError(f"{year}: a polling place has sections with and without coordinates")
+    lender = (
+        polling_places(BORROWED[year])
+        .filter("located")
+        .group_by(PLACE)
+        .agg(
+            pl.col("name").first(),
+            pl.col("address").first(),
+            pl.col("latitude").first(),
+            pl.col("longitude").first(),
+            single=(pl.col("name").n_unique() == 1)
+            & (pl.col("address").n_unique() == 1)
+            & (pl.struct("latitude", "longitude").n_unique() == 1),
+        )
+        .filter("single")
+    )
+    matched = (
+        places.filter(~pl.col("located") & (pl.col("names") == 1) & (pl.col("addresses") == 1))
+        .join(lender, on=[*PLACE, "name", "address"])
+        .select(*PLACE, "latitude", "longitude")
+    )
+    sections = own.select("section", *PLACE).join(matched, on=PLACE).select("section", "longitude", "latitude")
+    if sections["section"].is_duplicated().any():
+        raise ValueError(f"{year}: a section lies in two polling places")
+    unlocated = places.filter(~pl.col("located"))
+    note = (
+        f"The electoral court's {year} polling-place file gives no coordinates for {unlocated.height:,} of its "
+        f"{places.height:,} polling places in Brazil, with {own.join(unlocated, on=PLACE, how='semi').height:,} "
+        f"sections. {matched.height:,} of them appear in its {BORROWED[year]} file under the same number in the same "
+        f"municipality and zone, with the same name and address, so their {sections.height:,} sections are mapped at "
+        f"the {BORROWED[year]} place's point. The other sections have no point."
+    )
+    return sections, note
+
+
+KEY = f"{SOURCE}/all"
+SUMMARY = "Brazil's general elections from 1994 to 2026 by municipality and electoral zone, and by polling section"
+
+
+def point(longitude: float, latitude: float) -> str:
+    """A point as the database gives it back: upper-case hex EWKB with SRID 4326."""
+    return struct.pack("<BIIdd", 1, 0x20000001, 4326, longitude, latitude).hex().upper()
+
+
+def coordinates(location: str) -> tuple[float, float]:
+    order, kind, srid, longitude, latitude = struct.unpack("<BIIdd", bytes.fromhex(location))
+    if (order, kind, srid) != (1, 0x20000001, 4326):
+        raise ValueError(f"{location} is not a little-endian point with SRID 4326")
+    return longitude, latitude
+
+
+def derived_id(table: str, row: dict[str, object]) -> str:
+    """The id apply gives a note row: an md5 of the table, the pipeline, and each column's text."""
+    parts = [table, SOURCE]
+    for column in sorted(row):
+        value = row[column]
+        parts += [column, chr(30) if value is None else str(value).lower() if isinstance(value, bool) else str(value)]
+    digest = hashlib.md5(chr(31).join(parts).encode()).hexdigest()
+    return str(UUID(f"{digest[:12]}8{digest[13:16]}8{digest[17:]}"))
+
+
+def package_from_export() -> Path:
+    """Build br.tse_history/all from the archive's published rows (`ea package export`) with the one change the parse
+    now makes to them: the 2018 polling sections whose places the 2018 polling-place file leaves without coordinates
+    take the point of the same place in the 2022 file (`borrowed_points`), with a note on the 2018 election. It reads
+    only the two polling-place files, so it runs where the section results are not cached."""
+    out = package.export(SOURCE)
+    manifest = json.loads((out / "package.json").read_text())
+    before = {code: n for code, n, _ in package.check(out)}
+    counts = dict(manifest["tables"])
+    units = pl.read_parquet(out / "reporting_unit.parquet")
+    if "location" not in units.columns:
+        raise ValueError(f"{KEY}: the export carries no unit points")
+    new_artifacts: list[dict[str, object]] = []
+    notes = pl.read_parquet(out / "note.parquet")
+    keys = pl.read_parquet(out / "external_id.parquet")
+    sources = pl.read_parquet(out / "source.parquet")
+    for year, lender in BORROWED.items():
+        opened = units.filter(
+            (pl.col("scheme_code") == "br.secao")
+            & (pl.col("valid_from").dt.year() == year)
+            & (pl.col("kind") != "abroad_mission")
+        )
+        if opened["valid_from"].n_unique() != 1:
+            raise ValueError(f"{KEY}: the {year} sections open on {sorted(opened['valid_from'].unique())}")
+        # Every point the export holds for the year's sections is the one the year's own file gives, so the sections
+        # left without one are those whose places the file leaves without coordinates.
+        own = (
+            polling_places(year)
+            .filter(pl.col("principal") & pl.col("located"))
+            .unique("section", keep="first")
+            .select("section", "longitude", "latitude")
+        )
+        stored = pl.DataFrame(
+            [
+                (code, *(coordinates(location) if location is not None else (None, None)))
+                for code, location in opened.select("code", "location").iter_rows()
+            ],
+            schema={"section": pl.String, "stored_longitude": pl.Float64, "stored_latitude": pl.Float64},
+            orient="row",
+        )
+        differ = stored.join(own, on="section", how="left").filter(
+            pl.col("stored_longitude").ne_missing(pl.col("longitude"))
+            | pl.col("stored_latitude").ne_missing(pl.col("latitude"))
+        )
+        if differ.height:
+            raise ValueError(f"{KEY}: {differ.height:,} {year} section points differ from the {year} file: {differ}")
+        lent, note = borrowed_points(year)
+        fill = lent.join(opened.select(section="code", id="id"), on="section")
+        if fill.height != lent.height:
+            raise ValueError(f"{KEY}: {lent.height - fill.height:,} sections with a {lender} point have no {year} unit")
+        if opened.filter(pl.col("code").is_in(fill["section"].implode()) & pl.col("location").is_not_null()).height:
+            raise ValueError(f"{KEY}: a {year} section to take a {lender} point already has one")
+        points = {id: point(longitude, latitude) for _, longitude, latitude, id in fill.iter_rows()}
+        units = units.with_columns(
+            location=pl.col("id").replace_strict(points, default=pl.col("location"), return_dtype=pl.String)
+        )
+        print(f"{KEY}: {len(points):,} {year} sections take a point from the {lender} polling-place file", flush=True)
+        election = keys.filter(
+            (pl.col("scheme") == "br.election") & (pl.col("value") == f"{opened['valid_from'][0]}:general-elections")
+        )["entity_id"]
+        if election.len() != 1:
+            raise ValueError(f"{KEY}: no single {year} general election")
+        row: dict[str, object] = {"entity_id": election[0], "kind": "context", "body_md": note}
+        notes = pl.concat(
+            [notes, pl.DataFrame([{"id": derived_id("note", row), **row, "lang": None}], schema=notes.schema)]
+        )
+        results = sources.filter(pl.col("title") == f"Resultados - {lender}")["id"]
+        if results.len() != 1:
+            raise ValueError(f"{KEY}: no single Resultados - {lender} source")
+        # The lender's file is cited under its own year's results, as each year's polling-place file is.
+        artifact = raw.cached(SOURCE, POLLING_PLACES[lender])
+        new_artifacts.append(
+            {
+                "id": str(uuid5(package.NAMESPACE, f"source_artifact\x1f{results[0]}\x1f{artifact.storage_key}")),
+                "source_id": results[0],
+                "url": artifact.url,
+                "sha256": artifact.sha256,
+                "retrieved_at": artifact.retrieved_at,
+                "storage_key": artifact.storage_key,
+                "media_type": artifact.media_type,
+                "bytes": artifact.bytes,
+            }
+        )
+    units.write_parquet(out / "reporting_unit.parquet", statistics=False)
+    notes.write_parquet(out / "note.parquet", statistics=False)
+    counts["note"] = notes.height
+    file = out / "source_artifact.parquet"
+    artifacts = pl.read_parquet(file)
+    staged = pl.DataFrame(new_artifacts, schema=artifacts.schema).join(artifacts.select("id"), on="id", how="anti")
+    artifacts = pl.concat([artifacts, staged])
+    artifacts.write_parquet(file, statistics=False)
+    counts["source_artifact"] = artifacts.height
+    # The cited files are the ones these rows read: the two polling-place files. The adopted changesets cite only
+    # their own parquets, which the package's rows replace.
+    read = artifacts.filter(
+        pl.col("url").is_in([POLLING_PLACES[year] for pair in BORROWED.items() for year in pair])
+        & pl.col("storage_key").str.starts_with(f"raw/{SOURCE}/")
+    )
+    with connect() as conn:
+        cited = package._cited(conn, package._adopted(conn, SOURCE)[1], read)
+    built = package._seal(KEY, SOURCE, SUMMARY, out, counts, manifest["adopts"], cited, None)
+    after = {code: n for code, n, _ in package.check(out)}
+    if after != before:
+        raise ValueError(f"{KEY}: the points move the check findings from {before} to {after}")
+    built["accepted"] = manifest["accepted"]
+    (out / "package.json").write_text(json.dumps(built, indent=1) + "\n")
+    return out
