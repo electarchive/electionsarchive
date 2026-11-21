@@ -218,6 +218,136 @@ class Race(NamedTuple):
     reporting: tuple[int, int]
 
 
+class Seat(NamedTuple):
+    title: str  # the title the county's report gives the race
+    tail: str  # the contest's key after the date and state
+    name: str
+    leaf: str  # the contest's last URL segment
+    seats: int
+    area: str | None = None  # key of the seat's own area, when the board's seats have one
+
+
+class Government(NamedTuple):
+    county: str
+    label: str
+    polity_key: str
+    polity_kind: str
+    area_scheme: str
+    area_code: str
+    election_key: str
+    body_key: str
+    body_name: str
+    home: str  # URL path of the government's polity
+    whole: bool  # whether the county's report holds all of the contest's votes
+    seats: list[Seat]
+
+
+CAD = "48491-williamson-central-appraisal-district"
+MUDS = {
+    "solana-ranch-municipal-utility-district-no-1": (
+        "Solana Ranch Municipal Utility District No. 1",
+        "Solana Ranch Municipal Utility District No. 1 Permanent Directors Election",
+    ),
+    "theon-ranches-municipal-utility-district-no-1": (
+        "Theon Ranches Municipal Utility District No. 1",
+        "Theon Ranches Municipal Utility District No. 1 Directors Election",
+    ),
+    "williamson-county-municipal-utility-district-no-80": (
+        "Williamson County Municipal Utility District No. 80",
+        "Williamson County Municipal Utility District No. 80 Permanent Directors Election",
+    ),
+}
+GOVERNMENTS = [
+    Government(
+        "Hood",
+        "Granbury",
+        "place:4830416",
+        "municipality",
+        "us.place",
+        "4830416",
+        "4830416",
+        "TX:4830416:council",
+        "Granbury Council",
+        "us/tx/granbury",
+        True,
+        [
+            Seat(
+                f"City of Granbury, Councilperson, Place {n}",
+                f"4830416:council:place-{n}",
+                f"2026 Granbury Council election, Place {n}",
+                f"council-place-{n}",
+                1,
+            )
+            for n in (4, 6)
+        ],
+    ),
+    Government(
+        "Hood",
+        "Bluff Dale Independent School District",
+        "school:4810620",
+        "school_district",
+        "us.school_district",
+        "4810620",
+        "school:4810620",
+        "TX:4810620:board",
+        "Bluff Dale Independent School District Board of Trustees",
+        "us/tx/bluff-dale-independent-school-district",
+        False,
+        [
+            Seat(
+                "Bluff Dale ISD Board of Trustees",
+                "4810620:board",
+                "2026 Bluff Dale Independent School District Board of Trustees election",
+                "board",
+                3,
+            )
+        ],
+    ),
+    Government(
+        "Williamson",
+        "Williamson Central Appraisal District",
+        f"special:{CAD}",
+        "special_district",
+        "us.special_district",
+        f"48491:district:{CAD[6:]}",
+        CAD,
+        f"TX:{CAD}:board",
+        "Williamson Central Appraisal District Board of Directors",
+        f"us/tx/{CAD[6:]}",
+        True,
+        [
+            Seat(
+                f"Williamson Central Appraisal District Board of Directors, Place {n}",
+                f"{CAD}:board:place-{n}",
+                f"2026 Williamson Central Appraisal District Board of Directors, Place {n} election",
+                f"board-place-{n}",
+                1,
+                f"TX:{CAD}:board:place-{n}",
+            )
+            for n in (1, 2, 3)
+        ],
+    ),
+    *(
+        Government(
+            "Williamson",
+            label,
+            f"special:48491:district:{mud}",
+            "special_district",
+            "us.special_district",
+            f"48491:district:{mud}",
+            f"48491:district:{mud}",
+            f"TX:48491-{mud}:board",
+            f"{label} Board of Directors",
+            f"us/tx/{mud}",
+            True,
+            [Seat(title, f"48491-{mud}:board", f"2026 {label} Board of Directors election", "board", 5)],
+        )
+        for mud, (label, title) in MUDS.items()
+    ),
+]
+SEATS = {(g.county, s.title): (g, s) for g in GOVERNMENTS for s in g.seats}
+
+
 def races(feed: Feed) -> list[Race]:
     with zipfile.ZipFile(feed.detail.path) as archive:
         root = ElementTree.fromstring(archive.read("detail.xml"))
@@ -328,15 +458,30 @@ def build() -> Built:
     run = feeds()
     gaps: dict[str, list[str]] = defaultdict(list)
     hits: dict[str, list[tuple[Feed, Race, Match]]] = defaultdict(list)
+    new: dict[tuple[str, str], tuple[Feed, Race]] = {}
     for feed in run:
         for race in races(feed):
             if OUT_OF_SCOPE.match(race.title):
+                continue
+            if (feed.county, race.title) in SEATS and not race.question:
+                new[(feed.county, race.title)] = (feed, race)
                 continue
             found = match(race, feed.fips, ref)
             if isinstance(found, str):
                 gaps[feed.county].append(f"{race.title}: {found}")
                 continue
             hits[ref.contests[found.contest].election].append((feed, race, found))
+    seats: Package | None = None
+    made_elections: set[str] = set()
+    if new:
+        seats, made = seats_package(new)
+        for (county, title), (feed, race) in new.items():
+            contest, held_contest, ids = made[(county, title)]
+            ref.contests[contest] = held_contest
+            made_elections.add(held_contest.election)
+            hits[held_contest.election].append(
+                (feed, race, Match(contest, {c.label: ids[c.label] for c in race.choices}))
+            )
     minted: dict[str, tuple[Feed, str]] = {}
     for items in hits.values():
         for feed, race, _ in items:
@@ -379,21 +524,176 @@ def build() -> Built:
             valid_to=DAY + timedelta(days=1),
         )
     built = [units]
+    if seats is not None:
+        built.append(seats)
     for election, items in sorted(hits.items()):
-        built.append(election_package(election, items, ref))
+        built.append(election_package(election, items, ref, election in made_elections))
     return Built(built, dict(gaps))
+
+
+WHOLE = {f"{DAY}:TX:{s.tail}" for g in GOVERNMENTS if g.whole for s in g.seats}
+CONTESTS = f"{SOURCE}/contests"
+
+
+def held(con: duckdb.DuckDBPyConnection, scheme: str, value: str) -> str | None:
+    """The id of a row another pipeline holds under an external id."""
+    row = con.execute(
+        f"select entity_id from '{REFERENCE / 'external_id.parquet'}' "
+        "where scheme = ? and value = ? and coalesce(pipeline, '') <> ? limit 1",
+        [scheme, value, SOURCE],
+    ).fetchone()
+    return None if row is None else str(row[0])
+
+
+def held_area(con: duckdb.DuckDBPyConnection, scheme: str, code: str) -> str | None:
+    row = con.execute(
+        f"select a.id from '{REFERENCE / 'area.parquet'}' a join '{REFERENCE / 'area_code.parquet'}' c "
+        "on c.area_id = a.id where a.scheme_code = ? and c.code = ? and coalesce(a.pipeline, '') <> ? limit 1",
+        [scheme, code, SOURCE],
+    ).fetchone()
+    return None if row is None else str(row[0])
+
+
+def seats_package(
+    found: dict[tuple[str, str], tuple[Feed, Race]],
+) -> tuple[Package, dict[tuple[str, str], tuple[str, Contest, dict[str, str]]]]:
+    """The contests, options, candidates, and the governments and elections behind them that the archive lacks."""
+    p = Package(
+        CONTESTS,
+        SOURCE,
+        "Contests with their options and candidates for races of November 3, 2026 that the archive did not yet hold",
+        depends=[UNITS],
+    )
+    con = duckdb.connect()
+    texas = con.execute(
+        f"select id from '{REFERENCE / 'polity.parquet'}' where iso_code = 'US-TX'",
+    ).fetchone()
+    state_election = held(con, "us.election", f"{DAY}:TX")
+    if texas is None or state_election is None:
+        raise LookupError("the reference lacks Texas or its November 3, 2026 election")
+    p.external |= {str(texas[0]), state_election}
+    made: dict[tuple[str, str], tuple[str, Contest, dict[str, str]]] = {}
+    for gov in GOVERNMENTS:
+        seats = [(seat, *found[(gov.county, seat.title)]) for seat in gov.seats if (gov.county, seat.title) in found]
+        if not seats:
+            continue
+        src = source_id(gov.county)
+        polity = held(con, "us.polity", gov.polity_key)
+        area = held_area(con, gov.area_scheme, gov.area_code)
+        if polity is None:
+            polity = key("polity", gov.polity_key)
+            p.add("polity", id=polity, kind=gov.polity_kind)
+            p.add("polity_parent", polity_id=polity, parent_id=str(texas[0]))
+            p.add("external_id", entity_id=polity, scheme="us.polity", value=gov.polity_key)
+            p.name(polity, gov.label, "en", "official")
+            p.add("slug", path=gov.home, entity_id=polity, is_current=True)
+        else:
+            p.external.add(polity)
+        if area is None:
+            area = key("area", gov.area_scheme, gov.area_code)
+            p.external.add(gov.area_scheme)
+            p.add("area", id=area, scheme_code=gov.area_scheme)
+            p.add("area_code", area_id=area, code=gov.area_code)
+            p.name(area, f"{gov.label}, TX", "en", "official")
+            p.add("polity_territory", polity_id=polity, area_id=area)
+        else:
+            p.external.add(area)
+        body = held(con, "us.body", gov.body_key)
+        if body is None:
+            body = key("body", gov.body_key)
+            p.add("body", id=body, polity_id=polity, kind="council")
+            p.add("external_id", entity_id=body, scheme="us.body", value=gov.body_key)
+            p.name(body, gov.body_name, "en", "official")
+        else:
+            p.external.add(body)
+        election_value = f"{DAY}:TX:{gov.election_key}"
+        election = held(con, "us.election", election_value)
+        if election is None:
+            election = key("election", election_value)
+            p.add(
+                "election",
+                id=election,
+                polity_id=polity,
+                parent_id=state_election,
+                kind="general",
+                date_from=DAY,
+                date_to=DAY,
+                status="held",
+            )
+            p.add("external_id", entity_id=election, scheme="us.election", value=election_value)
+            p.name(election, f"2026 {gov.label} general election", "en", "official")
+            p.add("slug", path=f"{gov.home}/{DAY}-general", entity_id=election, is_current=True)
+        else:
+            p.external.add(election)
+        for seat, feed, race in seats:
+            contest = key("contest", seat.tail)
+            district = area
+            if seat.area:
+                district = key("area", "us.local_district", seat.area)
+                p.external.add("us.local_district")
+                p.add("area", id=district, scheme_code="us.local_district")
+                p.add("area_code", area_id=district, code=seat.area)
+                p.name(district, seat.name.removeprefix("2026 ").removesuffix(" election"), "en", "official")
+            p.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="body_seats",
+                body_id=body,
+                district_area_id=district,
+                magnitude=seat.seats,
+            )
+            p.add("external_id", entity_id=contest, scheme="us.contest", value=f"{DAY}:TX:{seat.tail}")
+            p.name(contest, seat.name, "en", "official")
+            p.add("slug", path=f"{gov.home}/{DAY}-general/{seat.leaf}", entity_id=contest, is_current=True)
+            p.add("citation", id=key("citation", contest), entity_id=contest, source_id=src)
+            options: dict[str, str] = {}
+            kinds: dict[str, str] = {}
+            ids: dict[str, str] = {}
+            for choice in race.choices:
+                if norm(choice.label) in ("writein", "writeins"):
+                    option = key("option", seat.tail, "write-in")
+                    p.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-in")
+                    kinds[option] = "write_in"
+                else:
+                    person = key("person", seat.tail, norm(choice.label))
+                    option = key("option", seat.tail, norm(choice.label))
+                    p.add("person", id=person)
+                    p.name(person, choice.label, "en", "official")
+                    p.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=choice.label)
+                    p.add(
+                        "candidacy",
+                        id=key("candidacy", seat.tail, norm(choice.label)),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=choice.label,
+                    )
+                    kinds[option] = "candidate"
+                    options[norm(choice.label)] = option
+                ids[choice.label] = option
+            made[(gov.county, seat.title)] = (
+                contest,
+                Contest(f"{DAY}:TX:{seat.tail}", election, seat.name, False, options, kinds, []),
+                ids,
+            )
+            p.uses(feed.detail)
+            p.uses(feed.settings)
+    return p, made
 
 
 def package_key(election: str) -> str:
     return f"{SOURCE}/{election[:8]}"
 
 
-def election_package(election: str, items: list[tuple[Feed, Race, Match]], ref: Reference) -> Package:
+def election_package(
+    election: str, items: list[tuple[Feed, Race, Match]], ref: Reference, contests: bool = False
+) -> Package:
     p = Package(
         package_key(election),
         SOURCE,
         "Counties' canvassed results for contests of one existing November 3, 2026 election",
-        depends=[UNITS],
+        depends=[UNITS, CONTESTS] if contests else [UNITS],
     )
     p.external.add(election)
     seen: set[tuple[str, str]] = set()
@@ -422,7 +722,7 @@ def election_package(election: str, items: list[tuple[Feed, Race, Match]], ref: 
             else:
                 p.external.add(option)
             options[choice.label] = option
-        whole = local(feed.fips, held.key)
+        whole = local(feed.fips, held.key) or held.key in WHOLE
         certified_default = any(stage == "certified" and default for _, stage, default in held.sets)
         default = whole and not certified_default
         county_set = key("result_set", feed.county, found.contest, "county")
