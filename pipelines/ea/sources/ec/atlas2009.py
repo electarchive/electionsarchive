@@ -144,7 +144,7 @@ def _segments(row: np.ndarray) -> list[tuple[int, int]]:
     return [(int(a), int(b) - 1) for a, b in zip(edges[::2], edges[1::2], strict=True)]
 
 
-def tables(image: Image.Image) -> list[Table]:
+def tables(image: Image.Image, header: int = 60) -> list[Table]:
     """The ruled five-column tables on a page.
 
     A rule is a long run of dark pixels; the rules that share a table's left and right edges are its rules. Within
@@ -178,7 +178,7 @@ def tables(image: Image.Image) -> list[Table]:
             top -= 1
         while bottom + 1 < len(shade) and (shade[bottom + 1] > 0.5 or shade[bottom + 1 : bottom + 12].mean() > 0.5):
             bottom += 1
-        if bottom - top < 60:
+        if bottom - top < header:
             continue
         lines = [r for r in rules if r[0] > bottom]
         rows: list[tuple[int, int]] = []
@@ -350,3 +350,49 @@ def mayors() -> list[Mayor]:
     if checked:
         raise ValueError(f"checked rows the tables do not have: {sorted(checked)}")
     return result
+
+
+# a list table the rules do not find, by page: the top of its header; it shares the columns of the table above it
+UNRULED = {141: 1930}
+
+
+def _lines(image: Image.Image, top: int, column: tuple[int, int]) -> list[tuple[int, int]]:
+    """The text lines of a list table's votes column, between its header and its shaded total row.
+
+    The header is a mid-gray block, each list's votes are one line of dark figures on a light row, and the total row
+    is a block darker still, so each row's figures stand alone in the column's profile of dark pixels.
+    """
+    cell = np.asarray(image)[:, column[0] + 6 : column[1] - 6]
+    dark = (cell < 110).mean(axis=1)
+    light = cell.mean(axis=1) > 185
+    y = top
+    while not light[y : y + 4].all():
+        y += 1
+    total = next(r for r in _segments(dark > 0.5) if r[1] - r[0] >= 12 and r[0] > y)
+    lines: list[tuple[int, int]] = []
+    for a, b in _segments(dark > 0.01):
+        if a < y or b >= total[0]:
+            continue
+        if lines and a - lines[-1][1] <= 6:
+            lines[-1] = (lines[-1][0], b)
+        else:
+            lines.append((a, b))
+    return [(a, b) for a, b in lines if b - a >= 8 and dark[a : b + 1].mean() < 0.45]
+
+
+@functools.cache
+def list_boxes(page: int) -> list[list[tuple[float, float, float, float]]]:
+    """The votes cell of each row of each list table on the page, top to bottom, as fractions of the page."""
+    image = render(page)
+    found = [(t.header[0], t.columns[2]) for t in sorted(tables(image, 20), key=lambda t: t.header[0])]
+    if page in UNRULED:
+        found.append((UNRULED[page], found[-1][1]))
+    boxes = []
+    for top, (x0, x1) in found:
+        boxes.append(
+            [
+                (x0 / image.width, (a - 10) / image.height, x1 / image.width, (b + 10) / image.height)
+                for a, b in _lines(image, top, (x0, x1))
+            ]
+        )
+    return boxes
