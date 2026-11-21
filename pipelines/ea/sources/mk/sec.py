@@ -11,7 +11,8 @@ from the files within reach:
   and the Commission's results service for the registered voters of each unit.
 - 2020: the decision of 25 July 2020 (a scan) with each list's votes and seats by electoral unit, and the results
   by polling station from the minutes of the polling boards (Form 16).
-- 2024: the decision of 18 May 2024, which gives the votes and seats of the lists that won seats in each unit.
+- 2024: the decision of 18 May 2024, which gives the votes and seats of the lists that won seats in each unit, and for
+  units 5 and 6 the later decisions of 27 and 30 May 2024 after the repeat voting, which supersede it.
 
 The decisions of 2020 and 2024 also name the deputies elected in each unit, by list; these are stored as list-member
 candidacies with elected outcomes. The decision of 2016 names none.
@@ -57,6 +58,9 @@ FILES = {
     "form16": f"{ARCHIVE}/2021/10/Резултати-врз-основа-на-податоци-од-записниците-од-ИО.pdf",
     "pdf24": f"{ARCHIVE}/2025/09/zakluchok-za-konechni-rezultati-i-utvrduvaњe-na-mandati-po-izborni-ediniczi-"
     "parlamentarni-izbori-2024mk-al.pdf",
+    # The decisions of 27 and 30 May 2024 for units 5 and 6, after the voting was repeated at some polling stations.
+    "pdf24_5": "https://drive.google.com/uc?export=download&id=13SHgHfcaacNxX9C-tRMq4U4VEffdPc6d",
+    "pdf24_6": "https://drive.google.com/uc?export=download&id=1PXLbFu1Zzc-RsaA9fK-oQHTeOnWt6BY9",
 }
 # The reports of 2002 to 2011, which sec_early reads.
 FILES |= {
@@ -629,6 +633,75 @@ def elected_2024() -> list[Deputy]:
     return found
 
 
+# The decisions of 27 May (unit 5) and 30 May 2024 (unit 6), which give each unit's final votes, seats, and deputies
+# after the voting was repeated at polling stations 1194 and 1202 in Krushevo, 1470 and 1470/1 in Dolneni, 1844 in
+# Struga, and 1272 in Ohrid (unit 5) and at the polling station in Zhelino (unit 6). Transcribed from the scans;
+# each deputy carries the page of the scan that prints the name.
+FINAL_2024: dict[int, dict[str, object]] = {
+    5: {
+        "file": "pdf24_5",
+        "number": "08-2677/2",
+        "seats": [
+            ("vmro", 74287, 10),
+            ("dui", 27278, 4),
+            ("sdsm", 26668, 3),
+            ("vlen", 10793, 1),
+            ("levica", 9850, 1),
+            ("znam", 8671, 1),
+        ],
+        "deputies": [
+            (4, "vmro", "Ѓорѓија Сајкоски", "Gjorgjija Sajkoski"),
+            (4, "vmro", "Олга Лозановска", "Ollga Llozanovska"),
+            (4, "vmro", "Сашо Донев", "Sasho Donev"),
+            (4, "vmro", "Пеце Милевски", "Pece Milevski"),
+            (4, "vmro", "Јован Јаулески", "Jovan Jauleski"),
+            (4, "vmro", "Лидија Петкоска", "Lidija Petkoska"),
+            (4, "vmro", "Мевмед Џафери", "Mevmed Xhaferri"),
+            (4, "vmro", "Кире Божиновски", "Kire Bozhinovski"),
+            (4, "vmro", "Силвана Ангелевска", "Sillvana Angelevska"),
+            (4, "vmro", "Грација Бакраческа", "Gracija Bakraçeska"),
+            (4, "dui", "Зиадин Села", "Ziadin Sela"),
+            (4, "dui", "Муса Џафери", "Musa Zhaferri"),
+            (4, "dui", "Арбана Пашоли", "Arbana Pasholi"),
+            (4, "dui", "Исмаил Јахоски", "Ismail Yahoski"),
+            (5, "sdsm", "Јован Митрески", "Jovan Mitreski"),
+            (5, "sdsm", "Бисера Костадиновска Стојчевска", "Bisera Kostadinovska Stojçevska"),
+            (5, "sdsm", "Митко Трајчулески", "Mitko Trajçuleski"),
+            (5, "levica", "Јована Мојоска", "Jovana Mojoska"),
+            (5, "vlen", "Салим Сулејмани", "Salim Sulejmani"),
+            (5, "znam", "Весна Бандевска", "Vesna Bandevska"),
+        ],
+    },
+    6: {
+        "file": "pdf24_6",
+        "number": "08-3081/1",
+        "seats": [("dui", 53731, 8), ("vlen", 47849, 8), ("vmro", 21639, 3), ("sdsm", 6414, 1)],
+        "deputies": [
+            (3, "dui", "Али Ахмети", "Ali Ahmeti"),
+            (3, "dui", "Талат Џафери", "Talat Xhaferi"),
+            (3, "dui", "Илире Даути", "Ilire Dauti"),
+            (3, "dui", "Мендух Таќи", "Menduh Taqi"),
+            (3, "dui", "Рина Ајдари", "Rina Ajdari"),
+            (3, "dui", "Бејџан Иљас", "Bejxhan Iljas"),
+            (3, "dui", "Илир Демири", "Ilir Demiri"),
+            (4, "dui", "Сали Мурати", "Sali Murati"),
+            (4, "vlen", "Биљал Касами", "Bilall Kasami"),
+            (4, "vlen", "Беким Ќоку", "Bekim Qoku"),
+            (4, "vlen", "Мимоза Муса", "Mimoza Musa"),
+            (4, "vlen", "Халил Снопче", "Halil Snopçe"),
+            (4, "vlen", "Фатмир Лимани", "Fatmir Limani"),
+            (4, "vlen", "Саранда Имери-Стафаи", "Saranda Imeri - Stafai"),
+            (4, "vlen", "Садик Сулејмани", "Sadik Sulejmani"),
+            (4, "vlen", "Имрлије Салиу-Фетаи", "Imrlije Saliu-Fetai"),
+            (4, "vmro", "Дафина Стојаноска", "Dafina Stojanoska"),
+            (4, "vmro", "Александар Вељановски", "Aleksandar Veljanovski"),
+            (4, "vmro", "Валентина Марчевска", "Valentina Marçevska"),
+            (5, "sdsm", "Славјанка Петровска", "Sllavjanka Petrovska"),
+        ],
+    },
+}
+
+
 def deputies(
     p: Package, year: int, rs: str, options: dict[str, str], members: list[Deputy], seats: dict[str, int]
 ) -> None:
@@ -925,7 +998,17 @@ def contest(
 
 
 def result_set(
-    p: Package, year: int, election: str, cid: str, code: str, tag: str, *, default: bool, completeness: float
+    p: Package,
+    year: int,
+    election: str,
+    cid: str,
+    code: str,
+    tag: str,
+    *,
+    default: bool,
+    completeness: float,
+    supersedes: str | None = None,
+    status: str = "active",
 ) -> str:
     rs = key("result_set", DAYS[year], code, tag)
     p.add(
@@ -936,9 +1019,10 @@ def result_set(
         stage="official",
         kind="counted",
         source_id=SEC,
-        status="active",
+        status=status,
         is_default=default,
         completeness=completeness,
+        supersedes_id=supersedes,
     )
     return rs
 
@@ -1336,7 +1420,11 @@ def build_2024(p: Package, election: str, path_: str, lists: dict[str, Ballot]) 
     for number, code in enumerate(codes, 1):
         mine = found[number]
         cid, options = contest(p, year, election, path_, lists, code, 20, {name for name, _, _ in mine})
-        rs = result_set(p, year, election, cid, code, "decision", default=True, completeness=1.0)
+        final = FINAL_2024.get(number)
+        rs = result_set(
+            p, year, election, cid, code, "decision", default=final is None, completeness=1.0,
+            status="active" if final is None else "superseded",
+        )  # fmt: skip
         note(
             p,
             rs,
@@ -1345,14 +1433,15 @@ def build_2024(p: Package, election: str, path_: str, lists: dict[str, Ballot]) 
             "seats in the unit. Lists that won no seats, and the registered voters and ballot counts, are not in it, "
             "so only these lists have values.",
         )
-        if number == 5:
+        if final is not None:
             note(
                 p,
                 rs,
                 "caveat",
-                "The decision reports this unit before the voting was repeated at polling stations 1194 and 1202 in "
-                "Krushevo, 1470 and 1470/1 in Dolneni, 1844 in Struga, and 1272 in Ohrid. A later decision of the "
-                "Commission was to give the final votes and seats of the unit, so these figures may change.",
+                "The decision reports this unit before the voting was repeated at some polling stations on 22 May "
+                "2024. The Commission's later decision of "
+                f"{'27' if number == 5 else '30'} May 2024 (number {final['number']}) gives the unit's final votes, "
+                "seats, and deputies and supersedes this set.",
                 "repeat",
             )
         if sum(seats for _, _, seats in mine) != 20:
@@ -1379,10 +1468,67 @@ def build_2024(p: Package, election: str, path_: str, lists: dict[str, Ballot]) 
             ),
             "deputies",
         )
+    for number, final in FINAL_2024.items():
+        code = str(number)
+        mine = found[number]
+        cid = key("contest", DAYS[year], code)
+        options = {list_id: key("option", DAYS[year], code, list_id) for list_id, _, _ in mine}
+        previous = key("result_set", DAYS[year], code, "decision")
+        rs = result_set(p, year, election, cid, code, "final", default=True, completeness=1.0, supersedes=previous)
+        seats_by_list = {list_id: seats for list_id, _, seats in cast(list[tuple[str, int, int]], final["seats"])}
+        if sorted(seats_by_list) != sorted(options):
+            raise ValueError(f"unit {number}: the final decision's lists differ from the first decision's")
+        if sum(seats_by_list.values()) != 20:
+            raise ValueError(f"unit {number}: {sum(seats_by_list.values())} final seats")
+        day = DAYS[year]
+        stored = raw.cached(SOURCE, FILES[str(final["file"])])
+        p.artifact(stored, SEC)
+        for list_id, votes, seats in cast(list[tuple[str, int, int]], final["seats"]):
+            rows.append(fact(rs, districts[code], options[list_id], VOTES, votes))
+            p.add("outcome", result_set_id=rs, option_id=options[list_id], kind="won", seats=seats)
+        first = {(d.unit, d.list_id, d.row): d for d in elected if d.unit == number}
+        counted: Counter[str] = Counter()
+        for _page, list_id, mk, sq in cast(list[tuple[int, str, str, str]], final["deputies"]):
+            counted[list_id] += 1
+            tag = (day, number, list_id, counted[list_id])
+            candidacy = key("candidacy", *tag)
+            if (number, list_id, counted[list_id]) in first:
+                # The same deputy the first decision named, in the same place on the list.
+                pass
+            else:
+                person = key("person", *tag)
+                p.add("person", id=person)
+                p.name(person, mk, "mk", "official")
+                p.name(person, sq, "sq", "official", False)
+                p.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=options[list_id],
+                    role="list_member",
+                    ballot_name=mk,
+                )
+            p.add("outcome", result_set_id=rs, option_id=options[list_id], candidacy_id=candidacy, kind="elected")
+        for list_id, n in counted.items():
+            if n != seats_by_list[list_id]:
+                raise ValueError(f"unit {number} {list_id}: {n} deputies for {seats_by_list[list_id]} seats")
+        note(
+            p,
+            rs,
+            "caveat",
+            f"The State Election Commission's decision number {final['number']} of "
+            f"{'27' if number == 5 else '30'} May 2024 gives the final votes and seats of the lists that won seats "
+            "in the unit, after the voting was repeated at some polling stations on 22 May 2024 and the complaints "
+            "were decided. Lists that won no seats, and the registered voters and ballot counts, are not in it. "
+            "The deputies are those the decision names, one per seat; where the first decision named the same "
+            "deputy, the name is the one it printed.",
+            "final",
+        )
     p.accept(
         "outcomes.list_members",
         "The decision of 18 May 2024 names 19 deputies in each of units 5 and 6: the seat of the European Front "
         "that repeated voting at some polling stations could still move was left to a later decision, so that "
-        "list names one deputy fewer than its declared seats in each unit.",
+        "list names one deputy fewer than its declared seats in each unit. The later decisions, which supersede "
+        "those sets, name all 20.",
     )
     return finish(p, rows, [])
