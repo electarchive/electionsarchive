@@ -1,21 +1,23 @@
 import csv
+import hashlib
 import io
 import json
 import multiprocessing
 import os
 import shutil
+import struct
 import time
 import unicodedata
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import httpx
 import polars as pl
 
-from ea import raw
+from ea import package, raw
 from ea.changeset import Changeset
 from ea.sources.br.identity import namesakes
 from ea.sources.br.tse import ANNULLED, COORDINATES, NOT_OPENED, SEATS, UFS, proper
@@ -41,6 +43,12 @@ POLLING_PLACES = {
     year: f"{TSE}eleitorado_locais_votacao/eleitorado_local_votacao_{year}.zip"
     for year in (2010, 2014, 2018, 2022, 2026)
 }
+# The polling-place file of a later election that lends its points to the places an election's own file leaves
+# without coordinates (see `borrowed_points`).
+BORROWED = {2018: 2022}
+PLACE = ["municipality", "zone", "place"]
+# The suffix of the key of a coalition's runoff alliance; its first-round alliance keeps the coalition's own key.
+RUNOFF_ALLIANCE = ":runoff"
 SECTION_YEARS = (1998, 2002, 2006, 2010, 2014, 2018, 2026)
 SECTIONS = {
     year: {
@@ -1036,6 +1044,16 @@ def sections(year: int) -> None:
         .unique("section", keep="first")
         .select("section", location=pl.format("SRID=4326;POINT({} {})", "NR_LONGITUDE", "NR_LATITUDE"))
     )
+    if year in BORROWED:
+        lent, _ = borrowed_points(year)
+        points = pl.concat(
+            [
+                points,
+                lent.join(points, on="section", how="anti").select(
+                    "section", location=pl.format("SRID=4326;POINT({} {})", "longitude", "latitude")
+                ),
+            ]
+        )
     units = (
         sheet.sort("contest")
         .unique("section", keep="first")
@@ -1155,6 +1173,8 @@ def emit() -> Path:
             *([POLLING_PLACES[section_year]] if section_year in POLLING_PLACES else []),
         ]:
             cs.artifact(raw.cached(SOURCE, url), results[section_year])
+        if section_year in BORROWED:
+            cs.artifact(raw.cached(SOURCE, POLLING_PLACES[BORROWED[section_year]]), results[BORROWED[section_year]])
         feed = None
         if votes.filter(pl.col("contest").str.starts_with("2026:2:")).height:
             feed = cs.source("Tribunal Superior Eleitoral", "Resultados - 2026, 2º turno")
@@ -1440,7 +1460,14 @@ def emit() -> Path:
                     name(parties[key], abbreviation, kind="abbreviation")
             by_abbreviation[(year, abbreviation.replace(" ", "").upper())] = parties[key]
 
-        alliances: dict[str, UUID] = {}
+        # An alliance belongs to the election of the contests its options stand in, so a coalition that stands in a
+        # runoff is two alliances, one for each round, with the same name and parties (`runoff_alliances`).
+        alliances: dict[tuple[str, str], UUID] = {}
+        runoff = set(
+            candidates.filter(pl.col("coalition").is_not_null() & pl.col("contest").str.contains(r"^\d{4}:2:"))[
+                "coalition"
+            ]
+        )
         for coalition, year, label, members in (
             candidates.filter(pl.col("coalition").is_not_null())
             .select("coalition", "year", "coalition_label", "coalition_members")
@@ -1448,14 +1475,15 @@ def emit() -> Path:
             .sort("coalition")
             .iter_rows()
         ):
-            alliances[coalition] = cs.key(f"{SOURCE}.coalition", coalition)
-            cs.add("alliance", id=alliances[coalition], kind="electoral_alliance", election_id=cycles[year])
-            name(alliances[coalition], proper(label))
-            for member in {part.strip().replace(" ", "").upper() for part in (members or "").split("/")}:
-                if (year, member) in by_abbreviation:
-                    cs.add(
-                        "alliance_member", alliance_id=alliances[coalition], party_id=by_abbreviation[(year, member)]
-                    )
+            for round in ("1", "2") if coalition in runoff else ("1",):
+                alliance = alliances[(coalition, round)] = cs.key(
+                    f"{SOURCE}.coalition", coalition if round == "1" else f"{coalition}{RUNOFF_ALLIANCE}"
+                )
+                cs.add("alliance", id=alliance, kind="electoral_alliance", election_id=rounds[f"{year}:{round}"])
+                name(alliance, proper(label))
+                for member in {part.strip().replace(" ", "").upper() for part in (members or "").split("/")}:
+                    if (year, member) in by_abbreviation:
+                        cs.add("alliance_member", alliance_id=alliance, party_id=by_abbreviation[(year, member)])
 
         valid = (
             votes.group_by("contest")
@@ -1669,7 +1697,7 @@ def emit() -> Path:
                             contest_id=contest,
                             kind="list",
                             party_id=None if coalition else party,
-                            alliance_id=alliances[coalition] if coalition else None,
+                            alliance_id=alliances[(coalition, round)] if coalition else None,
                             ballot_label=abbreviation if coalition is None else None,
                         )
                     legend = cs.key("br.option", f"{key}:legend:{number}")
@@ -1713,7 +1741,9 @@ def emit() -> Path:
                     kind="ticket" if office in ("president", "governor") else "candidate",
                     parent_option_id=lists.get(group),
                     party_id=party,
-                    alliance_id=alliances[row["coalition"]] if row["coalition"] is not None and not lists else None,
+                    alliance_id=alliances[(row["coalition"], round)]
+                    if row["coalition"] is not None and not lists
+                    else None,
                     ballot_label=proper(row["ballot"]),
                 )
                 cs.add(
@@ -1802,4 +1832,402 @@ def emit() -> Path:
             .with_columns(**common)
             .collect(),
         )
+        if section_year in BORROWED:
+            cs.add("note", entity_id=cycles[section_year], kind="context", body_md=borrowed_points(section_year)[1])
         return cs.write()
+
+
+def polling_places(year: int) -> pl.DataFrame:
+    """Each section of the year's polling-place file in Brazil, once for each round, with its place's key, its name
+    and address folded to letters and digits, and its point where the file gives one within Brazil."""
+    columns = [
+        "NR_TURNO",
+        "SG_UF",
+        "CD_MUNICIPIO",
+        "NR_ZONA",
+        "NR_SECAO",
+        "NR_LOCAL_VOTACAO",
+        "NM_LOCAL_VOTACAO",
+        "DS_ENDERECO",
+        "DS_TIPO_SECAO_AGREGADA",
+        *COORDINATES,
+    ]
+    frames: list[pl.DataFrame] = []
+    with zipfile.ZipFile(raw.cached(SOURCE, POLLING_PLACES[year]).path) as archive:
+        for member in archive.namelist():
+            if member.endswith(".csv"):
+                frames.append(
+                    pl.read_csv(
+                        io.TextIOWrapper(archive.open(member), encoding="latin-1").read().encode(),
+                        separator=";",
+                        infer_schema=False,
+                        columns=columns,
+                    )
+                )
+
+    def folded(column: str) -> pl.Expr:
+        return pl.col(column).str.normalize("NFKD").str.to_uppercase().str.replace_all(r"[^A-Z0-9]", "")
+
+    return (
+        pl.concat(frames)
+        .filter(pl.col("SG_UF") != "ZZ")
+        .select(
+            round=pl.col("NR_TURNO").cast(pl.Int64),
+            municipality=pl.col("CD_MUNICIPIO").str.zfill(5),
+            zone=pl.col("NR_ZONA").cast(pl.Int64),
+            number=pl.col("NR_SECAO").cast(pl.Int64),
+            place=pl.col("NR_LOCAL_VOTACAO").cast(pl.Int64),
+            principal=pl.col("DS_TIPO_SECAO_AGREGADA") == "Principal",
+            name=folded("NM_LOCAL_VOTACAO"),
+            address=folded("DS_ENDERECO"),
+            latitude=pl.col("NR_LATITUDE").str.replace(",", ".").cast(pl.Float64),
+            longitude=pl.col("NR_LONGITUDE").str.replace(",", ".").cast(pl.Float64),
+        )
+        .with_columns(
+            section=pl.concat_str("municipality", "zone", "number", separator=":"),
+            located=pl.col("latitude").is_between(*COORDINATES["NR_LATITUDE"])
+            & pl.col("longitude").is_between(*COORDINATES["NR_LONGITUDE"]),
+        )
+    )
+
+
+def borrowed_points(year: int) -> tuple[pl.DataFrame, str]:
+    """The points a later polling-place file lends to the sections of the places the year's own file leaves without
+    coordinates, and a note saying so.
+
+    The electoral court's 2018 file gives no coordinates (-1) for about a fifth of its polling places. A place keeps
+    its number within its municipality and zone from one election to the next, so where the 2022 file lists the same
+    number there under the same name and the same address, with a single point, each of the place's 2018 sections takes
+    that point. Of the 2018 places that do have coordinates and match a 2022 place this way, 99 percent lie within
+    200 meters of the 2022 point. As the parse does, a section the file locates in either round keeps its own point,
+    so a section takes a lent point only when the file gives it none in either round. A section's place is its
+    first-round place."""
+    rows = polling_places(year).filter("principal")
+    anywhere = rows.filter("located").select("section").unique()
+    own = rows.filter(pl.col("round") == 1)
+    if own["section"].is_duplicated().any():
+        raise ValueError(f"{year}: a section lies in two polling places")
+    places = own.group_by(PLACE).agg(
+        pl.col("located").any(),
+        pl.col("located").all().alias("whole"),
+        pl.col("name").first(),
+        pl.col("address").first(),
+        pl.col("name").n_unique().alias("names"),
+        pl.col("address").n_unique().alias("addresses"),
+    )
+    if places.filter(pl.col("located") != pl.col("whole")).height:
+        raise ValueError(f"{year}: a polling place has sections with and without coordinates")
+    own = own.join(anywhere, on="section", how="anti")
+    lender = (
+        polling_places(BORROWED[year])
+        .filter("located")
+        .group_by(PLACE)
+        .agg(
+            pl.col("name").first(),
+            pl.col("address").first(),
+            pl.col("latitude").first(),
+            pl.col("longitude").first(),
+            single=(pl.col("name").n_unique() == 1)
+            & (pl.col("address").n_unique() == 1)
+            & (pl.struct("latitude", "longitude").n_unique() == 1),
+        )
+        .filter("single")
+    )
+    matched = (
+        places.filter(~pl.col("located") & (pl.col("names") == 1) & (pl.col("addresses") == 1))
+        .join(lender, on=[*PLACE, "name", "address"])
+        .select(*PLACE, "latitude", "longitude")
+    )
+    sections = own.select("section", *PLACE).join(matched, on=PLACE).select("section", "longitude", "latitude")
+    unlocated = places.filter(~pl.col("located"))
+    note = (
+        f"The electoral court's {year} polling-place file gives no coordinates for {unlocated.height:,} of its "
+        f"{places.height:,} polling places in Brazil, which hold {own.height:,} sections the file does not locate in "
+        f"either round. {matched.height:,} of these places appear in its {BORROWED[year]} file under the same number in the same "
+        f"municipality and zone, with the same name and address, so their {sections.height:,} sections are mapped at "
+        f"the {BORROWED[year]} place's point. The other sections have no point."
+    )
+    return sections, note
+
+
+# Only findings that the electoral court's own figures cause may be accepted.
+ACCEPTED = {
+    "accounting.turnout": "as the electoral court's polling-section files give them: in 250 sections in the first "
+    "round of 1998, 73 in its runoff, and one in the 2002 runoff, the turnout the file gives for the section exceeds "
+    "its registered electorate, by at most 370 voters",
+}
+KEY = f"{SOURCE}/all"
+SUMMARY = "Brazil's general elections from 1994 to 2026 by municipality and electoral zone, and by polling section"
+
+
+def point(longitude: float, latitude: float) -> str:
+    """A point as the database gives it back: upper-case hex EWKB with SRID 4326."""
+    return struct.pack("<BIIdd", 1, 0x20000001, 4326, longitude, latitude).hex().upper()
+
+
+def coordinates(location: str) -> tuple[float, float]:
+    order, kind, srid, longitude, latitude = struct.unpack("<BIIdd", bytes.fromhex(location))
+    if (order, kind, srid) != (1, 0x20000001, 4326):
+        raise ValueError(f"{location} is not a little-endian point with SRID 4326")
+    return longitude, latitude
+
+
+def derived_id(table: str, row: dict[str, object]) -> str:
+    """The id apply gives a note row: an md5 of the table, the pipeline, and each column's text."""
+    parts = [table, SOURCE]
+    for column in sorted(row):
+        value = row[column]
+        parts += [column, chr(30) if value is None else str(value).lower() if isinstance(value, bool) else str(value)]
+    digest = hashlib.md5(chr(31).join(parts).encode()).hexdigest()
+    return str(UUID(f"{digest[:12]}8{digest[13:16]}8{digest[17:]}"))
+
+
+def runoff_alliances(out: Path, counts: dict[str, int]) -> None:
+    """Give each alliance the election of the contests its options stand in, as the emit now does. The changeset
+    path tied a coalition to the year's general election and let its first-round and runoff options share it, though
+    those contests belong to the two round elections. Each alliance now belongs to the first round, and a coalition
+    that stands in a runoff gets a second alliance there, keyed by the coalition's key and `RUNOFF_ALLIANCE`, with the
+    same names and parties, which its runoff options join. The rounds and contests another pipeline holds (those of
+    2022) come from the database."""
+    scheme = f"{SOURCE}.coalition"
+    alliances = pl.read_parquet(out / "alliance.parquet")
+    members = pl.read_parquet(out / "alliance_member.parquet")
+    options = pl.read_parquet(out / "contest_option.parquet")
+    names = pl.read_parquet(out / "name.parquet")
+    keys = pl.read_parquet(out / "external_id.parquet")
+    elections = pl.read_parquet(out / "election.parquet").select("id", "parent_id", "kind")
+    contests = pl.read_parquet(out / "contest.parquet").select(contest_id="id", contest_election="election_id")
+    coalitions = keys.filter(pl.col("scheme") == scheme).select(id="entity_id", value="value")
+    if coalitions["id"].is_duplicated().any() or alliances.join(coalitions, on="id", how="anti").height:
+        raise ValueError(f"{KEY}: an alliance has no single {scheme} key")
+    cycles = sorted(set(alliances["election_id"]) - set(elections["id"]))
+    absent = sorted(set(options["contest_id"]) - set(contests["contest_id"]))
+    with connect() as conn:
+        held = conn.execute(
+            "select id::text, parent_id::text, kind::text from election where parent_id::text = any(%s)", [cycles]
+        ).fetchall()
+        standing = conn.execute(
+            "select id::text, election_id::text from contest where id::text = any(%s)", [absent]
+        ).fetchall()
+    if len(standing) != len(absent):
+        raise ValueError(f"{KEY}: {len(absent) - len(standing):,} contests of its options are nowhere")
+    elections = pl.concat(
+        [elections, pl.DataFrame(held, schema=elections.schema, orient="row")], how="vertical_relaxed"
+    )
+    contests = pl.concat([contests, pl.DataFrame(standing, schema=contests.schema, orient="row")])
+    rounds = elections.filter(pl.col("parent_id").is_not_null()).select(
+        cycle="parent_id", round_election="id", stage="kind"
+    )
+    if rounds.select("cycle", "stage").is_duplicated().any():
+        raise ValueError(f"{KEY}: a general election has two rounds of one kind")
+    first = rounds.filter(pl.col("stage") == "general").select("cycle", first="round_election")
+    second = rounds.filter(pl.col("stage") == "runoff").select("cycle", second="round_election")
+    alliances = alliances.join(first, left_on="election_id", right_on="cycle", how="left").join(
+        second, left_on="election_id", right_on="cycle", how="left"
+    )
+    if alliances["first"].null_count():
+        raise ValueError(f"{KEY}: an alliance belongs to no election with a first round")
+    used = (
+        options.filter(pl.col("alliance_id").is_not_null())
+        .join(contests, on="contest_id", how="left")
+        .join(alliances.select(alliance_id="id", first="first", second="second"), on="alliance_id", how="left")
+    )
+    stray = used.filter(
+        (pl.col("contest_election") != pl.col("first")) & pl.col("contest_election").ne_missing(pl.col("second"))
+    )
+    if stray.height:
+        raise ValueError(f"{KEY}: {stray.height:,} options join an alliance of another general election: {stray}")
+    runoff = (
+        used.filter(pl.col("contest_election") == pl.col("second"))
+        .select(id="alliance_id")
+        .unique()
+        .join(alliances.select("id", "kind", "second"), on="id")
+        .join(coalitions, on="id")
+        .with_columns(
+            new=pl.col("value").map_elements(
+                lambda value: str(uuid5(package.NAMESPACE, f"external_id:{scheme}\x1f{value}{RUNOFF_ALLIANCE}")),
+                return_dtype=pl.String,
+            )
+        )
+    )
+    if runoff["new"].is_in(keys["entity_id"].implode()).any():
+        raise ValueError(f"{KEY}: a runoff alliance's id is taken")
+    renamed = dict(runoff.select("id", "new").iter_rows())
+    # A runoff alliance's names are its first-round alliance's, each with an id derived from its own columns.
+    columns = [column for column in names.columns if column != "id"]
+    copied = (
+        names.filter(pl.col("entity_id").is_in(list(renamed)))
+        .with_columns(entity_id=pl.col("entity_id").replace_strict(renamed))
+        .with_columns(id=pl.struct(columns).map_elements(lambda row: derived_id("name", row), return_dtype=pl.String))
+    )
+    if copied["id"].is_in(names["id"].implode()).any() or copied["id"].is_duplicated().any():
+        raise ValueError(f"{KEY}: a runoff alliance's name id is taken")
+    tables = {
+        "alliance": pl.concat(
+            [
+                alliances.select("id", "kind", election_id="first"),
+                runoff.select(id="new", kind="kind", election_id="second"),
+            ]
+        ),
+        "alliance_member": pl.concat(
+            [
+                members,
+                members.filter(pl.col("alliance_id").is_in(list(renamed))).with_columns(
+                    alliance_id=pl.col("alliance_id").replace_strict(renamed)
+                ),
+            ]
+        ),
+        "contest_option": options.join(contests, on="contest_id", how="left")
+        .join(alliances.select(alliance_id="id", second="second"), on="alliance_id", how="left")
+        .with_columns(
+            alliance_id=pl.when(pl.col("contest_election") == pl.col("second"))
+            .then(pl.col("alliance_id").replace_strict(renamed, default=None))
+            .otherwise("alliance_id")
+        )
+        .select(options.columns),
+        "name": pl.concat([names, copied.select(names.columns)]),
+        "external_id": pl.concat(
+            [
+                keys,
+                runoff.select(entity_id="new", scheme=pl.lit(scheme), value=pl.col("value") + RUNOFF_ALLIANCE).select(
+                    keys.columns
+                ),
+            ]
+        ),
+    }
+    if tables["contest_option"]["alliance_id"].null_count() != options["alliance_id"].null_count():
+        raise ValueError(f"{KEY}: a runoff option lost its alliance")
+    for table, frame in tables.items():
+        frame.write_parquet(out / f"{table}.parquet", statistics=False)
+        counts[table] = frame.height
+    moved = tables["contest_option"].filter(pl.col("alliance_id").is_in(list(renamed.values()))).height
+    print(
+        f"{KEY}: {alliances.height:,} alliances move to their first rounds; {runoff.height:,} coalitions get a runoff "
+        f"alliance, which {moved:,} runoff options join",
+        flush=True,
+    )
+
+
+def package_from_export(exported: Path | None = None) -> Path:
+    """Build br.tse_history/all from the archive's published rows (`ea package export`) with the two changes the emit
+    now makes to them: the 2018 polling sections whose places the 2018 polling-place file leaves without coordinates
+    take the point of the same place in the 2022 file (`borrowed_points`), with a note on the 2018 election; and each
+    alliance belongs to the round its options stand in (`runoff_alliances`). It reads only the two polling-place
+    files, so it runs where the section results are not cached. `exported` names a copy of an earlier export to
+    start from instead of exporting again, which takes most of an hour."""
+    if exported is None:
+        out = package.export(SOURCE)
+    else:
+        out = package.folder(KEY) / "build"
+        if out.exists():
+            shutil.rmtree(out)
+        shutil.copytree(exported, out)
+        if json.loads((out / "package.json").read_text())["summary"] != f"{SOURCE}, exported from the changeset path":
+            raise ValueError(f"{exported} is not an export of {SOURCE}")
+    manifest = json.loads((out / "package.json").read_text())
+    before = {code: n for code, n, _ in package.check(out)}
+    counts = dict(manifest["tables"])
+    units = pl.read_parquet(out / "reporting_unit.parquet")
+    if "location" not in units.columns:
+        raise ValueError(f"{KEY}: the export carries no unit points")
+    new_artifacts: list[dict[str, object]] = []
+    notes = pl.read_parquet(out / "note.parquet")
+    keys = pl.read_parquet(out / "external_id.parquet")
+    sources = pl.read_parquet(out / "source.parquet")
+    for year, lender in BORROWED.items():
+        opened = units.filter(
+            (pl.col("scheme_code") == "br.secao")
+            & (pl.col("valid_from").dt.year() == year)
+            & (pl.col("kind") != "abroad_mission")
+        )
+        if opened["valid_from"].n_unique() != 1:
+            raise ValueError(f"{KEY}: the {year} sections open on {sorted(opened['valid_from'].unique())}")
+        # Every point the export holds for the year's sections is the one the year's own file gives, so the sections
+        # left without one are those whose places the file leaves without coordinates.
+        own = (
+            polling_places(year)
+            .filter(pl.col("principal") & pl.col("located"))
+            .sort("round")
+            .unique("section", keep="first", maintain_order=True)
+            .select("section", "longitude", "latitude")
+        )
+        stored = pl.DataFrame(
+            [
+                (code, *(coordinates(location) if location is not None else (None, None)))
+                for code, location in opened.select("code", "location").iter_rows()
+            ],
+            schema={"section": pl.String, "stored_longitude": pl.Float64, "stored_latitude": pl.Float64},
+            orient="row",
+        )
+        differ = stored.join(own, on="section", how="left").filter(
+            pl.col("stored_longitude").ne_missing(pl.col("longitude"))
+            | pl.col("stored_latitude").ne_missing(pl.col("latitude"))
+        )
+        if differ.height:
+            raise ValueError(f"{KEY}: {differ.height:,} {year} section points differ from the {year} file: {differ}")
+        lent, note = borrowed_points(year)
+        fill = lent.join(opened.select(section="code", id="id"), on="section")
+        if fill.height != lent.height:
+            raise ValueError(f"{KEY}: {lent.height - fill.height:,} sections with a {lender} point have no {year} unit")
+        if opened.filter(pl.col("code").is_in(fill["section"].implode()) & pl.col("location").is_not_null()).height:
+            raise ValueError(f"{KEY}: a {year} section to take a {lender} point already has one")
+        points = {id: point(longitude, latitude) for _, longitude, latitude, id in fill.iter_rows()}
+        units = units.with_columns(
+            location=pl.col("id").replace_strict(points, default=pl.col("location"), return_dtype=pl.String)
+        )
+        print(f"{KEY}: {len(points):,} {year} sections take a point from the {lender} polling-place file", flush=True)
+        election = keys.filter(
+            (pl.col("scheme") == "br.election") & (pl.col("value") == f"{opened['valid_from'][0]}:general-elections")
+        )["entity_id"]
+        if election.len() != 1:
+            raise ValueError(f"{KEY}: no single {year} general election")
+        row: dict[str, object] = {"entity_id": election[0], "kind": "context", "body_md": note}
+        notes = pl.concat(
+            [notes, pl.DataFrame([{"id": derived_id("note", row), **row, "lang": None}], schema=notes.schema)]
+        )
+        results = sources.filter(pl.col("title") == f"Resultados - {lender}")["id"]
+        if results.len() != 1:
+            raise ValueError(f"{KEY}: no single Resultados - {lender} source")
+        # The lender's file is cited under its own year's results, as each year's polling-place file is.
+        artifact = raw.cached(SOURCE, POLLING_PLACES[lender])
+        new_artifacts.append(
+            {
+                "id": str(uuid5(package.NAMESPACE, f"source_artifact\x1f{results[0]}\x1f{artifact.storage_key}")),
+                "source_id": results[0],
+                "url": artifact.url,
+                "sha256": artifact.sha256,
+                "retrieved_at": artifact.retrieved_at,
+                "storage_key": artifact.storage_key,
+                "media_type": artifact.media_type,
+                "bytes": artifact.bytes,
+            }
+        )
+    runoff_alliances(out, counts)
+    units.write_parquet(out / "reporting_unit.parquet", statistics=False)
+    notes.write_parquet(out / "note.parquet", statistics=False)
+    counts["note"] = notes.height
+    file = out / "source_artifact.parquet"
+    artifacts = pl.read_parquet(file)
+    staged = pl.DataFrame(new_artifacts, schema=artifacts.schema).join(artifacts.select("id"), on="id", how="anti")
+    artifacts = pl.concat([artifacts, staged])
+    artifacts.write_parquet(file, statistics=False)
+    counts["source_artifact"] = artifacts.height
+    # The cited files are the ones these rows read: the two polling-place files. The adopted changesets cite only
+    # their own parquets, which the package's rows replace.
+    read = artifacts.filter(
+        pl.col("url").is_in([POLLING_PLACES[year] for pair in BORROWED.items() for year in pair])
+        & pl.col("storage_key").str.starts_with(f"raw/{SOURCE}/")
+    )
+    with connect() as conn:
+        cited = package._cited(conn, package._adopted(conn, SOURCE)[1], read)
+    built = package._seal(KEY, SOURCE, SUMMARY, out, counts, manifest["adopts"], cited, None)
+    after = {code: n for code, n, _ in package.check(out)}
+    fixed = {code: n for code, n in before.items() if code != "fact.alliance_election"}
+    if after != fixed:
+        raise ValueError(f"{KEY}: the changes move the check findings from {before} to {after}")
+    refused = sorted(code for code in after if not code.startswith(("accounting.", "outcomes.")))
+    if refused:
+        raise ValueError(f"{KEY}: findings no package may accept: {refused}")
+    built["accepted"] = {code: ACCEPTED[code] for code in after}
+    (out / "package.json").write_text(json.dumps(built, indent=1) + "\n")
+    return out

@@ -230,6 +230,7 @@ TABLES: dict[str, tuple[tuple[str, ...] | None, dict[str, pl.DataType]]] = {
             "valid_from_precision": U,
             "valid_to": D,
             "valid_to_precision": U,
+            "location": U,
         },
     ),
     "result_set": (
@@ -390,7 +391,12 @@ OPTIONAL: dict[str, frozenset[str]] = {
     "candidacy": frozenset({"preference_option_id"}),
     "contest": frozenset({"term", "party_scope_id", "seat_id", "boundary_set_id", "allocation_parent_id"}),
     "contest_option": frozenset({"alliance_id"}),
+    "reporting_unit": frozenset({"location"}),
 }
+# Optional columns that a load leaves as the database holds them when a package's file lacks them, rather than
+# clearing them. A unit's point was outside the format until packages carried one, so a package built without the
+# column keeps the points the changeset path gave its units.
+KEPT_WHEN_ABSENT: dict[str, frozenset[str]] = {"reporting_unit": frozenset({"location"})}
 
 
 def _empty(table: str, frame: pl.LazyFrame) -> list[str]:
@@ -1494,7 +1500,11 @@ def _facts(
             columns = list(_present(table, TABLES[table][1], file))
             _stage(conn, table, columns, file)
             for column in OPTIONAL.get(table, ()):
-                if column not in columns and column in _columns(conn, table):
+                if (
+                    column not in columns
+                    and column in _columns(conn, table)
+                    and column not in KEPT_WHEN_ABSENT.get(table, ())
+                ):
                     conn.execute(
                         sql.SQL("alter table {s} add column {c} {k}").format(
                             s=sql.Identifier(f"pkg_{table}"),
