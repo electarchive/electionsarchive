@@ -1,0 +1,8 @@
+[Unit]
+Description=Turn the Cloudflare surge challenge on while the origin sheds load, and off once it is calm (infra/surge.py)
+
+[Service]
+Type=oneshot
+TimeoutStartSec=2min
+WorkingDirectory=%h/electionsarchive
+ExecStart=/usr/bin/python3 -I %h/electionsarchive/infra/surge.py
