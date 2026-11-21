@@ -12,7 +12,8 @@ from uuid import UUID
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.licenses import PUBLIC_RECORD
 from ea.store import connect
 
@@ -581,12 +582,22 @@ def emit() -> Path:
         return f"{name_[cut:].strip()} {name_[:cut].strip()}"
 
     with connect() as conn:
-        cs = Changeset(
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary="Federal Council elections by the United Federal Assembly, 1919–2025, with every ballot",
             polity="CH",
+        )
+        cs.accept(
+            "accounting.votes_valid",
+            "seven ballots print votes for candidates and scattered votes that do not add up to their valid votes; "
+            "each is stored as printed, with a caveat note on its contest",
+        )
+        cs.accept(
+            "accounting.ballots_sum",
+            "three ballots print blank, invalid, and valid ballots that do not add up to the ballots received; "
+            "each is stored as printed, with a caveat note on its contest",
         )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
@@ -692,6 +703,8 @@ def emit() -> Path:
             prefix = fold(seat["surname"] if "surname" in seat else seat["full"])
             rounds = seat["rounds"]
             previous = None
+            # Each ballot's absolute majority sits in contest.rules_override, which the changeset path wrote and the
+            # package format leaves in place.
             for index, col in enumerate(rounds, 1):
                 key = f"{day_}:federal-council:{number_}:{index}"
                 contest = cs.key("ch.contest", key)
@@ -706,7 +719,6 @@ def emit() -> Path:
                     round_number=index,
                     previous_round_id=previous,
                     electoral_system_id=system,
-                    rules_override={"required": col["required"]} if "required" in col else {},
                     default_result_kind="counted",
                 )
                 label = f"Seat {number_}" if len(rounds) == 1 else f"Seat {number_}, ballot {index}"
