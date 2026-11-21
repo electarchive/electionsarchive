@@ -1,21 +1,33 @@
 import io
 import json
 import re
+import subprocess
 import unicodedata
 import zipfile
-from datetime import date
+from collections.abc import Callable
+from dataclasses import replace
+from datetime import date, datetime
 from pathlib import Path
 from uuid import UUID
 
+import httpx
 import polars as pl
+from psycopg import Connection
 
-from ea import raw
-from ea.changeset import Changeset, slug
+from ea import package, raw
+from ea.changeset import slug
+from ea.package import Draft
 from ea.sources.es.infoelectoral import APLIEXTR, DOCXL, PAGE
 from ea.store import DATA, connect
 
 SOURCE = "es.referendums"
 VERSION = "1"
+KEY = f"{SOURCE}/all"
+MINISTRY = (
+    *(f"{APLIEXTR}01{stamp}_TOTA.zip" for stamp in ("197812", "198603", "200502")),
+    *(f"{APLIEXTR}01{stamp}_MESA.zip" for stamp in ("198603", "200502")),
+    DOCXL + "PROV_01_197612_1.zip",
+)
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Ministerio del Interior"
 TITLE = "Resultados electorales: referendos (ficheros de datos)"
@@ -100,6 +112,187 @@ MESA_PROVISIONAL = (
 
 BOE = "Boletín Oficial del Estado"
 BOE_LICENSE = "https://www.boe.es/informacion/aviso_legal/index.php"
+GAZETTE = "https://www.boe.es/boe/dias/"
+# The decree that put each question to the voters, as the BOE printed it, and the question it set, read from the
+# decree's page; the build checks that the page carries the question.
+QUESTIONS: dict[str, tuple[str, str, str]] = {
+    "1976-12-15:referendum": (
+        (
+            "Real Decreto 2635/1976, de 24 de noviembre, por el que se somete a Referéndum de la Nación el Proyecto de Ley "
+            "para la Reforma Política (BOE 282, 24 November 1976)"
+        ),
+        GAZETTE + "1976/11/24/pdfs/A23350-23351.pdf",
+        "¿Aprueba el Proyecto de Ley para la Reforma Política?",
+    ),
+    "1978-12-06:referendum": (
+        (
+            "Real Decreto 2560/1978, de 3 de noviembre, por el que se somete a Referéndum de la Nación el proyecto de "
+            "Constitución (BOE 265, 6 November 1978)"
+        ),
+        GAZETTE + "1978/11/06/pdfs/A25365-25382.pdf",
+        "¿Aprueba el proyecto de Constitución?",
+    ),
+    "1986-03-12:referendum": (
+        (
+            "Real Decreto 214/1986, de 6 de febrero, por el que se somete a referéndum de la Nación la decisión política "
+            "del Gobierno en relación con la Alianza Atlántica (BOE 33, 7 February 1986)"
+        ),
+        GAZETTE + "1986/02/07/pdfs/A05072-05073.pdf",
+        (
+            "¿Considera conveniente para España permanecer en la Alianza Atlántica en los términos acordados por el "
+            "Gobierno de la Nación?"
+        ),
+    ),
+    "2005-02-20:referendum": (
+        (
+            "Real Decreto 5/2005, de 14 de enero, por el que se somete a referéndum consultivo de la Nación la decisión "
+            "política de ratificar el Tratado por el que se establece una Constitución para Europa (BOE 13, 15 January "
+            "2005)"
+        ),
+        GAZETTE + "2005/01/15/pdfs/A01627-01628.pdf",
+        "¿Aprueba usted el Tratado por el que se establece una Constitución para Europa?",
+    ),
+    "1979-10-25:referendum:basque-country": (
+        (
+            "Real Decreto-ley 13/1979, de 14 de septiembre, por el que se somete a referéndum el proyecto de Estatuto de "
+            "autonomía para el País Vasco (BOE 229, 24 September 1979)"
+        ),
+        GAZETTE + "1979/09/24/pdfs/A22237-22243.pdf",
+        "¿Aprueba el proyecto de Estatuto de autonomía para el País Vasco?",
+    ),
+    "1980-02-28:referendum:andalusia-initiative": (
+        (
+            "Real Decreto 145/1980, de 26 de enero, por el que se convoca a referéndum de las provincias de Almería, Cádiz, "
+            "Córdoba, Granada, Huelva, Jaén, Málaga y Sevilla en cumplimiento de lo dispuesto en el artículo 151 de la "
+            "Constitución (BOE 24, 28 January 1980)"
+        ),
+        GAZETTE + "1980/01/28/pdfs/A02084-02085.pdf",
+        (
+            "¿Da usted su acuerdo a la ratificación de la iniciativa prevista en el artículo ciento cincuenta y uno de la "
+            "Constitución a efectos de su tramitación por el procedimiento establecido en dicho artículo?"
+        ),
+    ),
+    "1980-12-21:referendum:galicia": (
+        (
+            "Real Decreto 2400/1980, de 7 de noviembre, por el que se somete a referéndum el proyecto de Estatuto de "
+            "Autonomía para Galicia (BOE 269, 8 November 1980)"
+        ),
+        GAZETTE + "1980/11/08/pdfs/A24949-24955.pdf",
+        "¿Aprueba el proyecto de Estatuto de Autonomía para Galicia?",
+    ),
+    "1981-10-20:referendum:andalusia": (
+        (
+            "Real Decreto 1835/1981, de 20 de agosto, por el que se somete a referéndum el proyecto de Estatuto de "
+            "Autonomía para Andalucía (BOE 204, 26 August 1981)"
+        ),
+        GAZETTE + "1981/08/26/pdfs/A19596-19602.pdf",
+        "¿Aprueba el proyecto de Estatuto de Autonomía para Andalucía?",
+    ),
+    "2007-02-18:referendum:andalusia-reform": (
+        (
+            "Decreto del Presidente 2/2007, de 16 de enero, por el que se somete a referéndum el Proyecto de Reforma del "
+            "Estatuto de Autonomía para Andalucía (BOE 15, 17 January 2007)"
+        ),
+        GAZETTE + "2007/01/17/pdfs/A02318-02357.pdf",
+        "¿Aprueba el proyecto de Estatuto de Autonomía para Andalucía?",
+    ),
+}
+# The question of 1986 refers to the terms of the Government's decision, which article 1 of the decree prints in
+# full as the decision put to the vote.
+DECISIONS = {
+    "1986-03-12:referendum": (
+        "El Gobierno considera conveniente, para los intereses nacionales, que España permanezca en la Alianza "
+        "Atlántica, y acuerda que dicha permanencia se establezca en los siguientes términos:\n\n"
+        "1.° La participación de España en la Alianza Atlántica no incluirá su incorporación a la estructura militar "
+        "integrada.\n\n"
+        "2.° Se mantendrá la prohibición de instalar, almacenar o introducir armas nucleares en territorio español.\n\n"
+        "3.° Se procederá a la reducción progresiva de la presencia militar de los Estados Unidos en España."
+    ),
+}
+# Where the BOE prints each national referendum's result: the Junta Electoral Central's declaration from 1978, and
+# for 1976, when no Junta's declaration appeared in the BOE, the law the referendum ratified. Each comes with the
+# national electors, Yes, No, blank, and null ballots it prints, which the build checks against the ministry's
+# provinces, and a note on how the two agree.
+PROCLAMATIONS: dict[date, tuple[tuple[tuple[str, str], ...], tuple[int, int, int, int, int] | None, str]] = {
+    date(1976, 12, 15): (
+        (
+            (
+                "Ley 1/1977, de 4 de enero, para la Reforma Política (BOE 4, 5 January 1977)",
+                GAZETTE + "1977/01/05/pdfs/A00170-00171.pdf",
+            ),
+        ),
+        None,
+        (
+            "No declaration of the result by a Junta appears in the BOE. Ley 1/1977, the Law for Political Reform as "
+            "the King enacted it on 4 January 1977, records that the project was put to the Nation and ratified by a "
+            "majority of votes in the referendum of 15 December 1976, and the outcome is stored as it records it."
+        ),
+    ),
+    date(1978, 12, 6): (
+        (
+            (
+                (
+                    "Acuerdo de la Junta Electoral Central por el que se hace público el resumen de la votación en el "
+                    "Referéndum Constitucional (BOE 305, 22 December 1978)"
+                ),
+                GAZETTE + "1978/12/22/pdfs/A28934-28934.pdf",
+            ),
+        ),
+        (26632180, 15706078, 1400505, 632902, 133786),
+        (
+            "The outcome is the one the Junta Electoral Central's summary of the vote made public (BOE 305, 22 "
+            "December 1978). In every province it prints the electors, Yes, No, blank, and null ballots of the "
+            "ministry's file. Its voters differ from the sum of those ballots in six provinces (Barcelona +58, Ciudad "
+            "Real −24, Cuenca −1, Gerona +6, Palencia −7, Segovia −2), so its national total of 17,873,301 voters is 30 "
+            "more than the ballots cast stored here."
+        ),
+    ),
+    date(1986, 3, 12): (
+        (
+            (
+                (
+                    "Resolución de 26 de marzo de 1986 por la que se declaran los resultados oficiales definitivos del "
+                    "Referéndum convocado por Real Decreto 214/1986, de 6 de febrero (BOE 79, 2 April 1986)"
+                ),
+                GAZETTE + "1986/04/02/pdfs/A11631-11632.pdf",
+            ),
+            (
+                (
+                    "Rectificación de errores materiales en la Resolución de 26 de marzo de 1986 por la que se declaran los "
+                    "resultados oficiales definitivos del referéndum convocado por Real Decreto 214/1986, de 6 de febrero "
+                    "(BOE 87, 11 April 1986)"
+                ),
+                GAZETTE + "1986/04/11/pdfs/A12801-12801.pdf",
+            ),
+        ),
+        (29024494, 9054509, 6872421, 1127673, 191849),
+        (
+            "The outcome is the one the Junta Electoral Central declared on 26 March 1986 (BOE 79, 2 April 1986). With "
+            "the correction it published on 11 April 1986, which revised the electors of Oviedo, the voters of "
+            "Castellón, and the null ballots of La Rioja, its national electors, Yes, No, blank, and null ballots equal "
+            "the ministry's. The voters it prints are more than the sum of those ballots stored here as ballots cast."
+        ),
+    ),
+    date(2005, 2, 20): (
+        (
+            (
+                (
+                    "Resolución de 7 de abril de 2005, de la Junta Electoral Central, de declaración oficial de los "
+                    "resultados del referéndum consultivo por el que se somete a la Nación la decisión política del "
+                    "Gobierno de ratificar el Tratado por el que se establece una Constitución para Europa (BOE 84, 8 April "
+                    "2005)"
+                ),
+                GAZETTE + "2005/04/08/pdfs/A12308-12309.pdf",
+            ),
+        ),
+        (34692491, 11057563, 2453002, 856664, 124523),
+        (
+            "The outcome is the one the Junta Electoral Central declared official on 7 April 2005 (BOE 84, 8 April "
+            "2005). In every province its electors, Yes, No, blank, and null ballots equal the ministry's, and its "
+            "voters equal the sum of those ballots."
+        ),
+    ),
+}
 ARE = "https://hauteskundeak.euskadi.eus/ab12aAREWar/resultado/search"
 ARE_PAGE = "https://hauteskundeak.euskadi.eus/webelec00-app/es/ab12aAREWar/?locale=es"
 ARE_TITLE = "Archivo de resultados electorales (ARE): Referéndum Estatuto de Autonomía 1979"
@@ -252,8 +445,36 @@ ARE_UNEVEN = (
 )
 
 
+def ministry(url: str) -> raw.Artifact:
+    """The ministry's file, or the Internet Archive's copy of it where the ministry refuses a request."""
+    keys = raw.keys("es.infoelectoral")
+    if url in keys:
+        return raw.cached("es.infoelectoral", url)
+    for key in sorted(keys):
+        if key.startswith("https://web.archive.org/web/") and key.endswith(f"/{url}"):
+            return raw.cached("es.infoelectoral", key)
+    raise LookupError(f"{url} is not in the es.infoelectoral raw cache; run `ea fetch {SOURCE}` first")
+
+
+def folded(text: str) -> str:
+    """Text without case, punctuation, spacing, or the hyphens that break a word at a line's end, so a question
+    reads the same in the decree's text layer, whose scanned pages carry stray marks."""
+    return re.sub(r"[\W_]+", "", re.sub("[­-]\\s*\n\\s*", "", text).lower())
+
+
+def printed(artifact: raw.Artifact, text: str) -> int:
+    """The page of the gazette file that prints the text."""
+    pages = subprocess.run(
+        ["pdftotext", str(artifact.path), "-"], check=True, capture_output=True, text=True
+    ).stdout.split("\f")
+    for number, page in enumerate(pages, 1):
+        if folded(text) in folded(page):
+            return number
+    raise ValueError(f"{artifact.url} does not print {text}")
+
+
 def zipped(url: str, name: str) -> bytes:
-    with zipfile.ZipFile(raw.cached("es.infoelectoral", url).path) as archive:
+    with zipfile.ZipFile(ministry(url).path) as archive:
         return archive.read(name)
 
 
@@ -294,8 +515,20 @@ def mesa(line: str, year: int) -> dict[str, int | str | bool]:
 
 
 def fetch() -> None:
+    # The ministry's files sit in es.infoelectoral's cache, beside the other files of its data portal. The portal
+    # refuses some requests for the 1976 file, whose Internet Archive copy the cache may hold instead.
+    for url in MINISTRY:
+        try:
+            raw.fetch("es.infoelectoral", url, suffix=".zip")
+        except httpx.HTTPStatusError:
+            ministry(url)
     for spec in STATUTES.values():
         raw.fetch(SOURCE, spec[7], suffix=".pdf")
+    for _, url, _ in QUESTIONS.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
+    for gazettes, _, _ in PROCLAMATIONS.values():
+        for _, url in gazettes:
+            raw.fetch(SOURCE, url, suffix=".pdf")
     raw.fetch(SOURCE, ARE, suffix=".json", body=ARE_BODY)
 
 
@@ -368,32 +601,111 @@ def parse() -> None:
     pl.DataFrame(
         municipalities, schema=["name", "registered", "voters", "yes", "no", "blank", "null"], orient="row"
     ).write_parquet(PARSED / "basque_1979.parquet")
+    build()
 
 
-def emit() -> Path:
+def emit() -> None:
+    package.run("load", [KEY])
+
+
+def retrieved(conn: Connection) -> Callable[[raw.Artifact], raw.Artifact]:
+    """A file the cache holds with the same bytes as a file the archive already cites, fetched from its address or
+    from the Internet Archive's copy of that address, keeps the address and retrieval time the archive recorded for
+    it, so a fresh copy of the cache rebuilds the same citation."""
+    stored: dict[str, tuple[str, datetime]] = {
+        str(digest): (str(url), at)
+        for url, digest, at in conn.execute(
+            """select a.url, a.sha256, a.retrieved_at from source_artifact a
+               join changeset c on c.id = a.changeset_id where c.pipeline = %s""",
+            [SOURCE],
+        )
+    }
+
+    def pin(artifact: raw.Artifact) -> raw.Artifact:
+        if artifact.sha256 not in stored:
+            return artifact
+        url, at = stored[artifact.sha256]
+        archived = artifact.url.startswith("https://web.archive.org/web/") and artifact.url.endswith(f"/{url}")
+        return replace(artifact, url=url, retrieved_at=at) if artifact.url == url or archived else artifact
+
+    return pin
+
+
+def build() -> Path:
+    """Write the package es.referendums/all from the parsed tables. It reads the database, through Draft, so the rows
+    it rebuilds keep the ids the changeset path gave them."""
     provinces = pl.read_parquet(PARSED / "provinces.parquet")
     mesas = pl.read_parquet(PARSED / "mesas.parquet")
     with connect() as conn:
-        cs = Changeset(
+        pin = retrieved(conn)
+        cs = Draft(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary=(
                 "Spain's national referendums of 1976, 1978, 1986, and 2005 by province and, for 1986 and 2005, by "
                 "mesa, from the Ministry of the Interior's data files, and the Basque, Galician, and Andalusian statute "
-                "referendums of 1979 to 2007 by province from the Junta Electoral Central's declarations in the BOE"
+                "referendums of 1979 to 2007 by province from the Junta Electoral Central's declarations in the BOE, "
+                "with each question as the decree calling the referendum set it and the declarations of the national "
+                "results"
             ),
             polity="ES",
+        )
+        cs.accept(
+            "accounting.ballots_sum",
+            "the Junta Electoral Central's declaration of the 1980 Andalusian initiative prints voters in Córdoba, Jaén, "
+            "and Sevilla, and the Basque Government's archive prints voters in three municipalities in 1979, that "
+            "differ from the sum of Yes, No, blank, and null ballots; they are stored as printed, and each set's note "
+            "says so",
+        )
+        cs.accept(
+            "accounting.turnout",
+            "the ministry's 1986 mesa file prints more ballots than registered voters in eight mesas; they are stored "
+            "as printed, and the set's note counts them",
         )
 
         def name(entity: UUID, text: str, lang: str = "en", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
 
+        def gazette(title: str, url: str) -> tuple[UUID, raw.Artifact]:
+            """The BOE item as a source, citing its file."""
+            boe = cs.source(BOE, title)
+            cs.add(
+                "source",
+                id=boe,
+                kind="official_body",
+                publisher=BOE,
+                title=title,
+                url=url,
+                license="Public record: official gazette, free to reuse",
+                license_url=BOE_LICENSE,
+                attribution="Fuente: Boletín Oficial del Estado.",
+            )
+            artifact = pin(raw.cached(SOURCE, url))
+            cs.artifact(artifact, boe)
+            return boe, artifact
+
+        def question(key: str, contest: UUID) -> None:
+            """The question the decree put to the voters, and for 1986 the decision it asked them about."""
+            title, url, text = QUESTIONS[key]
+            decree, artifact = gazette(title, url)
+            for kind, body in (("text", text), ("summary", DECISIONS.get(key))):
+                if body is not None:
+                    cs.add(
+                        "ballot_question_text",
+                        contest_id=contest,
+                        kind=kind,
+                        lang="es",
+                        body=body,
+                        url=url,
+                        source_id=decree,
+                        locator={"page": printed(artifact, body)},
+                    )
+
         spain = cs.polity("ES")
         if conn.execute("select 1 from scheme where code = 'es.seccion'").fetchone() is None:
             raise ValueError("publish es.ine before the referendums")
-        if conn.execute("select 1 from scheme where code = 'es.mesa'").fetchone() is None:
-            cs.add("scheme", code="es.mesa", polity_id=spain, kind="precinct", rank=5, noun="polling station")
+        cs.add("scheme", code="es.mesa", polity_id=spain, kind="precinct", rank=5, noun="polling station")
         source = cs.source(PUBLISHER, TITLE)
         cs.add(
             "source",
@@ -405,25 +717,26 @@ def emit() -> Path:
             license="Reuse under Ley 37/2007 with the source cited",
             attribution="Origen de los datos: Ministerio del Interior.",
         )
-        for stamp in ("197812", "198603", "200502"):
-            cs.artifact(raw.cached("es.infoelectoral", f"{APLIEXTR}01{stamp}_TOTA.zip"), source)
-        for stamp in ("198603", "200502"):
-            cs.artifact(raw.cached("es.infoelectoral", f"{APLIEXTR}01{stamp}_MESA.zip"), source)
-        cs.artifact(raw.cached("es.infoelectoral", DOCXL + "PROV_01_197612_1.zip"), source)
+        for url in MINISTRY:
+            cs.artifact(pin(ministry(url)), source)
 
         system = cs.key("es.electoral_system", "referendum")
         cs.add("electoral_system", id=system, polity_id=spain, rules={"formula": "referendum"}, rules_version=1)
         name(system, "Spanish national referendum")
         cs.add("note", entity_id=system, kind="methodology", body_md=SYSTEM)
 
+        # Mesas sit on the 2025 section map; es.ine also holds earlier sections under the same codes, dated to end
+        # when the map redrew them.
         sections = dict(
             conn.execute(
-                "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'es.seccion'"
+                """select c.code, a.id from area a join area_code c on c.area_id = a.id
+                   where a.scheme_code = 'es.seccion' and c.valid @> date '2025-01-01'"""
             ).fetchall()
         )
         municipalities = dict(
             conn.execute(
-                "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'es.municipio'"
+                """select c.code, a.id from area a join area_code c on c.area_id = a.id
+                   where a.scheme_code = 'es.municipio' and c.valid @> date '2025-01-01'"""
             ).fetchall()
         )
         unit_rows = {}
@@ -456,6 +769,7 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type=kind)
+            question(key, contest)
             name(contest, english)
             name(contest, native, "es", "native")
             cs.add("slug", path=f"{path}/{slug(english)}", entity_id=contest)
@@ -476,7 +790,15 @@ def emit() -> Path:
             national = rows.filter(pl.col("unit") == "ES")
             if national.height and (national["yes"][0], national["no"][0]) != (yes, no):
                 raise ValueError(f"{day}: the national row differs from the sum of the provinces")
-            winner = "yes" if yes > no else "no"
+            gazettes, proclaimed, declared = PROCLAMATIONS[day]
+            sums = tuple(int(units_rows[column].sum()) for column in ("registered", "yes", "no", "blank", "null"))
+            if proclaimed is not None and sums != proclaimed:
+                raise ValueError(f"{day}: the provinces add up to {sums}, not the {proclaimed} the BOE prints")
+            # Every national referendum carried, as its declaration or the law it ratified records.
+            if yes <= no:
+                raise ValueError(f"{day}: Yes carried, as the BOE records, but does not lead the count")
+            winner = "yes"
+            proclamations = [gazette(title, url)[0] for title, url in gazettes]
             sets = {f"{key}:provinces": (rows, True, "province")}
             day_mesas = mesas.filter(pl.col("day") == day)
             if day_mesas.height:
@@ -508,8 +830,10 @@ def emit() -> Path:
                 ).height
                 if over:
                     note += f" In {over} units the ballots cast exceed the registered voters, as the file prints them."
-                cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
+                cs.add("note", entity_id=result_set, kind="methodology", body_md=f"{note} {declared}")
                 cs.add("note", entity_id=result_set, kind="context", body_md=about)
+                for proclamation in proclamations:
+                    cs.add("citation", entity_id=result_set, source_id=proclamation, locator={"page": 1})
                 for answer, option in options.items():
                     cs.add(
                         "outcome",
@@ -581,7 +905,7 @@ def emit() -> Path:
             license_url=None,
             attribution="Fuente: Gobierno Vasco, euskadi.eus.",
         )
-        cs.artifact(raw.cached(SOURCE, ARE, ARE_BODY), are)
+        cs.artifact(pin(raw.cached(SOURCE, ARE, ARE_BODY)), are)
         statute_system = cs.key("es.electoral_system", "statute-referendum")
         cs.add("electoral_system", id=statute_system, polity_id=spain, rules={"formula": "referendum"}, rules_version=1)
         name(statute_system, "Spanish statute of autonomy referendum")
@@ -613,26 +937,14 @@ def emit() -> Path:
             native_title,
             english,
             native,
-            gazette,
-            gazette_url,
+            declaration,
+            declaration_url,
             about,
             carried,
             _rows,
         ) in STATUTES.items():
             key = f"{day}:referendum:{statute}"
-            boe = cs.source(BOE, gazette)
-            cs.add(
-                "source",
-                id=boe,
-                kind="official_body",
-                publisher=BOE,
-                title=gazette,
-                url=gazette_url,
-                license="Public record: official gazette, free to reuse",
-                license_url=BOE_LICENSE,
-                attribution="Fuente: Boletín Oficial del Estado.",
-            )
-            cs.artifact(raw.cached(SOURCE, gazette_url), boe)
+            boe, _ = gazette(declaration, declaration_url)
             election = cs.key("es.election", key)
             cs.add(
                 "election", id=election, polity_id=spain, kind="referendum", date_from=day, date_to=day, status="held"
@@ -652,6 +964,7 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
+            question(key, contest)
             name(contest, english)
             name(contest, native, "es", "native")
             cs.add("slug", path=f"{path}/{slug(english)}", entity_id=contest)
@@ -752,14 +1065,6 @@ def emit() -> Path:
                         values.append(
                             (str(result_set), str(unit), None if option is None else str(option), measure, value, 0)
                         )
-        staged = {(str(row["entity_id"]), row["body_md"]) for row in cs.rows["note"]}
-        for note, entity, body in conn.execute(
-            """select n.id, n.entity_id, n.body_md from note n
-               join changeset w on w.id = n.changeset_id and w.pipeline = %s""",
-            [SOURCE],
-        ).fetchall():
-            if (str(entity), body) not in staged:
-                cs.add("note_drop", note_id=note, entity_id=entity, body_md=body, reason="the note was rewritten")
         minted = [row for row in unit_rows.values() if row[0] in cs.minted]
         if minted:
             cs.frame(
