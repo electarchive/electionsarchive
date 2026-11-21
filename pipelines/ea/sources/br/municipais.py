@@ -15,7 +15,7 @@ from ea.changeset import NAMESPACE, Changeset
 from ea.sources.br.identity import namesakes
 from ea.sources.br.tse import UFS, proper
 from ea.sources.br.tse_history import ELECTED, WITHDRAWN, party_key
-from ea.store import DATA, connect
+from ea.store import DATA, Connection, connect
 
 SOURCE = "br.municipais"
 VERSION = "1"
@@ -90,6 +90,10 @@ COUNCIL_2024 = (
 SHORT = (
     "The electoral court's candidate totals here fall {short} votes short of its count of valid nominal votes for "
     "this contest."
+)
+SHELL = (
+    "The electoral court's {year} municipal files list no candidates for this municipality, so the election has no "
+    "contests or results."
 )
 SECTIONED = (
     "The electoral court's municipal results files leave this contest out, so its votes are summed from the court's "
@@ -581,8 +585,61 @@ def person_keys() -> pl.DataFrame:
     return pl.concat(frames)
 
 
+def shells(conn: Connection, year: int, listed: list[UUID]) -> list[tuple[UUID, str]]:
+    """The pipeline's own live elections of `year`, other than `listed`, that nothing hangs on: no contest, result
+    set, alliance, crown, finance summary, government, party relation, citation, merge, or other election."""
+    return [
+        (UUID(str(id)), str(key))
+        for id, key in conn.execute(
+            """
+            select e.id, x.value from external_id x
+            join election e on e.id = x.entity_id
+            join changeset w on w.id = e.changeset_id and w.pipeline = %s
+            join entity t on t.id = e.id and t.retired_by is null
+            where x.scheme = %s and x.value like %s and e.id <> all(%s::uuid[])
+              and not exists (select from contest k where k.election_id = e.id)
+              and not exists (select from result_set r where r.election_id = e.id)
+              and not exists (select from alliance a where a.election_id = e.id)
+              and not exists (select from election c where e.id in (c.parent_id, c.rerun_of_id) and c.id <> e.id)
+              and not exists (select from election_crown c where e.id in (c.election_id, c.parent_id))
+              and not exists (select from finance_summary f where f.election_id = e.id)
+              and not exists (select from government g where g.election_id = e.id)
+              and not exists (select from party_relation p where p.election_id = e.id)
+              and not exists (select from citation c where c.entity_id = e.id)
+              and not exists (select from entity_merge m where e.id in (m.entity_id, m.into_id))
+            order by e.id
+            """,
+            [SOURCE, f"{SOURCE}.election", f"{year}:%", [str(id) for id in listed]],
+        ).fetchall()
+    ]
+
+
+def retire_shells(year: int) -> Path:
+    """Stage only the retirement of the year's empty elections, for a run that holds none of the court's files
+    (`BR_SHELLS=1`). The full emit spares the elections the files list; every election the files list has its
+    contests once emitted, so on an emitted year this finds the same elections."""
+    with connect() as conn:
+        found = shells(conn, year, [])
+        if not found:
+            raise SystemExit(f"br.municipais holds no empty {year} election")
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary=f"Retire Brazil's {year} municipal elections that the electoral court's files no longer list",
+            polity="BR",
+            kind="correction",
+        )
+        for id, key in found:
+            print(f"retires {key} ({id})")
+            cs.add("entity_retirement", entity_id=id, reason=SHELL.format(year=year))
+        return cs.write()
+
+
 def emit() -> Path:
     year = int(os.environ["BR_YEAR"])
+    if os.environ.get("BR_SHELLS"):
+        return retire_shells(year)
     folder = PARSED / str(year)
     candidates = pl.read_parquet(folder / "candidates.parquet")
     votes = pl.read_parquet(folder / "votes.parquet")
@@ -764,6 +821,8 @@ def emit() -> Path:
                 f"{year} {proper(labels[code])} municipal election" + (", second round" if round == "2" else ""),
                 "en",
             )
+        for shell, _ in shells(conn, year, list(elections.values())):
+            cs.add("entity_retirement", entity_id=shell, reason=SHELL.format(year=year))
 
         units: dict[str, str] = {}
         rows: list[dict[str, object]] = []
